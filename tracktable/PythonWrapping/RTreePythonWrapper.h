@@ -1,0 +1,123 @@
+/*
+ * Copyright (c) 2015, Sandia Corporation.  All rights
+ * reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#ifndef __tracktable_python_rtree_wrapper_h
+#define __tracktable_python_rtree_wrapper_h
+
+#include <boost/python.hpp>
+#include <boost/python/object.hpp>
+#include <boost/python/list.hpp>
+#include <boost/python/stl_iterator.hpp>
+
+#include <tracktable/Analysis/RTree.h>
+#include <tracktable/Domain/FeatureVectors.h>
+
+template<typename PointT>
+class RTreePythonWrapper
+{
+public:
+  typedef PointT point_type;
+  typedef std::pair<point_type, int> indexed_point_type;
+  typedef tracktable::RTree<indexed_point_type> rtree_type;
+
+  RTreePythonWrapper() { }
+  ~RTreePythonWrapper() { }
+
+  void set_points(boost::python::object const& points)
+    {
+      boost::python::stl_input_iterator<point_type> point_begin(points), point_end;
+      std::vector<indexed_point_type> indexed_points;
+      int point_id = 0;
+      for (; point_begin != point_end; ++point_begin, ++point_id)
+        {
+        point_type next_point(*point_begin);
+        indexed_points.push_back(indexed_point_type(*point_begin, point_id));
+        }
+      this->Points = points;
+      this->Tree = rtree_type(indexed_points.begin(), indexed_points.end());
+    }
+
+  boost::python::object points() const
+    {
+      return this->Points;
+    }
+
+  // ----------------------------------------------------------------------
+
+  boost::python::object find_points_in_box(boost::python::object const& min_corner,
+                                           boost::python::object const& max_corner)
+    {
+      std::vector<indexed_point_type> points_in_box;
+      point_type _min_corner((boost::python::extract<point_type>(min_corner)));
+      point_type _max_corner((boost::python::extract<point_type>(max_corner)));
+
+      this->Tree.find_points_inside_box(
+        _min_corner, _max_corner,
+        std::back_inserter(points_in_box)
+        );
+
+      boost::python::list point_indices;
+      for (typename std::vector<indexed_point_type>::const_iterator iter = points_in_box.begin();
+           iter != points_in_box.end();
+           ++iter)
+        {
+        point_indices.append(iter->second);
+        }
+
+      return point_indices;
+    }
+
+  // ----------------------------------------------------------------------
+
+  boost::python::object find_nearest_neighbors(boost::python::object const& search_point,
+                                               std::size_t num_neighbors)
+    {
+      // The double parens here are present to ward off the "vexing
+      // parse" problem.
+      point_type query_location((boost::python::extract<point_type>(search_point)));
+      indexed_point_type query_point(query_location, -1);
+      std::vector<indexed_point_type> neighbors;
+
+      this->Tree.find_nearest_neighbors(query_point, num_neighbors, std::back_inserter(neighbors));
+      boost::python::list result;
+      for (typename std::vector<indexed_point_type>::const_iterator neighbor_iter = neighbors.begin();
+           neighbor_iter != neighbors.end();
+           ++neighbor_iter)
+        {
+        result.append(neighbor_iter->second);
+        }
+      return result;
+    }
+
+private:
+  rtree_type Tree;
+  boost::python::object Points;
+};
+
+
+#endif

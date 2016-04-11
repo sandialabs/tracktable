@@ -1,0 +1,318 @@
+# Copyright (c) 2015, Sandia Corporation.
+# All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+# notice, this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+
+# Response file for parallel_movie_from_csv.py
+#
+#
+# ------------------------------------
+#
+# Render a movie of traffic found in a delimited text file
+#
+#
+# ------------------------------------
+#
+# SECTION: positional arguments
+#
+#
+# Positional Argument: Delimited text file containing point data
+data/SampleTrajectories.tsv
+#
+# Positional Argument: Filename for trajectory movie
+sample_movie.mp4
+#
+#
+# ------------------------------------
+#
+# SECTION: optional arguments
+#
+#
+# --resolution: Resolution of movie frames.  Defaults to 800 600.
+# --resolution
+#
+# --dpi: DPI of movie frames.
+# --dpi 72
+#
+# --trail-duration: How long should each object's trail last? (seconds)
+--trail-duration 1800
+#
+# ------------------------------------
+#
+# SECTION: Delimited Text Point Reader
+#
+# Parameters for parsing points from delimited text files
+#
+#
+# --latitude-column: Column in input file containing the latitude for
+#                    each point
+# --latitude-column 3
+#
+# --longitude-column: Column in input file containing the longitude for
+#                     each point
+# --longitude-column 2
+#
+# --speed-column: Column in input file containing the speed at each
+#                 point
+# --speed-column
+#
+# --object-id-column: Column in input files containing the ID associated
+#                     with each moving object
+# --object-id-column 0
+#
+# --altitude-column: Column in input file containing the altitude at
+#                    each point
+# --altitude-column
+#
+# --delimiter: Character that separates fields in the input file.  Use
+#              any single character.  The string "tab" will be
+#              interpreted as the tab character.
+# --delimiter tab
+#
+# --heading-column: Column in input file containing the heading at each
+#                   point
+# --heading-column
+#
+# --timestamp-column: Column in input file containing the timestamp for
+#                     each point
+# --timestamp-column 1
+#
+# --comment-character: Character that indicates comment lines in the
+#                      input file.  Lines where this is the first non-
+#                      whitespace character will be ignored.
+# --comment-character #
+#
+# ------------------------------------
+#
+# SECTION: Trajectory Builder Arguments
+#
+# Set the parameters that govern how we assemble sequences of time-stamped
+# points into continuous trajectories.
+#
+#
+# --separation-distance: Start a new trajectory after a gap of this far
+#                        between points (measured in KM)
+# --separation-distance 100
+#
+# --separation-time: Start a new trajectory after a gap of at least this
+#                    long between points (measured in minutes)
+# --separation-time 20
+#
+# --minimum-length: Only return trajectories that contain at least this
+#                   many points
+# --minimum-length 10
+#
+# ------------------------------------
+#
+# SECTION: Trajectory Appearance
+#
+# Parameters for trajectory color, linewidth and decoration
+#
+#
+# --trajectory-head-color: Color name for trajectory color.  You can
+#                          also specify 'body' to use the same color as
+#                          the first segment of the trajectory.
+# --trajectory-head-color white
+#
+# --trajectory-linewidth: Trajectory linewidth in points.  You can also
+#                         specify 'taper', in which case trajectory
+#                         linewidth will start at the value of
+#                         '--trajectory-initial-linewidth' and end at
+#                         '--trajectory-final-linewidth'.
+--trajectory-linewidth taper
+#
+# --trajectory-initial-linewidth: Initial trajectory linewidth in
+#                                 points.  Requires '--trajectory-
+#                                 linewidth taper'.
+--trajectory-initial-linewidth 2
+#
+# --trajectory-final-linewidth: Final trajectory linewidth in points.
+#                               Requires '--trajectory-linewidth taper'.
+# --trajectory-final-linewidth 0.01
+#
+# --decorate-trajectory-head: If set, draw a dot at the head of each
+#                             trajectory
+# --decorate-trajectory-head
+#
+# --trajectory-head-dot-size: Size (in points) of dot to render at the
+#                             head of each trajectory.  Requires
+#                             --decorate-trajectory-head.
+# --trajectory-head-dot-size 2
+#
+# --trajectory-zorder: Z-order (layer) for rendered trajectories
+# --trajectory-zorder 10
+#
+# --trajectory-color: Trajectory color.  This must be the name of a
+#                     color or a hex string if --trajectory-color-type
+#                     is 'constant' and the name of a function (options
+#                     are ['progress', 'climb_rate']) if --trajectory-
+#                     color-type is 'scalar'.
+# --trajectory-color progress
+#
+# --trajectory-color-type: Whether to use a function or a constant to
+#                          color trajectories
+#   Must be one of ['scalar', 'constant']
+# --trajectory-color-type scalar
+#
+# --trajectory-colormap: Colormap to use to color trajectories.  Use one
+#                        of the Matplotlib standard colormaps or one of
+#                        Tracktable's color maps from
+#                        tracktable.render.colormaps.
+# --trajectory-colormap gist_heat
+#
+# ------------------------------------
+#
+# SECTION: Create and annotate a geographic map
+#
+# Here you can set all of the options for creating and annotating your
+# map.  These include asking for a predefined map of a region of the
+# world, a map around an airport, a map of the whole world, whether or not
+# to draw continents, country borders, state/province borders (in the US
+# and Canada), cities and longitude/latitude lines.  The ability to
+# specify a fully arbitrary map will come eventually.
+#
+#
+# --lonlat-spacing: Spacing (in degrees) between longitude/latitude
+#                   lines
+# --lonlat-spacing 10
+#
+# --omit-lonlat: Do not draw longitude/latitude lines (drawn by default)
+# --omit-lonlat
+#
+# --country-linewidth: Linewidth (in points) for country borders
+# --country-linewidth 0.5
+#
+# --coastline-zorder: Layer (z-order) for coastlines - higher layers are
+#                     on top
+# --coastline-zorder 3
+#
+# --draw-largest-cities: Draw the N largest cities (by population) on
+#                        the map
+# --draw-largest-cities
+#
+# --country-color: Color for country borders (either color name or hex
+#                  string)
+# --country-color #606060
+#
+# --city-label-color: Color (name or hex string) for city labels on map
+# --city-label-color white
+#
+# --city-dot-color: Color (name or hex string) for cities on map
+# --city-dot-color white
+#
+# --omit-states: Do not draw US/Canada state borders on the map (drawn
+#                by default)
+# --omit-states
+#
+# --coastline-color: Color for coastlines (either color name or hex
+#                    string)
+# --coastline-color #808080
+#
+# --state-color: Color for state borders (either color name or hex
+#                string
+# --state-color #404040
+#
+# --omit-coastlines: Do not draw coastlines on the map (drawn by
+#                    default)
+# --omit-coastlines
+#
+# --draw-cities-larger-than: Draw all cities in the visible part of the
+#                            map with population larger than N.
+# --draw-cities-larger-than
+#
+# --state-zorder: Layer (z-order) for state borders - higher layers are
+#                 on top
+# --state-zorder 1
+#
+# --state-linewidth: Line width (in points) for state borders
+# --state-linewidth 0.3
+#
+# --omit-countries: Do not draw country borders on the map (drawn by
+#                   default)
+# --omit-countries
+#
+# --coastline-linewidth: Width (in points) for coastlines
+# --coastline-linewidth 1
+#
+# --country-zorder: Layer (z-order) for coastlines - higher layers are
+#                   on top
+# --country-zorder 2
+#
+# --map: Which map do you want to use?  This must be one of ['europe',
+#        'australia', 'south_america', 'conus', 'world',
+#        'north_america'] or else a string of the form 'airport:XXX'
+#        where XXX is the 3- or 4-letter abbreviation for that airport.
+# --map world
+#
+# --city-dot-size: Size for dots representing cities (in points)
+# --city-dot-size 2
+#
+# --city-label-size: Size for city names (in points)
+# --city-label-size 12
+#
+# ------------------------------------
+#
+# SECTION: Movie Parameters
+#
+# Movie-specific parameters such as frame rate, encoder options, title and
+# metadata
+#
+#
+# --encoder: Which encoder to use.  NOTE: All options may not be
+#            available on all systems.
+#   Must be one of ['ffmpeg', 'mencoder', 'avconv', 'imagemagick']
+--encoder ffmpeg
+#
+# --start-time: Start time for the movie in 'YYYY-MM-DD HH:MM:SS+XX'
+#               format (defaults to start time of data)
+# --start-time
+#
+# --encoder-args: Extra args to pass to the encoder (pass in as a single
+#                 string)
+--encoder-args "-c:v mpeg4 -q 3"
+#
+# --end-time: End time for the movie in 'YYYY-MM-DD HH:MM:SS+XX' format
+#             (defaults to end time of data)
+# --end-time
+#
+# --duration: How many seconds long the movie should be
+--duration 10
+#
+# --fps: Movie frame rate in frames/second
+--fps 15
+#
+# ------------------------------------
+#
+# SECTION: Multiprocess Parallelism
+#
+# Set the number of processes and (eventually) maximum memory that you
+# want to use when running jobs in parallel.
+#
+#
+# --processors: How many processes to spawn.  The default value (0)
+#               means 'one process for each detected core on the
+#               system'.
+--processors 2
