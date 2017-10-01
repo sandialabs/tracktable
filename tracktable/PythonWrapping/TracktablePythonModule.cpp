@@ -1,6 +1,8 @@
 /*
- * Copyright (c) 2014, Sandia Corporation.  All rights
- * reserved.
+ * Copyright (c) 2014-2017 National Technology and Engineering
+ * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
+ * with National Technology and Engineering Solutions of Sandia, LLC,
+ * the U.S. Government retains certain rights in this software.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,7 +34,6 @@
 // Boost.Python code to wrap Tracktable C++ code into a Python module
 //
 // Created by Danny Rintoul and Andy Wilson.
-// Copyright (c) 2013 Sandia Corporation.  All rights reserved.
 
 #include <tracktable/PythonWrapping/DateTimeWrapper.h>
 #include <tracktable/PythonWrapping/PropertyMapWrapper.h>

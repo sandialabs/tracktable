@@ -1,10 +1,16 @@
+/*
+ * Copyright (c) 2014-2017 National Technology and Engineering
+ * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
+ * with National Technology and Engineering Solutions of Sandia, LLC,
+ * the U.S. Government retains certain rights in this software.
+ */
+
 //
 //   SinglePortal
 //   
 // First example of covering flights with single portals
 //
 // Created by Danny Rintoul
-// Copyright (c) 2014 Sandia Corporation.  All rights reserved.
 //
 
 #include "SinglePortal.h"

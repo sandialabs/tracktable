@@ -1,9 +1,7 @@
-# This is tracktable/Python/CMakeLists.txt
-#
-# This file has the sole purpose of forwarding CMake to Python/tracktable.
-
-# Copyright (c) 2014, Sandia Corporation.  All rights
-# reserved.
+# Copyright (c) 2014-2017 National Technology and Engineering
+# Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
+# with National Technology and Engineering Solutions of Sandia, LLC,
+# the U.S. Government retains certain rights in this software.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -27,5 +25,9 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# This is tracktable/Python/CMakeLists.txt
+#
+# This file has the sole purpose of forwarding CMake to Python/tracktable.
 
 add_subdirectory(tracktable)
