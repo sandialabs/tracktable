@@ -34,7 +34,6 @@
 // Boost.Python code for a trivial Hello World module
 //
 // Created by Danny Rintoul and Andy Wilson.
-// Copyright (c) 2013 Sandia Corporation.  All rights reserved.
 
 #include <boost/python.hpp>
 

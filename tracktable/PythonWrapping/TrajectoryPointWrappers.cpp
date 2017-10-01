@@ -34,7 +34,6 @@
 // Python wrapping for point types
 //
 // Created by Danny Rintoul and Andy Wilson.
-// Copyright (c) 2013 Sandia Corporation.  All rights reserved.
 
 #include <boost/python.hpp>
 #include <boost/python/module.hpp>

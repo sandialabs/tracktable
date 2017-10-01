@@ -34,7 +34,6 @@
 // Python wrapping for trajectory types
 //
 // Created by Danny Rintoul and Andy Wilson.
-// Copyright (c) 2014 Sandia Corporation.  All rights reserved.
 
 #include <boost/python.hpp>
 #include <boost/python/class.hpp>

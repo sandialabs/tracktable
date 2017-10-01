@@ -34,7 +34,6 @@
 // Python wrapping for trajectory types
 //
 // Created by Danny Rintoul and Andy Wilson.
-// Copyright (c) 2013 Sandia Corporation.  All rights reserved.
 
 #ifndef __tracktable_TrajectoryWrappers_h
 #define __tracktable_TrajectoryWrappers_h
