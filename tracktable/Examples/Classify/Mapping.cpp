@@ -1,11 +1,14 @@
-//
-//   Mapping
-//   
-// A simple example how one can find mapping flights
-//
-// Created by Danny Rintoul
-// Copyright (c) 2014 Sandia Corporation.  All rights reserved.
-//
+/*
+ * Copyright (c) 2014-2017 National Technology and Engineering
+ * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
+ * with National Technology and Engineering Solutions of Sandia, LLC,
+ * the U.S. Government retains certain rights in this software.
+ *
+ * Mapping: A simple example for finding mapping flights with lots of
+ * back-and-forth motion.
+ *
+ * Created by Danny Rintoul.
+ */
 
 #include "Mapping.h"
 #include <algorithm>
