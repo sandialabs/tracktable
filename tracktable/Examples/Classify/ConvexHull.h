@@ -11,8 +11,8 @@
 // This routine calculates the convex hull of a set of lat-lon points
 //
 // Created by Danny Rintoul.
-// Copyright 2013 Sandia Corporation.  All rights reserved. 
 //
+
 #ifndef __get_convex_hull
 #define __get_convex_hull
 

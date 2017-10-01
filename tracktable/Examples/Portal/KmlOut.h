@@ -9,7 +9,6 @@
 // KmlOut.h
 //
 // Created by Danny Rintoul.
-// Copyright (c) 2013 Sandia Corporation.  All rights reserved.
 
 #ifndef __KmlOut
 #define __KmlOut
