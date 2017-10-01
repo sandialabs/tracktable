@@ -1,10 +1,16 @@
+/*
+ * Copyright (c) 2014-2017 National Technology and Engineering
+ * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
+ * with National Technology and Engineering Solutions of Sandia, LLC,
+ * the U.S. Government retains certain rights in this software.
+ */
+
 // 
 // ConvexHull
 //
 // This routine calculates the convex hull of a set of lat-lon points
 //
 // Created by Danny Rintoul.
-// Copyright 2013 Sandia Corporation.  All rights reserved. 
 //
 #ifndef __get_convex_hull
 #define __get_convex_hull
