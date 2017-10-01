@@ -9,10 +9,10 @@ Tracktable
 Tracktable is written by Andy Wilson and Danny Rintoul at Sandia
 National Laboratories in Albuquerque, New Mexico.
 
-Sandia Corporation is a multi-program laboratory managed and
-operated by Sandia Corporation, a Lockheed Martin Corporation, for the
-U.S. Department of Energy's National Nuclear Security Administration
-under contract DE-AC04-94AL85000.
+Sandia Corporation is a multi-program laboratory managed and operated
+by National Technology and Engineering Solutions of Sandia, LLC, for
+the U.S. Department of Energy's National Nuclear Security
+Administration under contract DE-NA0003525.
 
 
 Third-Party Software
