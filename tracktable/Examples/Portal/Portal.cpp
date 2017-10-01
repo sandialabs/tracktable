@@ -12,8 +12,8 @@
 //
 //
 // Created by Danny Rintoul
-// Copyright (c) 2014 Sandia Corporation.  All rights reserved.
 // 
+
 #include <algorithm>
 #include <iterator>
 #include <boost/bind.hpp>

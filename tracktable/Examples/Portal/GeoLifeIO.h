@@ -13,7 +13,7 @@
 // puts everything in one vector.
 //
 // Created by Danny Rintoul.
-// Copyright (c) 2013 Sandia Corporation.  All rights reserved.
+
 
 #ifndef __GeoLifeIO
 #define __GeoLifeIO
