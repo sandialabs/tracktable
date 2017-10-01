@@ -37,7 +37,6 @@
 // Boost.Python BOOST_PYTHON_MODULE.  We do this inside TrailMixPythonModule.cpp.
 //
 // Created by Danny Rintoul and Andy Wilson.
-// Copyright (c) 2013 Sandia Corporation.  All rights reserved.
 
 #ifndef __DateTimeWrapper_h
 #define __DateTimeWrapper_h

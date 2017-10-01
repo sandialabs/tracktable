@@ -35,7 +35,6 @@
 // double/timestamp/string to Python.
 //
 // Created by Danny Rintoul and Andy Wilson.
-// Copyright (c) 2014 Sandia Corporation.  All rights reserved.
 
 #ifndef __tracktable_CommonMapWrappers_h
 #define __tracktable_CommonMapWrappers_h

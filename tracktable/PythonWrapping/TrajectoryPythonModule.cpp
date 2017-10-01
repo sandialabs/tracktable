@@ -34,7 +34,6 @@
 // Boost.Python code to wrap Tracktable C++ code into a Python module
 //
 // Created by Danny Rintoul and Andy Wilson.
-// Copyright (c) 2013 Sandia Corporation.  All rights reserved.
 
 #include <tracktable/PythonWrapping/TrajectoryWrappers.h>
 

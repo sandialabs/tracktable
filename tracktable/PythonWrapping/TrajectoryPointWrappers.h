@@ -34,7 +34,6 @@
 // Python wrapping for point types used in trajectories
 //
 // Created by Danny Rintoul and Andy Wilson.
-// Copyright (c) 2013 Sandia Corporation.  All rights reserved.
 
 #ifndef __tracktable_TrajectoryPointWrappers_h
 #define __tracktable_TrajectoryPointWrappers_h
