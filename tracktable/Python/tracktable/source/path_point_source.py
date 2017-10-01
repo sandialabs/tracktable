@@ -1,5 +1,8 @@
-# Copyright (c) 2014, Sandia Corporation.
-# All rights reserved.
+#
+# Copyright (c) 2014-2017 National Technology and Engineering
+# Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
+# with National Technology and Engineering Solutions of Sandia, LLC,
+# the U.S. Government retains certain rights in this software.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -26,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 """
-trailmix.source.path_point_source - Generate points along a path
+tracktable.source.path_point_source - Generate points along a path
 """
 
 from __future__ import division, print_function, absolute_import
