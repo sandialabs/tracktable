@@ -1,8 +1,15 @@
+/*
+ * Copyright (c) 2013-2017 National Technology and Engineering
+ * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
+ * with National Technology and Engineering Solutions of Sandia, LLC,
+ * the U.S. Government retains certain rights in this software.
+ */
+
 // 
 // Predict
 //
 // Created by Danny Rintoul.
-// Copyright (c) 2013 Sandia Corporation.  All rights reserved.
+
 
 #ifndef __Predict_h
 #define __Predict_h
