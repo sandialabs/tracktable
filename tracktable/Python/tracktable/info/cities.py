@@ -1,5 +1,8 @@
-# Copyright (c) 2015, Sandia Corporation.
-# All rights reserved.
+#
+# Copyright (c) 2014-2017 National Technology and Engineering
+# Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
+# with National Technology and Engineering Solutions of Sandia, LLC,
+# the U.S. Government retains certain rights in this software.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -34,7 +37,7 @@ cities.py - Locations and population values for many cities of the world
 #
 # This code is derived from a list of cities provided by MaxMind at
 # http://www.maxmind.com/en/worldcities.  Here is the license under
-# which we use the data:
+# which we use and redistribute the data:
 #
 # OPEN DATA LICENSE for MaxMind WorldCities and Postal Code Databases
 #
