@@ -5,12 +5,6 @@
  * the U.S. Government retains certain rights in this software.
  */
 
-//
-// KmlOut.h
-//
-// Created by Danny Rintoul.
-
-
 #ifndef __KmlOut
 #define __KmlOut
 #include <iostream>
