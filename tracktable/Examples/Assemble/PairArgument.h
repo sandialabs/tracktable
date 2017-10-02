@@ -38,9 +38,7 @@
 #ifndef __tracktable_examples_PairArgument_h
 #define __tracktable_examples_PairArgument_h
 
-#include <tracktable/Core/TracktableCommon.h>
 #include <boost/program_options.hpp>
-#include <vector>
 
 namespace bpo = boost::program_options;
 
@@ -57,8 +55,8 @@ public:
 
   multiple_tokens_typed_value(T *t, unsigned min_count, unsigned max_count)
     : base_type(t)
-    , MinTokenCount(min_count)
-    , MaxTokenCount(max_count)
+    ,MinTokenCount(min_count)
+    ,MaxTokenCount(max_count)
     {
       this->base_type::multitoken();
     }
