@@ -21,7 +21,6 @@
 #include "DistanceFeatures.h"
 #include "Predict.h"
 #include "KmlOut.h"
-#include "Mem.h"
 #include "BuildTrajectories.h"
 #include "ParseCommandLine.h"
 #include <tracktable/Analysis/DBSCAN.h>
@@ -38,20 +37,6 @@ bool HasConsistentDestination(trajectory_type &trajectory);
 
 int main(int argc, char *argv[])
 {
-
-/*
-  ProgramOptions opts;
-  opts.addOption<std::string>("input_file,i","input file","air-jul10-N.tsv");
-  opts.addOption<std::string>("output-kml,o","output file","output.kml");
-  opts.addOption<std::string>("sep_char,s","separation character","\t,");
-
-  opts.addOption<unsigned int>("num_samp,n","number of samples",10U);
-  opts.parseOptions(argc,argv);
-  std::string data_file = opts.getValue<std::string>("input_file");
-  std::string output_file = opts.getValue<std::string>("output-kml");
-  std::string sep_char = opts.getValue<std::string>("sep_char");
-  unsigned int num_samples = opts.getValue<unsigned int>("num_samp");
-*/
   srand(time(0));
   CommandLineOptions options = ParseCommandLine(argc, argv);
 
@@ -59,10 +44,6 @@ int main(int argc, char *argv[])
   BuildTrajectories<trajectory_type>(options,trajectories);
   std::size_t num_samples = options.NumSamples;
 
-/*  Trajectories trajectories;
-
-  readAirDataFile(data_file,sep_char,trajectories);
-  CleanTrajectories(trajectories); */
   std::cout << "trajectories.size() = " << trajectories.size() << std::endl;
 
   // Remove "tail number" flights

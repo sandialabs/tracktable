@@ -32,7 +32,6 @@
 #include "KmlOut.h"
 #include "ConvexHull.h"
 #include "my_rtree.h"
-#include "Mem.h"
 #include <numeric>
 #include <boost/bind.hpp>
 
@@ -54,12 +53,10 @@ void LLPredict(Trajectories &trajectories, std::vector<my_data> &features,
   }
 
   std::cout << "Made data vector" << std::endl;
-  print_mem_usage();
   // Insert the values into the rtree;
 
   rtree.insert(data.begin(),data.end());
   std::cout << "Inserted into rtree" << std::endl;
-  print_mem_usage();
 
   // Okay.  Here is where the work is done.  Go through each flight and 
   // find all of its neighbors to predict where it will land.
