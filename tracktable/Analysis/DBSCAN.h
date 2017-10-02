@@ -45,6 +45,8 @@
 // #undef.
 #undef TIME_CLUSTERING_STEPS
 
+#include <tracktable/Core/TracktableCommon.h>
+
 #include <list>
 #include <utility>
 #include <vector>
