@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017 National Technology and Engineering
+ * Copyright (c) 2014-2017 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -54,9 +54,9 @@ public:
   // (boost/program_options/value_semantic.hpp).
 
   multiple_tokens_typed_value(T *t, unsigned min_count, unsigned max_count)
-    : base_type(t), MinTokenCount(min_count)
-    , MaxTokenCount(max_count)
-//    , base_type(t)
+    : base_type(t)
+    ,MinTokenCount(min_count)
+    ,MaxTokenCount(max_count)
     {
       this->base_type::multitoken();
     }

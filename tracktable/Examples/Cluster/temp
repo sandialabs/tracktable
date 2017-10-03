@@ -1,3 +1,0 @@
-  trajectories.erase(std::remove_if(trajectories.begin(),trajectories.end(),
-   boost::bind(&tracktable::end_to_end_distance<trajectory_type>,_1) < 500.0),
-   trajectories.end());
