@@ -56,7 +56,6 @@ add_executable( predict
   Interpolate.cpp
   Predict.cpp
   LLPredict.cpp
-  Mem.cpp
   DistanceFeatures.cpp
   ParseCommandLine.cpp
   )

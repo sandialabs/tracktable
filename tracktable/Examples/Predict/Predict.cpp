@@ -31,12 +31,16 @@
 #include "Predict.h"
 #include "KmlOut.h"
 #include "my_rtree.h"
-#include "Mem.h"
+
 #include <numeric>
 #include <boost/bind.hpp>
 
-void Predict(Trajectories &trajectories, std::vector<my_data> &features, 
- std::vector<my_data> &to_be_predicted, unsigned int sample_size)
+void Predict(
+             Trajectories &trajectories,
+             std::vector<my_data> &features, 
+             std::vector<my_data> &to_be_predicted,
+             unsigned int sample_size
+             )
 {
   // Use the rtree from "my_rtree.h", and the value typedef.  The value
   // typedef basically contains the features, a value reserved (not used) for
@@ -53,12 +57,10 @@ void Predict(Trajectories &trajectories, std::vector<my_data> &features,
   }
 
   std::cout << "Made data vector" << std::endl;
-  print_mem_usage();
   // Insert the values into the rtree;
 
   rtree.insert(data.begin(),data.end());
   std::cout << "Inserted into rtree" << std::endl;
-  print_mem_usage();
 
   // Define the the number of trajectories that will be used to predict
   // the destination.  The bins vector will be used to hold the result of 
