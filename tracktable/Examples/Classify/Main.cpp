@@ -42,6 +42,12 @@
 #include "Mapping.h"
 #include "ConvexHull.h"
 
+template<typename trajectory_t>
+float absolute_curvature(trajectory_t const& trajectory)
+{
+  return fabs(TotalCurvature(trajectory));
+}
+
 int main(int argc, char* argv[])
 {
 
@@ -55,13 +61,28 @@ int main(int argc, char* argv[])
   AssignTrajectoriesHeadings(trajectories);
 
   // Example: get rid of short (< 50km) trajectories
-  trajectories.erase(std::remove_if(trajectories.begin(),trajectories.end(),
-   boost::bind(&tracktable::length<trajectory_type>,_1) < 50.0),
+  trajectories.erase(
+   std::remove_if(trajectories.begin(), trajectories.end(),
+                  boost::bind(&tracktable::length<trajectory_type>,_1) < 50.0),
    trajectories.end());
 
-  trajectories.erase(std::remove_if(trajectories.begin(),trajectories.end(),
-   boost::bind(fabs,(boost::bind(TotalCurvature,_1))) < 3600),trajectories.end());
-/*
+  // trajectories.erase(
+  //     std::remove_if(
+  //         trajectories.begin(),
+  //         trajectories.end(),
+  //         boost::bind(fabs,
+  //                     (boost::bind(TotalCurvature,_1))) < 3600),
+  //     trajectories.end());
+
+
+  trajectories.erase(
+                     std::remove_if(
+                                    trajectories.begin(),
+                                    trajectories.end(),
+                                    (boost::bind(absolute_curvature<trajectory_type>, _1) < 3600)),
+                     trajectories.end());
+  
+  /*
   trajectories.erase(std::remove_if(trajectories.begin(),trajectories.end(),
    boost::bind(std::divides<double>(),
    boost::bind(&GetHullArea,_1),
