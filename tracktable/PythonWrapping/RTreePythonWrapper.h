@@ -36,6 +36,9 @@
 #include <boost/python/list.hpp>
 #include <boost/python/stl_iterator.hpp>
 
+// possible hotfix for compile errors in 1.65.0 and 1.65.1
+#include <boost/geometry/strategies/strategies.hpp>
+
 #include <tracktable/Analysis/RTree.h>
 #include <tracktable/Domain/FeatureVectors.h>
 
