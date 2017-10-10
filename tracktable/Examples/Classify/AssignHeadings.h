@@ -35,6 +35,6 @@
 
 void AssignTrajectoriesHeadings(std::vector<trajectory_type> &trajectories);
 void AssignTrajectoryHeadings(trajectory_type &trajectory);
-double TotalCurvature(trajectory_type &trajectory);
+double TotalCurvature(trajectory_type const& trajectory);
 
 #endif

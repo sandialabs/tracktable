@@ -56,7 +56,7 @@ void AssignTrajectoryHeadings(trajectory_type &trajectory)
   return;
 }
 
-double TotalCurvature(trajectory_type &trajectory)
+double TotalCurvature(trajectory_type const& trajectory)
 {
   if (trajectory.size() < 3)
     return 0.0;
