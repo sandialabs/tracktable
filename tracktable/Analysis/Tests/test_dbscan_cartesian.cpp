@@ -37,9 +37,6 @@
  * tracktable::domain::terrestrial and tracktable::domain::cartesian2d
  * instead.
  */
- 
-#define _USE_MATH_DEFINES
-#include <cmath>
 
 #include <tracktable/Analysis/DBSCAN.h>
 #include <tracktable/Core/PointCartesian.h>
@@ -48,7 +45,11 @@
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
 
+
+#define _USE_MATH_DEFINES
+#include <cmath>
 #include <cstdlib>
+#include <iostream>
 #include <limits>
 
 // ----------------------------------------------------------------------
