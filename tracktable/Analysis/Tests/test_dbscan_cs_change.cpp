@@ -38,8 +38,6 @@
  * instead.
  */
 
-#define _USE_MATH_DEFINES
-#include <cmath>
 
 #include <tracktable/Analysis/ComputeDBSCANClustering.h>
 #include <tracktable/Core/PointArithmetic.h>
@@ -47,11 +45,15 @@
 #include <tracktable/Core/PointLonLat.h>
 
 #include <boost/geometry/arithmetic/arithmetic.hpp>
-#include <cstdlib>
-#include <limits>
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
+
+#define _USE_MATH_DEFINES
+#include <cmath>
+#include <cstdlib>
+#include <iostream>
+#include <limits>
 
 boost::random::mt19937 random_generator;
 boost::random::uniform_real_distribution<> random_die(0, 1);
