@@ -808,7 +808,7 @@ main(int argc, char* argv[])
 {
   int error_count = 0;
 
-  error_count += test_find_points_inside_box_all_value_types< tracktable::domain::terrestrial::base_point_type >(7);
+  error_count += test_find_points_inside_box_all_value_types< tracktable::domain::terrestrial::base_point_type >(9);
   error_count += test_find_points_inside_box_all_value_types< tracktable::domain::cartesian2d::base_point_type >(9);
   error_count += test_find_points_inside_box_all_value_types< tracktable::domain::cartesian3d::base_point_type >(9);
 
@@ -828,7 +828,7 @@ main(int argc, char* argv[])
 
   std::cout << "\n\n\n";
 
-    error_count += test_find_points_inside_box_all_value_types< tracktable::domain::terrestrial::base_point_type >(7);
+  error_count += test_find_points_inside_box_all_value_types< tracktable::domain::terrestrial::base_point_type >(9);
   error_count += test_find_points_inside_box_all_value_types< tracktable::domain::cartesian2d::base_point_type >(9);
   error_count += test_find_points_inside_box_all_value_types< tracktable::domain::cartesian3d::base_point_type >(9);
 
