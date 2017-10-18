@@ -29,27 +29,47 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-# This is tracktable/Python/tracktable/render/tests/CMakeLists.txt
-#
-# Here we list the Python tests that we need to run to make sure that
-# our rendering code is working.  These are basically "smoke tests" --
-# we don't yet have the ability to verify the content of an image.
+import sys
+import os.path
+import traceback
+import matplotlib
+matplotlib.use('Agg')
+
+from matplotlib import pyplot
+from tracktable.render.mapmaker import mapmaker
+from tracktable.core import test_utilities
+
+# ----------------------------------------------------------------------
+
+def test_conus_map(ground_truth_dir,
+                   test_output_dir,
+                   image_filename='ConusMap.png'):
+
+    pyplot.figure(figsize=(8, 6))
+    (mymap, artists) = mapmaker(map_name='conus', domain='terrestrial')
+    pyplot.savefig(os.path.join(test_output_dir, image_filename),
+                   dpi=150)
+    pyplot.close()
+    return test_utilities.compare_image_to_ground_truth(image_filename,
+                                                        ground_truth_dir,
+                                                        test_output_dir)
 
 
-include(PythonTest)
+# ----------------------------------------------------------------------
 
-add_python_test(P_Mapmaker_Airport
-  tracktable.render.tests.test_mapmaker_airport "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
-)
+def test_mapmaker(ground_truth_path, test_output_path):
 
-add_python_test(P_Mapmaker_CONUS
-  tracktable.render.tests.test_mapmaker_conus "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
-)
+    return test_conus_map(ground_truth_path, test_output_path)
 
-add_python_test(P_Mapmaker_NorthAmerica
-  tracktable.render.tests.test_mapmaker_north_america "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
-)
+# ----------------------------------------------------------------------
 
-add_python_test(P_Mapmaker_Europe
-  tracktable.render.tests.test_mapmaker_europe "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
-)
+def main():
+    if len(sys.argv) != 3:
+        print("usage: {} ground_truth_dir test_output_dir".format(sys.argv[0]))
+
+    return test_mapmaker(sys.argv[1], sys.argv[2])
+
+# ----------------------------------------------------------------------
+
+if __name__ == '__main__':
+    sys.exit(main())
