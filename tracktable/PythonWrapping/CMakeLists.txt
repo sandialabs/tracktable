@@ -34,12 +34,25 @@
 # a single symbol -- its entry point -- and Boost.Python already
 # handles the dllexport/dllimport annotation for that.
 
-#set(Boost_USE_STATIC_LIBS     ON)
-#set(Boost_USE_STATIC_RUNTIME OFF)
-
-find_package(Boost 1.57 COMPONENTS date_time python regex REQUIRED)
 find_package(PythonLibs REQUIRED)
 find_package(NumPy REQUIRED)
+
+# Recent versions of Boost.Python generate libboost_python.so for
+# Python 2 and libboost_python3.so for Python 3.  CMake has not yet
+# caught up to this so we have to determine the version number by hand.
+
+set(Boost_PYTHON_LIBRARY_NAME "python")
+
+include(FindPythonInterp)
+if (PYTHONINTERP_FOUND)
+  if (PYTHON_VERSION_MAJOR EQUAL 3)
+    set(Boost_PYTHON_LIBRARY_NAME "python3")
+  endif (PYTHON_VERSION_MAJOR EQUAL 3)
+else (PYTHONINTERP_FOUND)
+  message(WARNING "Couldn't find a Python interpreter on your path.  Assuming Python 2.")
+endif (PYTHONINTERP_FOUND)
+
+find_package(Boost 1.57 COMPONENTS date_time regex ${Boost_PYTHON_LIBRARY_NAME} REQUIRED)
 
 include(PythonExtension)
 
