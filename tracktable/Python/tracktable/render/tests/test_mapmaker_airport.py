@@ -43,7 +43,7 @@ def test_map_for_airport(ground_truth_dir,
                          test_output_dir,
                          image_filename='MapForAirport.png'):
 
-    pyplot.figure()
+    pyplot.figure(figsize=(8, 6))
     (mymap, artists) = mapmaker(map_name='airport:ORD',
                                 domain='terrestrial',
                                 region_size=(400, 400),
@@ -51,77 +51,18 @@ def test_map_for_airport(ground_truth_dir,
                                 draw_coastlines=True)
 
     pyplot.savefig(os.path.join(test_output_dir, image_filename),
-                   figsize=(4, 4), dpi=150)
+                   dpi=150)
     pyplot.close()
     return test_utilities.compare_image_to_ground_truth(image_filename,
                                                         ground_truth_dir,
                                                         test_output_dir)
 
-# ----------------------------------------------------------------------
-
-def test_conus_map(ground_truth_dir,
-                   test_output_dir,
-                   image_filename='ConusMap.png'):
-
-    pyplot.figure()
-    (mymap, artists) = mapmaker(map_name='conus', domain='terrestrial')
-    pyplot.savefig(os.path.join(test_output_dir, image_filename),
-                   figsize=(8, 8), dpi=150)
-    pyplot.close()
-    return test_utilities.compare_image_to_ground_truth(image_filename,
-                                                        ground_truth_dir,
-                                                        test_output_dir)
-
-# ----------------------------------------------------------------------
-
-def test_north_america_map(ground_truth_dir,
-                           test_output_dir,
-                           image_filename='NorthAmericaMap.png'):
-
-    pyplot.figure()
-    (mymap, artists) = mapmaker(domain='terrestrial',
-                                map_name='north_america',
-                                state_color='#FF8080',
-                                country_color='#80FF80',
-                                lonlat_color='#0000FF',
-                                lonlat_linewidth=0.5)
-    pyplot.savefig(os.path.join(test_output_dir, image_filename),
-                   figsize=(8, 8), dpi=150)
-    pyplot.close()
-
-    return test_utilities.compare_image_to_ground_truth(image_filename,
-                                                        ground_truth_dir,
-                                                        test_output_dir)
-
-# ----------------------------------------------------------------------
-
-def test_europe_map(ground_truth_dir,
-                    test_output_dir,
-                    image_filename='EuropeMap.png'):
-
-    pyplot.figure()
-    (mymap, artists) = mapmaker(domain='terrestrial',
-                                map_name='europe',
-                                lonlat_linewidth=0.25,
-                                lonlat_color='#6060FF')
-    pyplot.savefig(os.path.join(test_output_dir, image_filename),
-                   figsize=(8, 8), dpi=150)
-    pyplot.close()
-
-    return test_utilities.compare_image_to_ground_truth(image_filename,
-                                                        ground_truth_dir,
-                                                        test_output_dir)
 
 # ----------------------------------------------------------------------
 
 def test_mapmaker(ground_truth_path, test_output_path):
 
-    status1 = test_map_for_airport(ground_truth_path, test_output_path)
-    status2 = test_conus_map(ground_truth_path, test_output_path)
-    status3 = test_north_america_map(ground_truth_path, test_output_path)
-    status4 = test_europe_map(ground_truth_path, test_output_path)
-
-    return sum([status1, status2, status3, status4])
+    return test_map_for_airport(ground_truth_path, test_output_path)
 
 # ----------------------------------------------------------------------
 
