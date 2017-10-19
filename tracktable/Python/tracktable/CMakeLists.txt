@@ -37,6 +37,7 @@ if (BUILD_TESTING)
   add_subdirectory(source/tests)
   add_subdirectory(render/tests)
   add_subdirectory(domain/tests)
+  add_subdirectory(io/tests)
 endif (BUILD_TESTING)
 
 

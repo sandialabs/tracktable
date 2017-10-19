@@ -39,6 +39,8 @@ from ._terrestrial import BasePointWriterTerrestrial as BasePointWriter
 from ._terrestrial import TrajectoryPointWriterTerrestrial as TrajectoryPointWriter
 from ._terrestrial import TrajectoryWriterTerrestrial as TrajectoryWriter
 
+DIMENSION = 2
+
 domain_classes = {
     'BasePoint': BasePoint,
     'TrajectoryPoint': TrajectoryPoint,
@@ -64,3 +66,4 @@ for domain_class in [
         TrajectoryWriter,
         BoundingBox ]:
     domain_class.domain_classes = domain_classes
+    domain_class.DOMAIN = "terrestrial"
