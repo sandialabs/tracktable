@@ -43,14 +43,16 @@ def trajectory_from_dictionary(dictionary):
     Args:
        dictionary: the dictionary to convert into a trajectory
     """
-    #verify coords list lengths are equal
+    domain = importlib.import_module("tracktable.domain."+
+                                     dictionary['domain'].lower())
+    dimension = domain.DIMENSION
+
+    #verify each coordinate matches dimension
     points = []
-    dimension = dictionary['dimension']
-    numPoints = len(dictionary['coords0'])
-    for coordIndex in range(dimension):
-        if len(dictionary['coords'+str(coordIndex)]) != numPoints:
-            raise ValueError("coords"+str(coordIndex)+" with length of "+ str(len(dictionary['coords'+str(coordIndex)])) +
-                             " does not match numPoints="+str(numPoints))
+    numPoints = len(dictionary['coordinates'])
+    for point in dictionary['coordinates']:
+        if len(point) != dimension:
+            raise ValueError("Error: point " + str(point) + " has "+ str(len(point)) + " coordinate(s), expected " + str(dimension)+".")
 
     #verify properties list lengths are equal
     numProperties = len(dictionary['propertyNames'])
@@ -59,13 +61,9 @@ def trajectory_from_dictionary(dictionary):
             raise ValueError("property"+str(propertyIndex)+" with length of "+ str(len(dictionary['property'+str(propertyIndex)])) +
                              " does not match numPoints="+str(numPoints))
 
-    domain = importlib.import_module("tracktable.domain."+
-                                     dictionary['domain'].lower())
 
     for i in range(numPoints):
-        point = domain.TrajectoryPoint()
-        for j in range(dimension):
-            point[j] = dictionary['coords'+str(j)][i]
+        point = domain.TrajectoryPoint(dictionary['coordinates'][i])
         point.object_id = dictionary['object_id']
         point.timestamp = Timestamp.from_string(dictionary['timestamps'][i])
         for propertyIndex in range(numProperties):
@@ -90,8 +88,6 @@ def dictionary_from_trajectory(trajectory):
     """
 
     dictionary = {}
-    dimension = len(trajectory[0])
-    dictionary['dimension'] = dimension
     dictionary['domain'] = trajectory.DOMAIN
 
     dictionary['trajectoryPropNames'] = trajectory.properties.keys()
@@ -106,17 +102,12 @@ def dictionary_from_trajectory(trajectory):
     dictionary['object_id'] = trajectory[0].object_id
     dictionary['timestamps'] = []
 
-    dictionary['coords0'] = []
-    if dimension > 1:
-        dictionary['coords1'] = []
-    if dimension > 2:
-        dictionary['coords2'] = []
+    dictionary['coordinates'] = []
 
     for i in range(len(trajectory)):
         dictionary['timestamps'].append(Timestamp.to_string(trajectory[i].timestamp,
                                                             include_tz=False))
-        for j in range(dimension):
-            dictionary['coords'+str(j)].append(trajectory[i][j])
+        dictionary['coordinates'].append(tuple(trajectory[i]))
         for propertyIndex in range(numProperties):
             dictionary['property'+str(propertyIndex)].append(trajectory[i].property(dictionary['propertyNames'][propertyIndex]))
     return dictionary

@@ -45,8 +45,7 @@ class TestReadWriteDictionary(unittest.TestCase):
         domain = importlib.import_module("tracktable.domain."+domainString.lower())
 
         # Manually set up a dictionary which contains trajectory info
-        dictionary = {'dimension'     : domain.DIMENSION,
-                      'domain'        : domainString,
+        dictionary = {'domain'        : domainString.lower(),
                       'trajectoryPropNames' : ['platform', 'start'],
                       'trajectoryProp0'     : 747,
                       'trajectoryProp1'     : "2004-12-07 11:36:00",
@@ -55,15 +54,16 @@ class TestReadWriteDictionary(unittest.TestCase):
                       'timestamps'    : ['2004-12-07 11:36:18',#-0000',
                                          '2004-12-07 11:37:56',#-0000',
                                          '2004-12-07 11:39:18'],#-0000'],
-                      'coords0'       : [26.995, 27.0447, 27.1136],
                       'property0'     : [2700, 4200, 6700],
                       'property1'     : [108, 108, 225],
                       'property2'     : ["hello", "world", "!"],
                       'property3'     : [0, -27, -22]}
-        if domain.DIMENSION > 1:
-            dictionary.update({'coords1' : [-81.9731, -81.9844, -82.0458]})
-        if domain.DIMENSION > 2:
-            dictionary.update({'coords2' : [-100.0, -101.0, -102.0]})
+        if domain.DIMENSION == 1:
+            dictionary.update({'coordinates' : [(26.995), (27.0447), (27.1136)]})
+        if domain.DIMENSION == 2:
+            dictionary.update({'coordinates' : [(26.995, -81.9731), (27.0447, -81.9844), (27.1136, -82.0458)]})
+        if domain.DIMENSION == 3:
+            dictionary.update({'coordinates' : [(26.995, -81.9731, -100.0), (27.0447, -81.9844, -101.0), (27.1136, -82.0458, -102.0)]})
 
         # Manually set up a matching Trajectory object
         p1 = domain.TrajectoryPoint()
@@ -158,11 +158,10 @@ class TestReadWriteDictionary(unittest.TestCase):
         print "Testing the conversion of an invalid dictionary to a trajectory in the", domain, "domain."
         dictionary, unused = self.gen_dictionary_and_trajectory(domain)
 
-        dictionary['coords0'] = dictionary['coords0'][:-1] #remove last coord0
+        dictionary['coordinates'][0] = dictionary['coordinates'][0][:-1] #remove last element of coordinate 0
         with self.assertRaises(ValueError) as ctx:
             trajectory_from_dictionary(dictionary)
-        self.assertEqual(ctx.exception.message, "coords1 with length of 3 does not match numPoints=2",
-                         msg="Message="+ctx.exception.message) #optional
+        #self.assertEqual(ctx.exception.message, "..."   )#can use this to ensure message is correct
 
     def test_dictionary(self):
         for domain in self.domains:
