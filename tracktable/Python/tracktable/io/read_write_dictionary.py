@@ -43,12 +43,18 @@ def traj_from_dictionary(dictionary):
     Args:
        dictionary: the dictionary to convert into a trajectory
     """
+    #verify list lengths are equal
     points = []
     dimension = dictionary['dimension']
+    numSamples = len(dictionary['coords0'])
+    for j in range(dimension):
+        if len(dictionary['coords'+str(j)]) != numSamples:
+            raise ValueError("coords"+str(j)+" with length of "+ str(len(dictionary['coords'+str(j)])) + " does not match numSamples="+str(numSamples))
+
     domain = importlib.import_module("tracktable.domain."+
                                      dictionary['domain'].lower())
     numProperties = dictionary['numProperties']
-    for i in range(len(dictionary['coords0'])):
+    for i in range(numSamples):
         point = domain.TrajectoryPoint()
         for j in range(dimension):
             point[j] = dictionary['coords'+str(j)][i]
