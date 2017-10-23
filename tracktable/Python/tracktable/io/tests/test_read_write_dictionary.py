@@ -31,8 +31,8 @@
 
 import sys
 
-from tracktable.io.read_write_dictionary import traj_from_dictionary
-from tracktable.io.read_write_dictionary import dictionary_from_traj
+from tracktable.io.read_write_dictionary import trajectory_from_dictionary
+from tracktable.io.read_write_dictionary import dictionary_from_trajectory
 from tracktable.core import Timestamp
 import importlib
 import unittest
@@ -41,14 +41,15 @@ class TestReadWriteDictionary(unittest.TestCase):
 
     domains = ['terrestrial', 'cartesian2d', 'cartesian3d']
 
-    def gen_dictionary_and_traj(self, domainString):
+    def gen_dictionary_and_trajectory(self, domainString):
         domain = importlib.import_module("tracktable.domain."+domainString.lower())
 
         # Manually set up a dictionary which contains trajectory info
         dictionary = {'dimension'     : domain.DIMENSION,
                       'domain'        : domainString,
-                      'trajPropNames' : ['platform'],
-                      'trajProp0'     : 747,
+                      'trajectoryPropNames' : ['platform', 'start'],
+                      'trajectoryProp0'     : 747,
+                      'trajectoryProp1'     : "2004-12-07 11:36:00",
                       'propertyNames' : ['altitude', 'heading', 'note', 'speed'],
                       'object_id'     : 'AAA001',
                       'timestamps'    : ['2004-12-07 11:36:18',#-0000',
@@ -104,63 +105,72 @@ class TestReadWriteDictionary(unittest.TestCase):
         p3.object_id = 'AAA001'
         p3.timestamp = Timestamp.from_string('2004-12-07 11:39:18', format_string='%Y-%m-%d %H:%M:%S')
 
-        traj = domain.Trajectory.from_position_list([p1,p2,p3])
-        traj.set_property('platform', 747)
+        trajectory = domain.Trajectory.from_position_list([p1,p2,p3])
+        trajectory.set_property('platform', 747)
+        trajectory.set_property('start', "2004-12-07 11:36:00")
+        #trajectory.set_property('start', Timestamp.from_string('2004-12-07 11:36:00'))
 
-        return dictionary, traj
+        return dictionary, trajectory
 
-    def tst_traj_from_dictionary(self, domain):
+    def tst_trajectory_from_dictionary(self, domain):
         print "Testing the conversion of a dictionary to a trajectory in the", domain, "domain."
-        dictionary, trajExpected = self.gen_dictionary_and_traj(domain)
+        dictionary, trajectoryExpected = self.gen_dictionary_and_trajectory(domain)
 
-        traj = traj_from_dictionary(dictionary)
+        trajectory = trajectory_from_dictionary(dictionary)
 
-        self.assertEqual(traj, trajExpected,
-                         msg="Error: The "+domain+" trajectory generated from dictionary does not match what was expected")
+        self.assertEqual(trajectory, trajectoryExpected,
+                         msg="Error: The "+domain+" trajectory generated from dictionary does not match what"
+                         "was expected")
 
-    def tst_dictionary_from_traj(self, domain):
+    def tst_dictionary_from_trajectory(self, domain):
         print "Testing the conversion of a trajectory to a dictionary in the", domain, "domain."
-        dictionaryExpected, traj = self.gen_dictionary_and_traj(domain)
+        dictionaryExpected, trajectory = self.gen_dictionary_and_trajectory(domain)
 
-        dictionary = dictionary_from_traj(traj)
+        dictionary = dictionary_from_trajectory(trajectory)
 
         self.assertEqual(dictionary, dictionaryExpected,
-                         msg="Error: The "+domain+" dictionary generated from the trajectory does not match what was expected. \nGot     :"+str(dictionary)+"\nExpected:"+str(dictionaryExpected))
+                         msg="Error: The "+domain+" dictionary generated from the trajectory does not match "
+                         "what was expected. \nGot     :"+str(dictionary)+"\nExpected:"+str(dictionaryExpected))
 
-    def tst_dictionary_to_traj_to_dictionary(self, domain):
-        print "Testing the conversion of a dictionary to a trajectory and back to a dictionary in the", domain, "domain."
-        dictionary, trajUnused = self.gen_dictionary_and_traj(domain)
+    def tst_dictionary_to_trajectory_to_dictionary(self, domain):
+        print "Testing the conversion of a dictionary to a trajectory and back to a dictionary in the", domain,
+        "domain."
+        dictionary, unused = self.gen_dictionary_and_trajectory(domain)
 
-        dictionaryFinal = dictionary_from_traj(traj_from_dictionary(dictionary))
+        dictionaryFinal = dictionary_from_trajectory(trajectory_from_dictionary(dictionary))
 
         self.assertEqual(dictionary, dictionaryFinal,
-                         msg="Error: The "+domain+" dictionary generated from the trajectory generated from a dictionary does not match what was expected")
+                         msg="Error: The "+domain+" dictionary generated from the trajectory generated from a "
+                         "dictionary does not match what was expected")
 
-    def tst_traj_to_dictionary_to_traj(self, domain):
-        print "Testing the conversion of a trajectory to a dictionary and back to a trajectory in the", domain, "domain."
-        dictionaryUnused, traj = self.gen_dictionary_and_traj(domain)
+    def tst_trajectory_to_dictionary_to_trajectory(self, domain):
+        print "Testing the conversion of a trajectory to a dictionary and back to a trajectory in the", domain,
+        "domain."
+        dictionaryUnused, trajectory = self.gen_dictionary_and_trajectory(domain)
 
-        trajFinal = traj_from_dictionary(dictionary_from_traj(traj))
+        trajectoryFinal = trajectory_from_dictionary(dictionary_from_trajectory(trajectory))
 
-        self.assertEqual(traj, trajFinal,
-                         msg="Error: The "+domain+" trajectory generated from the dictionary generated from a trajectory does not match what was expected")
+        self.assertEqual(trajectory, trajectoryFinal,
+                         msg="Error: The "+domain+" trajectory generated from the dictionary generated from a "
+                         "trajectory does not match what was expected")
 
-    def tst_traj_from_invalid_dictionary(self, domain):
+    def tst_trajectory_from_invalid_dictionary(self, domain):
         print "Testing the conversion of an invalid dictionary to a trajectory in the", domain, "domain."
-        dictionary, trajUnused = self.gen_dictionary_and_traj(domain)
+        dictionary, unused = self.gen_dictionary_and_trajectory(domain)
 
         dictionary['coords0'] = dictionary['coords0'][:-1] #remove last coord0
         with self.assertRaises(ValueError) as ctx:
-            traj_from_dictionary(dictionary)
-        self.assertEqual(ctx.exception.message, "coords1 with length of 3 does not match numSamples=2", msg="Message="+ctx.exception.message) #optional
+            trajectory_from_dictionary(dictionary)
+        self.assertEqual(ctx.exception.message, "coords1 with length of 3 does not match numPoints=2",
+                         msg="Message="+ctx.exception.message) #optional
 
     def test_dictionary(self):
         for domain in self.domains:
-            self.tst_dictionary_from_traj(domain)
-            self.tst_traj_from_dictionary(domain)
-            self.tst_dictionary_to_traj_to_dictionary(domain)
-            self.tst_traj_to_dictionary_to_traj(domain)
-            self.tst_traj_from_invalid_dictionary(domain)
+            self.tst_dictionary_from_trajectory(domain)
+            self.tst_trajectory_from_dictionary(domain)
+            self.tst_dictionary_to_trajectory_to_dictionary(domain)
+            self.tst_trajectory_to_dictionary_to_trajectory(domain)
+            self.tst_trajectory_from_invalid_dictionary(domain)
 
 if __name__ == '__main__':
     unittest.main()
