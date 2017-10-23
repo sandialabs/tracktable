@@ -47,8 +47,9 @@ class TestReadWriteDictionary(unittest.TestCase):
         # Manually set up a dictionary which contains trajectory info
         dictionary = {'dimension'     : domain.DIMENSION,
                       'domain'        : domainString,
-                      'numProperties' : 3,
-                      'propertyNames' : ['altitude', 'heading', 'speed'],
+                      'trajPropNames' : ['platform'],
+                      'trajProp0'     : 747,
+                      'propertyNames' : ['altitude', 'heading', 'note', 'speed'],
                       'object_id'     : 'AAA001',
                       'timestamps'    : ['2004-12-07 11:36:18',#-0000',
                                          '2004-12-07 11:37:56',#-0000',
@@ -56,7 +57,8 @@ class TestReadWriteDictionary(unittest.TestCase):
                       'coords0'       : [26.995, 27.0447, 27.1136],
                       'property0'     : [2700, 4200, 6700],
                       'property1'     : [108, 108, 225],
-                      'property2'     : [0, -27, -22]}
+                      'property2'     : ["hello", "world", "!"],
+                      'property3'     : [0, -27, -22]}
         if domain.DIMENSION > 1:
             dictionary.update({'coords1' : [-81.9731, -81.9844, -82.0458]})
         if domain.DIMENSION > 2:
@@ -71,10 +73,8 @@ class TestReadWriteDictionary(unittest.TestCase):
             p1[2] = -100.0
         p1.set_property('altitude', 2700)
         p1.set_property('heading', 108)
+        p1.set_property('note', "hello")
         p1.set_property('speed', 0)
-            #p1.__dict__.update({'altitude': 2700})
-            #p1.__dict__.update({'heading': 108})
-            #p1.__dict__.update({'speed': 0})
         p1.object_id = 'AAA001'
         p1.timestamp = Timestamp.from_string('2004-12-07 11:36:18', format_string='%Y-%m-%d %H:%M:%S')
 
@@ -86,10 +86,8 @@ class TestReadWriteDictionary(unittest.TestCase):
             p2[2] = -101.0
         p2.set_property('altitude', 4200)
         p2.set_property('heading', 108)
+        p2.set_property('note', "world")
         p2.set_property('speed', -27)
-            #p2.__dict__.update({'altitude': 4200})
-            #p2.__dict__.update({'heading': 108})
-            #p2.__dict__.update({'speed': -27})
         p2.object_id = 'AAA001'
         p2.timestamp = Timestamp.from_string('2004-12-07 11:37:56', format_string='%Y-%m-%d %H:%M:%S')
 
@@ -101,14 +99,13 @@ class TestReadWriteDictionary(unittest.TestCase):
             p3[2] = -102.0
         p3.set_property('altitude', 6700)
         p3.set_property('heading', 225)
+        p3.set_property('note', "!")
         p3.set_property('speed', -22)
-            #p3.__dict__.update({'altitude': 6700})
-            #p3.__dict__.update({'heading': 225})
-            #p3.__dict__.update({'speed': -22})
         p3.object_id = 'AAA001'
         p3.timestamp = Timestamp.from_string('2004-12-07 11:39:18', format_string='%Y-%m-%d %H:%M:%S')
 
         traj = domain.Trajectory.from_position_list([p1,p2,p3])
+        traj.set_property('platform', 747)
 
         return dictionary, traj
 
@@ -159,8 +156,8 @@ class TestReadWriteDictionary(unittest.TestCase):
 
     def test_dictionary(self):
         for domain in self.domains:
-            self.tst_traj_from_dictionary(domain)
             self.tst_dictionary_from_traj(domain)
+            self.tst_traj_from_dictionary(domain)
             self.tst_dictionary_to_traj_to_dictionary(domain)
             self.tst_traj_to_dictionary_to_traj(domain)
             self.tst_traj_from_invalid_dictionary(domain)

@@ -53,20 +53,25 @@ def traj_from_dictionary(dictionary):
 
     domain = importlib.import_module("tracktable.domain."+
                                      dictionary['domain'].lower())
-    numProperties = dictionary['numProperties']
+
     for i in range(numSamples):
         point = domain.TrajectoryPoint()
         for j in range(dimension):
             point[j] = dictionary['coords'+str(j)][i]
         point.object_id = dictionary['object_id']
         point.timestamp = Timestamp.from_string(dictionary['timestamps'][i])
-        for propertyIndex in range(numProperties):
+        for propertyIndex in range(len(dictionary['propertyNames'])):
             point.set_property(dictionary['propertyNames'][propertyIndex],
                                dictionary['property'+str(propertyIndex)][i])
-            #point.__dict__.update({dictionary['propertyNames'][propertyIndex]: dictionary['property'+str(propertyIndex)][i]})
         points.append(point)
 
     trajectory = domain.Trajectory.from_position_list(points)
+
+    #add trajectory properties
+    index=0
+    for trajPropName in dictionary['trajPropNames']:
+        trajectory.set_property(trajPropName, dictionary["trajProp"+str(index)])
+        index+=1
 
     return trajectory
 
@@ -80,9 +85,12 @@ def dictionary_from_traj(traj):
     dictionary['dimension'] = dimension
     dictionary['domain'] = traj.DOMAIN
 
-    numProperties = 3 #fix
-    dictionary['numProperties'] = numProperties
-    dictionary['propertyNames'] = ['altitude', 'heading', 'speed'] #fix
+    dictionary['trajPropNames'] = traj.properties.keys()
+    for trajPropIndex in range(len(traj.properties)):
+        dictionary['trajProp'+str(trajPropIndex)] = traj.property(traj.properties.keys()[trajPropIndex])
+
+    numProperties = len(traj[0].properties)
+    dictionary['propertyNames'] = traj[0].properties.keys()
     for nameIndex in range(numProperties):
         dictionary['property'+str(nameIndex)] = []
 
@@ -102,7 +110,6 @@ def dictionary_from_traj(traj):
             dictionary['coords'+str(j)].append(traj[i][j])
         for propertyIndex in range(numProperties):
             dictionary['property'+str(propertyIndex)].append(traj[i].property(dictionary['propertyNames'][propertyIndex]))
-            #dict['property'+str(propertyIndex)].append(traj[i].__dict__[dict['propertyNames'][propertyIndex]])
     return dictionary
 
 #need to handle double, string and timestamp properties
