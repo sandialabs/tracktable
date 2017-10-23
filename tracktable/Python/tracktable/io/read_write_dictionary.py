@@ -36,6 +36,7 @@ dictionary
 
 from tracktable.core import Timestamp
 import importlib
+import datetime
 
 #todo make sure lists are same length
 def trajectory_from_dictionary(dictionary):
@@ -54,30 +55,32 @@ def trajectory_from_dictionary(dictionary):
         if len(point) != dimension:
             raise ValueError("Error: point " + str(point) + " has "+ str(len(point)) + " coordinate(s), expected " + str(dimension)+".")
 
-    #verify properties list lengths are equal
-    numProperties = len(dictionary['propertyNames'])
-    for propertyIndex in range(numProperties):
-        if len(dictionary['property'+str(propertyIndex)]) != numPoints:
-            raise ValueError("property"+str(propertyIndex)+" with length of "+ str(len(dictionary['property'+str(propertyIndex)])) +
-                             " does not match numPoints="+str(numPoints))
+    #verify properties values lists are of equal length
+    for (name, attributes) in dictionary['point_properties'].items():
+        if len(attributes['values']) != numPoints:
+             raise ValueError("Error: "+name+" property has only " + str(len(attributes['values'])) + " values, but there are " + numPoints + " points in the trajectory.")
 
-
+    #generate points / position list
     for i in range(numPoints):
         point = domain.TrajectoryPoint(dictionary['coordinates'][i])
         point.object_id = dictionary['object_id']
         point.timestamp = Timestamp.from_string(dictionary['timestamps'][i])
-        for propertyIndex in range(numProperties):
-            point.set_property(dictionary['propertyNames'][propertyIndex],
-                               dictionary['property'+str(propertyIndex)][i])
+        for (name, attributes) in dictionary['point_properties'].items():
+            if attributes['type'] == "datetime" or attributes['type'] == "timestamp":  #okay to support both?  todo
+                point.set_property(name, Timestamp.from_string(attributes['values'][i], format_string='%Y-%m-%d %H:%M:%S'))
+            else:
+                point.set_property(name, attributes['values'][i])
         points.append(point)
 
+    #make trajectory
     trajectory = domain.Trajectory.from_position_list(points)
 
     #add trajectory properties
-    index=0
-    for trajectoryPropName in dictionary['trajectoryPropNames']:
-        trajectory.set_property(trajectoryPropName, dictionary["trajectoryProp"+str(index)])
-        index+=1
+    for (name, attributes) in dictionary['trajectory_properties'].items():
+        if attributes['type'] == "datetime" or attributes['type'] == "timestamp":  #okay to support both?  todo
+            trajectory.set_property(name, Timestamp.from_string(attributes['value'], format_string='%Y-%m-%d %H:%M:%S'))
+        else:
+            trajectory.set_property(name, attributes['value'])
 
     return trajectory
 
@@ -90,14 +93,16 @@ def dictionary_from_trajectory(trajectory):
     dictionary = {}
     dictionary['domain'] = trajectory.DOMAIN
 
-    dictionary['trajectoryPropNames'] = trajectory.properties.keys()
-    for trajectoryPropIndex in range(len(trajectory.properties)):
-        dictionary['trajectoryProp'+str(trajectoryPropIndex)] = trajectory.property(trajectory.properties.keys()[trajectoryPropIndex])
+    dictionary['trajectory_properties'] = {}
+    for (name, value) in trajectory.properties.items():
+        if isinstance(value, datetime.datetime):
+            dictionary['trajectory_properties'].update({name: {'type': type(value).__name__, 'value': Timestamp.to_string(value, include_tz=False)}})
+        else:
+            dictionary['trajectory_properties'].update({name: {'type': type(value).__name__, 'value': value}})
 
-    numProperties = len(trajectory[0].properties)
-    dictionary['propertyNames'] = trajectory[0].properties.keys()
-    for nameIndex in range(numProperties):
-        dictionary['property'+str(nameIndex)] = []
+    dictionary['point_properties'] = {}
+    for (name, value) in trajectory[0].properties.items():
+        dictionary['point_properties'].update({name: {'type': type(value).__name__, 'values': []}})
 
     dictionary['object_id'] = trajectory[0].object_id
     dictionary['timestamps'] = []
@@ -108,9 +113,12 @@ def dictionary_from_trajectory(trajectory):
         dictionary['timestamps'].append(Timestamp.to_string(trajectory[i].timestamp,
                                                             include_tz=False))
         dictionary['coordinates'].append(tuple(trajectory[i]))
-        for propertyIndex in range(numProperties):
-            dictionary['property'+str(propertyIndex)].append(trajectory[i].property(dictionary['propertyNames'][propertyIndex]))
+        for (name, value) in trajectory[i].properties.items():
+            if isinstance(value, datetime.datetime):
+                dictionary['point_properties'][name]['values'].append(Timestamp.to_string(value, include_tz=False))
+            else:
+                dictionary['point_properties'][name]['values'].append(value)
+
     return dictionary
 
-#need to handle double, string and timestamp properties
 #does every point need to have a given property?

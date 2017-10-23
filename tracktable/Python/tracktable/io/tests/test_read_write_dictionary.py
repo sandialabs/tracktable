@@ -45,19 +45,20 @@ class TestReadWriteDictionary(unittest.TestCase):
         domain = importlib.import_module("tracktable.domain."+domainString.lower())
 
         # Manually set up a dictionary which contains trajectory info
-        dictionary = {'domain'        : domainString.lower(),
-                      'trajectoryPropNames' : ['platform', 'start'],
-                      'trajectoryProp0'     : 747,
-                      'trajectoryProp1'     : "2004-12-07 11:36:00",
-                      'propertyNames' : ['altitude', 'heading', 'note', 'speed'],
-                      'object_id'     : 'AAA001',
-                      'timestamps'    : ['2004-12-07 11:36:18',#-0000',
-                                         '2004-12-07 11:37:56',#-0000',
-                                         '2004-12-07 11:39:18'],#-0000'],
-                      'property0'     : [2700, 4200, 6700],
-                      'property1'     : [108, 108, 225],
-                      'property2'     : ["hello", "world", "!"],
-                      'property3'     : [0, -27, -22]}
+        dictionary = {'domain'                : domainString.lower(),
+                      'object_id'             : 'AAA001',
+                      'trajectory_properties' : {'percent' : {'type': 'float',    'value': 33.333},
+                                                 'platform': {'type': 'str',      'value': "Boeing 747"},
+                                                 'start'   : {'type': 'datetime', 'value': "2004-12-07 11:36:00"},
+                                                 'tailNum' : {'type': 'int',      'value': 3878}},
+                      'timestamps'            : ['2004-12-07 11:36:18',#-0000',
+                                                 '2004-12-07 11:37:56',#-0000',
+                                                 '2004-12-07 11:39:18'],#-0000'],
+                      'point_properties'      : {'altitude': {'type': 'int',      'values': [2700, 4200, 6700]},
+                                                 'heading' : {'type': 'float',    'values': [108.1, 108.2, 225.3]},
+                                                 'note'    : {'type': 'str',      'values': ["hello", "world", "!"]},
+                                                 'time2'   : {'type': 'datetime', 'values': ["2004-01-01 00:00:01","2004-01-01 00:00:02", "2004-01-01 00:00:03"]} }
+        }
         if domain.DIMENSION == 1:
             dictionary.update({'coordinates' : [(26.995), (27.0447), (27.1136)]})
         if domain.DIMENSION == 2:
@@ -73,9 +74,9 @@ class TestReadWriteDictionary(unittest.TestCase):
         if domain.DIMENSION > 2:
             p1[2] = -100.0
         p1.set_property('altitude', 2700)
-        p1.set_property('heading', 108)
+        p1.set_property('heading', 108.1)
         p1.set_property('note', "hello")
-        p1.set_property('speed', 0)
+        p1.set_property('time2', Timestamp.from_string('2004-01-01 00:00:01'))
         p1.object_id = 'AAA001'
         p1.timestamp = Timestamp.from_string('2004-12-07 11:36:18', format_string='%Y-%m-%d %H:%M:%S')
 
@@ -86,9 +87,9 @@ class TestReadWriteDictionary(unittest.TestCase):
         if domain.DIMENSION > 2:
             p2[2] = -101.0
         p2.set_property('altitude', 4200)
-        p2.set_property('heading', 108)
+        p2.set_property('heading', 108.2)
         p2.set_property('note', "world")
-        p2.set_property('speed', -27)
+        p2.set_property('time2', Timestamp.from_string('2004-01-01 00:00:02'))
         p2.object_id = 'AAA001'
         p2.timestamp = Timestamp.from_string('2004-12-07 11:37:56', format_string='%Y-%m-%d %H:%M:%S')
 
@@ -99,16 +100,17 @@ class TestReadWriteDictionary(unittest.TestCase):
         if domain.DIMENSION > 2:
             p3[2] = -102.0
         p3.set_property('altitude', 6700)
-        p3.set_property('heading', 225)
+        p3.set_property('heading', 225.3)
         p3.set_property('note', "!")
-        p3.set_property('speed', -22)
+        p3.set_property('time2', Timestamp.from_string('2004-01-01 00:00:03'))
         p3.object_id = 'AAA001'
         p3.timestamp = Timestamp.from_string('2004-12-07 11:39:18', format_string='%Y-%m-%d %H:%M:%S')
 
         trajectory = domain.Trajectory.from_position_list([p1,p2,p3])
-        trajectory.set_property('platform', 747)
-        trajectory.set_property('start', "2004-12-07 11:36:00")
-        #trajectory.set_property('start', Timestamp.from_string('2004-12-07 11:36:00'))
+        trajectory.set_property('percent', 33.333)
+        trajectory.set_property('platform', "Boeing 747")
+        trajectory.set_property('start', Timestamp.from_string('2004-12-07 11:36:00'))
+        trajectory.set_property('tailNum', 3878)
 
         return dictionary, trajectory
 
