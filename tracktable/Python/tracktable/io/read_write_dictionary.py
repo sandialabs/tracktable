@@ -38,29 +38,37 @@ from tracktable.core import Timestamp
 import importlib
 
 #todo make sure lists are same length
-def traj_from_dictionary(dictionary):
+def trajectory_from_dictionary(dictionary):
     """Returns a trajectory constructed from the given dictionary.
     Args:
        dictionary: the dictionary to convert into a trajectory
     """
-    #verify list lengths are equal
+    #verify coords list lengths are equal
     points = []
     dimension = dictionary['dimension']
-    numSamples = len(dictionary['coords0'])
-    for j in range(dimension):
-        if len(dictionary['coords'+str(j)]) != numSamples:
-            raise ValueError("coords"+str(j)+" with length of "+ str(len(dictionary['coords'+str(j)])) + " does not match numSamples="+str(numSamples))
+    numPoints = len(dictionary['coords0'])
+    for coordIndex in range(dimension):
+        if len(dictionary['coords'+str(coordIndex)]) != numPoints:
+            raise ValueError("coords"+str(coordIndex)+" with length of "+ str(len(dictionary['coords'+str(coordIndex)])) +
+                             " does not match numPoints="+str(numPoints))
+
+    #verify properties list lengths are equal
+    numProperties = len(dictionary['propertyNames'])
+    for propertyIndex in range(numProperties):
+        if len(dictionary['property'+str(propertyIndex)]) != numPoints:
+            raise ValueError("property"+str(propertyIndex)+" with length of "+ str(len(dictionary['property'+str(propertyIndex)])) +
+                             " does not match numPoints="+str(numPoints))
 
     domain = importlib.import_module("tracktable.domain."+
                                      dictionary['domain'].lower())
 
-    for i in range(numSamples):
+    for i in range(numPoints):
         point = domain.TrajectoryPoint()
         for j in range(dimension):
             point[j] = dictionary['coords'+str(j)][i]
         point.object_id = dictionary['object_id']
         point.timestamp = Timestamp.from_string(dictionary['timestamps'][i])
-        for propertyIndex in range(len(dictionary['propertyNames'])):
+        for propertyIndex in range(numProperties):
             point.set_property(dictionary['propertyNames'][propertyIndex],
                                dictionary['property'+str(propertyIndex)][i])
         points.append(point)
@@ -69,32 +77,33 @@ def traj_from_dictionary(dictionary):
 
     #add trajectory properties
     index=0
-    for trajPropName in dictionary['trajPropNames']:
-        trajectory.set_property(trajPropName, dictionary["trajProp"+str(index)])
+    for trajectoryPropName in dictionary['trajectoryPropNames']:
+        trajectory.set_property(trajectoryPropName, dictionary["trajectoryProp"+str(index)])
         index+=1
 
     return trajectory
 
-def dictionary_from_traj(traj):
+def dictionary_from_trajectory(trajectory):
     """Returns a dictionary constructed from the given trajectory
     Args:
-       traj: the trajectory to convert into a dictonary representation
+       trajectory: the trajectory to convert into a dictonary representation
     """
+
     dictionary = {}
-    dimension = len(traj[0])
+    dimension = len(trajectory[0])
     dictionary['dimension'] = dimension
-    dictionary['domain'] = traj.DOMAIN
+    dictionary['domain'] = trajectory.DOMAIN
 
-    dictionary['trajPropNames'] = traj.properties.keys()
-    for trajPropIndex in range(len(traj.properties)):
-        dictionary['trajProp'+str(trajPropIndex)] = traj.property(traj.properties.keys()[trajPropIndex])
+    dictionary['trajectoryPropNames'] = trajectory.properties.keys()
+    for trajectoryPropIndex in range(len(trajectory.properties)):
+        dictionary['trajectoryProp'+str(trajectoryPropIndex)] = trajectory.property(trajectory.properties.keys()[trajectoryPropIndex])
 
-    numProperties = len(traj[0].properties)
-    dictionary['propertyNames'] = traj[0].properties.keys()
+    numProperties = len(trajectory[0].properties)
+    dictionary['propertyNames'] = trajectory[0].properties.keys()
     for nameIndex in range(numProperties):
         dictionary['property'+str(nameIndex)] = []
 
-    dictionary['object_id'] = traj[0].object_id
+    dictionary['object_id'] = trajectory[0].object_id
     dictionary['timestamps'] = []
 
     dictionary['coords0'] = []
@@ -103,13 +112,13 @@ def dictionary_from_traj(traj):
     if dimension > 2:
         dictionary['coords2'] = []
 
-    for i in range(len(traj)):
-        dictionary['timestamps'].append(Timestamp.to_string(traj[i].timestamp,
+    for i in range(len(trajectory)):
+        dictionary['timestamps'].append(Timestamp.to_string(trajectory[i].timestamp,
                                                             include_tz=False))
         for j in range(dimension):
-            dictionary['coords'+str(j)].append(traj[i][j])
+            dictionary['coords'+str(j)].append(trajectory[i][j])
         for propertyIndex in range(numProperties):
-            dictionary['property'+str(propertyIndex)].append(traj[i].property(dictionary['propertyNames'][propertyIndex]))
+            dictionary['property'+str(propertyIndex)].append(trajectory[i].property(dictionary['propertyNames'][propertyIndex]))
     return dictionary
 
 #need to handle double, string and timestamp properties
