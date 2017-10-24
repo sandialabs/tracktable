@@ -80,3 +80,13 @@ def json_from_trajectory(trajectory):
     """
 
     return json.dumps(dictionary_from_trajectory(trajectory), sort_keys=True)
+
+def trajectory_from_json_file(json_filename):
+    json_string = open(json_filename).read() #todo handle error
+    return trajectory_from_json(json_string)
+
+def json_file_from_trajectory(trajectory, json_filename):
+    with open(json_filename, 'w') as outfile: #todo handle error
+        outfile.write(json_from_trajectory(trajectory))
+
+#todo can improve performance for large files by streaming

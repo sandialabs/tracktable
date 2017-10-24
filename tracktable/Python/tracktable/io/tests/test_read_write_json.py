@@ -30,17 +30,22 @@
 # Date:   October, 24, 2017
 
 import sys
+import os
 import unittest
 import importlib
 
 from tracktable.io.read_write_json import trajectory_from_json
 from tracktable.io.read_write_json import json_from_trajectory
+from tracktable.io.read_write_json import json_file_from_trajectory
+from tracktable.io.read_write_json import trajectory_from_json_file
+
+import tracktable.domain.terrestrial
+
 from tracktable.core import Timestamp
 
 class TestReadWriteDictionary(unittest.TestCase):
-    def gen_json_and_trajectory(self, domainString):
-        domain = importlib.import_module("tracktable.domain."+domainString.lower())
-
+    def gen_json_and_trajectory(self):
+        domain = tracktable.domain.terrestrial
         json = "{\"coordinates\": [[26.995, -81.9731], [27.0447, -81.9844], [27.1136, -82.0458]], \"domain\": \"terrestrial\", \"object_id\": \"AAA001\", \"point_properties\": {\"altitude\": {\"type\": \"int\", \"values\": [2700, 4200, 6700]}, \"heading\": {\"type\": \"float\", \"values\": [108.1, 108.2, 225.3]}, \"note\": {\"type\": \"str\", \"values\": [\"hello\", \"world\", \"!\"]}, \"time2\": {\"type\": \"datetime\", \"values\": [\"2004-01-01 00:00:01\", \"2004-01-01 00:00:02\", \"2004-01-01 00:00:03\"]}}, \"timestamps\": [\"2004-12-07 11:36:18\", \"2004-12-07 11:37:56\", \"2004-12-07 11:39:18\"], \"trajectory_properties\": {\"percent\": {\"type\": \"float\", \"value\": 33.333}, \"platform\": {\"type\": \"str\", \"value\": \"Boeing 747\"}, \"start\": {\"type\": \"datetime\", \"value\": \"2004-12-07 11:36:00\"}, \"tailNum\": {\"type\": \"int\", \"value\": 3878}}}"
 
         # Manually set up a matching Trajectory object
@@ -91,27 +96,37 @@ class TestReadWriteDictionary(unittest.TestCase):
 
         return json, trajectory
 
-    def tst_trajectory_from_json(self, domain):
-        print("Testing the conversion of a json string to a trajectory in the "+domain+" domain.")
-        json, trajectoryExpected = self.gen_json_and_trajectory("terrestrial")
+    def tst_trajectory_from_json(self):
+        print("Testing the conversion of a json string to a trajectory.")
+        json, trajectoryExpected = self.gen_json_and_trajectory()
         trajectory = trajectory_from_json(json)
 
         self.assertEqual(trajectory, trajectoryExpected,
-                         msg="Error: The "+domain+" trajectory generated from json does not match what"
+                         msg="Error: The trajectory generated from json does not match what"
                          "was expected")
 
-    def tst_json_from_trajectory(self, domain):
-        print("Testing the conversion of a trajectory to a json string in the "+domain+" domain.")
-        jsonExpected, trajectory = self.gen_json_and_trajectory("terrestrial")
+    def tst_json_from_trajectory(self):
+        print("Testing the conversion of a trajectory to a json string.")
+        jsonExpected, trajectory = self.gen_json_and_trajectory()
         json = json_from_trajectory(trajectory)
 
         self.assertEqual(json, jsonExpected,
-                         msg="Error: The "+domain+" json generated from the trajectory does not match "
+                         msg="Error: The json generated from the trajectory does not match "
                          "what was expected. \nGot     :"+str(json)+"\nExpected:"+str(jsonExpected))
 
+    def tst_trajectory_from_json_file_from_trajectory(self):
+        print("Testing the writing of a trajectory to a json file and reading it back in.")
+        unused, trajectoryExpected = self.gen_json_and_trajectory()
+        json_file_from_trajectory(trajectoryExpected, "_test-output.json")
+        trajectory = trajectory_from_json_file("_test-output.json")
+        os.remove("_test-output.json")
+
+        self.assertEqual(trajectory, trajectoryExpected,
+                         msg="Error: The trajectory read in from the file does not match the original trajectory written to the file")
     def test_json(self):
-        self.tst_trajectory_from_json("terrestrial")
-        self.tst_json_from_trajectory("terrestrial")
+        self.tst_trajectory_from_json()
+        self.tst_json_from_trajectory()
+        self.tst_trajectory_from_json_file_from_trajectory()
 
 if __name__ == '__main__':
     unittest.main()
