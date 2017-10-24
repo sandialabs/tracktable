@@ -38,7 +38,6 @@ from tracktable.core import Timestamp
 import importlib
 import datetime
 
-#todo make sure lists are same length
 def trajectory_from_dictionary(dictionary):
     """Returns a trajectory constructed from the given dictionary.
     Args:
@@ -49,7 +48,7 @@ def trajectory_from_dictionary(dictionary):
     try:
         domain = importlib.import_module("tracktable.domain."+
                                          dictionary['domain'].lower())
-    except ImportError, err:
+    except ImportError:
         raise ValueError("Error: invalid domain name: "+dictionary['domain'].lower())
 
     dimension = domain.DIMENSION
