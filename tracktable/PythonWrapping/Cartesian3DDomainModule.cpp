@@ -282,8 +282,8 @@ void install_cartesian3d_domain_wrappers()
 {
   using namespace boost::python;
 
-  tracktable::domain::cartesian2d::base_point_type base_point;
-  tracktable::domain::cartesian2d::trajectory_point_type trajectory_point;
+  tracktable::domain::cartesian3d::base_point_type base_point;
+  tracktable::domain::cartesian3d::trajectory_point_type trajectory_point;
 
   install_cartesian3d_base_point_wrappers();
   install_cartesian3d_trajectory_point_wrappers();
