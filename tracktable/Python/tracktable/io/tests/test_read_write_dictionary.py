@@ -57,7 +57,9 @@ class TestReadWriteDictionary(unittest.TestCase):
                       'point_properties'      : {'altitude': {'type': 'int',      'values': [2700, 4200, 6700]},
                                                  'heading' : {'type': 'float',    'values': [108.1, 108.2, 225.3]},
                                                  'note'    : {'type': 'str',      'values': ["hello", "world", "!"]},
-                                                 'time2'   : {'type': 'datetime', 'values': ["2004-01-01 00:00:01","2004-01-01 00:00:02", "2004-01-01 00:00:03"]} }
+                                                 'time2'   : {'type': 'datetime', 'values': ["2004-01-01 00:00:01",
+                                                                                             "2004-01-01 00:00:02",
+                                                                                             "2004-01-01 00:00:03"]} }
         }
         if domain.DIMENSION == 1:
             dictionary.update({'coordinates' : [(26.995), (27.0447), (27.1136)]})
@@ -135,8 +137,7 @@ class TestReadWriteDictionary(unittest.TestCase):
                          "what was expected. \nGot     :"+str(dictionary)+"\nExpected:"+str(dictionaryExpected))
 
     def tst_dictionary_to_trajectory_to_dictionary(self, domain):
-        print "Testing the conversion of a dictionary to a trajectory and back to a dictionary in the", domain,
-        "domain."
+        print "Testing the conversion of a dictionary to a trajectory and back to a dictionary in the", domain, "domain."
         dictionary, unused = self.gen_dictionary_and_trajectory(domain)
 
         dictionaryFinal = dictionary_from_trajectory(trajectory_from_dictionary(dictionary))
@@ -146,8 +147,7 @@ class TestReadWriteDictionary(unittest.TestCase):
                          "dictionary does not match what was expected")
 
     def tst_trajectory_to_dictionary_to_trajectory(self, domain):
-        print "Testing the conversion of a trajectory to a dictionary and back to a trajectory in the", domain,
-        "domain."
+        print "Testing the conversion of a trajectory to a dictionary and back to a trajectory in the", domain, "domain."
         dictionaryUnused, trajectory = self.gen_dictionary_and_trajectory(domain)
 
         trajectoryFinal = trajectory_from_dictionary(dictionary_from_trajectory(trajectory))
@@ -156,14 +156,53 @@ class TestReadWriteDictionary(unittest.TestCase):
                          msg="Error: The "+domain+" trajectory generated from the dictionary generated from a "
                          "trajectory does not match what was expected")
 
-    def tst_trajectory_from_invalid_dictionary(self, domain):
-        print "Testing the conversion of an invalid dictionary to a trajectory in the", domain, "domain."
+    def tst_trajectory_from_invalid_coordinates(self, domain):
+        print "Testing the conversion of a dictionary with invalid coordinates in the", domain, "domain."
         dictionary, unused = self.gen_dictionary_and_trajectory(domain)
 
-        dictionary['coordinates'][0] = dictionary['coordinates'][0][:-1] #remove last element of coordinate 0
+        #test coordinates don't match in length
+        dictionaryBad1 = dictionary.copy()
+
+        dictionaryBad1['coordinates'][0] = dictionaryBad1['coordinates'][0][:-1] #remove last element of coordinate 0
         with self.assertRaises(ValueError) as ctx:
-            trajectory_from_dictionary(dictionary)
+            trajectory_from_dictionary(dictionaryBad1)
         #self.assertEqual(ctx.exception.message, "..."   )#can use this to ensure message is correct
+
+    def tst_trajectory_from_invalid_point_properties(self, domain):
+        print "Testing the conversion of a dictionary with invalid point properties in the", domain, "domain."
+        dictionary, unused = self.gen_dictionary_and_trajectory(domain)
+
+        #test point properties lists don't match length of coordinates by removing last element of the altitude list
+        dictionaryBad2 = dictionary.copy()
+        dictionaryBad2['point_properties']['altitude']['values'] = dictionaryBad2['point_properties']['altitude']['values'][:-1]
+        with self.assertRaises(ValueError) as ctx:
+            trajectory_from_dictionary(dictionaryBad2)
+        #print ctx.exception.message, "*******"
+
+    def tst_trajectory_from_invalid_timestamps(self, domain):
+        print "Testing the conversion of a dictionary with invalid timestamps in the", domain, "domain."
+        dictionary, unused = self.gen_dictionary_and_trajectory(domain)
+
+        #test a timestamp list that doesn't match length of coordinates by removing last timestamp
+        dictionaryBad3 = dictionary.copy()
+        dictionaryBad3['timestamps'] = dictionaryBad3['timestamps'][:-1]
+        with self.assertRaises(ValueError) as ctx:
+            trajectory_from_dictionary(dictionaryBad3)
+
+    def tst_invalid_domain(self):
+        print "Testing invalid domain"
+        dictionaryBad, unused = self.gen_dictionary_and_trajectory("terrestrial")
+        dictionaryBad['domain'] = "invalid"
+        with self.assertRaises(ValueError) as ctx:
+            trajectory_from_dictionary(dictionaryBad)
+
+    def tst_invalid_object_id(self):
+        print "Testing invalid object_id"
+        dictionaryBad, unused = self.gen_dictionary_and_trajectory("terrestrial")
+        dictionaryBad['object_id'] = 2
+        with self.assertRaises(ValueError) as ctx:
+            trajectory_from_dictionary(dictionaryBad)
+        #print ctx.exception.message, "*******"
 
     def test_dictionary(self):
         for domain in self.domains:
@@ -171,7 +210,11 @@ class TestReadWriteDictionary(unittest.TestCase):
             self.tst_trajectory_from_dictionary(domain)
             self.tst_dictionary_to_trajectory_to_dictionary(domain)
             self.tst_trajectory_to_dictionary_to_trajectory(domain)
-            self.tst_trajectory_from_invalid_dictionary(domain)
+            self.tst_trajectory_from_invalid_coordinates(domain)
+            self.tst_trajectory_from_invalid_point_properties(domain)
+            self.tst_trajectory_from_invalid_timestamps(domain)
+        self.tst_invalid_domain()
+        self.tst_invalid_object_id()
 
 if __name__ == '__main__':
     unittest.main()
