@@ -44,8 +44,14 @@ def trajectory_from_dictionary(dictionary):
     Args:
        dictionary: the dictionary to convert into a trajectory
     """
-    domain = importlib.import_module("tracktable.domain."+
-                                     dictionary['domain'].lower())
+
+    #verify domain is valid and import appropriate domain
+    try:
+        domain = importlib.import_module("tracktable.domain."+
+                                         dictionary['domain'].lower())
+    except ImportError, err:
+        raise ValueError("Error: invalid domain name: "+dictionary['domain'].lower())
+
     dimension = domain.DIMENSION
 
     #verify each coordinate matches dimension
@@ -55,10 +61,18 @@ def trajectory_from_dictionary(dictionary):
         if len(point) != dimension:
             raise ValueError("Error: point " + str(point) + " has "+ str(len(point)) + " coordinate(s), expected " + str(dimension)+".")
 
-    #verify properties values lists are of equal length
+    #verify point properties values lists are of equal length
     for (name, attributes) in dictionary['point_properties'].items():
         if len(attributes['values']) != numPoints:
-             raise ValueError("Error: "+name+" property has only " + str(len(attributes['values'])) + " values, but there are " + numPoints + " points in the trajectory.")
+            raise ValueError("Error: "+name+" property has only " + str(len(attributes['values'])) + " values, but there are " + str(numPoints) + " points in the trajectory.")
+
+    #verify there are the right number of timestamps
+    if len(dictionary['timestamps']) != numPoints:
+        raise ValueError("Error: Only " + str(len(dictionary['timestamps'])) + " timestamp values, but there are " + str(numPoints) + " points in the trajectory.")
+
+    #verify object_id is a string
+    if not isinstance(dictionary['object_id'], str):
+        raise ValueError("Error: object_id must be a string, but got a value of type "+type(dictionary['object_id']).__name__)
 
     #generate points / position list
     for i in range(numPoints):
@@ -92,7 +106,9 @@ def dictionary_from_trajectory(trajectory):
 
     dictionary = {}
     dictionary['domain'] = trajectory.DOMAIN
+    dictionary['object_id'] = trajectory[0].object_id
 
+    # set trajectory properties
     dictionary['trajectory_properties'] = {}
     for (name, value) in trajectory.properties.items():
         if isinstance(value, datetime.datetime):
@@ -100,15 +116,16 @@ def dictionary_from_trajectory(trajectory):
         else:
             dictionary['trajectory_properties'].update({name: {'type': type(value).__name__, 'value': value}})
 
+    # initialize timestamps and coordinates
+    dictionary['timestamps'] = []
+    dictionary['coordinates'] = []
+
+    # initialize point properties
     dictionary['point_properties'] = {}
     for (name, value) in trajectory[0].properties.items():
         dictionary['point_properties'].update({name: {'type': type(value).__name__, 'values': []}})
 
-    dictionary['object_id'] = trajectory[0].object_id
-    dictionary['timestamps'] = []
-
-    dictionary['coordinates'] = []
-
+    # set timestamps, coordinates and point_properties
     for i in range(len(trajectory)):
         dictionary['timestamps'].append(Timestamp.to_string(trajectory[i].timestamp,
                                                             include_tz=False))
@@ -122,3 +139,4 @@ def dictionary_from_trajectory(trajectory):
     return dictionary
 
 #does every point need to have a given property?
+#assume object Id must be string of any lenght, right?
