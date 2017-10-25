@@ -137,5 +137,5 @@ def dictionary_from_trajectory(trajectory):
 
     return dictionary
 
-#does every point need to have a given property?
-#assume object Id must be string of any lenght, right?
+
+
