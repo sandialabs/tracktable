@@ -127,34 +127,49 @@ class Timestamp(object):
             return None
 
     @staticmethod
-    def from_string(timestring, format_string='%Y-%m-%d %H:%M:%S'):
+    def from_string(timestring, format_string=None):
         """Convert from a string to a datetime
 
         Populate from a string such as '2012-09-10 12:34:56' or
         '2012-09-10T12:34:56'.  Note that you *must* have both a date
         and a time in that format or else the method will fail.
 
-        Also note that this method expects its input times to be in UTC.
+        You can use a different format if you like but you will have
+        to supply the 'format_string' argument.  It will be passed to
+        datetime.strptime.  In Python 3 you can use the '%z' directive
+        to parse a time zone declaration -- for example, '2017-06-01
+        12:34:56-0500' is June 5, 2017 in UTC-5, aka the US east coast.
+
+        Note: Python 2.7 does not have the %z directive.  You must use
+        Python 3.4 or newer to get that.
 
         Args:
           timestring (string): String containing your timestamp
 
         Kwargs:
           format_string (string): Format string for datetime.strptime
-
         Returns:
-          An aware datetime object imbued with tracktable.core.timestamp.DEFAULT_TIMEZONE.
+          An aware datetime object.  By default this will be imbued
+          with tracktable.core.timestamp.DEFAULT_TIMEZONE.  If you
+          used a format string with %z or %Z then you will get
+          whatever time zone Python parsed.
         """
 
-        timestamp = Timestamp.beginning_of_time()
-
         if timestring:
-            if 'T' in timestring:
-                return DEFAULT_TIMEZONE.localize(timestamp.strptime(timestring, format_string='%Y-%m-%dT%H:%M:%S'))
+            if format_string is None:
+                if timestring[10] == 'T':
+                    format_string = '%Y-%m-%dT%H:%M:%S'
+                else:
+                    format_string = '%Y-%m-%d %H:%M:%S'
+
+            parsed_time = datetime.datetime.strptime(timestring, format_string)
+
+            if parsed_time.tzinfo is not None:
+                return parsed_time
             else:
-                return DEFAULT_TIMEZONE.localize(timestamp.strptime(timestring, format_string))
+                return DEFAULT_TIMEZONE.localize(parsed_time)
         else:
-            return None
+            return Timestamp.beginning_of_time()
 
     @staticmethod
     def from_struct_time(mytime):
