@@ -42,31 +42,47 @@ class TestReadWriteDictionary(unittest.TestCase):
     domains = ['terrestrial', 'cartesian2d', 'cartesian3d']
 
     def gen_dictionary_and_trajectory(self, domainString):
-        domain = importlib.import_module("tracktable.domain."+domainString.lower())
+        domain = importlib.import_module("tracktable.domain."
+                                         + domainString.lower())
 
         # Manually set up a dictionary which contains trajectory info
-        dictionary = {'domain'                : domainString.lower(),
-                      'object_id'             : 'AAA001',
-                      'trajectory_properties' : {'percent' : {'type': 'float',    'value': 33.333},
-                                                 'platform': {'type': 'str',      'value': "Boeing 747"},
-                                                 'start'   : {'type': 'datetime', 'value': "2004-12-07 11:36:00"},
-                                                 'tailNum' : {'type': 'int',      'value': 3878}},
-                      'timestamps'            : ['2004-12-07 11:36:18',#-0000',
-                                                 '2004-12-07 11:37:56',#-0000',
-                                                 '2004-12-07 11:39:18'],#-0000'],
-                      'point_properties'      : {'altitude': {'type': 'int',      'values': [2700, 4200, 6700]},
-                                                 'heading' : {'type': 'float',    'values': [108.1, 108.2, 225.3]},
-                                                 'note'    : {'type': 'str',      'values': ["hello", "world", "!"]},
-                                                 'time2'   : {'type': 'datetime', 'values': ["2004-01-01 00:00:01",
-                                                                                             "2004-01-01 00:00:02",
-                                                                                             "2004-01-01 00:00:03"]} }
+        dictionary = {
+         'domain'               : domainString.lower(),
+         'object_id'            : 'AAA001',
+         'trajectory_properties':{'percent' : {'type' :'float',
+                                               'value':33.333},
+                                  'platform': {'type' :'str',
+                                               'value':"Boeing 747"},
+                                  'start'   : {'type' :'timestamp',
+                                               'value':"2004-12-07 11:36:00"},
+                                  'tailNum' : {'type': 'int',
+                                               'value': 3878}},
+         'timestamps'           : ['2004-12-07 11:36:18',#-0000',
+                                   '2004-12-07 11:37:56',#-0000',
+                                   '2004-12-07 11:39:18'],#-0000'],
+         'point_properties': {'altitude': {'type': 'int',
+                                           'values': [2700, 4200, 6700]},
+                              'heading' : {'type': 'float',
+                                           'values': [108.1, 108.2, 225.3]},
+                              'note'    : {'type': 'str',
+                                           'values': ["hello", "world", "!"]},
+                              'time2'   : {'type': 'timestamp',
+                                           'values': ["2004-01-01 00:00:01",
+                                                      "2004-01-01 00:00:02",
+                                                      "2004-01-01 00:00:03"]}}
         }
         if domain.DIMENSION == 1:
-            dictionary.update({'coordinates' : [(26.995), (27.0447), (27.1136)]})
+            dictionary.update({'coordinates' : [(26.995),
+                                                (27.0447),
+                                                (27.1136)]})
         if domain.DIMENSION == 2:
-            dictionary.update({'coordinates' : [(26.995, -81.9731), (27.0447, -81.9844), (27.1136, -82.0458)]})
+            dictionary.update({'coordinates' : [(26.995, -81.9731),
+                                                (27.0447, -81.9844),
+                                                (27.1136, -82.0458)]})
         if domain.DIMENSION == 3:
-            dictionary.update({'coordinates' : [(26.995, -81.9731, -100.0), (27.0447, -81.9844, -101.0), (27.1136, -82.0458, -102.0)]})
+            dictionary.update({'coordinates' : [(26.995, -81.9731, -100.0),
+                                                (27.0447, -81.9844, -101.0),
+                                                (27.1136, -82.0458, -102.0)]})
 
         # Manually set up a matching Trajectory object
         p1 = domain.TrajectoryPoint()
@@ -80,7 +96,8 @@ class TestReadWriteDictionary(unittest.TestCase):
         p1.set_property('note', "hello")
         p1.set_property('time2', Timestamp.from_string('2004-01-01 00:00:01'))
         p1.object_id = 'AAA001'
-        p1.timestamp = Timestamp.from_string('2004-12-07 11:36:18', format_string='%Y-%m-%d %H:%M:%S')
+        p1.timestamp =Timestamp.from_string('2004-12-07 11:36:18',
+                                            format_string='%Y-%m-%d %H:%M:%S')
 
         p2 = domain.TrajectoryPoint()
         p2[0] = 27.0447;
@@ -93,7 +110,8 @@ class TestReadWriteDictionary(unittest.TestCase):
         p2.set_property('note', "world")
         p2.set_property('time2', Timestamp.from_string('2004-01-01 00:00:02'))
         p2.object_id = 'AAA001'
-        p2.timestamp = Timestamp.from_string('2004-12-07 11:37:56', format_string='%Y-%m-%d %H:%M:%S')
+        p2.timestamp =Timestamp.from_string('2004-12-07 11:37:56',
+                                            format_string='%Y-%m-%d %H:%M:%S')
 
         p3 = domain.TrajectoryPoint()
         p3[0] = 27.1136;
@@ -106,84 +124,99 @@ class TestReadWriteDictionary(unittest.TestCase):
         p3.set_property('note', "!")
         p3.set_property('time2', Timestamp.from_string('2004-01-01 00:00:03'))
         p3.object_id = 'AAA001'
-        p3.timestamp = Timestamp.from_string('2004-12-07 11:39:18', format_string='%Y-%m-%d %H:%M:%S')
+        p3.timestamp =Timestamp.from_string('2004-12-07 11:39:18',
+                                            format_string='%Y-%m-%d %H:%M:%S')
 
         trajectory = domain.Trajectory.from_position_list([p1,p2,p3])
         trajectory.set_property('percent', 33.333)
         trajectory.set_property('platform', "Boeing 747")
-        trajectory.set_property('start', Timestamp.from_string('2004-12-07 11:36:00'))
+        trajectory.set_property('start',
+                                Timestamp.from_string('2004-12-07 11:36:00'))
         trajectory.set_property('tailNum', 3878)
 
         return dictionary, trajectory
 
     def tst_trajectory_from_dictionary(self, domain):
-        print("Testing the conversion of a dictionary to a trajectory in the "+domain+" domain.")
-        dictionary, trajectoryExpected = self.gen_dictionary_and_trajectory(domain)
+        print("Testing the conversion of a dictionary to a trajectory in the "
+              +domain+" domain.")
+        dict, trajectoryExpected = self.gen_dictionary_and_trajectory(domain)
 
-        trajectory = from_dict(dictionary)
+        trajectory = from_dict(dict)
 
         self.assertEqual(trajectory, trajectoryExpected,
-                         msg="Error: The "+domain+" trajectory generated from dictionary does not match what"
-                         "was expected")
+                         msg="Error: The "+domain+" trajectory generated from"
+                         + " dictionary does not match what was expected")
 
     def tst_dictionary_from_trajectory(self, domain):
-        print("Testing the conversion of a trajectory to a dictionary in the "+domain+" domain.")
-        dictionaryExpected, trajectory = self.gen_dictionary_and_trajectory(domain)
+        print("Testing the conversion of a trajectory to a dictionary in the "
+              + domain + " domain.")
+        dictExpected, trajectory = self.gen_dictionary_and_trajectory(domain)
 
         dictionary = to_dict(trajectory)
 
-        self.assertEqual(dictionary, dictionaryExpected,
-                         msg="Error: The "+domain+" dictionary generated from the trajectory does not match "
-                         "what was expected. \nGot     :"+str(dictionary)+"\nExpected:"+str(dictionaryExpected))
+        self.assertEqual(dictionary, dictExpected,
+                         msg="Error: The " + domain + " dictionary generated"
+                         + " from the trajectory does not match what was "
+                         + "expected. \nGot     :"+str(dictionary)
+                         + "\nExpected:"+str(dictExpected))
 
     def tst_dictionary_to_trajectory_to_dictionary(self, domain):
-        print("Testing the conversion of a dictionary to a trajectory and back to a dictionary in the "+domain+" domain.")
+        print("Testing the conversion of a dictionary to a trajectory and"
+              + " back to a dictionary in the "+domain+" domain.")
         dictionary, unused = self.gen_dictionary_and_trajectory(domain)
 
         dictionaryFinal = to_dict(from_dict(dictionary))
 
         self.assertEqual(dictionary, dictionaryFinal,
-                         msg="Error: The "+domain+" dictionary generated from the trajectory generated from a "
-                         "dictionary does not match what was expected")
+                         msg="Error: The "+domain+" dictionary generated from"
+                         + " the trajectory generated from a dictionary does"
+                         + " not match what was expected")
 
     def tst_trajectory_to_dictionary_to_trajectory(self, domain):
-        print("Testing the conversion of a trajectory to a dictionary and back to a trajectory in the "+domain+" domain.")
-        dictionaryUnused, trajectory = self.gen_dictionary_and_trajectory(domain)
+        print("Testing the conversion of a trajectory to a dictionary and"
+              + " back to a trajectory in the "+domain+" domain.")
+        dictUnused, trajectory = self.gen_dictionary_and_trajectory(domain)
 
         trajectoryFinal = from_dict(to_dict(trajectory))
 
         self.assertEqual(trajectory, trajectoryFinal,
-                         msg="Error: The "+domain+" trajectory generated from the dictionary generated from a "
-                         "trajectory does not match what was expected")
+                         msg="Error: The "+domain+" trajectory generated from"
+                         + " the dictionary generated from a trajectory does"
+                         + " not match what was expected")
 
     def tst_trajectory_from_invalid_coordinates(self, domain):
-        print("Testing the conversion of a dictionary with invalid coordinates in the "+domain+" domain.")
+        print("Testing the conversion of a dictionary with invalid"
+              + " coordinates in the " + domain + " domain.")
         dictionary, unused = self.gen_dictionary_and_trajectory(domain)
 
-        #test coordinates don't match in length
-        dictionaryBad1 = dictionary.copy()
-
-        dictionaryBad1['coordinates'][0] = dictionaryBad1['coordinates'][0][:-1] #remove last element of coordinate 0
+        #remove last element of coordinate 0
+        dictionary['coordinates'][0] = dictionary['coordinates'][0][:-1]
         with self.assertRaises(ValueError) as ctx:
-            from_dict(dictionaryBad1)
-        #self.assertEqual(ctx.exception.message, "..."   )#can use this to ensure message is correct
+            from_dict(dictionary)
+        #optionally, can use this to ensure message is correct
+        #self.assertEqual(ctx.exception.message, "..."   )
 
     def tst_trajectory_from_invalid_point_properties(self, domain):
-        print("Testing the conversion of a dictionary with invalid point properties in the "+domain+" domain.")
+        print("Testing the conversion of a dictionary with invalid point"
+              + " properties in the "+domain+" domain.")
         dictionary, unused = self.gen_dictionary_and_trajectory(domain)
 
-        #test point properties lists don't match length of coordinates by removing last element of the altitude list
-        dictionaryBad2 = dictionary.copy()
-        dictionaryBad2['point_properties']['altitude']['values'] = dictionaryBad2['point_properties']['altitude']['values'][:-1]
+        # test point properties lists don't match length of coordinates by
+        # removing last element of the altitude list
+        newValues = dictionary['point_properties']['altitude']['values'][:-1]
+        dictionary['point_properties']['altitude']['values'] = newValues
+
         with self.assertRaises(ValueError) as ctx:
-            from_dict(dictionaryBad2)
+            from_dict(dictionary)
         #print(ctx.exception.message)
 
     def tst_trajectory_from_invalid_timestamps(self, domain):
-        print("Testing the conversion of a dictionary with invalid timestamps in the "+domain, " domain.")
+        print("Testing the conversion of a dictionary with invalid timestamps"
+              + " in the "+domain, " domain.")
         dictionary, unused = self.gen_dictionary_and_trajectory(domain)
 
-        #test a timestamp list that doesn't match length of coordinates by removing last timestamp
+        # test a timestamp list that doesn't match length of coordinates by
+        # removing last timestamp
         dictionaryBad3 = dictionary.copy()
         dictionaryBad3['timestamps'] = dictionaryBad3['timestamps'][:-1]
         with self.assertRaises(ValueError) as ctx:
@@ -191,18 +224,17 @@ class TestReadWriteDictionary(unittest.TestCase):
 
     def tst_invalid_domain(self):
         print("Testing invalid domain")
-        dictionaryBad, unused = self.gen_dictionary_and_trajectory("terrestrial")
-        dictionaryBad['domain'] = "invalid"
+        dictBad, unused = self.gen_dictionary_and_trajectory("terrestrial")
+        dictBad['domain'] = "invalid"
         with self.assertRaises(ValueError) as ctx:
-            from_dict(dictionaryBad)
+            from_dict(dictBad)
 
     def tst_invalid_object_id(self):
         print("Testing invalid object_id")
-        dictionaryBad, unused = self.gen_dictionary_and_trajectory("terrestrial")
-        dictionaryBad['object_id'] = 2
+        dictBad, unused = self.gen_dictionary_and_trajectory("terrestrial")
+        dictBad['object_id'] = 2
         with self.assertRaises(ValueError) as ctx:
-            from_dict(dictionaryBad)
-        #print(ctx.exception.message)
+            from_dict(dictBad)
 
     def test_dictionary(self):
         for domain in self.domains:

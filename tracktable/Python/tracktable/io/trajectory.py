@@ -60,20 +60,29 @@ def from_dict(dictionary):
     numPoints = len(dictionary['coordinates'])
     for point in dictionary['coordinates']:
         if len(point) != dimension:
-            raise ValueError("Error: point " + str(point) + " has "+ str(len(point)) + " coordinate(s), expected " + str(dimension)+".")
+            raise ValueError("Error: point " + str(point) + " has "
+                             + str(len(point)) + " coordinate(s), expected "
+                             + str(dimension)+".")
 
     #verify point properties values lists are of equal length
     for (name, attributes) in dictionary['point_properties'].items():
         if len(attributes['values']) != numPoints:
-            raise ValueError("Error: "+name+" property has only " + str(len(attributes['values'])) + " values, but there are " + str(numPoints) + " points in the trajectory.")
+            raise ValueError("Error: "+name+" property has only "
+                             + str(len(attributes['values']))
+                             + " values, but there are " + str(numPoints)
+                             + " points in the trajectory.")
 
     #verify there are the right number of timestamps
     if len(dictionary['timestamps']) != numPoints:
-        raise ValueError("Error: Only " + str(len(dictionary['timestamps'])) + " timestamp values, but there are " + str(numPoints) + " points in the trajectory.")
+        raise ValueError("Error: Only " + str(len(dictionary['timestamps']))
+                         + " timestamp values, but there are "
+                         + str(numPoints) + " points in the trajectory.")
 
     #verify object_id is a string
     if not isinstance(dictionary['object_id'], str):
-        raise ValueError("Error: object_id must be a string, but got a value of type "+type(dictionary['object_id']).__name__)
+        raise ValueError("Error: object_id must be a string, but got a "
+                         + "value of type "
+                         +type(dictionary['object_id']).__name__)
 
     #generate points / position list
     for i in range(numPoints):
@@ -81,8 +90,10 @@ def from_dict(dictionary):
         point.object_id = dictionary['object_id']
         point.timestamp = Timestamp.from_string(dictionary['timestamps'][i])
         for (name, attributes) in dictionary['point_properties'].items():
-            if attributes['type'] == "datetime" or attributes['type'] == "timestamp":  #okay to support both?  todo
-                point.set_property(name, Timestamp.from_string(attributes['values'][i], format_string='%Y-%m-%d %H:%M:%S'))
+            if attributes['type'] == "timestamp":
+                ts = Timestamp.from_string(attributes['values'][i],
+                                           format_string='%Y-%m-%d %H:%M:%S')
+                point.set_property(name, ts)
             else:
                 point.set_property(name, attributes['values'][i])
         points.append(point)
@@ -92,8 +103,10 @@ def from_dict(dictionary):
 
     #add trajectory properties
     for (name, attributes) in dictionary['trajectory_properties'].items():
-        if attributes['type'] == "datetime" or attributes['type'] == "timestamp":  #okay to support both?  todo
-            trajectory.set_property(name, Timestamp.from_string(attributes['value'], format_string='%Y-%m-%d %H:%M:%S'))
+        if attributes['type'] == "timestamp":
+            ts = Timestamp.from_string(attributes['value'],
+                                       format_string='%Y-%m-%d %H:%M:%S')
+            trajectory.set_property(name, ts)
         else:
             trajectory.set_property(name, attributes['value'])
 
@@ -113,9 +126,12 @@ def to_dict(trajectory):
     dictionary['trajectory_properties'] = {}
     for (name, value) in trajectory.properties.items():
         if isinstance(value, datetime.datetime):
-            dictionary['trajectory_properties'].update({name: {'type': type(value).__name__, 'value': Timestamp.to_string(value, include_tz=False)}})
+            ts = Timestamp.to_string(value, include_tz=False)
+            entry = {name: {'type': "timestamp", 'value': ts}}
+            dictionary['trajectory_properties'].update(entry)
         else:
-            dictionary['trajectory_properties'].update({name: {'type': type(value).__name__, 'value': value}})
+            entry = {name: {'type': type(value).__name__, 'value': value}}
+            dictionary['trajectory_properties'].update(entry)
 
     # initialize timestamps and coordinates
     dictionary['timestamps'] = []
@@ -124,29 +140,37 @@ def to_dict(trajectory):
     # initialize point properties
     dictionary['point_properties'] = {}
     for (name, value) in trajectory[0].properties.items():
-        dictionary['point_properties'].update({name: {'type': type(value).__name__, 'values': []}})
+        if isinstance(value, datetime.datetime):
+            entry = {name: {'type': "timestamp", 'values': []}}
+            dictionary['point_properties'].update(entry)
+        else:
+            entry = {name: {'type': type(value).__name__, 'values': []}}
+            dictionary['point_properties'].update(entry)
 
     # set timestamps, coordinates and point_properties
     for i in range(len(trajectory)):
-        dictionary['timestamps'].append(Timestamp.to_string(trajectory[i].timestamp,
-                                                            include_tz=False))
+        ts = Timestamp.to_string(trajectory[i].timestamp, include_tz=False)
+        dictionary['timestamps'].append(ts)
         dictionary['coordinates'].append(tuple(trajectory[i]))
         for (name, value) in trajectory[i].properties.items():
             if isinstance(value, datetime.datetime):
-                dictionary['point_properties'][name]['values'].append(Timestamp.to_string(value, include_tz=False))
+                ts = Timestamp.to_string(value, include_tz=False)
+                dictionary['point_properties'][name]['values'].append(ts)
             else:
                 dictionary['point_properties'][name]['values'].append(value)
 
     return dictionary
 
-# below by Mirec Miskuf from: https://stackoverflow.com/questions/956867/how-to-get-string-objects-instead-of-unicode-from-json
+# below by Mirec Miskuf from: https://stackoverflow.com/questions/956867
+#    /how-to-get-string-objects-instead-of-unicode-from-json
 def json_loads_byteified(json_text):
     return _byteify(
         json.loads(json_text, object_hook=_byteify),
         ignore_dicts=True
     )
 
-# below by Mirec Miskuf from: https://stackoverflow.com/questions/956867/how-to-get-string-objects-instead-of-unicode-from-json
+# below by Mirec Miskuf from: https://stackoverflow.com/questions/956867
+#    /how-to-get-string-objects-instead-of-unicode-from-json
 def _byteify(data, ignore_dicts = False):
     # if this is a unicode string, return its string representation
     if isinstance(data, unicode):
@@ -158,7 +182,8 @@ def _byteify(data, ignore_dicts = False):
     # but only if we haven't already byteified it
     if isinstance(data, dict) and not ignore_dicts:
         return {
-            _byteify(key, ignore_dicts=True): _byteify(value, ignore_dicts=True)
+            _byteify(key, ignore_dicts=True): _byteify(value,
+                                                       ignore_dicts=True)
             for key, value in data.iteritems()
         }
     # if it's anything else, return it in its original form
