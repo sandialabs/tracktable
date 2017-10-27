@@ -34,10 +34,10 @@ import os
 import unittest
 import importlib
 
-from tracktable.io.read_write_json import trajectory_from_json
-from tracktable.io.read_write_json import json_from_trajectory
-from tracktable.io.read_write_json import json_file_from_trajectory
-from tracktable.io.read_write_json import trajectory_from_json_file
+from tracktable.io.trajectory import from_json
+from tracktable.io.trajectory import to_json
+from tracktable.io.trajectory import to_json_file
+from tracktable.io.trajectory import from_json_file
 
 import tracktable.domain.terrestrial
 
@@ -99,7 +99,7 @@ class TestReadWriteDictionary(unittest.TestCase):
     def tst_trajectory_from_json(self):
         print("Testing the conversion of a json string to a trajectory.")
         json, trajectoryExpected = self.gen_json_and_trajectory()
-        trajectory = trajectory_from_json(json)
+        trajectory = from_json(json)
 
         self.assertEqual(trajectory, trajectoryExpected,
                          msg="Error: The trajectory generated from json does not match what"
@@ -108,7 +108,7 @@ class TestReadWriteDictionary(unittest.TestCase):
     def tst_json_from_trajectory(self):
         print("Testing the conversion of a trajectory to a json string.")
         jsonExpected, trajectory = self.gen_json_and_trajectory()
-        json = json_from_trajectory(trajectory)
+        json = to_json(trajectory)
 
         self.assertEqual(json, jsonExpected,
                          msg="Error: The json generated from the trajectory does not match "
@@ -117,8 +117,8 @@ class TestReadWriteDictionary(unittest.TestCase):
     def tst_trajectory_from_json_file_from_trajectory(self):
         print("Testing the writing of a trajectory to a json file and reading it back in.")
         unused, trajectoryExpected = self.gen_json_and_trajectory()
-        json_file_from_trajectory(trajectoryExpected, "_test-output.json")
-        trajectory = trajectory_from_json_file("_test-output.json")
+        to_json_file(trajectoryExpected, "_test-output.json")
+        trajectory = from_json_file("_test-output.json")
         os.remove("_test-output.json")
 
         self.assertEqual(trajectory, trajectoryExpected,

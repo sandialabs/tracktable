@@ -31,8 +31,8 @@
 
 import sys
 
-from tracktable.io.read_write_dictionary import trajectory_from_dictionary
-from tracktable.io.read_write_dictionary import dictionary_from_trajectory
+from tracktable.io.trajectory import from_dict
+from tracktable.io.trajectory import to_dict
 from tracktable.core import Timestamp
 import importlib
 import unittest
@@ -120,7 +120,7 @@ class TestReadWriteDictionary(unittest.TestCase):
         print("Testing the conversion of a dictionary to a trajectory in the "+domain+" domain.")
         dictionary, trajectoryExpected = self.gen_dictionary_and_trajectory(domain)
 
-        trajectory = trajectory_from_dictionary(dictionary)
+        trajectory = from_dict(dictionary)
 
         self.assertEqual(trajectory, trajectoryExpected,
                          msg="Error: The "+domain+" trajectory generated from dictionary does not match what"
@@ -130,7 +130,7 @@ class TestReadWriteDictionary(unittest.TestCase):
         print("Testing the conversion of a trajectory to a dictionary in the "+domain+" domain.")
         dictionaryExpected, trajectory = self.gen_dictionary_and_trajectory(domain)
 
-        dictionary = dictionary_from_trajectory(trajectory)
+        dictionary = to_dict(trajectory)
 
         self.assertEqual(dictionary, dictionaryExpected,
                          msg="Error: The "+domain+" dictionary generated from the trajectory does not match "
@@ -140,7 +140,7 @@ class TestReadWriteDictionary(unittest.TestCase):
         print("Testing the conversion of a dictionary to a trajectory and back to a dictionary in the "+domain+" domain.")
         dictionary, unused = self.gen_dictionary_and_trajectory(domain)
 
-        dictionaryFinal = dictionary_from_trajectory(trajectory_from_dictionary(dictionary))
+        dictionaryFinal = to_dict(from_dict(dictionary))
 
         self.assertEqual(dictionary, dictionaryFinal,
                          msg="Error: The "+domain+" dictionary generated from the trajectory generated from a "
@@ -150,7 +150,7 @@ class TestReadWriteDictionary(unittest.TestCase):
         print("Testing the conversion of a trajectory to a dictionary and back to a trajectory in the "+domain+" domain.")
         dictionaryUnused, trajectory = self.gen_dictionary_and_trajectory(domain)
 
-        trajectoryFinal = trajectory_from_dictionary(dictionary_from_trajectory(trajectory))
+        trajectoryFinal = from_dict(to_dict(trajectory))
 
         self.assertEqual(trajectory, trajectoryFinal,
                          msg="Error: The "+domain+" trajectory generated from the dictionary generated from a "
@@ -165,7 +165,7 @@ class TestReadWriteDictionary(unittest.TestCase):
 
         dictionaryBad1['coordinates'][0] = dictionaryBad1['coordinates'][0][:-1] #remove last element of coordinate 0
         with self.assertRaises(ValueError) as ctx:
-            trajectory_from_dictionary(dictionaryBad1)
+            from_dict(dictionaryBad1)
         #self.assertEqual(ctx.exception.message, "..."   )#can use this to ensure message is correct
 
     def tst_trajectory_from_invalid_point_properties(self, domain):
@@ -176,7 +176,7 @@ class TestReadWriteDictionary(unittest.TestCase):
         dictionaryBad2 = dictionary.copy()
         dictionaryBad2['point_properties']['altitude']['values'] = dictionaryBad2['point_properties']['altitude']['values'][:-1]
         with self.assertRaises(ValueError) as ctx:
-            trajectory_from_dictionary(dictionaryBad2)
+            from_dict(dictionaryBad2)
         #print(ctx.exception.message)
 
     def tst_trajectory_from_invalid_timestamps(self, domain):
@@ -187,21 +187,21 @@ class TestReadWriteDictionary(unittest.TestCase):
         dictionaryBad3 = dictionary.copy()
         dictionaryBad3['timestamps'] = dictionaryBad3['timestamps'][:-1]
         with self.assertRaises(ValueError) as ctx:
-            trajectory_from_dictionary(dictionaryBad3)
+            from_dict(dictionaryBad3)
 
     def tst_invalid_domain(self):
         print("Testing invalid domain")
         dictionaryBad, unused = self.gen_dictionary_and_trajectory("terrestrial")
         dictionaryBad['domain'] = "invalid"
         with self.assertRaises(ValueError) as ctx:
-            trajectory_from_dictionary(dictionaryBad)
+            from_dict(dictionaryBad)
 
     def tst_invalid_object_id(self):
         print("Testing invalid object_id")
         dictionaryBad, unused = self.gen_dictionary_and_trajectory("terrestrial")
         dictionaryBad['object_id'] = 2
         with self.assertRaises(ValueError) as ctx:
-            trajectory_from_dictionary(dictionaryBad)
+            from_dict(dictionaryBad)
         #print(ctx.exception.message)
 
     def test_dictionary(self):

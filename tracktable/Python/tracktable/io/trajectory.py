@@ -30,15 +30,17 @@
 # Date:   October, 19, 2017
 
 """
-tracktable.io.read_write_dictionary - Read/Write a trajectory from/to a python
-dictionary
+tracktable.io.trajectory - Read/Write a trajectory from/to a python
+dictionary and from/to a json string or file
 """
 
 from tracktable.core import Timestamp
+import sys
 import importlib
 import datetime
+import json
 
-def trajectory_from_dictionary(dictionary):
+def from_dict(dictionary):
     """Returns a trajectory constructed from the given dictionary.
     Args:
        dictionary: the dictionary to convert into a trajectory
@@ -97,7 +99,7 @@ def trajectory_from_dictionary(dictionary):
 
     return trajectory
 
-def dictionary_from_trajectory(trajectory):
+def to_dict(trajectory):
     """Returns a dictionary constructed from the given trajectory
     Args:
        trajectory: the trajectory to convert into a dictonary representation
@@ -137,5 +139,55 @@ def dictionary_from_trajectory(trajectory):
 
     return dictionary
 
+# below by Mirec Miskuf from: https://stackoverflow.com/questions/956867/how-to-get-string-objects-instead-of-unicode-from-json
+def json_loads_byteified(json_text):
+    return _byteify(
+        json.loads(json_text, object_hook=_byteify),
+        ignore_dicts=True
+    )
 
+# below by Mirec Miskuf from: https://stackoverflow.com/questions/956867/how-to-get-string-objects-instead-of-unicode-from-json
+def _byteify(data, ignore_dicts = False):
+    # if this is a unicode string, return its string representation
+    if isinstance(data, unicode):
+        return data.encode('utf-8')
+    # if this is a list of values, return list of byteified values
+    if isinstance(data, list):
+        return [ _byteify(item, ignore_dicts=True) for item in data ]
+    # if this is a dictionary, return dictionary of byteified keys and values
+    # but only if we haven't already byteified it
+    if isinstance(data, dict) and not ignore_dicts:
+        return {
+            _byteify(key, ignore_dicts=True): _byteify(value, ignore_dicts=True)
+            for key, value in data.iteritems()
+        }
+    # if it's anything else, return it in its original form
+    return data
 
+def from_json(json_string):
+    """Returns a trajectory constructed from the given json string.
+    Args:
+       json: the json to convert into a trajectory
+    """
+    if sys.version_info[0] < 3:
+        return from_dict(json_loads_byteified(json_string))
+    else:
+        return from_dict(json.loads(json_string))
+
+def to_json(trajectory):
+    """Returns a json string constructed from the given trajectory
+    Args:
+       trajectory: the trajectory to convert into a dictonary representation
+    """
+
+    return json.dumps(to_dict(trajectory), sort_keys=True)
+
+def from_json_file(json_filename):
+    json_string = open(json_filename).read() #todo handle error
+    return from_json(json_string)
+
+def to_json_file(trajectory, json_filename):
+    with open(json_filename, 'w') as outfile: #todo handle error
+        outfile.write(to_json(trajectory))
+
+#todo can improve performance for large files by streaming
