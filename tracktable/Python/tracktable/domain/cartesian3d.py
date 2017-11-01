@@ -40,6 +40,8 @@ from ._cartesian3d import BasePointWriterCartesian3D as BasePointWriter
 from ._cartesian3d import TrajectoryPointWriterCartesian3D as TrajectoryPointWriter
 from ._cartesian3d import TrajectoryWriterCartesian3D as TrajectoryWriter
 
+DIMENSION = 3
+
 domain_classes = {
     'BasePoint': BasePoint,
     'TrajectoryPoint': TrajectoryPoint,
@@ -65,3 +67,4 @@ for domain_class in [
         TrajectoryWriter,
         BoundingBox ]:
     domain_class.domain_classes = domain_classes
+    domain_class.DOMAIN = "cartesian3d"
