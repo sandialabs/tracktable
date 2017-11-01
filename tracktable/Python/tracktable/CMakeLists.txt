@@ -32,7 +32,7 @@
 
 if (BUILD_TESTING)
   add_subdirectory(analysis/tests)
-#  add_subdirectory(core/tests)
+  add_subdirectory(core/tests)
   add_subdirectory(examples/tests)
   add_subdirectory(source/tests)
   add_subdirectory(render/tests)
