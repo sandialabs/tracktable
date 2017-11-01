@@ -51,29 +51,6 @@ include(PythonTest)
 
 add_python_test(P_EchoArgs tracktable.core.tests.echo_args foo bar baz)
 
-# if (MINGW OR MSVC)
-#   string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )
-#   string( REPLACE ";" "\\;" ESCAPED_PYTHONPATH "$ENV{PYTHONPATH}" )
-#   string( REPLACE "/" "\\" ESCAPED_RUNTIME_OUTPUT_DIR "${Tracktable_BINARY_DIR}/bin" )
-  
-#   set_tests_properties(
-#     P_TravelFromPoint
-#     P_WrappedPointTypes
-#     P_WrappedTrajectoryTypes
-#     PROPERTIES
-#     ENVIRONMENT
-# 	  "PYTHONPATH=${Tracktable_SOURCE_DIR}\\tracktable\\Python\\;${ESCAPED_PYTHONPATH};PATH=${ESCAPED_RUNTIME_OUTPUT_DIR}\\;${ESCAPED_SYSTEM_PATH}"
-# 	)
-# else (MINGW OR MSVC)
-#   # Trust the compiler to set RPATH so that the libraries in bin/ are
-#   # accessible.
-#   set_tests_properties(
-#     P_TravelFromPoint
-#     P_WrappedPointTypes
-#     P_WrappedTrajectoryTypes
-#     PROPERTIES
-#     ENVIRONMENT
-# 	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python:${CTEST_PYTHONPATH_ADDITIONS}:$ENV{PYTHONPATH}"
-# 	)
-# endif (MINGW OR MSVC)
+add_python_test(P_ParseTimestampNoTimeZone tracktable.core.tests.parse_timestamp_no_time_zone)
 
+add_python_test(P_ParseTimestampWithTimeZone tracktable.core.tests.parse_timestamp_with_time_zone)
