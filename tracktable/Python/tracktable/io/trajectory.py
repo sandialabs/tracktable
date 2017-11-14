@@ -88,7 +88,7 @@ def from_dict(dictionary):
     for i in range(numPoints):
         point = domain.TrajectoryPoint(dictionary['coordinates'][i])
         point.object_id = dictionary['object_id']
-        point.timestamp = Timestamp.from_string(dictionary['timestamps'][i])
+        point.timestamp = Timestamp.from_string(dictionary['timestamps'][i], format_string='%Y-%m-%d %H:%M:%S%z')
         for (name, attributes) in dictionary['point_properties'].items():
             if attributes['type'] == "timestamp":
                 ts = Timestamp.from_string(attributes['values'][i],
@@ -149,7 +149,7 @@ def to_dict(trajectory):
 
     # set timestamps, coordinates and point_properties
     for i in range(len(trajectory)):
-        ts = Timestamp.to_string(trajectory[i].timestamp, include_tz=False)
+        ts = Timestamp.to_string(trajectory[i].timestamp, include_tz=True)
         dictionary['timestamps'].append(ts)
         dictionary['coordinates'].append(tuple(trajectory[i]))
         for (name, value) in trajectory[i].properties.items():

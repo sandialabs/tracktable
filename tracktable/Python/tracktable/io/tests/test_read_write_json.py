@@ -56,8 +56,8 @@ class TestReadWriteDictionary(unittest.TestCase):
                 ' \"time2\": {\"type\": \"timestamp\", \"values\":'
                 ' [\"2004-01-01 00:00:01\", \"2004-01-01 00:00:02\",'
                 ' \"2004-01-01 00:00:03\"]}}, \"timestamps\":'
-                ' [\"2004-12-07 11:36:18\", \"2004-12-07 11:37:56\",'
-                ' \"2004-12-07 11:39:18\"], \"trajectory_properties\":'
+                ' [\"2004-12-07 11:36:18-0000\", \"2004-12-07 11:37:56-0000\",'
+                ' \"2004-12-07 11:39:18-0000\"], \"trajectory_properties\":'
                 ' {\"percent\": {\"type\": \"float\", \"value\": 33.333},'
                 ' \"platform\": {\"type\": \"str\", \"value\":'
                 ' \"Boeing 747\"}, \"start\": {\"type\": \"timestamp\",'
@@ -76,8 +76,8 @@ class TestReadWriteDictionary(unittest.TestCase):
         p1.set_property('note', "hello")
         p1.set_property('time2', Timestamp.from_string('2004-01-01 00:00:01'))
         p1.object_id = 'AAA001'
-        p1.timestamp =Timestamp.from_string('2004-12-07 11:36:18',
-                                            format_string='%Y-%m-%d %H:%M:%S')
+        p1.timestamp =Timestamp.from_string('2004-12-07 11:36:18-0000',
+                                            format_string='%Y-%m-%d %H:%M:%S%z')
 
         p2 = domain.TrajectoryPoint()
         p2[0] = 27.0447;
@@ -90,8 +90,8 @@ class TestReadWriteDictionary(unittest.TestCase):
         p2.set_property('note', "world")
         p2.set_property('time2', Timestamp.from_string('2004-01-01 00:00:02'))
         p2.object_id = 'AAA001'
-        p2.timestamp =Timestamp.from_string('2004-12-07 11:37:56',
-                                            format_string='%Y-%m-%d %H:%M:%S')
+        p2.timestamp =Timestamp.from_string('2004-12-07 11:37:56-0000',
+                                            format_string='%Y-%m-%d %H:%M:%S%z')
 
         p3 = domain.TrajectoryPoint()
         p3[0] = 27.1136;
@@ -104,8 +104,8 @@ class TestReadWriteDictionary(unittest.TestCase):
         p3.set_property('note', "!")
         p3.set_property('time2', Timestamp.from_string('2004-01-01 00:00:03'))
         p3.object_id = 'AAA001'
-        p3.timestamp =Timestamp.from_string('2004-12-07 11:39:18',
-                                            format_string='%Y-%m-%d %H:%M:%S')
+        p3.timestamp =Timestamp.from_string('2004-12-07 11:39:18-0000',
+                                            format_string='%Y-%m-%d %H:%M:%S%z')
 
         trajectory = domain.Trajectory.from_position_list([p1,p2,p3])
         trajectory.set_property('percent', 33.333)
