@@ -55,9 +55,15 @@ coords=[[-111.501, 47.3697], [-111.528, 47.3353], [-111.551, 47.3039], [-111.575
 #        return True
 
 import numpy as np
-from shapely.geometry import Point, LineString
-from shapely.ops import split
+from shapely.geometry import Point, LineString, MultiLineString
+from shapely.ops import split, linemerge
 import networkx as nx
+from networkx.drawing.nx_pydot import write_dot
+#from networkx.drawing.nx_pydot import write_dot
+#from networkx import write_dot
+import matplotlib.pyplot as plt
+
+
 
 #Adjust position and scale for plotting over the tree
 def plot_path(ax, line, pos, color, zorder):
@@ -87,7 +93,7 @@ def splitPath(path, numResultingPieces):
     subs.append(pathRemaining)
     return subs
 
-nodeNum=1  #global variable.  Find a better way! todo
+nodeNum=1  #global variable.  Find a better way! todo  #should it be 0?
 
 #recursively subdivide the trajectory until the threshold is reached.
 def subTrajectorize(path, G, prevNum):
@@ -106,33 +112,26 @@ def subTrajectorize(path, G, prevNum):
             subTrajectorize(sub, G, nodeNum-1)
 
 # divide trajectory and then plot
-def test_subTrajectorize():
+def setup():
     points = []
     for coord in coords:
         points.append(Point(coord))
+    return LineString(points)
 
-    path = LineString(points)
-
-    global nodeNum
-
-    G = nx.Graph()
-    G.add_node(nodeNum, p=path)
-    nodeNum+=1
-    subTrajectorize(path, G, nodeNum-1)
-
-    import matplotlib.pyplot as plt
-
-    fig = plt.figure(figsize=(25, 14), dpi=80)
+def plotTree(G, fullIndex, with_labels=False):
+    #fig = plt.figure(figsize=(25, 14), dpi=80)
+    fig = plt.figure(figsize=(12, 7), dpi=80)
     ax = fig.gca()
 
     pos=nx.nx_agraph.graphviz_layout(G, prog='dot')
-    nx.draw(G, pos, with_labels=False, arrows=False, node_size=1000, zorder=1, node_color='w')
+    write_dot(G, "test.dot")
+    nx.draw(G, pos, with_labels=with_labels, arrows=False, node_size=1000, zorder=1, width=1, linewidths=0, node_color='w')
 
     paths=nx.get_node_attributes(G, 'p')
 
     for i in range(len(paths)):
         plot_path(ax, paths[i+1], pos[i+1], 'b', 5)
-        plot_path(ax, paths[1], pos[i+1], '#f2f2f2', 4) #light grey
+        plot_path(ax, paths[fullIndex], pos[i+1], '#f2f2f2', 4) #light grey
     plt.show()
 
     #uncomment below to also plot just the trajectory
@@ -142,5 +141,89 @@ def test_subTrajectorize():
     #ax.plot(x, y, color='b', linewidth=3, solid_capstyle='round', zorder=1)
     #plt.show()
 
+def test_sub_trajectorize():
+    path = setup()
+
+    global nodeNum
+
+    G = nx.Graph()
+    G.add_node(nodeNum, p=path)
+    nodeNum+=1
+    subTrajectorize(path, G, nodeNum-1)
+
+    plotTree(G, 1)
+
+
+def get_next_piece(path, threshold):
+    parts = list((split(path, Point(path.coords[1]))))#was 0
+    sub_traj = parts[0]
+    if(len(parts)>1):
+        remainder = parts[1]
+    else:
+        remainder = None
+    for coord in path.coords[2:]:  #skip first point  and second is above
+        parts = list((split(path, Point(coord))))
+        if calcRatio(parts[0]) > threshold:
+            return (sub_traj, remainder) #return previous split results
+        else:
+            sub_traj = parts[0]
+            if(len(parts)>1):
+                remainder = parts[1]
+            else:
+                remainder = None
+    return (path, None) #can't subdivide
+
+nodeNum2=1
+
+from itertools import izip_longest
+
+def pairs(iterable):
+    even = iterable[::2]
+    odd = iterable[1::2]
+    return izip_longest(even,odd, fillvalue=None)
+    
+
+def bottom_up_sub_trajectorize():
+    threshold = 1.1
+    path = setup()
+    remainder = path
+
+    global nodeNum2
+    G = nx.Graph()
+    
+    leaves = []
+    while remainder != None:
+        (sub, remainder) = get_next_piece(remainder, threshold)
+        G.add_node(nodeNum2, p=sub)
+        leaves.append(nodeNum2)
+        nodeNum2+=1
+    
+    nodes = leaves
+    nextNodes = []
+    
+    while(True):
+        paths=nx.get_node_attributes(G, 'p')
+        if len(nodes) == 1:
+            break
+        else:
+            for pair in pairs(nodes):
+                if pair[1] == None:
+                    nextNodes.append(pair[0])
+                else:
+                    G.add_node(nodeNum2, p=linemerge([paths[pair[0]].coords, paths[pair[1]].coords]))
+                    G.add_edge(pair[0], nodeNum2)
+                    G.add_edge(pair[1], nodeNum2)
+                    nextNodes.append(nodeNum2)
+                    nodeNum2+=1
+            nodes = nextNodes
+            nextNodes = []  
+    
+    plotTree(G, nodeNum2-1, with_labels=True)
+            
+
+def test_bottom_up_sub_trajectorize():
+    bottom_up_sub_trajectorize()
+
 if __name__ == "__main__":
-    test_subTrajectorize()
+    #test_sub_trajectorize()
+    test_bottom_up_sub_trajectorize()
