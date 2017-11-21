@@ -29,6 +29,9 @@
 # Author: Ben Newton
 # Date:   November, 15, 2017
 
+#this is currently just a playground to play around with some different
+# sub-trajectoryization ideas.  NOT PRODUCTION CODE
+
 #Data
 coords0=[[0,0],[5,5],[10,0]]
 coords1=[[0,0],[5,5],[6,-6],[8,3],[10,0]]
@@ -58,9 +61,7 @@ import numpy as np
 from shapely.geometry import Point, LineString, MultiLineString
 from shapely.ops import split, linemerge
 import networkx as nx
-from networkx.drawing.nx_pydot import write_dot
 #from networkx.drawing.nx_pydot import write_dot
-#from networkx import write_dot
 import matplotlib.pyplot as plt
 
 
@@ -124,8 +125,9 @@ def plotTree(G, fullIndex, with_labels=False):
     ax = fig.gca()
 
     pos=nx.nx_agraph.graphviz_layout(G, prog='dot')
-    write_dot(G, "test.dot")
-    nx.draw(G, pos, with_labels=with_labels, arrows=False, node_size=1000, zorder=1, width=1, linewidths=0, node_color='w')
+    #write_dot(G, "test.dot")
+    #nx.write_dot(G, "test.dot")
+    nx.draw(G, pos, with_labels=with_labels, arrows=False, node_size=4000, zorder=1, width=1, linewidths=0, node_color='w') #size was 1000
 
     paths=nx.get_node_attributes(G, 'p')
 
@@ -173,7 +175,7 @@ def get_next_piece(path, threshold):
                 remainder = None
     return (path, None) #can't subdivide
 
-nodeNum2=1
+nodeNum2=31#was 1
 
 from itertools import izip_longest
 
@@ -181,7 +183,7 @@ def pairs(iterable):
     even = iterable[::2]
     odd = iterable[1::2]
     return izip_longest(even,odd, fillvalue=None)
-    
+
 
 def bottom_up_sub_trajectorize():
     threshold = 1.1
@@ -190,17 +192,17 @@ def bottom_up_sub_trajectorize():
 
     global nodeNum2
     G = nx.Graph()
-    
+
     leaves = []
     while remainder != None:
         (sub, remainder) = get_next_piece(remainder, threshold)
         G.add_node(nodeNum2, p=sub)
         leaves.append(nodeNum2)
-        nodeNum2+=1
-    
+        nodeNum2-=1#was +=
+
     nodes = leaves
     nextNodes = []
-    
+
     while(True):
         paths=nx.get_node_attributes(G, 'p')
         if len(nodes) == 1:
@@ -214,12 +216,12 @@ def bottom_up_sub_trajectorize():
                     G.add_edge(pair[0], nodeNum2)
                     G.add_edge(pair[1], nodeNum2)
                     nextNodes.append(nodeNum2)
-                    nodeNum2+=1
+                    nodeNum2-=1 #was +=
             nodes = nextNodes
-            nextNodes = []  
-    
-    plotTree(G, nodeNum2-1, with_labels=True)
-            
+            nextNodes = []
+
+    plotTree(G, 1, with_labels=False)#True) #was nodeNum2-1
+
 
 def test_bottom_up_sub_trajectorize():
     bottom_up_sub_trajectorize()
