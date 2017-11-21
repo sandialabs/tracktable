@@ -175,7 +175,7 @@ def get_next_piece(path, threshold):
                 remainder = None
     return (path, None) #can't subdivide
 
-nodeNum2=31#was 1
+nodeNum2=1
 
 from itertools import izip_longest
 
@@ -198,7 +198,7 @@ def bottom_up_sub_trajectorize():
         (sub, remainder) = get_next_piece(remainder, threshold)
         G.add_node(nodeNum2, p=sub)
         leaves.append(nodeNum2)
-        nodeNum2-=1#was +=
+        nodeNum2+=1
 
     nodes = leaves
     nextNodes = []
@@ -216,11 +216,16 @@ def bottom_up_sub_trajectorize():
                     G.add_edge(pair[0], nodeNum2)
                     G.add_edge(pair[1], nodeNum2)
                     nextNodes.append(nodeNum2)
-                    nodeNum2-=1 #was +=
+                    nodeNum2+=1
             nodes = nextNodes
             nextNodes = []
 
-    plotTree(G, 1, with_labels=False)#True) #was nodeNum2-1
+    #relabel in opposite order (root is 1)
+    mapping = {}
+    for i in range(nodeNum2-1):
+        mapping[i+1] = nodeNum2-1-i
+    H=nx.relabel_nodes(G, mapping)
+    plotTree(H, 1, with_labels=True)#False)#True) #was nodeNum2-1
 
 
 def test_bottom_up_sub_trajectorize():
