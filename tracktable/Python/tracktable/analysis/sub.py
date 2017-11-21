@@ -119,7 +119,7 @@ def setup():
         points.append(Point(coord))
     return LineString(points)
 
-def plotTree(G, fullIndex, with_labels=False):
+def plotTree(G, fullIndex, with_labels=False, node_size=1000):
     #fig = plt.figure(figsize=(25, 14), dpi=80)
     fig = plt.figure(figsize=(12, 7), dpi=80)
     ax = fig.gca()
@@ -127,7 +127,7 @@ def plotTree(G, fullIndex, with_labels=False):
     pos=nx.nx_agraph.graphviz_layout(G, prog='dot')
     #write_dot(G, "test.dot")
     #nx.write_dot(G, "test.dot")
-    nx.draw(G, pos, with_labels=with_labels, arrows=False, node_size=4000, zorder=1, width=1, linewidths=0, node_color='w') #size was 1000
+    nx.draw(G, pos, with_labels=with_labels, arrows=False, node_size=node_size, zorder=1, width=1, linewidths=0, node_color='w') #size was 1000
 
     paths=nx.get_node_attributes(G, 'p')
 
@@ -186,7 +186,8 @@ def pairs(iterable):
 
 
 def bottom_up_sub_trajectorize():
-    threshold = 1.1
+    #threshold = 1.1
+    threshold = 2
     path = setup()
     remainder = path
 
@@ -225,7 +226,7 @@ def bottom_up_sub_trajectorize():
     for i in range(nodeNum2-1):
         mapping[i+1] = nodeNum2-1-i
     H=nx.relabel_nodes(G, mapping)
-    plotTree(H, 1, with_labels=True)#False)#True) #was nodeNum2-1
+    plotTree(H, 1, with_labels=False, node_size=4000)#False)#True) #was nodeNum2-1
 
 
 def test_bottom_up_sub_trajectorize():
