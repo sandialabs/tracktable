@@ -90,12 +90,13 @@ def from_dict(dictionary):
         point.object_id = dictionary['object_id']
         point.timestamp = Timestamp.from_string(dictionary['timestamps'][i], format_string='%Y-%m-%d %H:%M:%S%z')
         for (name, attributes) in dictionary['point_properties'].items():
-            if attributes['type'] == "timestamp":
-                ts = Timestamp.from_string(attributes['values'][i],
-                                           format_string='%Y-%m-%d %H:%M:%S')
-                point.set_property(name, ts)
-            else:
-                point.set_property(name, attributes['values'][i])
+            if attributes['values'][i] is not None:
+                if attributes['type'] == "timestamp":
+                    ts = Timestamp.from_string(attributes['values'][i],
+                                               format_string='%Y-%m-%d %H:%M:%S%z')
+                    point.set_property(name, ts)
+                else:
+                    point.set_property(name, attributes['values'][i])
         points.append(point)
 
     #make trajectory
@@ -105,7 +106,7 @@ def from_dict(dictionary):
     for (name, attributes) in dictionary['trajectory_properties'].items():
         if attributes['type'] == "timestamp":
             ts = Timestamp.from_string(attributes['value'],
-                                       format_string='%Y-%m-%d %H:%M:%S')
+                                       format_string='%Y-%m-%d %H:%M:%S%z')
             trajectory.set_property(name, ts)
         else:
             trajectory.set_property(name, attributes['value'])
@@ -126,7 +127,7 @@ def to_dict(trajectory):
     dictionary['trajectory_properties'] = {}
     for (name, value) in trajectory.properties.items():
         if isinstance(value, datetime.datetime):
-            ts = Timestamp.to_string(value, include_tz=False)
+            ts = Timestamp.to_string(value, include_tz=True)
             entry = {name: {'type': "timestamp", 'value': ts}}
             dictionary['trajectory_properties'].update(entry)
         else:
@@ -139,13 +140,6 @@ def to_dict(trajectory):
 
     # initialize point properties
     dictionary['point_properties'] = {}
-    for (name, value) in trajectory[0].properties.items():
-        if isinstance(value, datetime.datetime):
-            entry = {name: {'type': "timestamp", 'values': []}}
-            dictionary['point_properties'].update(entry)
-        else:
-            entry = {name: {'type': type(value).__name__, 'values': []}}
-            dictionary['point_properties'].update(entry)
 
     # set timestamps, coordinates and point_properties
     for i in range(len(trajectory)):
@@ -154,10 +148,17 @@ def to_dict(trajectory):
         dictionary['coordinates'].append(tuple(trajectory[i]))
         for (name, value) in trajectory[i].properties.items():
             if isinstance(value, datetime.datetime):
-                ts = Timestamp.to_string(value, include_tz=False)
-                dictionary['point_properties'][name]['values'].append(ts)
+                ts = Timestamp.to_string(value, include_tz=True)
+                if name not in dictionary['point_properties']:
+                    entry = {name: {'type': "timestamp", 'values': [None]*len(trajectory)}}
+                    dictionary['point_properties'].update(entry)
+                dictionary['point_properties'][name]['values'][i] = ts
             else:
-                dictionary['point_properties'][name]['values'].append(value)
+                if name not in dictionary['point_properties']:
+                    entry = {name: {'type': type(value).__name__,
+                                    'values': [None]*len(trajectory)}}
+                    dictionary['point_properties'].update(entry)
+                dictionary['point_properties'][name]['values'][i] = value
 
     return dictionary
 
@@ -189,30 +190,63 @@ def _byteify(data, ignore_dicts = False):
     # if it's anything else, return it in its original form
     return data
 
-def from_json(json_string):
-    """Returns a trajectory constructed from the given json string.
+def from_json_multi(json_string): #todo may want to make a multi version
+    """Returns a list of trajectories constructed from the given json string.
     Args:
-       json: the json to convert into a trajectory
+       json_string: the json to convert into a list of trajectories
     """
+    trajectories = []
     if sys.version_info[0] < 3:
-        return from_dict(json_loads_byteified(json_string))
+        for traj_json_string in json_loads_byteified(json_string):
+            trajectories.append(from_dict(traj_json_string))
     else:
-        return from_dict(json.loads(json_string))
+        for traj_json_string in json.loads(json_string):
+            trajectories.append(from_dict(traj_json_string))
+    return trajectories
+
+def from_json(json_string):
+     """Returns a single trajectory constructed from the given json string.
+    Args:
+       json_string: the json string to convert into a single trajectory
+    """
+     if sys.version_info[0] < 3:
+         return from_dict(json_loads_byteified(json_string))
+     else:
+         return from_dict(json.loads(json_string))
+
+def to_json_multi(trajectories):
+    """Returns a json string constructed from the given list of trajectories
+    Args:
+       trajectories: the trajectories to convert into a dictonary
+                     representation
+    """
+    json_string = "["
+    for trajectory in trajectories:
+        json_string+=json.dumps(to_dict(trajectory), sort_keys=True)+", "
+    json_string=json_string[:-2]+"]" # replace ", " with "]"
+    return json_string
 
 def to_json(trajectory):
-    """Returns a json string constructed from the given trajectory
+    """Returns a json string constructed from the given single trajectory
     Args:
        trajectory: the trajectory to convert into a dictonary representation
     """
-
     return json.dumps(to_dict(trajectory), sort_keys=True)
 
 def from_json_file(json_filename):
     json_string = open(json_filename).read() #todo handle error
     return from_json(json_string)
 
+def from_json_file_multi(json_filename):
+    json_string = open(json_filename).read() #todo handle error
+    return from_json_multi(json_string)
+
 def to_json_file(trajectory, json_filename):
     with open(json_filename, 'w') as outfile: #todo handle error
         outfile.write(to_json(trajectory))
+
+def to_json_file_multi(trajectories, json_filename):
+    with open(json_filename, 'w') as outfile: #todo handle error
+        outfile.write(to_json_multi(trajectories))
 
 #todo can improve performance for large files by streaming
