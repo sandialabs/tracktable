@@ -45,6 +45,7 @@ from tracktable.core import Timestamp
 
 class TestReadWriteDictionary(unittest.TestCase):
     def gen_json_and_trajectory(self):
+        format = '%Y-%m-%d %H:%M:%S%z'
         domain = tracktable.domain.terrestrial
         json = ('{\"coordinates\": [[26.995, -81.9731], [27.0447, -81.9844], '
                 '[27.1136, -82.0458]], \"domain\": \"terrestrial\", '
@@ -54,14 +55,14 @@ class TestReadWriteDictionary(unittest.TestCase):
                 ' \"values\": [108.1, 108.2, 225.3]}, \"note\": {\"type\":'
                 ' \"str\", \"values\": [\"hello\", \"world\", \"!\"]},'
                 ' \"time2\": {\"type\": \"timestamp\", \"values\":'
-                ' [\"2004-01-01 00:00:01\", \"2004-01-01 00:00:02\",'
-                ' \"2004-01-01 00:00:03\"]}}, \"timestamps\":'
+                ' [\"2004-01-01 00:00:01-0000\", \"2004-01-01 00:00:02-0000\",'
+                ' \"2004-01-01 00:00:03-0000\"]}}, \"timestamps\":'
                 ' [\"2004-12-07 11:36:18-0000\", \"2004-12-07 11:37:56-0000\",'
                 ' \"2004-12-07 11:39:18-0000\"], \"trajectory_properties\":'
                 ' {\"percent\": {\"type\": \"float\", \"value\": 33.333},'
                 ' \"platform\": {\"type\": \"str\", \"value\":'
                 ' \"Boeing 747\"}, \"start\": {\"type\": \"timestamp\",'
-                ' \"value\": \"2004-12-07 11:36:00\"}, \"tailNum\":'
+                ' \"value\": \"2004-12-07 11:36:00-0000\"}, \"tailNum\":'
                 ' {\"type\": \"int\", \"value\": 3878}}}')
 
         # Manually set up a matching Trajectory object
@@ -74,10 +75,12 @@ class TestReadWriteDictionary(unittest.TestCase):
         p1.set_property('altitude', 2700)
         p1.set_property('heading', 108.1)
         p1.set_property('note', "hello")
-        p1.set_property('time2', Timestamp.from_string('2004-01-01 00:00:01'))
+        p1.set_property('time2',
+                        Timestamp.from_string('2004-01-01 00:00:01-0000',
+                                              format_string =format))
         p1.object_id = 'AAA001'
         p1.timestamp =Timestamp.from_string('2004-12-07 11:36:18-0000',
-                                            format_string='%Y-%m-%d %H:%M:%S%z')
+                                            format_string=format)
 
         p2 = domain.TrajectoryPoint()
         p2[0] = 27.0447;
@@ -88,10 +91,12 @@ class TestReadWriteDictionary(unittest.TestCase):
         p2.set_property('altitude', 4200)
         p2.set_property('heading', 108.2)
         p2.set_property('note', "world")
-        p2.set_property('time2', Timestamp.from_string('2004-01-01 00:00:02'))
+        p2.set_property('time2',
+                        Timestamp.from_string('2004-01-01 00:00:02-0000',
+                                              format_string =format))
         p2.object_id = 'AAA001'
         p2.timestamp =Timestamp.from_string('2004-12-07 11:37:56-0000',
-                                            format_string='%Y-%m-%d %H:%M:%S%z')
+                                            format_string=format)
 
         p3 = domain.TrajectoryPoint()
         p3[0] = 27.1136;
@@ -102,16 +107,20 @@ class TestReadWriteDictionary(unittest.TestCase):
         p3.set_property('altitude', 6700)
         p3.set_property('heading', 225.3)
         p3.set_property('note', "!")
-        p3.set_property('time2', Timestamp.from_string('2004-01-01 00:00:03'))
+        p3.set_property('time2',
+                        Timestamp.from_string('2004-01-01 00:00:03-0000',
+                                              format_string =format))
         p3.object_id = 'AAA001'
         p3.timestamp =Timestamp.from_string('2004-12-07 11:39:18-0000',
-                                            format_string='%Y-%m-%d %H:%M:%S%z')
+                                            format_string=format)
 
         trajectory = domain.Trajectory.from_position_list([p1,p2,p3])
         trajectory.set_property('percent', 33.333)
         trajectory.set_property('platform', "Boeing 747")
         trajectory.set_property('start',
-                                Timestamp.from_string('2004-12-07 11:36:00'))
+                                Timestamp.from_string(
+                                    '2004-12-07 11:36:00-0000',
+                                    format_string =format))
         trajectory.set_property('tailNum', 3878)
 
         return json, trajectory
