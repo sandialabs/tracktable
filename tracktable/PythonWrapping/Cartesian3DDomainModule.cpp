@@ -150,9 +150,9 @@ void install_cartesian3d_base_point_wrappers()
   using tracktable::python_wrapping::make_point_3d;
 
   class_< base_point_type >("BasePointCartesian3D")
-    .def("__init__", make_constructor(make_point_3d<base_point_type>))
     .def(tracktable::python_wrapping::basic_point_methods())
     .def(tracktable::python_wrapping::point_to_string_methods())
+    .def("__init__", make_constructor(make_point_3d<base_point_type>))
     ;
 }
 
@@ -267,7 +267,8 @@ void install_cartesian3d_trajectory_wrappers()
 
   class_< trajectory_type >("TrajectoryCartesian3D")
     .def(tracktable::python_wrapping::property_access_suite())
-//    .def("from_position_list", &trajectory_from_position_list, return_value_policy<manage_new_object>())
+    .def("from_position_list", tracktable::python_wrapping::trajectory_from_position_list<trajectory_type>, return_value_policy<manage_new_object>())
+    .staticmethod("from_position_list")
     .def("__iter__", iterator<trajectory_type>())
     .def(self==self)
     .def(self!=self)
@@ -281,14 +282,17 @@ void install_cartesian3d_domain_wrappers()
 {
   using namespace boost::python;
 
+  tracktable::domain::cartesian3d::base_point_type base_point;
+  tracktable::domain::cartesian3d::trajectory_point_type trajectory_point;
+
   install_cartesian3d_base_point_wrappers();
   install_cartesian3d_trajectory_point_wrappers();
   install_cartesian3d_trajectory_wrappers();
   install_point_reader_wrappers();
   install_trajectory_reader_wrappers();
+  install_cartesian3d_box_wrappers();
   install_point_writer_wrappers();
   install_trajectory_writer_wrappers();
-  install_cartesian3d_box_wrappers();
 }
 
 BOOST_PYTHON_MODULE(_cartesian3d)

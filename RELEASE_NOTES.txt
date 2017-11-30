@@ -1,6 +1,22 @@
 Tracktable Release Notes
 
 
+VERSION 1.0.4, November 2017
+----------------------------
+
+Notable bugfixes:
+
+* References to std::cout are still in Boost's geometry library.  This
+  causes compile problems if I don't work around it.
+* tracktable.core.Timestamp.from_string() should now honor %z.
+
+New features:
+
+* Trajectories can be written to and read from JSON and Python
+  dictionaries.  At the moment this is only present in Python.  Check
+  out tracktable.io.read_write_dictionary and
+  tracktable.io.read_write_json.  
+
 VERSION 1.0.3, October 2017
 ---------------------------
 

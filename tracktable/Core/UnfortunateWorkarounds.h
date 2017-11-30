@@ -37,11 +37,11 @@
 
 #include <boost/version.hpp>
 
-// The boost::geometry toolkit in Boost 1.61 has a few references to
-// std::cout in files that do not include iostream either directly or
-// transitively.
+// The boost::geometry toolkit in Boost versions 1.61 - 1.65 (at
+// least) includes references to std::cout in files that do not
+// include iostream either directly or transitively.
 
-#if (BOOST_VERSION == 106100)
+#if (BOOST_VERSION >= 106100)
 # include <iostream>
 #endif
 
