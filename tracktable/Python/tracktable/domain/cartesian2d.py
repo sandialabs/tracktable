@@ -40,6 +40,8 @@ from ._cartesian2d import BasePointWriterCartesian2D as BasePointWriter
 from ._cartesian2d import TrajectoryPointWriterCartesian2D as TrajectoryPointWriter
 from ._cartesian2d import TrajectoryWriterCartesian2D as TrajectoryWriter
 
+DIMENSION = 2
+
 domain_classes = {
     'BasePoint': BasePoint,
     'TrajectoryPoint': TrajectoryPoint,
@@ -66,7 +68,7 @@ for domain_class in [
         TrajectoryWriter,
         BoundingBox ]:
     domain_class.domain_classes = domain_classes
-
+    domain_class.DOMAIN = "cartesian2d"
 
 def identity_projection(*coord_lists):
     return coord_lists
