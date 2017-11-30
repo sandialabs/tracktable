@@ -27,7 +27,7 @@ Tracktable has the following required dependencies:
 Python
 ^^^^^^
 
-* Python 2.7 - http://python.org
+* Python 2.7, 3.5, or 3.6 - http://python.org
 * numpy 1.7+ - http://numpy.org
 * Matplotlib 1.2.1+ - http://matplotlib.org
 * Basemap - http://matplotlib.org/basemap
@@ -38,7 +38,7 @@ C++
 ^^^
 
 * Compiler - GCC 4.4.7 or newer (http://gcc.gnu.org), clang 3.5 or newer (http://clang.llvm.org)
-* Boost 1.57 or newer - http://www.boost.org
+* Boost 1.57 or newer, preferably 1.61 or newer - http://www.boost.org
 * GEOS library - http://geos.osgeo.org
 
   - You must build Boost with Boost.Python enabled using the headers
@@ -47,7 +47,7 @@ C++
   - We rely on the r-tree and distance computation code available in
     recent versions of Boost.  These appeared in version 1.55 but have
     serious compile bugs in versions 1.55 and 1.56.  Please use 1.57.0
-    or newer.
+    or newer.  Use 1.61 or newer if at all possible.
 
 Other
 ^^^^^
