@@ -225,10 +225,10 @@ def to_json_multi(trajectories):
        trajectories: the trajectories to convert into a dictonary
                      representation
     """
-    json_string = "["
+    json_string = "[\n"
     for trajectory in trajectories:
         json_string+=json.dumps(to_dict(trajectory), sort_keys=True)+",\n"
-    json_string=json_string[:-2]+"]" # replace ",\n" with "]"
+    json_string=json_string[:-2]+"\n]\n" # replace ",\n" with "]"
     return json_string
 
 def to_json(trajectory):
@@ -239,7 +239,8 @@ def to_json(trajectory):
     return json.dumps(to_dict(trajectory), sort_keys=True)
 
 def from_json_file(json_filename):
-    json_string = open(json_filename).read() #todo handle error
+    with open(json_filename) as file:
+        json_string = file.read() #todo handle error
     return from_json(json_string)
 
 #requires lots of memory for large files.
