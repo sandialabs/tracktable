@@ -38,6 +38,7 @@ from tracktable.io.trajectory import from_json
 from tracktable.io.trajectory import to_json
 from tracktable.io.trajectory import to_json_file
 from tracktable.io.trajectory import from_json_file
+from tracktable.io.trajectory import from_json_file_multi
 
 import tracktable.domain.terrestrial
 
@@ -156,10 +157,17 @@ class TestReadWriteDictionary(unittest.TestCase):
                          msg="Error: The trajectory read in from the file"
                          + " does not match the original trajectory written"
                          + " to the file")
+
+    def tst_multi_trajectories_from_json_file(self):
+        print("Testing reading multiple trajectories from a json file")
+        trajectories = from_json_file_multi("/home/bdnewto/research/edamame/tracktable/TestData/two_trajectories.json") #todo fix this !!!
+        print(trajectories)
+
     def test_json(self):
         self.tst_trajectory_from_json()
         self.tst_json_from_trajectory()
         self.tst_trajectory_from_json_file_from_trajectory()
+        self.tst_multi_trajectories_from_json_file()
 
 if __name__ == '__main__':
     unittest.main()

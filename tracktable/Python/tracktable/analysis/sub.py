@@ -253,17 +253,18 @@ def split_line_at_indices(line, indices):
     segments.append(remainder)
     return segments
 
-def find_straight(path, threshold):
+def find_straight(path, threshold, start_length):
     num_points = len(path.coords)
     if num_points == 3:
-        return split_line_at_indices(path, [1]) # split at middle of three points making two segments
+        return split_line_at_indices(path, [1]), start_length # split at middle of three points making two segments
     if num_points == 2:
         print "************two****" #return [path] #??
     straight_indices = []
-    for i in range(num_points)[1:]:
+    for i in range(num_points)[num_points-start_length+1:]: #start at where we left off previously (don't redo work)  #had +1
+        print i, num_points-i
         for j in range(i+1):
             end_index = num_points-1-i+j
-            print j, end_index, "///"
+            #print j, end_index, "///"
             segs = split_line_at_indices(path, [j, end_index])
             if calcRatio(segs[1]) < threshold:
                 #straight_segments.append({"seg": segs[1], "start_index": j, "end_index": num_points-1-i+j})
@@ -272,45 +273,37 @@ def find_straight(path, threshold):
         if straight_indices: #not empty
             break
     print "start", straight_indices
-    return split_line_at_indices(path, straight_indices)
+    return split_line_at_indices(path, straight_indices), num_points-i
     #print straight_indices #straight_segments
 
-def adapt_helper(G, path, thisIndex, threshold):
+    #consider only segments of length start_length or smaller
+def adapt_helper(G, path, thisIndex, threshold, start_length):
     print "start", path.coords[0], path.coords[-1]
     global nodeNum3
     if calcRatio(path) >= threshold:
-        segs = find_straight(path, threshold)
-        print(segs, "***")
+        segs, strt_len = find_straight(path, threshold, start_length)
+        print(segs, strt_len, "***")
         for i in range(len(segs)):
             if i%2 == 0:#even = not straight
                 if segs[i].coords: #not empty
                     G.add_node(nodeNum3, p=segs[i])
                     G.add_edge(nodeNum3, thisIndex)
                     nodeNum3+=1
-                    adapt_helper(G, segs[i], nodeNum3-1, threshold)
-                    #        for seg in segs[1:][::2]:
+                    adapt_helper(G, segs[i], nodeNum3-1, threshold, strt_len)
             else: #odd = straight
                 G.add_node(nodeNum3, p=segs[i])
                 G.add_edge(nodeNum3, thisIndex)
                 nodeNum3+=1
-            #for seg in segs[0:][::2]:
-
-        #for i in range(len(segs)):
-#    nodeNum3 += 1
 
 def adapt_sub_trajectorize():
-    threshold = 1.1#2#1.1
+    threshold = 1.01#1.05#2#1.1
     path = setup(coords)#2
 
     G = nx.Graph()
     global nodeNum3
     G.add_node(nodeNum3, p=path)
     nodeNum3+=1
-    adapt_helper(G, path, nodeNum3-1, threshold)
-
-    #G.add_node(nodeNum2, p=linemerge([paths[pair[0]].coords, paths[pair[1]].coords]))
-    #G.add_edge(pair[0], nodeNum2)
-    #G.add_edge(pair[1], nodeNum2)
+    adapt_helper(G, path, nodeNum3-1, threshold, len(path.coords))
 
     plotTree(G, 1, with_labels=False, node_size=4000)#False)#True) #was nodeNum2-1
 

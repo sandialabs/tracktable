@@ -51,7 +51,8 @@ def from_dict(dictionary):
         domain = importlib.import_module("tracktable.domain."+
                                          dictionary['domain'].lower())
     except ImportError:
-        raise ValueError("Error: invalid domain name: "+dictionary['domain'].lower())
+        raise ValueError("Error: invalid domain name: "+
+                         dictionary['domain'].lower())
 
     dimension = domain.DIMENSION
 
@@ -88,12 +89,15 @@ def from_dict(dictionary):
     for i in range(numPoints):
         point = domain.TrajectoryPoint(dictionary['coordinates'][i])
         point.object_id = dictionary['object_id']
-        point.timestamp = Timestamp.from_string(dictionary['timestamps'][i], format_string='%Y-%m-%d %H:%M:%S%z')
+        point.timestamp = Timestamp.from_string(dictionary['timestamps'][i],
+                                                format_string=
+                                                '%Y-%m-%d %H:%M:%S%z')
         for (name, attributes) in dictionary['point_properties'].items():
             if attributes['values'][i] is not None:
                 if attributes['type'] == "timestamp":
                     ts = Timestamp.from_string(attributes['values'][i],
-                                               format_string='%Y-%m-%d %H:%M:%S%z')
+                                               format_string=
+                                               '%Y-%m-%d %H:%M:%S%z')
                     point.set_property(name, ts)
                 else:
                     point.set_property(name, attributes['values'][i])
@@ -150,7 +154,8 @@ def to_dict(trajectory):
             if isinstance(value, datetime.datetime):
                 ts = Timestamp.to_string(value, include_tz=True)
                 if name not in dictionary['point_properties']:
-                    entry = {name: {'type': "timestamp", 'values': [None]*len(trajectory)}}
+                    entry = {name: {'type': "timestamp",
+                                    'values': [None]*len(trajectory)}}
                     dictionary['point_properties'].update(entry)
                 dictionary['point_properties'][name]['values'][i] = ts
             else:
@@ -222,8 +227,8 @@ def to_json_multi(trajectories):
     """
     json_string = "["
     for trajectory in trajectories:
-        json_string+=json.dumps(to_dict(trajectory), sort_keys=True)+", "
-    json_string=json_string[:-2]+"]" # replace ", " with "]"
+        json_string+=json.dumps(to_dict(trajectory), sort_keys=True)+",\n"
+    json_string=json_string[:-2]+"]" # replace ",\n" with "]"
     return json_string
 
 def to_json(trajectory):
@@ -237,9 +242,36 @@ def from_json_file(json_filename):
     json_string = open(json_filename).read() #todo handle error
     return from_json(json_string)
 
+#requires lots of memory for large files.
 def from_json_file_multi(json_filename):
     json_string = open(json_filename).read() #todo handle error
     return from_json_multi(json_string)
+
+class from_json_file_iter:
+    def __init__(self, json_file):
+        self.file = json_file
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        line = self.file.readline()  #doing all this will likely slow it down!
+        if not line: #end of file
+            raise StopIteration()
+        if line.replace(" ", "") == "[\n":
+            line = self.file.readline() #skip [\n and read another line
+        if line.strip()[0] == "[":
+            line = line.strip()[1:]#skip [ at head of line #todo is this okay?
+        if line[-2:] == ",\n" or line[-2:] == "]\n":
+            line = line[:-2] #remove ,\n on all but 2nd to last line and ]\n
+                             # on last line
+        if not line: #line is now empty
+            raise StopIteration()
+        else:
+            if sys.version_info[0] < 3:
+                return from_dict(json.loads_byteified(line))
+            else:
+                return from_dict(json.loads(line))
 
 def to_json_file(trajectory, json_filename):
     with open(json_filename, 'w') as outfile: #todo handle error
