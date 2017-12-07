@@ -115,8 +115,7 @@ protected:
     typedef typename StringT::traits_type  traits_type;
 
     LineReaderIterator()
-      : Stream(0),
-        LineNum(0)
+      : Stream(0)
       { }
 
     LineReaderIterator(istream_type* stream)
@@ -163,23 +162,8 @@ protected:
       assert(this->Stream != NULL);
       if (!getline(*this->Stream, this->Value))
         {
-        std::cout << "Setting stream to NULL" << std::endl;
-        if (((*this->Stream).rdstate() & std::istream::failbit) != 0)
-          {
-          std::cout << "Logical error on i/o operation.  failbit" << std::endl;
-          }
-        if (((*this->Stream).rdstate() & std::istream::badbit) != 0)
-          {
-          std::cout << "Read/writing error on i/o operation.  badbit" << std::endl;
-          }
-        if (((*this->Stream).rdstate() & std::istream::eofbit) != 0)
-          {
-          std::cout << "End of file reached.  eofbit" << std::endl;
-          }
         this->Stream = NULL;
         }
-      LineNum++;
-      std::cout << "Read line " << LineNum << std::endl;
       return *this;
       }
 
@@ -204,7 +188,6 @@ protected:
   public:
     istream_type* Stream;
     value_type Value;
-    long LineNum;
   };
 
 public:
