@@ -29,8 +29,9 @@
 # Author: Ben Newton
 # Date:   November, 29, 2017
 
-#Example: python3 asdiToJson.py /ascldap/users/bdnewto/research/edamame/data/asdi/asdi_july_2013.tsv out2.json
-#Example python3 asdiToJson.py /ascldap/users/bdnewto/research/edamame/data/asdi/asdi_july_2013.tsv /data/edamame/july_2013.json
+#Example: python3 asdi_to_json.py /ascldap/users/bdnewto/research/edamame/data/asdi/asdi_july_2013.tsv out2.json
+#Example python3 asdi_to_json.py /data/edamame/asdi/asdi_july_2013.tsv /data/edamame/json/july_2013.json
+#Example python3 asdi_to_json.py /data/edamame/asdi/asdi_july_2013-first10k.tsv /data/edamame/json/asdi_july_2013-first10k.json
 
 
 from tracktable.source.trajectory import AssembleTrajectoryFromPoints
@@ -42,24 +43,47 @@ import importlib
 import datetime
 import argparse
 
-def remove_nulls(traj):
-    for i in range(len(traj)):
-        for (name, value) in traj[i].properties.items():
-            if value == None:
-                del traj[i].properties[name]
+#def remove_nulls(traj):
+#    for i in range(len(traj)):
+#        for (name, value) in traj[i].properties.items():
+#            if value == None:
+#                del traj[i].properties[name]
 
-def make_trajectory_properties(traj):
+#def make_trajectory_properties(traj):
+#    for (name, value) in traj[0].properties.items():
+#        all_same=True
+#        for i in range(len(traj)):
+#            if name not in traj[i].properties or \
+#            traj[i].properties[name] != traj[0].properties[name]:  #could avoid 0 to optimize
+#                all_same=False
+#                break
+#        if(all_same):
+#            traj.set_property(name, traj[0].properties[name]) #make it a trajectory property
+#            for i in range(len(traj)):
+#                del traj[i].properties[name] #remove point properties
+
+def condense_properties(traj): #remove nulls, and make trajectory properties from point properties
+    commonValues = {}
+    #assumes every trajectory point has all the properties  #could change later if needed
     for (name, value) in traj[0].properties.items():
-        all_same=True
+        commonValues[name] = value  #initialize common values to the 0th points properties
+    for i in range(len(traj))[1:]:
+        for (name, value) in traj[i].properties.items():
+            if name in commonValues:  #if not, it has already been seen to have multiple non-None values
+                if commonValues[name] != value:
+                    if commonValues[name] is None:
+                        commonValues[name] = value #only seen None before now
+                    elif value is not None: #they don't match and neither is None
+                        del commonValues[name]
+                    #else value is none only seen none and the single value in common values, continue
+
+    for (name, value) in commonValues.items():
+        if value is not None:
+            traj.set_property(name, value)
         for i in range(len(traj)):
-            if name not in traj[i].properties or \
-            traj[i].properties[name] != traj[0].properties[name]:  #could avoid 0 to optimize
-                all_same=False
-                break
-        if(all_same):
-            traj.set_property(name, traj[0].properties[name]) #make it a trajectory property
-            for i in range(len(traj)):
-                del traj[i].properties[name] #remove point properties
+            del traj[i].properties[name]
+
+
 
 #add later!!!!
 #if only value once make trajectory property # todo may be able to combine with above?
@@ -166,9 +190,10 @@ numberAssembled = 0
 args.json_file.write("[\n")
 
 for traj in trajectory_assembler.trajectories():
-    remove_nulls(traj)
-    make_trajectory_properties(traj)
+    #remove_nulls(traj)
+    #make_trajectory_properties(traj)
     #make_trajectory_properties_single_value(traj)
+    condense_properties(traj)
     if numberAssembled != 0:
         args.json_file.write(",\n") #coma newline before each except first
     args.json_file.write(to_json(traj))
