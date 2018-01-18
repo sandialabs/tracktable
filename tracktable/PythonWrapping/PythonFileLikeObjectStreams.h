@@ -141,7 +141,7 @@ public:
 
     boost::python::extract<std::streamsize> bytes_written(this->Writer(data));
 
-    return (bytes_written.check() ? bytes_written : n);
+    return (bytes_written.check() ? bytes_written() : n);
   }
 
   // Flushable concept
