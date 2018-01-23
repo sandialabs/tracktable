@@ -29,18 +29,25 @@
 # Author: Ben Newton
 # Date:   November, 29, 2017
 
-#Example: python3 readJson.py /home/bdnewto/research/edamame/tracktable/TestData/two_trajectories.json
+#Example: python3 readJson.py tracktable/TestData/two_trajectories.json
 
 import tracktable.io.trajectory as trajectory
 import argparse
+#from memory_profiler import profile
 
-parser = argparse.ArgumentParser(description=
-                                 'Example of Reading a Json file.')
-parser.add_argument('json_file', type=argparse.FileType('r'))
-args = parser.parse_args()
+#@profile
+def read():
+    parser = argparse.ArgumentParser(description=
+                                     'Example of Reading a Json file.')
+    parser.add_argument('json_file', type=argparse.FileType('r'))
+    args = parser.parse_args()
 
-for trajectory in trajectory.from_json_file_iter(args.json_file):
-    print(trajectory)
+    for traj in trajectory.from_ijson_file_iter(args.json_file):
+        print(traj)
+    #trajs = trajectory.from_json_file_multi(args.json_file)
+    #for traj in trajs:
+    #    print(traj)
+    #for trajectory in trajectory.from_json_file_iter(args.json_file):
+    #    print(trajectory)
 
-
-
+read()

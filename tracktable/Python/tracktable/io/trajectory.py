@@ -39,6 +39,8 @@ import sys
 import importlib
 import datetime
 import json
+import ijson
+#import ijson.backends.yajl2_cffi as ijson #would be faster, but don't thik yajl-py is currently supported in python3 (todo could look into later)
 
 def from_dict(dictionary):
     """Returns a trajectory constructed from the given dictionary.
@@ -87,7 +89,8 @@ def from_dict(dictionary):
 
     #generate points / position list
     for i in range(numPoints):
-        point = domain.TrajectoryPoint(dictionary['coordinates'][i])
+        #print(type(dictionary['coordinates'][i]), dictionary['coordinates'][i])
+        point = domain.TrajectoryPoint([float(i) for i in dictionary['coordinates'][i]]) #had to change from Decimal('132.32') to float when using ijson
         point.object_id = dictionary['object_id']
         point.timestamp = Timestamp.from_string(dictionary['timestamps'][i],
                                                 format_string=
@@ -238,15 +241,31 @@ def to_json(trajectory):
     """
     return json.dumps(to_dict(trajectory), sort_keys=True)
 
-def from_json_file(json_filename):
-    with open(json_filename) as file:
-        json_string = file.read() #todo handle error
+def from_json_file(json_file):
+    #with open(json_filename) as file:
+    json_string = json_file.read() #todo handle error
     return from_json(json_string)
 
+def from_ijson_file_multi(json_file):
+    trajectories = []
+    for obj in ijson.items(json_file, 'item'):
+        trajectories.append(from_dict(obj))
+    return trajectories
+
 #requires lots of memory for large files.
-def from_json_file_multi(json_filename):
-    json_string = open(json_filename).read() #todo handle error
+def from_json_file_multi(json_file):
+    json_string = json_file.read()
     return from_json_multi(json_string)
+
+class from_ijson_file_iter:
+    def __init__(self, json_file):
+        self.generator = ijson.items(json_file, 'item')
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        return from_dict(next(self.generator))
 
 class from_json_file_iter:
     def __init__(self, json_file):
