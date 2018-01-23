@@ -99,6 +99,8 @@ def splitPath(path, numResultingPieces):
 
 nodeNum=1  #global variable.  Find a better way! todo  #should it be 0?
 
+nodeNum4=1 #global variable find a better way! #could change to 0 but would need to change all and change plot_path
+
 #recursively subdivide the trajectory until the threshold is reached.
 def subTrajectorize(path, G, prevNum):
     threshold = 1.1
@@ -122,9 +124,9 @@ def setup(coords):
         points.append(Point(coord))
     return LineString(points)
 
-def plotTree(G, fullIndex, with_labels=False, node_size=1000):
-    #fig = plt.figure(figsize=(25, 14), dpi=80)
-    fig = plt.figure(figsize=(12, 7), dpi=80)
+def plotTree(G, fullIndex, with_labels=False, node_size=1000, threshold=0):
+    fig = plt.figure(figsize=(25, 14), dpi=80)
+    #fig = plt.figure(figsize=(12, 7), dpi=80)
     ax = fig.gca()
 
     pos=nx.nx_agraph.graphviz_layout(G, prog='dot')
@@ -135,9 +137,12 @@ def plotTree(G, fullIndex, with_labels=False, node_size=1000):
     paths=nx.get_node_attributes(G, 'p')
 
     for i in range(len(paths)):
+        #print(paths, pos)
+        #print(i)
         plot_path(ax, paths[i+1], pos[i+1], 'b', 5)
         plot_path(ax, paths[fullIndex], pos[i+1], '#f2f2f2', 4) #light grey
-    plt.show()
+    #plt.show()
+    plt.savefig('sub-'+str(threshold)+'.png')
 
     #uncomment below to also plot just the trajectory
     #fig = plt.figure()
@@ -180,7 +185,7 @@ def get_next_piece(path, threshold):
 
 nodeNum2=1
 
-from itertools import izip_longest
+from itertools import zip_longest    #izip_longest in python3
 
 def pairs(iterable):
     even = iterable[::2]
@@ -258,10 +263,10 @@ def find_straight(path, threshold, start_length):
     if num_points == 3:
         return split_line_at_indices(path, [1]), start_length # split at middle of three points making two segments
     if num_points == 2:
-        print "************two****" #return [path] #??
+        print("************two****") #return [path] #??
     straight_indices = []
     for i in range(num_points)[num_points-start_length+1:]: #start at where we left off previously (don't redo work)  #had +1
-        print i, num_points-i
+        print(i, num_points-i)
         for j in range(i+1):
             end_index = num_points-1-i+j
             #print j, end_index, "///"
@@ -272,13 +277,13 @@ def find_straight(path, threshold, start_length):
                 straight_indices.append(end_index)
         if straight_indices: #not empty
             break
-    print "start", straight_indices
+    print("start", straight_indices)
     return split_line_at_indices(path, straight_indices), num_points-i
     #print straight_indices #straight_segments
 
     #consider only segments of length start_length or smaller
 def adapt_helper(G, path, thisIndex, threshold, start_length):
-    print "start", path.coords[0], path.coords[-1]
+    print("start", path.coords[0], path.coords[-1])
     global nodeNum3
     if calcRatio(path) >= threshold:
         segs, strt_len = find_straight(path, threshold, start_length)
@@ -307,13 +312,84 @@ def adapt_sub_trajectorize():
 
     plotTree(G, 1, with_labels=False, node_size=4000)#False)#True) #was nodeNum2-1
 
+def find_all_straight_segments_of_length(path, threshold, segment_length):
+    straight_indices = []
+    num_segments_of_length = (len(path.coords)-segment_length)+1
+    for start_index in range(num_segments_of_length):
+        end_index = start_index+segment_length-1
+        segs = split_line_at_indices(path, [start_index, end_index]) #todo make sure we understand when happens when start_index is 0???
+        if calcRatio(segs[1]) < threshold:
+            straight_indices.append(start_index)
+            straight_indices.append(end_index)
+    print("straight indices",straight_indices)
+    return split_line_at_indices(path, straight_indices)
+
+def has_straight_segments_of_length(path, threshold, segment_length):
+    num_segments_of_length = (len(path.coords)-segment_length)+1
+    for start_index in range(num_segments_of_length):
+        end_index = start_index+segment_length-1
+        segs = split_line_at_indices(path, [start_index, end_index]) #todo make sure we understand when happens when start_index is 0???
+        if calcRatio(segs[1]) < threshold:
+            return True
+    return False
+
+def bin_search_to_find_longest_straight_segments(G, path, thisIndex, threshold, start_length):
+    if calcRatio(path) >= threshold: #if not already straight  - leaves nodes that are straight after being split
+        first = 2
+        last = start_length
+        found = False
+
+        segment_length = last
+        while first<=last and not found:
+            segment_length = (first + last)//2 #midpoint
+            print(segment_length)
+            has_straight_segments_this_long = has_straight_segments_of_length(path, threshold, segment_length)
+            has_straight_segments_one_point_longer = has_straight_segments_of_length(path, threshold, segment_length+1)
+            if(has_straight_segments_this_long and not has_straight_segments_one_point_longer):
+                found = True
+            else:
+                if(has_straight_segments_this_long and has_straight_segments_one_point_longer):
+                    first = segment_length+1
+                else: #not straight either    should never have not straight this, but straight one longer.
+                    last = segment_length-1
+        segs = find_all_straight_segments_of_length(path, threshold, segment_length) #odd segments are straight
+        global nodeNum4
+        for i in range(len(segs)):
+            if i%2 == 0:#even = not straight
+                if segs[i].coords: #not empty
+                    G.add_node(nodeNum4, p=segs[i])
+                    G.add_edge(nodeNum4, thisIndex)
+                    nodeNum4+=1
+                    bin_search_to_find_longest_straight_segments(G, segs[i], nodeNum4-1, threshold, segment_length-1)
+            else: #odd = straight
+                G.add_node(nodeNum4, p=segs[i])
+                G.add_edge(nodeNum4, thisIndex)
+                nodeNum4+=1
+
+def bin_search_sub_trajectorize():
+    threshold = 1.001 #1.1#1.01#1.05#2#1.1
+    path = setup(coords)
+
+    G = nx.Graph()
+    global nodeNum4
+    G.add_node(nodeNum4, p=path)
+    nodeNum4+=1
+    bin_search_to_find_longest_straight_segments(G, path, nodeNum4-1, threshold, len(path.coords))
+
+    #print("plotting...")
+    plotTree(G, 1, with_labels=False, node_size=4000, threshold=threshold)#False)#True) #was nodeNum2-1
+
 def test_bottom_up_sub_trajectorize():
     bottom_up_sub_trajectorize()
 
 def test_adapt_sub_trajectorize():
     adapt_sub_trajectorize()
 
+def test_bin_search_sub_trajectorize():
+    bin_search_sub_trajectorize()
+
 if __name__ == "__main__":
     #test_sub_trajectorize()
     #test_bottom_up_sub_trajectorize()
-    test_adapt_sub_trajectorize()
+    #test_adapt_sub_trajectorize()
+    test_bin_search_sub_trajectorize()  #much faster than adapt with same output
