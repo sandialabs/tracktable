@@ -73,6 +73,8 @@ import matplotlib.pyplot as plt
 
 #Adjust position and scale for plotting over the tree
 def plot_path(ax, line, pos, color, zorder):
+    #print("*")
+    #print(line)
     x, y = line.xy
     xr = np.array(x)*20
     yr = np.array(y)*20
@@ -86,13 +88,30 @@ def compute_norm_dist_matrix(coords):
     distance_matrix = np.zeros(shape=(len(coords), len(coords)))
 
     for x in range(1, len(coords)):
-        distance_matrix[x,0] = compute_distance(coords[x], coords[x-1]) + distance_matrix[x-1, 0]
+        distance_matrix[0, x] = compute_distance(coords[x], coords[x-1]) + distance_matrix[0,x-1]
+        distance_matrix[x, 0] = distance_matrix[0, x]
 
-    for end in range(1, len(coords)):
-        for start in range(end+1, len(coords)):
-            distance_matrix[start,end] = 
-    print(distance_matrix)
-#for x in range(
+    for start in range(1, len(coords)):
+        for end in range(start+1, len(coords)):
+            distance_matrix[start,end] = distance_matrix[start-1, end]-distance_matrix[start-1,start]
+            distance_matrix[end,start] = distance_matrix[start,end]
+
+    #ratio of distance traveled to separation distance of start and end
+    normalized_distance_matrix = np.copy(distance_matrix)
+    for start in range(0, len(coords)):
+        for end in range(start+1, len(coords)):
+            normalized_distance_matrix[start,end]/=compute_distance(coords[start], coords[end])
+            normalized_distance_matrix[end,start] = normalized_distance_matrix[start,end]
+
+    #print(distance_matrix)
+    #print(normalized_distance_matrix)
+    return normalized_distance_matrix
+
+def is_straight(start, end, normalized_distance_matrix, threshold=1.1):
+    return norm_dist(start,end, normalized_distance_matrix) < threshold
+
+def norm_dist(start, end, normalized_distance_matrix):
+    return normalized_distance_matrix[start, end]
 
 #Calculate the ratio of path length to separation of endpoints.
 def calcRatio(line):
@@ -140,6 +159,16 @@ def setup(coords):
     points = []
     for coord in coords:
         points.append(Point(coord))
+    return LineString(points)
+
+def get_path_piece(start, end, coords):
+    #print("**")
+    #print(start,end)
+    #print("**")
+    points = []
+    for coord in coords[start:end+1]:
+        points.append(Point(coord))
+    #print(LineString(points))
     return LineString(points)
 
 def plotTree(G, fullIndex, with_labels=False, node_size=1000, threshold=0):
@@ -256,6 +285,27 @@ def bottom_up_sub_trajectorize():
 
 nodeNum3 = 1
 
+#todo likely can simplify below
+def new_split_at_indices(indices, start, end):  #indices assumed to be increasing can have two the same !!
+    segments = []
+    remainderStart = start
+    remainderEnd = end
+    for i in indices:
+        if i == start:
+            segments.append(None)
+        elif i == end:
+            segments.append([remainderStart, remainderEnd])
+        elif i== remainderStart:
+            segments.append(None)
+        else:
+            segments.append([remainderStart, i])
+            remainderStart = i
+    if remainderStart == remainderEnd:
+        segments.append(None)
+    else:
+        segments.append([remainderStart, remainderEnd])
+    return segments
+
 #assumes indices are in order could check or sort.
 def split_line_at_indices(line, indices):
     segments = []
@@ -330,29 +380,37 @@ def adapt_sub_trajectorize():
 
     plotTree(G, 1, with_labels=False, node_size=4000)#False)#True) #was nodeNum2-1
 
-def find_all_straight_segments_of_length(path, threshold, segment_length):
+def find_all_straight_segments_of_length(threshold, segment_length, norm_dist_matrix, start, end):  #how to handle overlap?
     straight_indices = []
-    num_segments_of_length = (len(path.coords)-segment_length)+1
-    for start_index in range(num_segments_of_length):
+    num_segments_of_length = ((end-start+1)-segment_length)+1
+    #for start_index in range(num_segments_of_length):
+    start_index = 0
+    while start_index < num_segments_of_length:
         end_index = start_index+segment_length-1
-        segs = split_line_at_indices(path, [start_index, end_index]) #todo make sure we understand when happens when start_index is 0???
-        if calcRatio(segs[1]) < threshold:
-            straight_indices.append(start_index)
-            straight_indices.append(end_index)
-    print("straight indices",straight_indices)
-    return split_line_at_indices(path, straight_indices)
+        segs = new_split_at_indices([start_index+start, end_index+start], start, end) #todo make sure we understand when happens when start_index is 0???
+        #if calcRatio(segs[1]) < threshold:
+        if is_straight(segs[1][0], segs[1][1], norm_dist_matrix, threshold):
+            straight_indices.append(start_index+start)
+            straight_indices.append(end_index+start)
+            start_index=end_index #to avoid overlap
+        else:
+            start_index+=1
+    print("straight indices",straight_indices, start, end)
+    return new_split_at_indices(straight_indices, start, end)
 
-def has_straight_segments_of_length(path, threshold, segment_length):
-    num_segments_of_length = (len(path.coords)-segment_length)+1
+def has_straight_segments_of_length(threshold, segment_length, norm_dist_matrix, start, end):
+    num_segments_of_length = ((end-start+1)-segment_length)+1
     for start_index in range(num_segments_of_length):
         end_index = start_index+segment_length-1
-        segs = split_line_at_indices(path, [start_index, end_index]) #todo make sure we understand when happens when start_index is 0???
-        if calcRatio(segs[1]) < threshold:
+        segs = new_split_at_indices([start_index+start, end_index+start], start, end) #todo make sure we understand when happens when start_index is 0???
+        #if calcRatio(segs[1]) < threshold:
+        if is_straight(segs[1][0], segs[1][1], norm_dist_matrix, threshold):
             return True
     return False
 
-def bin_search_to_find_longest_straight_segments(G, path, thisIndex, threshold, start_length):
-    if calcRatio(path) >= threshold: #if not already straight  - leaves nodes that are straight after being split
+def bin_search_to_find_longest_straight_segments(G, coords, thisIndex, threshold, start_length, norm_dist_matrix, start, end):
+    print(start, end)
+    if not is_straight(start, end, norm_dist_matrix, threshold=threshold): #calcRatio(path) >= threshold: #if not already straight  - leaves nodes that are straight after being split
         first = 2
         last = start_length
         found = False
@@ -361,8 +419,8 @@ def bin_search_to_find_longest_straight_segments(G, path, thisIndex, threshold, 
         while first<=last and not found:
             segment_length = (first + last)//2 #midpoint
             print(segment_length)
-            has_straight_segments_this_long = has_straight_segments_of_length(path, threshold, segment_length)
-            has_straight_segments_one_point_longer = has_straight_segments_of_length(path, threshold, segment_length+1)
+            has_straight_segments_this_long = has_straight_segments_of_length(threshold, segment_length, norm_dist_matrix, start, end)
+            has_straight_segments_one_point_longer = has_straight_segments_of_length(threshold, segment_length+1, norm_dist_matrix, start, end)
             if(has_straight_segments_this_long and not has_straight_segments_one_point_longer):
                 found = True
             else:
@@ -370,32 +428,38 @@ def bin_search_to_find_longest_straight_segments(G, path, thisIndex, threshold, 
                     first = segment_length+1
                 else: #not straight either    should never have not straight this, but straight one longer.
                     last = segment_length-1
-        segs = find_all_straight_segments_of_length(path, threshold, segment_length) #odd segments are straight
+        segs = find_all_straight_segments_of_length(threshold, segment_length, norm_dist_matrix, start, end) #odd segments are straight
+        print(segs)
         global nodeNum4
         for i in range(len(segs)):
             if i%2 == 0:#even = not straight
-                if segs[i].coords: #not empty
-                    G.add_node(nodeNum4, p=segs[i])
+                #if segs[i].coords: #not empty
+                if segs[i] != None:
+                    G.add_node(nodeNum4, p=get_path_piece(segs[i][0], segs[i][1], coords))
                     G.add_edge(nodeNum4, thisIndex)
                     nodeNum4+=1
-                    bin_search_to_find_longest_straight_segments(G, segs[i], nodeNum4-1, threshold, segment_length-1)
+                    bin_search_to_find_longest_straight_segments(G, coords, nodeNum4-1, threshold, segment_length-1, norm_dist_matrix, segs[i][0], segs[i][1])
             else: #odd = straight
-                G.add_node(nodeNum4, p=segs[i])
+                G.add_node(nodeNum4, p=get_path_piece(segs[i][0], segs[i][1], coords))
                 G.add_edge(nodeNum4, thisIndex)
                 nodeNum4+=1
 
 def bin_search_sub_trajectorize():
     threshold = 1.001 #1.1#1.01#1.05#2#1.1
-    path = setup(coords)
+    path = setup(coords)  #or get_path_piece
+
+    norm_dist_matrix = compute_norm_dist_matrix(coords)
 
     G = nx.Graph()
     global nodeNum4
     G.add_node(nodeNum4, p=path)
     nodeNum4+=1
-    bin_search_to_find_longest_straight_segments(G, path, nodeNum4-1, threshold, len(path.coords))
+    start=0;
+    end = len(coords)-1
+    bin_search_to_find_longest_straight_segments(G, coords, nodeNum4-1, threshold, len(path.coords), norm_dist_matrix, start, end)
 
     #print("plotting...")
-    #plotTree(G, 1, with_labels=False, node_size=4000, threshold=threshold)#False)#True) #was nodeNum2-1
+    plotTree(G, 1, with_labels=False, node_size=4000, threshold=threshold)#False)#True) #was nodeNum2-1
 
 def test_bottom_up_sub_trajectorize():
     bottom_up_sub_trajectorize()
@@ -411,5 +475,5 @@ if __name__ == "__main__":
     #test_bottom_up_sub_trajectorize()
     #test_adapt_sub_trajectorize()
 
-    #test_bin_search_sub_trajectorize()  #much faster than adapt with same output
-    compute_norm_dist_matrix(coords5)
+    test_bin_search_sub_trajectorize()  #much faster than adapt with same output
+    #compute_norm_dist_matrix(coords5)
