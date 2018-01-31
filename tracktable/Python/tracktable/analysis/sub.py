@@ -100,7 +100,11 @@ def compute_norm_dist_matrix(coords):
     normalized_distance_matrix = np.copy(distance_matrix)
     for start in range(0, len(coords)):
         for end in range(start+1, len(coords)):
-            normalized_distance_matrix[start,end]/=compute_distance(coords[start], coords[end])
+            dist = compute_distance(coords[start], coords[end])
+            if dist != 0.0:
+                normalized_distance_matrix[start,end]/=compute_distance(coords[start], coords[end])
+            else:
+                normalized_distance_matrix[start,end]= 0.0 #is this okay?
             normalized_distance_matrix[end,start] = normalized_distance_matrix[start,end]
 
     #print(distance_matrix)
@@ -138,6 +142,8 @@ nodeNum=1  #global variable.  Find a better way! todo  #should it be 0?
 
 nodeNum4=1 #global variable find a better way! #could change to 0 but would need to change all and change plot_path
 
+nodeNum5 = 1
+
 #recursively subdivide the trajectory until the threshold is reached.
 def subTrajectorize(path, G, prevNum):
     threshold = 1.1
@@ -170,6 +176,16 @@ def get_path_piece(start, end, coords):
         points.append(Point(coord))
     #print(LineString(points))
     return LineString(points)
+
+def plotTreeNew(G, fullIndex, coords, with_labels=False, node_size=1000, threshold=0):
+    #for n,d in G.nodes_iter(data=True):
+    #    n['p'] = get_path_piece(d['s'], d['e'], coords)
+    starts = nx.get_node_attributes(G, 's')
+    ends = nx.get_node_attributes(G, 'e')
+    for i in range(len(starts)):
+        G.node[i+1]['p'] = get_path_piece(starts[i+1], ends[i+1], coords)
+
+    plotTree(G, fullIndex, with_labels=with_labels, node_size=node_size, threshold=threshold)
 
 def plotTree(G, fullIndex, with_labels=False, node_size=1000, threshold=0):
     fig = plt.figure(figsize=(25, 14), dpi=80)
@@ -291,15 +307,19 @@ def new_split_at_indices(indices, start, end):  #indices assumed to be increasin
     remainderStart = start
     remainderEnd = end
     for i in indices:
-        if i == start:
-            segments.append(None)
-        elif i == end:
-            segments.append([remainderStart, remainderEnd])
-        elif i== remainderStart:
-            segments.append(None)
+        if i >= remainderStart:  #otherwise ignore?
+            if i == start:
+                segments.append(None)
+            #elif i == end:
+            #    segments.append([remainderStart, remainderEnd]) #can be combinde with normal case I think
+            #    remainderStart = i
+            elif i== remainderStart:
+                segments.append(None)
+            else:
+                segments.append([remainderStart, i])
+                remainderStart = i
         else:
-            segments.append([remainderStart, i])
-            remainderStart = i
+            segments.append(None)   #todo think through this a bit more!
     if remainderStart == remainderEnd:
         segments.append(None)
     else:
@@ -452,7 +472,7 @@ def bin_search_sub_trajectorize():
 
     G = nx.Graph()
     global nodeNum4
-    G.add_node(nodeNum4, p=path)
+    G.add_node(nodeNum4, p=path) #get rid of path later!
     nodeNum4+=1
     start=0;
     end = len(coords)-1
@@ -460,6 +480,55 @@ def bin_search_sub_trajectorize():
 
     #print("plotting...")
     plotTree(G, 1, with_labels=False, node_size=4000, threshold=threshold)#False)#True) #was nodeNum2-1
+
+def matrix_search_to_find_longest_straight_segments(G, coords, thisIndex, threshold, start_length, norm_dist_matrix, start, end):
+    #print(start, end, start_length)
+    if not is_straight(start, end, norm_dist_matrix, threshold=threshold):
+        indices = []
+        new_start_length = start_length
+        for segment_length in range(start_length, 2, -1): #is 2 right?
+            num_segments_of_length = ((end-start+1)-segment_length)+1
+            for start_index in range(num_segments_of_length):
+                end_index = start_index+segment_length-1
+                #print(start_index, end_index, "***")
+                if norm_dist_matrix[start_index+start, end_index+start] < threshold:
+                    indices.append(start_index+start)
+                    indices.append(end_index+start)
+            if indices:
+                new_start_length = segment_length-1
+                break
+        #print("indices", indices)
+        segs = new_split_at_indices(indices, start, end)
+        #print("segs", segs)
+        global nodeNum5
+        for i in range(len(segs)):
+            if i%2 == 0:#even = not straight
+                if segs[i] != None:
+                    G.add_node(nodeNum5, s=segs[i][0], e=segs[i][1])#p=get_path_piece(segs[i][0], segs[i][1], coords))
+                    G.add_edge(nodeNum5, thisIndex)
+                    nodeNum5+=1
+                    matrix_search_to_find_longest_straight_segments(G, coords, nodeNum5-1, threshold, new_start_length, norm_dist_matrix, segs[i][0], segs[i][1])
+            else: #odd = straight
+                G.add_node(nodeNum5, s=segs[i][0], e=segs[i][1])#p=get_path_piece(segs[i][0], segs[i][1], coords))
+                G.add_edge(nodeNum5, thisIndex)
+                nodeNum5+=1
+    #else:
+        #print("already straight")
+def matrix_sub_trajectorize():
+    threshold = 1.1
+
+    norm_dist_matrix = compute_norm_dist_matrix(coords)
+
+    G = nx.Graph()
+    global nodeNum5
+    start=0
+    end = len(coords)-1
+    G.add_node(nodeNum5, s=start, e=end)#p=get_path_piece(start, end, coords))
+    nodeNum5+=1
+
+    matrix_search_to_find_longest_straight_segments(G, coords, nodeNum5-1, threshold, len(coords), norm_dist_matrix, start, end)
+
+    plotTreeNew(G, 1, coords, with_labels=False, node_size=4000, threshold=threshold)#False)#True) #was nodeNum2-1
 
 def test_bottom_up_sub_trajectorize():
     bottom_up_sub_trajectorize()
@@ -470,10 +539,15 @@ def test_adapt_sub_trajectorize():
 def test_bin_search_sub_trajectorize():
     bin_search_sub_trajectorize()
 
+def test_matrix_sub_trajectorize():
+    matrix_sub_trajectorize()
+
 if __name__ == "__main__":
     #test_sub_trajectorize()
     #test_bottom_up_sub_trajectorize()
     #test_adapt_sub_trajectorize()
 
-    test_bin_search_sub_trajectorize()  #much faster than adapt with same output
+    #test_bin_search_sub_trajectorize()  #much faster than adapt with same output
     #compute_norm_dist_matrix(coords5)
+
+    test_matrix_sub_trajectorize()
