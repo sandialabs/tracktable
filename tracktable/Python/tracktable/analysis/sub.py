@@ -69,6 +69,7 @@ import networkx as nx
 #from networkx.drawing.nx_pydot import write_dot
 import matplotlib.pyplot as plt
 
+import cProfile
 
 
 #Adjust position and scale for plotting over the tree
@@ -81,7 +82,11 @@ def plot_path(ax, line, pos, color, zorder):
     ax.plot(xr+pos[0]+2250, yr+pos[1]-930, color=color, linewidth=1, solid_capstyle='round', zorder=zorder)
 
 def compute_distance(a, b):
-    return sqrt((b[0]-a[0])*(b[0]-a[0]) + (b[1] - a[1])*(b[1] - a[1]))
+    return sqrt(compute_squared_distance(a,b))
+
+def compute_squared_distance(a, b):
+    return (b[0] - a[0])*(b[0] - a[0]) + (b[1] - a[1])*(b[1] - a[1])
+#return ((b[0] - a[0]) ** 2) + ((b[1] - a[1]) ** 2)  #seemed slightly slower?
 
 #compute total distance traveled at each point of the trajectory
 def compute_norm_dist_matrix(coords):
@@ -517,18 +522,19 @@ def matrix_search_to_find_longest_straight_segments(G, coords, thisIndex, thresh
 def matrix_sub_trajectorize():
     threshold = 1.1
 
-    norm_dist_matrix = compute_norm_dist_matrix(coords)
+    coords_used = coords
+    norm_dist_matrix = compute_norm_dist_matrix(coords_used)
 
     G = nx.Graph()
     global nodeNum5
     start=0
-    end = len(coords)-1
+    end = len(coords_used)-1
     G.add_node(nodeNum5, s=start, e=end)#p=get_path_piece(start, end, coords))
     nodeNum5+=1
 
-    matrix_search_to_find_longest_straight_segments(G, coords, nodeNum5-1, threshold, len(coords), norm_dist_matrix, start, end)
+    matrix_search_to_find_longest_straight_segments(G, coords_used, nodeNum5-1, threshold, len(coords_used), norm_dist_matrix, start, end)
 
-    plotTreeNew(G, 1, coords, with_labels=False, node_size=4000, threshold=threshold)#False)#True) #was nodeNum2-1
+    #plotTreeNew(G, 1, coords_used, with_labels=False, node_size=4000, threshold=threshold)#False)#True) #was nodeNum2-1
 
 def test_bottom_up_sub_trajectorize():
     bottom_up_sub_trajectorize()
@@ -550,4 +556,6 @@ if __name__ == "__main__":
     #test_bin_search_sub_trajectorize()  #much faster than adapt with same output
     #compute_norm_dist_matrix(coords5)
 
-    test_matrix_sub_trajectorize()
+    #test_matrix_sub_trajectorize()
+
+    cProfile.run('matrix_sub_trajectorize()')
