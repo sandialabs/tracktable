@@ -37,47 +37,52 @@ class NormalizedDistanceMatrix:
     sub-trajectory"""
 
     def __init__(self, coords, threshold=1.1):
-        self.distance_matrix = np.zeros(shape=(len(coords), len(coords)))
+        self.dist_mat = np.zeros(shape=(len(coords), len(coords)))
         self.threshold = threshold
 
         for x in range(1, len(coords)):
-            self.distance_matrix[0, x] = self.compute_distance(coords[x], coords[x-1]) + self.distance_matrix[0,x-1]
-            self.distance_matrix[x, 0] = self.distance_matrix[0, x]
+            self.dist_mat[0, x] = \
+            self.dist(coords[x], coords[x-1]) + self.dist_mat[0,x-1]
+            self.dist_mat[x, 0] = self.dist_mat[0, x]
 
         for start in range(1, len(coords)):
             for end in range(start+1, len(coords)):
-                self.distance_matrix[start,end] = self.distance_matrix[start-1, end]-self.distance_matrix[start-1,start]
-                self.distance_matrix[end,start] = self.distance_matrix[start,end]
+                self.dist_mat[start,end] = \
+                self.dist_mat[start-1, end] - self.dist_mat[start-1,start]
+                self.dist_mat[end,start] = self.dist_mat[start,end]
 
         #ratio of distance traveled to separation distance of start and end
-        self.normalized_distance_matrix = np.copy(self.distance_matrix)
+        self.norm_dist_mat = np.copy(self.dist_mat)
         for start in range(0, len(coords)):
             for end in range(start+1, len(coords)):
-                dist = self.compute_distance(coords[start], coords[end])
+                dist = self.dist(coords[start], coords[end])
                 if dist != 0.0:
-                    self.normalized_distance_matrix[start,end]/=self.compute_distance(coords[start], coords[end])
+                    self.norm_dist_mat[start,end] /= self.dist(coords[start],
+                                                               coords[end])
                 else:
-                    self.normalized_distance_matrix[start,end]= 0.0 #is this okay?
-                self.normalized_distance_matrix[end,start] = self.normalized_distance_matrix[start,end]
+                    self.norm_dist_mat[start,end]= 0.0 #is this okay?
+                self.norm_dist_mat[end,start] = self.norm_dist_mat[start,end]
 
-    def compute_squared_distance(self, a, b):
+    def squared_dist(self, a, b):
         return (b[0] - a[0])*(b[0] - a[0]) + (b[1] - a[1])*(b[1] - a[1])
 
-    def compute_distance(self, a, b):
-        return sqrt(self.compute_squared_distance(a,b))
+    def dist(self, a, b):
+        return sqrt(self.squared_dist(a,b))
 
     def is_straight(self, start, end):
-        return self.normalized_distance_matrix[start,end] < self.threshold
+        return self.norm_dist_mat[start,end] < self.threshold
 
 class SubTrajectorizer:
     'Splits a trajectory into straight-ish segments'
     def __init__(self, straightness_threshold=1.1):
         self.threshold = straightness_threshold
         self.currentNodeIndex = 1 #change to 0
-        self.norm_dist_matrix = NormalizedDistanceMatrix([]) #todo better way?
+        self.norm_dist_mat = NormalizedDistanceMatrix([]) #todo better way?
 
     def split_at_indices(self, indices, start, end):
-        'returns a list of index pairs, and/or "None" objects.  Even elements are not straight segments or are None.  Odd elements are the straight segments'
+        """returns a list of index pairs, and/or "None" objects.  Even
+        elements are not straight segments or are None.  Odd elements are the
+        straight segments"""
         segments = []
         remainderStart = start
         remainderEnd = end
@@ -90,7 +95,9 @@ class SubTrajectorizer:
                 else:
                     segments.append([remainderStart, i])
                     remainderStart = i
-            else: #overalpping segments, ignore second one.  TODO, later may want to use a better way to determine which overlapping segment to use
+            else: #overalpping segments, ignore second one.  TODO, later may
+                #want to use a better way to determine which overlapping
+                #segment to use
                 segments.append(None)
         if remainderStart == remainderEnd:
             segments.append(None)
@@ -98,16 +105,18 @@ class SubTrajectorizer:
             segments.append([remainderStart, remainderEnd])
         return segments
 
-    def find_longest_straight_segments(self, G, coords, thisIndex, start_length, start, end):
+    def longest_straight_segments(self, G, coords, thisIndex,
+                                       start_length, start, end):
         #print(start,end, start_length)
-        if not self.norm_dist_matrix.is_straight(start, end):
+        if not self.norm_dist_mat.is_straight(start, end):
             indices = []
             new_start_length = start_length
             for segment_length in range(start_length, 2, -1): #is 2 right?
                 num_segments_of_length = ((end-start+1)-segment_length)+1
                 for start_index in range(num_segments_of_length):
                     end_index = start_index+segment_length-1
-                    if self.norm_dist_matrix.is_straight(start_index+start, end_index+start):
+                    if self.norm_dist_mat.is_straight(start_index+start,
+                                                         end_index+start):
                         indices.append(start_index+start)
                         indices.append(end_index+start)
                 if indices:
@@ -117,28 +126,37 @@ class SubTrajectorizer:
             for i in range(len(segs)):
                 if i%2 == 0: #even = not straight
                     if segs[i] != None:
-                        G.add_node(self.currentNodeIndex, s=segs[i][0], e=segs[i][1])
+                        G.add_node(self.currentNodeIndex, s=segs[i][0],
+                                   e=segs[i][1])
                         G.add_edge(thisIndex, self.currentNodeIndex)
                         self.currentNodeIndex+=1
-                        self.find_longest_straight_segments(G, coords, self.currentNodeIndex-1, new_start_length, segs[i][0], segs[i][1])
+                        self.longest_straight_segments(G, coords,
+                                                       self.currentNodeIndex-1,
+                                                       new_start_length,
+                                                       segs[i][0],
+                                                       segs[i][1])
                 else: #odd = straight
-                    G.add_node(self.currentNodeIndex, s=segs[i][0], e=segs[i][1])#p=get_path_piece(segs[i][0], segs[i][1], coords))
+                    G.add_node(self.currentNodeIndex, s=segs[i][0],
+                               e=segs[i][1])
                     G.add_edge(thisIndex, self.currentNodeIndex)
                     self.currentNodeIndex+=1
 
     def subtrajectorize(self, trajectory, returnGraph=False):
         coordinates = trajectory # later get coordinates here
         self.currentNodeIndex = 1
-        self.norm_dist_matrix = NormalizedDistanceMatrix(coordinates,
-                                                         threshold=self.threshold)
+        self.norm_dist_mat = NormalizedDistanceMatrix(coordinates,
+                                                      threshold=self.threshold)
 
         G = nx.DiGraph()
         start = 0
         end = len(coordinates)-1
         G.add_node(self.currentNodeIndex, s=start, e=end)
         self.currentNodeIndex += 1
-        self.find_longest_straight_segments(G, coordinates, 1, len(coordinates), start, end)
-        leaves = [(G.node[x]['s'], G.node[x]['e']) for x in G.nodes() if G.out_degree(x)==0 and G.in_degree(x)==1] #G# ?
+        self.longest_straight_segments(G, coordinates, 1,
+                                            len(coordinates), start, end)
+        leaves = [(G.node[x]['s'], G.node[x]['e'])
+                  for x in G.nodes() if G.out_degree(x)==0 and
+                  G.in_degree(x)==1]
         if returnGraph:
             return leaves, G
         else:
