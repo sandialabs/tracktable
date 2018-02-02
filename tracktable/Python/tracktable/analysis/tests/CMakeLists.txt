@@ -38,7 +38,7 @@ set(ANALYSIS "tracktable.analysis.tests")
 add_python_test(P_DBSCAN ${ANALYSIS}.test_dbscan_clustering)
 add_python_test(P_RTree_Nearest_Neighbors ${ANALYSIS}.test_rtree_nearest_neighbors)
 add_python_test(P_RTree_Points_In_Box ${ANALYSIS}.test_rtree_points_in_box)
-
+add_python_test(P_Sub_Trajectorize ${ANALYSIS}.test_sub_trajectorize)
 
 # add_test(
 #   NAME P_DBSCAN
