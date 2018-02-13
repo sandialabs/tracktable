@@ -143,22 +143,28 @@ def plot_path(ax, line, pos, color, zorder):
     x, y = line.xy
     xr = np.array(x)*20
     yr = np.array(y)*20
-    ax.plot(xr+pos[0]+2250, yr+pos[1]-930, color=color, linewidth=1, solid_capstyle='round', zorder=zorder)
+    ax.plot(xr+pos[0]+2250, yr+pos[1]-930, color=color, linewidth=1,
+            solid_capstyle='round', zorder=zorder)
 
-def plotTree(G, coords, with_labels=False, node_size=1000, threshold=1.1, savefig=False):
+def plotTree(G, coords, with_labels=False, node_size=1000, threshold=1.1,
+             savefig=False):
     starts = nx.get_node_attributes(G, 's')
     ends = nx.get_node_attributes(G, 'e')
     for i in range(len(starts)):
         G.node[i+1]['p'] = get_path_piece(starts[i+1], ends[i+1], coords)
 
-    plotTreeHelper(G, with_labels=with_labels, node_size=node_size, threshold=threshold, savefig=savefig)
+    plotTreeHelper(G, with_labels=with_labels, node_size=node_size,
+                   threshold=threshold, savefig=savefig)
 
-def plotTreeHelper(G, with_labels=False, node_size=1000, threshold=1.1, savefig=False):
+def plotTreeHelper(G, with_labels=False, node_size=1000, threshold=1.1,
+                   savefig=False):
     fig = plt.figure(figsize=(25, 14), dpi=80)
     ax = fig.gca()
 
     pos=nx.nx_agraph.graphviz_layout(G, prog='dot')
-    nx.draw(G, pos, with_labels=with_labels, arrows=False, node_size=node_size, zorder=1, width=1, linewidths=0, node_color='w') #size was 1000
+    nx.draw(G, pos, with_labels=with_labels, arrows=False,
+            node_size=node_size, zorder=1, width=1, linewidths=0,
+            node_color='w') #size was 1000
 
     paths=nx.get_node_attributes(G, 'p')
 
@@ -173,8 +179,10 @@ def plotTreeHelper(G, with_labels=False, node_size=1000, threshold=1.1, savefig=
 
 def main():
 
-    threshold = 1.1
-    subtrajer = st.SubTrajectorizer(threshold)
+    threshold = 1.001
+    length_threshold_samples = 7  #2 is minimum
+    subtrajer = st.SubTrajectorizer(straightness_threshold=threshold,
+                                    length_threshold_samples=length_threshold_samples)
     leaves, G = subtrajer.subtrajectorize(coords, returnGraph=True)
     plotTree(G, coords, with_labels=False, node_size=4000, threshold=threshold, savefig=False)
 

@@ -74,8 +74,9 @@ class NormalizedDistanceMatrix:
 
 class SubTrajectorizer:
     'Splits a trajectory into straight-ish segments'
-    def __init__(self, straightness_threshold=1.1):
+    def __init__(self, straightness_threshold=1.1, length_threshold_samples=2): #2 is minimum
         self.threshold = straightness_threshold
+        self.length_threshold_samples = length_threshold_samples
         self.currentNodeIndex = 1 #change to 0
         self.norm_dist_mat = NormalizedDistanceMatrix([]) #todo better way?
 
@@ -107,11 +108,13 @@ class SubTrajectorizer:
 
     def longest_straight_segments(self, G, coords, thisIndex,
                                        start_length, start, end):
-        #print(start,end, start_length)
-        if not self.norm_dist_mat.is_straight(start, end):
+        if start_length >= (end-start+1):
+            start_length = end-start
+        print(start, end, start_length)
+        if (not self.norm_dist_mat.is_straight(start, end)) and (end-start+1) > self.length_threshold_samples :
             indices = []
             new_start_length = start_length
-            for segment_length in range(start_length, 2, -1): #is 2 right?
+            for segment_length in range(start_length, 1, -1):
                 num_segments_of_length = ((end-start+1)-segment_length)+1
                 for start_index in range(num_segments_of_length):
                     end_index = start_index+segment_length-1
@@ -124,7 +127,7 @@ class SubTrajectorizer:
                     break
             segs = self.split_at_indices(indices, start, end)
             for i in range(len(segs)):
-                if i%2 == 0: #even = not straight
+                if i%2 == 0: #even = not straight, recurse
                     if segs[i] != None:
                         G.add_node(self.currentNodeIndex, s=segs[i][0],
                                    e=segs[i][1])
@@ -135,7 +138,7 @@ class SubTrajectorizer:
                                                        new_start_length,
                                                        segs[i][0],
                                                        segs[i][1])
-                else: #odd = straight
+                else: #odd = straight, make leaf node
                     G.add_node(self.currentNodeIndex, s=segs[i][0],
                                e=segs[i][1])
                     G.add_edge(thisIndex, self.currentNodeIndex)
