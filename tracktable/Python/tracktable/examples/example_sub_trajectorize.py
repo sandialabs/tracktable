@@ -139,6 +139,24 @@ def get_path_piece(start, end, coords):
         points.append(Point(coord))
     return LineString(points)
 
+def plot_colored_segments_path(coords, leaves, savefig=False):
+    fig = plt.figure(figsize=(25, 14), dpi=80)
+    ax = fig.gca()
+
+    for i in range(len(leaves)):
+        leaf = leaves[i]
+        line = get_path_piece(leaf[0], leaf[1], coords)
+        x, y = line.xy
+        color = 'b'
+        if i%2 == 1:
+            color='r'
+        ax.plot(np.array(x), np.array(y), color=color, linewidth=1,
+            solid_capstyle='round')
+    if savefig:
+        plt.savefig('sub_trajectorization-colored-'+str(threshold)+'.png')
+    else:
+        plt.show()
+
 def plot_path(ax, line, pos, color, zorder):
     x, y = line.xy
     xr = np.array(x)*20
@@ -146,17 +164,17 @@ def plot_path(ax, line, pos, color, zorder):
     ax.plot(xr+pos[0]+2250, yr+pos[1]-930, color=color, linewidth=1,
             solid_capstyle='round', zorder=zorder)
 
-def plotTree(G, coords, with_labels=False, node_size=1000, threshold=1.1,
+def plot_tree(G, coords, with_labels=False, node_size=1000, threshold=1.1,
              savefig=False):
     starts = nx.get_node_attributes(G, 's')
     ends = nx.get_node_attributes(G, 'e')
     for i in range(len(starts)):
         G.node[i+1]['p'] = get_path_piece(starts[i+1], ends[i+1], coords)
 
-    plotTreeHelper(G, with_labels=with_labels, node_size=node_size,
+    plot_tree_helper(G, with_labels=with_labels, node_size=node_size,
                    threshold=threshold, savefig=savefig)
 
-def plotTreeHelper(G, with_labels=False, node_size=1000, threshold=1.1,
+def plot_tree_helper(G, with_labels=False, node_size=1000, threshold=1.1,
                    savefig=False):
     fig = plt.figure(figsize=(25, 14), dpi=80)
     ax = fig.gca()
@@ -184,7 +202,8 @@ def main():
     subtrajer = st.SubTrajectorizer(straightness_threshold=threshold,
                                     length_threshold_samples=length_threshold_samples)
     leaves, G = subtrajer.subtrajectorize(coords, returnGraph=True)
-    plotTree(G, coords, with_labels=False, node_size=4000, threshold=threshold, savefig=False)
+    plot_tree(G, coords, with_labels=False, node_size=4000, threshold=threshold, savefig=False)
+    plot_colored_segments_path(coords, leaves, savefig=False)
 
 if __name__ == '__main__':
     main()

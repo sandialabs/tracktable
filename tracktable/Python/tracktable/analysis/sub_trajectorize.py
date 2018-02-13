@@ -110,7 +110,7 @@ class SubTrajectorizer:
                                        start_length, start, end):
         if start_length >= (end-start+1):
             start_length = end-start
-        print(start, end, start_length)
+        #print(start, end, start_length)
         if (not self.norm_dist_mat.is_straight(start, end)) and (end-start+1) > self.length_threshold_samples :
             indices = []
             new_start_length = start_length
