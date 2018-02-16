@@ -29,7 +29,7 @@
 # Author: Ben Newton
 # Date:   November, 29, 2017
 
-#Example: python3 readJson.py tracktable/TestData/two_trajectories.json
+#Example: python3 read_json.py tracktable/TestData/two_trajectories.json
 
 import tracktable.io.trajectory as trajectory
 import argparse

@@ -139,7 +139,7 @@ def get_path_piece(start, end, coords):
         points.append(Point(coord))
     return LineString(points)
 
-def plot_colored_segments_path(coords, leaves, savefig=False):
+def plot_colored_segments_path(coords, leaves, threshold, savefig=False):
     fig = plt.figure(figsize=(25, 14), dpi=80)
     ax = fig.gca()
 
@@ -188,7 +188,8 @@ def plot_tree_helper(G, with_labels=False, node_size=1000, threshold=1.1,
 
     for i in range(len(paths)):
         plot_path(ax, paths[i+1], pos[i+1], 'b', 5) #remove +1
-        plot_path(ax, paths[1], pos[i+1], '#f2f2f2', 4) #light grey #change 1 to 0
+        plot_path(ax, paths[1], pos[i+1], '#f2f2f2', 4) #light grey
+        #change 1 to 0 above
 
     if savefig:
         plt.savefig('sub_trajectorization-'+str(threshold)+'.png')
@@ -202,8 +203,9 @@ def main():
     subtrajer = st.SubTrajectorizer(straightness_threshold=threshold,
                                     length_threshold_samples=length_threshold_samples)
     leaves, G = subtrajer.subtrajectorize(coords, returnGraph=True)
-    plot_tree(G, coords, with_labels=False, node_size=4000, threshold=threshold, savefig=False)
-    plot_colored_segments_path(coords, leaves, savefig=False)
+    plot_tree(G, coords, with_labels=False, node_size=4000,
+              threshold=threshold, savefig=False)
+    plot_colored_segments_path(coords, leaves, threshold, savefig=False)
 
 if __name__ == '__main__':
     main()
