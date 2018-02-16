@@ -36,7 +36,13 @@ import tracktable.io.trajectory as trajectory
 import datetime
 import argparse
 
+from mpl_toolkits.basemap import Basemap
+from tracktable.render import colormaps, mapmaker, paths
+from matplotlib.patches import Polygon
+from matplotlib import gridspec
+
 from tracktable.domain.terrestrial import Trajectory, TrajectoryPoint
+from tracktable.core import geomath
 
 def get_path_piece(start, end, coords):
     points = []
@@ -50,22 +56,44 @@ def traj_to_coords(traj):
         coordinates.append([point[0], point[1]])
     return coordinates
 
+# below adapted from https://stackoverflow.com/questions/12251189/how-to-draw-rectangles-on-a-basemap
+def draw_screen_poly( lats, lons, m):
+    x, y = m( lons, lats )
+    xy = list(zip(x,y))
+    poly = Polygon( xy, facecolor='red', alpha=0.4, zorder=10)
+    plt.gca().add_patch(poly)
+
 def plot_colored_segments_path(traj, leaves, threshold, savefig=False):
+    fig = plt.figure(figsize=(25,14), dpi=80)
+    gs = gridspec.GridSpec(1,2,width_ratios=[3,1])
+    ax = fig.add_subplot(gs[0])
+
     coords = traj_to_coords(traj)
-    fig = plt.figure(figsize=(25, 14), dpi=80)
-    ax = fig.gca()
+
+    bbox = geomath.compute_bounding_box(traj)
+
+    (mymap, map_actors) = mapmaker.mapmaker(map_name='custom', domain='terrestrial', map_bbox=bbox, map_projection="merc", land_color='w')
 
     for i in range(len(leaves)):
         leaf = leaves[i]
         line = get_path_piece(leaf[0], leaf[1], coords)
-        x, y = line.xy
+        lons, lats = line.xy
+        x,y = mymap(lons, lats)
+
         color = 'b'
         if i%2 == 1:
             color='r'
-        ax.plot(np.array(x), np.array(y), color=color, linewidth=1,
-            solid_capstyle='round')
+        mymap.plot(x, y, color=color, linewidth=1)
+
+    ax = fig.add_subplot(gs[1])
+    #draw box showing where in us the map is
+    (mymap2, map_actors) = mapmaker.mapmaker(map_name='conus', domain='terrestrial', land_color='w', sea_color='w')
+    lons = [bbox.min_corner[0], bbox.max_corner[0], bbox.max_corner[0], bbox.min_corner[0]]
+    lats = [bbox.min_corner[1], bbox.min_corner[1], bbox.max_corner[1], bbox.max_corner[1]]
+    draw_screen_poly(lats, lons, mymap2)
+
     if savefig:
-        plt.savefig('sub_trajectorization-colored-'+str(threshold)+'.png')
+        plt.savefig('sub_trajectorization-colored-'+traj[0].object_id+'-'+str(threshold)+'.png')
     else:
         plt.show()
 
@@ -84,11 +112,12 @@ def plot_tree(G, traj, with_labels=False, node_size=1000, threshold=1.1,
     for i in range(len(starts)):
         G.node[i+1]['p'] = get_path_piece(starts[i+1], ends[i+1], coords)
 
-    plot_tree_helper(G, with_labels=with_labels, node_size=node_size,
-                   threshold=threshold, savefig=savefig)
+    plot_tree_helper(G, traj[0].object_id, with_labels=with_labels,
+                     node_size=node_size, threshold=threshold,
+                     savefig=savefig)
 
-def plot_tree_helper(G, with_labels=False, node_size=1000, threshold=1.1,
-                   savefig=False):
+def plot_tree_helper(G, object_id, with_labels=False, node_size=1000,
+                     threshold=1.1, savefig=False):
     fig = plt.figure(figsize=(25, 14), dpi=80)
     ax = fig.gca()
 
@@ -105,28 +134,31 @@ def plot_tree_helper(G, with_labels=False, node_size=1000, threshold=1.1,
         #change 1 to 0 above
 
     if savefig:
-        plt.savefig('sub_trajectorization-'+str(threshold)+'.png')
+        plt.savefig('sub_trajectorization-'+object_id+'-'+str(threshold)+'.png')
     else:
         plt.show()
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Subtrajectorize the trajectories in a given json file.')
     parser.add_argument('-i', '--input', dest='json_trajectory_file', type=argparse.FileType('r'), default="/home/bdnewto/research/edamame/tracktable/TestData/mapping_flight.json")
+    parser.add_argument('-s', '--saveFigures', dest='save_fig', action="store_true")
     return parser.parse_args()
 
 def main():
     args = parse_args()
+
     threshold = 1.001
     length_threshold_samples = 7  #2 is minimum
 
     subtrajer = st.SubTrajectorizer(straightness_threshold=threshold,
                                     length_threshold_samples=length_threshold_samples)
+
     for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
         leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
-        print(leaves)
+        print(traj[0].object_id, leaves)
         plot_tree(G, traj, with_labels=False, node_size=4000,
-                  threshold=threshold, savefig=False)
-        plot_colored_segments_path(traj, leaves, threshold, savefig=False)
+                  threshold=threshold, savefig=args.save_fig)
+        plot_colored_segments_path(traj, leaves, threshold, savefig=args.save_fig)
 
 if __name__ == '__main__':
     main()
