@@ -144,7 +144,7 @@ class SubTrajectorizer:
                     G.add_edge(thisIndex, self.currentNodeIndex)
                     self.currentNodeIndex+=1
 
-    def subtrajectorize(self, trajectory, returnGraph=False):
+    def subtrajectorize(self, trajectory, returnGraph=False): #can take coordinate list or a trajectory.
         coordinates = []
         for point in trajectory: #make into coordinate list
             coordinates.append([point[0], point[1]])
