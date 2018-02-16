@@ -145,7 +145,9 @@ class SubTrajectorizer:
                     self.currentNodeIndex+=1
 
     def subtrajectorize(self, trajectory, returnGraph=False):
-        coordinates = trajectory # later get coordinates here
+        coordinates = [] 
+        for point in trajectory: #make into coordinate list
+            coordinates.append([point[0], point[1]])
         self.currentNodeIndex = 1
         self.norm_dist_mat = NormalizedDistanceMatrix(coordinates,
                                                       threshold=self.threshold)

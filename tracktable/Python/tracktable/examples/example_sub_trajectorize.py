@@ -32,6 +32,7 @@ import tracktable.analysis.sub_trajectorize as st
 import networkx as nx
 from shapely.geometry import Point, LineString
 import numpy as np
+import tracktable.io.trajectory as trajectory
 
 coords=[[-111.501, 47.3697], [-111.528, 47.3353], [-111.551, 47.3039],
         [-111.575, 47.2719], [-111.599, 47.2403], [-111.621, 47.2081],
@@ -200,12 +201,17 @@ def main():
 
     threshold = 1.001
     length_threshold_samples = 7  #2 is minimum
+
     subtrajer = st.SubTrajectorizer(straightness_threshold=threshold,
                                     length_threshold_samples=length_threshold_samples)
-    leaves, G = subtrajer.subtrajectorize(coords, returnGraph=True)
-    plot_tree(G, coords, with_labels=False, node_size=4000,
-              threshold=threshold, savefig=False)
-    plot_colored_segments_path(coords, leaves, threshold, savefig=False)
+
+    with open("/home/bdnewto/research/edamame/tracktable/TestData/two_trajectories.json", 'r') as file:
+        coordinates = []
+        for traj in trajectory.from_ijson_file_iter(file):
+            leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
+            plot_tree(G, coords, with_labels=False, node_size=4000,
+                      threshold=threshold, savefig=False)
+            plot_colored_segments_path(coords, leaves, threshold, savefig=False)
 
 if __name__ == '__main__':
     main()

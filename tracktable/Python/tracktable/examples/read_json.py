@@ -29,7 +29,7 @@
 # Author: Ben Newton
 # Date:   November, 29, 2017
 
-#Example: python3 read_json.py tracktable/TestData/two_trajectories.json
+#Example: python3 read_json.py read_json.py ../../../../TestData/two_trajectories.json
 
 import tracktable.io.trajectory as trajectory
 import argparse
@@ -44,6 +44,7 @@ def read():
 
     for traj in trajectory.from_ijson_file_iter(args.json_file):
         print(traj)
+
     #trajs = trajectory.from_json_file_multi(args.json_file)
     #for traj in trajs:
     #    print(traj)
