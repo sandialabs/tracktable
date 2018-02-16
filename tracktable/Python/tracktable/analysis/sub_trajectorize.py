@@ -145,7 +145,7 @@ class SubTrajectorizer:
                     self.currentNodeIndex+=1
 
     def subtrajectorize(self, trajectory, returnGraph=False):
-        coordinates = [] 
+        coordinates = []
         for point in trajectory: #make into coordinate list
             coordinates.append([point[0], point[1]])
         self.currentNodeIndex = 1

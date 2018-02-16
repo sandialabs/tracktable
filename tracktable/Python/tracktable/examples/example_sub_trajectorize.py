@@ -33,6 +33,10 @@ import networkx as nx
 from shapely.geometry import Point, LineString
 import numpy as np
 import tracktable.io.trajectory as trajectory
+import datetime
+import argparse
+
+from tracktable.domain.terrestrial import Trajectory, TrajectoryPoint
 
 coords=[[-111.501, 47.3697], [-111.528, 47.3353], [-111.551, 47.3039],
         [-111.575, 47.2719], [-111.599, 47.2403], [-111.621, 47.2081],
@@ -134,6 +138,17 @@ coords=[[-111.501, 47.3697], [-111.528, 47.3353], [-111.551, 47.3039],
         [-111.362, 47.4414], [-111.319, 47.4808], [-111.337, 47.5011],
         [-111.371, 47.4781]]
 
+#def coordListToTrajectory(coords, start_time=datetime.datetime.now()):
+#    timestamp = start_time
+#    position_list = []
+#    for coord in coords:
+#        trajPoint = TrajectoryPoint(coord)
+#        trajPoint.object_id = 'TST_000' #'TST_'+str(index).zfill(3)
+#        trajPoint.timestamp = timestamp
+#        position_list.append(trajPoint)
+#        timestamp += datetime.timedelta(minutes=1)
+#    return Trajectory.from_position_list(position_list)
+
 def get_path_piece(start, end, coords):
     points = []
     for coord in coords[start:end+1]:
@@ -197,21 +212,27 @@ def plot_tree_helper(G, with_labels=False, node_size=1000, threshold=1.1,
     else:
         plt.show()
 
-def main():
+def parse_args():
+    parser = argparse.ArgumentParser(description='Subtrajectorize the trajectories in a given json file.')
+    parser.add_argument('-i', '--input', dest='json_trajectory_file', type=argparse.FileType('r'), default="/home/bdnewto/research/edamame/tracktable/TestData/mapping_flight.json")
+    return parser.parse_args()
 
+def main():
+    args = parse_args()
     threshold = 1.001
     length_threshold_samples = 7  #2 is minimum
 
     subtrajer = st.SubTrajectorizer(straightness_threshold=threshold,
                                     length_threshold_samples=length_threshold_samples)
-
-    with open("/home/bdnewto/research/edamame/tracktable/TestData/two_trajectories.json", 'r') as file:
-        coordinates = []
-        for traj in trajectory.from_ijson_file_iter(file):
-            leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
-            plot_tree(G, coords, with_labels=False, node_size=4000,
-                      threshold=threshold, savefig=False)
-            plot_colored_segments_path(coords, leaves, threshold, savefig=False)
+    for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
+        print(traj)
+    #traj = coordListToTrajectory(coords)
+    #json = trajectory.to_json_file(traj, "mappingFlight.json")  ##didn't work right, had to add [] around output in file
+        leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
+        print(leaves)
+        plot_tree(G, coords, with_labels=False, node_size=4000,
+                  threshold=threshold, savefig=False)
+        plot_colored_segments_path(coords, leaves, threshold, savefig=False)
 
 if __name__ == '__main__':
     main()
