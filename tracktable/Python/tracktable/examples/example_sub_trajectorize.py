@@ -44,6 +44,9 @@ from matplotlib import gridspec
 from tracktable.domain.terrestrial import Trajectory, TrajectoryPoint
 from tracktable.core import geomath
 
+#todo.  Uses too much memory when many trajs are processed.  Fix leak.
+#todo may want to try a value of 5 or 4 not 7 for length threshold
+
 def get_path_piece(start, end, coords):
     points = []
     for coord in coords[start:end+1]:
@@ -84,7 +87,7 @@ def plot_colored_segments_path(traj, leaves, threshold, savefig=False):
         if i%2 == 1:
             color='r'
         mymap.plot(x, y, color=color, linewidth=1)
-        mymap.plot(x,y, 'go', markersize=5)
+        mymap.plot(x,y, 'go', markersize=1)
 
     ax = fig.add_subplot(gs[1])
     #draw box showing where in us the map is
