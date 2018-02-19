@@ -520,7 +520,7 @@ def sanity_check_distance_less_than(max_distance):
 
 # ----------------------------------------------------------------------
 
-def compute_bounding_box(point_sequence):
+def compute_bounding_box(point_sequence, expand=0.0, expand_zero_length=0.0):
     """Compute a bounding box for a sequence of points.
 
     This function will construct a domain-specific bounding box over
@@ -542,7 +542,7 @@ def compute_bounding_box(point_sequence):
     bbox_type = None
 
     num_points = 0
-    
+
     for point in point_sequence:
         num_points += 1
         if bbox_type is None:
@@ -563,6 +563,13 @@ def compute_bounding_box(point_sequence):
         print("ERROR: Cannot compute bounding box.  No points provided.")
         return None
     else:
+        for i in range(len(min_corner)):
+            expand_len = (max_corner[i]-min_corner[i])*expand
+            if expand_len == 0.0: # if the bbox has no length for this dim
+                expand_len = expand_zero_length # add some
+            max_corner[i] = max_corner[i]+expand_len
+            min_corner[i] = min_corner[i]-expand_len
+
         print("Bounding box points: {}, {}".format(min_corner, max_corner))
         result = bbox_type(min_corner, max_corner)
         print("Final bounding box: {}".format(result))

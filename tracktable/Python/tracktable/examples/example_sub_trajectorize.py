@@ -70,9 +70,9 @@ def plot_colored_segments_path(traj, leaves, threshold, savefig=False):
 
     coords = traj_to_coords(traj)
 
-    bbox = geomath.compute_bounding_box(traj)
+    bbox = geomath.compute_bounding_box(traj, expand=.05, expand_zero_length=.1) #expand 5% or .1 degrees when bbox has no expanse in some dim
 
-    (mymap, map_actors) = mapmaker.mapmaker(map_name='custom', domain='terrestrial', map_bbox=bbox, map_projection="merc", land_color='w')
+    (mymap, map_actors) = mapmaker.mapmaker(map_name='custom', domain='terrestrial', map_bbox=bbox, map_projection="merc", land_color='w', sea_color='gray', resolution='f')
 
     for i in range(len(leaves)):
         leaf = leaves[i]
@@ -84,10 +84,11 @@ def plot_colored_segments_path(traj, leaves, threshold, savefig=False):
         if i%2 == 1:
             color='r'
         mymap.plot(x, y, color=color, linewidth=1)
+        mymap.plot(x,y, 'go', markersize=5)
 
     ax = fig.add_subplot(gs[1])
     #draw box showing where in us the map is
-    (mymap2, map_actors) = mapmaker.mapmaker(map_name='conus', domain='terrestrial', land_color='w', sea_color='w')
+    (mymap2, map_actors) = mapmaker.mapmaker(map_name='conus', domain='terrestrial', land_color='w', sea_color='gray', resolution='c')
     lons = [bbox.min_corner[0], bbox.max_corner[0], bbox.max_corner[0], bbox.min_corner[0]]
     lats = [bbox.min_corner[1], bbox.min_corner[1], bbox.max_corner[1], bbox.max_corner[1]]
     draw_screen_poly(lats, lons, mymap2)
@@ -154,6 +155,7 @@ def main():
                                     length_threshold_samples=length_threshold_samples)
 
     for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
+        #if len(traj) >= length_threshold_samples:
         leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
         print(traj[0].object_id, leaves)
         plot_tree(G, traj, with_labels=False, node_size=4000,

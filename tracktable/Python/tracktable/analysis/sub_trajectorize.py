@@ -162,6 +162,9 @@ class SubTrajectorizer:
         leaves = [(G.node[x]['s'], G.node[x]['e'])
                   for x in G.nodes() if G.out_degree(x)==0 and
                   G.in_degree(x)==1]
+        if len(G) == 1:
+            leaves = [(G.node[1]['s'], G.node[1]['e'])] #just root node #change 1's to 0's
+
         if returnGraph:
             return leaves, G
         else:
