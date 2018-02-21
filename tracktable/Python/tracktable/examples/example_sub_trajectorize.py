@@ -100,9 +100,10 @@ def plot_colored_segments_path(traj, leaves, threshold, bbox, mymap, savefig=Fal
 
     if savefig:
         plt.savefig('sub_trajectorization-colored-'+
-                    traj[0].object_id+'-'+str(threshold)+'.png')
+                    traj[0].object_id+'-'+str(traj[0].timestamp)+'-'+str(threshold)+'.png')
     else:
         plt.show()
+    plt.close()
 
 def plot_path(ax, line, pos, color, zorder, max_width_height, magnification,
               xoffset, yoffset):
@@ -122,12 +123,13 @@ def plot_tree(G, traj, bbox, mymap, with_labels=False, node_size=1000, threshold
     for i in range(len(starts)):
         G.node[i+1]['p'] = get_path_piece(starts[i+1], ends[i+1], coords)
 
-    plot_tree_helper(G, traj[0].object_id, max_width_height,
+    plot_tree_helper(G, traj[0].object_id, traj[0].timestamp, max_width_height,
                      with_labels=with_labels, node_size=node_size,
                      threshold=threshold, savefig=savefig)
 
-def plot_tree_helper(G, object_id, max_width_height, with_labels=False,
-                     node_size=1000, threshold=1.1, savefig=False):
+def plot_tree_helper(G, object_id, timestamp, max_width_height,
+                     with_labels=False, node_size=1000, threshold=1.1,
+                     savefig=False):
     fig = plt.figure(figsize=(25, 14), dpi=80)
     ax = fig.gca()
 
@@ -154,10 +156,11 @@ def plot_tree_helper(G, object_id, max_width_height, with_labels=False,
         #change 1 to 0 above
 
     if savefig:
-        plt.savefig('sub_trajectorization-'+object_id+'-'+
+        plt.savefig('sub_trajectorization-'+object_id+'-'+str(timestamp)+'-'+
                     str(threshold)+'.png')
     else:
         plt.show()
+    plt.close()
 
 def parse_args():
     desc = 'Subtrajectorize the trajectories in a given json file.'
@@ -173,7 +176,7 @@ def main():
     args = parse_args()
 
     threshold = 1.001
-    length_thresh = 7  #2 is minimum
+    length_thresh = 7  #2 is minimum  #could likely decrease?
 
     subtrajer = st.SubTrajectorizer(straightness_threshold=threshold,
                                     length_threshold_samples=length_thresh)
