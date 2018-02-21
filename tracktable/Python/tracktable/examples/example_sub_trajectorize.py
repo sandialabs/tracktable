@@ -59,23 +59,20 @@ def traj_to_coords(traj):
         coordinates.append([point[0], point[1]])
     return coordinates
 
-# below adapted from https://stackoverflow.com/questions/12251189/how-to-draw-rectangles-on-a-basemap
+# below adapted from https://stackoverflow.com/questions/12251189/
+#                                          how-to-draw-rectangles-on-a-basemap
 def draw_screen_poly( lats, lons, m):
     x, y = m( lons, lats )
     xy = list(zip(x,y))
     poly = Polygon( xy, facecolor='red', alpha=0.4, zorder=10)
     plt.gca().add_patch(poly)
 
-def plot_colored_segments_path(traj, leaves, threshold, savefig=False):
+def plot_colored_segments_path(traj, leaves, threshold, bbox, mymap, savefig=False):
     fig = plt.figure(figsize=(25,14), dpi=80)
     gs = gridspec.GridSpec(1,2,width_ratios=[3,1])
     ax = fig.add_subplot(gs[0])
 
     coords = traj_to_coords(traj)
-
-    bbox = geomath.compute_bounding_box(traj, expand=.05, expand_zero_length=.1) #expand 5% or .1 degrees when bbox has no expanse in some dim
-
-    (mymap, map_actors) = mapmaker.mapmaker(map_name='custom', domain='terrestrial', map_bbox=bbox, map_projection="merc", land_color='w', sea_color='gray', resolution='f')
 
     for i in range(len(leaves)):
         leaf = leaves[i]
@@ -91,37 +88,46 @@ def plot_colored_segments_path(traj, leaves, threshold, savefig=False):
 
     ax = fig.add_subplot(gs[1])
     #draw box showing where in us the map is
-    (mymap2, map_actors) = mapmaker.mapmaker(map_name='conus', domain='terrestrial', land_color='w', sea_color='gray', resolution='c')
-    lons = [bbox.min_corner[0], bbox.max_corner[0], bbox.max_corner[0], bbox.min_corner[0]]
-    lats = [bbox.min_corner[1], bbox.min_corner[1], bbox.max_corner[1], bbox.max_corner[1]]
+    (mymap2, map_actors) = mapmaker.mapmaker(map_name='conus',
+                                             domain='terrestrial',
+                                             land_color='w', sea_color='gray',
+                                             resolution='c')
+    lons = [bbox.min_corner[0], bbox.max_corner[0],
+            bbox.max_corner[0], bbox.min_corner[0]]
+    lats = [bbox.min_corner[1], bbox.min_corner[1],
+            bbox.max_corner[1], bbox.max_corner[1]]
     draw_screen_poly(lats, lons, mymap2)
 
     if savefig:
-        plt.savefig('sub_trajectorization-colored-'+traj[0].object_id+'-'+str(threshold)+'.png')
+        plt.savefig('sub_trajectorization-colored-'+
+                    traj[0].object_id+'-'+str(threshold)+'.png')
     else:
         plt.show()
 
-def plot_path(ax, line, pos, color, zorder):
+def plot_path(ax, line, pos, color, zorder, max_width_height, magnification,
+              xoffset, yoffset):
     x, y = line.xy
-    xr = np.array(x)*20
-    yr = np.array(y)*20
-    ax.plot(xr+pos[0]+2250, yr+pos[1]-930, color=color, linewidth=1,
-            solid_capstyle='round', zorder=zorder)
+    xr = np.array(x)*magnification#18.87#1.5   #    y=-.000004252x+21.454678635  where x is max width/height
+    yr = np.array(y)*magnification#18.87#1.5
+    ax.plot(xr+pos[0]+xoffset, yr+pos[1]+yoffset,
+            color=color, linewidth=1, solid_capstyle='round', zorder=zorder)
 
-def plot_tree(G, traj, with_labels=False, node_size=1000, threshold=1.1,
-             savefig=False):
+def plot_tree(G, traj, bbox, mymap, with_labels=False, node_size=1000, threshold=1.1,
+              savefig=False):
+    max_width, max_height = mymap(bbox.max_corner[0], bbox.max_corner[1])
+    max_width_height = max(max_width, max_height)
     coords = traj_to_coords(traj)
     starts = nx.get_node_attributes(G, 's')
     ends = nx.get_node_attributes(G, 'e')
     for i in range(len(starts)):
         G.node[i+1]['p'] = get_path_piece(starts[i+1], ends[i+1], coords)
 
-    plot_tree_helper(G, traj[0].object_id, with_labels=with_labels,
-                     node_size=node_size, threshold=threshold,
-                     savefig=savefig)
+    plot_tree_helper(G, traj[0].object_id, max_width_height,
+                     with_labels=with_labels, node_size=node_size,
+                     threshold=threshold, savefig=savefig)
 
-def plot_tree_helper(G, object_id, with_labels=False, node_size=1000,
-                     threshold=1.1, savefig=False):
+def plot_tree_helper(G, object_id, max_width_height, with_labels=False,
+                     node_size=1000, threshold=1.1, savefig=False):
     fig = plt.figure(figsize=(25, 14), dpi=80)
     ax = fig.gca()
 
@@ -132,38 +138,69 @@ def plot_tree_helper(G, object_id, with_labels=False, node_size=1000,
 
     paths=nx.get_node_attributes(G, 'p')
 
+    magnification = (-.000004252*max_width_height)+21.454678635
+    #                                                   hold
+    #                              continental mapping  AWE50   AFR6737   AWE297  AWE681 AWE1612  CLX771
+    xoffset = magnification*112.5 #    93.33     112.5    114     76        113?    112    77       83
+    yoffset = magnification*-46.5 #   -33.33    -46.5    -32.85  -41.33    -33.85   33    -38      -42
+    print(magnification, xoffset, yoffset)
+
     for i in range(len(paths)):
-        plot_path(ax, paths[i+1], pos[i+1], 'b', 5) #remove +1
-        plot_path(ax, paths[1], pos[i+1], '#f2f2f2', 4) #light grey
+        plot_path(ax, paths[i+1], pos[i+1], 'b', 5, max_width_height,
+                  magnification, xoffset, yoffset) #remove +1
+        light_gray = '#f2f2f2'
+        plot_path(ax, paths[1], pos[i+1], light_gray, 4, max_width_height,
+                  magnification, xoffset, yoffset)
         #change 1 to 0 above
 
     if savefig:
-        plt.savefig('sub_trajectorization-'+object_id+'-'+str(threshold)+'.png')
+        plt.savefig('sub_trajectorization-'+object_id+'-'+
+                    str(threshold)+'.png')
     else:
         plt.show()
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='Subtrajectorize the trajectories in a given json file.')
-    parser.add_argument('-i', '--input', dest='json_trajectory_file', type=argparse.FileType('r'), default="/home/bdnewto/research/edamame/tracktable/TestData/mapping_flight.json")
-    parser.add_argument('-s', '--saveFigures', dest='save_fig', action="store_true")
+    desc = 'Subtrajectorize the trajectories in a given json file.'
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument('-i', '--input', dest='json_trajectory_file',
+                        type=argparse.FileType('r'),
+                        default="../../../..//TestData/mapping_flight.json")
+    parser.add_argument('-s', '--saveFigures', dest='save_fig',
+                        action="store_true")
     return parser.parse_args()
 
 def main():
     args = parse_args()
 
     threshold = 1.001
-    length_threshold_samples = 7  #2 is minimum
+    length_thresh = 7  #2 is minimum
 
     subtrajer = st.SubTrajectorizer(straightness_threshold=threshold,
-                                    length_threshold_samples=length_threshold_samples)
+                                    length_threshold_samples=length_thresh)
 
     for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
         #if len(traj) >= length_threshold_samples:
         leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
         print(traj[0].object_id, leaves)
-        plot_tree(G, traj, with_labels=False, node_size=4000,
+
+        #below expand 5% or .1 degrees when bbox has no expanse in some dim
+        bbox = geomath.compute_bounding_box(traj, expand=.05,
+                                            expand_zero_length=.1)
+        (mymap, map_actors) = mapmaker.mapmaker(map_name='custom',
+                                                domain='terrestrial',
+                                                map_bbox=bbox,
+                                                map_projection="merc",
+                                                land_color='w',
+                                                sea_color='gray',
+                                                resolution='f')
+
+
+        # the mymap parameter below is only needed to get the max width or
+        # height in terms ov the values used to scale the maps
+        plot_tree(G, traj, bbox, mymap, with_labels=False, node_size=4000,
                   threshold=threshold, savefig=args.save_fig)
-        plot_colored_segments_path(traj, leaves, threshold, savefig=args.save_fig)
+        plot_colored_segments_path(traj, leaves, threshold, bbox, mymap,
+                                   savefig=args.save_fig)
 
 if __name__ == '__main__':
     main()
