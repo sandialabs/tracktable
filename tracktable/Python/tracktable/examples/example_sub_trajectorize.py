@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2018 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -26,6 +26,8 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
+
+# Author: Ben Newton  - February, 2018
 
 import matplotlib.pyplot as plt
 import tracktable.analysis.sub_trajectorize as st
@@ -174,7 +176,7 @@ def plot_tree_helper(G, object_id, timestamp, max_width_height,
     plt.close()
 
 def parse_args():
-    desc = 'Subtrajectorize the trajectories in a given json file.'
+    desc = 'Subtrajectorize and render the trajectories in a given json file.'
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-i', '--input', dest='json_trajectory_file',
                         type=argparse.FileType('r'),

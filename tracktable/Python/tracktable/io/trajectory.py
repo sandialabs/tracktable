@@ -297,7 +297,10 @@ def to_json_file(trajectory, json_filename):
     with open(json_filename, 'w') as outfile: #todo handle error
         outfile.write(to_json(trajectory))
 
-def to_json_file_multi(trajectories, json_filename):
+def to_json_file_multi(trajectories, outfile):
+    outfile.write(to_json_multi(trajectories))
+
+def to_json_filename_multi(trajectories, json_filename):
     with open(json_filename, 'w') as outfile: #todo handle error
         outfile.write(to_json_multi(trajectories))
 
