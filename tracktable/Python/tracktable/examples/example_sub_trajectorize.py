@@ -67,10 +67,19 @@ def draw_screen_poly( lats, lons, m):
     poly = Polygon( xy, facecolor='red', alpha=0.4, zorder=10)
     plt.gca().add_patch(poly)
 
-def plot_colored_segments_path(traj, leaves, threshold, bbox, mymap, savefig=False):
-    fig = plt.figure(figsize=(25,14), dpi=80)
+def plot_colored_segments_path(traj, leaves, threshold, bbox,
+                               savefig=False):
+    fig = plt.figure(figsize=(25, 14), dpi=80)
     gs = gridspec.GridSpec(1,2,width_ratios=[3,1])
     ax = fig.add_subplot(gs[0])
+
+    (mymap, map_actors) = mapmaker.mapmaker(map_name='custom',
+                                            domain='terrestrial',
+                                            map_bbox=bbox,
+                                            map_projection="merc",
+                                            land_color='w',
+                                            sea_color='gray',
+                                            resolution='f')
 
     coords = traj_to_coords(traj)
 
@@ -113,24 +122,26 @@ def plot_path(ax, line, pos, color, zorder, max_width_height, magnification,
     ax.plot(xr+pos[0]+xoffset, yr+pos[1]+yoffset,
             color=color, linewidth=1, solid_capstyle='round', zorder=zorder)
 
-def plot_tree(G, traj, bbox, mymap, with_labels=False, node_size=1000, threshold=1.1,
-              savefig=False):
-    max_width, max_height = mymap(bbox.max_corner[0], bbox.max_corner[1])
-    max_width_height = max(max_width, max_height)
+    #note this func does not take into account curvature of the earth
+def plot_tree(G, traj, bbox, with_labels=False, node_size=1000,
+              threshold=1.1, savefig=False):
+    #max_width, max_height = mymap(bbox.max_corner[0], bbox.max_corner[1])
+    max_width_height = max(bbox.max_corner[0], bbox.max_corner[1])
     coords = traj_to_coords(traj)
     starts = nx.get_node_attributes(G, 's')
     ends = nx.get_node_attributes(G, 'e')
     for i in range(len(starts)):
         G.node[i+1]['p'] = get_path_piece(starts[i+1], ends[i+1], coords)
 
-    plot_tree_helper(G, traj[0].object_id, traj[0].timestamp, max_width_height,
-                     with_labels=with_labels, node_size=node_size,
-                     threshold=threshold, savefig=savefig)
+    plot_tree_helper(G, traj[0].object_id, traj[0].timestamp,
+                     max_width_height, with_labels=with_labels,
+                     node_size=node_size, threshold=threshold,
+                     savefig=savefig)
 
 def plot_tree_helper(G, object_id, timestamp, max_width_height,
                      with_labels=False, node_size=1000, threshold=1.1,
                      savefig=False):
-    fig = plt.figure(figsize=(25, 14), dpi=80)
+    fig = plt.figure(figsize=(25,14), dpi=80)
     ax = fig.gca()
 
     pos=nx.nx_agraph.graphviz_layout(G, prog='dot')
@@ -145,7 +156,7 @@ def plot_tree_helper(G, object_id, timestamp, max_width_height,
     #                              continental mapping  AWE50   AFR6737   AWE297  AWE681 AWE1612  CLX771
     xoffset = magnification*112.5 #    93.33     112.5    114     76        113?    112    77       83
     yoffset = magnification*-46.5 #   -33.33    -46.5    -32.85  -41.33    -33.85   33    -38      -42
-    print(magnification, xoffset, yoffset)
+    #print(magnification, xoffset, yoffset)
 
     for i in range(len(paths)):
         plot_path(ax, paths[i+1], pos[i+1], 'b', 5, max_width_height,
@@ -182,28 +193,20 @@ def main():
                                     length_threshold_samples=length_thresh)
 
     for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
-        #if len(traj) >= length_threshold_samples:
         leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
         print(traj[0].object_id, leaves)
 
         #below expand 5% or .1 degrees when bbox has no expanse in some dim
         bbox = geomath.compute_bounding_box(traj, expand=.05,
                                             expand_zero_length=.1)
-        (mymap, map_actors) = mapmaker.mapmaker(map_name='custom',
-                                                domain='terrestrial',
-                                                map_bbox=bbox,
-                                                map_projection="merc",
-                                                land_color='w',
-                                                sea_color='gray',
-                                                resolution='f')
-
 
         # the mymap parameter below is only needed to get the max width or
         # height in terms ov the values used to scale the maps
-        plot_tree(G, traj, bbox, mymap, with_labels=False, node_size=4000,
-                  threshold=threshold, savefig=args.save_fig)
-        plot_colored_segments_path(traj, leaves, threshold, bbox, mymap,
+        plot_colored_segments_path(traj, leaves, threshold, bbox,
                                    savefig=args.save_fig)
+        plot_tree(G, traj, bbox, with_labels=False,
+                  node_size=4000, threshold=threshold, savefig=args.save_fig)
+
 
 if __name__ == '__main__':
     main()
