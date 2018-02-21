@@ -57,19 +57,20 @@ def main():
                         length_threshold_samples=args.length_threshold)
 
     first_time = True
+    sub_trajs = []
     for traj in trajectory.from_ijson_file_iter(args.input):
         if first_time: #assumes entire file is same domain
             domain_to_import = 'tracktable.domain.{}'.format(traj.DOMAIN)
             domain_module = importlib.import_module(domain_to_import)
+            first_time = False
         leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
-        sub_trajs = []
         for leaf in leaves:
-            points = []
+            pts = []
             for i in range(leaf[0], leaf[1]+1):
-                points.append(traj[i])
-            sub_trajs.append(domain_module.Trajectory.from_position_list(points))
-        #output
-        trajectory.to_json_file_multi(sub_trajs, args.output)
+                pts.append(traj[i])
+            sub_trajs.append(domain_module.Trajectory.from_position_list(pts))
+    #output
+    trajectory.to_json_file_multi(sub_trajs, args.output)
 
 if __name__ == '__main__':
     main()
