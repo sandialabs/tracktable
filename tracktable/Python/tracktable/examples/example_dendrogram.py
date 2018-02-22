@@ -29,51 +29,47 @@
 
 # Author: Ben Newton  - February 21, 2018
 
-#todo, may want to adjust object id to be originalId-001 where 001 is
-#      segement number
-
 import tracktable.io.trajectory as trajectory
-from tracktable.domain import all_domains as ALL_DOMAINS
-#from tracktable.domain.terrestrial import Trajectory, TrajectoryPoint
-import tracktable.analysis.sub_trajectorize as st
+from tracktable.core import geomath
 
-import importlib
 import argparse
 
 def parse_args():
-    desc = "Subtrajectorize the trajectories in a given json file and output \
-    to a json file of trajectories(segments)."
+    desc = "Given a set of trajectory segments (possibly from multiple \
+    original trajectories) create a hierarchical clustering of the \
+    trajectory segments."
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('input', type=argparse.FileType('r'))
-    parser.add_argument('output', type=argparse.FileType('w'))
-    parser.add_argument('-s', dest='straightness_threshold', type=float,
-                        default=1.001)
-    #below - 2 is minimum  #could likely decrease?
-    parser.add_argument('-l', dest='length_threshold', type=int, default=7)
+    parser.add_argument('-n', "--numSamples", dest="num_samples", type=int,
+                        default=4)
     return parser.parse_args()
+
+def distance_geometry(traj, samples):
+    points = []
+    for i in range(samples):
+        fraction = 0.5
+        if samples != 1:
+            fraction = float(i)/(samples-1)
+        points.append(geomath.point_at_fraction(traj, fraction)) # of dist
+    featureVec = []
+    for segment_length in range(2,samples+1): #similar to code in sub_trajectorize.py
+        #print(segment_length)
+        num_segments_of_length = (samples-segment_length)+1
+        for start_index in range(num_segments_of_length):
+            end_index = start_index+segment_length-1
+            #print(start_index, end_index)
+            featureVec.append(geomath.distance(points[start_index],
+                                               points[end_index]))
+    return featureVec
 
 def main():
     args = parse_args()
-
-    subtrajer = \
-    st.SubTrajectorizer(straightness_threshold=args.straightness_threshold,
-                        length_threshold_samples=args.length_threshold)
-
-    first_time = True
-    sub_trajs = []
+    samples = args.num_samples
+    features = []
+    normalize = True
     for traj in trajectory.from_ijson_file_iter(args.input):
-        if first_time: #assumes entire file is same domain
-            domain_to_import = 'tracktable.domain.{}'.format(traj.DOMAIN)
-            domain_module = importlib.import_module(domain_to_import)
-            first_time = False
-        leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
-        for leaf in leaves:
-            pts = []
-            for i in range(leaf[0], leaf[1]+1):
-                pts.append(traj[i])
-            sub_trajs.append(domain_module.Trajectory.from_position_list(pts))
-    #output
-    trajectory.to_json_file_multi(sub_trajs, args.output)
+        features.append(distance_geometry(traj, samples))
+        print(features)
 
 if __name__ == '__main__':
     main()
