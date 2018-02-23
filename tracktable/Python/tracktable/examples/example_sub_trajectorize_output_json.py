@@ -39,10 +39,12 @@ import tracktable.analysis.sub_trajectorize as st
 
 import importlib
 import argparse
+import copy
 
 def parse_args():
     desc = "Subtrajectorize the trajectories in a given json file and output \
-    to a json file of trajectories(segments)."
+    to a json file of trajectories(segments).\
+    Example: python example_sub_trajectorize_output_json.py -l 7 -s 1.001 ../../../../TestData/801Trajectories.json testOut.json"
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('input', type=argparse.FileType('r'))
     parser.add_argument('output', type=argparse.FileType('w'))
@@ -67,11 +69,15 @@ def main():
             domain_module = importlib.import_module(domain_to_import)
             first_time = False
         leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
+        segment_num = 0
         for leaf in leaves:
             pts = []
             for i in range(leaf[0], leaf[1]+1):
+                #point = copy.deepcopy(traj[i]) #todo why does copy not work? 
+                #point.object_id = point.object_id+'-'+str(segment_num).zfill(3)
                 pts.append(traj[i])
             sub_trajs.append(domain_module.Trajectory.from_position_list(pts))
+            segment_num+=1
     #output
     trajectory.to_json_file_multi(sub_trajs, args.output)
 
