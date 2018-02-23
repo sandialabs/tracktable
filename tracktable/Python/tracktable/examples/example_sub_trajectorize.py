@@ -117,15 +117,15 @@ def plot_colored_segments_path(traj, leaves, threshold, bbox,
     plt.close()
 
 def plot_path(ax, line, pos, color, zorder, max_width_height, magnification,
-              xoffset, yoffset):
+              xoffset, yoffset, linewidth=1):
     x, y = line.xy
     xr = np.array(x)*magnification#18.87#1.5   #    y=-.000004252x+21.454678635  where x is max width/height
     yr = np.array(y)*magnification#18.87#1.5
     ax.plot(xr+pos[0]+xoffset, yr+pos[1]+yoffset,
-            color=color, linewidth=1, solid_capstyle='round', zorder=zorder)
+            color=color, linewidth=linewidth, solid_capstyle='round', zorder=zorder)
 
     #note this func does not take into account curvature of the earth
-def plot_tree(G, traj, bbox, with_labels=False, node_size=1000,
+def plot_tree(G, traj, bbox, with_labels=False, node_size=5000,
               threshold=1.1, savefig=False):
     #max_width, max_height = mymap(bbox.max_corner[0], bbox.max_corner[1])
     max_width_height = max(bbox.max_corner[0], bbox.max_corner[1])
@@ -141,15 +141,15 @@ def plot_tree(G, traj, bbox, with_labels=False, node_size=1000,
                      savefig=savefig)
 
 def plot_tree_helper(G, object_id, timestamp, max_width_height,
-                     with_labels=False, node_size=1000, threshold=1.1,
+                     with_labels=False, node_size=5000, threshold=1.1,
                      savefig=False):
     fig = plt.figure(figsize=(25,14), dpi=80)
     ax = fig.gca()
 
     pos=nx.nx_agraph.graphviz_layout(G, prog='dot')
     nx.draw(G, pos, with_labels=with_labels, arrows=False,
-            node_size=node_size, zorder=1, width=1, linewidths=0,
-            node_color='w') #size was 1000
+            node_size=node_size, zorder=1, width=1, edge_color='#A92C00',
+            style='dotted', linewidths=0, node_color='w') 
 
     paths=nx.get_node_attributes(G, 'p')
 
@@ -161,9 +161,10 @@ def plot_tree_helper(G, object_id, timestamp, max_width_height,
     #print(magnification, xoffset, yoffset)
 
     for i in range(len(paths)):
-        plot_path(ax, paths[i+1], pos[i+1], 'b', 5, max_width_height,
-                  magnification, xoffset, yoffset) #remove +1
-        light_gray = '#f2f2f2'
+        plot_path(ax, paths[i+1], pos[i+1], '#005376', #matches poster color
+                  5, max_width_height,
+                  magnification, xoffset, yoffset, linewidth=2) #remove +1
+        light_gray = '#afafaf' #'#f2f2f2'
         plot_path(ax, paths[1], pos[i+1], light_gray, 4, max_width_height,
                   magnification, xoffset, yoffset)
         #change 1 to 0 above
@@ -207,7 +208,7 @@ def main():
         plot_colored_segments_path(traj, leaves, threshold, bbox,
                                    savefig=args.save_fig)
         plot_tree(G, traj, bbox, with_labels=False,
-                  node_size=4000, threshold=threshold, savefig=args.save_fig)
+                  node_size=5000, threshold=threshold, savefig=args.save_fig)
 
 
 if __name__ == '__main__':
