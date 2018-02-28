@@ -31,6 +31,8 @@ import networkx as nx
 import numpy as np
 from math import sqrt
 
+import scipy
+
 class NormalizedDistanceMatrix:
     """Generates a matrix giving the ratio of the distance along each
     sub-trajectory to the distance from the start to the end of that
@@ -72,7 +74,7 @@ class NormalizedDistanceMatrix:
     def is_straight(self, start, end):
         return self.norm_dist_mat[start,end] < self.threshold
 
-class SubTrajectorizer:
+class SubTrajerStraight:
     'Splits a trajectory into straight-ish segments'
     def __init__(self, straightness_threshold=1.1, length_threshold_samples=2): #2 is minimum
         self.threshold = straightness_threshold
@@ -169,3 +171,80 @@ class SubTrajectorizer:
             return leaves, G
         else:
             return leaves
+
+class SubTrajerAccel:
+    'Splits a trajectory where the change in accelleration exceeds some threshold'
+    def __init__(self, accel_threshold=0.025, tight=False): #not tight means include segment before and after a turn
+        self.accel_threshold = accel_threshold
+        self.tight = tight
+        self.currentNodeIndex = 1 #change to 0
+    
+    def acceleration(self, coords):  #x as array and y's as array   array 2,N
+        first = scipy.gradient(coords)[1]  #Derivative along columns is result [1]
+        second = scipy.gradient(first)[1]
+        mag = np.sqrt(second[0]**2 + second[1]**2)
+        return mag
+
+    def find_turns(self, acc):
+        if self.tight:
+            return np.where(acc > self.accel_threshold, True, False)[:-1]
+        else:
+            bin_acc = np.concatenate([[True], np.where(acc > self.accel_threshold, True, False)])
+            bin_acc = (bin_acc[:-1] + bin_acc[1:])[:-1] #segment before AND after are part of the curve
+            return bin_acc
+
+    def subtrajectorize(self, trajectory, returnGraph=False): #can take coordinate list or a trajectory.
+        coordinates = []
+        for point in trajectory: #make into coordinate list
+            coordinates.append([point[0], point[1]])
+        #print(len(coordinates))
+
+        coords = np.array(coordinates).transpose()
+        acc = self.acceleration(coords)
+        bin_acc = self.find_turns(acc)
+        #print(bin_acc)
+        #print(len(bin_acc))
+        shifts = [bin_acc[:-1] != bin_acc[1:]]
+        #print(shifts)
+        inflections = np.argwhere(shifts)#.flatten()
+        #print(inflections[:,1])
+        leaves = []
+        prev = 0
+        for inf in inflections[:,1]:
+            leaves.append((prev, inf+1))
+            prev = inf+1
+        leaves.append((prev, len(coordinates)-1)) #add a segment to the end
+        return leaves
+        #print("********8")
+        #print(leaves)
+        #[0 1 4 16
+        #1      2     5     17    end
+        #(0 1) (1 2) (2 5) (5 17) (17 19)
+
+        #for i in range(len(bin_acc)):
+            
+        #bin_mag[:-1]!=bin_mag-1:]
+        #inflections = np.argwhere(shifts).flatten()
+        #inflections = np.conacat(....
+        #print(bin_acc)
+        
+        #self.currentNodeIndex = 1 #todo duplicate
+        
+        #G = nx.DiGraph()
+        #start = 0
+        #end = len(coordinates)-1
+        #G.add_node(self.currentNodeIndex, s=start, e=end)
+        #self.currentNodeIndex += 1
+        #self.longest_straight_segments(G, coordinates, 1,
+        #                                    len(coordinates), start, end)
+        #leaves = [(G.node[x]['s'], G.node[x]['e'])
+        #          for x in G.nodes() if G.out_degree(x)==0 and
+        #          G.in_degree(x)==1]
+        #if len(G) == 1:
+        #    leaves = [(G.node[1]['s'], G.node[1]['e'])] #just root node #change 1's to 0's
+
+        #if returnGraph:
+        #    return leaves, G
+        #else:
+        #    return leaves
+

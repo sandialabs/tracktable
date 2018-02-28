@@ -29,6 +29,8 @@
 
 # Author: Ben Newton  - February, 2018
 
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import tracktable.analysis.sub_trajectorize as st
 import networkx as nx
@@ -192,8 +194,8 @@ def main():
     threshold = 1.001
     length_thresh = 7  #2 is minimum  #could likely decrease?
 
-    subtrajer = st.SubTrajectorizer(straightness_threshold=threshold,
-                                    length_threshold_samples=length_thresh)
+    subtrajer = st.SubTrajerStraight(straightness_threshold=threshold,
+                                     length_threshold_samples=length_thresh)
 
     for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
         leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)

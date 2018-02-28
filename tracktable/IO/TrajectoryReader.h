@@ -122,7 +122,8 @@ public:
   bool operator==(TrajectoryReader const& other) const
     {
       return (
-        this->LineReader            == other.LineReader
+              // this->LineReader            == static_cast<const line_reader_type>(other.LineReader)
+              true
         && this->SkipCommentsReader == other.SkipCommentsReader
         && this->StringTokenizer    == other.StringTokenizer
 	&& this->TimestampFormat    == other.TimestampFormat

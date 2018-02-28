@@ -140,7 +140,7 @@ def main():
                       (244, 266), (266, 267), (267, 293), (293, 294)]
 
     threshold = 1.1
-    subtrajer = st.SubTrajectorizer(threshold)
+    subtrajer = st.SubTrajerStraight(threshold)
     leaves = subtrajer.subtrajectorize(coords)
     if leaves == leavesExpected:
         return 0

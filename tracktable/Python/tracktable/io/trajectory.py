@@ -47,6 +47,7 @@ def from_dict(dictionary):
     Args:
        dictionary: the dictionary to convert into a trajectory
     """
+    #currently we ignore _id
 
     #verify domain is valid and import appropriate domain
     try:
@@ -94,13 +95,13 @@ def from_dict(dictionary):
         point.object_id = dictionary['object_id']
         point.timestamp = Timestamp.from_string(dictionary['timestamps'][i],
                                                 format_string=
-                                                '%Y-%m-%d %H:%M:%S%z')
+                                                '%Y-%m-%dT%H:%M:%S')
         for (name, attributes) in dictionary['point_properties'].items():
             if attributes['values'][i] is not None:
                 if attributes['type'] == "timestamp":
                     ts = Timestamp.from_string(attributes['values'][i],
                                                format_string=
-                                               '%Y-%m-%d %H:%M:%S%z')
+                                               '%Y-%m-%dT%H:%M:%S')
                     point.set_property(name, ts)
                 else:
                     point.set_property(name, attributes['values'][i])
@@ -113,10 +114,21 @@ def from_dict(dictionary):
     for (name, attributes) in dictionary['trajectory_properties'].items():
         if attributes['type'] == "timestamp":
             ts = Timestamp.from_string(attributes['value'],
-                                       format_string='%Y-%m-%d %H:%M:%S%z')
+                                       format_string='%Y-%m-%dT%H:%M:%S')
             trajectory.set_property(name, ts)
         else:
             trajectory.set_property(name, attributes['value'])
+
+    #add segment properties (if they exist)  #just save as trajectory properties
+    #names must start with "seg_"
+    if 'segment_properties' in dictionary:
+        for (name, attributes) in dictionary['segment_properties'].items():
+            if attributes['type'] == "timestamp":
+                ts = Timestamp.from_string(attributes['value'],
+                                           format_string='%Y-%m-%dT%H:%M:%S')
+                trajectory.set_property(name, ts)
+            else:
+                trajectory.set_property(name, attributes['value'])
 
     return trajectory
 
@@ -129,6 +141,11 @@ def to_dict(trajectory):
     dictionary = {}
     dictionary['domain'] = trajectory.DOMAIN
     dictionary['object_id'] = trajectory[0].object_id
+    #dictionary['_id'] =  {
+    #    'ads_callsign': trajectory[0].object_id,
+    #    'start_time': trajectory[0].timestamp
+    #}
+    dictionary['_id'] = trajectory[0].object_id+'_'+trajectory[0].timestamp.strftime('%Y-%m-%dT%H:%M:%S')  #only for pnnl
 
     # set trajectory properties
     dictionary['trajectory_properties'] = {}
@@ -136,10 +153,16 @@ def to_dict(trajectory):
         if isinstance(value, datetime.datetime):
             ts = Timestamp.to_string(value, include_tz=True)
             entry = {name: {'type': "timestamp", 'value': ts}}
-            dictionary['trajectory_properties'].update(entry)
+            if name.startswith('seg_'): #actually a segment_property
+                dictionary['segment_properties'].update(entry)
+            else:
+                dictionary['trajectory_properties'].update(entry)
         else:
             entry = {name: {'type': type(value).__name__, 'value': value}}
-            dictionary['trajectory_properties'].update(entry)
+            if name.startswith('seg_'): #actually a segment_property
+                dictionary['segment_properties'].update(entry)
+            else:
+                dictionary['trajectory_properties'].update(entry)
 
     # initialize timestamps and coordinates
     dictionary['timestamps'] = []

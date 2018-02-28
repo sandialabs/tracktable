@@ -4,3 +4,4 @@
 *.so
 Documentation/conf.py
 Documentation/Makefile
+*.png
