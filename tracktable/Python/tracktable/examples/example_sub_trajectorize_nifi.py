@@ -27,7 +27,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Author: Ben Newton  - February 26, 2018
+# Author: Ben Newton  - February 28, 2018
 
 import tracktable.io.trajectory as trajectory
 from tracktable.domain import all_domains as ALL_DOMAINS
@@ -35,11 +35,10 @@ import tracktable.analysis.sub_trajectorize as st
 
 import importlib
 import argparse
-import copy
-
-from pymongo import MongoClient
 
 from enum import Enum
+
+import ijson
 
 class Method(Enum):
     straight = 'straight'
@@ -50,10 +49,13 @@ class Method(Enum):
 
 def parse_args():
     desc = "Subtrajectorize the trajectories in a given json file and output \
-    to a mongo db\
-    Example: python example_sub_trajectorize_mongo.py -l 7 -s 1.001"
+    to stdout in json format (for use in a nifi workflow)\
+    Example Straight Segmentation Method:     python example_sub_trajectorize_nifi.py -m straight -l 7 -s 1.001 ../../../../TestData/trajectories.json \
+    Example Acceleration Segmentation Method: python example_sub_trajectorize_nifi.py -m accel -a .025 -t ../../../../TestData/trajectories.json"
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-m', dest='method', type=Method, choices=list(Method), default='straight')
+    parser.add_argument('input', type=argparse.FileType('r'))
+    
     parser.add_argument('-s', dest='straightness_threshold', type=float,
                         default=1.001)
     #below - 2 is minimum  #could likely decrease?
@@ -83,22 +85,14 @@ def main():
 
     first_time = True
     
-    client = MongoClient('localhost', 27017)
-    db = client.ASDI
-    segs = db.SegmentsStraight
-    if args.method == Method.accel:
-        segs = db.SegmentsAccel
-    
-    #trajs = db.SampleTrajectories
-    trajs = db.CompleteTrajectories #todo make configurable
-    
-    traj_iter = trajs.find({})
     count = 0
-    for traj_json in traj_iter:
-        traj = trajectory.from_dict(traj_json)
+    #for traj_json in traj_iter:
+    for traj in trajectory.from_ijson_file_iter(args.input):
         count += 1
         if args.verbose:
             print(count, traj[0].object_id)
+
+        parent_id = traj[0].object_id+'_'+traj[0].timestamp.strftime('%Y-%m-%dT%H:%M:%S')
 
         if first_time: #assumes entire file is same domain
             domain_to_import = 'tracktable.domain.{}'.format(traj.DOMAIN)
@@ -114,12 +108,13 @@ def main():
             traj_dict = trajectory.to_dict(domain_module.Trajectory.from_position_list(pts))
             traj_dict['_id'] = traj_dict['_id']+'_'+str(segment_num).zfill(3)  #add the segment number to ensure unique ids 
             # as there can be duplicate timestamps
-            traj_dict['segment_properties'] = {"seg_num" : segment_num, "seg_parent_id" : traj_json['_id']}
+            traj_dict['segment_properties'] = {"seg_num" : segment_num, "seg_parent_id" : parent_id}
             segments.append(traj_dict)
             segment_num+=1
-        entry = {"_id" : traj_json['_id'], "segments" : segments}
-        new_result = segs.insert_one(entry)
-    #end for trejectory
+        entry = {"_id" : parent_id, "segments" : segments}
+        #new_result = segs.insert_one(entry)
+        print(entry)
+    #end for trajectory
 
     
 if __name__ == '__main__':
