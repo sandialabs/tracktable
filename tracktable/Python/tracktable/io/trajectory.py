@@ -47,7 +47,6 @@ def from_dict(dictionary):
     Args:
        dictionary: the dictionary to convert into a trajectory
     """
-    #currently we ignore _id
 
     #verify domain is valid and import appropriate domain
     try:
@@ -119,9 +118,9 @@ def from_dict(dictionary):
         else:
             trajectory.set_property(name, attributes['value'])
 
-    #add segment properties (if they exist)  #just save as trajectory properties
-    #names must start with "seg_"
-    if 'segment_properties' in dictionary:
+    #add segment properties (if they exist)  #just save as trajectory
+    # properties.  Names must start with "seg_" may want to check for that.
+    if 'segment_properties' in dictionary: #pnnl only 
         for (name, attributes) in dictionary['segment_properties'].items():
             if attributes['type'] == "timestamp":
                 ts = Timestamp.from_string(attributes['value'],
@@ -132,7 +131,7 @@ def from_dict(dictionary):
 
     return trajectory
 
-def to_dict(trajectory):
+def to_dict(trajectory, addId=False):
     """Returns a dictionary constructed from the given trajectory
     Args:
        trajectory: the trajectory to convert into a dictonary representation
@@ -141,26 +140,25 @@ def to_dict(trajectory):
     dictionary = {}
     dictionary['domain'] = trajectory.DOMAIN
     dictionary['object_id'] = trajectory[0].object_id
-    #dictionary['_id'] =  {
-    #    'ads_callsign': trajectory[0].object_id,
-    #    'start_time': trajectory[0].timestamp
-    #}
-    dictionary['_id'] = trajectory[0].object_id+'_'+trajectory[0].timestamp.strftime('%Y-%m-%dT%H:%M:%S')  #only for pnnl
+    if addId:
+        dictionary['_id'] = trajectory[0].object_id+'_'+
+        trajectory[0].timestamp.strftime('%Y-%m-%dT%H:%M:%S') #pnnl only
 
     # set trajectory properties
     dictionary['trajectory_properties'] = {}
+    dictionary['segment_properties'] = {}
     for (name, value) in trajectory.properties.items():
         if isinstance(value, datetime.datetime):
             ts = Timestamp.to_string(value, include_tz=True)
             entry = {name: {'type': "timestamp", 'value': ts}}
-            if name.startswith('seg_'): #actually a segment_property
-                dictionary['segment_properties'].update(entry)
+            if name.startswith('seg_'): # a segment_property
+                dictionary['segment_properties'].update(entry) #pnnl only
             else:
                 dictionary['trajectory_properties'].update(entry)
         else:
             entry = {name: {'type': type(value).__name__, 'value': value}}
-            if name.startswith('seg_'): #actually a segment_property
-                dictionary['segment_properties'].update(entry)
+            if name.startswith('seg_'): # a segment_property
+                dictionary['segment_properties'].update(entry) #pnnl only
             else:
                 dictionary['trajectory_properties'].update(entry)
 

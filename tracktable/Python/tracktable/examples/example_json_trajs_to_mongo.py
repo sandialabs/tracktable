@@ -56,7 +56,7 @@ def main():
     trajs = db.FlightsSample
 
     for traj in trajectory.from_ijson_file_iter(args.json_file):
-        result = trajs.insert_one(trajectory.to_dict(traj))
+        result = trajs.insert_one(trajectory.to_dict(traj, addId=True))
     
 if __name__ == '__main__':
     main()

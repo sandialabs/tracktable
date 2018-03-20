@@ -105,7 +105,7 @@ def main():
             pts = []
             for i in range(leaf[0], leaf[1]+1):
                 pts.append(traj[i])
-            traj_dict = trajectory.to_dict(domain_module.Trajectory.from_position_list(pts))
+            traj_dict = trajectory.to_dict(domain_module.Trajectory.from_position_list(pts), addId = True)
             traj_dict['_id'] = traj_dict['_id']+'_'+str(segment_num).zfill(3)  #add the segment number to ensure unique ids 
             # as there can be duplicate timestamps
             traj_dict['segment_properties'] = {"seg_num" : segment_num, "seg_parent_id" : parent_id}
