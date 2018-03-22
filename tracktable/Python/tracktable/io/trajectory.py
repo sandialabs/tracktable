@@ -141,7 +141,7 @@ def to_dict(trajectory, addId=False):
     dictionary['domain'] = trajectory.DOMAIN
     dictionary['object_id'] = trajectory[0].object_id
     if addId:
-        dictionary['_id'] = trajectory[0].object_id+'_'+
+        dictionary['_id'] = trajectory[0].object_id+'_'+\
         trajectory[0].timestamp.strftime('%Y-%m-%dT%H:%M:%S') #pnnl only
 
     # set trajectory properties

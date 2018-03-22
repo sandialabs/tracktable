@@ -58,11 +58,11 @@ def parse_args():
                         default=1.001)
     #below - 2 is minimum  #could likely decrease?
     parser.add_argument('-l', dest='length_threshold', type=int, default=7)
-    
+
     #below params for Accel only
     parser.add_argument('-a', dest='accel_threshold', type=float, default=0.025)
     parser.add_argument('-t', '--tight', dest='tight', action="store_true")
-    
+
     parser.add_argument('-v', '--verbose', dest='verbose', action="store_true")
     return parser.parse_args()
 
@@ -82,16 +82,16 @@ def main():
                           length_threshold_samples=args.length_threshold)
 
     first_time = True
-    
+
     client = MongoClient('localhost', 27017)
     db = client.ASDI
     segs = db.SegmentsStraight
     if args.method == Method.accel:
         segs = db.SegmentsAccel
-    
+
     #trajs = db.SampleTrajectories
     trajs = db.CompleteTrajectories #todo make configurable
-    
+
     traj_iter = trajs.find({})
     count = 0
     for traj_json in traj_iter:
@@ -112,7 +112,7 @@ def main():
             for i in range(leaf[0], leaf[1]+1):
                 pts.append(traj[i])
             traj_dict = trajectory.to_dict(domain_module.Trajectory.from_position_list(pts), addId=True)
-            traj_dict['_id'] = traj_dict['_id']+'_'+str(segment_num).zfill(3)  #add the segment number to ensure unique ids 
+            traj_dict['_id'] = traj_dict['_id']+'_'+str(segment_num).zfill(3)  #add the segment number to ensure unique ids
             # as there can be duplicate timestamps
             traj_dict['segment_properties'] = {"seg_num" : segment_num, "seg_parent_id" : traj_json['_id']}
             segments.append(traj_dict)
@@ -121,6 +121,6 @@ def main():
         new_result = segs.insert_one(entry)
     #end for trejectory
 
-    
+
 if __name__ == '__main__':
     main()

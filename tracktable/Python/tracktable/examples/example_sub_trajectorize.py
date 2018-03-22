@@ -50,6 +50,14 @@ from tracktable.core import geomath
 
 #todo.  Uses too much memory when many trajs are processed.  Fix leak.
 #todo may want to try a value of 5 or 4 not 7 for length threshold
+from enum import Enum
+
+class Method(Enum):   #duplicated from example_sub_trajectoirze_mongo.  Fix todo
+    straight = 'straight'
+    accel = 'accel'
+
+    def __str__(self):
+        return self.value
 
 def get_path_piece(start, end, coords):
     points = []
@@ -151,7 +159,7 @@ def plot_tree_helper(G, object_id, timestamp, max_width_height,
     pos=nx.nx_agraph.graphviz_layout(G, prog='dot')
     nx.draw(G, pos, with_labels=with_labels, arrows=False,
             node_size=node_size, zorder=1, width=1, edge_color='#A92C00',
-            style='dotted', linewidths=0, node_color='w') 
+            style='dotted', linewidths=0, node_color='w')
 
     paths=nx.get_node_attributes(G, 'p')
 
@@ -184,21 +192,41 @@ def parse_args():
     parser.add_argument('-i', '--input', dest='json_trajectory_file',
                         type=argparse.FileType('r'),
                         default="../../../..//TestData/mapping_flight.json")
-    parser.add_argument('-s', '--saveFigures', dest='save_fig',
+    parser.add_argument('-f', '--saveFigures', dest='save_fig',
                         action="store_true")
+    parser.add_argument('-m', dest='method', type=Method, choices=list(Method), default='straight')
+    parser.add_argument('-s', dest='straightness_threshold', type=float,
+                        default=1.001)
+    #below - 2 is minimum  #could likely decrease?
+    parser.add_argument('-l', dest='length_threshold', type=int, default=7)
+
+    #below params for Accel only
+    parser.add_argument('-a', dest='accel_threshold', type=float, default=0.025)
+    parser.add_argument('-t', '--tight', dest='tight', action="store_true")
+
+    parser.add_argument('-v', '--verbose', dest='verbose', action="store_true")
     return parser.parse_args()
 
 def main():
     args = parse_args()
 
-    threshold = 1.001
-    length_thresh = 7  #2 is minimum  #could likely decrease?
+    if args.verbose:
+        print("Segmentation method is "+str(args.method))
 
-    subtrajer = st.SubTrajerStraight(straightness_threshold=threshold,
-                                     length_threshold_samples=length_thresh)
+    if args.method == Method.accel:
+        subtrajer = \
+        st.SubTrajerAccel(accel_threshold=args.accel_threshold,
+                          tight=args.tight)
+    else:
+        subtrajer = \
+        st.SubTrajerStraight(straightness_threshold=args.straightness_threshold,
+                          length_threshold_samples=args.length_threshold)
 
     for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
-        leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
+        if args.method == Method.accel:
+            leaves = subtrajer.subtrajectorize(traj, returnGraph=True)
+        else:
+            leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
         print(traj[0].object_id, leaves)
 
         #below expand 5% or .1 degrees when bbox has no expanse in some dim
@@ -207,10 +235,11 @@ def main():
 
         # the mymap parameter below is only needed to get the max width or
         # height in terms ov the values used to scale the maps
-        plot_colored_segments_path(traj, leaves, threshold, bbox,
+        plot_colored_segments_path(traj, leaves, args.straightness_threshold, bbox,
                                    savefig=args.save_fig)
-        plot_tree(G, traj, bbox, with_labels=False,
-                  node_size=5000, threshold=threshold, savefig=args.save_fig)
+        if args.method == Method.straight:
+            plot_tree(G, traj, bbox, with_labels=False,
+                      node_size=5000, threshold=args.straightness_threshold, savefig=args.save_fig)
 
 
 if __name__ == '__main__':
