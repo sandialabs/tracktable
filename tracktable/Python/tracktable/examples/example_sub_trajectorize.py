@@ -30,7 +30,7 @@
 # Author: Ben Newton  - February, 2018
 
 import matplotlib
-matplotlib.use("Agg")
+#matplotlib.use("Agg") #uncomment for headless/non-graphical operation
 import matplotlib.pyplot as plt
 import tracktable.analysis.sub_trajectorize as st
 import networkx as nx
@@ -80,18 +80,21 @@ def draw_screen_poly( lats, lons, m):
     plt.gca().add_patch(poly)
 
 def plot_colored_segments_path(traj, leaves, threshold, bbox,
-                               savefig=False):
+                               savefig=False, insetMap=True, ext="png"):
     fig = plt.figure(figsize=(25, 14), dpi=80)
-    gs = gridspec.GridSpec(1,2,width_ratios=[3,1])
-    ax = fig.add_subplot(gs[0])
+    if insetMap:
+        gs = gridspec.GridSpec(1,2,width_ratios=[3,1])
+        ax = fig.add_subplot(gs[0])
+    else:
+        ax = fig.gca()
 
     (mymap, map_actors) = mapmaker.mapmaker(map_name='custom',
                                             domain='terrestrial',
                                             map_bbox=bbox,
                                             map_projection="merc",
-                                            land_color='w',
-                                            sea_color='gray',
-                                            resolution='f')
+                                            land_color='w',#\/was gray before
+                                            sea_color='#ADD8E6', #light blue
+                                            resolution='f') #f=full
 
     coords = traj_to_coords(traj)
 
@@ -101,27 +104,37 @@ def plot_colored_segments_path(traj, leaves, threshold, bbox,
         lons, lats = line.xy
         x,y = mymap(lons, lats)
 
-        color = 'b'
-        if i%2 == 1:
-            color='r'
-        mymap.plot(x, y, color=color, linewidth=1)
-        mymap.plot(x,y, 'go', markersize=1)
+        parallels = np.arange(20,60,1.)
+        # labels = [left,right,top,bottom]
+        mymap.drawparallels(parallels,labels=[True,False,False,False],
+                            color='#eeeeee', zorder=0, fontsize=25)
+        meridians = np.arange(10.,351.,1.)
+        mymap.drawmeridians(meridians,labels=[False,False,False,True],
+                            color='#eeeeee', zorder=0, fontsize=25)
 
-    ax = fig.add_subplot(gs[1])
-    #draw box showing where in us the map is
-    (mymap2, map_actors) = mapmaker.mapmaker(map_name='conus',
-                                             domain='terrestrial',
-                                             land_color='w', sea_color='gray',
-                                             resolution='c')
-    lons = [bbox.min_corner[0], bbox.max_corner[0],
-            bbox.max_corner[0], bbox.min_corner[0]]
-    lats = [bbox.min_corner[1], bbox.min_corner[1],
-            bbox.max_corner[1], bbox.max_corner[1]]
-    draw_screen_poly(lats, lons, mymap2)
+        color = '#005376'
+        if i%2 == 1:
+            color='#A92C00'
+        mymap.plot(x, y, color=color, alpha=0.67, linewidth=6)
+        mymap.plot(x,y, 'wo', markersize=7)
+
+    if insetMap:
+        ax = fig.add_subplot(gs[1])
+
+        #draw box showing where in us the map is
+        (mymap2, map_actors) = mapmaker.mapmaker(map_name='conus',
+                                                 domain='terrestrial',
+                                                 land_color='w', sea_color='gray',
+                                                 resolution='c')
+        lons = [bbox.min_corner[0], bbox.max_corner[0],
+                bbox.max_corner[0], bbox.min_corner[0]]
+        lats = [bbox.min_corner[1], bbox.min_corner[1],
+                bbox.max_corner[1], bbox.max_corner[1]]
+        draw_screen_poly(lats, lons, mymap2)
 
     if savefig:
         plt.savefig('sub_trajectorization-colored-'+
-                    traj[0].object_id+'-'+str(traj[0].timestamp)+'-'+str(threshold)+'.png')
+                    traj[0].object_id+'-'+str(traj[0].timestamp)+'-'+str(threshold)+'.'+ext)
     else:
         plt.show()
     plt.close()
@@ -136,7 +149,7 @@ def plot_path(ax, line, pos, color, zorder, max_width_height, magnification,
 
     #note this func does not take into account curvature of the earth
 def plot_tree(G, traj, bbox, with_labels=False, node_size=5000,
-              threshold=1.1, savefig=False):
+              threshold=1.1, savefig=False, ext="png"):
     #max_width, max_height = mymap(bbox.max_corner[0], bbox.max_corner[1])
     max_width_height = max(bbox.max_corner[0], bbox.max_corner[1])
     coords = traj_to_coords(traj)
@@ -148,11 +161,11 @@ def plot_tree(G, traj, bbox, with_labels=False, node_size=5000,
     plot_tree_helper(G, traj[0].object_id, traj[0].timestamp,
                      max_width_height, with_labels=with_labels,
                      node_size=node_size, threshold=threshold,
-                     savefig=savefig)
+                     savefig=savefig, ext=ext)
 
 def plot_tree_helper(G, object_id, timestamp, max_width_height,
                      with_labels=False, node_size=5000, threshold=1.1,
-                     savefig=False):
+                     savefig=False, ext="png"):
     fig = plt.figure(figsize=(25,14), dpi=80)
     ax = fig.gca()
 
@@ -181,13 +194,17 @@ def plot_tree_helper(G, object_id, timestamp, max_width_height,
 
     if savefig:
         plt.savefig('sub_trajectorization-'+object_id+'-'+str(timestamp)+'-'+
-                    str(threshold)+'.png')
+                    str(threshold)+'.'+ext)
     else:
         plt.show()
     plt.close()
 
 def parse_args():
-    desc = 'Subtrajectorize and render the trajectories in a given json file.'
+    desc = 'Subtrajectorize and render the trajectories in a given json file.'+\
+           ' Example (accel figure for paper) python example_sub_trajectorize.py -f -m accel -t -d'\
+           ' Example (straight, 2, 1.1 for paper) python example_sub_trajectorize.py -f -m straight -l 2 -s 1.1 -d'\
+           ' Example (straight, 2, 1.001 for paper) python example_sub_trajectorize.py -f -m straight -l 2 -s 1.001 -d'\
+           ' Example (straight, 7, 1.001 for paper) python example_sub_trajectorize.py -f -m straight -l 7 -s 1.001 -d'
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-i', '--input', dest='json_trajectory_file',
                         type=argparse.FileType('r'),
@@ -204,11 +221,19 @@ def parse_args():
     parser.add_argument('-a', dest='accel_threshold', type=float, default=0.025)
     parser.add_argument('-t', '--tight', dest='tight', action="store_true")
 
+    parser.add_argument('-p', '--insetMap', dest='insetMap', action="store_true")
+
+    parser.add_argument('-d', '--pdf', dest='pdf', action="store_true") #output as pdf
+
     parser.add_argument('-v', '--verbose', dest='verbose', action="store_true")
     return parser.parse_args()
 
 def main():
     args = parse_args()
+
+    ext="png"
+    if args.pdf:
+        ext="pdf"
 
     if args.verbose:
         print("Segmentation method is "+str(args.method))
@@ -235,11 +260,13 @@ def main():
 
         # the mymap parameter below is only needed to get the max width or
         # height in terms ov the values used to scale the maps
-        plot_colored_segments_path(traj, leaves, args.straightness_threshold, bbox,
-                                   savefig=args.save_fig)
+        plot_colored_segments_path(traj, leaves, args.straightness_threshold,
+                                   bbox, savefig=args.save_fig,
+                                   insetMap=args.insetMap, ext=ext)
         if args.method == Method.straight:
             plot_tree(G, traj, bbox, with_labels=False,
-                      node_size=5000, threshold=args.straightness_threshold, savefig=args.save_fig)
+                      node_size=5000, threshold=args.straightness_threshold,
+                      savefig=args.save_fig, ext=ext)
 
 
 if __name__ == '__main__':
