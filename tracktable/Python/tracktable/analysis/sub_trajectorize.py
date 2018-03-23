@@ -178,7 +178,7 @@ class SubTrajerAccel:
         self.accel_threshold = accel_threshold
         self.tight = tight
         self.currentNodeIndex = 1 #change to 0
-    
+
     def acceleration(self, coords):  #x as array and y's as array   array 2,N
         first = scipy.gradient(coords)[1]  #Derivative along columns is result [1]
         second = scipy.gradient(first)[1]
@@ -248,3 +248,154 @@ class SubTrajerAccel:
         #else:
         #    return leaves
 
+
+
+class SubTrajerSemantic:
+    'Splits a trajectory into straight-ish segments'
+    def __init__(self, straightness_threshold=1.1, length_threshold_samples=2): #2 is minimum
+        self.threshold = straightness_threshold
+        self.length_threshold_samples = length_threshold_samples
+        self.currentNodeIndex = 1 #change to 0
+        self.norm_dist_mat = NormalizedDistanceMatrix([]) #todo better way?
+
+    def split_at_indices(self, indices, start, end):
+        """returns a list of index pairs, and/or "None" objects.  Even
+        elements are not straight segments or are None.  Odd elements are the
+        straight segments"""
+        segments = []
+        remainderStart = start
+        remainderEnd = end
+        for i in indices:
+            if i >= remainderStart:
+                if i == start:
+                    segments.append(None)
+                elif i== remainderStart:
+                    segments.append(None)
+                else:
+                    segments.append([remainderStart, i])
+                    remainderStart = i
+            else: #overalpping segments, ignore second one.  TODO, later may
+                #want to use a better way to determine which overlapping
+                #segment to use
+                segments.append(None)
+        if remainderStart == remainderEnd:
+            segments.append(None)
+        else:
+            segments.append([remainderStart, remainderEnd])
+        return segments
+
+    def longest_straight_segments(self, G, coords, thisIndex,
+                                       start_length, start, end):
+        if start_length >= (end-start+1):
+            start_length = end-start
+        #print(start, end, start_length)
+        if (not self.norm_dist_mat.is_straight(start, end)) and (end-start+1) > self.length_threshold_samples :
+            indices = []
+            new_start_length = start_length
+            for segment_length in range(start_length, 1, -1):
+                num_segments_of_length = ((end-start+1)-segment_length)+1
+                for start_index in range(num_segments_of_length):
+                    end_index = start_index+segment_length-1
+                    if self.norm_dist_mat.is_straight(start_index+start,
+                                                         end_index+start):
+                        indices.append(start_index+start)
+                        indices.append(end_index+start)
+                if indices:
+                    new_start_length = segment_length-1
+                    break
+            segs = self.split_at_indices(indices, start, end)
+            for i in range(len(segs)):
+                if i%2 == 0: #even = not straight, recurse
+                    if segs[i] != None:
+                        G.add_node(self.currentNodeIndex, s=segs[i][0],
+                                   e=segs[i][1])
+                        G.add_edge(thisIndex, self.currentNodeIndex)
+                        self.currentNodeIndex+=1
+                        self.longest_straight_segments(G, coords,
+                                                       self.currentNodeIndex-1,
+                                                       new_start_length,
+                                                       segs[i][0],
+                                                       segs[i][1])
+                else: #odd = straight, make leaf node
+                    G.add_node(self.currentNodeIndex, s=segs[i][0],
+                               e=segs[i][1])
+                    G.add_edge(thisIndex, self.currentNodeIndex)
+                    self.currentNodeIndex+=1
+
+    def subtrajectorize(self, trajectory, returnGraph=False): #can take coordinate list or a trajectory.
+        coordinates = []
+        for point in trajectory: #make into coordinate list
+            if 'altitudes' in point.properties.keys(): #add altitude if exists
+                coordinates.append([point[0], point[1], point.properties['altitudes']])
+                print(len(coordinates)-1, point.properties['altitudes']) #remove
+            else:
+                coordinates.append([point[0], point[1], None])
+
+        self.currentNodeIndex = 1
+        self.norm_dist_mat = NormalizedDistanceMatrix(coordinates,
+                                                      threshold=self.threshold)
+        takeoffThreshold = 10500
+        landingThreshold = 10500
+        cruisingThreshold = 0.00033 #essentially 33% of the flight must be in a bin?   not sure this is good or not
+        lastSample = len(coordinates)-1
+        #start out by removing the takeoff and landing.
+        takeOffEnd=0
+        if coordinates[0][2]: #has altitude
+            if coordinates[0][2] < takeoffThreshold: #starts less than 10k feet
+                print("has alt at start less 10k", coordinates[0][2])
+                for i in range(1,lastSample):#find where crosses 10k ft
+                    if coordinates[i][2] > takeoffThreshold:
+                        takeOffEnd = i
+                        break
+                print("take off ends at sample ", takeOffEnd)
+        #isolate landing based on altitude
+        landingStart= lastSample
+        if coordinates[lastSample][2]: #has altitude
+            if coordinates[lastSample][2] < landingThreshold: #starts less than 10k feet
+                for i in range(lastSample,-1, -1):#find where crosses 10k ft
+                    if coordinates[i][2] > landingThreshold:
+                        landingStart = i
+                        break
+                print("landing starts at sample ", landingStart)
+
+        cruisingStart = None
+        cruisingEnd = None
+        h = np.histogram(list(zip(*coordinates))[2], bins=np.append(np.append(0, np.arange(10500,46500,1000)), 60000), density=True)  #to determine where the cruising altitude was?
+        if np.max(h[0]) > cruisingThreshold: #multiply by 1000 to get approx ratio of samples in this bin
+            cruisingBin = np.argmax(h[0])
+            cruisingMin = h[1][cruisingBin]
+            cruisingMax = h[1][cruisingBin+1]
+            for i in range(takeOffEnd, landingStart):
+                if coordinates[i][2] > cruisingMin:
+                    cruisingStart = i
+                    print("cruising starts at sample ", cruisingStart)
+                    break
+            for i in range(landingStart, takeOffEnd, -1):
+                if coordinates[i][2] > cruisingMin:
+                    cruisingEnd = i
+                    print("descent starts at sample ", cruisingEnd)
+                    break
+
+        G = nx.DiGraph()
+        start = takeOffEnd
+        end = landingStart
+        G.add_node(self.currentNodeIndex, s=start, e=end)
+        self.currentNodeIndex += 1
+        self.longest_straight_segments(G, coordinates, 1,
+                                            len(coordinates), start, end)
+        leaves = [(G.node[x]['s'], G.node[x]['e'])
+                  for x in G.nodes() if G.out_degree(x)==0 and
+                  G.in_degree(x)==1]
+        if len(G) == 1:
+            leaves = [(G.node[1]['s'], G.node[1]['e'])] #just root node #change 1's to 0's
+
+        if returnGraph:
+            return leaves, G
+        else:
+            return leaves
+
+        #take off
+        #climb
+        #cruise
+        #descent
+        #landing

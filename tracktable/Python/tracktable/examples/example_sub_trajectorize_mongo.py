@@ -44,6 +44,7 @@ from enum import Enum
 class Method(Enum):
     straight = 'straight'
     accel = 'accel'
+    semantic = 'semantic'
 
     def __str__(self):
         return self.value
@@ -76,6 +77,10 @@ def main():
         subtrajer = \
         st.SubTrajerAccel(accel_threshold=args.accel_threshold,
                           tight=args.tight)
+    elif args.method == Method.semantic:
+        subtrajer = \
+        st.SubTrajerSemantic(straightness_threshold=args.straightness_threshold,
+                             length_threshold_samples=args.length_threshold)
     else:
         subtrajer = \
         st.SubTrajerStraight(straightness_threshold=args.straightness_threshold,
@@ -85,16 +90,22 @@ def main():
 
     client = MongoClient('localhost', 27017)
     db = client.ASDI
-    segs = db.SegmentsStraight
+    segs = db.SegmentsStraightJuly
     if args.method == Method.accel:
-        segs = db.SegmentsAccel
+        segs = db.SegmentsAccelJuly
+    elif args.method == Method.semantic:
+        segs = db.SegmentsSemanticJuly
 
-    #trajs = db.SampleTrajectories
     trajs = db.CompleteTrajectories #todo make configurable
 
-    traj_iter = trajs.find({})
+    #traj_iter = trajs.find({}) #original version
+    traj_iter = trajs.find({ "_id": { "$regex": "AAL1000_2016-07-03T18:11:56"}}) #specific trajectory  #nice descent
+    #traj_iter = trajs.find({ "_id": { "$regex": "0UXUB_2016-09-19T19:22:17"}}) #specific trajectory  #nice descent
+    #traj_iter = trajs.find({ "_id": { "$regex": "2016-07-03"}}) #only July 3
+    #traj_iter = trajs.find({ "_id": { "$regex": "2016-07-0[3456789]"}}) #only first week in July 2016
     count = 0
     for traj_json in traj_iter:
+        #print(traj_json['_id']) #remove
         traj = trajectory.from_dict(traj_json)
         count += 1
         if args.verbose:

@@ -55,6 +55,7 @@ from enum import Enum
 class Method(Enum):   #duplicated from example_sub_trajectoirze_mongo.  Fix todo
     straight = 'straight'
     accel = 'accel'
+    semantic = 'semantic'
 
     def __str__(self):
         return self.value
@@ -247,6 +248,10 @@ def main():
         subtrajer = \
         st.SubTrajerAccel(accel_threshold=args.accel_threshold,
                           tight=args.tight)
+    elif args.method == Method.semantic:
+        subtrajer = \
+        st.SubTrajerSemantic(straightness_threshold=args.straightness_threshold,
+                          length_threshold_samples=args.length_threshold)
     else:
         subtrajer = \
         st.SubTrajerStraight(straightness_threshold=args.straightness_threshold,
