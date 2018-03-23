@@ -29,6 +29,8 @@
 # Author: Ben Newton
 # Date:   October, 19, 2017
 
+#may need to include Timezone, include_tz=True at some point?
+
 """
 tracktable.io.trajectory - Read/Write a trajectory from/to a python
 dictionary and from/to a json string or file
@@ -149,7 +151,7 @@ def to_dict(trajectory, addId=False):
     dictionary['segment_properties'] = {}
     for (name, value) in trajectory.properties.items():
         if isinstance(value, datetime.datetime):
-            ts = Timestamp.to_string(value, include_tz=True)
+            ts = Timestamp.to_string(value, include_tz=False, format_string='%Y-%m-%dT%H:%M:%S')
             entry = {name: {'type': "timestamp", 'value': ts}}
             if name.startswith('seg_'): # a segment_property
                 dictionary['segment_properties'].update(entry) #pnnl only
@@ -171,12 +173,12 @@ def to_dict(trajectory, addId=False):
 
     # set timestamps, coordinates and point_properties
     for i in range(len(trajectory)):
-        ts = Timestamp.to_string(trajectory[i].timestamp, include_tz=True)
+        ts = Timestamp.to_string(trajectory[i].timestamp, include_tz=False, format_string='%Y-%m-%dT%H:%M:%S')
         dictionary['timestamps'].append(ts)
         dictionary['coordinates'].append(tuple(trajectory[i]))
         for (name, value) in trajectory[i].properties.items():
             if isinstance(value, datetime.datetime):
-                ts = Timestamp.to_string(value, include_tz=True)
+                ts = Timestamp.to_string(value, include_tz=False, format_string='%Y-%m-%dT%H:%M:%S')
                 if name not in dictionary['point_properties']:
                     entry = {name: {'type': "timestamp",
                                     'values': [None]*len(trajectory)}}
