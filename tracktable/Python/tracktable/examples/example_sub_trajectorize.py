@@ -80,8 +80,8 @@ def draw_screen_poly( lats, lons, m):
     plt.gca().add_patch(poly)
 
 def plot_colored_segments_path(traj, leaves, threshold, bbox,
-                               savefig=False, insetMap=True, ext="png"):
-    fig = plt.figure(figsize=(25, 14), dpi=80)
+                               savefig=False, insetMap=True, ext="png", output=''):
+    fig = plt.figure(figsize=(14,14), dpi=300)
     if insetMap:
         gs = gridspec.GridSpec(1,2,width_ratios=[3,1])
         ax = fig.add_subplot(gs[0])
@@ -132,9 +132,13 @@ def plot_colored_segments_path(traj, leaves, threshold, bbox,
                 bbox.max_corner[1], bbox.max_corner[1]]
         draw_screen_poly(lats, lons, mymap2)
 
+    #plt.tight_layout(pad=7.0) #uncomment for tight layout for paper figures
+
     if savefig:
-        plt.savefig('sub_trajectorization-colored-'+
-                    traj[0].object_id+'-'+str(traj[0].timestamp)+'-'+str(threshold)+'.'+ext)
+        if output == '':
+            output = 'sub_trajectorization-colored-'+\
+                     traj[0].object_id+'-'+str(traj[0].timestamp)+'-'+str(threshold)
+        plt.savefig(output+'.'+ext)
     else:
         plt.show()
     plt.close()
@@ -201,16 +205,17 @@ def plot_tree_helper(G, object_id, timestamp, max_width_height,
 
 def parse_args():
     desc = 'Subtrajectorize and render the trajectories in a given json file.'+\
-           ' Example (accel figure for paper) python example_sub_trajectorize.py -f -m accel -t -d'\
-           ' Example (straight, 2, 1.1 for paper) python example_sub_trajectorize.py -f -m straight -l 2 -s 1.1 -d'\
-           ' Example (straight, 2, 1.001 for paper) python example_sub_trajectorize.py -f -m straight -l 2 -s 1.001 -d'\
-           ' Example (straight, 7, 1.001 for paper) python example_sub_trajectorize.py -f -m straight -l 7 -s 1.001 -d'
+           ' Example (accel figure for paper) python example_sub_trajectorize.py -f -m accel -t -d -o "accelp025"'\
+           ' Example (straight, 2, 1.1 for paper) python example_sub_trajectorize.py -f -m straight -l 2 -s 1.1 -d -o "straight1p1"'\
+           ' Example (straight, 2, 1.001 for paper) python example_sub_trajectorize.py -f -m straight -l 2 -s 1.001 -d -o "straight1p001"'\
+           ' Example (straight, 7, 1.001 for paper) python example_sub_trajectorize.py -f -m straight -l 7 -s 1.001 -d -o "straight-71p001"'
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-i', '--input', dest='json_trajectory_file',
                         type=argparse.FileType('r'),
                         default="../../../..//TestData/mapping_flight.json")
     parser.add_argument('-f', '--saveFigures', dest='save_fig',
                         action="store_true")
+    parser.add_argument('-o', '--outputImageFilenameNoExt', dest='image_file', type=str, default='', help="filename and optional path without extension or period")
     parser.add_argument('-m', dest='method', type=Method, choices=list(Method), default='straight')
     parser.add_argument('-s', dest='straightness_threshold', type=float,
                         default=1.001)
@@ -262,7 +267,7 @@ def main():
         # height in terms ov the values used to scale the maps
         plot_colored_segments_path(traj, leaves, args.straightness_threshold,
                                    bbox, savefig=args.save_fig,
-                                   insetMap=args.insetMap, ext=ext)
+                                   insetMap=args.insetMap, ext=ext, output=args.image_file)
         if args.method == Method.straight:
             plot_tree(G, traj, bbox, with_labels=False,
                       node_size=5000, threshold=args.straightness_threshold,
