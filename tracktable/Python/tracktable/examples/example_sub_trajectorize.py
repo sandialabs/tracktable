@@ -60,6 +60,12 @@ class Method(Enum):   #duplicated from example_sub_trajectoirze_mongo.  Fix todo
     def __str__(self):
         return self.value
 
+def get_path_altitudes(start, end, coords):
+    altitudes = []
+    for coord in coords[start:end+1]:
+        altitudes.append(coord[2])
+    return altitudes
+
 def get_path_piece(start, end, coords):
     points = []
     for coord in coords[start:end+1]:
@@ -69,7 +75,10 @@ def get_path_piece(start, end, coords):
 def traj_to_coords(traj):
     coordinates = []
     for point in traj: #make into coordinate list
-        coordinates.append([point[0], point[1]])
+        if 'altitudes' in point.properties.keys(): #add altitude if exists
+            coordinates.append([point[0], point[1], point.properties['altitudes']])
+        else:
+            coordinates.append([point[0], point[1], None])
     return coordinates
 
 # below adapted from https://stackoverflow.com/questions/12251189/
@@ -81,10 +90,14 @@ def draw_screen_poly( lats, lons, m):
     plt.gca().add_patch(poly)
 
 def plot_colored_segments_path(traj, leaves, threshold, bbox,
-                               savefig=False, insetMap=True, ext="png", output=''):
-    fig = plt.figure(figsize=(14,14), dpi=300)
-    if insetMap:
+                               savefig=False, insetMap=True,
+                               altitudePlot=True, ext="png", output=''):
+    fig = plt.figure(figsize=(14,14), dpi=150)#dpi=300)
+    if (insetMap and not altitudePlot) or (altitudePlot and not insetMap):
         gs = gridspec.GridSpec(1,2,width_ratios=[3,1])
+        ax = fig.add_subplot(gs[0])
+    elif insetMap and altitudePlot:
+        gs = gridspec.GridSpec(1,3,width_ratios=[3,1,1])
         ax = fig.add_subplot(gs[0])
     else:
         ax = fig.gca()
@@ -94,7 +107,7 @@ def plot_colored_segments_path(traj, leaves, threshold, bbox,
                                             map_bbox=bbox,
                                             map_projection="merc",
                                             land_color='w',#\/was gray before
-                                            sea_color='#ADD8E6', #light blue
+                                            sea_color='gray',#'#ADD8E6', #light blue
                                             resolution='f') #f=full
 
     coords = traj_to_coords(traj)
@@ -108,16 +121,16 @@ def plot_colored_segments_path(traj, leaves, threshold, bbox,
         parallels = np.arange(20,60,1.)
         # labels = [left,right,top,bottom]
         mymap.drawparallels(parallels,labels=[True,False,False,False],
-                            color='#eeeeee', zorder=0, fontsize=25)
+                            color='#dddddd', zorder=0, fontsize=7)#fontsize=25)
         meridians = np.arange(10.,351.,1.)
         mymap.drawmeridians(meridians,labels=[False,False,False,True],
-                            color='#eeeeee', zorder=0, fontsize=25)
+                            color='#dddddd', zorder=0, fontsize=7)#fontsize=25)
 
         color = '#005376'
         if i%2 == 1:
             color='#A92C00'
-        mymap.plot(x, y, color=color, alpha=0.67, linewidth=6)
-        mymap.plot(x,y, 'wo', markersize=7)
+        mymap.plot(x, y, color=color, alpha=1.0, linewidth=1, zorder=5)#6) #.67
+        mymap.scatter(x,y, c='#bbbbbb', marker='o', s=2, zorder=4)#7) #eeeeee
 
     if insetMap:
         ax = fig.add_subplot(gs[1])
@@ -132,6 +145,22 @@ def plot_colored_segments_path(traj, leaves, threshold, bbox,
         lats = [bbox.min_corner[1], bbox.min_corner[1],
                 bbox.max_corner[1], bbox.max_corner[1]]
         draw_screen_poly(lats, lons, mymap2)
+
+    if insetMap and altitudePlot:
+        ax = fig.add_subplot(gs[2])
+    elif altitudePlot:
+        ax = fig.add_subplot(gs[1])
+
+    if altitudePlot:
+        for i in range(len(leaves)):
+            leaf = leaves[i]
+            alts = get_path_altitudes(leaf[0], leaf[1], coords)
+
+            color = '#005376'
+            if i%2 == 1:
+                color='#A92C00'
+            ax.plot(range(leaf[0],leaf[1]+1), alts, color=color, zorder=5) #just plot sample altitudes
+            ax.scatter(range(leaf[0],leaf[1]+1), alts, c='#bbbbbb', marker='o', s=2, zorder=4)#7)#eeeeee
 
     #plt.tight_layout(pad=7.0) #uncomment for tight layout for paper figures
 
@@ -228,6 +257,7 @@ def parse_args():
     parser.add_argument('-t', '--tight', dest='tight', action="store_true")
 
     parser.add_argument('-p', '--insetMap', dest='insetMap', action="store_true")
+    parser.add_argument('-u', '--altitudePlot', dest='altitudePlot', action="store_true")
 
     parser.add_argument('-d', '--pdf', dest='pdf', action="store_true") #output as pdf
 
@@ -258,10 +288,11 @@ def main():
                           length_threshold_samples=args.length_threshold)
 
     for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
-        if args.method == Method.accel:
-            leaves = subtrajer.subtrajectorize(traj, returnGraph=True)
-        else:
+        if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
+        else:
+            leaves = subtrajer.subtrajectorize(traj, returnGraph=True)
+
         print(traj[0].object_id, leaves)
 
         #below expand 5% or .1 degrees when bbox has no expanse in some dim
@@ -272,7 +303,9 @@ def main():
         # height in terms ov the values used to scale the maps
         plot_colored_segments_path(traj, leaves, args.straightness_threshold,
                                    bbox, savefig=args.save_fig,
-                                   insetMap=args.insetMap, ext=ext, output=args.image_file)
+                                   insetMap=args.insetMap,
+                                   altitudePlot=args.altitudePlot, ext=ext,
+                                   output=args.image_file)
         if args.method == Method.straight:
             plot_tree(G, traj, bbox, with_labels=False,
                       node_size=5000, threshold=args.straightness_threshold,

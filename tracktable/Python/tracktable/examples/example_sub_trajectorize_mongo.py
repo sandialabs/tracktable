@@ -99,7 +99,7 @@ def main():
     trajs = db.CompleteTrajectories #todo make configurable
 
     #traj_iter = trajs.find({}) #original version
-    traj_iter = trajs.find({ "_id": { "$regex": "AAL1000_2016-07-03T18:11:56"}}) #specific trajectory  #nice descent
+    traj_iter = trajs.find({ "_id": { "$regex": "AAL1000_2016-07-03T18:11:56"}}) #specific trajectory  #all phases
     #traj_iter = trajs.find({ "_id": { "$regex": "0UXUB_2016-09-19T19:22:17"}}) #specific trajectory  #nice descent
     #traj_iter = trajs.find({ "_id": { "$regex": "2016-07-03"}}) #only July 3
     #traj_iter = trajs.find({ "_id": { "$regex": "2016-07-0[3456789]"}}) #only first week in July 2016

@@ -258,76 +258,12 @@ class SubTrajerSemantic:
         self.currentNodeIndex = 1 #change to 0
         self.norm_dist_mat = NormalizedDistanceMatrix([]) #todo better way?
 
-    def split_at_indices(self, indices, start, end):
-        """returns a list of index pairs, and/or "None" objects.  Even
-        elements are not straight segments or are None.  Odd elements are the
-        straight segments"""
-        segments = []
-        remainderStart = start
-        remainderEnd = end
-        for i in indices:
-            if i >= remainderStart:
-                if i == start:
-                    segments.append(None)
-                elif i== remainderStart:
-                    segments.append(None)
-                else:
-                    segments.append([remainderStart, i])
-                    remainderStart = i
-            else: #overalpping segments, ignore second one.  TODO, later may
-                #want to use a better way to determine which overlapping
-                #segment to use
-                segments.append(None)
-        if remainderStart == remainderEnd:
-            segments.append(None)
-        else:
-            segments.append([remainderStart, remainderEnd])
-        return segments
-
-    def longest_straight_segments(self, G, coords, thisIndex,
-                                       start_length, start, end):
-        if start_length >= (end-start+1):
-            start_length = end-start
-        #print(start, end, start_length)
-        if (not self.norm_dist_mat.is_straight(start, end)) and (end-start+1) > self.length_threshold_samples :
-            indices = []
-            new_start_length = start_length
-            for segment_length in range(start_length, 1, -1):
-                num_segments_of_length = ((end-start+1)-segment_length)+1
-                for start_index in range(num_segments_of_length):
-                    end_index = start_index+segment_length-1
-                    if self.norm_dist_mat.is_straight(start_index+start,
-                                                         end_index+start):
-                        indices.append(start_index+start)
-                        indices.append(end_index+start)
-                if indices:
-                    new_start_length = segment_length-1
-                    break
-            segs = self.split_at_indices(indices, start, end)
-            for i in range(len(segs)):
-                if i%2 == 0: #even = not straight, recurse
-                    if segs[i] != None:
-                        G.add_node(self.currentNodeIndex, s=segs[i][0],
-                                   e=segs[i][1])
-                        G.add_edge(thisIndex, self.currentNodeIndex)
-                        self.currentNodeIndex+=1
-                        self.longest_straight_segments(G, coords,
-                                                       self.currentNodeIndex-1,
-                                                       new_start_length,
-                                                       segs[i][0],
-                                                       segs[i][1])
-                else: #odd = straight, make leaf node
-                    G.add_node(self.currentNodeIndex, s=segs[i][0],
-                               e=segs[i][1])
-                    G.add_edge(thisIndex, self.currentNodeIndex)
-                    self.currentNodeIndex+=1
-
     def subtrajectorize(self, trajectory, returnGraph=False): #can take coordinate list or a trajectory.
         coordinates = []
-        for point in trajectory: #make into coordinate list
+        for point in trajectory: #make into coordinate list    #todo duplicated in example_sub_trajectorize.  Consolidiate
             if 'altitudes' in point.properties.keys(): #add altitude if exists
                 coordinates.append([point[0], point[1], point.properties['altitudes']])
-                print(len(coordinates)-1, point.properties['altitudes']) #remove
+                #print(len(coordinates)-1, point.properties['altitudes']) #remove
             else:
                 coordinates.append([point[0], point[1], None])
 
@@ -360,6 +296,7 @@ class SubTrajerSemantic:
 
         cruisingStart = None
         cruisingEnd = None
+        #todo, below we must quit if there is not altituted values?
         h = np.histogram(list(zip(*coordinates))[2], bins=np.append(np.append(0, np.arange(10500,46500,1000)), 60000), density=True)  #to determine where the cruising altitude was?
         if np.max(h[0]) > cruisingThreshold: #multiply by 1000 to get approx ratio of samples in this bin
             cruisingBin = np.argmax(h[0])
@@ -376,23 +313,27 @@ class SubTrajerSemantic:
                     print("descent starts at sample ", cruisingEnd)
                     break
 
-        G = nx.DiGraph()
-        start = takeOffEnd
-        end = landingStart
-        G.add_node(self.currentNodeIndex, s=start, e=end)
-        self.currentNodeIndex += 1
-        self.longest_straight_segments(G, coordinates, 1,
-                                            len(coordinates), start, end)
-        leaves = [(G.node[x]['s'], G.node[x]['e'])
-                  for x in G.nodes() if G.out_degree(x)==0 and
-                  G.in_degree(x)==1]
-        if len(G) == 1:
-            leaves = [(G.node[1]['s'], G.node[1]['e'])] #just root node #change 1's to 0's
 
-        if returnGraph:
-            return leaves, G
-        else:
-            return leaves
+        #need to check below if not found
+        segments = [(0,takeOffEnd), (takeOffEnd, cruisingStart), (cruisingStart, cruisingEnd), (cruisingEnd, landingStart), (landingStart, lastSample)] #later add sub setments
+        return segments
+#        G = nx.DiGraph()
+#        start = takeOffEnd
+#        end = landingStart
+#        G.add_node(self.currentNodeIndex, s=start, e=end)
+#        self.currentNodeIndex += 1
+#        self.longest_straight_segments(G, coordinates, 1,
+#                                            len(coordinates), start, end)
+#        leaves = [(G.node[x]['s'], G.node[x]['e'])
+#                  for x in G.nodes() if G.out_degree(x)==0 and
+#                  G.in_degree(x)==1]
+#        if len(G) == 1:
+#            leaves = [(G.node[1]['s'], G.node[1]['e'])] #just root node #change 1's to 0's
+#
+#        if returnGraph:
+#            return leaves, G
+#        else:
+#            return leaves
 
         #take off
         #climb
