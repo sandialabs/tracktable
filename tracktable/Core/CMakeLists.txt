@@ -53,6 +53,10 @@ set( Core_SRCS
 set( Core_HEADERS
   Box.h
   Conversions.h
+  FloatingPointComparison.h
+  GeometricMean.h
+  GeometricMedian.h
+  Geometry.h
   PointArithmetic.h
   PointBase.h
   PointCartesian.h
@@ -65,6 +69,7 @@ set( Core_HEADERS
   TracktableCommon.h
   Trajectory.h
   TrajectoryPoint.h
+  UnfortunateWorkarounds.h
   )
 
 set( Core_Detail_Points_HEADERS
@@ -76,21 +81,42 @@ set( Core_Detail_Points_HEADERS
 
 set( Core_Detail_AlgorithmSignatures_HEADERS
   detail/algorithm_signatures/Bearing.h
+  detail/algorithm_signatures/ConvexHull.h
   detail/algorithm_signatures/Distance.h
   detail/algorithm_signatures/EndToEndDistance.h
   detail/algorithm_signatures/Interpolate.h
   detail/algorithm_signatures/Intersects.h
   detail/algorithm_signatures/Length.h
+  detail/algorithm_signatures/PointAtFraction.h
   detail/algorithm_signatures/PointAtTime.h
   detail/algorithm_signatures/SpeedBetween.h
+  detail/algorithm_signatures/SimplifyLinestring.h
   detail/algorithm_signatures/SphericalCoordinateAccess.h
   detail/algorithm_signatures/SubsetDuringInterval.h
+  detail/algorithm_signatures/TransferProperties.h
   detail/algorithm_signatures/TurnAngle.h
 )
 
 set( Core_Detail_Implementations_HEADERS
+  detail/implementations/CentroidCartesian.h
+  detail/implementations/CentroidTerrestrial.h
+  detail/implementations/ConvexHullAreaCartesian.h
+  detail/implementations/ConvexHullAreaTerrestrial.h
+  detail/implementations/ConvexHullCartesian.h
+  detail/implementations/ConvexHullTerrestrial.h
+  detail/implementations/ConvexHullAspectRatioCartesian.h
+  detail/implementations/ConvexHullAspectRatioTerrestrial.h
+  detail/implementations/ConvexHullCentroidCartesian.h
+  detail/implementations/ConvexHullCentroidTerrestrial.h
+  detail/implementations/ConvexHullPerimeterCartesian.h
+  detail/implementations/ConvexHullPerimeterTerrestrial.h
   detail/implementations/GreatCircleInterpolation.h
+  detail/implementations/NorthPoleConvexHull.h
   detail/implementations/PointAtTime.h
+  detail/implementations/PointAtFraction.h
+  detail/implementations/ProjectedConvexHullTerrestrial.h
+  detail/implementations/SphericalMath.h
+  detail/implementations/SphericalPolygons.h
   detail/implementations/SubsetDuringInterval.h
   detail/implementations/TrajectoryPointComparison.h
   detail/implementations/TurnAngle.h
