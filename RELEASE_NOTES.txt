@@ -1,5 +1,30 @@
 Tracktable Release Notes
 
+VERSION 1.0.5, March 2018
+-------------------------
+
+This is a bug-fix release.
+
+New features:
+
+* No new features.
+
+
+Notable bugfixes:
+
+* Writing to files or to file-like objects in Python caused a
+  segfault.  See the commit on Feb 21 2018 whose hash begins with
+  8db2248d for details.
+
+* C++ headers for convex hulls were not being installed with 'make
+  install'.
+
+
+Outstanding issues:
+
+* Link errors / segfaults under certain OSX configurations, especially
+  the Anaconda Python environment.  
+
 
 VERSION 1.0.4, November 2017
 ----------------------------
