@@ -27,7 +27,7 @@ Tracktable has the following required dependencies:
 Python
 ^^^^^^
 
-* Python 2.7, 3.5, or 3.6 - http://python.org
+* Python 2.7, 3.4, 3.5, or 3.6 - http://python.org
 * numpy 1.7+ - http://numpy.org
 * Matplotlib 1.2.1+ - http://matplotlib.org
 * Basemap - http://matplotlib.org/basemap
@@ -48,6 +48,13 @@ C++
     recent versions of Boost.  These appeared in version 1.55 but have
     serious compile bugs in versions 1.55 and 1.56.  Please use 1.57.0
     or newer.  Use 1.61 or newer if at all possible.
+
+  - With respect to C++11: if you want to call Tracktable from code
+    built with C++11 turned on, you must also build Tracktable with
+    C++11 turned on.  The implementation of boost::variant (which we
+    use for PropertyValueT) is entirely different between the two
+    language versions.  This causes link errors if you try to mix
+    versions.
 
 Other
 ^^^^^
@@ -72,11 +79,11 @@ Build Notes for Dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you can possibly help it, install all the dependencies using
-package managers like ``pip`` (comes with Python), ``yum``,
-``apt-get`` (both of these are common in Linux environments), MacPorts
-(http://macports.org) or Homebrew (http://brew.sh).  The notes in this
-section are for cases when you have no choice but to build external
-packages from source.
+package managers like ``conda`` (Anaconda's built-in package manager),
+``pip`` (comes with Python), ``yum``, ``apt-get`` (both of these are
+common in Linux environments), MacPorts (http://macports.org) or
+Homebrew (http://brew.sh).  The notes in this section are for cases
+when you have no choice but to build external packages from source.
 
 Building Python
 ***************
