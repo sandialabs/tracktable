@@ -27,36 +27,33 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Author: Ben Newton  - February 26, 2018
-
-#import tracktable.io.trajectory as trajectory
-#from tracktable.domain import all_domains as ALL_DOMAINS
-#import tracktable.analysis.sub_trajectorize as st
-
-#import importlib
-#import argparse
-#import copy
-
-#from pymongo import MongoClient
-
-#todo seems to import all but two trajectories from the given file.  Look into that!
+# Author: Ben Newton  - March 30, 2018
 
 import argparse
 from pymongo import MongoClient
 import tracktable.io.trajectory as trajectory
+from polyline.codec import PolylineCodec
 
 def main():
     parser = argparse.ArgumentParser(description=
-                                     'Example of Reading a Json file into mongo.')
-    parser.add_argument('json_file', type=argparse.FileType('r'))
+                                     'Reads from mongo to a json file.\
+                                     Example: example_mongo_to_json_trajs.py \
+                                     CompleteTrajectories CompleteTrajStrings')
+    parser.add_argument('mongo_collection')
+    parser.add_argument('output_mongo_collection')
+    parser.add_argument('-r', '--regex', default="")
     args = parser.parse_args()
 
     client = MongoClient('localhost', 27017)
     db = client.ASDI
-    trajs = db.FlightsSample
+    trajs = db[args.mongo_collection]
 
-    for traj in trajectory.from_ijson_file_iter(args.json_file):
-        result = trajs.insert_one(trajectory.to_dict(traj, addId=True))
+    trajs_out = db[args.output_mongo_collection]
+
+    for traj in trajs.find():#'{'+args.regex+'}'):   #could make this into an iterator todo duplicate of to_json_multi
+        #traj = trajectory.from_json(json_traj)
+        traj["coordinates"] = PolylineCodec().encode(traj["coordinates"])
+        result = trajs_out.insert_one(traj)
 
 if __name__ == '__main__':
     main()
