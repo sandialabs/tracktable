@@ -27,22 +27,32 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Author: Ben Newton  - March 30, 2018
+# Author: Ben Newton  - April 16, 2018
 
 import argparse
 from pymongo import MongoClient
 import tracktable.io.trajectory as trajectory
-from polyline.codec import PolylineCodec
+import tracktable.core.geomath as geomath
+
+def calculate_winding(traj):
+    prev1 = traj[1]
+    prev2 = traj[0]
+    winding = 0
+    for point in traj[2:]:
+        winding += geomath.signed_turn_angle(prev2, prev1, point)
+        prev2=prev1
+        prev1=point
+    return winding
 
 def main():
     parser = argparse.ArgumentParser(description=
-                                     'Reads from mongo translates coordinate \
-                                     list to a string and stores in mongo.\
-                                     Example: example_mongo_to_str.py \
-                                     CompleteTrajectories CompleteTrajStrings')
+                                     'Reads mongo and finds holding patterns \
+                                     write to mongo.\
+                                     Example: find_holding.py \
+                                     CompleteTrajectories HoldingTrajectories')
     parser.add_argument('mongo_collection')
     parser.add_argument('output_mongo_collection')
-    parser.add_argument('-r', '--regex', default="")
+    #parser.add_argument('-r', '--regex', default="")
     args = parser.parse_args()
 
     client = MongoClient('localhost', 27017)
@@ -51,10 +61,10 @@ def main():
 
     trajs_out = db[args.output_mongo_collection]
 
-    for traj in trajs.find():#'{'+args.regex+'}'):   #could make this into an iterator todo duplicate of to_json_multi
-        #traj = trajectory.from_json(json_traj)
-        traj["coordinates"] = PolylineCodec().encode(traj["coordinates"])
-        result = trajs_out.insert_one(traj)
-
+    for traj in trajs.find():
+        winding = calculate_winding(trajectory.from_dict(traj))
+        if winding > 900:
+            result = trajs_out.insert_one(traj)
+            
 if __name__ == '__main__':
     main()

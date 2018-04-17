@@ -27,19 +27,18 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Author: Ben Newton  - March 30, 2018
+# Author: Ben Newton  - April 17, 2018
 
 import argparse
 from pymongo import MongoClient
-import tracktable.io.trajectory as trajectory
-from polyline.codec import PolylineCodec
 
 def main():
     parser = argparse.ArgumentParser(description=
-                                     'Reads from mongo translates coordinate \
-                                     list to a string and stores in mongo.\
-                                     Example: example_mongo_to_str.py \
-                                     CompleteTrajectories CompleteTrajStrings')
+                                     'Read from mongo and write back a \
+                                     fraction of the entries to a new \
+                                     collection.\
+                                     Example: mongo_sample.py \
+                                     HoldingTrajectories VerifiedHoldingTrajectories')
     parser.add_argument('mongo_collection')
     parser.add_argument('output_mongo_collection')
     parser.add_argument('-r', '--regex', default="")
@@ -51,10 +50,13 @@ def main():
 
     trajs_out = db[args.output_mongo_collection]
 
-    for traj in trajs.find():#'{'+args.regex+'}'):   #could make this into an iterator todo duplicate of to_json_multi
-        #traj = trajectory.from_json(json_traj)
-        traj["coordinates"] = PolylineCodec().encode(traj["coordinates"])
-        result = trajs_out.insert_one(traj)
+    sample_rate = 100 # one in 100
+
+    count = 0
+    for traj in trajs.find():#'{'+args.regex+'}'):
+        if count % sample_rate == 0:
+            trajs_out.insert_one(traj)
+        count+=1
 
 if __name__ == '__main__':
     main()

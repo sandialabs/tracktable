@@ -32,16 +32,14 @@
 import argparse
 from pymongo import MongoClient
 import tracktable.io.trajectory as trajectory
-from polyline.codec import PolylineCodec
 
 def main():
     parser = argparse.ArgumentParser(description=
-                                     'Reads from mongo translates coordinate \
-                                     list to a string and stores in mongo.\
-                                     Example: example_mongo_to_str.py \
-                                     CompleteTrajectories CompleteTrajStrings')
+                                     'Reads from mongo to a json file.\
+                                     Example: example_mongo_to_json_trajs.py \
+                                     CompleteTrajectories trajs.json')
     parser.add_argument('mongo_collection')
-    parser.add_argument('output_mongo_collection')
+    parser.add_argument('json_file', type=argparse.FileType('w'))
     parser.add_argument('-r', '--regex', default="")
     args = parser.parse_args()
 
@@ -49,12 +47,11 @@ def main():
     db = client.ASDI
     trajs = db[args.mongo_collection]
 
-    trajs_out = db[args.output_mongo_collection]
-
-    for traj in trajs.find():#'{'+args.regex+'}'):   #could make this into an iterator todo duplicate of to_json_multi
-        #traj = trajectory.from_json(json_traj)
-        traj["coordinates"] = PolylineCodec().encode(traj["coordinates"])
-        result = trajs_out.insert_one(traj)
+    json_string = "[\n"
+    for traj in trajs.find('{'+args.regex+'}'):   #could make this into an iterator todo duplicate of to_json_multi
+        json_string+=traj+",\n"
+    json_string=json_string[:-2]+"\n]\n" # replace ",\n" with "]"
+    args.json_file.write(json_string)
 
 if __name__ == '__main__':
     main()
