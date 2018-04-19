@@ -48,7 +48,7 @@ def main():
     parser = argparse.ArgumentParser(description=
                                      'Reads mongo and finds holding patterns \
                                      write to mongo.\
-                                     Example: find_holding.py \
+                                     Example: find_candidate_holding_patterns.py \
                                      CompleteTrajectories HoldingTrajectories')
     parser.add_argument('mongo_collection')
     parser.add_argument('output_mongo_collection')
@@ -63,8 +63,8 @@ def main():
 
     for traj in trajs.find():
         winding = calculate_winding(trajectory.from_dict(traj))
-        if winding > 900:
+        if winding > 900 or winding < -900:
             result = trajs_out.insert_one(traj)
-            
+
 if __name__ == '__main__':
     main()
