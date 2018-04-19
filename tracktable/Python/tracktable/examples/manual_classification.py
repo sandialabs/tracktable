@@ -16,15 +16,6 @@ from tracktable.core import geomath
 from tracktable.render import colormaps, mapmaker, paths
 from tracktable.examples import example_trajectory_rendering
 
-#freqs = np.arange(2, 20, 3)
-
-#fig, ax = plt.subplots()
-#plt.subplots_adjust(bottom=0.2)
-#t = np.arange(0.0, 1.0, 0.001)
-#s = np.sin(2*np.pi*freqs[0]*t)
-#l, = plt.plot(t, s, lw=2)
-
-
 def parse_args():
     parser = argparse.ArgumentParser(description=
                                      'Read from mongo classify yes/no and write back \
@@ -53,7 +44,8 @@ def parse_args():
     args = parser.parse_args()
 
     if args.resolution is None:
-        args.resolution = [ 800, 600 ]
+        #args.resolution = [ 800, 600 ]
+        args.resolution = [ 1600, 1200 ]
     return args
 
 def render_trajectories(basemap,
@@ -92,13 +84,14 @@ class Index:
             sys.exit(0)
         else:
             plt.axes([0.1, 0.1, 0.8, 0.8])
+            plt.cla()
             traj = trajectory.from_dict(self.traj_dict)
             all_points = [point for point in traj]
             self.args.map_bbox = geomath.compute_bounding_box(all_points)
             mapmaker_args = argument_groups.extract_arguments("mapmaker", self.args)
             (mymap, map_actors) = mapmaker.mapmaker(**mapmaker_args)
             color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1)
-
+            plt.title(self.traj_dict['_id'])
             render_trajectories(mymap,
                                 [traj],
                                 self.args)

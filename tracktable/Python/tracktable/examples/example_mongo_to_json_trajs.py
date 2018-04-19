@@ -48,8 +48,8 @@ def main():
     trajs = db[args.mongo_collection]
 
     json_string = "[\n"
-    for traj in trajs.find('{'+args.regex+'}'):   #could make this into an iterator todo duplicate of to_json_multi
-        json_string+=traj+",\n"
+    for traj in trajs.find():#'{'+args.regex+'}'):   #could make this into an iterator todo duplicate of to_json_multi
+        json_string+=str(traj)+",\n"
     json_string=json_string[:-2]+"\n]\n" # replace ",\n" with "]"
     args.json_file.write(json_string)
 

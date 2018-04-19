@@ -80,6 +80,9 @@ def parse_args():
     if args.resolution is None:
         args.resolution = [ 800, 600 ]
 
+    if args.map_name is "world":
+        args.map_name = 'custom'  #I think world is the default but what if you want world? todo
+
     return args
 
 # ----------------------------------------------------------------------
