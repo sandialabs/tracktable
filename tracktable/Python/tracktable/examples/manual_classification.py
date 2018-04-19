@@ -1,7 +1,9 @@
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 
+import sys
 from mpl_toolkits.basemap import Basemap
 #import numpy as np
 #import matplotlib.pyplot as plt
@@ -9,6 +11,10 @@ from mpl_toolkits.basemap import Basemap
 from pymongo import MongoClient
 import argparse
 from tracktable.script_helpers import argument_groups, argparse
+import tracktable.io.trajectory as trajectory
+from tracktable.core import geomath
+from tracktable.render import colormaps, mapmaker, paths
+from tracktable.examples import example_trajectory_rendering
 
 #freqs = np.arange(2, 20, 3)
 
@@ -50,6 +56,15 @@ def parse_args():
         args.resolution = [ 800, 600 ]
     return args
 
+def render_trajectories(basemap,
+                        trajectory_source,
+                        args):
+
+    render_args = argument_groups.extract_arguments("trajectory_rendering", args)
+
+    example_trajectory_rendering.render_trajectories(basemap,
+                                                     trajectory_source,
+                                                     **render_args)
 
 class Index:
     def __init__(self, trajs, trajs_out, sample_rate, figure_dimensions, args, ax):
@@ -61,48 +76,49 @@ class Index:
         self.args = args
         self.ax = ax
 
-    def plot(self, num):
-        #print("next")
-        #self.ind += 1
-        #i = self.ind % len(freqs)
-        #ydata = np.sin(2*np.pi*freqs[i]*t)
-        #l.set_ydata(ydata)
-        self.ax.clear()
-        plt.axes([0.1, 0.1, 0.8, 0.8])
-        #plt.cla()
-        #plt.close()
-        m = Basemap(llcrnrlon=-105.,llcrnrlat=25.,urcrnrlon=25.,urcrnrlat=65.,\
-            rsphere=(6378137.00,6356752.3142),\
-            resolution='l',projection='merc',\
-            lat_0=40.,lon_0=-20.,lat_ts=20.)
-        m.drawcoastlines()
-        m.fillcontinents()
-        # draw parallels
-        m.drawparallels(np.arange(10,90,20),labels=[1,1,0,1])
-        # draw meridians
-        m.drawmeridians(np.arange(-180,180,30),labels=[1,1,0,1])
-        self.ax.set_title('Great Circle from New York to London')
-        nylat = 40.78; nylon = -73.98
-        # lonlat, lonlon are lat/lon of London.
-        lonlat = 51.53; lonlon = 0.08
-        m.drawgreatcircle(nylon+num,nylat+num,lonlon+num,lonlat+num,linewidth=2,color='k')
+    def plot(self):
+        found=False
+        done=False
+        while not found:
+            self.traj_dict = next(self.traj_iter, None)
+            self.count+=1
+            if self.traj_dict is None:
+                found=True
+                done=True
+            elif (self.count-1) % self.sample_rate == 0:
+                found=True
+        if done:
+            print("Done")
+            sys.exit(0)
+        else:
+            plt.axes([0.1, 0.1, 0.8, 0.8])
+            traj = trajectory.from_dict(self.traj_dict)
+            all_points = [point for point in traj]
+            self.args.map_bbox = geomath.compute_bounding_box(all_points)
+            mapmaker_args = argument_groups.extract_arguments("mapmaker", self.args)
+            (mymap, map_actors) = mapmaker.mapmaker(**mapmaker_args)
+            color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1)
+
+            render_trajectories(mymap,
+                                [traj],
+                                self.args)
 
     def buttons(self):
-        axprev = plt.axes([0.7, 0.05, 0.1, 0.075])
-        axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
-        bnext = Button(axnext, 'Yes')
-        bnext.on_clicked(self.next)
-        bprev = Button(axprev, 'No')
-        bprev.on_clicked(self.prev)
+        axyes = plt.axes([0.7, 0.05, 0.1, 0.075])
+        byes = Button(axyes, 'Yes')
+        axno = plt.axes([0.81, 0.05, 0.1, 0.075])
+        bno = Button(axno, 'No')
+        byes.on_clicked(self.yes_func)
+        bno.on_clicked(self.no_func)
 
-    def next(self, event):
-        print("yes")
-        self.plot(-5)
+    def yes_func(self, event):
+        self.trajs_out.insert_one(self.traj_dict)
+        self.plot()
         self.buttons()
         plt.draw()
 
-    def prev(self, event):
-        self.plot(5)
+    def no_func(self, event):
+        self.plot()
         self.buttons()
         plt.draw()
 
@@ -125,13 +141,13 @@ def main():
     ax=fig.add_axes([0.1,0.1,0.8,0.8])
     callback = Index(trajs, trajs_out, sample_rate, figure_dimensions, args, ax)
 
-    callback.plot(0)
-    axprev = plt.axes([0.7, 0.05, 0.1, 0.075])
-    axnext = plt.axes([0.81, 0.05, 0.1, 0.075])
-    bnext = Button(axnext, 'Yes')
-    bnext.on_clicked(callback.next)
-    bprev = Button(axprev, 'No')
-    bprev.on_clicked(callback.prev)
+    callback.plot()
+    axyes = plt.axes([0.7, 0.05, 0.1, 0.075])
+    byes = Button(axyes, 'Yes')
+    axno = plt.axes([0.81, 0.05, 0.1, 0.075])
+    bno = Button(axno, 'No')
+    byes.on_clicked(callback.yes_func)
+    bno.on_clicked(callback.no_func)
 
     plt.show()
 
