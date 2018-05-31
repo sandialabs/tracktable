@@ -69,7 +69,7 @@ def get_path_altitudes(start, end, coords):
 def get_path_piece(start, end, coords):
     points = []
     for coord in coords[start:end+1]:
-        points.append(Point(coord))
+        points.append(Point(coord[:2])) #don't include altitude
     return LineString(points)
 
 def traj_to_coords(traj):
@@ -293,7 +293,8 @@ def main():
         else:
             leaves = subtrajer.subtrajectorize(traj, returnGraph=True)
 
-        print(traj[0].object_id, leaves)
+        if args.verbose:
+            print("Segmentation=", traj[0].object_id, leaves)
 
         #below expand 5% or .1 degrees when bbox has no expanse in some dim
         bbox = geomath.compute_bounding_box(traj, expand=.05,
