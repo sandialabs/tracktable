@@ -111,12 +111,12 @@ class SliceList(deque):
 
             try:
                 pred = predicate(item, prev)
+                if pred:
+                    item.start = prev.start
+                    prev.delme = True
+                    item.iChanged = True
             except AttributeError:
-                pred = False
-            if pred:
-                item.start = prev.start
-                prev.delme = True
-                item.iChanged = True
+                pass
 
             prev = item
 
