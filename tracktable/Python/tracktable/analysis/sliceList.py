@@ -142,13 +142,13 @@ class SliceList(deque):
 
 
             try:
-                pred = predicate(item, prev)
+                pred = predicate(prev, item)
                 if pred:
                     item.start = prev.start
                     prev.delme = True
                     item.iChanged = True
             except AttributeError:
-                pass
+                raise
 
             prev = item
 
@@ -248,3 +248,32 @@ if __name__ == '__main__':
     print('sl3: '); print()
     print(sl3)
     print(); print(sl3.AsLeaves)
+
+    print();
+    print('--------------')
+    print('sl4: ');
+    print()
+
+    def computeDcOnly(aSliceRange):
+        aSliceRange.val1 = aSliceRange.getSegment()[0][0]
+        aSliceRange.val2 = aSliceRange.getSegment()[0][1]
+        aSliceRange.classification = 'Straight' if aSliceRange.val2 < 0.15 else "Curved"
+
+
+    sl4 = SliceList(secondList, RangeWidth=1, Overlap=0,
+                    computeParams=computeDcOnly)
+
+    print("Before consolidating:", len(sl4))
+    print(sl4)
+    print(); print()
+
+    predicate = lambda a, b: a.classification == b.classification
+    # predicate = lambda a, b: a.val2 < b.val2
+    sl4.consolidateNodeIf(predicate)
+    print()
+    print("After consolidating", len(sl4))
+    print(sl4)
+    print()
+    print(sl4.AsLeaves)
+
+
