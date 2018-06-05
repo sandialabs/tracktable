@@ -353,7 +353,7 @@ class SubTrajerCurvature:
             raise NotImplementedError(
                 "The class SubTrajerCurvature is not available due to import issues.")
 
-    def _paulsMethodNumber1(self, aPointList):
+    def _movingGrowingWindowMethod(self, aPointList):
         # Create a profile, x = length along, y = Degree of Curve
         dcProfile = []
         accumulatedX = 0.0
@@ -397,11 +397,24 @@ class SubTrajerCurvature:
         aSliceList.consolidateNodeIf(predicate)
         return aSliceList
 
+    def _individCurvaturesMethod(self, aPointList):
+        return None
 
-    def subtrajectorize(self, trajectory, returnGraph=False):
+
+    def subtrajectorize(self, trajectory, returnGraph=False, useMethod='movingGrowingWindow'):
+        findMethod = {'movingGrowingWindow': __class__._movingGrowingWindowMethod,
+                      'individualCurvatures_preferred': __class__._individCurvaturesMethod}
+
         aPointList = EPL.CreateExtendedPointList(trajectory)
 
         aPointList.computeAllPointInformation()
 
-        aSliceList = self._paulsMethodNumber1(aPointList)
+        try:
+            aSliceList = findMethod[useMethod](self, aPointList)
+        except KeyError:
+            msg = '"{0}" is not an available method.\n  '.format(useMethod)
+            msg = msg + 'Available methods are are: {0}.'\
+                .format([x for x in findMethod.keys()])
+            raise AttributeError(msg)
+
         return aSliceList.AsLeaves
