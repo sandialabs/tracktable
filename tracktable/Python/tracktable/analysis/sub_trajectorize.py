@@ -29,12 +29,13 @@
 
 import networkx as nx
 import numpy as np
-from math import sqrt
+from math import sqrt, fabs
 
 import scipy
 from tracktable.analysis.sliceList import SliceList
 import tracktable.analysis.ExtendedPointList as EPL
 import types
+
 
 class NormalizedDistanceMatrix:
     """Generates a matrix giving the ratio of the distance along each
@@ -384,8 +385,8 @@ class SubTrajerCurvature:
         aSliceList = SliceList(dcProfile, RangeWidth=5, Overlap=3,
                                computeParams=computeParams)
 
+        print("Using the Moving/Growing Window Method.")
         print(); print('Length before consolidation: {0}'.format(len(aSliceList)))
-        import math
         predicate = lambda a, b: math.isclose(a.DcStdDev, b.DcStdDev, abs_tol=0.01)
         aSliceList.consolidateNodeIf(predicate)
         print(); print('Length after  consolidation: {0}'.format(len(aSliceList)))
@@ -397,11 +398,33 @@ class SubTrajerCurvature:
         aSliceList.consolidateNodeIf(predicate)
         return aSliceList
 
-    def _individCurvaturesMethod(self, aPointList):
-        return None
+    def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=2.0):
+
+        segmentPrimitives = ['straight', 'turn']
 
 
-    def subtrajectorize(self, trajectory, returnGraph=False, useMethod='movingGrowingWindow'):
+        def computeParams(aSliceRange):
+            aSegment = aSliceRange.getSegment()
+            aSliceRange.DegreeOfCurve = 'straight' \
+                    if fabs(aSegment[0].arc.degreeCurve) < dcStraightThreshold \
+                    else 'turn'
+
+        aPointList = aPointList[1:-1]
+        aSliceList = SliceList(aPointList, RangeWidth=1, Overlap=0,
+                               computeParams=computeParams)
+
+        print("Using the Individual Curvatures Method.")
+        print(); print('Length before consolidation: {0}'.format(len(aSliceList)))
+        predicate = lambda a, b: a.DegreeOfCurve == b.DegreeOfCurve
+        aSliceList.consolidateNodeIf(predicate)
+        print(); print('Length after  consolidation: {0}'.format(len(aSliceList)))
+
+        aSliceList.shiftInteriorBoundariesBy(1)
+
+        return aSliceList
+
+
+    def subtrajectorize(self, trajectory, returnGraph=False, useMethod='individualCurvatures_preferred'):
         findMethod = {'movingGrowingWindow': __class__._movingGrowingWindowMethod,
                       'individualCurvatures_preferred': __class__._individCurvaturesMethod}
 

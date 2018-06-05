@@ -132,6 +132,17 @@ class SliceList(deque):
         for s in range(firstSlice, lastSlice, stepBy):
             yield (self[s], self[s].getSegment())
 
+    def shiftInteriorBoundariesBy(self, shiftDistance, recomputeParameters=False):
+        for aSlice in self:
+            aSlice.start += shiftDistance
+            aSlice.stop += shiftDistance
+        self[0].start -= shiftDistance
+        self[-1].stop -= shiftDistance
+
+        if recomputeParameters:
+            self.computeParams()
+
+
     def consolidateNodeIf(self, predicate):
         prev = None
         for item in self:
