@@ -176,8 +176,8 @@ if __name__ == '__main__':
 
     # Test 1
 
-    if False:
-        col1 = [1.2, 4.4, 0.2, -1.1, 8.9, 1.4, 1.5, 1.6, 1.4, 1.3, 1.45, 1.55]
+    if True:
+        col1 = [1.2, 4.4, 0.2, -1.1, 8.9, 1.4, 1.5, 1.6, 1.4, 1.3, 1.45, 1.55, 1.45, 1.22]
         def computeParameters(aSliceRange):
             aSliceRange.mean = statistics.mean(aSliceRange.getSegment())
             aSliceRange.stdDev = statistics.stdev(aSliceRange.getSegment())
