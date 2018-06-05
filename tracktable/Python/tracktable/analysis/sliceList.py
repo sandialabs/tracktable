@@ -109,8 +109,6 @@ class SliceList(deque):
     def AsLeaves(self):
         adjustBack = int(self.overlap // 2.0)
         adjustFront = int(self.overlap // 2.0)
-        # adjustFront = 0
-        # adjustBack = 0
         leafList = [[x.start+adjustFront, x.stop-adjustBack] for x in self.allSlices()]
         leafList[0][0] = 0
         leafList[-1][1] = len(self.target)
@@ -243,3 +241,10 @@ if __name__ == '__main__':
     print(len(sliceList2))
 
     print(sliceList2.AsLeaves)
+
+    sl3 = SliceList(secondList, RangeWidth=5, Overlap=0,
+                           computeParams=computeParams)
+    print(); print('--------------')
+    print('sl3: '); print()
+    print(sl3)
+    print(); print(sl3.AsLeaves)
