@@ -353,11 +353,7 @@ class SubTrajerCurvature:
             raise NotImplementedError(
                 "The class SubTrajerCurvature is not available due to import issues.")
 
-    def subtrajectorize(self, trajectory, returnGraph=False):
-        aPointList = EPL.CreateExtendedPointList(trajectory)
-
-        aPointList.computeAllPointInformation()
-
+    def _paulsMethodNumber1(self, aPointList):
         # Create a profile, x = length along, y = Degree of Curve
         dcProfile = []
         accumulatedX = 0.0
@@ -390,7 +386,7 @@ class SubTrajerCurvature:
 
         print(); print('Length before consolidation: {0}'.format(len(aSliceList)))
         import math
-        predicate = lambda a, b: math.isclose(a.stdDev, b.stdDev, abs_tol=0.01)
+        predicate = lambda a, b: math.isclose(a.DcStdDev, b.DcStdDev, abs_tol=0.01)
         aSliceList.consolidateNodeIf(predicate)
         print(); print('Length after  consolidation: {0}'.format(len(aSliceList)))
 
@@ -399,5 +395,13 @@ class SubTrajerCurvature:
         aSliceList.consolidateNodeIf(predicate)
         predicate = lambda a, b: int(a.DcStdDev // 6) > 0 and int(b.DcStdDev // 6) > 0
         aSliceList.consolidateNodeIf(predicate)
+        return aSliceList
 
+
+    def subtrajectorize(self, trajectory, returnGraph=False):
+        aPointList = EPL.CreateExtendedPointList(trajectory)
+
+        aPointList.computeAllPointInformation()
+
+        aSliceList = self._paulsMethodNumber1(aPointList)
         return aSliceList.AsLeaves
