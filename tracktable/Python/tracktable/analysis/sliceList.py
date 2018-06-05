@@ -69,6 +69,7 @@ class SliceList(deque):
 
         self.target = TargetSequence
         targetLen = len(TargetSequence)
+        self.overlap = Overlap
         advanceDelta = RangeWidth - Overlap
         endOffset = RangeWidth
         self.append(sliceRange(self.target, 0, endOffset))
@@ -106,12 +107,11 @@ class SliceList(deque):
 
     @property
     def AsLeaves(self):
-        return ""
-        adjustFront = -int(self.overlap // 2.0)
-        adjustBack = self.overlap + adjustFront
-        adjustFront = 0
-        adjustBack = 0
-        leafList = [[x.start-adjustFront, x.stop] for x in self.allSlices()]
+        adjustBack = int(self.overlap // 2.0)
+        adjustFront = int(self.overlap // 2.0)
+        # adjustFront = 0
+        # adjustBack = 0
+        leafList = [[x.start+adjustFront, x.stop-adjustBack] for x in self.allSlices()]
         leafList[0][0] = 0
         leafList[-1][1] = len(self.target)
         return leafList
