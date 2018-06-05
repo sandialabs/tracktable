@@ -56,6 +56,7 @@ class Method(Enum):   #duplicated from example_sub_trajectoirze_mongo.  Fix todo
     straight = 'straight'
     accel = 'accel'
     semantic = 'semantic'
+    curvature = 'curvature'
 
     def __str__(self):
         return self.value
@@ -130,7 +131,21 @@ def plot_colored_segments_path(traj, leaves, threshold, bbox,
         if i%2 == 1:
             color='#A92C00'
         mymap.plot(x, y, color=color, alpha=1.0, linewidth=1, zorder=5)#6) #.67
-        mymap.scatter(x,y, c='#bbbbbb', marker='o', s=2, zorder=4)#7) #eeeeee
+        # if i%4 == 0:
+        #     size = 50
+        #     colr = '#005376'
+        #     marker = 'x'
+        # else:
+        size = 20
+        colr = '#A92C00'
+        marker = 'o'
+        mymap.scatter(x,y, c=color, marker=marker, s=size, zorder=4) #, color=colr)#7) #eeeeee
+        # anXY = (x[-1], y[-1])
+        # ax.annotate(str(i), xy=anXY, xycoords='data',
+        #                xytext=(0.8, 0.95),
+        #                textcoords='figure points',
+        #                color='r')
+
 
     if insetMap:
         ax = fig.add_subplot(gs[1])
@@ -192,10 +207,10 @@ def plot_tree(G, traj, bbox, with_labels=False, node_size=5000,
     for i in range(len(starts)):
         G.node[i+1]['p'] = get_path_piece(starts[i+1], ends[i+1], coords)
 
-    plot_tree_helper(G, traj[0].object_id, traj[0].timestamp,
-                     max_width_height, with_labels=with_labels,
-                     node_size=node_size, threshold=threshold,
-                     savefig=savefig, ext=ext)
+    # plot_tree_helper(G, traj[0].object_id, traj[0].timestamp,
+    #                  max_width_height, with_labels=with_labels,
+    #                  node_size=node_size, threshold=threshold,
+    #                  savefig=savefig, ext=ext)
 
 def plot_tree_helper(G, object_id, timestamp, max_width_height,
                      with_labels=False, node_size=5000, threshold=1.1,
@@ -234,7 +249,7 @@ def plot_tree_helper(G, object_id, timestamp, max_width_height,
     plt.close()
 
 def parse_args():
-    desc = 'Subtrajectorize and render the trajectories in a given json file.'+\
+    desc = 'Subtrajectorize and render the trajectories in a given json file.'\
            ' Example (accel figure for paper) python example_sub_trajectorize.py -f -m accel -t -d -o "accelp025"'\
            ' Example (straight, 2, 1.1 for paper) python example_sub_trajectorize.py -f -m straight -l 2 -s 1.1 -d -o "straight1p1"'\
            ' Example (straight, 2, 1.001 for paper) python example_sub_trajectorize.py -f -m straight -l 2 -s 1.001 -d -o "straight1p001"'\
@@ -282,11 +297,16 @@ def main():
         subtrajer = \
         st.SubTrajerSemantic(straightness_threshold=args.straightness_threshold,
                           length_threshold_samples=args.length_threshold)
+    elif args.method == Method.curvature:
+        subtrajer = \
+        st.SubTrajerCurvature()
     else:
         subtrajer = \
         st.SubTrajerStraight(straightness_threshold=args.straightness_threshold,
                           length_threshold_samples=args.length_threshold)
 
+
+    tempV = trajectory.from_ijson_file_iter(args.json_trajectory_file)
     for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
         if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)

@@ -32,6 +32,9 @@ import numpy as np
 from math import sqrt
 
 import scipy
+from tracktable.analysis.sliceList import SliceList
+import tracktable.analysis.ExtendedPointList as EPL
+import types
 
 class NormalizedDistanceMatrix:
     """Generates a matrix giving the ratio of the distance along each
@@ -340,3 +343,61 @@ class SubTrajerSemantic:
         #cruise
         #descent
         #landing
+
+
+_isSubTrajerCurvatureAvailable = True
+
+class SubTrajerCurvature:
+    def __init__(self):
+        if not _isSubTrajerCurvatureAvailable:
+            raise NotImplementedError(
+                "The class SubTrajerCurvature is not available due to import issues.")
+
+    def subtrajectorize(self, trajectory, returnGraph=False):
+        aPointList = EPL.CreateExtendedPointList(trajectory)
+
+        aPointList.computeAllPointInformation()
+
+        # Create a profile, x = length along, y = Degree of Curve
+        dcProfile = []
+        accumulatedX = 0.0
+        myIndex = 1
+        for pt in aPointList[1:-1]:
+            accumulatedX += pt.pt2pt.distanceBack
+
+            # SimpleNamespace from https://stackoverflow.com/a/13828824/1339950
+            length_degree_pair = \
+                types.SimpleNamespace(x = accumulatedX,
+                                      degC = pt.arc.degreeCurve,
+                                      rad = pt.arc.radius,
+                                      myIndex = myIndex,
+                                      chordAzimuth = pt.arc.chordVector.azimuth,
+                                      deflection = pt.pt2pt.deflection)
+
+            dcProfile.append(length_degree_pair)
+            myIndex += 1
+
+        import statistics
+        def computeParams(aSliceRange):
+            aSegment = aSliceRange.getSegment()
+            extractedListDc = [x.degC for x in aSegment]
+            aSliceRange.DcAve = statistics.mean(extractedListDc)
+            # try:
+            aSliceRange.DcStdDev = statistics.stdev(extractedListDc)
+
+        aSliceList = SliceList(dcProfile, RangeWidth=5, Overlap=3,
+                               computeParams=computeParams)
+
+        print(); print('Length before consolidation: {0}'.format(len(aSliceList)))
+        import math
+        predicate = lambda a, b: math.isclose(a.stdDev, b.stdDev, abs_tol=0.01)
+        aSliceList.consolidateNodeIf(predicate)
+        print(); print('Length after  consolidation: {0}'.format(len(aSliceList)))
+
+        aSliceList.computeParams
+        predicate = lambda a, b: int(a.DcStdDev // 6) == 0 and int(b.DcStdDev // 6) == 0
+        aSliceList.consolidateNodeIf(predicate)
+        predicate = lambda a, b: int(a.DcStdDev // 6) > 0 and int(b.DcStdDev // 6) > 0
+        aSliceList.consolidateNodeIf(predicate)
+
+        return aSliceList.AsLeaves
