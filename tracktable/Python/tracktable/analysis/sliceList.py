@@ -13,6 +13,8 @@ This approach allows for an unofficial but useful "Time Series" analysis,
 '''
 
 from collections import deque
+import statistics
+import math
 
 class sliceRange():
     '''
@@ -31,11 +33,18 @@ class sliceRange():
     def getSegment(self):
         return self.target[self.getSlice()]
 
+    @property
+    def segment(self):
+        return self.getSegment()
+
     def __repr__(self):
         attribs = [x for x in self.__dict__ if 'target' not in x and 'iChanged' not in x]
         atDict = {k : self.__dict__[k] for k in attribs}
-        retStr = str(self.getSlice()) + ' ' + str(atDict)
+        retStr = str(self.getSlice()) +' ' + str(len(self)) + ' items, ' + str(atDict)
         return retStr
+
+    def __len__(self):
+        return self.stop - self.start
 
 class SliceList(deque):
     '''
@@ -57,30 +66,55 @@ class SliceList(deque):
 
     def __init__(self, TargetSequence, RangeWidth, Overlap=0, computeParams=None):
         super().__init__()
-        self.target = TargetSequence
-        self.overlap = Overlap + 1
-        self.startDelta = RangeWidth - Overlap - 1
-        if 0 == self.startDelta:
-            raise ValueError("RangeWidth must be at least 2 greater than Overlap.")
-        initialCount = len(self.target) // self.startDelta
-        for r in range(0, 1+initialCount, self.startDelta+1):
-            if r >= len(self.target):
-                break
 
-            end = r + self.startDelta + self.overlap
-            self.append(sliceRange(self.target, r, end))
-        stopEnd = self[-1].stop; targetLen = len(self.target)
-        if self[-1].stop < len(self.target):
-            begin = self[-1].stop - self.overlap + 1
-            self.append(sliceRange(self.target, begin, targetLen))
+        self.target = TargetSequence
+        targetLen = len(TargetSequence)
+        advanceDelta = RangeWidth - Overlap
+        endOffset = RangeWidth
+        self.append(sliceRange(self.target, 0, endOffset))
+        while endOffset < targetLen:
+            endOffset += advanceDelta
+            startOffset = endOffset - RangeWidth
+            if endOffset + 3 >= targetLen:
+                endOffset = targetLen
+            self.append(sliceRange(TargetSequence, startOffset, endOffset))
 
         if self[-1].stop > targetLen:
             self[-1].stop =  targetLen
         if len(self) > 2 and self[-2].stop > targetLen:
             self[-2].stop =  targetLen
+
+        for item in reversed(self):
+            if len(item) < 3:
+                item.delme = True
+            else:
+                item.delme = False
+                break
+
+        removeList = [x for x in reversed(self) if hasattr(x, 'delme') and getattr(x, 'delme')]
+        for item in reversed(removeList):
+            try:
+                if item.delme:
+                    self.remove(item)
+                else:
+                    break
+            except AttributeError:
+                break
+
         self.computeParams = computeParams
         self.computeDesiredParameters()
 
+    @property
+    def AsLeaves(self):
+        return ""
+        adjustFront = -int(self.overlap // 2.0)
+        adjustBack = self.overlap + adjustFront
+        adjustFront = 0
+        adjustBack = 0
+        leafList = [[x.start-adjustFront, x.stop] for x in self.allSlices()]
+        leafList[0][0] = 0
+        leafList[-1][1] = len(self.target)
+        return leafList
 
     def allSlices(self, firstSlice=0, lastSlice=-1, stepBy=1):
         if lastSlice == -1:
@@ -120,7 +154,7 @@ class SliceList(deque):
 
             prev = item
 
-        # How to remove deletable items adapted from
+        # How to remove deletable items adapted is from
         # https://stackoverflow.com/a/10665631/1339950
         # Note: It has to be a new list.
         removeList = [x for x in self if x.delme]
@@ -142,7 +176,7 @@ if __name__ == '__main__':
 
     # Test 1
 
-    if True:
+    if False:
         col1 = [1.2, 4.4, 0.2, -1.1, 8.9, 1.4, 1.5, 1.6, 1.4, 1.3, 1.45, 1.55]
         def computeParameters(aSliceRange):
             aSliceRange.mean = statistics.mean(aSliceRange.getSegment())
@@ -196,7 +230,7 @@ if __name__ == '__main__':
         aSliceRange.count = len(extractedList)
         aSliceRange.stdDev = statistics.stdev(extractedList)
 
-    sliceList2 = SliceList(secondList, RangeWidth=5, Overlap=3,
+    sliceList2 = SliceList(secondList, RangeWidth=5, Overlap=2,
                            computeParams=computeParams)
 
     print(); print("Test 2")
@@ -204,6 +238,8 @@ if __name__ == '__main__':
     print(len(sliceList2))
 
     predicate = lambda a, b: math.isclose(a.stdDev, b.stdDev, abs_tol=0.01)
-    sliceList2.consolidateNodeIf(predicate)
+    # sliceList2.consolidateNodeIf(predicate)
     print(sliceList2)
     print(len(sliceList2))
+
+    print(sliceList2.AsLeaves)
