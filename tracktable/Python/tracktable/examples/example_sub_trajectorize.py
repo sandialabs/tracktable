@@ -338,7 +338,7 @@ def main():
         if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
         else:
-            leaves = subtrajer.subtrajectorize(traj, returnGraph=True)
+            leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
 
         if leaves is None: # or pointCount < 3:
             continue
