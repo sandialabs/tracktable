@@ -1,4 +1,4 @@
-'''
+"""
 Classes to support automatic slicing of sequences. The primary class
     (the one you will usually instantiate and use) is SliceList. The
     other, sliceRange, makes up the individual slices in the SliceList.
@@ -10,16 +10,16 @@ The purpose of SliceList is to automate and convenientize the overlapping
 This approach allows for an unofficial but useful "Time Series" analysis,
     grouping similar segments into a collection of segments with some
     pre-defined thing in common.
-'''
+"""
 
 from collections import deque
 import statistics
 import math
 
 class sliceRange():
-    '''
+    """
     A single slice (range from n to m) into a sequence.
-    '''
+    """
     def __init__(self, TargetSequence, Start, Stop, Step=None):
         self.target = TargetSequence
         self.start = Start
@@ -49,7 +49,7 @@ class sliceRange():
         return self.stop - self.start
 
 class SliceList(deque):
-    '''
+    """
     An ordered collection of sliceRanges which cover an entire
         sequence (target) with customizable parameters attached
         to each sliceRange (such as mean, stdDev, or anything you
@@ -57,7 +57,7 @@ class SliceList(deque):
     Upon running consolidateNodeIf(), all nodes which are similar
         according to how you define similar are consolidated into
         a single node -- so long as the similar nodes are adjacent.
-    '''
+    """
     def computeDesiredParameters(self):
         compute = self.computeParams
         if compute:

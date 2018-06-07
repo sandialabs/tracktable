@@ -18,24 +18,24 @@ import math
 import collections
 
 class Azimuth:
-    '''
+    """
     Convenience class which represents Azimuths (headings) so that the client code
     does not have to concern itself with handling deflection additions which
     cross 2π. Values may only be initialized via the constructor and only radians
     are expected, although the client code does not need to normalize the azimuth.
     The constructor does that for you.
     References to normalize mean reducing the value so it is between 0.0 and 2π.
-    '''
+    """
 
     @staticmethod
     def _turn():
-        '''Private static method. Constant for one whole turn in radians.
-        '''
+        """Private static method. Constant for one whole turn in radians.
+        """
         return float(2.0 * math.pi)
 
     @staticmethod
     def ToDeg(inAz):
-        '''Takes a float: azimuth and converts it to degrees (float, not normalized)'''
+        """Takes a float: azimuth and converts it to degrees (float, not normalized)"""
         retDeg = 360.0 * inAz / Azimuth._turn()
         return retDeg
 
@@ -46,13 +46,13 @@ class Azimuth:
 
     @staticmethod
     def CreateFromDegrees(deg):
-        '''Factory method. Creates an azimuth from float: degrees.'''
+        """Factory method. Creates an azimuth from float: degrees."""
         asAz = deg * Azimuth._turn() / 360.0
         return Azimuth(asAz)
 
     @staticmethod
     def _normalizeAzimuth(unNormAz):
-        '''Makes sure the value is between 0.0 and 2π'''
+        """Makes sure the value is between 0.0 and 2π"""
         if unNormAz > 0.0:
             normedAz = unNormAz % Azimuth._turn()
         else:
@@ -64,17 +64,17 @@ class Azimuth:
 
     @staticmethod
     def _normalizeDeflection(unNormDefl):
-        '''Makes sure the value is between -π and π'''
+        """Makes sure the value is between -π and π"""
         normedDefl = Azimuth._normalizeAzimuth(unNormDefl + math.pi) \
                      - math.pi
         return normedDefl
 
     def __init__(self, newVal):
-        '''ctor: expects newVal to be in radians. Will normalize non-normal values.'''
+        """ctor: expects newVal to be in radians. Will normalize non-normal values."""
         self.az = Azimuth._normalizeAzimuth(newVal)
 
     def __add__(self, deflection):
-        '''Add an Azimuth and a number (usually a float). Return another Azimuth.'''
+        """Add an Azimuth and a number (usually a float). Return another Azimuth."""
         if type(deflection) is 'Azimuth':
             raise ValueError("Adding two Azimuths not allowed. You can only add an Azimuth to a number.")
         return Azimuth(self.az + deflection)
@@ -90,7 +90,7 @@ class Azimuth:
         return "Azimuth: {0} or {1:.8f}°.".format(self.az, self.asDegrees())
 
     def asDegrees(self):
-        '''returns float: degrees of the given Azimuth.'''
+        """returns float: degrees of the given Azimuth."""
         return Azimuth.ToDeg(self.az)
 
 
@@ -309,7 +309,7 @@ class ExtendedPoint(object):
         return ((otherPt.X - self.X)** 2 + (otherPt.Y - self.Y)**2)** 0.5
 
     def deflectionTo(self, otherPt, preferredDir=None):
-        '''When interpreting both ExtendedPoints as Vectors, return the
+        """When interpreting both ExtendedPoints as Vectors, return the
             deflection (in units of radians). Negative deflection is left.
         :param otherPt: ExtendedPoint to be compared with for computation of
             deflection
@@ -318,7 +318,7 @@ class ExtendedPoint(object):
         :return: a namedTuple of the interior solution azimuth and the
             exterior solution azimuth
         :rtype: namedTuple AzimuthPair
-        '''
+        """
         defl = otherPt.azimuth - self.azimuth
         if defl < -1.0 * math.pi:
             interiorDeflection = defl + 2 * math.pi
@@ -353,11 +353,11 @@ def cvt_radians_to_degrees(rad):
     return rad * 180.0 / math.pi
 
 class struct():
-    '''
+    """
     Named for and serving a similar purpose as the C concept of Struct.
     This class exists as something to add attributes to dynamically.
     (Python would not let me do this with Object, so struct.)
-    '''
+    """
     pass
 
 def any_in_point_equals_any_in_other(pointList, other, tolerance=0.005):
@@ -382,11 +382,11 @@ class IntersectionError(Exception):
             self.message = newMessage
 
 class Ray2D():
-    '''
+    """
     Represents a bidirectional ray, usually used for finding intersections.
     Also known as a line (as in, unbounded line).
     If the ray is vertical, slope and yIntercept are float("inf")
-    '''
+    """
     def __init__(self, extendedPt, azimuth):
         self.extendedPoint = extendedPt
         self.azimuth =  azimuth
@@ -417,11 +417,11 @@ class Ray2D():
         return str
 
     def given_X_get_Y(self, xValue):
-        '''Return Y using the y = mx + b equation of a line.'''
+        """Return Y using the y = mx + b equation of a line."""
         return self.slope * xValue + self.yIntercept
 
     def given_Y_get_X(self, yValue):
-        '''Return X using y = mx + b solved for x.'''
+        """Return X using y = mx + b solved for x."""
         if self.slope == float("inf"):
             return self.extendedPoint.X
         return (yValue - self.yIntercept) / self.slope
@@ -455,14 +455,14 @@ class Ray2D():
 
     @staticmethod
     def get_bisecting_normal_ray(firstPt, otherPt):
-        '''
+        """
         Given this point and another, return the ray which bisects the
             line segment between the two.
         :rtype: Ray2D
         :param otherPt: Second point of the line segment to be bisected.
         :return: Ray2d with origin point at the bisector of the line segment
             and ahead direction 90 degrees to the right of the line segment.
-        '''
+        """
         if otherPt.pt2pt:
             distBack = otherPt.pt2pt.distanceBack
         else:
@@ -597,18 +597,18 @@ def compute_arc_parameters(point1, point2, point3):
 
 
 def _assertFloatsEqual(f1, f2):
-    '''Test whether two floats are approximately equal.
+    """Test whether two floats are approximately equal.
     The idea for how to add the message comes from
     http://stackoverflow.com/a/3808078/1339950
-    '''
+    """
     customMessage = "{0} (Actual) does not equal {1} (Expected)".format(f1, f2)
     assert math.fabs(f1 - f2) < 0.000001, customMessage
 
 def _assertPointsEqualXY(p1, p2):
-    '''Test whether two points are approximately equal.
+    """Test whether two points are approximately equal.
     Only tests equality of X and Y.  Other extended properties
     are ignored
-    '''
+    """
     customMessage = "{0} does not equal {1}".format(p1, p2)
     assert math.fabs(p1.X - p2.X) < 0.000001, customMessage
     assert math.fabs(p1.Y - p2.Y) < 0.000001, customMessage

@@ -36,13 +36,13 @@ class ExtendedPointList(list):
                 f.write(writeStr + '\n')
 
 def _createExtendedPointList_trajectory(trajectory):
-    '''
+    """
     Args:
         trajectory: An np array of points. X is [0], Y is [1]
             Z is optional and would be [2]
 
     Returns: New instance of an ExtendedPointList.
-    '''
+    """
     xIndex = 0; yIndex = 1; zIndex = 2;
     newEPL = ExtendedPointList()
     if len(trajectory[0]) == 3:
@@ -64,12 +64,12 @@ def _createExtendedPointList_trajectory(trajectory):
 
 
 def _createExtendedPointList_csvFile(csvFileName=None):
-    '''
+    """
     Args:
         csvFileName: The path and filename of the csv file to be read.
 
     Returns: New instance of an ExtendedPointList.
-    '''
+    """
     newEPL = ExtendedPointList()
     with open(csvFileName, mode='r') as f:
         rdr = csv.reader(f)
@@ -88,7 +88,7 @@ def _createExtendedPointList_csvFile(csvFileName=None):
 
 
 def CreateExtendedPointList(trajectory=None, csvFileName=None):
-    '''
+    """
     Factory method. Use this instead of the constructor:
                 variable = ExtendedPointList().
 
@@ -97,7 +97,7 @@ def CreateExtendedPointList(trajectory=None, csvFileName=None):
         csvFileName: The path and filename of the csv file to be read.
 
     Returns: New instance of an ExtendedPointList.
-    '''
+    """
 
     if csvFileName is None and trajectory is None:
         return None
