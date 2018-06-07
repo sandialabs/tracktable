@@ -279,6 +279,11 @@ def parse_args():
     parser.add_argument('-v', '--verbose', dest='verbose', action="store_true")
     return parser.parse_args()
 
+
+def trajName(traj):
+    return traj[0].object_id
+
+
 def main():
     args = parse_args()
 
@@ -307,11 +312,52 @@ def main():
 
 
     tempV = trajectory.from_ijson_file_iter(args.json_trajectory_file)
-    for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
+    count=0; trajDict = {}
+    for aTraj in tempV:
+        count += 1
+        oid = aTraj[0].object_id
+        trajDict[oid] = aTraj
+
+    counter2 = 0; largeCount = 0; maxPointCount = 0
+    # for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
+    for _id, traj in trajDict.items():
+        if _id in ['UPS208', 'BAW252', 'THY6', 'SAS944', 'AEA52', 'WJA440A', 'UAL934',
+                   'ACA141', 'BAW48', 'IBE6402', 'VIRV20B', 'AFR439', 'BAW282',
+                   'GTI2016', 'SWA690', 'VIR02V', 'FIN32', 'IBE6402', 'WJA168',
+                   'SWA1361', 'UAE202', 'NAX7002', 'AAL80', 'GTI2046', 'VIR8', 'N248BF',
+                   'UAL693', 'VIR20V', 'KLM604', 'SWA1883', 'N47CA', 'THY12', 'ACA139',
+                   'SWA2872', 'AWE187', 'UAL543', 'JBU775', 'UAL1145', 'SWA2142', 'UAL337',
+                   'JBU161', 'UAL6178', 'N421DG', 'SKW441R', 'AWE1789', 'ASA485', 'UAL6699',
+                   'DAL994', 'AAY404', 'UAL411', 'DLH433', 'NKS373', 'WJA309', 'AWE530',
+                   'N950X']:
+
+            continue
+
         if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
         else:
             leaves = subtrajer.subtrajectorize(traj, returnGraph=True)
+
+        if leaves is None: # or pointCount < 3:
+            continue
+
+        pointCount =  -1; leafCount = -1
+        leaves, pointCount, leafCount = leaves
+        if pointCount < 16 or leafCount < 4:
+            continue
+
+        largeCount += 1
+        if pointCount > maxPointCount:
+            maxPointCount = pointCount
+
+        counter2 += 1
+        if counter2 > 1000:
+            return
+
+        trajectoryName = trajName(traj)
+        print("{3} {0}: {1} Points,    {2} Leaves      {4}"
+              .format(trajectoryName, pointCount, leafCount, largeCount, maxPointCount))
+        # continue
 
         if args.verbose:
             print("Segmentation=", traj[0].object_id, leaves)
@@ -320,13 +366,16 @@ def main():
         bbox = geomath.compute_bounding_box(traj, expand=.05,
                                             expand_zero_length=.1)
 
+        plotFileName = _id + '_' + args.image_file
+
+
         # the mymap parameter below is only needed to get the max width or
         # height in terms ov the values used to scale the maps
         plot_colored_segments_path(traj, leaves, args.straightness_threshold,
                                    bbox, savefig=args.save_fig,
                                    insetMap=args.insetMap,
                                    altitudePlot=args.altitudePlot, ext=ext,
-                                   output=args.image_file)
+                                   output=plotFileName)
         if args.method == Method.straight:
             plot_tree(G, traj, bbox, with_labels=False,
                       node_size=5000, threshold=args.straightness_threshold,
