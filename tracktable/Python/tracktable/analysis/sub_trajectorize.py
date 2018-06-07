@@ -35,6 +35,7 @@ import scipy
 from tracktable.analysis.sliceList import SliceList
 import tracktable.analysis.ExtendedPointList as EPL
 import types
+from math import isclose
 
 
 class NormalizedDistanceMatrix:
@@ -346,13 +347,18 @@ class SubTrajerSemantic:
         #landing
 
 
+def trajName(traj):
+    return traj[0].object_id
+
+
 _isSubTrajerCurvatureAvailable = True
 
 class SubTrajerCurvature:
     def __init__(self):
         if not _isSubTrajerCurvatureAvailable:
             raise NotImplementedError(
-                "The class SubTrajerCurvature is not available due to import issues.")
+                "The class SubTrajerCurvature is not available due " +
+                "to import issues.")
 
     def _movingGrowingWindowMethod(self, aPointList):
         # Create a profile, x = length along, y = Degree of Curve
@@ -365,11 +371,11 @@ class SubTrajerCurvature:
             # SimpleNamespace from https://stackoverflow.com/a/13828824/1339950
             length_degree_pair = \
                 types.SimpleNamespace(x = accumulatedX,
-                                      degC = pt.arc.degreeCurve,
-                                      rad = pt.arc.radius,
-                                      myIndex = myIndex,
-                                      chordAzimuth = pt.arc.chordVector.azimuth,
-                                      deflection = pt.pt2pt.deflection)
+                                      degC=pt.arc.degreeCurve,
+                                      rad=pt.arc.radius,
+                                      myIndex=myIndex,
+                                      chordAzimuth=pt.arc.chordVector.azimuth,
+                                      deflection=pt.pt2pt.deflection)
 
             dcProfile.append(length_degree_pair)
             myIndex += 1
@@ -386,15 +392,21 @@ class SubTrajerCurvature:
                                computeParams=computeParams)
 
         print("Using the Moving/Growing Window Method.")
-        print(); print('Length before consolidation: {0}'.format(len(aSliceList)))
-        predicate = lambda a, b: math.isclose(a.DcStdDev, b.DcStdDev, abs_tol=0.01)
+        print(); print('Length before consolidation: {0}' \
+                       .format(len(aSliceList)))
+        predicate = lambda a, b: isclose(a.DcStdDev, b.DcStdDev, abs_tol=0.01)
         aSliceList.consolidateNodeIf(predicate)
-        print(); print('Length after  consolidation: {0}'.format(len(aSliceList)))
+        print(); print('Length after  consolidation: {0}' \
+                       .format(len(aSliceList)))
 
-        aSliceList.computeParams
-        predicate = lambda a, b: int(a.DcStdDev // 6) == 0 and int(b.DcStdDev // 6) == 0
+        # aSliceList.computeParams
+        predicate = lambda a, b: int(a.DcStdDev // 6) == 0 and \
+                                 int(b.DcStdDev // 6) == 0
+
         aSliceList.consolidateNodeIf(predicate)
-        predicate = lambda a, b: int(a.DcStdDev // 6) > 0 and int(b.DcStdDev // 6) > 0
+        predicate = lambda a, b: int(a.DcStdDev // 6) > 0 and \
+                                 int(b.DcStdDev // 6) > 0
+
         aSliceList.consolidateNodeIf(predicate)
         return aSliceList
 
@@ -406,31 +418,46 @@ class SubTrajerCurvature:
         def computeParams(aSliceRange):
             aSegment = aSliceRange.getSegment()
             aSliceRange.DegreeOfCurve = 'straight' \
-                    if fabs(aSegment[0].arc.degreeCurve) < dcStraightThreshold \
-                    else 'turn'
+                if fabs(aSegment[0].arc.degreeCurve) < dcStraightThreshold \
+                else 'turn'
 
+        pointCount = len(aPointList)
         aPointList = aPointList[1:-1]
         aSliceList = SliceList(aPointList, RangeWidth=1, Overlap=0,
                                computeParams=computeParams)
 
-        print("Using the Individual Curvatures Method.")
-        print(); print('Length before consolidation: {0}'.format(len(aSliceList)))
+        # print("Using the Individual Curvatures Method.")
+        # print(); print('Length before consolidation: {0}' \
+        # .format(len(aSliceList)))
         predicate = lambda a, b: a.DegreeOfCurve == b.DegreeOfCurve
         aSliceList.consolidateNodeIf(predicate)
-        print(); print('Length after  consolidation: {0}'.format(len(aSliceList)))
+        # print(); print('Length after  consolidation: {0}' \
+        # .format(len(aSliceList)))
 
         aSliceList.shiftInteriorBoundariesBy(1)
+        aSliceList.pointCount = pointCount
 
         return aSliceList
 
 
-    def subtrajectorize(self, trajectory, returnGraph=False, useMethod='individualCurvatures_preferred'):
-        findMethod = {'movingGrowingWindow': __class__._movingGrowingWindowMethod,
-                      'individualCurvatures_preferred': __class__._individCurvaturesMethod}
+    def subtrajectorize(self,
+                        trajectory,
+                        returnGraph=False,
+                        useMethod='individualCurvatures_preferred'):
+        findMethod = \
+            {'movingGrowingWindow': __class__._movingGrowingWindowMethod,
+            'individualCurvatures_preferred':
+                                    __class__._individCurvaturesMethod}
 
         aPointList = EPL.CreateExtendedPointList(trajectory)
 
+        # if len(aPointList) > 22:
+        #     i = 0
+
         aPointList.computeAllPointInformation()
+        pointCount = len(aPointList)
+        if pointCount < 4:
+            return None
 
         try:
             aSliceList = findMethod[useMethod](self, aPointList)
@@ -440,4 +467,15 @@ class SubTrajerCurvature:
                 .format([x for x in findMethod.keys()])
             raise AttributeError(msg)
 
-        return aSliceList.AsLeaves
+        leafList = aSliceList.AsLeaves
+
+        llSize = 0
+        if leafList is not None:
+            llSize = len(leafList)
+
+        # print("{0}: {1} Points,    {2} Leaves"
+        #       .format(trajectory[0].object_id,
+        #               pointCount,
+        #             llSize))
+
+        return leafList, pointCount, llSize

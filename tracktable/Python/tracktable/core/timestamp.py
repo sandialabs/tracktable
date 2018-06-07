@@ -162,7 +162,22 @@ class Timestamp(object):
                 else:
                     format_string = '%Y-%m-%d %H:%M:%S'
 
-            parsed_time = datetime.datetime.strptime(timestring, format_string)
+            try:
+                parsed_time = datetime.datetime.strptime(timestring,
+                                                         format_string)
+            except ValueError:
+                if 'T' in format_string:
+                    format_string = '%Y-%m-%d %H:%M:%S'
+                else:
+                    format_string = '%Y-%m-%dT%H:%M:%S'
+                try:
+                    parsed_time = datetime.datetime.strptime(timestring,
+                                                             format_string)
+                except ValueError as ve:
+                    if 'unconverted' in ve.args[0]:
+                        timestring = timestring[:-5]
+                        parsed_time = datetime.datetime.strptime(timestring,
+                                                                 format_string)
 
             if parsed_time.tzinfo is not None:
                 return parsed_time

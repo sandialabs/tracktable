@@ -188,8 +188,8 @@ class ExtendedPoint(object):
                 over 1 unit (meters or feet - on any Planar Coordinate
                 System) Derived by equation, set by method, not set by user
             arc.radius (float) radius
-            arc.curveCenterPoint (Point or Extended Point) - Circular curve center
-                point related to this point (self) as set by method call.
+            arc.curveCenterPoint (Point or Extended Point) - Circular curve
+                center point related to this point (self) as set by method call
             arc.lengthBack (float) - distance along the arc back to the
                 previous point.
             arc.lengthAhead (float) distance along the arc ahead to the
@@ -197,8 +197,9 @@ class ExtendedPoint(object):
             arc.deflection - total deflection from back point to ahead point
                 as deflected along the arc defined by the three points. Value
                 interpreted as radians.
-            arc.radiusStartVector - vector from curve center to Point1 (begin point)
-            arc.radiusEndVector - vector from curve center to Point3 (end point)
+            arc.radiusStartVector - vector from curve center to
+                Point1 (begin point)
+            arc.radiusEndVector - vector from curve center to Point3 (end point
             arc.chordVector - vector from point1 to point2
         pt2pt (object) - values related to the points as the vertex of
             a triangle.
@@ -295,7 +296,8 @@ class ExtendedPoint(object):
         location within a certain tolerance
         :param other: Other point to compare against
         :param tolerance: Axis-based distance to compare for spatial equality
-        :return: True if the two points are within tolerance of each other on both axes.
+        :return: True if the two points are within tolerance of each other on
+                both axes.
         """
         if math.fabs(self.X -other.X) > tolerance:
             return False
@@ -307,11 +309,14 @@ class ExtendedPoint(object):
         return ((otherPt.X - self.X)** 2 + (otherPt.Y - self.Y)**2)** 0.5
 
     def deflectionTo(self, otherPt, preferredDir=None):
-        '''When interpreting both ExtendedPoints as Vectors, return the deflection
-        (in units of radians). Negative deflection is left.
-        :param otherPt: ExtendedPoint to be compared with for computation of deflection
-        :param longSolution: if True, compute deflection the long way around the circle
-        :return: a namedTuple of the interior solution azimuth and the exterior solution azimuth
+        '''When interpreting both ExtendedPoints as Vectors, return the
+            deflection (in units of radians). Negative deflection is left.
+        :param otherPt: ExtendedPoint to be compared with for computation of
+            deflection
+        :param longSolution: if True, compute deflection the long way around
+            the circle
+        :return: a namedTuple of the interior solution azimuth and the
+            exterior solution azimuth
         :rtype: namedTuple AzimuthPair
         '''
         defl = otherPt.azimuth - self.azimuth
@@ -330,16 +335,19 @@ class ExtendedPoint(object):
         if preferredDir == None:
             return AzimuthPair(interiorSolution = interiorDeflection,
                                 exteriorSolution = exteriorDeflection)
-        elif math.copysign(1, exteriorDeflection) == math.copysign(1, preferredDir):
+        elif math.copysign(1, exteriorDeflection) == \
+                math.copysign(1, preferredDir):
             return exteriorDeflection
         return interiorDeflection
 
     @staticmethod
     def header_list():
         return 'X,Y,Degree,Radius,ArcDeflection,ChordDirection,' + \
-               'PointsDefl,DistanceBack,DistanceAhead,ArcLengthBack,ArcLengthAhead'
+               'PointsDefl,DistanceBack,DistanceAhead,ArcLengthBack,' + \
+               'ArcLengthAhead'
 
-AzimuthPair = collections.namedtuple('AzimuthPair', 'interiorSolution exteriorSolution')
+AzimuthPair = collections.namedtuple('AzimuthPair',
+                                     'interiorSolution exteriorSolution')
 
 def cvt_radians_to_degrees(rad):
     return rad * 180.0 / math.pi
@@ -519,7 +527,9 @@ def compute_arc_parameters(point1, point2, point3):
     """
     Computes all relevatnt parameters to the trio of points.
     Side Effects: The computed parameters are added to pt2.
-    Assumptions: Total arc deflection from point1 to point3 is less than 180 degrees.
+    Assumptions: Total arc deflection from point1 to point3 is less than
+            180 degrees.
+            Todo: Revisit this assumption for hi deflection point triples.
     :param point1: Back point
     :param point2: Current point
     :param point3: Ahead point

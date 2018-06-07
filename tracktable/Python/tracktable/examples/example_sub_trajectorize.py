@@ -307,8 +307,9 @@ def main():
         st.SubTrajerCurvature()
     else:
         subtrajer = \
-        st.SubTrajerStraight(straightness_threshold=args.straightness_threshold,
-                          length_threshold_samples=args.length_threshold)
+        st.SubTrajerStraight(
+            straightness_threshold=args.straightness_threshold,
+            length_threshold_samples=args.length_threshold)
 
 
     tempV = trajectory.from_ijson_file_iter(args.json_trajectory_file)
@@ -321,15 +322,16 @@ def main():
     counter2 = 0; largeCount = 0; maxPointCount = 0
     # for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
     for _id, traj in trajDict.items():
-        if _id in ['UPS208', 'BAW252', 'THY6', 'SAS944', 'AEA52', 'WJA440A', 'UAL934',
-                   'ACA141', 'BAW48', 'IBE6402', 'VIRV20B', 'AFR439', 'BAW282',
-                   'GTI2016', 'SWA690', 'VIR02V', 'FIN32', 'IBE6402', 'WJA168',
-                   'SWA1361', 'UAE202', 'NAX7002', 'AAL80', 'GTI2046', 'VIR8', 'N248BF',
-                   'UAL693', 'VIR20V', 'KLM604', 'SWA1883', 'N47CA', 'THY12', 'ACA139',
-                   'SWA2872', 'AWE187', 'UAL543', 'JBU775', 'UAL1145', 'SWA2142', 'UAL337',
-                   'JBU161', 'UAL6178', 'N421DG', 'SKW441R', 'AWE1789', 'ASA485', 'UAL6699',
-                   'DAL994', 'AAY404', 'UAL411', 'DLH433', 'NKS373', 'WJA309', 'AWE530',
-                   'N950X']:
+        if _id in ['UPS208', 'BAW252', 'THY6', 'SAS944', 'AEA52', 'WJA440A',
+                   'UAL934', 'ACA141', 'BAW48', 'IBE6402', 'VIRV20B', 'AFR439',
+                   'BAW282', 'GTI2016', 'SWA690', 'VIR02V', 'FIN32', 'IBE6402',
+                   'WJA168', 'SWA1361', 'UAE202', 'NAX7002', 'AAL80',
+                   'GTI2046', 'VIR8', 'N248BF', 'UAL693', 'VIR20V', 'KLM604',
+                   'SWA1883', 'N47CA', 'THY12', 'ACA139', 'SWA2872', 'AWE187',
+                   'UAL543', 'JBU775', 'UAL1145', 'SWA2142', 'UAL337',
+                   'JBU161', 'UAL6178', 'N421DG', 'SKW441R', 'AWE1789',
+                   'ASA485', 'UAL6699', 'DAL994', 'AAY404', 'UAL411', 'DLH433',
+                   'NKS373', 'WJA309', 'AWE530', 'N950X']:
 
             continue
 
@@ -356,7 +358,8 @@ def main():
 
         trajectoryName = trajName(traj)
         print("{3} {0}: {1} Points,    {2} Leaves      {4}"
-              .format(trajectoryName, pointCount, leafCount, largeCount, maxPointCount))
+              .format(trajectoryName, pointCount, leafCount, largeCount,
+                      maxPointCount))
         # continue
 
         if args.verbose:

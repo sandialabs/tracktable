@@ -38,9 +38,11 @@ class sliceRange():
         return self.getSegment()
 
     def __repr__(self):
-        attribs = [x for x in self.__dict__ if 'target' not in x and 'iChanged' not in x]
+        attribs = [x for x in self.__dict__
+                   if 'target' not in x and 'iChanged' not in x]
         atDict = {k : self.__dict__[k] for k in attribs}
-        retStr = str(self.getSlice()) +' ' + str(len(self)) + ' items, ' + str(atDict)
+        retStr = str(self.getSlice()) +' ' + str(len(self)) + \
+                 ' items, ' + str(atDict)
         return retStr
 
     def __len__(self):
@@ -64,7 +66,11 @@ class SliceList(deque):
                     compute(item)
                     item.iChanged = False
 
-    def __init__(self, TargetSequence, RangeWidth, Overlap=0, computeParams=None):
+    def __init__(self,
+                 TargetSequence,
+                 RangeWidth,
+                 Overlap=0,
+                 computeParams=None):
         super().__init__()
 
         self.target = TargetSequence
@@ -92,7 +98,8 @@ class SliceList(deque):
                 item.delme = False
                 break
 
-        removeList = [x for x in reversed(self) if hasattr(x, 'delme') and getattr(x, 'delme')]
+        removeList = [x for x in reversed(self)
+                      if hasattr(x, 'delme') and getattr(x, 'delme')]
         for item in reversed(removeList):
             try:
                 if item.delme:
@@ -107,9 +114,13 @@ class SliceList(deque):
 
     @property
     def AsLeaves(self):
+        slices = [x for x in self.allSlices()]
+        if len(slices) < 1:
+            return None
+
         adjustBack = int(self.overlap // 2.0)
         adjustFront = int(self.overlap // 2.0)
-        leafList = [[x.start+adjustFront, x.stop-adjustBack] for x in self.allSlices()]
+        leafList = [[x.start+adjustFront, x.stop-adjustBack] for x in slices]
         leafList[0][0] = 0
         leafList[-1][1] = len(self.target)
         return leafList
@@ -132,7 +143,11 @@ class SliceList(deque):
         for s in range(firstSlice, lastSlice, stepBy):
             yield (self[s], self[s].getSegment())
 
-    def shiftInteriorBoundariesBy(self, shiftDistance, recomputeParameters=False):
+    def shiftInteriorBoundariesBy(self, shiftDistance,
+                                  recomputeParameters=False):
+        if len(self) == 0:
+            return
+
         for aSlice in self:
             aSlice.start += shiftDistance
             aSlice.stop += shiftDistance
@@ -186,7 +201,8 @@ if __name__ == '__main__':
     # Test 1
 
     if True:
-        col1 = [1.2, 4.4, 0.2, -1.1, 8.9, 1.4, 1.5, 1.6, 1.4, 1.3, 1.45, 1.55, 1.45, 1.22]
+        col1 = [1.2, 4.4, 0.2, -1.1, 8.9, 1.4, 1.5, 1.6, 1.4, 1.3, 1.45,
+                1.55, 1.45, 1.22]
         def computeParameters(aSliceRange):
             aSliceRange.mean = statistics.mean(aSliceRange.getSegment())
             aSliceRange.stdDev = statistics.stdev(aSliceRange.getSegment())
@@ -207,7 +223,8 @@ if __name__ == '__main__':
         for s in aSliceList.allSlices():
             print(s, '  ', s.mean, '  ', s.stdDev)
 
-        predicate = lambda a, b: math.isclose(a.stdDev, b.stdDev, abs_tol=0.025)
+        predicate = lambda a, b: \
+            math.isclose(a.stdDev, b.stdDev, abs_tol=0.025)
         aSliceList.consolidateNodeIf(predicate= predicate)
         print(); print('After Consolidating:')
 
@@ -268,7 +285,8 @@ if __name__ == '__main__':
     def computeDcOnly(aSliceRange):
         aSliceRange.val1 = aSliceRange.getSegment()[0][0]
         aSliceRange.val2 = aSliceRange.getSegment()[0][1]
-        aSliceRange.classification = 'Straight' if aSliceRange.val2 < 0.15 else "Curved"
+        aSliceRange.classification = \
+            'Straight' if aSliceRange.val2 < 0.15 else "Curved"
 
 
     sl4 = SliceList(secondList, RangeWidth=1, Overlap=0,

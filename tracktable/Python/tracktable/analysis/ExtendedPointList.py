@@ -12,7 +12,8 @@ class ExtendedPointList(list):
         attribute data for the arc (circular curve segment) that starts
         at point 1, passes through point 2, and ends at point 3.  Then
         assign the curve data to point 2 for safe keeping.
-        :param self: This list of points to be analyzed. These must be ordered spatially or the results are meaningless.
+        :param self: This list of points to be analyzed. These must be ordered
+                    spatially or the results are meaningless.
         :return: None
         """
         for pt1, pt2, pt3 in zip(self[:-2],
