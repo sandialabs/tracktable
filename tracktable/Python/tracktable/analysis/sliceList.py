@@ -10,6 +10,11 @@ The purpose of SliceList is to automate and convenientize the overlapping
 This approach allows for an unofficial but useful "Time Series" analysis,
     grouping similar segments into a collection of segments with some
     pre-defined thing in common.
+
+The term "sequence" is used instead of "collection" because it only makes
+    sense to operate on ordered collections: Lists, Deques, Tuples, or Strings,
+    but not Sets or Dictionaries (because their order is not guaranteed).
+    Not sure about Ordered Dictionaries. They have not been tested.
 """
 
 from collections import deque
@@ -18,9 +23,18 @@ import math
 
 class sliceRange():
     """
-    A single slice (range from n to m) into a sequence.
+    A single slice (range from n to m) into a sequence. Note: This is not
+    Python's slice object, but it works like it, and it can be converted
+    to a slice object via the getSlice() method.
     """
     def __init__(self, TargetSequence, Start, Stop, Step=None):
+        """
+        Creates new instance of a SliceRange.
+        :param TargetSequence: Reference to the sequence being sliced.
+        :param Start: Begin Index of this slice.
+        :param Stop: End Index of this slice.
+        :param Step: Not Implemented: Always 1. Step value through this slice.
+        """
         self.target = TargetSequence
         self.start = Start
         self.stop = Stop
@@ -28,13 +42,16 @@ class sliceRange():
         self.iChanged = True
 
     def getSlice(self):
+        """Converts self to a Python slice object."""
         return slice(self.start, self.stop, self.step)
 
     def getSegment(self):
+        """Returns the slice of the target sequence."""
         return self.target[self.getSlice()]
 
     @property
     def segment(self):
+        """Returns the slice of the target sequence."""
         return self.getSegment()
 
     def __repr__(self):
@@ -51,14 +68,16 @@ class sliceRange():
 class SliceList(deque):
     """
     An ordered collection of sliceRanges which cover an entire
-        sequence (target) with customizable parameters attached
-        to each sliceRange (such as mean, stdDev, or anything you
-        need.
+        sequence (target) -- actually a Python deque -- with customizable
+        parameters attached to each sliceRange (such as mean, stdDev, or
+        anything you need.
+    (Deque is used for efficient interior deletions for large datasets.)
     Upon running consolidateNodeIf(), all nodes which are similar
         according to how you define similar are consolidated into
         a single node -- so long as the similar nodes are adjacent.
+    The Slices may overlap if called for via the Overlap parameter.
     """
-    def computeDesiredParameters(self):
+    def computeDesiredAttributes(self):
         compute = self.computeParams
         if compute:
             for item in self:
@@ -70,7 +89,17 @@ class SliceList(deque):
                  TargetSequence,
                  RangeWidth,
                  Overlap=0,
-                 computeParams=None):
+                 computeAttribs=None):
+        """
+        :param TargetSequence: The underlying sequence being sliced.
+        :param RangeWidth: How many items are included in each slice (before
+                consolidating, which may change the width of slices.
+        :param Overlap: The number of elements included in both of two
+                adjacent slices.
+        :param computeAttribs: When a custom parameter is desired, they are
+                added in this function.
+        :type computeAttribs: callbackFunction(SliceList) -> None
+        """
         super().__init__()
 
         self.target = TargetSequence
@@ -98,6 +127,7 @@ class SliceList(deque):
                 item.delme = False
                 break
 
+        # Remove SliceRanges if marked delme.
         removeList = [x for x in reversed(self)
                       if hasattr(x, 'delme') and getattr(x, 'delme')]
         for item in reversed(removeList):
@@ -109,11 +139,15 @@ class SliceList(deque):
             except AttributeError:
                 break
 
-        self.computeParams = computeParams
-        self.computeDesiredParameters()
+        self.computeParams = computeAttribs
+        self.computeDesiredAttributes()
 
     @property
     def AsLeaves(self):
+        """Returns the slice list as a list of 'leaves', which are tuples
+            of (begin-slice-index, end-slice-index) When there is overlap in
+            the slice list, that overlap is removed and half the items are
+            assigned to previous and half are assigned to next."""
         slices = [x for x in self.allSlices()]
         if len(slices) < 1:
             return None
@@ -126,18 +160,25 @@ class SliceList(deque):
         return leafList
 
     def allSlices(self, firstSlice=0, lastSlice=-1, stepBy=1):
+        """Generator to return each slice range one at a time. Mainly intended
+        for internal use of the class, but it is not private. Overlap is not
+        eliminated in this method."""
         if lastSlice == -1:
             lastSlice = len(self)
         for s in range(firstSlice, lastSlice, stepBy):
             yield self[s]
 
     def allSegments(self, firstSlice=0, lastSlice=-1, stepBy=1):
+        """Generator to return all segments of the target sequence. Overlap
+        is not eliminated in this method."""
         if lastSlice == -1:
             lastSlice = len(self)
         for s in range(firstSlice, lastSlice, stepBy):
             yield self[s].getSegment()
 
     def allCombined(self, firstSlice=0, lastSlice=-1, stepBy=1):
+        """Generator to return tuples in which [0] is the slice range and
+            [1] is the segment from the target sequence."""
         if lastSlice == -1:
             lastSlice = len(self)
         for s in range(firstSlice, lastSlice, stepBy):
@@ -145,6 +186,16 @@ class SliceList(deque):
 
     def shiftInteriorBoundariesBy(self, shiftDistance,
                                   recomputeParameters=False):
+        """
+        Grows the first SliceRange by shiftDistance, shrinks the last by
+            the same amount, and shifts all internal SliceRanges by
+            shiftDistance.
+        :param shiftDistance: Integer of how far to shift the SliceRange
+                boundaries.
+        :param recomputeParameters: Whether or not to recompute parameters
+            after the shift. The default is don't (False).
+        :return: None
+        """
         if len(self) == 0:
             return
 
@@ -159,6 +210,16 @@ class SliceList(deque):
 
 
     def consolidateNodeIf(self, predicate):
+        """
+        From start+1 to the end, consolidates two adjacent nodes if the nodes
+            have some similarity based on a filter function (predicate).
+            After doing all consolidation, it automatically recomputes all
+            attributes for all remaining sliceRanges.
+        :param predicate: Determines when to consolidate two adjacent
+                sliceRanges.
+        :type predicate: callbackFunction(sliceRange, sliceRange) -> bool
+        :return: None
+        """
         prev = None
         for item in self:
             item.delme = False
@@ -178,15 +239,15 @@ class SliceList(deque):
 
             prev = item
 
-        # How to remove deletable items adapted is from
+        # How to remove deletable items is adapted from
         # https://stackoverflow.com/a/10665631/1339950
-        # Note: It has to be a new list.
+        # Note: List of items to be removed has to be a new list.
         removeList = [x for x in self if x.delme]
         for item in removeList:
             if item.delme:
                 self.remove(item)
 
-        self.computeDesiredParameters()
+        self.computeDesiredAttributes()
 
     def __str__(self):
         retStr = ''
@@ -203,13 +264,13 @@ if __name__ == '__main__':
     if True:
         col1 = [1.2, 4.4, 0.2, -1.1, 8.9, 1.4, 1.5, 1.6, 1.4, 1.3, 1.45,
                 1.55, 1.45, 1.22]
-        def computeParameters(aSliceRange):
+        def computeAttributes(aSliceRange):
             aSliceRange.mean = statistics.mean(aSliceRange.getSegment())
             aSliceRange.stdDev = statistics.stdev(aSliceRange.getSegment())
 
-        computeFunc = lambda each: computeParameters(each)
+        computeFunc = lambda each: computeAttributes(each)
         aSliceList = SliceList(col1, RangeWidth=5, Overlap=2,
-                               computeParams= computeFunc)
+                               computeAttribs= computeFunc)
         print(aSliceList)
         for s in aSliceList.allSlices():
             print(s)
@@ -248,7 +309,7 @@ if __name__ == '__main__':
                    (37.2, 0.2), (38.0, 0.1), (38.9, 0.3),
                    ]
 
-    def computeParams(aSliceRange):
+    def computeAttribs(aSliceRange):
         something = aSliceRange.getSegment()
         myTp = type(something)
         extractedList = [x[1] for x in something]
@@ -257,7 +318,7 @@ if __name__ == '__main__':
         aSliceRange.stdDev = statistics.stdev(extractedList)
 
     sliceList2 = SliceList(secondList, RangeWidth=5, Overlap=2,
-                           computeParams=computeParams)
+                           computeAttribs=computeAttribs)
 
     print(); print("Test 2")
     print(sliceList2)
@@ -271,7 +332,7 @@ if __name__ == '__main__':
     print(sliceList2.AsLeaves)
 
     sl3 = SliceList(secondList, RangeWidth=5, Overlap=0,
-                           computeParams=computeParams)
+                    computeAttribs=computeAttribs)
     print(); print('--------------')
     print('sl3: '); print()
     print(sl3)
@@ -290,7 +351,7 @@ if __name__ == '__main__':
 
 
     sl4 = SliceList(secondList, RangeWidth=1, Overlap=0,
-                    computeParams=computeDcOnly)
+                    computeAttribs=computeDcOnly)
 
     print("Before consolidating:", len(sl4))
     print(sl4)

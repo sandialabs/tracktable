@@ -6,7 +6,8 @@ three coplanar points.  The primary class, ExtendedPoint, simply
 carries the information about the defined circle segment after a call
 to compute_arc_parameters.
 
-Mini-Bibliography on computational geometry for circular segments (on the plane):
+Mini-Bibliography on computational geometry for circular segments (on
+    the plane):
 https://en.wikipedia.org/wiki/Circular_segment
 http://mathworld.wolfram.com/CircularSegment.html
 http://www.wsdot.wa.gov/publications/manuals/fulltext/M22-97/Chapter11.pdf
@@ -19,12 +20,12 @@ import collections
 
 class Azimuth:
     """
-    Convenience class which represents Azimuths (headings) so that the client code
-    does not have to concern itself with handling deflection additions which
-    cross 2π. Values may only be initialized via the constructor and only radians
-    are expected, although the client code does not need to normalize the azimuth.
-    The constructor does that for you.
-    References to normalize mean reducing the value so it is between 0.0 and 2π.
+    Convenience class which represents Azimuths (headings) so that the client
+    code does not have to concern itself with handling deflection additions
+    which cross 2π. Values may only be initialized via the constructor and only
+    radians are expected, although the client code does not need to normalize
+    the azimuth. The constructor does that for you.
+    References to normalize mean reducing the value so it is between 0.0 and 2π
     """
 
     @staticmethod
@@ -35,7 +36,8 @@ class Azimuth:
 
     @staticmethod
     def ToDeg(inAz):
-        """Takes a float: azimuth and converts it to degrees (float, not normalized)"""
+        """Takes a float: azimuth and converts it to degrees (float, not
+            normalized)"""
         retDeg = 360.0 * inAz / Azimuth._turn()
         return retDeg
 
@@ -70,13 +72,16 @@ class Azimuth:
         return normedDefl
 
     def __init__(self, newVal):
-        """ctor: expects newVal to be in radians. Will normalize non-normal values."""
+        """ctor: expects newVal to be in radians. Will normalize
+            non-normal values."""
         self.az = Azimuth._normalizeAzimuth(newVal)
 
     def __add__(self, deflection):
-        """Add an Azimuth and a number (usually a float). Return another Azimuth."""
+        """Add an Azimuth and a number (usually a float). Return another
+            Azimuth."""
         if type(deflection) is 'Azimuth':
-            raise ValueError("Adding two Azimuths not allowed. You can only add an Azimuth to a number.")
+            raise ValueError("Adding two Azimuths not allowed. " +
+                             "You can only add an Azimuth to a number.")
         return Azimuth(self.az + deflection)
 
     def __sub__(self, otherAz):
@@ -127,7 +132,8 @@ if __name__ == "__main__" \
     # Check Azimuth + float addition : Quad 1 -defl in Quad4
     anAz = Azimuth.CreateFromDegrees(10.0)
     aDeflection = Azimuth.DegToAzimuthFloat(-13.0)
-    AzActual = anAz + aDeflection; AzExpected = Azimuth.CreateFromDegrees(357.0)
+    AzActual = anAz + aDeflection; AzExpected = \
+        Azimuth.CreateFromDegrees(357.0)
     print('T3: AzActual expected: {0}, got {1}'.format(AzExpected, AzActual))
     assert AzActual == AzExpected, 'AzActual is {0}'.format(AzActual)
     print("Success"); print()
@@ -140,7 +146,8 @@ if __name__ == "__main__" \
     defActualAz = Az2 - otherAz
     defActual = Azimuth.ToDeg(defActualAz); defExpected = 13.0
     print('Defl Test 1: expected: {0}, got {1}'.format(defExpected, defActual))
-    assert math.isclose(defActual, defExpected), 'AzActual is {0}'.format(defActual)
+    assert math.isclose(defActual, defExpected), \
+        'AzActual is {0}'.format(defActual)
     print("Success"); print()
 
     # Check deflection = Azimuth1 - Azimuth2 : Both in Quad 1
@@ -149,7 +156,8 @@ if __name__ == "__main__" \
     Az1 = Azimuth.CreateFromDegrees(12.0)
     defActual = Azimuth.ToDeg(Az1 - Az2); defExpected = -13.0
     print('Defl Test 2: expected: {0}, got {1}'.format(defExpected, defActual))
-    assert math.isclose(defActual, defExpected), 'AzActual is {0}'.format(defActual)
+    assert math.isclose(defActual, defExpected), 'AzActual is {0}'\
+        .format(defActual)
     print("Success"); print()
 
     # Check deflection = Azimuth - Azimuth : Az1 in Quad 4, Az2 in Quad 1
@@ -158,7 +166,8 @@ if __name__ == "__main__" \
     defActualAz = Az1 - Az2
     defActual = Azimuth.ToDeg(defActualAz); defExpected = 13.0
     print('Defl Test 3: expected: {0}, got {1}'.format(defExpected, defActual))
-    assert math.isclose(defActual, defExpected), 'AzActual is {0}'.format(defActual)
+    assert math.isclose(defActual, defExpected), 'AzActual is {0}'\
+        .format(defActual)
     print("Success"); print()
 
 
@@ -168,7 +177,8 @@ if __name__ == "__main__" \
     defActualAz = Az1 - Az2
     defActual = Azimuth.ToDeg(defActualAz); defExpected = -13.0
     print('Defl Test 3: expected: {0}, got {1}'.format(defExpected, defActual))
-    assert math.isclose(defActual, defExpected), 'AzActual is {0}'.format(defActual)
+    assert math.isclose(defActual, defExpected), 'AzActual is {0}'\
+        .format(defActual)
     print("Success"); print()
 
 

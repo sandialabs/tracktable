@@ -354,13 +354,39 @@ def trajName(traj):
 _isSubTrajerCurvatureAvailable = True
 
 class SubTrajerCurvature:
+    """Breaks up a trajectory into subtrajectories based on curvatures of
+    each point triplet. Multiple approaches to consolidating sequential
+    curvature values into point ranges are available."""
     def __init__(self):
         if not _isSubTrajerCurvatureAvailable:
             raise NotImplementedError(
                 "The class SubTrajerCurvature is not available due " +
                 "to import issues.")
 
+    def _pyramidGrowingWindowMethod(self, aPointList):
+        """
+        A possible nuther method which considers growing windows on a pyramid
+            (multipass) sampling approach instead of a sequential sampling
+            approach like movingGrowingWindow does.
+        :param aPointList: sequence of points constituting the trajectory
+        :type aPointList: ExtendedPointList
+        :return: all subtrajectories
+        :rtype: SliceList
+        """
+        raise NotImplementedError('Try this later.')
+
     def _movingGrowingWindowMethod(self, aPointList):
+        """
+        Overlaps each slice a little, takes mean and stdev of curvature for
+            each slice, compares stdev, consolidates slices when the stdevs
+            of two adjacent slices are close to each other. When they are,
+            the consolidation causes the window to grow towards the right.
+        :param aPointList: sequence of points constituting the trajectory
+        :type aPointList: ExtendedPointList
+        :return: all subtrajectories
+        :rtype: SliceList
+        """
+
         # Create a profile, x = length along, y = Degree of Curve
         dcProfile = []
         accumulatedX = 0.0
@@ -392,14 +418,14 @@ class SubTrajerCurvature:
                                computeParams=computeParams)
 
         print("Using the Moving/Growing Window Method.")
-        print(); print('Length before consolidation: {0}' \
+        print(); print('Length before consolidation: {0}'
                        .format(len(aSliceList)))
         predicate = lambda a, b: isclose(a.DcStdDev, b.DcStdDev, abs_tol=0.01)
         aSliceList.consolidateNodeIf(predicate)
-        print(); print('Length after  consolidation: {0}' \
+        print(); print('Length after  consolidation: {0}'
                        .format(len(aSliceList)))
 
-        # aSliceList.computeParams
+        # aSliceList.computeAttribs
         predicate = lambda a, b: int(a.DcStdDev // 6) == 0 and \
                                  int(b.DcStdDev // 6) == 0
 
@@ -411,6 +437,19 @@ class SubTrajerCurvature:
         return aSliceList
 
     def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=2.0):
+        """
+        First, classifies each point triplet as curved or straight based on
+            a Degree of Curve threshold. Then consolidates slices when two
+            adjacent slices have the same classification.
+            Suggested by Ben Newton.
+        :param aPointList: sequence of points constituting the trajectory
+        :type aPointList: ExtendedPointList
+        :param dcStraightThreshold: border between classifying a point triplet
+            as straight or curved.
+        :type dcStraightThreshold: float (positive)
+        :return: all subtrajectories
+        :rtype: SliceList
+        """
 
         segmentPrimitives = ['straight', 'turn']
 
@@ -444,6 +483,26 @@ class SubTrajerCurvature:
                         trajectory,
                         returnGraph=False,
                         useMethod='individualCurvatures_preferred'):
+        """
+
+        :param trajectory: Trajectory to be processed.
+        :type trajectory: Trajectory
+        :param returnGraph: Return a NetworkX graph of the parse tree (Not
+                Implemented).
+        :type returnGraph: bool
+        :param useMethod:
+            'individualCurvatures_preferred' (default) - compare just the
+                straight/turn classification to grow subtrajectory segments.
+            'movingGrowingWindow' -
+        :type useMethod: str
+        :return: leaves, pointCount, and number of leaves
+        :rtype: list of tuples(startIndex, endIndex) and int and int
+        """
+
+        if returnGraph:
+            raise NotImplementedError("Currently return of a graph"
+                                      "is not implemented. Always pass False.")
+
         findMethod = \
             {'movingGrowingWindow': __class__._movingGrowingWindowMethod,
             'individualCurvatures_preferred':
