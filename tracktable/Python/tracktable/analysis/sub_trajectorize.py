@@ -394,7 +394,8 @@ class SubTrajerCurvature:
         for pt in aPointList[1:-1]:
             accumulatedX += pt.pt2pt.distanceBack
 
-            # SimpleNamespace from https://stackoverflow.com/a/13828824/1339950
+            # SimpleNamespace is
+            # from https://stackoverflow.com/a/13828824/1339950
             length_degree_pair = \
                 types.SimpleNamespace(x = accumulatedX,
                                       degC=pt.arc.degreeCurve,
@@ -454,7 +455,7 @@ class SubTrajerCurvature:
         segmentPrimitives = ['straight', 'turn']
 
 
-        def computeParams(aSliceRange):
+        def computeParameters(aSliceRange):
             aSegment = aSliceRange.getSegment()
             aSliceRange.DegreeOfCurve = 'straight' \
                 if fabs(aSegment[0].arc.degreeCurve) < dcStraightThreshold \
@@ -463,7 +464,7 @@ class SubTrajerCurvature:
         pointCount = len(aPointList)
         aPointList = aPointList[1:-1]
         aSliceList = SliceList(aPointList, RangeWidth=1, Overlap=0,
-                               computeParams=computeParams)
+                               computeAttribs=computeParameters)
 
         # print("Using the Individual Curvatures Method.")
         # print(); print('Length before consolidation: {0}' \
@@ -484,7 +485,11 @@ class SubTrajerCurvature:
                         returnGraph=False,
                         useMethod='individualCurvatures_preferred'):
         """
-
+        Decomposes a Trajectory into subtrajectories based on an analysis of
+            the curvature of each point triplet. Multiple methods are
+            available for this. Client code indicates which method to use by
+            setting useMethod. See the findMethod dictionary (in this function)
+            to see which methods are currently available.
         :param trajectory: Trajectory to be processed.
         :type trajectory: Trajectory
         :param returnGraph: Return a NetworkX graph of the parse tree (Not
@@ -493,7 +498,11 @@ class SubTrajerCurvature:
         :param useMethod:
             'individualCurvatures_preferred' (default) - compare just the
                 straight/turn classification to grow subtrajectory segments.
-            'movingGrowingWindow' -
+            'movingGrowingWindow' - Overlaps each slice a little, takes mean
+                and stdev of curvature for each slice, compares stdev,
+                consolidates slices when the stdevs of two adjacent slices are
+                close to each other. When they are, the consolidation causes
+                the window to grow towards the right.
         :type useMethod: str
         :return: leaves, pointCount, and number of leaves
         :rtype: list of tuples(startIndex, endIndex) and int and int
@@ -501,7 +510,8 @@ class SubTrajerCurvature:
 
         if returnGraph:
             raise NotImplementedError("Currently return of a graph"
-                                      "is not implemented. Always pass False.")
+                                      "is not implemented. Always pass False "
+                                      "for returnGraph")
 
         findMethod = \
             {'movingGrowingWindow': __class__._movingGrowingWindowMethod,
