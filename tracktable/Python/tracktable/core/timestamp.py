@@ -156,11 +156,6 @@ class Timestamp(object):
         """
 
         if timestring:
-            if format_string is None:
-                if timestring[10] == 'T':
-                    format_string = '%Y-%m-%dT%H:%M:%S'
-                else:
-                    format_string = '%Y-%m-%d %H:%M:%S'
 
             try:
                 parsed_time = datetime.datetime.strptime(timestring,
