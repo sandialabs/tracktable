@@ -443,7 +443,8 @@ class Ray2D():
         :return: ExtendedPoint of the Intersection
         :raises: IntersectionError if rays are parallel
         """
-        if self.azimuth == otherRay.azimuth:
+        if self.azimuth == otherRay.azimuth or \
+                (self.slope - otherRay.slope) == 0.0:
             raise IntersectionError()
         if math.isinf(otherRay.slope):
             newX = otherRay.extendedPoint.X
