@@ -33,7 +33,9 @@ from math import sqrt, fabs
 
 import scipy
 from tracktable.analysis.sliceList import SliceList
-import tracktable.analysis.ExtendedPointList as EPL
+import tracktable.analysis.ExtendedPoint
+from tracktable.analysis.ExtendedPointList import ExtendedPointList as EPL
+import tracktable.analysis.ExtendedPointList as EPLmod
 import types
 from math import isclose
 
@@ -346,7 +348,6 @@ class SubTrajerSemantic:
         #descent
         #landing
 
-
 def trajName(traj):
     return traj[0].object_id
 
@@ -518,7 +519,7 @@ class SubTrajerCurvature:
             'individualCurvatures_preferred':
                                     __class__._individCurvaturesMethod}
 
-        aPointList = EPL.CreateExtendedPointList(trajectory)
+        aPointList = EPLmod.CreateExtendedPointList(trajectory)
 
         # if len(aPointList) > 22:
         #     i = 0

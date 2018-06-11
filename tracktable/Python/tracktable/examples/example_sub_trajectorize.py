@@ -64,6 +64,7 @@ class Method(Enum):   #duplicated from example_sub_trajectoirze_mongo.  Fix todo
     def __str__(self):
         return self.value
 
+
 def get_path_altitudes(start, end, coords):
     altitudes = []
     for coord in coords[start:end+1]:

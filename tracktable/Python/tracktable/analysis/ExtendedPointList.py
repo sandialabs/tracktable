@@ -35,6 +35,7 @@ class ExtendedPointList(list):
                 writeStr = str(point)
                 f.write(writeStr + '\n')
 
+
 def _createExtendedPointList_trajectory(trajectory):
     """
     Args:
