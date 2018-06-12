@@ -47,37 +47,45 @@ def _compose_traj_name(traj, suffix_str=''):
     """Gets the name of the trajectory. Appends optional suffix string."""
     return traj[0].object_id + suffix_str
 
+class stackWriter():
+    def __init__(self, startTabDepth=0):
+        self.stack = list()
+        self._tab_level = startTabDepth
+
+    def push(self, a_string):
+        if '<' in a_string or '>' in a_string:
+            raise ValueError("Can't have symbol bracker '<' or '>' in xml "
+                "varialble name.")
+        self.stack.append(a_string)
+        ret_string = self.tabs + '<{0}>\n'.format(a_string)
+        self._tab_level += 1
+        return ret_string
+
+    def pop(self, optionalPopString=''):
+        if len(self.stack) == 0:
+            return None
+        self._tab_level -= 1
+
+        poppedString = self.stack.pop()
+        if len(optionalPopString) > 0 and \
+                poppedString != optionalPopString:
+            raise AttributeError('popped string ("{0}")not same as expected '
+                'string ("{1}")'.format(poppedString, optionalPopString))
+
+        return_string = self.tabs + '</{0}>\n'.format(poppedString)
+        return return_string
+
+    def singleLine(self, varName, varValue):
+        return (self.tabs + '<{0}>{1}</{0}>\n' \
+                .format(varName, str(varValue))
+                )
+
+    @property
+    def tabs(self):
+        return '\t' * self._tab_level
+
 
 def get_placemark_string(trajectory, a_segment):
-
-    class stackWriter():
-        def __init__(self):
-            self.stack = list()
-            self._tab_level = 0
-
-        def push(self, a_string):
-            self.stack.append(a_string)
-            ret_string = self.tabs + '<{0}>\n'.format(a_string)
-            self._tab_level += 1
-            return ret_string
-
-        def pop(self):
-            if len(self.stack) == 0:
-                return None
-            self._tab_level -= 1
-
-            return_string = self.tabs + '</{0}>\n'.format(self.stack.pop())
-            return return_string
-
-        def singleLine(self, varName, varValue):
-            return (self.tabs + '<{0}>{1}</{0}>\n' \
-                    .format(varName, str(varValue))
-                    )
-
-        @property
-        def tabs(self):
-            return '\t' * self._tab_level
-
 
     sr = stackWriter()
     returnString = list(sr.push('Placemark'))
@@ -123,22 +131,24 @@ def _create_styles_dict(trajectory, segments, color_func):
         style_id = style_color
         a_segment.styleUrl = style_id
         if style_color not in styles_dict:
-            style_xml = ("<Style id=\"{0}\">\n"
-                         "\t<LineStyle>\n"
-                         "\t\t<gx:labelVisibility>1</gx:labelVisibility>\n"
-                         "\t\t<width>{1}</width>\n"
-                         "\t\t<color>{2}</color>\n"
-                         "\t</LineStyle>\n"
-                         "\t<LabelStyle>\n"
-                         "\t<scale>0</scale>\n"
-                         "\t</LabelStyle>\n"
-                         "\t<IconStyle>\n"
-                         "\t\t<Icon>\n"
-                         "\t\t\t<href></href>\n"
-                         "\t\t</Icon>\n"
-                         "\t</IconStyle>\n"
-                         "</Style>\n"
-                         .format(style_id, width, style_color))
+            style_xml_list = []
+            style_xml_list.append("<Style id=\"{0}\">\n".format(style_id))
+            sr = stackWriter(1)
+            style_xml_list.append(sr.push('LineStyle'))
+            style_xml_list.append(sr.singleLine("labelVisibility", 1))
+            style_xml_list.append(sr.singleLine('width', 3))
+            style_xml_list.append(sr.singleLine('color',style_color))
+            style_xml_list.append(sr.pop('LineStyle'))
+            style_xml_list.append(sr.push('LabelStyle'))
+            style_xml_list.append(sr.singleLine('scale',0))
+            style_xml_list.append(sr.pop('LabelStyle'))
+            style_xml_list.append(sr.push("IconStyle"))
+            style_xml_list.append(sr.push("Icon"))
+            style_xml_list.append(sr.singleLine('href', ''))
+            style_xml_list.append(sr.pop('Icon'))
+            style_xml_list.append(sr.pop('IconStyle'))
+            style_xml_list.append("</Style>\n")
+            style_xml = ''.join(style_xml_list)
             styles_dict[style_color] = \
                 StyleNamedTuple(style_id=style_id,style_xml=style_xml)
     return styles_dict
