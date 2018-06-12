@@ -18,8 +18,12 @@ The term "sequence" is used instead of "collection" because it only makes
 """
 
 from collections import deque
-import statistics
+# import statistics
 import math
+
+lavendar_color = 'FFB57EDC'
+red_color = 'FF0000FF'
+white_color = 'FFFFFFFF'
 
 class sliceRange():
     """
@@ -27,6 +31,10 @@ class sliceRange():
     Python's slice object, but it works like it, and it can be converted
     to a slice object via the getSlice() method.
     """
+
+    straight_color = white_color
+    turn_color = lavendar_color
+
     def __init__(self, TargetSequence, Start, Stop, Step=None):
         """
         Creates new instance of a SliceRange.
@@ -77,6 +85,10 @@ class SliceList(deque):
         a single node -- so long as the similar nodes are adjacent.
     The Slices may overlap if called for via the Overlap parameter.
     """
+
+    straight_color = white_color
+    turn_color = lavendar_color
+
     def computeDesiredAttributes(self):
         compute = self.computeParams
         if compute:
@@ -142,19 +154,34 @@ class SliceList(deque):
         self.computeParams = computeAttribs
         self.computeDesiredAttributes()
 
+
+        self.color = self.straight_color
+
+
+
     @property
     def AsLeaves(self):
         """Returns the slice list as a list of 'leaves', which are tuples
             of (begin-slice-index, end-slice-index) When there is overlap in
             the slice list, that overlap is removed and half the items are
             assigned to previous and half are assigned to next."""
+
+        class _Leaf(list):
+            def __init__(self, sourceList):
+                for itm in sourceList:
+                    self.append(itm)
+
         slices = [x for x in self.allSlices()]
         if len(slices) < 1:
             return None
 
-        adjustBack = int(self.overlap // 2.0)
+        adjustBack = int(self.overlap // 2.0) - 1
         adjustFront = int(self.overlap // 2.0)
-        leafList = [[x.start+adjustFront, x.stop-adjustBack] for x in slices]
+        leafList = [_Leaf([x.start+adjustFront, x.stop-adjustBack]) for x in slices]
+
+        for a_leaf, a_slice in zip(leafList, slices):
+            a_leaf.color = a_slice.color
+
         leafList[0][0] = 0
         leafList[-1][1] = len(self.target)
         return leafList

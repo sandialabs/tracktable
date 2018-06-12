@@ -96,9 +96,9 @@ def draw_screen_poly( lats, lons, m):
 
 def plot_colored_segments_path(traj, leaves, threshold=None, bbox=None,
                                savefig=False, insetMap=False,
-                               altitudePlot=False, ext="png", output=''):
+                               altitudePlot=False, ext="kml", output=''):
     extension = '.' + ext
-    write_kml(output+extension, [traj])
+    write_kml(output+extension, traj, leaves, lambda a_leaf: a_leaf.getColor())
 
 
 def plot_colored_segments_path_old(traj, leaves, threshold, bbox,
@@ -397,6 +397,9 @@ def _composeName(aTraj):
     oid = ts + '_' + aTraj[0].object_id
     return oid
 
+_flightIdList = ['07011121_CLX431', '07011016_UAL651']
+_flightIdList = deque(_flightIdList)
+
 
 def main():
     args = parse_args()
@@ -432,7 +435,12 @@ def main():
     counter2 = 0; largeCount = 0; maxPointCount = 0
     # for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
     for traj in tempV:
-        if get_point_count(traj) < 70:
+        trajectoryName = _composeName(traj)
+        if len(_flightIdList) == 0:
+            break
+        elif trajectoryName in _flightIdList:
+            _flightIdList.remove(trajectoryName)
+        else:
             continue
 
         try:

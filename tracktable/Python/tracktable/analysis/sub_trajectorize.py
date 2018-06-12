@@ -33,6 +33,7 @@ from math import sqrt, fabs
 
 import scipy
 from tracktable.analysis.sliceList import SliceList
+from tracktable.analysis.sliceList import sliceRange as slice_range_class
 import tracktable.analysis.ExtendedPoint
 from tracktable.analysis.ExtendedPointList import ExtendedPointList as EPL
 import tracktable.analysis.ExtendedPointList as EPLmod
@@ -461,6 +462,10 @@ class SubTrajerCurvature:
             aSliceRange.DegreeOfCurve = 'straight' \
                 if fabs(aSegment[0].arc.degreeCurve) < dcStraightThreshold \
                 else 'turn'
+            aSliceRange.color = slice_range_class.straight_color
+            if aSliceRange.DegreeOfCurve is not 'straight':
+                aSliceRange.color = slice_range_class.turn_color
+
 
         pointCount = len(aPointList)
         aPointList = aPointList[1:-1]
@@ -510,9 +515,9 @@ class SubTrajerCurvature:
         """
 
         if returnGraph:
-            raise NotImplementedError("Currently return of a graph"
+            raise NotImplementedError("Currently return of a graph "
                                       "is not implemented. Always pass False "
-                                      "for returnGraph")
+                                      "for returnGraph.")
 
         findMethod = \
             {'movingGrowingWindow': __class__._movingGrowingWindowMethod,
