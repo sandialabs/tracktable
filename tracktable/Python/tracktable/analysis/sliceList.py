@@ -171,6 +171,14 @@ class SliceList(deque):
                 for itm in sourceList:
                     self.append(itm)
 
+            @property
+            def start(self):
+                return self[0]
+
+            @property
+            def stop(self):
+                return self[1]
+
         slices = [x for x in self.allSlices()]
         if len(slices) < 1:
             return None
