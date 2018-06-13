@@ -285,7 +285,6 @@ class SliceList(deque):
 if __name__ == '__main__':
     import statistics, math
 
-
     # Test 1
 
     if True:
