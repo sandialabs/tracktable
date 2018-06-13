@@ -121,6 +121,7 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
         representing the segment
     :param trajectory: The trajectory being operated on
     :param a_segment: the subtrajectory for this Placemark
+    :type a_segment: any type which has: .start, .stop
     :return: the Placemark string
     :rtype: str
     """
@@ -131,9 +132,9 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
 
     if with_time:
         returnString.append( sr.push('Timespan'))
-        returnString.append(sr.singleLine('begin', trajectory[a_segment[0]]
+        returnString.append(sr.singleLine('begin', trajectory[a_segment.start]
                                      .timestamp.isoformat()))
-        returnString.append(sr.singleLine('end', trajectory[a_segment[1]]
+        returnString.append(sr.singleLine('end', trajectory[a_segment.stop]
                                      .timestamp.isoformat()))
         returnString.append(sr.pop()) # 'Timespan'
 
@@ -143,14 +144,14 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
     returnString.append(sr.singleLine('altitudeMode', 'absolute'))
 
     if with_time:
-        for a_point in trajectory[a_segment[0]:a_segment[1]]:
+        for a_point in trajectory[a_segment.start:a_segment.stop]:
             returnString.append(
                 sr.singleLine('when', a_point.timestamp.isoformat()))
 
     convertFeetToMeters = 0.3048
     formatString = '{0},{1},{2}' if with_altitude \
         else '{0},{1},0.0'
-    for a_point in trajectory[a_segment[0]:a_segment[1]]:
+    for a_point in trajectory[a_segment.start:a_segment.stop]:
         point_str = formatString.format(geomath.longitude(a_point),
                            geomath.latitude(a_point),
                            geomath.altitude(a_point) * convertFeetToMeters)
