@@ -9,8 +9,16 @@ white_color = 'FFFFFFFF'
 def _tab(n):
     return '\t' * n
 
-def write_kml(fn, trajectory, segments=None, color_func=None, with_altitude=False):
-
+def write_kml(fn, trajectory, segments=None, with_altitude=False):
+    """
+    Writes a trajectory to a kml file for viewing by other applications.
+    :param fn: name of the kml file to create
+    :param trajectory: trajectory to be converted
+    :param segments: list of [start, stop] lists indicating subtrajectory
+        boundaries
+    :param with_altitude: Currently not implemented
+    :return: None
+    """
     with open(fn, "w") as kml_f:
 
         #write the kml header
@@ -25,10 +33,8 @@ def write_kml(fn, trajectory, segments=None, color_func=None, with_altitude=Fals
         if not segments:
             segments = [0, len(trajectory)]
             color_string = white_color
-        elif not color_func:
-            color_string = white_color
         else:
-            styles_dict = _create_styles_dict(trajectory, segments, color_func)
+            styles_dict = _create_styles_dict(trajectory, segments)
 
         # write the styles
         for a_style in styles_dict:
@@ -48,6 +54,9 @@ def _compose_traj_name(traj, suffix_str=''):
     return traj[0].object_id + suffix_str
 
 class stackWriter():
+    """
+    Useful for writing values to an xml file. Tab indentation already provided
+    """
     def __init__(self, startTabDepth=0):
         self.stack = list()
         self._tab_level = startTabDepth
@@ -86,7 +95,14 @@ class stackWriter():
 
 
 def get_placemark_string(trajectory, a_segment):
-
+    """
+    Given a trajectory and a single subtrajectory slice, return a kml string
+        representing the segment
+    :param trajectory: The trajectory being operated on
+    :param a_segment: the subtrajectory for this Placemark
+    :return: the Placemark string
+    :rtype: str
+    """
     sr = stackWriter()
     returnString = list(sr.push('Placemark'))
     returnString.append(sr.singleLine('name', trajectory[0].object_id))
@@ -117,11 +133,12 @@ def get_placemark_string(trajectory, a_segment):
     return ''.join(returnString)
 
 
-
-
 StyleNamedTuple = namedtuple('StyleNamedTuple', "style_id style_xml")
 
-def _create_styles_dict(trajectory, segments, color_func):
+def _create_styles_dict(trajectory, segments):
+    """Creates / returns a dictionary where the key is the key is the style
+    id, and the value is a named tuple of style_id and style_xml, the kml
+    text string for that style."""
     width = 3
     styles_dict = {}
     style_count = 0
