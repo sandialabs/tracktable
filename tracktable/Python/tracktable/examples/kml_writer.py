@@ -9,7 +9,7 @@ white_color = 'FFFFFFFF'
 def _tab(n):
     return '\t' * n
 
-def write_kml(fn, trajectory, segments=None, with_altitude=False):
+def write_kml(fn, trajectory, segments=None, with_altitude=True):
     """
     Writes a trajectory to a kml file for viewing by other applications.
     :param fn: name of the kml file to create
@@ -42,7 +42,9 @@ def write_kml(fn, trajectory, segments=None, with_altitude=False):
 
         # write the segments
         for a_segment in segments:
-            kml_f.write(get_placemark_string(trajectory, a_segment))
+            kml_f.write(get_placemark_string(trajectory, a_segment,
+                                             with_altitude,
+                                             with_time=False))
 
         # write the kml footer
         kml_f.write("</Document>\n")
@@ -112,7 +114,8 @@ class stackWriter():
         return '\t' * self._tab_level
 
 
-def get_placemark_string(trajectory, a_segment):
+def get_placemark_string(trajectory, a_segment, with_altitude=False,
+                         with_time=False):
     """
     Given a trajectory and a single subtrajectory slice, return a kml string
         representing the segment
@@ -126,22 +129,31 @@ def get_placemark_string(trajectory, a_segment):
     returnString.append(sr.singleLine('name', trajectory[0].object_id))
     returnString.append(sr.singleLine('description', 'temp description'))
 
-    # returnString.append( sr.push('Timespan'))
-    # returnString.append(sr.singleLine('begin', trajectory[a_segment[0]]
-    #                              .timestamp.isoformat()))
-    # returnString.append(sr.singleLine('end', trajectory[a_segment[1]]
-    #                              .timestamp.isoformat()))
-    # returnString.append(sr.pop()) # 'Timespan'
+    if with_time:
+        returnString.append( sr.push('Timespan'))
+        returnString.append(sr.singleLine('begin', trajectory[a_segment[0]]
+                                     .timestamp.isoformat()))
+        returnString.append(sr.singleLine('end', trajectory[a_segment[1]]
+                                     .timestamp.isoformat()))
+        returnString.append(sr.pop()) # 'Timespan'
 
     returnString.append(sr.singleLine('styleUrl', a_segment.styleUrl))
 
     returnString.append(sr.push('gx:Track'))
     returnString.append(sr.singleLine('altitudeMode', 'absolute'))
-    # for a_point in trajectory[a_segment[0]:a_segment[1]]:
-    #     returnString.append(
-    #         sr.singleLine('when', a_point.timestamp.isoformat()))
+
+    if with_time:
+        for a_point in trajectory[a_segment[0]:a_segment[1]]:
+            returnString.append(
+                sr.singleLine('when', a_point.timestamp.isoformat()))
+
+    convertFeetToMeters = 0.3048
+    formatString = '{0},{1},{2}' if with_altitude \
+        else '{0},{1},0.0'
     for a_point in trajectory[a_segment[0]:a_segment[1]]:
-        point_str = '{},{},0.0'.format(geomath.longitude(a_point), geomath.latitude(a_point))
+        point_str = formatString.format(geomath.longitude(a_point),
+                           geomath.latitude(a_point),
+                           geomath.altitude(a_point) * convertFeetToMeters)
         returnString.append(
             sr.singleLine('gx:coord', point_str))
     returnString.append(sr.pop()) # 'gx: Track'
