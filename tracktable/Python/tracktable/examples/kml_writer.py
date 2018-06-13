@@ -62,6 +62,8 @@ class stackWriter():
         self._tab_level = startTabDepth
 
     def push(self, a_string):
+        """Returns a single-word opening line with < and > around a_string.
+        Increases the indent level by 1 after returning the string."""
         if '<' in a_string or '>' in a_string:
             raise ValueError("Can't have symbol bracker '<' or '>' in xml "
                 "varialble name.")
@@ -71,6 +73,14 @@ class stackWriter():
         return ret_string
 
     def pop(self, optionalPopString=''):
+        """
+        Returns a single-word closing line with </ and > around the string
+        being popped off the stack. Decrements the indent level by 1 before
+        returning the string.
+        :param optionalPopString: If provided, verifies that the string your
+            thought was to be popped is actually the one being popped.
+        :return: The string that was popped off the stack.
+        """
         if len(self.stack) == 0:
             return None
         self._tab_level -= 1
@@ -85,6 +95,14 @@ class stackWriter():
         return return_string
 
     def singleLine(self, varName, varValue):
+        """
+        Returns a string of pattern:
+                <varName>varValue</varName>
+                Does not change the indent level
+        :param varName: The name of the xml variable to put in the string.
+        :param varValue: The value associated with this variable.
+        :return: An XML string representation of the variable/value pair.
+        """
         return (self.tabs + '<{0}>{1}</{0}>\n' \
                 .format(varName, str(varValue))
                 )
