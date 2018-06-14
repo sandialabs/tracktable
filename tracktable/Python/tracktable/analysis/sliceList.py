@@ -167,7 +167,9 @@ class SliceList(deque):
             assigned to previous and half are assigned to next."""
 
         class _Leaf(list):
-            def __init__(self, sourceList):
+            def __init__(self, sourceList, my_traj, associatedSlice=None):
+                self.my_slice = associatedSlice
+                self.my_trajectory = my_traj
                 for itm in sourceList:
                     self.append(itm)
 
@@ -179,13 +181,23 @@ class SliceList(deque):
             def stop(self):
                 return self[1]
 
+            @property
+            def description(self):
+                retString = ('Index: {0} - {1}\n'
+                             'Seg Type: {2}') \
+                    .format(self.start, self.stop,
+                            self.my_slice.DegreeOfCurve)
+                return retString
+
         slices = [x for x in self.allSlices()]
         if len(slices) < 1:
             return None
 
         adjustBack = int(self.overlap // 2.0) - 1
         adjustFront = int(self.overlap // 2.0)
-        leafList = [_Leaf([x.start+adjustFront, x.stop-adjustBack]) for x in slices]
+        leafList = [_Leaf([sl.start+adjustFront, sl.stop-adjustBack],
+                          self.target, sl)
+                    for sl in slices]
 
         for a_leaf, a_slice in zip(leafList, slices):
             a_leaf.color = a_slice.color

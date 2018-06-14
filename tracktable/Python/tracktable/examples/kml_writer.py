@@ -128,7 +128,8 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
     sr = stackWriter()
     returnString = list(sr.push('Placemark'))
     returnString.append(sr.singleLine('name', trajectory[0].object_id))
-    returnString.append(sr.singleLine('description', 'temp description'))
+    aDesc = a_segment.description
+    returnString.append(sr.singleLine('description', aDesc))
 
     if with_time:
         returnString.append( sr.push('Timespan'))
