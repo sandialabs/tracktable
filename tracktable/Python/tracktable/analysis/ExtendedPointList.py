@@ -46,19 +46,16 @@ def _createExtendedPointList_trajectory(trajectory):
     """
     xIndex = 0; yIndex = 1; zIndex = 2;
     newEPL = ExtendedPointList()
-    if len(trajectory[0]) == 3:
-        for aRow in trajectory:
-            x = aRow[xIndex]
-            y = aRow[yIndex]
+    for aRow in trajectory:
+        x = aRow[xIndex]
+        y = aRow[yIndex]
+        if len(trajectory[0]) == 3:
             z = aRow[zIndex]
-            newEPL.append(EP(x, y, z))
-    elif len(trajectory[0]) == 2:
-        for aRow in trajectory:
-            x = aRow[xIndex]
-            y = aRow[yIndex]
-            newEPL.append(EP(x, y))
-    else:
-        raise ValueError('trajectory matrix must have 2 or 3 columns.')
+        elif len(trajectory[0]) == 2:
+            z = None
+        else:
+            raise ValueError('trajectory matrix must have 2 or 3 columns.')
+        newEPL.append(EP(x, y, z))
 
     return newEPL
 
