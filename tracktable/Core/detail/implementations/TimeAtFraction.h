@@ -28,66 +28,54 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// Ben Newton, July 15, 2015
 
-#ifndef __tracktable_detail_implementations_PointAtFraction_h
-#define __tracktable_detail_implementations_PointAtFraction_h
+#ifndef __tracktable_detail_implementations_TimeAtFraction_h
+#define __tracktable_detail_implementations_TimeAtFraction_h
 
-#include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/Core/PropertyMap.h>
-#include <tracktable/Core/Trajectory.h>
+#include <tracktable/Core/Timestamp.h>
 
-#include <tracktable/Core/detail/algorithm_signatures/PointAtFraction.h>
 #include <tracktable/Core/detail/algorithm_signatures/TimeAtFraction.h>
-#include <tracktable/Core/detail/implementations/TimeAtFraction.h>
-#include <tracktable/Core/detail/implementations/TrajectoryPointComparison.h>
-
-#include <cassert>
-#include <typeinfo>
 
 namespace tracktable { namespace algorithms { namespace implementations {
 
-/** Return the estimated point at the specified fraction of travel distance
- *
- * If the specified distance falls exactly on a point in the
- * trajectory, return that point.  Otherwise, interpolate between the
- * two nearest points.
- *
- * If there are multiple points at the requested location then the
- * first one will be returned.
- *
- */
-
+/** Return the time at the specified trajectory fraction
+   *
+   * Returns the timestamp a specified fraction the time along this trajectory.
+   * If <0 or >1, you get start_time or end_time respectively.
+   * A fraction of .25 of a 4 hour trajectory would find the timestamp one hour
+   * after the start of the trajectory.
+   *
+   * @param fraction the fraction of the trajectory at which to find the time.
+   *
+   * @return the timestamp of a given fraction of the way along the trajectory.
+   */
 template<typename ContainerT>
-struct generic_point_at_fraction
+struct generic_time_at_fraction
 {
   template<typename TrajectoryType>
-  static typename TrajectoryType::point_type apply(
-    TrajectoryType const& path,
-    double fraction
-    )
+  static Timestamp apply(TrajectoryType const& path, double fraction)
     {
-      typedef typename TrajectoryType::point_type point_type;
-      typedef compare_point_distances<point_type> compare_point_type;
-      typedef typename TrajectoryType::const_iterator const_iterator;
-
-      if (path.empty()) return point_type();
-      if (path.size() == 1) return path.front();
-
-      if (fraction <= 0)
+      if (path.empty()) return Timestamp(BeginningOfTime);
+      if (fraction <= 0.0)
         {
-        return path.front();
-        }
-      if (fraction >= 1)
-        {
-        return path.back();
+        return path.front().timestamp();
         }
 
-	  //No need to interpolate anything here, let the point_at_time function do the work. Consistency!
-	  tracktable::Timestamp point_time = time_at_fraction<TrajectoryType>::apply(path, fraction);
-	  return point_at_time<TrajectoryType>::apply(path, point_time);
+      if (fraction >= 1.0)
+        {
+        return path.back().timestamp();
+        }
+
+      long delta_sec = static_cast<long>(fraction*
+                                         path.duration().total_seconds());
+
+      return path.front().timestamp() +
+        boost::posix_time::time_duration(boost::posix_time::seconds(delta_sec));
     }
 };
 
 } } } // exit namespace tracktable::algorithms::implementations
 
 #endif
+

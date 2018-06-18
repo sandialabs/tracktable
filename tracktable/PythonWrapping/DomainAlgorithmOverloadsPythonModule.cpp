@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -148,6 +148,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
   def("simplify", &(tracktable::simplify<TrajectoryTerrestrial>));
   def("point_at_fraction", &(tracktable::point_at_fraction<TrajectoryTerrestrial>));
   def("point_at_time", &(tracktable::point_at_time<TrajectoryTerrestrial>));
+  def("time_at_fraction", &(tracktable::time_at_fraction<TrajectoryTerrestrial>));
   def("subset_during_interval", &(tracktable::subset_during_interval<TrajectoryTerrestrial>));
   def("length", &(tracktable::length<TrajectoryTerrestrial>));
   def("end_to_end_distance", &(tracktable::end_to_end_distance<TrajectoryTerrestrial>));
@@ -197,6 +198,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
   def("simplify", &(tracktable::simplify<TrajectoryCartesian2D>));
   def("point_at_fraction", &(tracktable::point_at_fraction<TrajectoryCartesian2D>));
   def("point_at_time", &(tracktable::point_at_time<TrajectoryCartesian2D>));
+  def("time_at_fraction", &(tracktable::time_at_fraction<TrajectoryCartesian2D>));
   def("subset_during_interval", &(tracktable::subset_during_interval<TrajectoryCartesian2D>));
   def("length", &(tracktable::length<TrajectoryCartesian2D>));
   def("end_to_end_distance", &(tracktable::end_to_end_distance<TrajectoryCartesian2D>));
@@ -243,6 +245,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
   def("simplify", &(tracktable::simplify<TrajectoryCartesian3D>));
   def("point_at_fraction", &(tracktable::point_at_fraction<TrajectoryCartesian3D>));
   def("point_at_time", &(tracktable::point_at_time<TrajectoryCartesian3D>));
+  def("time_at_fraction", &(tracktable::time_at_fraction<TrajectoryCartesian3D>));
   def("subset_during_interval", &(tracktable::subset_during_interval<TrajectoryCartesian3D>));
   def("length", &(tracktable::length<TrajectoryCartesian3D>));
   def("end_to_end_distance", &(tracktable::end_to_end_distance<TrajectoryCartesian3D>));

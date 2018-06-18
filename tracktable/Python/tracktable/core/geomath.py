@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2018 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -49,6 +49,7 @@ from ._domain_algorithm_overloads import unsigned_turn_angle as _unsigned_turn_a
 from ._domain_algorithm_overloads import speed_between as _speed_between
 from ._domain_algorithm_overloads import point_at_fraction as _point_at_fraction
 from ._domain_algorithm_overloads import point_at_time as _point_at_time
+from ._domain_algorithm_overloads import time_at_fraction as _time_at_fraction
 from ._domain_algorithm_overloads import subset_during_interval as _subset_during_interval
 from ._domain_algorithm_overloads import length as _length
 from ._domain_algorithm_overloads import end_to_end_distance as _end_to_end_distance
@@ -437,6 +438,30 @@ def point_at_time(trajectory, when):
     """
 
     return _point_at_time(trajectory, when)
+
+# ----------------------------------------------------------------------
+
+def time_at_fraction(trajectory, fraction):
+    """Return a time from a trajectory at a specific fraction of its duration
+
+    This function will estimate a time in a trajectory at some
+    specific fraction of its total travel duration.  If the supplied
+    fraction does not fall exactly on a vertex of the trajectory we
+    will interpolate between the nearest two points.
+
+    Fractions before the beginning or after the end of the trajectory
+    will return the start and end times, respectively.
+
+    Args:
+      trajectory (Trajectory): Path to sample
+      fraction (float): Value between 0 and 1.  0 is the beginning and 1 is the end.
+
+    Returns:
+      Timestamp (datetime) at specified fraction
+
+    """
+
+    return _time_at_fraction(trajectory, fraction)
 
 # ----------------------------------------------------------------------
 

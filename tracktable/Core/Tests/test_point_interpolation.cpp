@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -265,6 +265,147 @@ int run_test()
   std::cout << "\nTesting interpolation beyond trajectory\n";
   result_after = point_at_time(surface_trajectory, way_after);
   error_count += verify_result(result_after, expected_result_after, "point after trajectory ends");
+
+  std::cout << "\nTesting duration\n";
+  tracktable::Duration duration = surface_trajectory.duration();
+  if (duration != after - before)
+  {
+	  error_count++;
+	  std::cout << "ERROR: Duration did not match. Expected duration is " <<
+		  to_simple_string(after - before) << ", Returned duration is " << to_simple_string(duration) << std::endl;
+  }
+
+  std::cout << "\nTesting duration, no points\n";
+  TrajectoryLonLat noPoints;
+  tracktable::Duration duration_no = noPoints.duration();
+  if (duration_no != tracktable::Duration(0,0,0,0))
+  {
+	  error_count++;
+	  std::cout << "ERROR: Duration did not match. Expected duration is " <<
+		  to_simple_string(tracktable::Duration(0, 0, 0, 0)) << ", Returned duration is " <<
+		  to_simple_string(duration_no) << std::endl;
+  }
+
+  std::cout << "\nTesting duration, one point\n";
+  TrajectoryLonLat onePoint;
+  onePoint.push_back(st_point_middle);
+  tracktable::Duration zero_duration = onePoint.duration();
+  if (zero_duration != tracktable::Duration(0, 0, 0, 0))
+  {
+	  error_count++;
+	  std::cout << "ERROR: Duration did not match. Expected duration is " <<
+		  to_simple_string(tracktable::Duration(0, 0, 0, 0)) << ", Returned duration is " << 
+		  to_simple_string(zero_duration) << std::endl;
+  }
+
+  std::cout << "\nTesting time at fraction 0.5\n";
+  tracktable::Timestamp test_middle = time_at_fraction(surface_trajectory, 0.5);
+  if (test_middle != middle)
+  {
+	  error_count++;
+	  std::cout << "Error: Time at fraction, 0.5, did not match. Expected time is " <<
+		  middle << ", Returned time is " << test_middle << std::endl;
+  }
+
+  std::cout << "\nTesting time at fraction 0.25\n";
+  tracktable::Timestamp test_first_quarter = time_at_fraction(surface_trajectory, 0.25);
+  if (test_first_quarter != first_quarter)
+  {
+	  error_count++;
+	  std::cout << "Error: Time at fraction, 0.25, did not match. Expected time is " <<
+		  first_quarter << ", Returned time is " << test_first_quarter << std::endl;
+  }
+
+  std::cout << "\nTesting time at fraction 0.75\n";
+  tracktable::Timestamp test_last_quarter = time_at_fraction(surface_trajectory, 0.75);
+  if (test_last_quarter != last_quarter)
+  {
+	  error_count++;
+	  std::cout << "Error: Time at fraction, 0.75, did not match. Expected time is " <<
+		  last_quarter << ", Returned time is " << test_last_quarter << std::endl;
+  }
+
+  std::cout << "\nTesting time at fraction 0\n";
+  tracktable::Timestamp test_before = time_at_fraction(surface_trajectory, 0);
+  if (test_before != before)
+  {
+	  error_count++;
+	  std::cout << "Error: Time at fraction, 0, did not match. Expected time is " <<
+		  before << ", Returned time is " << test_before << std::endl;
+  }
+
+  std::cout << "\nTesting time at fraction 1.0\n";
+  tracktable::Timestamp test_after = time_at_fraction(surface_trajectory, 1.0);
+  if (test_after != after)
+  {
+	  error_count++;
+	  std::cout << "Error: Time at fraction, 1.0, did not match. Expected time is " <<
+		  after << ", Returned time is " << test_after << std::endl;
+  }
+
+  std::cout << "\nTesting time at fraction -0.5\n";
+  tracktable::Timestamp test_way_before = time_at_fraction(surface_trajectory, -0.5);
+  if (test_way_before != before)
+  {
+	  error_count++;
+	  std::cout << "Error: Time at fraction, -0.5, did not match. Expected time is " <<
+		  before << ", Returned time is " << test_way_before << std::endl;
+  }
+
+  std::cout << "\nTesting time at fraction 1.5\n";
+  tracktable::Timestamp time_way_after = time_at_fraction(surface_trajectory, 1.5);
+  if (time_way_after != after)
+  {
+	  error_count++;
+	  std::cout << "Error: Time at fraction, 1.5, did not match. Expected time is " <<
+		  after << ", Returned time is " << time_way_after << std::endl;
+  }
+
+  std::cout << "\nTesting time at fraction no points\n";
+  tracktable::Timestamp time_no = time_at_fraction(noPoints, 0.5);
+  if (time_no != tracktable::BeginningOfTime)
+  {
+	  error_count++;
+	  std::cout << "Error: Time at fraction, no points, did not match. Expected time is " <<
+		  tracktable::Timestamp() << ", Returned time is " << time_no << std::endl;
+  }
+  
+  std::cout << "\nTesting point at fraction 0.5\n";
+  TrajectoryPointLonLat point_mid = point_at_fraction(surface_trajectory, 0.5);
+  error_count += verify_result(point_mid, expected_result_middle, "midpoint of trajectory");
+
+  std::cout << "\nTesting point at fraction 0.25\n";
+  TrajectoryPointLonLat point_first_quarter = point_at_fraction(surface_trajectory, 0.25);
+  error_count += verify_result(point_first_quarter, expected_result_first_quarter, "halfway between beginning and midpoint");
+
+  std::cout << "\nTesting point at fraction 0.75\n";
+  TrajectoryPointLonLat point_last_quarter = point_at_fraction(surface_trajectory, 0.75);
+  error_count += verify_result(point_last_quarter, expected_result_last_quarter, "halfway between midpoint and end");
+
+  std::cout << "\nTesting point at fraction 0.0\n";
+  TrajectoryPointLonLat point_start = point_at_fraction(surface_trajectory, 0.0);
+  error_count += verify_result(point_start, expected_result_before, "beginning of trajectory");
+
+  std::cout << "\nTesting point at fraction 1.0\n";
+  TrajectoryPointLonLat point_end = point_at_fraction(surface_trajectory, 1.0);
+  error_count += verify_result(point_end, expected_result_after, "end of trajectory");
+
+  std::cout << "\nTesting point at fraction -0.5\n";
+  TrajectoryPointLonLat point_before = point_at_fraction(surface_trajectory, -0.5);
+  error_count += verify_result(point_before, expected_result_before, "before beginning of trajectory");
+
+  std::cout << "\nTesting point at fraction 1.5\n";
+  TrajectoryPointLonLat point_after = point_at_fraction(surface_trajectory, 1.5);
+  error_count += verify_result(point_after, expected_result_after, "after end of trajectory");
+
+  std::cout << "\nTesting point at fraction, no points\n";
+  TrajectoryPointLonLat point_no = point_at_fraction(noPoints, 0.75);
+  if (point_no.timestamp() != tracktable::BeginningOfTime) //Coordinates are trash. Use timestamp instead.
+  {
+    error_count++;
+    std::cout << "Error: Point at fraction, no points, did not match. Expected point timestamp is " <<
+	tracktable::BeginningOfTime << ", Returned point timestamp is " << point_no.timestamp() << std::endl;
+  }
 
   return error_count;
 }
