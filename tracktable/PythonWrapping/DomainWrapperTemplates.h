@@ -325,8 +325,6 @@ class trajectory_point_methods : public boost::python::def_visitor<trajectory_po
     }
 };
 
-// This is meant to be used *along with* basic_point_methods, not
-// *instead of*.
 class trajectory_methods : public boost::python::def_visitor<trajectory_methods>
 {
 	friend class boost::python::def_visitor_access;
