@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -323,6 +323,26 @@ class trajectory_point_methods : public boost::python::def_visitor<trajectory_po
         .def(self != self)
         ;
     }
+};
+
+// This is meant to be used *along with* basic_point_methods, not
+// *instead of*.
+class trajectory_methods : public boost::python::def_visitor<trajectory_methods>
+{
+	friend class boost::python::def_visitor_access;
+
+	template<class ClassT>
+	void visit(ClassT& c) const
+	{
+		typedef typename ClassT::wrapped_type wrapped_type;
+		using namespace boost::python;
+
+		c
+			.add_property("duration", &wrapped_type::duration)
+			.def(self == self)
+			.def(self != self)
+			;
+	}
 };
 
 // Methods we use to access property maps from Python
