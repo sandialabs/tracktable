@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -37,6 +37,8 @@
 #include <tracktable/Core/Trajectory.h>
 
 #include <tracktable/Core/detail/algorithm_signatures/PointAtFraction.h>
+#include <tracktable/Core/detail/algorithm_signatures/TimeAtFraction.h>
+#include <tracktable/Core/detail/implementations/TimeAtFraction.h>
 #include <tracktable/Core/detail/implementations/TrajectoryPointComparison.h>
 
 #include <cassert>
@@ -80,6 +82,11 @@ struct generic_point_at_fraction
         return path.back();
         }
 
+	  //No need to interpolate anything here, let the point_at_time function do the work. Consistency!
+	  tracktable::Timestamp point_time = time_at_fraction<TrajectoryType>::apply(path, fraction);
+	  return point_at_time<TrajectoryType>::apply(path, point_time);
+
+	  /*
       double desired_distance = path.back().current_length() * fraction;
       point_type key;
       key.set_current_length(desired_distance);
@@ -152,6 +159,7 @@ struct generic_point_at_fraction
           }
         return interpolate<point_type>::apply(*before, *after, interpolant);
         }
+		*/
     }
 };
 
