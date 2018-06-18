@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -40,10 +40,12 @@
 #include <tracktable/Core/detail/algorithm_signatures/Length.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtFraction.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtTime.h>
+#include <tracktable/Core/detail/algorithm_signatures/TimeAtFraction.h>
 #include <tracktable/Core/detail/algorithm_signatures/SubsetDuringInterval.h>
 
 #include <tracktable/Core/detail/implementations/PointAtFraction.h>
 #include <tracktable/Core/detail/implementations/PointAtTime.h>
+#include <tracktable/Core/detail/implementations/TimeAtFraction.h>
 #include <tracktable/Core/detail/implementations/SubsetDuringInterval.h>
 
 #include <tracktable/Core/detail/trait_signatures/HasProperties.h>
@@ -143,6 +145,26 @@ public:
         return ::tracktable::no_such_timestamp();
         }
     }
+
+  /** Return the duration, if available.
+  *
+  * If there are any points in the trajectory, this method will return
+  * the duration of the trajectory.  If not it will return a duration of 0.
+  *
+  * @return the difference of end_time and start_time or 0 if no points.
+  */
+  Duration duration() const
+  {
+	  if (this->Points.size())
+	  {
+		  return this->Points[this->Points.size() - 1].timestamp() -
+			  this->Points[0].timestamp();
+	  }
+	  else
+	  {
+		  return Duration(0,0,0,0);
+	  }
+  }
 
   /** Return the ID of the moving object.
    *
@@ -697,6 +719,10 @@ struct point_at_time< Trajectory< PointT > > : implementations::generic_point_at
 
 template<class PointT>
 struct point_at_fraction< Trajectory< PointT > > : implementations::generic_point_at_fraction< Trajectory<PointT> >
+{ };
+
+template<class PointT>
+struct time_at_fraction< Trajectory< PointT > > : implementations::generic_time_at_fraction< Trajectory<PointT> >
 { };
 
 template<class PointT>

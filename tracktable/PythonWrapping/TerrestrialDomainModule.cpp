@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -205,6 +205,7 @@ void install_terrestrial_trajectory_wrappers()
     .def("from_position_list", &tracktable::python_wrapping::trajectory_from_position_list<trajectory_type>, return_value_policy<manage_new_object>())
     .staticmethod("from_position_list")
     .def("__iter__", iterator<trajectory_type>())
+    .def(tracktable::python_wrapping::trajectory_methods())
     .def(self==self)
     .def(self!=self)
     .def(vector_indexing_suite<trajectory_type>())
