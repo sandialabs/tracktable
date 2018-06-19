@@ -104,6 +104,11 @@ add_executable(test_trajectory_point_lonlat
 )
 set_property(TARGET test_trajectory_point_lonlat        PROPERTY FOLDER "Tests")
 
+add_executable(test_trajectory_radius_of_gyration
+ test_trajectory_radius_of_gyration.cpp
+)
+set_property(TARGET test_trajectory_radius_of_gyration  PROPERTY FOLDER "Tests")
+
 add_executable(test_trajectory_subset
  test_trajectory_subset.cpp
 )
@@ -192,6 +197,11 @@ target_link_libraries(test_trajectory_lonlat
 )
 
 target_link_libraries(test_trajectory_point_lonlat
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
+target_link_libraries(test_trajectory_radius_of_gyration
   TracktableCore
   ${Boost_LIBRARIES}
 )
@@ -286,6 +296,11 @@ add_test(
 add_test(
   NAME C_TrajectorySubset
   COMMAND test_trajectory_subset
+)
+
+add_test(
+  NAME C_TrajectoryRadiusOfGyration
+  COMMAND test_trajectory_radius_of_gyration
 )
 
 add_test(
