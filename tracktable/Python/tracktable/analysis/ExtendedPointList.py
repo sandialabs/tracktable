@@ -1,4 +1,4 @@
-import sys, csv, os
+import sys, csv, os, math
 # sys.path.append(os.getcwd())
 from tracktable.analysis.ExtendedPoint import ExtendedPoint as EP
 import tracktable.analysis.ExtendedPoint as ExtendedPoint
@@ -7,7 +7,8 @@ import tracktable.core.geomath as geomath
 __author__ = ['Paul Schrum']
 
 class ExtendedPointList(list):
-    def computeAllPointInformation(self, computeSpeeds=True):
+    def computeAllPointInformation(self, account_for_lat_long=False,
+                                   computeSpeeds=True):
         """
         For each triplet of points in the list of points, compute the
         attribute data for the arc (circular curve segment) that starts
@@ -15,12 +16,27 @@ class ExtendedPointList(list):
         assign the curve data to point 2 for safe keeping.
         :param self: This list of points to be analyzed. These must be ordered
                     spatially or the results are meaningless.
+        :param account_for_lat_long: When true, treat coordinates where
+                |y| < 90° and |x| < 180° as lat/long, then use the Quick
+                Projection method.
+                See https://tinyurl.com/QuickProjectionMethod for
+                documentation on that.
         :return: None
         """
-        for pt1, pt2, pt3 in zip(self[:-2],
-                                 self[1:-1],
-                                 self[2:]):
-            ExtendedPoint.compute_arc_parameters(pt1, pt2, pt3)
+        use_quick_projection = account_for_lat_long and \
+            math.fabs(self[2].Y) < 90.0 and \
+            math.fabs(self[2].X) < 180.0
+
+        if use_quick_projection:
+            for pt1, pt2, pt3 in zip(self[:-2],
+                                     self[1:-1],
+                                     self[2:]):
+                ExtendedPoint.compute_arc_parameters_lat_long(pt1, pt2, pt3)
+        else:
+            for pt1, pt2, pt3 in zip(self[:-2],
+                                     self[1:-1],
+                                     self[2:]):
+                ExtendedPoint.compute_arc_parameters(pt1, pt2, pt3)
 
         from math import cos
         for a_point, prev_point in zip(self[1:], self[:-1]):

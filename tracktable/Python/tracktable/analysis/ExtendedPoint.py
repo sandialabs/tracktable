@@ -614,6 +614,53 @@ def compute_arc_parameters(point1, point2, point3):
     point2.arc.degreeCurve100 = 100.0 * \
                                cvt_radians_to_degrees(point2.arc.degreeCurve)
 
+def compute_arc_parameters_lat_long(point1, point2, point3):
+    """
+    This is a parallel function to compute_arc_parameters. The difference is:
+    1: It is expecting latitude and longitude coordinates in decimal degree.
+    2: It uses my recently developed approximation method,
+            https://tinyurl.com/QuickProjectionMethod
+    3: Distance units are in degrees. (Multiply by 111000 to convert to
+            meters.)
+    4: Radius is unbounded since it is being computed with plane-embedded
+            equations. On the plane, a degree of curve of 0.0 == Radius of ±∞.
+            But on the sphere-earth radius-on-sphere is limited to a maximum
+            value so that degree of curve 0.0 == Radius-on-sphere of rπ/2
+            in which r is the radius you choose. I.e., radius can't be more
+            than sphere-circumference / 4.0.
+            All that to say, we aren't worrying with that computation.
+            Radiuses > quarter-sphere-circumference are used.
+
+    The function computes all relevant parameters to the trio of points.
+    Side Effects: The computed parameters are added to pt2.
+    Assumptions: Total arc deflection from point1 to point3 is less than
+            180 degrees.
+    :param point1: Back point
+    :param point2: Current point
+    :param point3: Ahead point
+    :requirement: Each point must have X and Y values (note capitals) in
+            which X is Longitude and Y is Latitude
+    :param convert_distances_to: Future - not implemented. Valid values will
+            be 'meters' and 'feet'. You can also pass in your own conversion
+            factor. It must convert from degrees of latitude to your desired
+            unit. Degree of Curve is always the arc deflection over 100.0
+            units of length-along the arc, whatever those unit may be.
+    :return: None
+    """
+
+    # 1. Create shadow versions of all 3 points so arithmetic won't change
+    # original values.
+
+
+    # 2. Adjust coordinate values of the 3 shadow points
+
+
+    # 3. Perform computations on the 3 shadow points.
+
+
+    # 4. Take results carried on shadow 2 and assign to real point 2.
+
+
 
 def _assertFloatsEqual(f1, f2):
     """Test whether two floats are approximately equal.
