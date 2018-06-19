@@ -44,4 +44,7 @@
 #include <tracktable/Core/detail/implementations/ConvexHullAspectRatioTerrestrial.h>
 #include <tracktable/Core/detail/implementations/ConvexHullPerimeterTerrestrial.h>
 
+#include <tracktable/Core/detail/algorithm_signatures/RadiusOfGyration.h>
+#include <tracktable/Core/detail/implementations/RadiusOfGyration.h>
+
 #endif
