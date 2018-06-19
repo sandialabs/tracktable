@@ -11,6 +11,11 @@ Mini-Bibliography on computational geometry for circular segments (on
 https://en.wikipedia.org/wiki/Circular_segment
 http://mathworld.wolfram.com/CircularSegment.html
 http://www.wsdot.wa.gov/publications/manuals/fulltext/M22-97/Chapter11.pdf
+
+The classes in this module all assume themselves to be embedded in the plane.
+For embedding on the sphere (i.e., lat/long) see module
+ExtendedPointLatLong.py.
+
 """
 
 __author__ = 'Paul Schrum'
