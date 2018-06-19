@@ -50,11 +50,13 @@ namespace tracktable {
         /** Return radius of gyration for a collection of points
         *
         * Returns the radius of gyration for a set of points in
-        * radians. If the set is empty, return 0. 
+        * radians. If the set is empty, return 0.
+        * The units of the result depend on the trajectory type
+        * used as this is the basis of the distance function.
         *
         * @param a trajectory or container of points.
         *
-        * @return double - the radius of gyration in radians.
+        * @return double - the radius of gyration.
         */
 
         template<typename ContainerT>
@@ -64,20 +66,18 @@ namespace tracktable {
             static inline double apply(TrajectoryT const& path)
             {
                 typedef typename TrajectoryT::point_type point_type;
-                typedef typename boost::geometry::coordinate_system<point_type>::type coord_system_type;
-                typedef typename tracktable::traits::dimension<point_type> dimension;
 
-                point_type centroid = compute_convex_hull_centroid<coord_system_type, dimension::value>::apply(path.begin(), path.end());
+                point_type centroid = tracktable::convex_hull_centroid(path);
 
                 double sum = 0.0;
                 double size = 0.0;
-                for (TrajectoryT::const_iterator itr = path.begin(); itr != path.end(); ++itr) {
+                for (TrajectoryT::const_iterator itr = path.begin(); itr != path.end(); itr++) {
                     double dist = tracktable::distance(*itr, centroid);
-                    sum += dist * dist;
+                    sum += (dist * dist);
                     size += 1.0;
                 }
-                if (size <= 1) return 0;
-                return sqrt(sum / (size - 1.0));
+                if (size < 1) return 0;
+                return sqrt(sum / size);
             }
         };
     }

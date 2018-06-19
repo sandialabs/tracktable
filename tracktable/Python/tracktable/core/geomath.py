@@ -60,6 +60,7 @@ from ._domain_algorithm_overloads import simplify as _simplify
 from ._domain_algorithm_overloads import convex_hull_perimeter as _convex_hull_perimeter
 from ._domain_algorithm_overloads import convex_hull_area as _convex_hull_area
 from ._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
+from ._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
 
 def xcoord(thing):
     """Return what we think is the X-coordinate for an object.
@@ -756,8 +757,29 @@ def convex_hull_aspect_ratio(trajectory):
       trajectory: Trajectory whose shape you want to measure
 
     Returns:
-      Aspect ratioof the trajectory's convex hull
+      Aspect ratio of the trajectory's convex hull
 
     """
 
     return _convex_hull_aspect_ratio(trajectory)
+
+# ----------------------------------------------------------------------
+
+def radius_of_gyration(trajectory):
+    """Compute the radius of gyration of a trajectory
+
+    Radius of gyration is an indication of the compactness of a trajectory.
+    Technically the result is in radians from the center of mass of 
+    the trajectory. The units of the radius is dependent on the type
+    of trajectory being measured. Terrestrial will return km, while 
+    Cartesian2D returns radians. 
+
+    Args:
+      trajectory: Trajectory whose shape you want to measure
+
+    Returns:
+      Radius of gyration of the trajectory
+
+    """
+
+    return _radius_of_gyration(trajectory)
