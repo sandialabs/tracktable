@@ -98,7 +98,9 @@ def plot_colored_segments_path(traj, leaves, threshold=None, bbox=None,
                                savefig=False, insetMap=False,
                                altitudePlot=False, ext="kml", output=''):
     extension = '.' + ext
-    write_kml(output+extension, traj, leaves, lambda a_leaf: a_leaf.getColor())
+
+    # write_kml(output + extension, traj, with_altitude=False)
+    write_kml(output+extension, traj, leaves)
 
 
 def plot_colored_segments_path_old(traj, leaves, threshold, bbox,
@@ -400,6 +402,12 @@ def _composeName(aTraj):
 _flightIdList = ['07011121_CLX431', '07011016_UAL651']
 _flightIdList = deque(_flightIdList)
 
+def point_count_greater_than(gen, max_count):
+    for ctr, _ in enumerate(gen):
+        if ctr > max_count:
+            return True
+
+    return False
 
 def main():
     args = parse_args()
@@ -428,20 +436,30 @@ def main():
             straightness_threshold=args.straightness_threshold,
             length_threshold_samples=args.length_threshold)
 
+
     tempV = trajectory.from_ijson_file_iter(args.json_trajectory_file)
     # tempV = dev_getTrajectoresInCustomList(tempV)
     # dev_createTrajectiresCustomList(tempV)
     # dev_order_the_bin_summary_by_key()
     counter2 = 0; largeCount = 0; maxPointCount = 0
     # for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
-    for traj in tempV:
+    for count, traj in enumerate(tempV):
+        # if not point_count_greater_than(traj, 30):
+        #     continue
+        #
+        # if count < 500:
+        #     continue
+        #
+        # if count > 1000:
+        #     break
+
         trajectoryName = _composeName(traj)
         if len(_flightIdList) == 0:
             break
         elif trajectoryName in _flightIdList:
             _flightIdList.remove(trajectoryName)
-        else:
-            continue
+        # else:
+        #     continue
 
         try:
             if args.method == Method.straight:

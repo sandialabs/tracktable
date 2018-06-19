@@ -17,6 +17,7 @@ __author__ = 'Paul Schrum'
 
 import math
 import collections
+import tracktable.core.geomath as geomath
 
 class Azimuth:
     """
@@ -235,9 +236,11 @@ class ExtendedPoint(object):
         if newY is None:
             self.X = aPoint.X
             self.Y = aPoint.Y
+            self.Z = getattr(aPoint, 'Z', None)
         else:
             self.X = aPoint
             self.Y = newY
+            self.Z = newZ
         self.pt2pt = False
         self.arc = False
 

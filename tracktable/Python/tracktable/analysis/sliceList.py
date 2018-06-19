@@ -20,6 +20,7 @@ The term "sequence" is used instead of "collection" because it only makes
 from collections import deque
 # import statistics
 import math
+import tracktable.core.geomath as geomath
 
 lavendar_color = 'FFB57EDC'
 red_color = 'FF0000FF'
@@ -181,13 +182,48 @@ class SliceList(deque):
             def stop(self):
                 return self[1]
 
+            def _traj_get_time_str(self, idx):
+                return self.my_trajectory[idx].timestamp.strftime('%H:%M:%S')
+
+            def _traj_get_duration_str(self, start, stop):
+                duration = self.my_trajectory[stop].timestamp - \
+                           self.my_trajectory[start].timestamp
+                return str(duration)
+
+            def _traj_get_alt_str(self, idx):
+                return str(self.my_trajectory[idx].Z)
+
+            def _traj_get_mid_alt_str(self):
+                traj_mid_point_count = len(self.my_trajectory) // 2
+                return str(self.my_trajectory[traj_mid_point_count].Z)
+
+
             @property
             def description(self):
-                retString = ('Index: {0} - {1}\n'
+                retList = list()
+                retString = ('Segment: Index: {0} - {1}\n'
                              'Seg Type: {2}') \
-                    .format(self.start, self.stop,
+                    .format(self.start, self.stop-1,
                             self.my_slice.DegreeOfCurve)
-                return retString
+                retList.append(retString)
+
+                retList.append('\nWhole Trajectory:')
+                retList.append('Start Time: {0}' \
+                               .format(self._traj_get_time_str(0)))
+                retList.append('End   Time: {0}' \
+                               .format(self._traj_get_time_str(-1)))
+                retList.append('Duration: {0}' \
+                               .format(self._traj_get_duration_str(0, -1)))
+
+                retList.append('\nStart Alt: {0}' \
+                               .format(self._traj_get_alt_str(0)))
+                retList.append('Mid Alt: {0}' \
+                               .format(self._traj_get_mid_alt_str()))
+                retList.append('End Alt: {0}' \
+                               .format(self._traj_get_alt_str(-1)))
+
+
+                return '\n'.join(retList)
 
         slices = [x for x in self.allSlices()]
         if len(slices) < 1:

@@ -19,6 +19,9 @@ def write_kml(fn, trajectory, segments=None, with_altitude=True):
     :param with_altitude: Currently not implemented
     :return: None
     """
+    if not segments:
+        return
+
     with open(fn, "w") as kml_f:
 
         #write the kml header
@@ -30,8 +33,9 @@ def write_kml(fn, trajectory, segments=None, with_altitude=True):
 
         styles_dict = {}
         width = 3.0
+
         if not segments:
-            segments = [0, len(trajectory)]
+            # segments = list_start_stop([[0, len(trajectory)])
             color_string = white_color
         else:
             styles_dict = _create_styles_dict(trajectory, segments)
@@ -128,8 +132,11 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
     sr = stackWriter()
     returnString = list(sr.push('Placemark'))
     returnString.append(sr.singleLine('name', trajectory[0].object_id))
-    aDesc = a_segment.description
-    returnString.append(sr.singleLine('description', aDesc))
+    try:
+        aDesc = a_segment.description
+        returnString.append(sr.singleLine('description', aDesc))
+    except AttributeError:
+        pass
 
     if with_time:
         returnString.append( sr.push('Timespan'))
@@ -139,7 +146,10 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
                                      .timestamp.isoformat()))
         returnString.append(sr.pop()) # 'Timespan'
 
-    returnString.append(sr.singleLine('styleUrl', a_segment.styleUrl))
+    try:
+        returnString.append(sr.singleLine('styleUrl', a_segment.styleUrl))
+    except AttributeError:
+        pass
 
     returnString.append(sr.push('gx:Track'))
     returnString.append(sr.singleLine('altitudeMode', 'absolute'))
@@ -153,9 +163,14 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
     formatString = '{0},{1},{2}' if with_altitude \
         else '{0},{1},0.0'
     for a_point in trajectory[a_segment.start:a_segment.stop]:
+        # try:
+        alt = geomath.altitude(a_point) * convertFeetToMeters
         point_str = formatString.format(geomath.longitude(a_point),
-                           geomath.latitude(a_point),
-                           geomath.altitude(a_point) * convertFeetToMeters)
+                                        geomath.latitude(a_point),
+                                            alt)
+        # except Exception:
+        #     point_str = formatString.format(geomath.longitude(a_point),
+        #                        geomath.latitude(a_point))
         returnString.append(
             sr.singleLine('gx:coord', point_str))
     returnString.append(sr.pop()) # 'gx: Track'

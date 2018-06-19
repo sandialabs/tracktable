@@ -534,6 +534,21 @@ class SubTrajerCurvature:
         if pointCount < 4:
             return None
 
+        terminal_altitudes =  (aPointList[0].Z, aPointList[-1].Z)
+        if not (aPointList[0].Z < 4000.0 and aPointList[-1].Z < 4000.0):
+            # Don't do flights without both takeoff and landing
+            return None
+
+        if aPointList.z_range.min_val > 4000.0:
+            # temporary filter
+            # Don't bother with trajectories that never land
+            return None
+
+        if aPointList.z_range.min_val < 1:
+            # temporary filter
+            # Don't bother with trajectories which have no altitude
+            return None
+
         try:
             aSliceList = findMethod[useMethod](self, aPointList)
         except KeyError:

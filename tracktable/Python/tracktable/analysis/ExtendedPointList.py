@@ -2,11 +2,12 @@ import sys, csv, os
 # sys.path.append(os.getcwd())
 from tracktable.analysis.ExtendedPoint import ExtendedPoint as EP
 import tracktable.analysis.ExtendedPoint as ExtendedPoint
+import tracktable.core.geomath as geomath
 
 __author__ = ['Paul Schrum']
 
 class ExtendedPointList(list):
-    def computeAllPointInformation(self):
+    def computeAllPointInformation(self, computeSpeeds=True):
         """
         For each triplet of points in the list of points, compute the
         attribute data for the arc (circular curve segment) that starts
@@ -20,6 +21,29 @@ class ExtendedPointList(list):
                                  self[1:-1],
                                  self[2:]):
             ExtendedPoint.compute_arc_parameters(pt1, pt2, pt3)
+
+        from math import cos
+        for a_point, prev_point in zip(self[1:], self[:-1]):
+            timedelta = a_point.timestamp - prev_point.timestamp
+            if a_point.pt2pt:
+                # The following hack is a hack for distance and speed
+                #   adjustment. Do not use it. Do not keep it. Do not
+                #   commit it. It is wrong and a crutch just for today.
+                distBackMiles = a_point.pt2pt.distanceBack
+                # adjFactor = 0.8 * 69.1
+                milesPerDegree = 69.1
+                latAdjustment = 1.1 * cos(a_point.Y / 57.2958)
+                adjFactor = milesPerDegree * latAdjustment
+                distBackMiles *= adjFactor
+                #  0.8 adjusts for latitude
+                #  69.1 adjusts for miles per degree
+                #
+
+                speed = distBackMiles / (timedelta.seconds / 3600.0)
+                # speed is miles per hour
+                a_point.pt2pt.speedBack = speed
+            if prev_point.pt2pt:
+                prev_point.pt2pt.speedAhead = speed
 
     def writeToCSV(self, fileName):
         """
@@ -35,6 +59,22 @@ class ExtendedPointList(list):
                 writeStr = str(point)
                 f.write(writeStr + '\n')
 
+class _low_high(list):
+    def __init__(self):
+        self.append(float("inf"))
+        self.append(-1 * float("inf"))
+
+    def _include(self, next_value):
+        self[0] = min(self[0], next_value)
+        self[1] = max(self[1], next_value)
+
+    @property
+    def min_val(self):
+        return self[0]
+
+    @property
+    def max_val(self):
+        return self[1]
 
 def _createExtendedPointList_trajectory(trajectory):
     """
@@ -44,19 +84,20 @@ def _createExtendedPointList_trajectory(trajectory):
 
     Returns: New instance of an ExtendedPointList.
     """
-    xIndex = 0; yIndex = 1; zIndex = 2;
+    z_range_list = _low_high()
+    xIndex = 0; yIndex = 1; zIndex = 2
     newEPL = ExtendedPointList()
     for aRow in trajectory:
         x = aRow[xIndex]
         y = aRow[yIndex]
-        if len(trajectory[0]) == 3:
-            z = aRow[zIndex]
-        elif len(trajectory[0]) == 2:
-            z = None
-        else:
-            raise ValueError('trajectory matrix must have 2 or 3 columns.')
-        newEPL.append(EP(x, y, z))
+        z = geomath.altitude(aRow)
 
+        new_ext_pt = EP(x, y, z)
+        new_ext_pt.timestamp = getattr(aRow, 'timestamp')
+        newEPL.append(new_ext_pt)
+        z_range_list._include(z)
+
+    newEPL.z_range = z_range_list
     return newEPL
 
 
