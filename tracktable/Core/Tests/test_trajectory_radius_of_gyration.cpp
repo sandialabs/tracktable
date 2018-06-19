@@ -36,6 +36,7 @@
 #include <sstream>
 
 #include <tracktable/Core/Geometry.h>
+#include <tracktable/Core/PointCartesian.h>
 #include <tracktable/Core/PointLonLat.h>
 #include <tracktable/Core/TrajectoryPoint.h>
 #include <tracktable/Core/Trajectory.h>
@@ -43,6 +44,8 @@
 typedef tracktable::TrajectoryPoint<tracktable::PointLonLat> TrajectoryPointLonLat;
 typedef tracktable::Trajectory<TrajectoryPointLonLat> TrajectoryLonLat;
 
+typedef tracktable::TrajectoryPoint<tracktable::PointCartesian<2>> TrajectoryPoint2dCartesian;
+typedef tracktable::Trajectory<TrajectoryPoint2dCartesian> Trajectory2dCartesian;
 
 TrajectoryPointLonLat create_point(double lat, double lon, std::string& id)
 {
@@ -54,9 +57,19 @@ TrajectoryPointLonLat create_point(double lat, double lon, std::string& id)
     return point;
 }
 
+TrajectoryPoint2dCartesian create_cart2_point(double x, double y, std::string& id)
+{
+    TrajectoryPoint2dCartesian point;
+    point.set_object_id(id);
+    point[0] = x;
+    point[1] = y;
+
+    return point;
+}
+
 int verify_result(double expected, double actual, std::string& test)
 {
-    if (abs(actual - expected) > .1)
+    if (abs(actual - expected) > .01)
     {
         std::cout << "ERROR: " << test << " failed. Expected radius of gyration of about " << expected <<
             " but actual value was " << actual << std::endl;
@@ -68,15 +81,18 @@ int verify_result(double expected, double actual, std::string& test)
 int run_test()
 {
     int error_count = 0;
-    double short_flight_radius, long_flight_radius, combined_radius;
+    double short_flight_radius, long_flight_radius, combined_radius, no_point_radius, one_point_radius, cart2d_radius;
 
-
-    TrajectoryPointLonLat albuquerque = create_point(35.0844, 106.6504, std::string("short_flight"));
-    TrajectoryPointLonLat denver = create_point(39.7392, 104.9903, std::string("short_flight"));
-    TrajectoryPointLonLat el_paso = create_point(31.7619, 106.4850, std::string("short_flight"));
-    TrajectoryPointLonLat san_francisco = create_point(37.7749, 122.4194, std::string("long_flight"));
-    TrajectoryPointLonLat new_york = create_point(40.7128, 74.0060, std::string("long_flight"));
-    TrajectoryPointLonLat london = create_point(51.5074, 0.1278, std::string("long_flight"));
+    TrajectoryPointLonLat albuquerque = create_point(35.0844, -106.6504, std::string("short_flight"));
+    TrajectoryPointLonLat denver = create_point(39.7392, -104.9903, std::string("short_flight"));
+    TrajectoryPointLonLat el_paso = create_point(31.7619, -106.4850, std::string("short_flight"));
+    TrajectoryPointLonLat san_francisco = create_point(37.7749, -122.4194, std::string("long_flight"));
+    TrajectoryPointLonLat new_york = create_point(40.7128, -74.0060, std::string("long_flight"));
+    TrajectoryPointLonLat london = create_point(51.5074, -0.1278, std::string("long_flight"));
+    TrajectoryPoint2dCartesian point1 = create_cart2_point(0,0, std::string("2d cartesian trajectory"));
+    TrajectoryPoint2dCartesian point2 = create_cart2_point(0,1, std::string("2d cartesian trajectory"));
+    TrajectoryPoint2dCartesian point3 = create_cart2_point(1,0, std::string("2d cartesian trajectory"));
+    TrajectoryPoint2dCartesian point4 = create_cart2_point(1,1, std::string("2d cartesian trajectory"));
 
     TrajectoryLonLat short_trajectory;
     short_trajectory.push_back(el_paso);
@@ -84,7 +100,7 @@ int run_test()
     short_trajectory.push_back(denver);
 
     //Short trajectorty should have small radius
-    double expected_short_radius = 0.071;
+    double expected_short_radius = 0.058;
 
     short_flight_radius = tracktable::radius_of_gyration(short_trajectory);
     error_count += verify_result(expected_short_radius, short_flight_radius, std::string("Short flight"));
@@ -95,7 +111,7 @@ int run_test()
     long_trajectory.push_back(london);
 
     //Longer flight should have larger radius
-    double expected_long_radius = 0.712;
+    double expected_long_radius = 0.581;
 
     long_flight_radius = tracktable::radius_of_gyration(long_trajectory);
     error_count += verify_result(expected_long_radius, long_flight_radius, std::string("Long flight"));
@@ -109,10 +125,38 @@ int run_test()
     combined_trajectory.push_back(london);
 
     //Combined flight should have smaller radius since there are more points relatively clustered together
-    double expected_combined_radius = 0.573;
+    double expected_combined_radius = 0.523;
 
     combined_radius = tracktable::radius_of_gyration(combined_trajectory);
     error_count += verify_result(expected_combined_radius, combined_radius, std::string("Combined flight"));
+
+    //No points in a trajectory should return 0
+    double expected_no_point_radius = 0.0;
+
+    TrajectoryLonLat no_points;
+    no_point_radius = tracktable::radius_of_gyration(no_points);
+    error_count += verify_result(expected_no_point_radius, no_point_radius, std::string("Empty flight"));
+
+    //One point in a trajectory should return 0
+    double expected_one_point_radius = 0.0;
+
+    TrajectoryLonLat one_point;
+    one_point.push_back(el_paso);
+
+    one_point_radius = tracktable::radius_of_gyration(one_point);
+    error_count += verify_result(expected_one_point_radius, one_point_radius, std::string("One point flight"));
+
+    //Test Cartesian for good measure
+    double expected_cartesian2d_radius = 0.707;
+
+    Trajectory2dCartesian cart_trajectory;
+    cart_trajectory.push_back(point1);
+    cart_trajectory.push_back(point2);
+    cart_trajectory.push_back(point3);
+    cart_trajectory.push_back(point4);
+
+    cart2d_radius = tracktable::radius_of_gyration(cart_trajectory);
+    error_count += verify_result(expected_cartesian2d_radius, cart2d_radius, std::string("Four points cartesian"));
 
     return error_count;
 }
