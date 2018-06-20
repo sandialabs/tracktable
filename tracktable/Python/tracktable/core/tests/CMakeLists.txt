@@ -58,3 +58,5 @@ add_python_test(P_ParseTimestampWithTimeZone tracktable.core.tests.parse_timesta
 add_python_test(P_TestTrajectoryTypes tracktable.core.tests.test_trajectory_types)
 
 add_python_test(P_TestRadiusGyration tracktable.core.tests.test_trajectory_radius_of_gyration)
+
+add_python_test(P_TestComputeBoundingBox tracktable.core.tests.test_compute_bounding_box)
