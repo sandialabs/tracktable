@@ -37,6 +37,7 @@ from tracktable.analysis.sliceList import sliceRange as slice_range_class
 import tracktable.analysis.ExtendedPoint
 from tracktable.analysis.ExtendedPointList import ExtendedPointList as EPL
 import tracktable.analysis.ExtendedPointList as EPLmod
+import tracktable.analysis.sliceList as SL
 import types
 from math import isclose
 
@@ -439,7 +440,7 @@ class SubTrajerCurvature:
         aSliceList.consolidateNodeIf(predicate)
         return aSliceList
 
-    def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=2.0):
+    def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=8.0):
         """
         First, classifies each point triplet as curved or straight based on
             a Degree of Curve threshold. Then consolidates slices when two
@@ -527,14 +528,14 @@ class SubTrajerCurvature:
                                     __class__._individCurvaturesMethod}
 
         aPointList = EPLmod.CreateExtendedPointList(trajectory)
-
-        # if len(aPointList) > 22:
-        #     i = 0
-
         aPointList.computeAllPointInformation(account_for_lat_long=True)
+
         pointCount = len(aPointList)
         if pointCount < 4:
             return None
+
+        endFlight = aPointList[352:]
+        dbg = True
 
         # Special filters - usually turned off by commenting out
         # terminal_altitudes =  (aPointList[0].Z, aPointList[-1].Z)
@@ -561,6 +562,22 @@ class SubTrajerCurvature:
             raise AttributeError(msg)
 
         leafList = aSliceList.AsLeaves
+        temp_test_str = None
+        if 'CLX4' in aPointList.name:
+            temp_test_str = SL.get_customizable_report_string(leafList)
+        if temp_test_str:
+            import os
+            outFileName = os.path.join(os.path.expanduser(
+                '~/Documents/tracktableTesting/testResults/'),
+                aPointList.name + '_report.csv')
+            try:
+                with open(outFileName, 'wt') as outF:
+                    outF.write(temp_test_str)
+                print()
+                print('report written to:  ', outFileName)
+            except Exception:
+                print()
+                print('Could not write report csv file.')
 
         llSize = 0
         if leafList is not None:

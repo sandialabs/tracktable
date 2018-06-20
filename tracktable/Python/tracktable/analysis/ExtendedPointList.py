@@ -62,6 +62,9 @@ class ExtendedPointList(list):
             if prev_point.pt2pt:
                 prev_point.pt2pt.speedAhead = speed
 
+        for idx, a_point in enumerate(self):
+            a_point.my_index = idx
+
     def writeToCSV(self, fileName):
         """
         Write all points in the point list to the indicated file, expecting
@@ -115,6 +118,7 @@ def _createExtendedPointList_trajectory(trajectory):
         z_range_list._include(z)
 
     newEPL.z_range = z_range_list
+    newEPL.name = trajectory[0].object_id
     return newEPL
 
 

@@ -154,11 +154,14 @@ class SliceList(deque):
 
         self.computeParams = computeAttribs
         self.computeDesiredAttributes()
+        self._recompute_indexes()
 
 
         self.color = self.straight_color
 
-
+    def _recompute_indexes(self):
+        for index, item in enumerate(self):
+            self.my_index = index
 
     @property
     def AsLeaves(self):
@@ -167,10 +170,13 @@ class SliceList(deque):
             the slice list, that overlap is removed and half the items are
             assigned to previous and half are assigned to next."""
 
-        class _Leaf(list):
-            def __init__(self, sourceList, my_traj, associatedSlice=None):
+        class Leaf(list):
+            def __init__(self, sourceList, my_traj, associatedSlice=None,
+                         ndx=-1):
                 self.my_slice = associatedSlice
                 self.my_trajectory = my_traj
+                if ndx > -1:
+                    self.index = ndx
                 for itm in sourceList:
                     self.append(itm)
 
@@ -201,10 +207,10 @@ class SliceList(deque):
             @property
             def description(self):
                 retList = list()
-                retString = ('Segment: Index: {0} - {1}\n'
+                retString = ('Segment: Index: {3} Target Index: {0} - {1}\n'
                              'Seg Type: {2}') \
                     .format(self.start, self.stop-1,
-                            self.my_slice.DegreeOfCurve)
+                            self.my_slice.DegreeOfCurve, self.index)
                 retList.append(retString)
 
                 retList.append('\nWhole Trajectory:')
@@ -222,8 +228,33 @@ class SliceList(deque):
                 retList.append('End Alt: {0}' \
                                .format(self._traj_get_alt_str(-1)))
 
-
                 return '\n'.join(retList)
+
+            def create_debug_report_string1(self):
+                pt1 = self.my_trajectory[self.start]
+                if self.start == 0:
+                    real_start = 1
+                else:
+                    real_start = self.start
+                    pt1 = self.my_trajectory[real_start-1]
+
+                build_string = ''
+                build_string += '{0},{1},{2},{3:.3f} mi,{4:+.3f}°,' \
+                               '{5:+.3f}°,{6:+.3f}°\n'\
+                    .format(self.index, self.my_slice.DegreeOfCurve,
+                            pt1.my_index, math.fabs(pt1.arc.radius),
+                            pt1.arc.degreeCurveDeg, pt1.arc.deflection,
+                            pt1.pt2pt.deflection)
+                for pt1 in self.my_trajectory[real_start:self.stop-2]:
+                    build_string += ',,{2},{3:.3f} mi,{4:+.3f}°,' \
+                                   '{5:+.3f}°,{6:+.3f}°\n'\
+                        .format(self.index, self.my_slice.DegreeOfCurve,
+                                pt1.my_index, math.fabs(pt1.arc.radius),
+                                pt1.arc.degreeCurveDeg, pt1.arc.deflection,
+                                pt1.pt2pt.deflection)
+
+                build_string += ',,,,,,\n'
+                return build_string
 
         slices = [x for x in self.allSlices()]
         if len(slices) < 1:
@@ -231,9 +262,9 @@ class SliceList(deque):
 
         adjustBack = int(self.overlap // 2.0) - 1
         adjustFront = int(self.overlap // 2.0)
-        leafList = [_Leaf([sl.start+adjustFront, sl.stop-adjustBack],
-                          self.target, sl)
-                    for sl in slices]
+        leafList = [Leaf([sl.start+adjustFront, sl.stop-adjustBack],
+                          self.target, sl, index)
+                    for index, sl in enumerate(slices)]
 
         for a_leaf, a_slice in zip(leafList, slices):
             a_leaf.color = a_slice.color
@@ -337,6 +368,17 @@ class SliceList(deque):
         for itm in self:
             retStr = retStr +  str(itm) + '\n'
         return retStr
+
+def get_customizable_report_string(some_leaves):
+    accumulate_string = 'id,class,ndx,radius,Dc,Δ,Chord Δ\n'
+
+    try:
+        for a_leaf in some_leaves:
+            accumulate_string += a_leaf.create_debug_report_string1()
+    except Exception:
+        pass
+
+    return accumulate_string
 
 if __name__ == '__main__':
     import statistics, math
