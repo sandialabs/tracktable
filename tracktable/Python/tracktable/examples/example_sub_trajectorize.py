@@ -443,7 +443,7 @@ def main():
     # dev_order_the_bin_summary_by_key()
     counter2 = 0; largeCount = 0; maxPointCount = 0
     # for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
-    for count, traj in enumerate(tempV):
+    for traj in tempV:
         # if not point_count_greater_than(traj, 30):
         #     continue
         #
