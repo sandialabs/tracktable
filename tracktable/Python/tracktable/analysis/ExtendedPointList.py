@@ -31,7 +31,8 @@ class ExtendedPointList(list):
             for pt1, pt2, pt3 in zip(self[:-2],
                                      self[1:-1],
                                      self[2:]):
-                ExtendedPoint.compute_arc_parameters_lat_long(pt1, pt2, pt3)
+                ExtendedPoint.compute_arc_parameters_lat_long(pt1, pt2, pt3,
+                                            convert_distances_to='miles')
         else:
             for pt1, pt2, pt3 in zip(self[:-2],
                                      self[1:-1],

@@ -455,12 +455,14 @@ class SubTrajerCurvature:
         """
 
         segmentPrimitives = ['straight', 'turn']
+        dbg = aPointList[-50:-30]
+        dbg1 = True
 
 
         def computeParameters(aSliceRange):
             aSegment = aSliceRange.getSegment()
             aSliceRange.DegreeOfCurve = 'straight' \
-                if fabs(aSegment[0].arc.degreeCurve) < dcStraightThreshold \
+                if fabs(aSegment[0].arc.degreeCurve100) < dcStraightThreshold \
                 else 'turn'
             aSliceRange.color = slice_range_class.straight_color
             if aSliceRange.DegreeOfCurve is not 'straight':
@@ -529,25 +531,26 @@ class SubTrajerCurvature:
         # if len(aPointList) > 22:
         #     i = 0
 
-        aPointList.computeAllPointInformation()
+        aPointList.computeAllPointInformation(account_for_lat_long=True)
         pointCount = len(aPointList)
         if pointCount < 4:
             return None
 
-        terminal_altitudes =  (aPointList[0].Z, aPointList[-1].Z)
-        if not (aPointList[0].Z < 4000.0 and aPointList[-1].Z < 4000.0):
-            # Don't do flights without both takeoff and landing
-            return None
-
-        if aPointList.z_range.min_val > 4000.0:
-            # temporary filter
-            # Don't bother with trajectories that never land
-            return None
-
-        if aPointList.z_range.min_val < 1:
-            # temporary filter
-            # Don't bother with trajectories which have no altitude
-            return None
+        # Special filters - usually turned off by commenting out
+        # terminal_altitudes =  (aPointList[0].Z, aPointList[-1].Z)
+        # if not (aPointList[0].Z < 4000.0 and aPointList[-1].Z < 4000.0):
+        #     # Don't do flights without both takeoff and landing
+        #     return None
+        #
+        # if aPointList.z_range.min_val > 4000.0:
+        #     # temporary filter
+        #     # Don't bother with trajectories that never land
+        #     return None
+        #
+        # if aPointList.z_range.min_val < 1:
+        #     # temporary filter
+        #     # Don't bother with trajectories which have no altitude
+        #     return None
 
         try:
             aSliceList = findMethod[useMethod](self, aPointList)
