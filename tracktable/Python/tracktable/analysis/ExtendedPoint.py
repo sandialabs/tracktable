@@ -234,14 +234,21 @@ class ExtendedPoint(object):
         """
         ctor for an Extended Point
         :param aPoint: anything with an X (float) and Y(float).
-                If aPoint is a number, then newY must be define (also a number)
+                If aPoint is a number, then newY must be a number too.
         :param newY: If aPoint is really X(float), then newY is the Y (float)
         :return: None
         """
         if newY is None:
-            self.X = aPoint.X
-            self.Y = aPoint.Y
-            self.Z = getattr(aPoint, 'Z', None)
+            if aPoint is tuple:
+                self.X = aPoint[0]
+                self.Y = aPoint[1]
+                self.Z = None
+                if len(aPoint) >= 3:
+                    self.Z = aPoint[2]
+            else:
+                self.X = aPoint.X
+                self.Y = aPoint.Y
+                self.Z = getattr(aPoint, 'Z', None)
         else:
             self.X = aPoint
             self.Y = newY
@@ -542,7 +549,8 @@ def normalizeDeflection(defl):
         returnDef = defl - 2.0 * math.pi
     return returnDef
 
-def compute_arc_parameters(point1, point2, point3):
+def compute_arc_parameters(point1, point2, point3,
+                           degree_of_curve_length=100.0):
     """
     Computes all relevatnt parameters to the trio of points.
     Side Effects: The computed parameters are added to pt2.
@@ -553,6 +561,8 @@ def compute_arc_parameters(point1, point2, point3):
     :param point2: Current point
     :param point3: Ahead point
     :requirement: Each point must have X and Y values (note capitals).
+    :param degree_of_curve_length: The length along the arc to use in
+            defining Degree of Curve. Default 100.0
     :return: None
     """
     point2.pt2pt = struct()
@@ -611,10 +621,18 @@ def compute_arc_parameters(point1, point2, point3):
     point2.arc.lengthAhead = defl23 * point2.arc.radiusStartVector.magnitude
     point2.arc.length =point2.arc.lengthBack + point2.arc.lengthAhead
     point2.arc.degreeCurve = deflSign / point2.arc.radius
-    point2.arc.degreeCurve100 = 100.0 * \
+    point2.arc.degreeCurve100 = degree_of_curve_length * \
                                cvt_radians_to_degrees(point2.arc.degreeCurve)
 
-def compute_arc_parameters_lat_long(point1, point2, point3):
+
+meter_cnvrt = 111120.0
+feet_cnvrt = meter_cnvrt * 3.28084
+kilom_cnvrt = 111120.0 / 1000.0
+miles_cnvrt = feet_cnvrt / 5280.0
+
+
+def compute_arc_parameters_lat_long(point1, point2, point3,
+                                    convert_distances_to=None):
     """
     This is a parallel function to compute_arc_parameters. The difference is:
     1: It is expecting latitude and longitude coordinates in decimal degree.
@@ -640,26 +658,58 @@ def compute_arc_parameters_lat_long(point1, point2, point3):
     :param point3: Ahead point
     :requirement: Each point must have X and Y values (note capitals) in
             which X is Longitude and Y is Latitude
-    :param convert_distances_to: Future - not implemented. Valid values will
-            be 'meters' and 'feet'. You can also pass in your own conversion
+    :param convert_distances_to: Optional. Valid values are 'meters',
+            'feet', 'miles'. You can also pass in your own conversion
             factor. It must convert from degrees of latitude to your desired
             unit. Degree of Curve is always the arc deflection over 100.0
             units of length-along the arc, whatever those unit may be.
     :return: None
     """
 
-    # 1. Create shadow versions of all 3 points so arithmetic won't change
-    # original values.
+    unit_conversion = 1.0
+    if convert_distances_to:
+        if isinstance(convert_distances_to, (int, float)):
+            unit_conversion = convert_distances_to
+            degree_of_curve_length = 100.0
+        else:
+            unit_conversion = \
+                {'meters' : meter_cnvrt,
+                'feet' : feet_cnvrt,
+                'miles' : miles_cnvrt,
+                 'kilometers' : kilom_cnvrt} \
+                .get(convert_distances_to, 1.0)
+            degree_of_curve_length = \
+                {'meters' : 100.0,
+                'feet' : 100.0,
+                'miles' : 1.0,
+                 'kilometers' : 1.0} \
+                .get(convert_distances_to, 100.0)
 
 
     # 2. Adjust coordinate values of the 3 shadow points
+    delta12_long, delta12_lat= (point1.X - point2.X, point1.Y - point2.Y)
+    delta23_long, delta23_lat = (point2.X - point3.X, point2.Y - point3.Y)
 
+    delta12_lat *= unit_conversion
+    delta23_lat *= unit_conversion
+
+    delta12_long = unit_conversion * delta12_long / \
+                   math.cos(math.radians(point2.Y))
+    delta23_long = unit_conversion * delta23_long / \
+                   math.cos(math.radians(point2.Y))
+
+    # 1. Create shadow versions of all 3 points so arithmetic won't change
+    # original values.
+    shadow1 = ExtendedPoint(delta12_long, delta12_lat)
+    shadow2 = ExtendedPoint(0.0, 0.0) 
+    shadow3 = ExtendedPoint(delta23_long, delta23_lat)
 
     # 3. Perform computations on the 3 shadow points.
-
+    compute_arc_parameters(shadow1, shadow2, shadow3,
+                           degree_of_curve_length=degree_of_curve_length)
 
     # 4. Take results carried on shadow 2 and assign to real point 2.
-
+    point2.arc, point2.pt2pt = (shadow2.arc, shadow2.pt2pt)
 
 
 def _assertFloatsEqual(f1, f2):
