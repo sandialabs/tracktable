@@ -546,15 +546,20 @@ def sanity_check_distance_less_than(max_distance):
 
 # ----------------------------------------------------------------------
 
-def compute_bounding_box(point_sequence):
+def compute_bounding_box(point_sequence, buffer=()):
     """Compute a bounding box for a sequence of points.
 
     This function will construct a domain-specific bounding box over
     an arbitrary sequence of points.  Those points must all have the
-    same type.
+    same type. It can also produce a buffer of space that extends the
+    bounding box some percentage beyond the min and max points. The
+    implementation is fairly naive and can cause issues if the values
+    extend past max values for the point/map type. 
 
     Args:
       point_sequence: Iterable of points
+      buffer: tuple of ratios to extend the bounding box. This defaults
+              to an empty tuple which means no padding is added.
 
     Returns:
       Bounding box with min_corner, max_corner attributes
@@ -584,7 +589,18 @@ def compute_bounding_box(point_sequence):
             for i in range(len(point)):
                 min_corner[i] = min(min_corner[i], point[i])
                 max_corner[i] = max(max_corner[i], point[i])
-
+    
+    if len(buffer) == 2:
+        horiz_buff = (max_corner[0] - min_corner[0]) * buffer[0]
+        vert_buff = (max_corner[1] - min_corner[1]) * buffer[1]
+        min_corner[0] = min_corner[0] - horiz_buff
+        min_corner[1] = min_corner[1] - vert_buff
+        max_corner[0] = max_corner[0] + horiz_buff
+        max_corner[1] = max_corner[1] + vert_buff
+    elif len(buffer) != 0:
+        print("ERROR: buffer requires exactly 0 or 2 values")
+        return None
+        
     if num_points == 0:
         print("ERROR: Cannot compute bounding box.  No points provided.")
         return None
