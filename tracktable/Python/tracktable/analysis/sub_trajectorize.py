@@ -462,7 +462,7 @@ class SubTrajerCurvature:
         def computeParameters(aSliceRange):
             aSegment = aSliceRange.getSegment()
             aSliceRange.DegreeOfCurve = 'straight' \
-                if fabs(aSegment[0].arc.degreeCurve100) < dcStraightThreshold \
+                if fabs(aSegment[0].arc.degreeCurveDeg) < dcStraightThreshold \
                 else 'turn'
             aSliceRange.color = slice_range_class.straight_color
             if aSliceRange.DegreeOfCurve is not 'straight':

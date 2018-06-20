@@ -4,4 +4,10 @@
 *.so
 Documentation/conf.py
 Documentation/Makefile
-*.png
+*.png.idea/
+build/
+tracktable/Python/tracktable/analysis/.idea/
+tracktable/Python/tracktable/examples/accelp025.pdf
+tracktable/Python/tracktable/examples/straight1p1.pdf
+tracktable/Python/tracktable/examples/curvature.png
+tracktable/Analysis/Tests/asdi_july_2013-first10k.json

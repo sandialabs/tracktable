@@ -582,7 +582,7 @@ def compute_arc_parameters(point1, point2, point3,
 
     if defl == 0.0:
         point2.arc.degreeCurve = 0.0
-        point2.arc.degreeCurve100 = 0.0
+        point2.arc.degreeCurveDeg = 0.0
         point2.arc.radius = float('inf')
         point2.arc.curveCenter = False
         point2.arc.lengthBack = False
@@ -621,8 +621,8 @@ def compute_arc_parameters(point1, point2, point3,
     point2.arc.lengthAhead = defl23 * point2.arc.radiusStartVector.magnitude
     point2.arc.length =point2.arc.lengthBack + point2.arc.lengthAhead
     point2.arc.degreeCurve = deflSign / point2.arc.radius
-    point2.arc.degreeCurve100 = degree_of_curve_length * \
-                               cvt_radians_to_degrees(point2.arc.degreeCurve)
+    point2.arc.degreeCurveDeg = degree_of_curve_length * \
+                                cvt_radians_to_degrees(point2.arc.degreeCurve)
 
 
 meter_cnvrt = 111120.0
