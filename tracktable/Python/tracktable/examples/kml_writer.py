@@ -159,6 +159,7 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
             returnString.append(
                 sr.singleLine('when', a_point.timestamp.isoformat()))
 
+    # Google Earth eats altitudes as meters, but we have them in feet.
     convertFeetToMeters = 0.3048
     formatString = '{0},{1},{2}' if with_altitude \
         else '{0},{1},0.0'
@@ -186,7 +187,7 @@ def _create_styles_dict(trajectory, segments):
     """Creates / returns a dictionary where the key is the key is the style
     id, and the value is a named tuple of style_id and style_xml, the kml
     text string for that style."""
-    width = 3
+    width = 6
     styles_dict = {}
     style_count = 0
     for a_segment in segments:
