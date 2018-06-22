@@ -576,6 +576,7 @@ def compute_arc_parameters(point1, point2, point3,
     if defl < 0:
         deflSign = -1
     point2.pt2pt.deflection = defl
+    point2.pt2pt.deflection_deg = math.degrees(defl)
 
     point2.arc = struct()
     point2.arc.chordVector = point1 - point3
@@ -620,6 +621,7 @@ def compute_arc_parameters(point1, point2, point3,
         point2.arc.degreeCurve = 1.0 / point2.arc.radius
         point2.arc.deflection = radStartV.deflectionTo(radEndV,
                                                        preferredDir=defl)
+        point2.arc.deflection_deg = math.degrees(point2.arc.deflection)
 
         p2Vector = point2.arc.curveCenter - point2
         defl12 = p2Vector.azimuth - point2.arc.radiusStartVector.azimuth
@@ -641,6 +643,7 @@ def compute_arc_parameters(point1, point2, point3,
         point2.arc.radiusEndVector = None
         point2.arc.degreeCurve = 0.0
         point2.arc.deflection = 0.0
+        point2.arc.deflection_deg = 0.0
 
         point2.arc.lengthBack = 0.0
         point2.arc.lengthAhead = 0.0
