@@ -461,13 +461,13 @@ def main():
         # else:
         #     continue
 
-        try:
-            if args.method == Method.straight:
-                leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
-            else:
-                leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
-        except IntersectionError:
-            continue
+        # try:
+        if args.method == Method.straight:
+            leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
+        else:
+            leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
+        # except IntersectionError:
+        #     continue
 
         if leaves is None: # or pointCount < 3:
             continue

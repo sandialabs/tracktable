@@ -159,7 +159,8 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
             returnString.append(
                 sr.singleLine('when', a_point.timestamp.isoformat()))
 
-    # Google Earth eats altitudes as meters, but we have them in feet.
+    # Google Earth eats altitudes as meters, but we have them in feet,
+    # so convert.
     convertFeetToMeters = 0.3048
     formatString = '{0},{1},{2}' if with_altitude \
         else '{0},{1},0.0'
