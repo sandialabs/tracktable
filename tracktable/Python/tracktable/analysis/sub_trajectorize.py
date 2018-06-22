@@ -459,8 +459,13 @@ class SubTrajerCurvature:
 
         def computeParameters(aSliceRange):
             aSegment = aSliceRange.getSegment()
+
+            # aSliceRange.DegreeOfCurve = 'straight' \
+            #     if fabs(aSegment[0].arc.degreeCurveDeg) < dcStraightThreshold \
+            #     else 'turn'
+
             aSliceRange.DegreeOfCurve = 'straight' \
-                if fabs(aSegment[0].arc.degreeCurveDeg) < dcStraightThreshold \
+                if aSegment[0].may_be_zigzag \
                 else 'turn'
             aSliceRange.color = slice_range_class.straight_color
             if aSliceRange.DegreeOfCurve is not 'straight':
@@ -526,6 +531,8 @@ class SubTrajerCurvature:
 
         aPointList = EPLmod.CreateExtendedPointList(trajectory)
         aPointList.computeAllPointInformation(account_for_lat_long=True)
+
+        aPointList.mark_likely_zigzags()
 
         pointCount = len(aPointList)
         if pointCount < 4:
