@@ -47,20 +47,13 @@ class ExtendedPointList(list):
                 #   adjustment. Do not use it. Do not keep it. Do not
                 #   commit it. It is wrong and a crutch just for today.
                 distBackMiles = a_point.pt2pt.distanceBack
-                # adjFactor = 0.8 * 69.1
-                milesPerDegree = 69.1
-                latAdjustment = 1.1 * cos(a_point.Y / 57.2958)
-                adjFactor = milesPerDegree * latAdjustment
-                distBackMiles *= adjFactor
-                #  0.8 adjusts for latitude
-                #  69.1 adjusts for miles per degree
-                #
 
+                a_point.pt2pt.seconds_back = timedelta.seconds
                 speed = distBackMiles / (timedelta.seconds / 3600.0)
+                a_point.pt2pt.speed_back_mph = speed
                 # speed is miles per hour
-                a_point.pt2pt.speedBack = speed
             if prev_point.pt2pt:
-                prev_point.pt2pt.speedAhead = speed
+                prev_point.pt2pt.speed_ahead_mph = speed
 
         for idx, a_point in enumerate(self):
             a_point.my_index = idx
@@ -96,6 +89,7 @@ class _low_high(list):
     def max_val(self):
         return self[1]
 
+
 def _createExtendedPointList_trajectory(trajectory):
     """
     Args:
@@ -107,6 +101,7 @@ def _createExtendedPointList_trajectory(trajectory):
     z_range_list = _low_high()
     xIndex = 0; yIndex = 1; zIndex = 2
     newEPL = ExtendedPointList()
+    prevRow = None
     for aRow in trajectory:
         x = aRow[xIndex]
         y = aRow[yIndex]
@@ -114,8 +109,10 @@ def _createExtendedPointList_trajectory(trajectory):
 
         new_ext_pt = EP(x, y, z)
         new_ext_pt.timestamp = getattr(aRow, 'timestamp')
+
         newEPL.append(new_ext_pt)
         z_range_list._include(z)
+        prevRow = aRow
 
     newEPL.z_range = z_range_list
     newEPL.name = trajectory[0].object_id

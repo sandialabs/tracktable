@@ -603,26 +603,49 @@ def compute_arc_parameters(point1, point2, point3,
     biRay12 = Ray2D.get_bisecting_normal_ray(point1, point2)
     biRay23 = Ray2D.get_bisecting_normal_ray(point2, point3)
 
-    cc = biRay12.intersectWith(biRay23)
-    point2.arc.curveCenter = cc
+    lines_are_not_same = True
+    try:
+        cc = biRay12.intersectWith(biRay23)
+    except IntersectionError:
+        lines_are_not_same = False
 
-    radStartV = cc - point1
-    point2.arc.radius = radStartV.magnitude
-    point2.arc.radiusStartVector = radStartV
-    radEndV = cc - point3
-    point2.arc.radiusEndVector = radEndV
-    point2.arc.degreeCurve = 1.0 / point2.arc.radius
-    point2.arc.deflection = radStartV.deflectionTo(radEndV, preferredDir=defl)
+    if lines_are_not_same:
+        point2.arc.curveCenter = cc
 
-    p2Vector = point2.arc.curveCenter - point2
-    defl12 = p2Vector.azimuth - point2.arc.radiusStartVector.azimuth
-    defl23 = point2.arc.deflection - defl12
-    point2.arc.lengthBack = defl12 * point2.arc.radiusStartVector.magnitude
-    point2.arc.lengthAhead = defl23 * point2.arc.radiusStartVector.magnitude
-    point2.arc.length =point2.arc.lengthBack + point2.arc.lengthAhead
-    point2.arc.degreeCurve = deflSign / point2.arc.radius
-    point2.arc.degreeCurveDeg = degree_of_curve_length * \
+        radStartV = cc - point1
+        point2.arc.radius = radStartV.magnitude
+        point2.arc.radiusStartVector = radStartV
+        radEndV = cc - point3
+        point2.arc.radiusEndVector = radEndV
+        point2.arc.degreeCurve = 1.0 / point2.arc.radius
+        point2.arc.deflection = radStartV.deflectionTo(radEndV,
+                                                       preferredDir=defl)
+
+        p2Vector = point2.arc.curveCenter - point2
+        defl12 = p2Vector.azimuth - point2.arc.radiusStartVector.azimuth
+        defl23 = point2.arc.deflection - defl12
+        point2.arc.lengthBack = defl12 * \
+                                point2.arc.radiusStartVector.magnitude
+        point2.arc.lengthAhead = defl23 * \
+                                 point2.arc.radiusStartVector.magnitude
+        point2.arc.length =point2.arc.lengthBack + point2.arc.lengthAhead
+        point2.arc.degreeCurve = deflSign / point2.arc.radius
+        point2.arc.degreeCurveDeg = degree_of_curve_length * \
                                 cvt_radians_to_degrees(point2.arc.degreeCurve)
+    else:
+        point2.arc.curveCenter = float('inf')
+
+        radStartV = None
+        point2.arc.radius = float('inf')
+        point2.arc.radiusStartVector = None
+        point2.arc.radiusEndVector = None
+        point2.arc.degreeCurve = 0.0
+        point2.arc.deflection = 0.0
+
+        point2.arc.lengthBack = 0.0
+        point2.arc.lengthAhead = 0.0
+        point2.arc.length = 0.0
+        point2.arc.degreeCurveDeg = 0.0
 
 
 meter_cnvrt = 111120.0
@@ -688,14 +711,14 @@ def compute_arc_parameters_lat_long(point1, point2, point3,
 
     # 2. Adjust coordinate values of the 3 shadow points
     delta12_long, delta12_lat= (point1.X - point2.X, point1.Y - point2.Y)
-    delta23_long, delta23_lat = (point2.X - point3.X, point2.Y - point3.Y)
+    delta23_long, delta23_lat = (point3.X - point2.X, point3.Y - point2.Y)
 
     delta12_lat *= unit_conversion
     delta23_lat *= unit_conversion
 
-    delta12_long = unit_conversion * delta12_long / \
+    delta12_long = unit_conversion * delta12_long * \
                    math.cos(math.radians(point2.Y))
-    delta23_long = unit_conversion * delta23_long / \
+    delta23_long = unit_conversion * delta23_long * \
                    math.cos(math.radians(point2.Y))
 
     # 1. Create shadow versions of all 3 points so arithmetic won't change
@@ -703,6 +726,9 @@ def compute_arc_parameters_lat_long(point1, point2, point3,
     shadow1 = ExtendedPoint(delta12_long, delta12_lat)
     shadow2 = ExtendedPoint(0.0, 0.0) 
     shadow3 = ExtendedPoint(delta23_long, delta23_lat)
+
+    if math.isclose(point2.X, -121.367):
+        dbg = True
 
     # 3. Perform computations on the 3 shadow points.
     compute_arc_parameters(shadow1, shadow2, shadow3,

@@ -232,26 +232,37 @@ class SliceList(deque):
 
             def create_debug_report_string1(self):
                 pt1 = self.my_trajectory[self.start]
+                build_string = ''
                 if self.start == 0:
                     real_start = 1
                 else:
                     real_start = self.start
                     pt1 = self.my_trajectory[real_start-1]
 
-                build_string = ''
-                build_string += '{0},{1},{2},{3:.3f} mi,{4:+.3f}°,' \
-                               '{5:+.3f}°,{6:+.3f}°\n'\
-                    .format(self.index, self.my_slice.DegreeOfCurve,
-                            pt1.my_index, math.fabs(pt1.arc.radius),
+                build_string += '{0},{1},'.format(self.index,
+                                                  self.my_slice.DegreeOfCurve)
+                main_string = '{2},{3:.3f},{4:.3f},{5:.3f},{6:+.3f},' \
+                               '{7:+.3f},{8:+.3f},{9:.3f},' \
+                               '{10:.4f},{11:.1f},{12:.1f}\n'
+                build_string += main_string \
+                    .format(self.index,self.my_slice.DegreeOfCurve,
+                            pt1.my_index, pt1.Y, pt1.X,
+                            math.fabs(pt1.arc.radius),
                             pt1.arc.degreeCurveDeg, pt1.arc.deflection,
-                            pt1.pt2pt.deflection)
+                            pt1.pt2pt.deflection, pt1.pt2pt.distanceBack,
+                            pt1.pt2pt.distanceAhead, pt1.pt2pt.seconds_back,
+                            pt1.pt2pt.speed_back_mph)
                 for pt1 in self.my_trajectory[real_start:self.stop-2]:
-                    build_string += ',,{2},{3:.3f} mi,{4:+.3f}°,' \
-                                   '{5:+.3f}°,{6:+.3f}°\n'\
+                    build_string += ',,'
+                    build_string += main_string \
                         .format(self.index, self.my_slice.DegreeOfCurve,
-                                pt1.my_index, math.fabs(pt1.arc.radius),
+                                pt1.my_index, pt1.Y, pt1.X,
+                                math.fabs(pt1.arc.radius),
                                 pt1.arc.degreeCurveDeg, pt1.arc.deflection,
-                                pt1.pt2pt.deflection)
+                                pt1.pt2pt.deflection, pt1.pt2pt.distanceBack,
+                                pt1.pt2pt.distanceAhead,
+                                pt1.pt2pt.seconds_back,
+                                pt1.pt2pt.speed_back_mph)
 
                 build_string += ',,,,,,\n'
                 return build_string
@@ -370,7 +381,9 @@ class SliceList(deque):
         return retStr
 
 def get_customizable_report_string(some_leaves):
-    accumulate_string = 'id,class,ndx,radius,Dc,Δ,Chord Δ\n'
+    accumulate_string = 'id,class,ndx,Long,Lat,radius_mi,Dc°,Δ°,' \
+                        'Chord Δ°,ℓ_Back_mi,ℓ_Ahead_mi,' \
+                        'seconds,speed_mph\n'
 
     try:
         for a_leaf in some_leaves:

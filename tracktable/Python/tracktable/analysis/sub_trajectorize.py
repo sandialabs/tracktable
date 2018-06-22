@@ -440,7 +440,7 @@ class SubTrajerCurvature:
         aSliceList.consolidateNodeIf(predicate)
         return aSliceList
 
-    def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=8.0):
+    def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=9.0):
         """
         First, classifies each point triplet as curved or straight based on
             a Degree of Curve threshold. Then consolidates slices when two
@@ -456,9 +456,6 @@ class SubTrajerCurvature:
         """
 
         segmentPrimitives = ['straight', 'turn']
-        dbg = aPointList[-50:-30]
-        dbg1 = True
-
 
         def computeParameters(aSliceRange):
             aSegment = aSliceRange.getSegment()
@@ -534,25 +531,6 @@ class SubTrajerCurvature:
         if pointCount < 4:
             return None
 
-        endFlight = aPointList[352:]
-        dbg = True
-
-        # Special filters - usually turned off by commenting out
-        # terminal_altitudes =  (aPointList[0].Z, aPointList[-1].Z)
-        # if not (aPointList[0].Z < 4000.0 and aPointList[-1].Z < 4000.0):
-        #     # Don't do flights without both takeoff and landing
-        #     return None
-        #
-        # if aPointList.z_range.min_val > 4000.0:
-        #     # temporary filter
-        #     # Don't bother with trajectories that never land
-        #     return None
-        #
-        # if aPointList.z_range.min_val < 1:
-        #     # temporary filter
-        #     # Don't bother with trajectories which have no altitude
-        #     return None
-
         try:
             aSliceList = findMethod[useMethod](self, aPointList)
         except KeyError:
@@ -582,10 +560,5 @@ class SubTrajerCurvature:
         llSize = 0
         if leafList is not None:
             llSize = len(leafList)
-
-        # print("{0}: {1} Points,    {2} Leaves"
-        #       .format(trajectory[0].object_id,
-        #               pointCount,
-        #             llSize))
 
         return leafList, pointCount, llSize
