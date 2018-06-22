@@ -40,7 +40,8 @@ class ExtendedPointList(list):
                 ExtendedPoint.compute_arc_parameters(pt1, pt2, pt3)
 
         from math import cos
-        for a_point, prev_point in zip(self[1:], self[:-1]):
+        for a_point, prev_point, next_point in \
+                zip(self[1:-2], self[:-3], self[2:-1]):
             timedelta = a_point.timestamp - prev_point.timestamp
             if a_point.pt2pt:
                 # The following hack is a hack for distance and speed
@@ -54,6 +55,30 @@ class ExtendedPointList(list):
                 # speed is miles per hour
             if prev_point.pt2pt:
                 prev_point.pt2pt.speed_ahead_mph = speed
+            if a_point.arc:
+                a_point.arc.time_delta = next_point.timestamp - \
+                    prev_point.timestamp
+
+                if a_point.arc.deflection != 0.0:
+                    miles_per_second = (a_point.arc.lengthBack + \
+                                        a_point.arc.lengthAhead) / \
+                                        (a_point.arc.time_delta.seconds)
+                    a_point.arc.speed = (miles_per_second * 3600.0, 'mph')
+
+                    # compute ω
+                    radial_speed = a_point.arc.deflection / \
+                                   a_point.arc.time_delta.seconds
+                    radial_accel_meters_per_s2 = radial_speed * radial_speed \
+                                                 / (a_point.arc.radius * 1609.344)
+                    rad_accel_g_force = radial_accel_meters_per_s2 / 9.81
+                    micro_g = 1000000.0 * rad_accel_g_force
+
+                    a_point.arc.radial_acceleration = (micro_g, 'μg')
+
+                else:
+                    a_point.arc.speed = 0.0
+                    a_point.arc.radial_acceleration = (0.0, 'μg')
+                dbg = True
 
         for idx, a_point in enumerate(self):
             a_point.my_index = idx

@@ -242,8 +242,9 @@ class SliceList(deque):
                 build_string += '{0},{1},'.format(self.index,
                                                   self.my_slice.DegreeOfCurve)
                 main_string = '{2},{3:.3f},{4:.3f},{5:.3f},{6:+.3f},' \
-                               '{7:+.3f},{8:+.3f},{9:.3f},' \
-                               '{10:.4f},{11:.1f},{12:.1f}\n'
+                              '{7:+.3f},{8:+.3f},{9:.3f},' \
+                              '{10:.4f},{11:.1f},{12:.1f},' \
+                              '{13:.3f}\n'
                 build_string += main_string \
                     .format(self.index,self.my_slice.DegreeOfCurve,
                             pt1.my_index, pt1.Y, pt1.X,
@@ -251,7 +252,8 @@ class SliceList(deque):
                             pt1.arc.degreeCurveDeg, pt1.arc.deflection_deg,
                             pt1.pt2pt.deflection_deg, pt1.pt2pt.distanceBack,
                             pt1.pt2pt.distanceAhead, pt1.pt2pt.seconds_back,
-                            pt1.pt2pt.speed_back_mph)
+                            pt1.pt2pt.speed_back_mph,
+                            pt1.arc.radial_acceleration[0])
                 for pt1 in self.my_trajectory[real_start:self.stop-2]:
                     build_string += ',,'
                     build_string += main_string \
@@ -264,7 +266,8 @@ class SliceList(deque):
                                 pt1.pt2pt.distanceBack,
                                 pt1.pt2pt.distanceAhead,
                                 pt1.pt2pt.seconds_back,
-                                pt1.pt2pt.speed_back_mph)
+                                pt1.pt2pt.speed_back_mph,
+                                pt1.arc.radial_acceleration[0])
 
                 build_string += ',,,,,,\n'
                 return build_string
@@ -385,7 +388,7 @@ class SliceList(deque):
 def get_customizable_report_string(some_leaves):
     accumulate_string = 'id,class,ndx,Long,Lat,radius_mi,Dc°,Δ°,' \
                         'Chord Δ°,ℓ_Back_mi,ℓ_Ahead_mi,' \
-                        'seconds,speed_mph\n'
+                        'seconds,speed_mph,Radial_μg\n'
 
     try:
         for a_leaf in some_leaves:
