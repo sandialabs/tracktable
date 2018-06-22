@@ -426,9 +426,11 @@ if __name__ == '__main__':
         for s in aSliceList.allSlices():
             print(s, '  ', s.mean, '  ', s.stdDev)
 
+        # predicate = lambda a, b: \
+        #     math.isclose(a.stdDev, b.stdDev, abs_tol=0.025)
         predicate = lambda a, b: \
-            math.isclose(a.stdDev, b.stdDev, abs_tol=0.025)
-        aSliceList.consolidateNodeIf(predicate= predicate)
+            a.may_be_zigzag ^ b.may_be_zigzag
+        aSliceList.consolidateNodeIf(predicate=predicate)
         print(); print('After Consolidating:')
 
         print('Slice ID          Slice Mean   Slice StdDev')
