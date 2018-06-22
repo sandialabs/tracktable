@@ -3,6 +3,7 @@ import sys, csv, os, math
 from tracktable.analysis.ExtendedPoint import ExtendedPoint as EP
 import tracktable.analysis.ExtendedPoint as ExtendedPoint
 import tracktable.core.geomath as geomath
+from statistics import median
 
 __author__ = ['Paul Schrum']
 
@@ -82,6 +83,42 @@ class ExtendedPointList(list):
 
         for idx, a_point in enumerate(self):
             a_point.my_index = idx
+
+    def mark_likely_zigzags(self):
+        """
+        Marks every point with may_be_zigzag attribute based on criteria
+        in this method
+        :return: None
+        """
+        for pt in self:
+            pt.may_be_zigzag = False
+        if len(self) < 26:
+            return
+
+        time_delta_zz_threshold = median([pt.pt2pt.seconds_back
+                                     for pt in self[2:-2]]) * 1.25
+
+        prev_secs = self[1].pt2pt.seconds_back
+        # prev_dist = self[1].pt2pt.distanceBack
+        for pt in self[2:-2]:
+            # current_dist = pt.pt2pt.distanceBack
+            current_secs = pt.pt2pt.seconds_back
+            if current_secs < 0.001 or prev_secs < 0.001:
+                seconds_ratio = float('inf')
+            else:
+                seconds_ratio = current_secs / prev_secs
+                if seconds_ratio < 1.0:
+                    seconds_ratio = 1 / seconds_ratio
+            # totlTime = prev_secs + current_secs
+            def_deg = math.fabs(pt.pt2pt.deflection_deg)
+            # speed_mph = pt.pt2pt.speed_back_mph
+            if (def_deg >= 75.0 and seconds_ratio > 2.1) or \
+                def_deg >= 125.0:
+                pt.may_be_zigzag = True
+            prev_secs = current_secs
+            # prev_dist = current_dist
+
+        dbg = True
 
     def writeToCSV(self, fileName):
         """
