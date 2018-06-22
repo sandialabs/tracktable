@@ -440,7 +440,7 @@ class SubTrajerCurvature:
         aSliceList.consolidateNodeIf(predicate)
         return aSliceList
 
-    def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=9.0):
+    def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=4.0):
         """
         First, classifies each point triplet as curved or straight based on
             a Degree of Curve threshold. Then consolidates slices when two
