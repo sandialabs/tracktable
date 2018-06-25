@@ -1,6 +1,6 @@
 import math
 
-class ParseTreeNode(list):
+class Parse_Tree_Node(list):
     def __init__(self, sourceList, my_traj, associatedSlice=None,
                  ndx=-1):
         self.my_slice = associatedSlice

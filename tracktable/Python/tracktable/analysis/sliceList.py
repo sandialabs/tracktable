@@ -19,8 +19,8 @@ The term "sequence" is used instead of "collection" because it only makes
 
 from collections import deque
 # import statistics
-from tracktable.analysis.parseTreeNode import ParseTreeNode
-# from tracktable.Python.tracktable.analysis.parseTreeNode import ParseTreeNode
+from tracktable.analysis.parseTreeNode import Parse_Tree_Node
+# from tracktable.Python.tracktable.analysis.parse_Tree_Node import Parse_Tree_Node
 
 lavendar_color = 'FFB57EDC'
 red_color = 'FF0000FF'
@@ -181,7 +181,7 @@ class SliceList(deque):
         adjustBack = int(self.overlap // 2.0) - 1
         adjustFront = int(self.overlap // 2.0)
         leafList = [
-            ParseTreeNode([sl.start + adjustFront, sl.stop - adjustBack],
+            Parse_Tree_Node([sl.start + adjustFront, sl.stop - adjustBack],
                           self.target, sl, index)
             for index, sl in enumerate(slices)]
 
