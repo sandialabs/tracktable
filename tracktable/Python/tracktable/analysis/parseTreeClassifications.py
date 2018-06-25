@@ -7,7 +7,7 @@ class Classifications_base(enum.Enum):
         raise NotImplementedError('This class must override the create()'
                                   'method')
 
-class leg_length(enum.Enum):
+class leg_length(Classifications_base):
     single_point = (1, lambda v: len(v) == 1)
     short = (2, lambda v: v.horizontal_distance <= 4.0)
     medium = (3, lambda v: v.horizontal_distance <= 15.0)
@@ -59,7 +59,7 @@ def _test_run():
     aList = _whatever([v1, v2])
 
     leg_length.assign_to(aList)
-    dbg = True
+    print ('Test length = ', aList.leg_length)
 
 
 if __name__ == '__main__':
