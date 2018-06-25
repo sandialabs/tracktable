@@ -34,6 +34,13 @@ class Parse_Tree_Node(list):
         return str(self.my_trajectory[traj_mid_point_count].Z)
 
     @property
+    def horizontal_distance(self):
+        accum_dist = 0.0
+        for a_seg in self.my_trajectory[self.start, self.stop]:
+            accum_dist += a_seg.pt2pt.distanceBack
+        return accum_dist
+
+    @property
     def description(self):
         retList = list()
         retString = ('Segment: Index: {3} Target Index: {0} - {1}\n'
