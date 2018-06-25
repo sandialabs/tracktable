@@ -74,103 +74,7 @@ class sliceRange():
     def __len__(self):
         return self.stop - self.start
 
-class SliceList(deque):
-    """
-    An ordered collection of sliceRanges which cover an entire
-        sequence (target) -- actually a Python deque -- with customizable
-        parameters attached to each sliceRange (such as mean, stdDev, or
-        anything you need.
-    (Deque is used for efficient interior deletions for large datasets.)
-    Upon running consolidateNodeIf(), all nodes which are similar
-        according to how you define similar are consolidated into
-        a single node -- so long as the similar nodes are adjacent.
-    The Slices may overlap if called for via the Overlap parameter.
-    """
-
-    straight_color = white_color
-    turn_color = lavendar_color
-
-    def computeDesiredAttributes(self):
-        compute = self.computeParams
-        if compute:
-            for item in self:
-                if item.iChanged:
-                    compute(item)
-                    item.iChanged = False
-
-    def __init__(self,
-                 TargetSequence,
-                 RangeWidth,
-                 Overlap=0,
-                 computeAttribs=None):
-        """
-        :param TargetSequence: The underlying sequence being sliced.
-        :param RangeWidth: How many items are included in each slice (before
-                consolidating, which may change the width of slices.
-        :param Overlap: The number of elements included in both of two
-                adjacent slices.
-        :param computeAttribs: When a custom parameter is desired, they are
-                added in this function.
-        :type computeAttribs: callbackFunction(SliceList) -> None
-        """
-        super().__init__()
-
-        self.target = TargetSequence
-        targetLen = len(TargetSequence)
-        self.overlap = Overlap
-        advanceDelta = RangeWidth - Overlap
-        endOffset = RangeWidth
-        self.append(sliceRange(self.target, 0, endOffset))
-        while endOffset < targetLen:
-            endOffset += advanceDelta
-            startOffset = endOffset - RangeWidth
-            if endOffset + 3 >= targetLen:
-                endOffset = targetLen
-            self.append(sliceRange(TargetSequence, startOffset, endOffset))
-
-        if self[-1].stop > targetLen:
-            self[-1].stop =  targetLen
-        if len(self) > 2 and self[-2].stop > targetLen:
-            self[-2].stop =  targetLen
-
-        for item in reversed(self):
-            if len(item) < 3:
-                item.delme = True
-            else:
-                item.delme = False
-                break
-
-        # Remove SliceRanges if marked delme.
-        removeList = [x for x in reversed(self)
-                      if hasattr(x, 'delme') and getattr(x, 'delme')]
-        for item in reversed(removeList):
-            try:
-                if item.delme:
-                    self.remove(item)
-                else:
-                    break
-            except AttributeError:
-                break
-
-        self.computeParams = computeAttribs
-        self.computeDesiredAttributes()
-        self._recompute_indexes()
-
-
-        self.color = self.straight_color
-
-    def _recompute_indexes(self):
-        for index, item in enumerate(self):
-            self.my_index = index
-
-    @property
-    def AsLeaves(self):
-        """Returns the slice list as a list of 'leaves', which are tuples
-            of (begin-slice-index, end-slice-index) When there is overlap in
-            the slice list, that overlap is removed and half the items are
-            assigned to previous and half are assigned to next."""
-
-        class Leaf(list):
+class Leaf(list):
             def __init__(self, sourceList, my_traj, associatedSlice=None,
                          ndx=-1):
                 self.my_slice = associatedSlice
@@ -271,6 +175,103 @@ class SliceList(deque):
 
                 build_string += ',,,,,,\n'
                 return build_string
+
+
+class SliceList(deque):
+    """
+    An ordered collection of sliceRanges which cover an entire
+        sequence (target) -- actually a Python deque -- with customizable
+        parameters attached to each sliceRange (such as mean, stdDev, or
+        anything you need.
+    (Deque is used for efficient interior deletions for large datasets.)
+    Upon running consolidateNodeIf(), all nodes which are similar
+        according to how you define similar are consolidated into
+        a single node -- so long as the similar nodes are adjacent.
+    The Slices may overlap if called for via the Overlap parameter.
+    """
+
+    straight_color = white_color
+    turn_color = lavendar_color
+
+    def computeDesiredAttributes(self):
+        compute = self.computeParams
+        if compute:
+            for item in self:
+                if item.iChanged:
+                    compute(item)
+                    item.iChanged = False
+
+    def __init__(self,
+                 TargetSequence,
+                 RangeWidth,
+                 Overlap=0,
+                 computeAttribs=None):
+        """
+        :param TargetSequence: The underlying sequence being sliced.
+        :param RangeWidth: How many items are included in each slice (before
+                consolidating, which may change the width of slices.
+        :param Overlap: The number of elements included in both of two
+                adjacent slices.
+        :param computeAttribs: When a custom parameter is desired, they are
+                added in this function.
+        :type computeAttribs: callbackFunction(SliceList) -> None
+        """
+        super().__init__()
+
+        self.target = TargetSequence
+        targetLen = len(TargetSequence)
+        self.overlap = Overlap
+        advanceDelta = RangeWidth - Overlap
+        endOffset = RangeWidth
+        self.append(sliceRange(self.target, 0, endOffset))
+        while endOffset < targetLen:
+            endOffset += advanceDelta
+            startOffset = endOffset - RangeWidth
+            if endOffset + 3 >= targetLen:
+                endOffset = targetLen
+            self.append(sliceRange(TargetSequence, startOffset, endOffset))
+
+        if self[-1].stop > targetLen:
+            self[-1].stop =  targetLen
+        if len(self) > 2 and self[-2].stop > targetLen:
+            self[-2].stop =  targetLen
+
+        for item in reversed(self):
+            if len(item) < 3:
+                item.delme = True
+            else:
+                item.delme = False
+                break
+
+        # Remove SliceRanges if marked delme.
+        removeList = [x for x in reversed(self)
+                      if hasattr(x, 'delme') and getattr(x, 'delme')]
+        for item in reversed(removeList):
+            try:
+                if item.delme:
+                    self.remove(item)
+                else:
+                    break
+            except AttributeError:
+                break
+
+        self.computeParams = computeAttribs
+        self.computeDesiredAttributes()
+        self._recompute_indexes()
+
+
+        self.color = self.straight_color
+
+    def _recompute_indexes(self):
+        for index, item in enumerate(self):
+            self.my_index = index
+
+    @property
+    def AsLeaves(self):
+        """Returns the slice list as a list of 'leaves', which are tuples
+            of (begin-slice-index, end-slice-index) When there is overlap in
+            the slice list, that overlap is removed and half the items are
+            assigned to previous and half are assigned to next."""
 
         slices = [x for x in self.allSlices()]
         if len(slices) < 1:
