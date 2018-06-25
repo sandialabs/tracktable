@@ -1,46 +1,41 @@
 import enum
 
 
-class Classifications_base(enum.Enum):
-    @classmethod
-    def create(cls):
-        raise NotImplementedError('This class must override the create()'
-                                  'method')
-
-class leg_length(Classifications_base):
-    single_point = (1, lambda v: len(v) == 1)
-    short = (2, lambda v: v.horizontal_distance <= 4.0)
-    medium = (3, lambda v: v.horizontal_distance <= 15.0)
-    long = (4, lambda v: True)
-
+class CategoryBase(enum.Enum):
     def __init__(self, num, criteria=None):
         self.num = num
         self.criteria_lambda = criteria
 
     @classmethod
-    def assign_to(cls, a_parse_tree_node):
-        for enm in leg_length:
+    def assign_to(cls, a_parse_tree_node, new_attr_name):
+        dbg = True
+        for enm in cls:
             if enm.criteria_lambda(a_parse_tree_node):
-                a_parse_tree_node.leg_length = enm
+                setattr(a_parse_tree_node, new_attr_name, enm)
                 return
         else:
-            a_parse_tree_node.leg_length = leg_length[-1]
+            # a_parse_tree_node.leg_length_cat = cls[-1]
+            setattr(a_parse_tree_node, new_attr_name, cls[-1])
             return
 
+class LegLengthCat(CategoryBase):
+    single_point = (1, lambda v: len(v) == 1)
+    short = (2, lambda v: v.horizontal_distance <= 4.0)
+    medium = (3, lambda v: v.horizontal_distance <= 15.0)
+    long = (4, lambda v: True)
+
+
+class CurvatureCat(CategoryBase):
+    hard_left = (-3, lambda v: v.degree_curve <= -12.0)
+    normal_left = (-2, lambda v: v.degree_curve <= -4.0)
+    gentle_left = (-1, lambda v: v.degree_curve <= -1.0)
+    straight = (0, lambda v: v.degree_curve <= 1.0)
+    gentle_right = (1, lambda v: v.degree_curve <= 4.0)
+    normal_right = (2, lambda v: v.degree_curve <= 12.0)
+    hard_right = (3, lambda v: True)
 
 
 def _test_run():
-    print('whatup')
-
-    # for val in leg_length:
-    #     print(val.num, val)
-    #
-    # val = leg_length.single_point
-    # print('Name:', leg_length.single_point)
-    # print('Value:', leg_length.single_point.value)
-    # print('Custom attribute:', leg_length.single_point.criteria_lambda)
-    # print('Lambda result:', leg_length.single_point.criteria_lambda([1]))
-
     class _temp_():
         def __init__(self, dist=1.0):
             self.horizontal_distance = dist
@@ -54,12 +49,23 @@ def _test_run():
         def horizontal_distance(self):
             return 11.0
 
+        @property
+        def degree_curve(self):
+            return 44.5
+
     v1 = _temp_(1.0)
     v2 = _temp_(2.0)
     aList = _whatever([v1, v2])
 
-    leg_length.assign_to(aList)
-    print ('Test length = ', aList.leg_length)
+    LegLengthCat.assign_to(aList, 'leg_length_cat')
+    print('Test length = ', aList.leg_length_cat)
+    print(type(aList.leg_length_cat).__name__,
+          aList.leg_length_cat.name,
+          type(aList.leg_length_cat.name))
+
+    print()
+    CurvatureCat.assign_to(aList, 'curvature_cat')
+    print("Curvature Category: ", aList.curvature_cat)
 
 
 if __name__ == '__main__':
