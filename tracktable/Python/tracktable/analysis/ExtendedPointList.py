@@ -79,7 +79,6 @@ class ExtendedPointList(list):
                 else:
                     a_point.arc.speed = 0.0
                     a_point.arc.radial_acceleration = (0.0, 'μg')
-                dbg = True
 
         for idx, a_point in enumerate(self):
             a_point.my_index = idx
@@ -117,8 +116,6 @@ class ExtendedPointList(list):
                 pt.may_be_zigzag = True
             prev_secs = current_secs
             # prev_dist = current_dist
-
-        dbg = True
 
     def writeToCSV(self, fileName):
         """
