@@ -75,7 +75,7 @@ class sliceRange():
         return self.stop - self.start
 
 
-class Leaf(list):
+class ParseTreeNode(list):
     def __init__(self, sourceList, my_traj, associatedSlice=None,
                  ndx=-1):
         self.my_slice = associatedSlice
@@ -280,8 +280,8 @@ class SliceList(deque):
 
         adjustBack = int(self.overlap // 2.0) - 1
         adjustFront = int(self.overlap // 2.0)
-        leafList = [Leaf([sl.start+adjustFront, sl.stop-adjustBack],
-                          self.target, sl, index)
+        leafList = [ParseTreeNode([sl.start + adjustFront, sl.stop - adjustBack],
+                                  self.target, sl, index)
                     for index, sl in enumerate(slices)]
 
         for a_leaf, a_slice in zip(leafList, slices):
