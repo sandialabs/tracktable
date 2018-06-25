@@ -471,19 +471,13 @@ class SubTrajerCurvature:
             if aSliceRange.DegreeOfCurve is not 'straight':
                 aSliceRange.color = slice_range_class.turn_color
 
-
         pointCount = len(aPointList)
         aPointList = aPointList[1:-1]
         aSliceList = SliceList(aPointList, RangeWidth=1, Overlap=0,
                                computeAttribs=computeParameters)
 
-        # print("Using the Individual Curvatures Method.")
-        # print(); print('Length before consolidation: {0}' \
-        # .format(len(aSliceList)))
         predicate = lambda a, b: a.DegreeOfCurve == b.DegreeOfCurve
         aSliceList.consolidateNodeIf(predicate)
-        # print(); print('Length after  consolidation: {0}' \
-        # .format(len(aSliceList)))
 
         aSliceList.shiftInteriorBoundariesBy(1)
         aSliceList.pointCount = pointCount
