@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -303,6 +303,29 @@ struct distance<tracktable::domain::terrestrial::TerrestrialPoint>
     {
       double distance_in_radians = distance<PointLonLat>::apply(from, to);
       return conversions::radians_to_km(distance_in_radians);
+    }
+};
+
+// Distance between trajectories is measured in km, not radians
+template<>
+struct distance<Trajectory<tracktable::domain::terrestrial::TerrestrialTrajectoryPoint>>
+{
+    typedef Trajectory<tracktable::domain::terrestrial::TerrestrialTrajectoryPoint> trajectory_type;
+
+    static inline double apply(trajectory_type const& from, trajectory_type const& to)
+    {
+        double distance_in_radians = boost::geometry::distance(from, to);
+        return conversions::radians_to_km(distance_in_radians);
+    }
+};
+
+// Distance between points and trajectories is measured in km, not radians
+template<>
+struct point_to_trajectory_distance<tracktable::domain::terrestrial::TerrestrialTrajectoryPoint, Trajectory>
+{
+    static double inline apply(tracktable::domain::terrestrial::TerrestrialTrajectoryPoint const& from, Trajectory<tracktable::domain::terrestrial::TerrestrialTrajectoryPoint> const& to) {
+        double distance_in_radians = boost::geometry::distance(from, to);
+        return conversions::radians_to_km(distance_in_radians);
     }
 };
 
