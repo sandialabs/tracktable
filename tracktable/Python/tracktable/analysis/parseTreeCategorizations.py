@@ -1,5 +1,6 @@
 import enum
 
+_huge_number = 1000000
 
 class CategoryBase(enum.Enum):
     """Base class for all parse tree categorizations."""
@@ -25,7 +26,7 @@ class LegLengthCat(CategoryBase):
     single_point = (1, lambda v, this_num: len(v) == 1)
     short = (4, lambda v, this_num: v.horizontal_distance <= this_num)
     medium = (15, lambda v, this_num: v.horizontal_distance <= this_num)
-    long = (1000, lambda v, this_num: True)
+    long = (_huge_number, lambda v, this_num: True)
 
 
 class CurvatureCat(CategoryBase):
@@ -36,7 +37,7 @@ class CurvatureCat(CategoryBase):
     flat = (1, lambda v, this_num: v.degree_curve <= this_num)
     gentle_right = (4, lambda v, this_num: v.degree_curve <= this_num)
     normal_right = (12, lambda v, this_num: v.degree_curve <= this_num)
-    hard_right = (1000, lambda v, this_num: True)
+    hard_right = (_huge_number, lambda v, this_num: True)
 
 
 class DeflectionCat(CategoryBase):
