@@ -200,7 +200,7 @@ class ExtendedPoint(object):
                   compute_arc_parameters is called.
         Derived Members:
         arc (object) - values related to the arc this point is part of
-            arc.degreeCurve  (float) - degree of curve based on deflection
+            arc.curvature  (float) - curvature in radians based on deflection
                 over 1 unit (meters or feet - on any Planar Coordinate
                 System) Derived by equation, set by method, not set by user
             arc.radius (float) radius
@@ -276,7 +276,7 @@ class ExtendedPoint(object):
 
         if self.arc:
             arcString = """,{0},{1},{2},{3},{4},{5}
-            """.format(self.arc.degreeCurve100,
+            """.format(self.arc.degree_curvature,
                        self.arc.radius,
                        cvt_radians_to_degrees(self.arc.deflection),
                        cvt_radians_to_degrees(self.arc.chordVector.azimuth),
@@ -476,7 +476,7 @@ class Ray2D():
 
     @staticmethod
     def get_csv_header_string():
-        return 'X,Y,ArcDeflection,DegreeCurve,DegreeCurveEnglish,' + \
+        return 'X,Y,ArcDeflection,curvature,curvatureEnglish,' + \
                 'Radius,'
 
     @staticmethod
@@ -582,8 +582,8 @@ def compute_arc_parameters(point1, point2, point3,
     point2.arc.chordVector = point1 - point3
 
     if defl == 0.0:
-        point2.arc.degreeCurve = 0.0
-        point2.arc.degreeCurveDeg = 0.0
+        point2.arc.curvature = 0.0
+        point2.arc.degree_curvature = 0.0
         point2.arc.radius = float('inf')
         point2.arc.curveCenter = False
         point2.arc.lengthBack = False
@@ -618,7 +618,7 @@ def compute_arc_parameters(point1, point2, point3,
         point2.arc.radiusStartVector = radStartV
         radEndV = cc - point3
         point2.arc.radiusEndVector = radEndV
-        point2.arc.degreeCurve = 1.0 / point2.arc.radius
+        point2.arc.curvature = 1.0 / point2.arc.radius
         point2.arc.deflection = radStartV.deflectionTo(radEndV,
                                                        preferredDir=defl)
         point2.arc.deflection_deg = math.degrees(point2.arc.deflection)
@@ -631,9 +631,9 @@ def compute_arc_parameters(point1, point2, point3,
         point2.arc.lengthAhead = defl23 * \
                                  point2.arc.radiusStartVector.magnitude
         point2.arc.length =point2.arc.lengthBack + point2.arc.lengthAhead
-        point2.arc.degreeCurve = deflSign / point2.arc.radius
-        point2.arc.degreeCurveDeg = degree_of_curve_length * \
-                                cvt_radians_to_degrees(point2.arc.degreeCurve)
+        point2.arc.curvature = deflSign / point2.arc.radius
+        point2.arc.degree_curvature = degree_of_curve_length * \
+                                cvt_radians_to_degrees(point2.arc.curvature)
     else:
         point2.arc.curveCenter = float('inf')
 
@@ -641,14 +641,14 @@ def compute_arc_parameters(point1, point2, point3,
         point2.arc.radius = float('inf')
         point2.arc.radiusStartVector = None
         point2.arc.radiusEndVector = None
-        point2.arc.degreeCurve = 0.0
+        point2.arc.curvature = 0.0
         point2.arc.deflection = 0.0
         point2.arc.deflection_deg = 0.0
 
         point2.arc.lengthBack = 0.0
         point2.arc.lengthAhead = 0.0
         point2.arc.length = 0.0
-        point2.arc.degreeCurveDeg = 0.0
+        point2.arc.degree_curvature = 0.0
 
 
 meter_cnvrt = 111120.0
@@ -850,7 +850,7 @@ if __name__ == '__main__':
     expected = ExtendedPoint(1,1)
     _assertPointsEqualXY(p2.arc.curveCenter, expected)
     expected = 1.0 / 9.0
-    _assertFloatsEqual(p2.arc.degreeCurve, expected)
+    _assertFloatsEqual(p2.arc.curvature, expected)
     expected = math.pi / 2.0
     _assertFloatsEqual(p2.arc.deflection, expected)
     expected = 9.0 * math.pi / 4.0

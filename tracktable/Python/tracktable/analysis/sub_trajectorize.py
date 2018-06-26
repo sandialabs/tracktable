@@ -40,7 +40,8 @@ import tracktable.analysis.ExtendedPointList as EPLmod
 import tracktable.analysis.sliceList as SL
 import types
 from math import isclose
-
+from collections import defaultdict
+import math
 
 class NormalizedDistanceMatrix:
     """Generates a matrix giving the ratio of the distance along each
@@ -356,6 +357,10 @@ def trajName(traj):
 
 _isSubTrajerCurvatureAvailable = True
 
+def compute_everything_else(aVar: tracktable.analysis.ExtendedPoint)\
+        -> tuple:
+    return 0.0, 0.2
+
 class SubTrajerCurvature:
     """Breaks up a trajectory into subtrajectories based on curvatures of
     each point triplet. Multiple approaches to consolidating sequential
@@ -457,16 +462,16 @@ class SubTrajerCurvature:
 
         segmentPrimitives = ['straight', 'turn']
 
-        def computeParameters(aSliceRange):
+        def tag_zigzag_segments(aSliceRange):
             aSegment = aSliceRange.getSegment()
 
-            # aSliceRange.DegreeOfCurve = 'straight' \
-            #     if fabs(aSegment[0].arc.degreeCurveDeg) < dcStraightThreshold \
-            #     else 'turn'
-
             aSliceRange.DegreeOfCurve = 'straight' \
-                if aSegment[0].may_be_zigzag \
+                if fabs(aSegment[0].arc.degree_curvature) < dcStraightThreshold \
                 else 'turn'
+
+            # aSliceRange.DegreeOfCurve = 'straight' \
+            #     if aSegment[0].may_be_zigzag \
+            #     else 'turn'
             aSliceRange.color = slice_range_class.straight_color
             if aSliceRange.DegreeOfCurve is not 'straight':
                 aSliceRange.color = slice_range_class.turn_color
@@ -474,7 +479,28 @@ class SubTrajerCurvature:
         pointCount = len(aPointList)
         aPointList = aPointList[1:-1]
         aSliceList = SliceList(aPointList, RangeWidth=1, Overlap=0,
-                               computeAttribs=computeParameters)
+                               computeAttribs=tag_zigzag_segments)
+
+        # vad = aSliceList.AsLeaves[4].my_slice.segment[0].arc.degreeCurve
+        vad = aSliceList.AsLeaves[4]
+        dbg = True
+
+        x = [(sl.index, sl.my_slice.segment[0].arc.degree_curvature,
+              sl.my_slice.segment[0].pt2pt.deflection_deg,
+              sl.my_slice.segment[0].pt2pt.distanceBack,
+              sl.my_slice.segment[0].may_be_zigzag)+
+              compute_everything_else(sl.my_slice.segment[0])
+
+             for sl in aSliceList.AsLeaves[240:265]]
+
+        dt = np.dtype('int,float,float,float,bool,float,float')
+        xarr = np.array(x, dtype=dt)
+        # xarr.dtype.names = ['idx', 'Dc', 'Δ_chords', 'dist', 'zigzags' \
+        #                     'val1, val2']
+        print(xarr[:4])
+        # newCol = np.array()
+
+
 
         predicate = lambda a, b: a.DegreeOfCurve == b.DegreeOfCurve
         aSliceList.consolidateNodeIf(predicate)
@@ -534,6 +560,8 @@ class SubTrajerCurvature:
 
         try:
             aSliceList = findMethod[useMethod](self, aPointList)
+        except KeyboardInterrupt:
+            exit(0)
         except KeyError:
             msg = '"{0}" is not an available method.\n  '.format(useMethod)
             msg = msg + 'Available methods are are: {0}.'\
