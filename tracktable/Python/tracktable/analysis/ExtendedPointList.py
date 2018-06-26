@@ -4,6 +4,7 @@ from tracktable.analysis.ExtendedPoint import ExtendedPoint as EP
 import tracktable.analysis.ExtendedPoint as ExtendedPoint
 import tracktable.core.geomath as geomath
 from statistics import median
+import tracktable.analysis.parseTreeCategorizations as CATs
 
 __author__ = ['Paul Schrum']
 
@@ -116,6 +117,17 @@ class ExtendedPointList(list):
                 pt.may_be_zigzag = True
             prev_secs = current_secs
             # prev_dist = current_dist
+
+    def categorize_points(self: "ExtendedPointList") -> None:
+        """For certain criteria, categorize each point."""
+        for a_point in self[1:-1]:
+            CATs.LegLengthCat.assign_to(a_point, 'leg_length_cat')
+            CATs.CurvatureCat.assign_to(a_point, 'curvature_cat')
+            CATs.DeflectionCat.assign_to(a_point, 'deflection_cat')
+            self[0].leg_length_cat = self[1].leg_length_cat = None
+        self[0].curvature_cat = self[-1].curvature_cat = None
+        self[0].deflection_cat = self[-1].deflection_cat = None
+
 
     def writeToCSV(self, fileName):
         """

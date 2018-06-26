@@ -476,6 +476,8 @@ class SubTrajerCurvature:
             if aSliceRange.DegreeOfCurve is not 'straight':
                 aSliceRange.color = slice_range_class.turn_color
 
+        aPointList.categorize_points()
+
         pointCount = len(aPointList)
         aPointList = aPointList[1:-1]
         aSliceList = SliceList(aPointList, RangeWidth=1, Overlap=0,

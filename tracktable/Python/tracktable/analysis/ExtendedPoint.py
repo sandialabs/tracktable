@@ -306,6 +306,27 @@ class ExtendedPoint(object):
     def azimuth(self):
         return math.atan2(self.X, self.Y)
 
+    @property
+    def horizontal_distance(self):
+        try:
+            return self.pt2pt.distanceBack
+        except AttributeError:
+            return None
+
+    @property
+    def degree_curve(self):
+        try:
+            return self.arc.degree_curvature
+        except AttributeError:
+            return None
+
+    @property
+    def deflection_deg(self):
+        try:
+            return self.pt2pt.deflection
+        except AttributeError:
+            return None
+
     def __hash__(self):
         return self.X - self.Y + (self.X % 17)
 
