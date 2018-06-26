@@ -10,7 +10,7 @@ class CategoryBase(enum.Enum):
     def assign_to(cls, a_parse_tree_node, new_attr_name):
         dbg = True
         for enm in cls:
-            if enm.criteria_lambda(a_parse_tree_node):
+            if enm.criteria_lambda(a_parse_tree_node, enm.value[0]):
                 setattr(a_parse_tree_node, new_attr_name, enm)
                 return
         else:
@@ -18,21 +18,22 @@ class CategoryBase(enum.Enum):
             setattr(a_parse_tree_node, new_attr_name, cls[-1])
             return
 
+
 class LegLengthCat(CategoryBase):
-    single_point = (1, lambda v: len(v) == 1)
-    short = (2, lambda v: v.horizontal_distance <= 4.0)
-    medium = (3, lambda v: v.horizontal_distance <= 15.0)
-    long = (4, lambda v: True)
+    single_point = (1, lambda v, this_num: len(v) == 1)
+    short = (4, lambda v, this_num: v.horizontal_distance <= this_num)
+    medium = (15, lambda v, this_num: v.horizontal_distance <= this_num)
+    long = (1000, lambda v, this_num: True)
 
 
 class CurvatureCat(CategoryBase):
-    hard_left = (-3, lambda v: v.degree_curve <= -12.0)
-    normal_left = (-2, lambda v: v.degree_curve <= -4.0)
-    gentle_left = (-1, lambda v: v.degree_curve <= -1.0)
-    straight = (0, lambda v: v.degree_curve <= 1.0)
-    gentle_right = (1, lambda v: v.degree_curve <= 4.0)
-    normal_right = (2, lambda v: v.degree_curve <= 12.0)
-    hard_right = (3, lambda v: True)
+    hard_left = (-12, lambda v, this_num: v.degree_curve <= this_num)
+    normal_left = (-4, lambda v, this_num: v.degree_curve <= this_num)
+    gentle_left = (-1, lambda v, this_num: v.degree_curve <= this_num)
+    straight = (1, lambda v, this_num: v.degree_curve <= this_num)
+    gentle_right = (4, lambda v, this_num: v.degree_curve <= this_num)
+    normal_right = (12, lambda v, this_num: v.degree_curve <= this_num)
+    hard_right = (1000, lambda v, this_num: True)
 
 
 def _test_run():
@@ -69,6 +70,9 @@ def _test_run():
 
 
 if __name__ == '__main__':
-    _test_run()
+    try:
+        _test_run()
+    except KeyboardInterrupt:
+        exit(0)
 
 
