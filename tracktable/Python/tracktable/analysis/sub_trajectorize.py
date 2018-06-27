@@ -41,7 +41,7 @@ import tracktable.analysis.sliceList as SL
 import types
 from math import isclose
 from collections import defaultdict
-import math
+import tracktable.analysis.nx_graph as nxg
 
 class NormalizedDistanceMatrix:
     """Generates a matrix giving the ratio of the distance along each
@@ -445,7 +445,8 @@ class SubTrajerCurvature:
         aSliceList.consolidateNodeIf(predicate)
         return aSliceList
 
-    def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=4.0):
+    def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=4.0,
+                        request_graph_plot: bool =False):
         """
         First, classifies each point triplet as curved or straight based on
             a Degree of Curve threshold. Then consolidates slices when two
@@ -480,7 +481,12 @@ class SubTrajerCurvature:
 
         G = aPointList.create_minimal_digraph()
 
-        print('Nodes:',G.number_of_nodes(), 'Edges:', G.number_of_edges())
+        print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
+        if request_graph_plot:
+            try:
+                nxg.plot_graph(G)
+            except ImportError:
+                pass
 
         pointCount = len(aPointList)
         aPointList = aPointList[1:-1]
@@ -520,7 +526,8 @@ class SubTrajerCurvature:
     def subtrajectorize(self,
                         trajectory,
                         returnGraph=False,
-                        useMethod='individualCurvatures_preferred'):
+                        useMethod='individualCurvatures_preferred',
+                        request_graph_plot: bool =True):
         """
         Decomposes a Trajectory into subtrajectories based on an analysis of
             the curvature of each point triplet. Multiple methods are
@@ -565,7 +572,8 @@ class SubTrajerCurvature:
             return None
 
         try:
-            aSliceList = findMethod[useMethod](self, aPointList)
+            aSliceList = findMethod[useMethod](self, aPointList,
+                                    request_graph_plot=request_graph_plot)
         except KeyboardInterrupt:
             exit(0)
         except KeyError:
