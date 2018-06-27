@@ -133,6 +133,9 @@ class ExtendedPointList(list):
         self[0].deflection_cat = self[-1].deflection_cat = None
 
     def create_minimal_digraph(self: "ExtendedPointList") -> nx.DiGraph:
+        """From self create/return a NetworkX Directed Graph of the network.
+        This includes only the root (mapped to the whole trajectory), and all
+        points, which are leaves on the graph."""
         g = nx.DiGraph()
         g.my_EPL = self
         g.my_trajecory = self.my_trajectory
