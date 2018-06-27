@@ -371,7 +371,8 @@ class SubTrajerCurvature:
                 "The class SubTrajerCurvature is not available due " +
                 "to import issues.")
 
-    def _pyramidGrowingWindowMethod(self, aPointList):
+    def _pyramidGrowingWindowMethod(self, aPointList,
+                        request_graph_plot: bool =False):
         """
         A possible nuther method which considers growing windows on a pyramid
             (multipass) sampling approach instead of a sequential sampling
@@ -383,7 +384,8 @@ class SubTrajerCurvature:
         """
         raise NotImplementedError('Try this later.')
 
-    def _movingGrowingWindowMethod(self, aPointList):
+    def _movingGrowingWindowMethod(self, aPointList,
+                        request_graph_plot: bool =False):
         """
         Overlaps each slice a little, takes mean and stdev of curvature for
             each slice, compares stdev, consolidates slices when the stdevs
@@ -391,6 +393,7 @@ class SubTrajerCurvature:
             the consolidation causes the window to grow towards the right.
         :param aPointList: sequence of points constituting the trajectory
         :type aPointList: ExtendedPointList
+        :param request_graph_plot: Not implemented. Does nothing
         :return: all subtrajectories
         :rtype: SliceList
         """
@@ -457,6 +460,8 @@ class SubTrajerCurvature:
         :param dcStraightThreshold: border between classifying a point triplet
             as straight or curved.
         :type dcStraightThreshold: float (positive)
+        :param request_graph_plot: when True, immediately opens a window of
+            showing the tree graph of the categorized subtrajectories.
         :return: all subtrajectories
         :rtype: SliceList
         """
