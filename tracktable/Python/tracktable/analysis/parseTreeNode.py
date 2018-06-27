@@ -15,8 +15,8 @@ class Parse_Tree_Node(list):
             self.append(itm)
 
     def __hash__(self):
-        multiplier = math.pow(20, self.depth_level+0.4)
-        return int(multiplier * self[0])
+        multiplier = math.pow(20, self.depth_level+0.05)
+        return int(multiplier + self[0])
 
     def __eq__(self, other):
         return self.depth_level == other.depth_level and \
