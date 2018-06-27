@@ -48,7 +48,7 @@ from matplotlib import gridspec
 from tracktable.domain.terrestrial import Trajectory, TrajectoryPoint
 from tracktable.core import geomath
 
-from kml_writer import write_kml
+from tracktable.examples.kml_writer import write_kml
 from tracktable.analysis.ExtendedPoint import IntersectionError
 
 #todo.  Uses too much memory when many trajs are processed.  Fix leak.
