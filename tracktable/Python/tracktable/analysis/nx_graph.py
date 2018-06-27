@@ -11,7 +11,8 @@ except ImportError:
         from networkx.drawing.nx_pydot import graphviz_layout
     except ImportError:
         raise ImportError("This example needs Graphviz and either "
-                          "PyGraphviz or pydot")
+                          "PyGraphviz or pydot. 'pip install pydot' worked"
+                          " for me.")
 
 def plot_graph(nxGraph: nx.DiGraph) -> None:
     pos = graphviz_layout(G, prog='dot', args='')
