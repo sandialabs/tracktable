@@ -1,17 +1,26 @@
 import math
 import networkx as nx
-from collections import deque
+from typing import List
 
-class Parse_Tree_Node(deque):
+class Parse_Tree_Node(list):
 
-    def __init__(self, sourceList, my_traj, associatedSlice=None,
+    def __init__(self, point_range: List[int], my_traj,
+                 associatedSlice=None,
                  ndx=-1):
         self.my_slice = associatedSlice
         self.my_trajectory = my_traj
         if ndx > -1:
             self.index = ndx
-        for itm in sourceList:
+        for itm in point_range:
             self.append(itm)
+
+    def __hash__(self):
+        multiplier = math.pow(20, self.depth_level+0.4)
+        return int(multiplier * self[0])
+
+    def __eq__(self, other):
+        return self.depth_level == other.depth_level and \
+                self[0] == other[0]
 
     @property
     def start(self):
@@ -23,8 +32,8 @@ class Parse_Tree_Node(deque):
 
     @property
     def depth_level(self):
-        raise AttributeError("Depth Level is meaningless on class " \
-            "Parse_Tree_Node.")
+        raise AttributeError("Depth Level is meaningless on class " + \
+            self.__class__.__name__)
 
     def _traj_get_time_str(self, idx):
         return self.my_trajectory[idx].timestamp.strftime('%H:%M:%S')
@@ -117,9 +126,9 @@ class Parse_Tree_Node(deque):
         return build_string
 
 class Parse_Tree_Root(Parse_Tree_Node):
-    def __init__(self, sourceList, my_traj, associatedSlice=None,
+    def __init__(self, point_range, my_traj, associatedSlice=None,
                  ndx=-1):
-        super().__init__(sourceList, my_traj, associatedSlice, ndx)
+        super().__init__(point_range, my_traj, associatedSlice, ndx)
 
     @property
     def depth_level(self):
@@ -127,12 +136,16 @@ class Parse_Tree_Root(Parse_Tree_Node):
 
 
 class Parse_Tree_Leaf(Parse_Tree_Node):
-    def __init__(self, sourceList, my_traj, associatedSlice=None,
+    def __init__(self, point_range, my_traj, associatedSlice=None,
                  ndx=-1):
-        super().__init__(self, sourceList, my_traj, associatedSlice, ndx)
+        super().__init__(point_range, my_traj, associatedSlice, ndx)
 
     @property
     def depth_level(self):
         return 3
 
+# def nodes_by_level(G: nx.grap)
+
+if __name__ == '__main__':
+    print("parseTreeNode successfully loaded and run.")
 

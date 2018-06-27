@@ -478,6 +478,10 @@ class SubTrajerCurvature:
 
         aPointList.categorize_points()
 
+        G = aPointList.create_minimal_digraph()
+
+        print('Nodes:',G.number_of_nodes(), 'Edges:', G.number_of_edges())
+
         pointCount = len(aPointList)
         aPointList = aPointList[1:-1]
         aSliceList = SliceList(aPointList, RangeWidth=1, Overlap=0,

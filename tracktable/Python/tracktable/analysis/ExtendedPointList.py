@@ -5,6 +5,10 @@ import tracktable.analysis.ExtendedPoint as ExtendedPoint
 import tracktable.core.geomath as geomath
 from statistics import median
 import tracktable.analysis.parseTreeCategorizations as CATs
+import tracktable.analysis.parseTreeNode
+from tracktable.analysis.parseTreeNode import Parse_Tree_Root as PTroot
+from tracktable.analysis.parseTreeNode import Parse_Tree_Leaf as PTleaf
+import networkx as nx
 
 __author__ = ['Paul Schrum']
 
@@ -124,10 +128,26 @@ class ExtendedPointList(list):
             CATs.LegLengthCat.assign_to(a_point, 'leg_length_cat')
             CATs.CurvatureCat.assign_to(a_point, 'curvature_cat')
             CATs.DeflectionCat.assign_to(a_point, 'deflection_cat')
-            self[0].leg_length_cat = self[1].leg_length_cat = None
+        self[0].leg_length_cat = self[1].leg_length_cat = None
         self[0].curvature_cat = self[-1].curvature_cat = None
         self[0].deflection_cat = self[-1].deflection_cat = None
 
+    def create_minimal_digraph(self: "ExtendedPointList") -> nx.DiGraph:
+        g = nx.DiGraph()
+        g.my_EPL = self
+        g.my_trajecory = self.my_trajectory
+
+        trajectory_range = [0, len(self)]
+        root_node = PTroot(trajectory_range, self)
+        g.add_node(root_node)
+
+        for a_point in self:
+            pt_range = [a_point.my_index, a_point.my_index+1]
+            a_leaf = PTleaf(pt_range, self)
+            g.add_node(a_leaf)
+            g.add_edge(root_node, a_leaf)
+
+        return g
 
     def writeToCSV(self, fileName):
         """
@@ -187,6 +207,8 @@ def _createExtendedPointList_trajectory(trajectory):
 
     newEPL.z_range = z_range_list
     newEPL.name = trajectory[0].object_id
+    trajectory.my_EPL = newEPL
+    newEPL.my_trajectory = trajectory
     return newEPL
 
 
@@ -212,6 +234,8 @@ def _createExtendedPointList_csvFile(csvFileName=None):
                 x = float(aRow[xIndex])
                 y = float(aRow[yIndex])
                 newEPL.append(EP(x, y))
+
+    newEPL.my_trajectory = None
     return newEPL
 
 
