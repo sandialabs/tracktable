@@ -1,6 +1,9 @@
 import math
+import networkx as nx
+from collections import deque
 
-class Parse_Tree_Node(list):
+class Parse_Tree_Node(deque):
+
     def __init__(self, sourceList, my_traj, associatedSlice=None,
                  ndx=-1):
         self.my_slice = associatedSlice
@@ -17,6 +20,11 @@ class Parse_Tree_Node(list):
     @property
     def stop(self):
         return self[1]
+
+    @property
+    def depth_level(self):
+        raise AttributeError("Depth Level is meaningless on class " \
+            "Parse_Tree_Node.")
 
     def _traj_get_time_str(self, idx):
         return self.my_trajectory[idx].timestamp.strftime('%H:%M:%S')
@@ -107,4 +115,24 @@ class Parse_Tree_Node(list):
 
         build_string += ',,,,,,\n'
         return build_string
+
+class Parse_Tree_Root(Parse_Tree_Node):
+    def __init__(self, sourceList, my_traj, associatedSlice=None,
+                 ndx=-1):
+        super().__init__(sourceList, my_traj, associatedSlice, ndx)
+
+    @property
+    def depth_level(self):
+        return 0
+
+
+class Parse_Tree_Leaf(Parse_Tree_Node):
+    def __init__(self, sourceList, my_traj, associatedSlice=None,
+                 ndx=-1):
+        super().__init__(self, sourceList, my_traj, associatedSlice, ndx)
+
+    @property
+    def depth_level(self):
+        return 3
+
 
