@@ -16,7 +16,8 @@ except ImportError:
 def plot_graph(nxGraph: nx.DiGraph) -> None:
     pos = graphviz_layout(G, prog='dot', args='')
     plt.figure(figsize=(12, 10))
-    nx.draw(nxGraph, pos, node_size=20, alpha=0.5, node_color="blue", with_labels=False)
+    nx.draw(nxGraph, pos, node_size=20, alpha=0.5, node_color="blue",
+            with_labels=False)
     plt.axis('equal')
     plt.show()
 
