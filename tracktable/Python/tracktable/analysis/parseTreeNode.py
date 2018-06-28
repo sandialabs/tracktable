@@ -1,13 +1,13 @@
 import math
 import networkx as nx
-from typing import List
+from typing import List, Any
 
 class Parse_Tree_Node(list):
 
     def __init__(self, point_range: List[int], my_traj,
                  associatedSlice=None,
                  ndx=-1):
-        self.my_slice = associatedSlice
+        # self.my_slice = associatedSlice
         self.my_trajectory = my_traj
         if ndx > -1:
             self.index = ndx
@@ -29,6 +29,10 @@ class Parse_Tree_Node(list):
     @property
     def stop(self):
         return self[1]
+
+    @property
+    def my_slice(self):
+        return self.my_trajectory[self.start:self.stop]
 
     @property
     def depth_level(self):
@@ -129,10 +133,30 @@ class Parse_Tree_Root(Parse_Tree_Node):
     def __init__(self, point_range, my_traj, associatedSlice=None,
                  ndx=-1):
         super().__init__(point_range, my_traj, associatedSlice, ndx)
+        self.my_trajectory = None
 
     @property
     def depth_level(self):
         return 0
+
+class ParseTreeNodeL1(Parse_Tree_Node):
+    def __init__(self, point_range, my_traj=None, associatedSlice=None,
+                 ndx=-1):
+        super().__init__(point_range, my_traj, associatedSlice, ndx)
+        self.my_trajectory = None
+
+    @property
+    def depth_level(self):
+        return 1
+
+class ParseTreeNodeL2(Parse_Tree_Node):
+    def __init__(self, point_range, my_traj=None, associatedSlice=None,
+                 ndx=-1):
+        super().__init__(point_range, my_traj, associatedSlice, ndx)
+
+    @property
+    def depth_level(self):
+        return 2
 
 
 class Parse_Tree_Leaf(Parse_Tree_Node):
@@ -144,8 +168,86 @@ class Parse_Tree_Leaf(Parse_Tree_Node):
     def depth_level(self):
         return 3
 
-# def nodes_by_level(G: nx.grap)
+    @property
+    def my_point(self):
+        return self.my_slice[0]
+
+
+class NodeListAtLevel(list):
+    def __init__(self, the_level: int, from_list: List[Any]=[]):
+        self.my_level = the_level
+        self.categorization = None
+        self.end_index = 1
+        # if from_list:
+        #     for item in from_list:
+        #         self.append(item)
+        #     self.current = self[-1]
+
+    def extend_with(self, next_child_node: Parse_Tree_Node):
+        self.current[1] += 1
+        self.end_index = self.current[1]
+
+    def start_new_with(self, next_child_node: Parse_Tree_Node,
+                       start_index: int = -1):
+        if next_child_node.depth_level - self.my_level != 1:
+            raise AttributeError("Level mismatch between NodeList and "
+                                 "ParseTreeNode.")
+        if self.my_level == 2:
+            self.append(ParseTreeNodeL2([0, 1], self))
+        elif self.my_level == 1:
+            self.append(ParseTreeNodeL1([0, 1], self))
+        else:
+            raise Exception("Should not get to this point in "
+                "parseTreeNode.py")
+
+        self.current[0] = self.end_index
+        self.end_index += 1
+        self.current[1] = self.end_index
+
+    @property
+    def current(self):
+        if len(self) == 0:
+            return None
+        return self[-1]
+
+    def insert_into_tree_graph(self, g: nx.DiGraph) -> None:
+        """
+        Takes the current list of nodes (self), and inserts all in the list
+        into graph g at the level of self.
+        Side effects: Everything is a side effect, operating on graph g.
+        :param g:
+        :return:
+        """
+        pass
+
+
+def get_all_by_level(g: nx.DiGraph) -> tuple:
+    """
+    Performs a "row-based" filter of a tree graph. For every level of a tree
+    graph (number of edges from root to a node), returns a list of all nodes
+    on that level, then retuns the whole thing in a tuple of those lists.
+    :param g: Graph to operate on.
+    :return: tuple of all nodes for each level
+    """
+    node_count = g.number_of_nodes()
+    lev_0 = None
+    for node in g:
+        if node.depth_level == 0:
+            lev_0 = list(node)
+            break
+
+    lev_3 = [n for n in g if n.depth_level == 3]
+    lev_1 = []
+    lev_2 = []
+    if len(lev_0) + len(lev_3) < node_count:
+        lev_1 = [n for n in g if n.depth_level == 1]
+        lev_2 = [n for n in g if n.depth_level == 2]
+
+    return (lev_0, lev_1, lev_2, lev_3)
+
 
 if __name__ == '__main__':
     print("parseTreeNode successfully loaded and run.")
+
+
 

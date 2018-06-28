@@ -42,6 +42,7 @@ import types
 from math import isclose
 from collections import defaultdict
 import tracktable.analysis.nx_graph as nxg
+import tracktable.analysis.parseTreeCategorizations as PTcats
 
 class NormalizedDistanceMatrix:
     """Generates a matrix giving the ratio of the distance along each
@@ -485,9 +486,11 @@ class SubTrajerCurvature:
         aPointList.categorize_points()
 
         G = aPointList.create_minimal_digraph()
+        PTcats.categorize_level3_to_level2(G)
 
         print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
-        if request_graph_plot:
+        # if request_graph_plot:
+        if True:
             try:
                 nxg.plot_graph(G)
             except ImportError:

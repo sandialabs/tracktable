@@ -1,5 +1,8 @@
 import enum
+import tracktable.analysis.parseTreeNode as ParseTreeNode
 from typing import Any, Union
+from networkx import DiGraph
+from tracktable.analysis.ExtendedPoint import ExtendedPoint as EP
 
 _huge_number = 1000000
 
@@ -8,6 +11,31 @@ class CategoryBase(enum.Enum):
     def __init__(self, num, criteria=None):
         self.num = num
         self.criteria_lambda = criteria
+
+    @property
+    def as_int(self):
+        if self.value is list:
+            return self.value[0]
+        else:
+            return self.value
+
+    def __lt__(self, other: "CategoryBase"):
+        return self.as_int < other.as_int
+
+    def __le__(self, other: "CategoryBase"):
+        return self.as_int <= other.as_int
+
+    def __gt__(self, other: "CategoryBase"):
+        return self.as_int > other.as_int
+
+    def __ge__(self, other: "CategoryBase"):
+        return self.as_int >= other.as_int
+
+    def __eq__(self, other: "CategoryBase"):
+        return self.as_int == other.as_int
+
+    def __ne__(self, other: "CategoryBase"):
+        return self.as_int != other.as_int
 
     @staticmethod
     def default_criteria(target_variable: Any,
@@ -80,6 +108,70 @@ class DeflectionCat(CategoryBase):
         CategoryBase.default_criteria(v, "deflection_deg", this_num))
 
     sharp_right = (360, lambda v, this_num: True)
+
+class Level1Cat(CategoryBase):
+    straight_reach = 0,
+    s_curve = 1,
+    j_hook = 2,
+    u_turn = 3,
+    grand_j_hook = 4
+
+class Level2Cat(CategoryBase):
+    left_turn = -1,
+    straight = 0,
+    right_turn = 1
+
+class CategoryStateException(AttributeError):
+    def __init__(self, msg):
+        self.message = msg
+
+def level2_categorize(leaf_node: ParseTreeNode.Parse_Tree_Leaf) -> Level2Cat:
+    """If the leaf is zigzag, return None"""
+    l2_cat = None
+    leaf: EP = leaf_node.my_point
+
+    if getattr(leaf, "may_be_zigzag", False):
+        raise CategoryStateException('zigzag')
+
+    if leaf.deflection_cat < DeflectionCat.straight:
+        l2_cat = Level2Cat.left_turn
+    elif leaf.deflection_cat > DeflectionCat.straight:
+        l2_cat = Level2Cat.right_turn
+    else:
+        l2_cat = Level2Cat.straight
+    return l2_cat
+
+
+def _insinuate_new_nodes_into_tree(node_list: ParseTreeNode,
+                                   g: DiGraph) -> None:
+    pass
+
+def categorize_level3_to_level2(g: DiGraph) -> None:
+    """When you see a bunch of functions with numbers in the function names,
+        it is a prediction that you will be refactoring later."""
+    root, _1, _2, lev_3 = ParseTreeNode.get_all_by_level(g)
+    l2_node_list = ParseTreeNode.NodeListAtLevel(2)
+    l2_node_list.start_new_with(lev_3[0], 0)
+    l2_node_list.current.category = level2_categorize(lev_3[1]) # trouble here if CategoryStateException
+    for a_node in lev_3[2:-1]:
+        try:
+            prospective_category = level2_categorize(a_node)
+            keep_extending = \
+                prospective_category == l2_node_list.current.category
+        except CategoryStateException as ce:
+            keep_extending = True
+            # prospective_category is unchanged
+
+        if keep_extending:
+            l2_node_list.extend_with(a_node)
+        else:
+            l2_node_list.start_new_with(a_node)
+            l2_node_list.current.category = prospective_category
+
+    _insinuate_new_nodes_into_tree(l2_node_list, g)
+
+    dbg = True
+
 
 
 def _test_run():
