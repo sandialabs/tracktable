@@ -212,9 +212,12 @@ int run_test()
     actual = distance(albuquerque2, sa_to_hou2);
     error_count += verify_result(actual, expected, "TerrestrialTrajectoryPoint to TerrestrialTrajectory");
 
+    actual = distance(sa_to_hou2, albuquerque2);
+    error_count += verify_result(actual, expected, "TerrestrialTrajectory to TerrestrialTrajectoryPoint");
+
     actual = conversions::radians_to_km(distance(albuquerque4, sa_to_hou2));
     error_count += verify_result(actual, expected, "TerrestrialPoint to TerrestrialTrajectory");
-    
+
     expected = 349.276;
     actual = conversions::radians_to_km(distance(ep_to_dal, sa_to_hou));
     error_count += verify_result(actual, expected, "TrajectoryLonLat to TrajectoryLonLat");

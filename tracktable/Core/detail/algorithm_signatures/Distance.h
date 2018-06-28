@@ -82,6 +82,13 @@ double distance(P const& from, T<P> const& to)
    return algorithms::point_to_trajectory_distance<P, T>::apply(from, to);
 }
 
+// And the inverse
+template<template<class> class T, class P>
+double distance(T<P> const& from, P const& to)
+{
+    return algorithms::point_to_trajectory_distance<P, T>::apply(to, from);
+}
+
 } // namespace tracktable
 
 #endif
