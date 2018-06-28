@@ -27,11 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
-
 import sys
-import os
-import traceback
 from tracktable.core import geomath
 from tracktable.domain.terrestrial import Trajectory as TerrestrialTrajectory
 from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
@@ -74,6 +70,9 @@ def test_cartesian2d_distance():
     expected = 1.414
     actual = geomath.distance(point00, traj2)
     error_count += verify_result(actual, expected, "Cartesian2dTrajectoryPoint to Cartesian2dTrajectory")
+    
+    actual = geomath.distance(traj2, point00)
+    error_count += verify_result(actual, expected, "Cartesian2dTrajectory to Cartesian2dTrajectoryPoint")
 
     return error_count
 
@@ -108,6 +107,9 @@ def test_cartesian3d_distance():
     expected = 1.732
     actual = geomath.distance(point000, traj2)
     error_count += verify_result(actual, expected, "Cartesian3dTrajectoryPoint to Cartesian3dTrajectory")
+
+    actual = geomath.distance(traj2, point000)
+    error_count += verify_result(actual, expected, "Cartesian3dTrajectory to Cartesian3dTrajectoryPoint")
 
     return error_count
 
@@ -145,6 +147,9 @@ def test_terrestrial_distance():
     actual = geomath.distance(albuquerque, sa_to_hou)
     error_count += verify_result(actual, expected, "TerrestrialTrajectoryPoint to TerrestrialTrajectory")
    
+    actual = geomath.distance(sa_to_hou, albuquerque)
+    error_count += verify_result(actual, expected, "TerrestrialTrajectory to TerrestrialTrajectoryPoint")
+    
     return error_count
 
 # ----------------------------------------------------------------------

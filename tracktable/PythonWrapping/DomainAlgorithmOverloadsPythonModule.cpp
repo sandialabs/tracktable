@@ -156,6 +156,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
   def("end_to_end_distance", &(tracktable::end_to_end_distance<TrajectoryTerrestrial>));
 
   def("distance", &(tracktable::distance<TrajectoryPointTerrestrial, tracktable::Trajectory>));
+  def("distance", &(tracktable::distance<tracktable::Trajectory, TrajectoryPointTerrestrial>));
 
   def("geometric_mean", &(wrap_geometric_mean<BasePointTerrestrial>));
   def("geometric_mean", &(wrap_geometric_mean<TrajectoryPointTerrestrial>));
@@ -211,6 +212,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
   def("norm", &(tracktable::arithmetic::norm<TrajectoryPointCartesian2D>));
 
   def("distance", &(tracktable::distance<TrajectoryPointCartesian2D, tracktable::Trajectory>));
+  def("distance", &(tracktable::distance<tracktable::Trajectory, TrajectoryPointCartesian2D>));
 
   def("geometric_mean", &(wrap_geometric_mean<BasePointCartesian2D>));
   def("geometric_mean", &(wrap_geometric_mean<TrajectoryPointCartesian2D>));
@@ -261,6 +263,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
   def("norm", &(tracktable::arithmetic::norm<TrajectoryPointCartesian3D>));
 
   def("distance", &(tracktable::distance<TrajectoryPointCartesian3D, tracktable::Trajectory>));
+  def("distance", &(tracktable::distance<tracktable::Trajectory, TrajectoryPointCartesian3D>));
 
   def("geometric_mean", &(wrap_geometric_mean<BasePointCartesian3D>));
   def("geometric_mean", &(wrap_geometric_mean<TrajectoryPointCartesian3D>));
