@@ -505,19 +505,19 @@ class SubTrajerCurvature:
         vad = aSliceList.AsLeaves[4]
         dbg = True
 
-        x = [(sl.index, sl.my_slice.segment[0].arc.degree_curvature,
-              sl.my_slice.segment[0].pt2pt.deflection_deg,
-              sl.my_slice.segment[0].pt2pt.distanceBack,
-              sl.my_slice.segment[0].may_be_zigzag)+
-              compute_everything_else(sl.my_slice.segment[0])
+        # x = [(sl.index, sl.my_slice.segment[0].arc.degree_curvature,
+        #       sl.my_slice.segment[0].pt2pt.deflection_deg,
+        #       sl.my_slice.segment[0].pt2pt.distanceBack,
+        #       sl.my_slice.segment[0].may_be_zigzag)+
+        #       compute_everything_else(sl.my_slice.segment[0])
 
-             for sl in aSliceList.AsLeaves[240:265]]
+             # for sl in aSliceList.AsLeaves[240:265]]
 
-        dt = np.dtype('int,float,float,float,bool,float,float')
-        xarr = np.array(x, dtype=dt)
-        # xarr.dtype.names = ['idx', 'Dc', 'Δ_chords', 'dist', 'zigzags' \
-        #                     'val1, val2']
-        print(xarr[:4])
+        # dt = np.dtype('int,float,float,float,bool,float,float')
+        # xarr = np.array(x, dtype=dt)
+        # # xarr.dtype.names = ['idx', 'Dc', 'Δ_chords', 'dist', 'zigzags' \
+        # #                     'val1, val2']
+        # print(xarr[:4])
         # newCol = np.array()
 
 
