@@ -3,6 +3,7 @@ import tracktable.analysis.parseTreeNode as ParseTreeNode
 from typing import Any, Union
 from networkx import DiGraph
 from tracktable.analysis.ExtendedPoint import ExtendedPoint as EP
+import tracktable.analysis.nx_graph as nxg
 
 _huge_number = 1000000
 
@@ -143,13 +144,36 @@ def level2_categorize(leaf_node: ParseTreeNode.Parse_Tree_Leaf) -> Level2Cat:
 
 
 def _insinuate_new_nodes_into_tree(node_list: ParseTreeNode,
-                                   g: DiGraph) -> None:
-    pass
+                                   g: nxg.TreeDiGraph,
+                                   partitioned_tuple: tuple) -> None:
+    """
 
-def categorize_level3_to_level2(g: DiGraph) -> None:
+
+    All functionality is via side effects. No return value.
+
+    :param node_list: The list of mid-level nodes to insinuate into the graph
+    :param g: the graph to be ininuated into
+    :param partitioned_tuple: lists of nodes at different levels
+    :return: None
+    """
+    root, lev_1, lev_2, leaves = partitioned_tuple
+
+    for an_L2_node in node_list:
+        start, stop = an_L2_node.index_range
+        g.add_node(an_L2_node)
+        g.add_edge(root, an_L2_node)
+        for a_leaf in leaves[start:stop]:
+            g.remove_edge(root, a_leaf)
+            g.add_edge(an_L2_node, a_leaf)
+
+
+    dbg = True
+
+def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     """When you see a bunch of functions with numbers in the function names,
         it is a prediction that you will be refactoring later."""
-    root, _1, _2, lev_3 = ParseTreeNode.get_all_by_level(g)
+    partitioned_tuple = ParseTreeNode.get_all_by_level(g)
+    root, _1, _2, lev_3 = partitioned_tuple
     l2_node_list = ParseTreeNode.NodeListAtLevel(2)
     l2_node_list.start_new_with(lev_3[0], 0)
     l2_node_list.current.category = level2_categorize(lev_3[1]) # trouble here if CategoryStateException
@@ -168,7 +192,7 @@ def categorize_level3_to_level2(g: DiGraph) -> None:
             l2_node_list.start_new_with(a_node)
             l2_node_list.current.category = prospective_category
 
-    _insinuate_new_nodes_into_tree(l2_node_list, g)
+    _insinuate_new_nodes_into_tree(l2_node_list, g, partitioned_tuple)
 
     dbg = True
 

@@ -4,7 +4,7 @@ from typing import List, Any
 
 class Parse_Tree_Node(list):
 
-    def __init__(self, point_range: List[int], my_traj,
+    def __init__(self, point_range: List[int], my_traj=None,
                  associatedSlice=None,
                  ndx=-1):
         # self.my_slice = associatedSlice
@@ -22,6 +22,9 @@ class Parse_Tree_Node(list):
         return self.depth_level == other.depth_level and \
                 self[0] == other[0]
 
+    def __str__(self):
+        return '{0} Level {1}'.format(super().__str__(), self.depth_level)
+
     @property
     def start(self):
         return self[0]
@@ -29,6 +32,10 @@ class Parse_Tree_Node(list):
     @property
     def stop(self):
         return self[1]
+
+    @property
+    def index_range(self):
+        return self.start, self.stop
 
     @property
     def my_slice(self):
@@ -130,7 +137,7 @@ class Parse_Tree_Node(list):
         return build_string
 
 class Parse_Tree_Root(Parse_Tree_Node):
-    def __init__(self, point_range, my_traj, associatedSlice=None,
+    def __init__(self, point_range, my_traj=None, associatedSlice=None,
                  ndx=-1):
         super().__init__(point_range, my_traj, associatedSlice, ndx)
         self.my_trajectory = None
@@ -160,7 +167,7 @@ class ParseTreeNodeL2(Parse_Tree_Node):
 
 
 class Parse_Tree_Leaf(Parse_Tree_Node):
-    def __init__(self, point_range, my_traj, associatedSlice=None,
+    def __init__(self, point_range, my_traj=None, associatedSlice=None,
                  ndx=-1):
         super().__init__(point_range, my_traj, associatedSlice, ndx)
 
@@ -233,7 +240,7 @@ def get_all_by_level(g: nx.DiGraph) -> tuple:
     lev_0 = None
     for node in g:
         if node.depth_level == 0:
-            lev_0 = list(node)
+            lev_0 = Parse_Tree_Root(list(node))
             break
 
     lev_3 = [n for n in g if n.depth_level == 3]

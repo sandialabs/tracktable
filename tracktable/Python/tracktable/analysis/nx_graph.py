@@ -1,6 +1,25 @@
 import matplotlib.pyplot as plt
 import networkx as nx
+from typing import Any
 from collections import defaultdict
+
+class TreeDiGraph(nx.DiGraph):
+
+    _root_node: Any = None
+    @property
+    def root_node(self):
+        if self._root_node:
+            return self._root_node
+        else:
+            try:
+                for n in self.nodes:
+                    predecessors = self.pred[n]
+                    if len(self.pred[n]) == 0:
+                        self._root_node = n
+                        break
+            except IndexError:
+                self._root_node = None
+            return self._root_node
 
 try:
     import pygraphviz

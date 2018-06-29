@@ -8,7 +8,7 @@ import tracktable.analysis.parseTreeCategorizations as CATs
 import tracktable.analysis.parseTreeNode
 from tracktable.analysis.parseTreeNode import Parse_Tree_Root as PTroot
 from tracktable.analysis.parseTreeNode import Parse_Tree_Leaf as PTleaf
-import networkx as nx
+import tracktable.analysis.nx_graph as nxg
 
 __author__ = ['Paul Schrum']
 
@@ -132,11 +132,11 @@ class ExtendedPointList(list):
         self[0].curvature_cat = self[-1].curvature_cat = None
         self[0].deflection_cat = self[-1].deflection_cat = None
 
-    def create_minimal_digraph(self: "ExtendedPointList") -> nx.DiGraph:
+    def create_minimal_digraph(self: "ExtendedPointList") -> nxg.TreeDiGraph:
         """From self create/return a NetworkX Directed Graph of the network.
         This includes only the root (mapped to the whole trajectory), and all
         points, which are leaves on the graph."""
-        g = nx.DiGraph()
+        g = nxg.TreeDiGraph()
         g.my_EPL = self
         g.my_trajecory = self.my_trajectory
 
