@@ -489,8 +489,8 @@ class SubTrajerCurvature:
         PTcats.categorize_level3_to_level2(G)
 
         # print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
-        if request_graph_plot:
-        # if True:
+        # if request_graph_plot:
+        if True:
             try:
                 nxg.plot_graph(G)
             except ImportError:

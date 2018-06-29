@@ -35,11 +35,32 @@ except ImportError:
 
 def plot_graph(nxGraph: nx.DiGraph) -> None:
     pos = graphviz_layout(nxGraph, prog='dot', args='')
+    for val in pos:
+        try:
+            ycoord = plot_graph.switch[int(str(val)[-1])]
+        except KeyError:
+            continue
+        node_coords = pos[val]
+        pos[val] = (node_coords[0], ycoord)
+        dbg = True
+
+    # for n, coords in zip(nxGraph.nodes, pos):
+    #     dbg = True
+        # try:
+        #     temp = nxGraph.node[n]
+        #     dbg = True
+        # except KeyError as ae:
+        #     dbg = True
+
     plt.figure(figsize=(12, 10))
     nx.draw(nxGraph, pos, node_size=20, alpha=0.5, node_color="blue",
             with_labels=False)
     plt.axis('equal')
     plt.show()
+plot_graph.switch = {
+    0: 10000,
+    3: -10000
+}
 
 
 if __name__ == '__main__':
