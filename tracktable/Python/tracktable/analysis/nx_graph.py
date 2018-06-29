@@ -34,15 +34,30 @@ except ImportError:
                           " for me.")
 
 def plot_graph(nxGraph: nx.DiGraph) -> None:
+    """
+    Plot the graph via matplotlib.
+    :see_also: https://matplotlib.org/api/_as_gen/matplotlib.pyplot.scatter.html
+    :param nxGraph: The graph to be plotted
+    :return: None
+    :side_effect: Generates a matplotlib drawing and shows it on the screen.
+    """
     pos = graphviz_layout(nxGraph, prog='dot', args='')
+    level2_label_coords = {}
+    level2_nodes_g = nx.DiGraph(); level2_node_labels = {}
     for val in pos:
+        level = int(str(val)[-1])
         try:
-            ycoord = plot_graph.switch[int(str(val)[-1])]
+            ycoord = plot_graph.switch[level]
         except KeyError:
+            level2_label_coords[val] = pos[val]
+            level2_nodes_g.add_node(val)
+            cat_str = (str(val.category)).split('.')[-1]\
+                .replace('_', ' ').title()
+            level2_node_labels[val] = str(cat_str)
+            # val.key
             continue
         node_coords = pos[val]
         pos[val] = (node_coords[0], ycoord)
-        dbg = True
 
     # for n, coords in zip(nxGraph.nodes, pos):
     #     dbg = True
@@ -55,8 +70,11 @@ def plot_graph(nxGraph: nx.DiGraph) -> None:
     plt.figure(figsize=(12, 10))
     nx.draw(nxGraph, pos, node_size=20, alpha=0.5, node_color="blue",
             with_labels=False)
-    plt.axis('equal')
+    nx.draw(level2_nodes_g, level2_label_coords, node_size=100, alpha=0.5,
+            labels=level2_node_labels, node_color="red", with_labels=True)
+    plt.axis('off')
     plt.show()
+    # plt.savefig(r'/ascldap/users/pschrum/Documents/Getting Close.png')
 plot_graph.switch = {
     0: 10000,
     3: -10000
