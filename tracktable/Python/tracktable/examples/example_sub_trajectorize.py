@@ -48,7 +48,7 @@ from matplotlib import gridspec
 from tracktable.domain.terrestrial import Trajectory, TrajectoryPoint
 from tracktable.core import geomath
 
-from tracktable.examples.kml_writer import write_kml
+from tracktable.examples.kml_writer import write_kml_graph
 from tracktable.analysis.ExtendedPoint import IntersectionError
 
 #todo.  Uses too much memory when many trajs are processed.  Fix leak.
@@ -94,13 +94,13 @@ def draw_screen_poly( lats, lons, m):
     poly = Polygon( xy, facecolor='red', alpha=0.4, zorder=10)
     plt.gca().add_patch(poly)
 
-def plot_colored_segments_path(traj, leaves, threshold=None, bbox=None,
+def plot_colored_segments_path(traj, tree_graph, threshold=None, bbox=None,
                                savefig=False, insetMap=False,
                                altitudePlot=False, ext="kml", output=''):
     extension = '.' + ext
 
     # write_kml(output + extension, traj, with_altitude=False)
-    write_kml(output+extension, traj, leaves)
+    write_kml_graph(output + extension, traj, tree_graph)
 
 
 def plot_colored_segments_path_old(traj, leaves, threshold, bbox,
@@ -465,22 +465,21 @@ def main():
         if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
         else:
-            leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
+            G: nx.DiGraph = subtrajer.subtrajectorize(traj, returnGraph=False)
         # except IntersectionError:
         #     continue
 
-        if leaves is None: # or pointCount < 3:
+        if G is None: # or pointCount < 3:
             continue
 
         pointCount =  -1; leafCount = -1
-        leaves, pointCount, leafCount = leaves
 
         trajectoryName = _composeName(traj)
-        counter2 += 1
-        if counter2 % 20 == 0:
-            print("{3} {0}: {1} Points,    {2} Leaves      {4}"
-                  .format(trajectoryName, pointCount, leafCount, largeCount,
-                          maxPointCount))
+        # counter2 += 1
+        # if counter2 % 20 == 0:
+        #     print("{3} {0}: {1} Points,    {2} Leaves      {4}"
+        #           .format(trajectoryName, pointCount, leafCount, largeCount,
+        #                   maxPointCount))
 
         # continue
 
@@ -497,7 +496,7 @@ def main():
         trajectoryName = os.path.join(outputDir, trajectoryName)
         # the mymap parameter below is only needed to get the max width or
         # height in terms ov the values used to scale the maps
-        plot_colored_segments_path(traj, leaves, args.straightness_threshold,
+        plot_colored_segments_path(traj, G, args.straightness_threshold,
                                    bbox, savefig=args.save_fig,
                                    insetMap=args.insetMap,
                                    altitudePlot=args.altitudePlot,

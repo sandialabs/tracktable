@@ -4,6 +4,7 @@ from typing import Any, Union
 from networkx import DiGraph
 from tracktable.analysis.ExtendedPoint import ExtendedPoint as EP
 import tracktable.analysis.nx_graph as nxg
+from tracktable.analysis.symbology_kml import kml_symbology
 
 _huge_number = 1000000
 
@@ -15,9 +16,9 @@ class CategoryBase(enum.Enum):
 
     @property
     def as_int(self):
-        if self.value is list:
+        try:
             return self.value[0]
-        else:
+        except:
             return self.value
 
     def __lt__(self, other: "CategoryBase"):
@@ -37,6 +38,9 @@ class CategoryBase(enum.Enum):
 
     def __ne__(self, other: "CategoryBase"):
         return self.as_int != other.as_int
+
+    def __hash__(self):
+        return self.as_int
 
     @staticmethod
     def default_criteria(target_variable: Any,
@@ -78,14 +82,15 @@ class CurvatureCat(CategoryBase):
     normal_left = (-4, lambda v, this_num:
         CategoryBase.default_criteria(v, "degree_curve", this_num))
 
-    gentle_left = (-1, lambda v, this_num:
-        CategoryBase.default_criteria(v, "degree_curve", this_num))
+    # gentle_left = (-1, lambda v, this_num:
+    #     CategoryBase.default_criteria(v, "degree_curve", this_num))
 
-    flat = (1, lambda v, this_num:
-        CategoryBase.default_criteria(v, "degree_curve", this_num))
+    # flat = (1, lambda v, this_num:
+    flat = (4, lambda v, this_num:
+            CategoryBase.default_criteria(v, "degree_curve", this_num))
 
-    gentle_right = (4, lambda v, this_num:
-        CategoryBase.default_criteria(v, "degree_curve", this_num))
+    # gentle_right = (4, lambda v, this_num:
+    #     CategoryBase.default_criteria(v, "degree_curve", this_num))
 
     normal_right = (12, lambda v, this_num:
         CategoryBase.default_criteria(v, "degree_curve", this_num))
@@ -117,14 +122,26 @@ class Level1Cat(CategoryBase):
     u_turn = 3,
     grand_j_hook = 4
 
+
 class Level2Cat(CategoryBase):
     left_turn = -1,
     straight = 0,
     right_turn = 1
 
+    @property
+    def symbology(self):
+        if self == Level2Cat.left_turn:
+            return kml_symbology(self.name, color='lavender', width=3)
+        elif self == Level2Cat.straight:
+            return kml_symbology(self.name, color='white', width=3)
+        elif self == Level2Cat.right_turn:
+            return kml_symbology(self.name, color='red', width=3)
+
+
 class CategoryStateException(AttributeError):
     def __init__(self, msg):
         self.message = msg
+
 
 def level2_categorize(leaf_node: ParseTreeNode.Parse_Tree_Leaf) -> Level2Cat:
     """If the leaf is zigzag, return None"""
@@ -134,9 +151,9 @@ def level2_categorize(leaf_node: ParseTreeNode.Parse_Tree_Leaf) -> Level2Cat:
     if getattr(leaf, "may_be_zigzag", False):
         raise CategoryStateException('zigzag')
 
-    if leaf.deflection_cat < DeflectionCat.straight:
+    if leaf.curvature_cat < DeflectionCat.straight:
         l2_cat = Level2Cat.left_turn
-    elif leaf.deflection_cat > DeflectionCat.straight:
+    elif leaf.curvature_cat > DeflectionCat.straight:
         l2_cat = Level2Cat.right_turn
     else:
         l2_cat = Level2Cat.straight
@@ -227,6 +244,10 @@ def _test_run():
     print()
     CurvatureCat.assign_to(aList, 'curvature_cat')
     print("Curvature Category:", aList.curvature_cat)
+    print()
+
+    an_l2cat = Level2Cat.left_turn
+    print(an_l2cat.symbology.to_kml())
 
 
 if __name__ == '__main__':

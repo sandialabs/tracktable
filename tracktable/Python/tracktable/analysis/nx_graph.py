@@ -1,7 +1,8 @@
 import matplotlib.pyplot as plt
 import networkx as nx
-from typing import Any
+from typing import Any, Iterator
 from collections import defaultdict
+from tracktable.analysis.parseTreeNode import *
 
 class TreeDiGraph(nx.DiGraph):
 
@@ -80,9 +81,32 @@ plot_graph.switch = {
     3: -10000
 }
 
+def leaves_gen(g :nx.DiGraph) -> Iterator[Parse_Tree_Leaf]:
+    a_node: Parse_Tree_Node
+    for a_node in g:
+        if a_node is Parse_Tree_Leaf:
+            yield a_node
+
+
+def depth_level_x_gen(g :nx.DiGraph, depth_level :int) \
+        -> Iterator[Parse_Tree_Node]:
+    """
+    Given a tree graph (single root node), yield only nodes that are at a
+        given depth level. Note, this function needs to be optimized.
+    :param g: The tree graph to operate on
+    :param depth_level: The depth level to reach for
+    :return: yield nodes at indicated depth level
+    """
+    a_node: Parse_Tree_Node
+    for a_node in g:
+        if a_node.depth_level == depth_level:
+            yield a_node
+
 
 if __name__ == '__main__':
 
     G = nx.balanced_tree(3, 4)
     plot_graph(G)
+
+
 

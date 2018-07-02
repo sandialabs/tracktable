@@ -385,72 +385,8 @@ class SubTrajerCurvature:
         """
         raise NotImplementedError('Try this later.')
 
-    def _movingGrowingWindowMethod(self, aPointList,
-                        request_graph_plot: bool =False):
-        """
-        Overlaps each slice a little, takes mean and stdev of curvature for
-            each slice, compares stdev, consolidates slices when the stdevs
-            of two adjacent slices are close to each other. When they are,
-            the consolidation causes the window to grow towards the right.
-        :param aPointList: sequence of points constituting the trajectory
-        :type aPointList: ExtendedPointList
-        :param request_graph_plot: Not implemented. Does nothing
-        :return: all subtrajectories
-        :rtype: SliceList
-        """
-
-        # Create a profile, x = length along, y = Degree of Curve
-        dcProfile = []
-        accumulatedX = 0.0
-        myIndex = 1
-        for pt in aPointList[1:-1]:
-            accumulatedX += pt.pt2pt.distanceBack
-
-            # SimpleNamespace is
-            # from https://stackoverflow.com/a/13828824/1339950
-            length_degree_pair = \
-                types.SimpleNamespace(x = accumulatedX,
-                                      degC=pt.arc.degreeCurve,
-                                      rad=pt.arc.radius,
-                                      myIndex=myIndex,
-                                      chordAzimuth=pt.arc.chordVector.azimuth,
-                                      deflection=pt.pt2pt.deflection)
-
-            dcProfile.append(length_degree_pair)
-            myIndex += 1
-
-        import statistics
-        def computeParams(aSliceRange):
-            aSegment = aSliceRange.getSegment()
-            extractedListDc = [x.degC for x in aSegment]
-            aSliceRange.DcAve = statistics.mean(extractedListDc)
-            # try:
-            aSliceRange.DcStdDev = statistics.stdev(extractedListDc)
-
-        aSliceList = SliceList(dcProfile, RangeWidth=5, Overlap=3,
-                               computeParams=computeParams)
-
-        print("Using the Moving/Growing Window Method.")
-        print(); print('Length before consolidation: {0}'
-                       .format(len(aSliceList)))
-        predicate = lambda a, b: isclose(a.DcStdDev, b.DcStdDev, abs_tol=0.01)
-        aSliceList.consolidateNodeIf(predicate)
-        print(); print('Length after  consolidation: {0}'
-                       .format(len(aSliceList)))
-
-        # aSliceList.computeAttribs
-        predicate = lambda a, b: int(a.DcStdDev // 6) == 0 and \
-                                 int(b.DcStdDev // 6) == 0
-
-        aSliceList.consolidateNodeIf(predicate)
-        predicate = lambda a, b: int(a.DcStdDev // 6) > 0 and \
-                                 int(b.DcStdDev // 6) > 0
-
-        aSliceList.consolidateNodeIf(predicate)
-        return aSliceList
-
     def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=4.0,
-                        request_graph_plot: bool =False):
+                        request_graph_plot: bool =False) -> nx.DiGraph:
         """
         First, classifies each point triplet as curved or straight based on
             a Degree of Curve threshold. Then consolidates slices when two
@@ -490,52 +426,31 @@ class SubTrajerCurvature:
 
         # print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
         # if request_graph_plot:
-        if True:
+        if False:
             try:
                 nxg.plot_graph(G)
             except ImportError:
                 pass
 
-        pointCount = len(aPointList)
-        aPointList = aPointList[1:-1]
-        aSliceList = SliceList(aPointList, RangeWidth=1, Overlap=0,
-                               computeAttribs=tag_zigzag_segments)
+        # pointCount = len(aPointList)
+        # aPointList = aPointList[1:-1]
+        # aSliceList = SliceList(aPointList, RangeWidth=1, Overlap=0,
+        #                        computeAttribs=tag_zigzag_segments)
+        #
+        # predicate = lambda a, b: a.DegreeOfCurve == b.DegreeOfCurve
+        # aSliceList.consolidateNodeIf(predicate)
+        #
+        # aSliceList.shiftInteriorBoundariesBy(1)
+        # aSliceList.pointCount = pointCount
 
-        # vad = aSliceList.AsLeaves[4].my_slice.segment[0].arc.degreeCurve
-        vad = aSliceList.AsLeaves[4]
-        dbg = True
-
-        # x = [(sl.index, sl.my_slice.segment[0].arc.degree_curvature,
-        #       sl.my_slice.segment[0].pt2pt.deflection_deg,
-        #       sl.my_slice.segment[0].pt2pt.distanceBack,
-        #       sl.my_slice.segment[0].may_be_zigzag)+
-        #       compute_everything_else(sl.my_slice.segment[0])
-
-             # for sl in aSliceList.AsLeaves[240:265]]
-
-        # dt = np.dtype('int,float,float,float,bool,float,float')
-        # xarr = np.array(x, dtype=dt)
-        # # xarr.dtype.names = ['idx', 'Dc', 'Δ_chords', 'dist', 'zigzags' \
-        # #                     'val1, val2']
-        # print(xarr[:4])
-        # newCol = np.array()
-
-
-
-        predicate = lambda a, b: a.DegreeOfCurve == b.DegreeOfCurve
-        aSliceList.consolidateNodeIf(predicate)
-
-        aSliceList.shiftInteriorBoundariesBy(1)
-        aSliceList.pointCount = pointCount
-
-        return aSliceList
+        return G
 
 
     def subtrajectorize(self,
                         trajectory,
                         returnGraph=False,
                         useMethod='individualCurvatures_preferred',
-                        request_graph_plot: bool =True):
+                        request_graph_plot: bool =True) -> nx.DiGraph :
         """
         Decomposes a Trajectory into subtrajectories based on an analysis of
             the curvature of each point triplet. Multiple methods are
@@ -565,51 +480,44 @@ class SubTrajerCurvature:
                                       "is not implemented. Always pass False "
                                       "for returnGraph.")
 
-        findMethod = \
-            {'movingGrowingWindow': __class__._movingGrowingWindowMethod,
-            'individualCurvatures_preferred':
-                                    __class__._individCurvaturesMethod}
-
         aPointList = EPLmod.CreateExtendedPointList(trajectory)
-        aPointList.computeAllPointInformation(account_for_lat_long=True)
-
-        aPointList.mark_likely_zigzags()
-
         pointCount = len(aPointList)
         if pointCount < 4:
             return None
 
+        aPointList.computeAllPointInformation(account_for_lat_long=True)
+        aPointList.mark_likely_zigzags()
+
         try:
-            aSliceList = findMethod[useMethod](self, aPointList,
-                                    request_graph_plot=request_graph_plot)
+            parse_graph: nx.DiGraph = \
+                self._individCurvaturesMethod(aPointList,
+                    request_graph_plot=request_graph_plot)
         except KeyboardInterrupt:
             exit(0)
-        except KeyError:
-            msg = '"{0}" is not an available method.\n  '.format(useMethod)
-            msg = msg + 'Available methods are are: {0}.'\
-                .format([x for x in findMethod.keys()])
-            raise AttributeError(msg)
 
-        leafList = aSliceList.AsLeaves
-        temp_test_str = None
-        if 'CLX4' in aPointList.name:
-            temp_test_str = SL.get_customizable_report_string(leafList)
-        if temp_test_str:
-            import os
-            outFileName = os.path.join(os.path.expanduser(
-                '~/Documents/tracktableTesting/testResults/'),
-                aPointList.name + '_report.csv')
-            try:
-                with open(outFileName, 'wt') as outF:
-                    outF.write(temp_test_str)
-                print()
-                print('report written to:  ', outFileName)
-            except Exception:
-                print()
-                print('Could not write report csv file.')
+        return parse_graph
 
-        llSize = 0
-        if leafList is not None:
-            llSize = len(leafList)
 
-        return leafList, pointCount, llSize
+        # leafList = parse_graph.AsLeaves
+        # temp_test_str = None
+        # if 'CLX4' in aPointList.name:
+        #     temp_test_str = SL.get_customizable_report_string(leafList)
+        # if temp_test_str:
+        #     import os
+        #     outFileName = os.path.join(os.path.expanduser(
+        #         '~/Documents/tracktableTesting/testResults/'),
+        #         aPointList.name + '_report.csv')
+        #     try:
+        #         with open(outFileName, 'wt') as outF:
+        #             outF.write(temp_test_str)
+        #         print()
+        #         print('report written to:  ', outFileName)
+        #     except Exception:
+        #         print()
+        #         print('Could not write report csv file.')
+        #
+        # llSize = 0
+        # if leafList is not None:
+        #     llSize = len(leafList)
+        #
+        # return leafList, pointCount, llSize

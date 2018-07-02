@@ -143,12 +143,15 @@ class ExtendedPointList(list):
         trajectory_range = [0, len(self)]
         root_node = PTroot(trajectory_range, self)
         g.add_node(root_node)
+        g.root = root_node
 
         for a_point in self:
             pt_range = [a_point.my_index, a_point.my_index+1]
             a_leaf = PTleaf(pt_range, self)
             g.add_node(a_leaf)
             g.add_edge(root_node, a_leaf)
+
+        g.leaf_count = len(self)
 
         return g
 
