@@ -150,7 +150,7 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
     convertFeetToMeters = 0.3048
     formatString = '{0},{1},{2}' if with_altitude \
         else '{0},{1},0.0'
-    for a_point in trajectory[a_segment.start:a_segment.stop]:
+    for a_point in trajectory[a_segment.start-1:a_segment.stop]:
         # try:
         alt = geomath.altitude(a_point) * convertFeetToMeters
         point_str = formatString.format(geomath.longitude(a_point),
