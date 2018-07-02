@@ -1,6 +1,7 @@
 import tracktable.core.geomath as geomath
 import datetime
 from collections import namedtuple
+from tracktable.analysis.symbology_kml import *
 
 lavendar_color = 'FFB57EDC'
 red_color = 'FF0000FF'
@@ -59,63 +60,6 @@ def _compose_traj_name(traj, suffix_str=''):
     """Gets the name of the trajectory. Appends optional suffix string."""
     return traj[0].object_id + suffix_str
 
-class stackWriter():
-    """
-    Useful for writing values to an xml file. Tab indentation already provided
-    """
-    def __init__(self, startTabDepth=0):
-        self.stack = list()
-        self._tab_level = startTabDepth
-
-    def push(self, a_string):
-        """Returns a single-word opening line with < and > around a_string.
-        Increases the indent level by 1 after returning the string."""
-        if '<' in a_string or '>' in a_string:
-            raise ValueError("Can't have symbol bracker '<' or '>' in xml "
-                "varialble name.")
-        self.stack.append(a_string)
-        ret_string = self.tabs + '<{0}>\n'.format(a_string)
-        self._tab_level += 1
-        return ret_string
-
-    def pop(self, optionalPopString=''):
-        """
-        Returns a single-word closing line with </ and > around the string
-        being popped off the stack. Decrements the indent level by 1 before
-        returning the string.
-        :param optionalPopString: If provided, verifies that the string your
-            thought was to be popped is actually the one being popped.
-        :return: The string that was popped off the stack.
-        """
-        if len(self.stack) == 0:
-            return None
-        self._tab_level -= 1
-
-        poppedString = self.stack.pop()
-        if len(optionalPopString) > 0 and \
-                poppedString != optionalPopString:
-            raise AttributeError('popped string ("{0}")not same as expected '
-                'string ("{1}")'.format(poppedString, optionalPopString))
-
-        return_string = self.tabs + '</{0}>\n'.format(poppedString)
-        return return_string
-
-    def singleLine(self, varName, varValue):
-        """
-        Returns a string of pattern:
-                <varName>varValue</varName>
-                Does not change the indent level
-        :param varName: The name of the xml variable to put in the string.
-        :param varValue: The value associated with this variable.
-        :return: An XML string representation of the variable/value pair.
-        """
-        return (self.tabs + '<{0}>{1}</{0}>\n' \
-                .format(varName, str(varValue))
-                )
-
-    @property
-    def tabs(self):
-        return '\t' * self._tab_level
 
 
 def get_placemark_string(trajectory, a_segment, with_altitude=False,
@@ -185,7 +129,7 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
 StyleNamedTuple = namedtuple('StyleNamedTuple', "style_id style_xml")
 
 def _create_styles_dict(trajectory, segments):
-    """Creates / returns a dictionary where the key is the key is the style
+    """Creates / returns a dictionary where the key is the style
     id, and the value is a named tuple of style_id and style_xml, the kml
     text string for that style."""
     width = 6
@@ -202,7 +146,7 @@ def _create_styles_dict(trajectory, segments):
             sr = stackWriter(1)
             style_xml_list.append(sr.push('LineStyle'))
             style_xml_list.append(sr.singleLine("labelVisibility", 1))
-            style_xml_list.append(sr.singleLine('width', 3))
+            style_xml_list.append(sr.singleLine('width', width))
             style_xml_list.append(sr.singleLine('color',style_color))
             style_xml_list.append(sr.pop('LineStyle'))
             style_xml_list.append(sr.push('LabelStyle'))
