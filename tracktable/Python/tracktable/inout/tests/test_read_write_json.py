@@ -31,18 +31,18 @@
 
 import sys
 import os
-import io
+import inout
 import unittest
 import importlib
 
-from tracktable.io.trajectory import from_json
-from tracktable.io.trajectory import to_json
-from tracktable.io.trajectory import to_json_file
-from tracktable.io.trajectory import from_json_file
-from tracktable.io.trajectory import from_json_file_multi
-#from tracktable.io.trajectory import from_json_file_iter
+from tracktable.inout.trajectory import from_json
+from tracktable.inout.trajectory import to_json
+from tracktable.inout.trajectory import to_json_file
+from tracktable.inout.trajectory import from_json_file
+from tracktable.inout.trajectory import from_json_file_multi
+#from tracktable.inout.trajectory import from_json_file_iter
 
-import tracktable.io.trajectory as trajectory
+import tracktable.inout.trajectory as trajectory
 
 import tracktable.domain.terrestrial
 
@@ -172,7 +172,7 @@ class TestReadWriteDictionary(unittest.TestCase):
     def tst_multi_trajectories_from_json_file(self):
         print("Testing reading multiple trajectories from a json file")
         trajs = []
-        with io.StringIO() as f:
+        with inout.StringIO() as f:
             f.write(self.two_trajectories_json())
             f.seek(0)
             for traj in trajectory.from_json_file_iter(f):

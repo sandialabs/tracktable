@@ -31,7 +31,7 @@
 
 #Example: python3 read_json.py read_json.py ../../../../TestData/two_trajectories.json
 
-import tracktable.io.trajectory as trajectory
+import tracktable.inout.trajectory as trajectory
 import argparse
 #from memory_profiler import profile
 

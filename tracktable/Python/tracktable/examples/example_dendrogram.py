@@ -29,7 +29,7 @@
 
 # Author: Ben Newton  - February 21, 2018
 
-import tracktable.io.trajectory as trajectory
+import tracktable.inout.trajectory as trajectory
 from tracktable.core import geomath
 
 from sklearn.cluster import AgglomerativeClustering

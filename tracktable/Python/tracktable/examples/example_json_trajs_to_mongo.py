@@ -29,7 +29,7 @@
 
 # Author: Ben Newton  - February 26, 2018
 
-#import tracktable.io.trajectory as trajectory
+#import tracktable.inout.trajectory as trajectory
 #from tracktable.domain import all_domains as ALL_DOMAINS
 #import tracktable.analysis.sub_trajectorize as st
 
@@ -43,7 +43,7 @@
 
 import argparse
 from pymongo import MongoClient
-import tracktable.io.trajectory as trajectory
+import tracktable.inout.trajectory as trajectory
 
 def main():
     parser = argparse.ArgumentParser(description=

@@ -32,7 +32,7 @@
 #todo, may want to adjust object id to be originalId-001 where 001 is
 #      segement number
 
-import tracktable.io.trajectory as trajectory
+import tracktable.inout.trajectory as trajectory
 from tracktable.domain import all_domains as ALL_DOMAINS
 #from tracktable.domain.terrestrial import Trajectory, TrajectoryPoint
 import tracktable.analysis.sub_trajectorize as st

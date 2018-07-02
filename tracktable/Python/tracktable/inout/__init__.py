@@ -26,7 +26,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""tracktable.io - Input/output for Tracktable points and trajectories
+"""tracktable.inout - Input/output for Tracktable points and trajectories
 
 This module contains code to input and output trajectories in different formats
 """

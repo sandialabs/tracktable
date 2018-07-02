@@ -36,7 +36,7 @@ import tracktable.analysis.sub_trajectorize as st
 import networkx as nx
 from shapely.geometry import Point, LineString
 import numpy as np
-import tracktable.io.trajectory as trajectory
+import tracktable.inout.trajectory as trajectory
 import datetime
 import argparse
 
@@ -101,6 +101,7 @@ def plot_colored_segments_path(traj, tree_graph, threshold=None, bbox=None,
 
     # write_kml(output + extension, traj, with_altitude=False)
     write_kml_graph(output + extension, traj, tree_graph)
+
 
 
 def plot_colored_segments_path_old(traj, leaves, threshold, bbox,

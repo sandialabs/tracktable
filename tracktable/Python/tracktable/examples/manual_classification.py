@@ -11,7 +11,7 @@ from mpl_toolkits.basemap import Basemap
 from pymongo import MongoClient
 import argparse
 from tracktable.script_helpers import argument_groups, argparse
-import tracktable.io.trajectory as trajectory
+import tracktable.inout.trajectory as trajectory
 from tracktable.core import geomath
 from tracktable.render import colormaps, mapmaker, paths
 from tracktable.examples import example_trajectory_rendering
