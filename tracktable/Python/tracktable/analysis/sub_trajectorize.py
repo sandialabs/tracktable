@@ -495,25 +495,23 @@ class SubTrajerCurvature:
         except KeyboardInterrupt:
             exit(0)
 
-        return parse_graph
-
-
-        # leafList = parse_graph.AsLeaves
-        # temp_test_str = None
-        # if 'CLX4' in aPointList.name:
-        #     temp_test_str = SL.get_customizable_report_string(leafList)
-        # if temp_test_str:
-        #     import os
-        #     outFileName = os.path.join(os.path.expanduser(
-        #         '~/Documents/tracktableTesting/testResults/'),
-        #         aPointList.name + '_report.csv')
-        #     try:
-        #         with open(outFileName, 'wt') as outF:
-        #             outF.write(temp_test_str)
-        #         print()
-        #         print('report written to:  ', outFileName)
-        #     except Exception:
-        #         print()
+        import  tracktable.analysis.nx_graph as nxg
+        leafList = list(nxg.leaves_gen(parse_graph))
+        temp_test_str = None
+        if 'CLX4' in aPointList.name:
+            temp_test_str = SL.get_customizable_report_string(leafList)
+        if temp_test_str:
+            import os
+            outFileName = os.path.join(os.path.expanduser(
+                '~/Documents/tracktableTesting/testResults/'),
+                aPointList.name + '_report.csv')
+            try:
+                with open(outFileName, 'wt') as outF:
+                    outF.write(temp_test_str)
+                print()
+                print('report written to:  ', outFileName)
+            except Exception:
+                print()
         #         print('Could not write report csv file.')
         #
         # llSize = 0
@@ -521,3 +519,6 @@ class SubTrajerCurvature:
         #     llSize = len(leafList)
         #
         # return leafList, pointCount, llSize
+
+        return parse_graph
+
