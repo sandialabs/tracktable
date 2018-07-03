@@ -63,8 +63,11 @@ class stackWriter():
         return '\t' * self._tab_level
 
 
-def color_name_to_rgb_string(color_name, alpha=None):
-    r, g, b, a = clr.ColorConverter().to_rgba(color_name, alpha=alpha)
+def color_name_to_rgb_string(color_name, alpha=None, swap_red_blue=False):
+    if swap_red_blue:
+        b, g, r, a = clr.ColorConverter().to_rgba(color_name, alpha=alpha)
+    else:
+        r, g, b, a = clr.ColorConverter().to_rgba(color_name, alpha=alpha)
 
     r, g, b = (int(math.floor(r * 255.9)), int(math.floor(g * 255.9)),
                int(math.floor(b * 255.9)))
@@ -105,7 +108,8 @@ class kml_symbology():
 
         self.symbology_name = symbology_name
         try:
-            self.color = color_name_to_rgb_string(color, alpha)
+            self.color = color_name_to_rgb_string(color, alpha,
+                                                  swap_red_blue=True)
         except:
             self.color = hex(int(color, 16)).upper()[2:]
 

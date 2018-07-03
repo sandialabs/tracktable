@@ -183,7 +183,6 @@ class Parse_Tree_Leaf(Parse_Tree_Node):
 class NodeListAtLevel(list):
     def __init__(self, the_level: int, from_list: List[Any]=[]):
         self.my_level = the_level
-        self.categorization = None
         self.end_index = 1
         # if from_list:
         #     for item in from_list:

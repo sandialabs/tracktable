@@ -131,7 +131,7 @@ class Level2Cat(CategoryBase):
     @property
     def symbology(self):
         if self == Level2Cat.left_turn:
-            return kml_symbology(self.name, color='lavender', width=3)
+            return kml_symbology(self.name, color='green', width=3)
         elif self == Level2Cat.straight:
             return kml_symbology(self.name, color='white', width=3)
         elif self == Level2Cat.right_turn:
@@ -151,9 +151,9 @@ def level2_categorize(leaf_node: ParseTreeNode.Parse_Tree_Leaf) -> Level2Cat:
     if getattr(leaf, "may_be_zigzag", False):
         raise CategoryStateException('zigzag')
 
-    if leaf.curvature_cat < DeflectionCat.straight:
+    if leaf.curvature_cat < CurvatureCat.flat:
         l2_cat = Level2Cat.left_turn
-    elif leaf.curvature_cat > DeflectionCat.straight:
+    elif leaf.curvature_cat > CurvatureCat.flat:
         l2_cat = Level2Cat.right_turn
     else:
         l2_cat = Level2Cat.straight
