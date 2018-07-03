@@ -175,6 +175,8 @@ def _insinuate_new_nodes_into_tree(node_list: ParseTreeNode,
     """
     root, lev_1, lev_2, leaves = partitioned_tuple
 
+    node_list[0]._set_start(0)
+
     for an_L2_node in node_list:
         start, stop = an_L2_node.index_range
         g.add_node(an_L2_node)
@@ -191,11 +193,12 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
         it is a prediction that you will be refactoring later."""
     partitioned_tuple = ParseTreeNode.get_all_by_level(g)
     root, _1, _2, lev_3 = partitioned_tuple
+    # alt_root = g.root_node
     l2_node_list = ParseTreeNode.NodeListAtLevel(2)
     l2_node_list.start_new_with(lev_3[0], 0)
     l2_node_list.current.category = level2_categorize(lev_3[1])
     l2_node_list.current.index = node_count = 0
-    for a_node in lev_3[2:-1]:
+    for a_node in lev_3[1:-1]:
         try:
             prospective_category = level2_categorize(a_node)
             keep_extending = \
@@ -212,7 +215,12 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
             l2_node_list.current.category = prospective_category
             l2_node_list.current.index = node_count
 
+    leaf_successors_of_root_before_insinuation = \
+        [n for n in g.successors(g.root_node) if n.depth_level == 3]
+
     _insinuate_new_nodes_into_tree(l2_node_list, g, partitioned_tuple)
+    successors_of_root_after_insinuation = \
+        [n for n in g.successors(g.root_node) if n.depth_level == 3]
 
     dbg = True
 
