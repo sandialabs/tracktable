@@ -63,11 +63,51 @@ class stackWriter():
         return '\t' * self._tab_level
 
 
-def color_name_to_rgb_string(color_name, alpha=None, swap_red_blue=False):
+# This color palette taken from
+# http://mkweb.bcgsc.ca/colorblind/
+# Conservative Seven Color Palette
+
+black = ('#%02x%02x%02x' % (0, 0, 0)).upper()
+orange = ('#%02x%02x%02x' % (230, 159, 0)).upper()
+sky_blue = ('#%02x%02x%02x' % (86, 180, 233)).upper()
+bluish_green = ('#%02x%02x%02x' % (0, 158, 115)).upper()
+yellow = ('#%02x%02x%02x' % (240, 228, 66)).upper()
+blue = ('#%02x%02x%02x' % (0, 114, 178)).upper()
+vermillion = ('#%02x%02x%02x' % (213, 94, 0)).upper()
+reddish_purple = ('#%02x%02x%02x' % (204, 121, 167)).upper()
+
+color_blind_acceptable_dict = \
+    {
+        black: 'black',
+        orange: 'orange',
+        sky_blue: 'sky blue',
+        bluish_green: 'bluish green',
+        yellow: 'yellow',
+        blue: 'blue',
+        vermillion: 'vermillion',
+        reddish_purple: 'reddish purple',
+        'black': black,
+        'orange': orange,
+        'sky blue': sky_blue,
+        'bluish green': bluish_green,
+        'yellow': yellow,
+        'blue': blue,
+        'vermillion': vermillion,
+        'reddish_purple': reddish_purple,
+    }
+
+
+def color_name_to_rgb_string(color_name, alpha=None, swap_red_blue=False,
+                             limit_to_color_blind_palette=False):
+    if limit_to_color_blind_palette:
+        rgb = color_blind_acceptable_dict[color_name]
+        return '#FF' + rgb[1:]
+
+    r, g, b, a = clr.ColorConverter().to_rgba(color_name, alpha=alpha)
     if swap_red_blue:
-        b, g, r, a = clr.ColorConverter().to_rgba(color_name, alpha=alpha)
-    else:
-        r, g, b, a = clr.ColorConverter().to_rgba(color_name, alpha=alpha)
+        temp = r
+        r = b
+        b = temp
 
     r, g, b = (int(math.floor(r * 255.9)), int(math.floor(g * 255.9)),
                int(math.floor(b * 255.9)))
@@ -85,6 +125,19 @@ def color_name_to_rgb_string(color_name, alpha=None, swap_red_blue=False):
 
 if __name__ == '__main__':
     print('Test runs.')
+
+
+    all_colors = clr._colors_full_map
+    for key, value in all_colors.items():
+        if key.startswith('xkcd:'):
+            continue
+        for color_code, color_name in color_blind_acceptable_dict.items():
+            if value == color_code:
+                print('Web site {0} is matplotlib {1}'\
+                    .format(color_name, key))
+                break
+
+
     print('Purple is', color_name_to_rgb_string('purple'))
     print('Transparent Charteuse is', color_name_to_rgb_string('chartreuse',
                                                               0.5))
