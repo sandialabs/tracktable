@@ -1,6 +1,7 @@
 import math
 import networkx as nx
 from typing import List, Any
+# from tracktable.analysis.parseTreeCategorizations import CategoryBase
 
 class Parse_Tree_Node(list):
 
@@ -67,6 +68,22 @@ class Parse_Tree_Node(list):
         for a_seg in self.my_trajectory[self.start, self.stop]:
             accum_dist += a_seg.pt2pt.distanceBack
         return accum_dist
+
+    @property
+    def report_header_string(self) -> str:
+        raise NotImplementedError
+
+    @property
+    def report_data_lines(self) -> str:
+        raise NotImplementedError
+
+    # _the_category: CategoryBase = None
+    # @property
+    # def category(self) -> CategoryBase:
+    #     return self._the_category
+    # @category.setter
+    # def category(self, value: CategoryBase) -> None:
+    #     self._the_category = value
 
     @property
     def description(self):
@@ -156,6 +173,16 @@ class Parse_Tree_Root(Parse_Tree_Node):
     def depth_level(self):
         return 0
 
+    @property
+    def report_header_string(self) -> str:
+        def report_header_string(self) -> str:
+            return 'trajectory_id, trajectory_cat,' \
+                   + self.my_trajectory[self.start].report_header_string
+
+    @property
+    def report_data_lines(self) -> str:
+        raise NotImplementedError
+
 class ParseTreeNodeL1(Parse_Tree_Node):
     def __init__(self, point_range, my_traj=None, associatedSlice=None,
                  ndx=-1):
@@ -166,6 +193,16 @@ class ParseTreeNodeL1(Parse_Tree_Node):
     def depth_level(self):
         return 1
 
+    @property
+    def report_header_string(self) -> str:
+        def report_header_string(self) -> str:
+            return 'L1id, L1cat,' \
+                   + self.my_trajectory[self.start].report_header_string
+    @property
+    def report_data_lines(self) -> str:
+        raise NotImplementedError
+
+
 class ParseTreeNodeL2(Parse_Tree_Node):
     def __init__(self, point_range, my_traj=None, associatedSlice=None,
                  ndx=-1):
@@ -174,6 +211,15 @@ class ParseTreeNodeL2(Parse_Tree_Node):
     @property
     def depth_level(self):
         return 2
+
+    @property
+    def report_header_string(self) -> str:
+        return 'L2id, L2cat,' \
+               + self.my_trajectory[self.start].report_header_string
+
+    @property
+    def report_data_lines(self) -> str:
+        ret_str = '{0},{1}'.format_map(self.index, self)
 
 
 class Parse_Tree_Leaf(Parse_Tree_Node):
@@ -188,6 +234,27 @@ class Parse_Tree_Leaf(Parse_Tree_Node):
     @property
     def my_point(self):
         return self.my_slice[0]
+
+    @property
+    def report_header_string(self) -> str:
+        return \
+        'L4id, L4cat, Long, Lat, radius_mi, Dc°, Δ°, ' \
+        'Chord Δ°, ℓ_Back_mi, ℓ_Ahead_mi'
+        # 'seconds, speed_mph, Radial_μg\n'
+
+    @property
+    def report_data_lines(self) -> str:
+        pt = self.my_point
+        ret_str = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}'
+        if pt.arc:
+            ret_str = ret_str.format(\
+                pt.my_index, "No category", pt.Y, pt.X,
+                math.fabs(pt.arc.radius),pt.arc.degreeCurveDeg,
+                pt.arc.deflection_deg,pt.pt2pt.deflection_deg,
+                pt.pt2pt.distanceBack,pt.pt2pt.distanceAhead
+                # ,pt.pt2pt.seconds_back,pt.pt2pt.speed_back_mph,
+                # pt.arc.radial_acceleration[0]
+            )
 
 
 class NodeListAtLevel(list):
