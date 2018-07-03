@@ -26,6 +26,9 @@ class Parse_Tree_Node(list):
     def __str__(self):
         return '{0} Level {1}'.format(super().__str__(), self.depth_level)
 
+    def _set_start(self, new_start_val):
+        self[0] = new_start_val
+
     @property
     def start(self):
         return self[0]
@@ -69,8 +72,7 @@ class Parse_Tree_Node(list):
             accum_dist += a_seg.pt2pt.distanceBack
         return accum_dist
 
-    @property
-    def report_header_string(self) -> str:
+    def report_header_string(self, g: nx.DiGraph) -> str:
         raise NotImplementedError
 
     @property
@@ -173,11 +175,10 @@ class Parse_Tree_Root(Parse_Tree_Node):
     def depth_level(self):
         return 0
 
-    @property
-    def report_header_string(self) -> str:
-        def report_header_string(self) -> str:
-            return 'trajectory_id, trajectory_cat,' \
-                   + self.my_trajectory[self.start].report_header_string
+    def report_header_string(self, g: nx.DiGraph) -> str:
+        first_successor = next(g.successors(self))
+        ret_val = 'trajectory id,trajectory cat,' + first_successor.report_header_string(g)
+        return ret_val
 
     @property
     def report_data_lines(self) -> str:
@@ -193,8 +194,7 @@ class ParseTreeNodeL1(Parse_Tree_Node):
     def depth_level(self):
         return 1
 
-    @property
-    def report_header_string(self) -> str:
+    def report_header_string(self, g: nx.DiGraph) -> str:
         def report_header_string(self) -> str:
             return 'L1id, L1cat,' \
                    + self.my_trajectory[self.start].report_header_string
@@ -212,14 +212,18 @@ class ParseTreeNodeL2(Parse_Tree_Node):
     def depth_level(self):
         return 2
 
-    @property
-    def report_header_string(self) -> str:
-        return 'L2id, L2cat,' \
-               + self.my_trajectory[self.start].report_header_string
+    def report_header_string(self, g: nx.DiGraph) -> str:
+        first_successor = next(g.successors(self))
+        ret_val = 'L2id, L2cat,' + first_successor.report_header_string(g)
+        return ret_val
 
     @property
     def report_data_lines(self) -> str:
-        ret_str = '{0},{1}'.format_map(self.index, self)
+        ret_list = list('{0},{1}'.format(self.index, 'No Category'))
+        for a_node in self.my_trajectory[self.start-1:self.stop]:
+            ret_list.append(a_node.report_data_lines)
+
+        return '\n'.join(ret_list)
 
 
 class Parse_Tree_Leaf(Parse_Tree_Node):
@@ -235,8 +239,7 @@ class Parse_Tree_Leaf(Parse_Tree_Node):
     def my_point(self):
         return self.my_slice[0]
 
-    @property
-    def report_header_string(self) -> str:
+    def report_header_string(self, g: nx.DiGraph) -> str:
         return \
         'L4id, L4cat, Long, Lat, radius_mi, Dc°, Δ°, ' \
         'Chord Δ°, ℓ_Back_mi, ℓ_Ahead_mi'

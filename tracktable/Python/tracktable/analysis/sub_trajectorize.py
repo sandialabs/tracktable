@@ -432,17 +432,6 @@ class SubTrajerCurvature:
             except ImportError:
                 pass
 
-        # pointCount = len(aPointList)
-        # aPointList = aPointList[1:-1]
-        # aSliceList = SliceList(aPointList, RangeWidth=1, Overlap=0,
-        #                        computeAttribs=tag_zigzag_segments)
-        #
-        # predicate = lambda a, b: a.DegreeOfCurve == b.DegreeOfCurve
-        # aSliceList.consolidateNodeIf(predicate)
-        #
-        # aSliceList.shiftInteriorBoundariesBy(1)
-        # aSliceList.pointCount = pointCount
-
         return G
 
 
@@ -499,7 +488,8 @@ class SubTrajerCurvature:
         leafList = list(nxg.leaves_gen(parse_graph))
         temp_test_str = None
         if 'CLX4' in aPointList.name:
-            temp_test_str = SL.get_customizable_report_string(leafList)
+            temp_test_str = parse_graph.csv_report
+            # temp_test_str = SL.get_customizable_report_string_old(leafList)
         if temp_test_str:
             import os
             outFileName = os.path.join(os.path.expanduser(
