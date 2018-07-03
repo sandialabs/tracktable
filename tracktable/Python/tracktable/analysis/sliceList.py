@@ -293,11 +293,8 @@ def get_customizable_report_string(some_leaves):
                         'Chord Δ°,ℓ_Back_mi,ℓ_Ahead_mi,' \
                         'seconds,speed_mph,Radial_μg\n'
 
-    try:
-        for a_leaf in some_leaves:
-            accumulate_string += a_leaf.create_debug_report_string1()
-    except Exception:
-        pass
+    for a_leaf in some_leaves:
+        accumulate_string += a_leaf.create_debug_report_string1()
 
     return accumulate_string
 
