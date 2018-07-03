@@ -71,26 +71,36 @@ class Parse_Tree_Node(list):
     @property
     def description(self):
         retList = list()
-        retString = ('Segment: Index: {3} Target Index: {0} - {1}\n'
-                     'Seg Type: {2}') \
-            .format(self.start, self.stop - 1,
-                    self.my_slice.DegreeOfCurve, self.index)
+        try:
+            catstr = str(self.category).split('.')[1].title()
+            retString = ('Segment: Index: {3} Target Index: {0} - {1}\n'
+                         'Seg Category: {2}') \
+                .format(self.start, self.stop - 1,
+                        catstr, self.index)
+        except Exception:
+            retString = ('Segment: Index: {3} Target Index: {0} - {1}\n') \
+                .format(self.start, self.stop - 1,
+                        None, self.index)
+
         retList.append(retString)
 
-        retList.append('\nWhole Trajectory:')
-        retList.append('Start Time: {0}' \
-                       .format(self._traj_get_time_str(0)))
-        retList.append('End   Time: {0}' \
-                       .format(self._traj_get_time_str(-1)))
-        retList.append('Duration: {0}' \
-                       .format(self._traj_get_duration_str(0, -1)))
+        try:
+            retList.append('\nWhole Trajectory:')
+            retList.append('Start Time: {0}' \
+                           .format(self._traj_get_time_str(0)))
+            retList.append('End   Time: {0}' \
+                           .format(self._traj_get_time_str(-1)))
+            retList.append('Duration: {0}' \
+                           .format(self._traj_get_duration_str(0, -1)))
 
-        retList.append('\nStart Alt: {0}' \
-                       .format(self._traj_get_alt_str(0)))
-        retList.append('Mid Alt: {0}' \
-                       .format(self._traj_get_mid_alt_str()))
-        retList.append('End Alt: {0}' \
-                       .format(self._traj_get_alt_str(-1)))
+            retList.append('\nStart Alt: {0}' \
+                           .format(self._traj_get_alt_str(0)))
+            retList.append('Mid Alt: {0}' \
+                           .format(self._traj_get_mid_alt_str()))
+            retList.append('End Alt: {0}' \
+                           .format(self._traj_get_alt_str(-1)))
+        except AttributeError:
+            retList.pop()
 
         return '\n'.join(retList)
 

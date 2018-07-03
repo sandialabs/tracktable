@@ -117,9 +117,12 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
     sr = stackWriter()
     returnString = list(sr.push('Placemark'))
     returnString.append(sr.singleLine('name', trajectory[0].object_id))
+
     try:
-        aDesc = a_segment.description
-        returnString.append(sr.singleLine('description', aDesc))
+        a_desc = a_segment.description
+        if '<' in a_desc:
+            a_desc = "Description not available."
+        returnString.append(sr.singleLine('description', a_desc))
     except AttributeError:
         pass
 

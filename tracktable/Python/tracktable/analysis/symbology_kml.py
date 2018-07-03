@@ -63,7 +63,7 @@ class stackWriter():
         return '\t' * self._tab_level
 
 
-# This color palette taken from
+# This color palette is based on
 # http://mkweb.bcgsc.ca/colorblind/
 # Conservative Seven Color Palette
 
@@ -75,6 +75,7 @@ yellow = ('#%02x%02x%02x' % (240, 228, 66)).upper()
 blue = ('#%02x%02x%02x' % (0, 114, 178)).upper()
 vermillion = ('#%02x%02x%02x' % (213, 94, 0)).upper()
 reddish_purple = ('#%02x%02x%02x' % (204, 121, 167)).upper()
+white = ('#%02x%02x%02x' % (255, 255, 255)).upper()
 
 color_blind_acceptable_dict = \
     {
@@ -86,6 +87,7 @@ color_blind_acceptable_dict = \
         blue: 'blue',
         vermillion: 'vermillion',
         reddish_purple: 'reddish purple',
+        white: 'white',
         'black': black,
         'orange': orange,
         'sky blue': sky_blue,
@@ -94,6 +96,7 @@ color_blind_acceptable_dict = \
         'blue': blue,
         'vermillion': vermillion,
         'reddish_purple': reddish_purple,
+        'white': white
     }
 
 
@@ -101,6 +104,12 @@ def color_name_to_rgb_string(color_name, alpha=None, swap_red_blue=False,
                              limit_to_color_blind_palette=False):
     if limit_to_color_blind_palette:
         rgb = color_blind_acceptable_dict[color_name]
+        if swap_red_blue:
+            rgb = rgb[1:]
+            r = rgb[:2]
+            g = rgb[2:-2]
+            b = rgb[-2:]
+            rgb = '#' + b + g + r
         return '#FF' + rgb[1:]
 
     r, g, b, a = clr.ColorConverter().to_rgba(color_name, alpha=alpha)
@@ -152,7 +161,8 @@ class kml_symbology():
         self.symbology_name = symbology_name
         try:
             self.color = color_name_to_rgb_string(color, alpha,
-                                                  swap_red_blue=True)
+                         swap_red_blue=True,
+                         limit_to_color_blind_palette=True)
         except:
             self.color = hex(int(color, 16)).upper()[2:]
 

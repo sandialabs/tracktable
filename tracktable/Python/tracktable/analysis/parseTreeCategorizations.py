@@ -131,7 +131,7 @@ class Level2Cat(CategoryBase):
     @property
     def symbology(self):
         if self == Level2Cat.left_turn:
-            return kml_symbology(self.name, color='sky blue', width=3)
+            return kml_symbology(self.name, color='yellow', width=3)
         elif self == Level2Cat.straight:
             return kml_symbology(self.name, color='white', width=3)
         elif self == Level2Cat.right_turn:
@@ -193,7 +193,8 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     root, _1, _2, lev_3 = partitioned_tuple
     l2_node_list = ParseTreeNode.NodeListAtLevel(2)
     l2_node_list.start_new_with(lev_3[0], 0)
-    l2_node_list.current.category = level2_categorize(lev_3[1]) # trouble here if CategoryStateException
+    l2_node_list.current.category = level2_categorize(lev_3[1])
+    l2_node_list.current.index = node_count = 0
     for a_node in lev_3[2:-1]:
         try:
             prospective_category = level2_categorize(a_node)
@@ -206,8 +207,10 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
         if keep_extending:
             l2_node_list.extend_with(a_node)
         else:
+            node_count += 1
             l2_node_list.start_new_with(a_node)
             l2_node_list.current.category = prospective_category
+            l2_node_list.current.index = node_count
 
     _insinuate_new_nodes_into_tree(l2_node_list, g, partitioned_tuple)
 
