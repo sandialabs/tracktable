@@ -288,7 +288,16 @@ class SliceList(deque):
             retStr = retStr +  str(itm) + '\n'
         return retStr
 
-def get_customizable_report_string(some_leaves):
+from tracktable.analysis.nx_graph import TreeDiGraph
+from tracktable.analysis.parseTreeNode import *
+def get_customizaable_report_string(g: TreeDiGraph) -> str:
+    root_node: Parse_Tree_Root = g.root_node
+    ret_list = list(root_node.report_header_string)
+
+    return '\n'.join(ret_list)
+
+
+def get_customizable_report_string_old(some_leaves):
     accumulate_string = 'id,class,ndx,Long,Lat,radius_mi,Dc°,Δ°,' \
                         'Chord Δ°,ℓ_Back_mi,ℓ_Ahead_mi,' \
                         'seconds,speed_mph,Radial_μg\n'

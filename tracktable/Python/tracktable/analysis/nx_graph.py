@@ -22,6 +22,18 @@ class TreeDiGraph(nx.DiGraph):
                 self._root_node = None
             return self._root_node
 
+    @property
+    def csv_report(self):
+        root: Parse_Tree_Root = self.root_node
+        astr = root.report_header_string(self)
+        accumulate_list = list(astr)
+        # accumulate_list.extend(root.report_data_lines)
+        temp = self.successors(root)
+
+
+        return '\n'.join(accumulate_list)
+
+
 try:
     import pygraphviz
     from networkx.drawing.nx_agraph import graphviz_layout
