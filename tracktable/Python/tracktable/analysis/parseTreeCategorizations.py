@@ -131,11 +131,11 @@ class Level2Cat(CategoryBase):
     @property
     def symbology(self):
         if self == Level2Cat.left_turn:
-            return kml_symbology(self.name, color='green', width=3)
+            return kml_symbology(self.name, color='sky blue', width=3)
         elif self == Level2Cat.straight:
             return kml_symbology(self.name, color='white', width=3)
         elif self == Level2Cat.right_turn:
-            return kml_symbology(self.name, color='red', width=3)
+            return kml_symbology(self.name, color='vermillion', width=3)
 
 
 class CategoryStateException(AttributeError):

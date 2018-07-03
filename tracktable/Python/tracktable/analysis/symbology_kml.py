@@ -125,22 +125,12 @@ def color_name_to_rgb_string(color_name, alpha=None, swap_red_blue=False,
 
 if __name__ == '__main__':
     print('Test runs.')
-
-
-    all_colors = clr._colors_full_map
-    for key, value in all_colors.items():
-        if key.startswith('xkcd:'):
-            continue
-        for color_code, color_name in color_blind_acceptable_dict.items():
-            if value == color_code:
-                print('Web site {0} is matplotlib {1}'\
-                    .format(color_name, key))
-                break
-
-
     print('Purple is', color_name_to_rgb_string('purple'))
     print('Transparent Charteuse is', color_name_to_rgb_string('chartreuse',
                                                               0.5))
+    print ('Color Blind friendly vermillion is',
+           color_name_to_rgb_string('vermillion',
+            limit_to_color_blind_palette=True))
 
 class kml_symbology():
     def __init__(self, symbology_name: str,
