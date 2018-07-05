@@ -47,11 +47,11 @@ class CategoryBase(enum.Enum):
                          attr_name: str,
                          comparison_value: Union[int, float]) \
                         -> bool:
+
         return getattr(target_variable, attr_name) <= comparison_value
 
     @classmethod
     def assign_to(cls, a_parse_tree_node, new_attr_name):
-        dbg = True
         for enm in cls:
             if enm.criteria_lambda(a_parse_tree_node, enm.value[0]):
                 setattr(a_parse_tree_node, new_attr_name, enm)
@@ -101,16 +101,16 @@ class CurvatureCat(CategoryBase):
 class DeflectionCat(CategoryBase):
     """Categorize the deflection (change in heading) of a pair of trajectory
     chord segments."""
-    sharp_left = (-6, lambda v, this_num:
+    sharp_left = (-9.5, lambda v, this_num:
         CategoryBase.default_criteria(v, "deflection_deg", this_num))
 
-    left = (-2, lambda v, this_num:
+    left = (-3, lambda v, this_num:
         CategoryBase.default_criteria(v, "deflection_deg", this_num))
 
-    straight = (2, lambda v, this_num:
+    straight = (3, lambda v, this_num:
         CategoryBase.default_criteria(v, "deflection_deg", this_num))
 
-    right = (6, lambda v, this_num:
+    right = (9.5, lambda v, this_num:
         CategoryBase.default_criteria(v, "deflection_deg", this_num))
 
     sharp_right = (360, lambda v, this_num: True)
@@ -151,7 +151,7 @@ def level2_categorize(leaf_node: ParseTreeNode.Parse_Tree_Leaf) -> Level2Cat:
     if getattr(leaf, "may_be_zigzag", False):
         raise CategoryStateException('zigzag')
 
-    if leaf.curvature_cat < CurvatureCat.flat:
+    if leaf.curvature_cat < CurvatureCat.normal_left:
         l2_cat = Level2Cat.left_turn
     elif leaf.curvature_cat > CurvatureCat.flat:
         l2_cat = Level2Cat.right_turn
@@ -186,8 +186,6 @@ def _insinuate_new_nodes_into_tree(node_list: ParseTreeNode,
             g.add_edge(an_L2_node, a_leaf)
 
 
-    dbg = True
-
 def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     """When you see a bunch of functions with numbers in the function names,
         it is a prediction that you will be refactoring later."""
@@ -211,19 +209,25 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
             l2_node_list.extend_with(a_node)
         else:
             node_count += 1
+            # l2_node_list.current[1] -= 1
             l2_node_list.start_new_with(a_node)
             l2_node_list.current.category = prospective_category
             l2_node_list.current.index = node_count
 
-    leaf_successors_of_root_before_insinuation = \
-        [n for n in g.successors(g.root_node) if n.depth_level == 3]
+    #region This region is a kludge until I can get my indexing right.
+    for cnt, a_node in enumerate(l2_node_list[:-1]):
+        a_node[1] -= 1
+        if cnt > 0:
+            a_node[0] -= 1
+    l2_node_list[-1][0] -= 1
+    #endregion
+
+    # leaf_successors_of_root_before_insinuation = \
+    #     [n for n in g.successors(g.root_node) if n.depth_level == 3]
 
     _insinuate_new_nodes_into_tree(l2_node_list, g, partitioned_tuple)
-    successors_of_root_after_insinuation = \
-        [n for n in g.successors(g.root_node) if n.depth_level == 3]
-
-    dbg = True
-
+    # successors_of_root_after_insinuation = \
+    #     [n for n in g.successors(g.root_node) if n.depth_level == 3]
 
 
 def _test_run():

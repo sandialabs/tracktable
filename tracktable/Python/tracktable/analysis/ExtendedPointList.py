@@ -124,10 +124,13 @@ class ExtendedPointList(list):
 
     def categorize_points(self: "ExtendedPointList") -> None:
         """For certain criteria, categorize each point."""
+        lcl_index = 1
         for a_point in self[1:-1]:
+            lcl_index += 1
             CATs.LegLengthCat.assign_to(a_point, 'leg_length_cat')
             CATs.CurvatureCat.assign_to(a_point, 'curvature_cat')
             CATs.DeflectionCat.assign_to(a_point, 'deflection_cat')
+
         self[0].leg_length_cat = self[1].leg_length_cat = None
         self[0].curvature_cat = self[-1].curvature_cat = None
         self[0].deflection_cat = self[-1].deflection_cat = None
@@ -199,7 +202,7 @@ def _createExtendedPointList_trajectory(trajectory):
     xIndex = 0; yIndex = 1; zIndex = 2
     newEPL = ExtendedPointList()
     prevRow = None
-    for aRow in trajectory:
+    for indx, aRow in enumerate(trajectory):
         x = aRow[xIndex]
         y = aRow[yIndex]
         z = geomath.altitude(aRow)

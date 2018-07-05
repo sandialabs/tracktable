@@ -323,7 +323,7 @@ class ExtendedPoint(object):
     @property
     def deflection_deg(self):
         try:
-            return self.pt2pt.deflection
+            return self.pt2pt.deflection_deg
         except AttributeError:
             return None
 
@@ -751,9 +751,6 @@ def compute_arc_parameters_lat_long(point1, point2, point3,
     shadow1 = ExtendedPoint(delta12_long, delta12_lat)
     shadow2 = ExtendedPoint(0.0, 0.0) 
     shadow3 = ExtendedPoint(delta23_long, delta23_lat)
-
-    if math.isclose(point2.X, -121.367):
-        dbg = True
 
     # 3. Perform computations on the 3 shadow points.
     compute_arc_parameters(shadow1, shadow2, shadow3,
