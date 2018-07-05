@@ -170,7 +170,7 @@ def get_placemark_string(trajectory, a_segment,
     #Also, if the altitudes are all 0, we msut set altitudeMode to realative.
     altitude_list = []
 
-    try:
+    if a_segment.start != 0:
         prev_pt = trajectory[a_segment.start-1]
         start_pt = trajectory[a_segment.start]
         halfway_pt = _interpolate_points(prev_pt, start_pt)
@@ -184,8 +184,6 @@ def get_placemark_string(trajectory, a_segment,
                                             alt)
         returnString.append(
             sr.singleLine('gx:coord', point_str))
-    except IndexError:
-        pass
 
     for a_point in trajectory[a_segment.start:a_segment.stop]:
         # try:
