@@ -612,6 +612,7 @@ def compute_arc_parameters(point1, point2, point3,
         point2.arc.radiusStartVector = False
         point2.arc.radiusEndVector = False
         point2.arc.deflection = 0.0
+        point2.arc.deflection_deg = 0.0
         point2.arc.ArcLengthBack = 0.0
         point2.arc.ArcLengthAhead = 0.0
         return
