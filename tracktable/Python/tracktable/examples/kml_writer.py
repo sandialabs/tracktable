@@ -44,9 +44,11 @@ def write_kml_graph(fn, trajectory, g: nx.DiGraph, with_altitude=True):
 
         # write the segments
         for a_segment in level_2_list:
-            kml_f.write(get_placemark_string(trajectory, a_segment,
+            write_str = get_placemark_string(trajectory, a_segment,
                                              with_altitude,
-                                             with_time=False))
+                                             with_time=False)
+            if write_str:
+                kml_f.write(write_str)
 
         # write the kml footer
         kml_f.write("</Document>\n")
@@ -102,9 +104,17 @@ def _compose_traj_name(traj, suffix_str=''):
     """Gets the name of the trajectory. Appends optional suffix string."""
     return traj[0].object_id + suffix_str
 
+def _interpolate_points(point1: tuple, point2: tuple) -> tuple:
+    long = statistics.mean([point1[0], point2[0]])
+    lat =  statistics.mean([point1[1], point2[1]])
+    if len(point1) > 2:
+        alt = statistics.mean([point1[2], point2[2]])
+        return long, lat, alt
+    else:
+        return long, lat
 
-
-def get_placemark_string(trajectory, a_segment, with_altitude=False,
+def get_placemark_string(trajectory, a_segment,
+                         with_altitude=False,
                          with_time=False):
     """
     Given a trajectory and a single subtrajectory slice, return a kml string
@@ -115,6 +125,9 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
     :return: the Placemark string
     :rtype: str
     """
+    if not a_segment:
+        return
+
     sr = stackWriter()
     returnString = list(sr.push('Placemark'))
     returnString.append(sr.singleLine('name', trajectory[0].object_id))
@@ -157,18 +170,50 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
     #Also, if the altitudes are all 0, we msut set altitudeMode to realative.
     altitude_list = []
 
-    for a_point in trajectory[a_segment.start:a_segment.stop+1]:
+    try:
+        prev_pt = trajectory[a_segment.start-1]
+        start_pt = trajectory[a_segment.start]
+        halfway_pt = _interpolate_points(prev_pt, start_pt)
+        try:
+            alt = geomath.altitude(halfway_pt) * convertFeetToMeters
+        except AttributeError:
+            alt = 0
+        altitude_list.append(alt)
+        point_str = formatString.format(geomath.longitude(halfway_pt),
+                                        geomath.latitude(halfway_pt),
+                                            alt)
+        returnString.append(
+            sr.singleLine('gx:coord', point_str))
+    except IndexError:
+        pass
+
+    for a_point in trajectory[a_segment.start:a_segment.stop]:
         # try:
         alt = geomath.altitude(a_point) * convertFeetToMeters
         altitude_list.append(alt)
         point_str = formatString.format(geomath.longitude(a_point),
                                         geomath.latitude(a_point),
                                             alt)
-        # except Exception:
-        #     point_str = formatString.format(geomath.longitude(a_point),
-        #                        geomath.latitude(a_point))
         returnString.append(
             sr.singleLine('gx:coord', point_str))
+
+    try:
+        lastplotted = trajectory[a_segment.stop-1]
+        next_seg_first_pt = trajectory[a_segment.stop]
+        halfway_pt = _interpolate_points(lastplotted, next_seg_first_pt)
+        try:
+            alt = geomath.altitude(halfway_pt) * convertFeetToMeters
+        except AttributeError:
+            alt = 0
+        altitude_list.append(alt)
+        point_str = formatString.format(geomath.longitude(halfway_pt),
+                                        geomath.latitude(halfway_pt),
+                                            alt)
+        returnString.append(
+            sr.singleLine('gx:coord', point_str))
+    except IndexError:
+        pass
+
 
     if statistics.median(altitude_list) < 100.0:
         returnString.append(sr.singleLine('altitudeMode', 'relative'))
