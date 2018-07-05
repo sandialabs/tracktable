@@ -25,14 +25,9 @@ class TreeDiGraph(nx.DiGraph):
     @property
     def csv_report(self):
         root: Parse_Tree_Root = self.root_node
-        astr = root.report_header_string(self)
-        accumulate_list = list(astr)
-        # accumulate_list.extend(root.report_data_lines)
-        temp = self.successors(root)
-
-
-        return '\n'.join(accumulate_list)
-
+        header_str = root.report_header_string(self)
+        data_str = root.report_data_lines(self)
+        return header_str + data_str
 
 try:
     import pygraphviz

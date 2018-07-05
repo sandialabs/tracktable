@@ -489,7 +489,6 @@ class SubTrajerCurvature:
         temp_test_str = None
         if 'CLX4' in aPointList.name:
             temp_test_str = parse_graph.csv_report
-            # temp_test_str = SL.get_customizable_report_string_old(leafList)
         if temp_test_str:
             import os
             outFileName = os.path.join(os.path.expanduser(

@@ -1,7 +1,8 @@
 import math
 import networkx as nx
-from typing import List, Any
+from typing import List, Any, Union
 # from tracktable.analysis.parseTreeCategorizations import CategoryBase
+
 
 class Parse_Tree_Node(list):
 
@@ -75,14 +76,13 @@ class Parse_Tree_Node(list):
     def report_header_string(self, g: nx.DiGraph) -> str:
         raise NotImplementedError
 
-    @property
-    def report_data_lines(self) -> str:
+    def report_data_lines(self, g: nx.DiGraph) -> Union[List[str],str]:
         raise NotImplementedError
 
     # _the_category: CategoryBase = None
-    # @property
-    # def category(self) -> CategoryBase:
-    #     return self._the_category
+    @property
+    def category_str(self) -> str:
+        return 'No Cat.'
     # @category.setter
     # def category(self, value: CategoryBase) -> None:
     #     self._the_category = value
@@ -177,12 +177,22 @@ class Parse_Tree_Root(Parse_Tree_Node):
 
     def report_header_string(self, g: nx.DiGraph) -> str:
         first_successor = next(g.successors(self))
-        ret_val = 'trajectory id,trajectory cat,' + first_successor.report_header_string(g)
+        ret_val = 'trajectory id,trajectory cat,' + \
+                  first_successor.report_header_string(g)
         return ret_val
 
-    @property
-    def report_data_lines(self) -> str:
-        raise NotImplementedError
+    def report_data_lines(self, g: nx.DiGraph) -> str:
+        successors = list(g.successors(self))
+        successors.sort(key=lambda node:node.start)
+        prefix_str = 'No Name Root,No Category,'
+        ret_list = []
+        for a_node in successors:
+            row_str = prefix_str + a_node.report_data_lines(g)
+            ret_list.append(row_str)
+            prefix_str = ',,'
+            dbg = True
+
+        return '\n'.join(ret_list)
 
 class ParseTreeNodeL1(Parse_Tree_Node):
     def __init__(self, point_range, my_traj=None, associatedSlice=None,
@@ -198,8 +208,8 @@ class ParseTreeNodeL1(Parse_Tree_Node):
         def report_header_string(self) -> str:
             return 'L1id, L1cat,' \
                    + self.my_trajectory[self.start].report_header_string
-    @property
-    def report_data_lines(self) -> str:
+
+    def report_data_lines(self, g: nx.DiGraph) -> str:
         raise NotImplementedError
 
 
@@ -212,16 +222,26 @@ class ParseTreeNodeL2(Parse_Tree_Node):
     def depth_level(self):
         return 2
 
+    @property
+    def category_str(self) -> str:
+        return self.category
+
     def report_header_string(self, g: nx.DiGraph) -> str:
         first_successor = next(g.successors(self))
         ret_val = 'L2id, L2cat,' + first_successor.report_header_string(g)
         return ret_val
 
-    @property
-    def report_data_lines(self) -> str:
-        ret_list = list('{0},{1}'.format(self.index, 'No Category'))
-        for a_node in self.my_trajectory[self.start-1:self.stop]:
-            ret_list.append(a_node.report_data_lines)
+    def report_data_lines(self, g: nx.DiGraph) -> str:
+        ret_str_prefix = '{0} L2,{1},'.format(self.index, self.category_str)
+        successors = list(g.successors(self))
+        successors.sort(key=lambda node: node.start)
+        ret_list = []
+        for a_node in successors:
+            ret_string = ret_str_prefix
+            point_csv = a_node.report_data_lines(g)
+            ret_string = ret_string + point_csv
+            ret_list.append(ret_string)
+            ret_str_prefix = ',,,,'
 
         return '\n'.join(ret_list)
 
@@ -239,25 +259,37 @@ class Parse_Tree_Leaf(Parse_Tree_Node):
     def my_point(self):
         return self.my_slice[0]
 
+    @property
+    def category_str(self) -> str:
+        pt = self.my_point
+        ret_str = '{0} | {1} | {2}'.format(pt.curvature_cat,pt.deflection_cat,
+                                       pt.leg_length_cat)
+        return ret_str
+
     def report_header_string(self, g: nx.DiGraph) -> str:
         return \
-        'L4id, L4cat, Long, Lat, radius_mi, Dc°, Δ°, ' \
-        'Chord Δ°, ℓ_Back_mi, ℓ_Ahead_mi'
-        # 'seconds, speed_mph, Radial_μg\n'
+        'L4id, L4cat, Long, Lat, radius_mi, Arc Dc°, Arc Δ°, ' \
+        'Chord Δ°, ℓ_Back_mi, ℓ_Ahead_mi' \
+        '\n'
+        # 'seconds, speed_mph, Radial_μgn'
 
-    @property
-    def report_data_lines(self) -> str:
+    _format_str = '{0},{1},{2:0.2f},{3:0.2f},{4:0.2f},{5:0.2f},' \
+                    '{6:0.2f},{7:0.2f},{8:0.2f},{9:0.2f}'
+    def report_data_lines(self, g: nx.DiGraph) -> str:
         pt = self.my_point
-        ret_str = '{0},{1},{2},{3},{4},{5},{6},{7},{8},{9}'
-        if pt.arc:
-            ret_str = ret_str.format(\
-                pt.my_index, "No category", pt.Y, pt.X,
-                math.fabs(pt.arc.radius),pt.arc.degreeCurveDeg,
-                pt.arc.deflection_deg,pt.pt2pt.deflection_deg,
-                pt.pt2pt.distanceBack,pt.pt2pt.distanceAhead
-                # ,pt.pt2pt.seconds_back,pt.pt2pt.speed_back_mph,
-                # pt.arc.radial_acceleration[0]
-            )
+        if not pt.pt2pt:
+            ret_str = '{0},,,,,,,,,'.format(pt.my_index)
+            return ret_str
+
+        teststr = self.category_str
+        ret_str = self._format_str.format(\
+            pt.my_index, self.category_str, pt.Y, pt.X,
+            math.fabs(pt.arc.radius),pt.arc.degree_curvature,
+            pt.arc.deflection_deg,pt.pt2pt.deflection_deg,
+            pt.pt2pt.distanceBack,pt.pt2pt.distanceAhead)
+            # ,pt.pt2pt.seconds_back,pt.pt2pt.speed_back_mph,
+            # pt.arc.radial_acceleration[0]
+        return ret_str
 
 
 class NodeListAtLevel(list):
