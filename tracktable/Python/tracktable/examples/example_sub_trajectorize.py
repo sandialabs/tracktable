@@ -349,8 +349,6 @@ def dev_createTrajectiresCustomList(tempV):
                 if successCount >= 11:
                     return retList
 
-            dbg = True
-
     print('finished')
     print(datetime.datetime.now())
     return retList
@@ -388,7 +386,7 @@ def dev_getTrajectoresInCustomList(tempV):
         gc.collect()
         if len(flightsDeque) == 0:
             return returnList
-        dbg = True
+
 
     print('finished')
     print(datetime.datetime.now())

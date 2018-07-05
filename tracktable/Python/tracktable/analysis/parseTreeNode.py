@@ -190,7 +190,6 @@ class Parse_Tree_Root(Parse_Tree_Node):
             row_str = prefix_str + a_node.report_data_lines(g)
             ret_list.append(row_str)
             prefix_str = ',,'
-            dbg = True
 
         return '\n'.join(ret_list)
 
@@ -281,7 +280,6 @@ class Parse_Tree_Leaf(Parse_Tree_Node):
             ret_str = '{0},,,,,,,,,'.format(pt.my_index)
             return ret_str
 
-        teststr = self.category_str
         ret_str = self._format_str.format(\
             pt.my_index, self.category_str, pt.Y, pt.X,
             math.fabs(pt.arc.radius),pt.arc.degree_curvature,

@@ -67,14 +67,6 @@ def plot_graph(nxGraph: nx.DiGraph) -> None:
         node_coords = pos[val]
         pos[val] = (node_coords[0], ycoord)
 
-    # for n, coords in zip(nxGraph.nodes, pos):
-    #     dbg = True
-        # try:
-        #     temp = nxGraph.node[n]
-        #     dbg = True
-        # except KeyError as ae:
-        #     dbg = True
-
     plt.figure(figsize=(12, 10))
     nx.draw(nxGraph, pos, node_size=20, alpha=0.5, node_color="blue",
             with_labels=False)
