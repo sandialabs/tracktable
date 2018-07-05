@@ -107,11 +107,11 @@ def _compose_traj_name(traj, suffix_str=''):
 def _interpolate_points(point1: tuple, point2: tuple) -> tuple:
     long = statistics.mean([point1[0], point2[0]])
     lat =  statistics.mean([point1[1], point2[1]])
-    if len(point1) > 2:
-        alt = statistics.mean([point1[2], point2[2]])
-        return long, lat, alt
-    else:
-        return long, lat
+    alt1 = geomath.altitude(point1)
+    alt2 = geomath.altitude(point2)
+    alt = statistics.mean([alt1, alt2])
+    return long, lat, alt
+
 
 def get_placemark_string(trajectory, a_segment,
                          with_altitude=False,
@@ -127,6 +127,17 @@ def get_placemark_string(trajectory, a_segment,
     """
     if not a_segment:
         return
+
+    altitude_mode = 'absolute'
+    altitude_list = []
+    for a_pt in trajectory:
+        try:
+            alt = geomath.altitude(a_pt)
+        except AttributeError:
+            alt = 0
+        altitude_list.append(alt)
+    if statistics.median(altitude_list) < 100.0:
+        altitude_mode = 'relative'
 
     sr = stackWriter()
     returnString = list(sr.push('Placemark'))
@@ -175,7 +186,7 @@ def get_placemark_string(trajectory, a_segment,
         start_pt = trajectory[a_segment.start]
         halfway_pt = _interpolate_points(prev_pt, start_pt)
         try:
-            alt = geomath.altitude(halfway_pt) * convertFeetToMeters
+            alt = halfway_pt[2] * convertFeetToMeters
         except AttributeError:
             alt = 0
         altitude_list.append(alt)
@@ -200,7 +211,7 @@ def get_placemark_string(trajectory, a_segment,
         next_seg_first_pt = trajectory[a_segment.stop]
         halfway_pt = _interpolate_points(lastplotted, next_seg_first_pt)
         try:
-            alt = geomath.altitude(halfway_pt) * convertFeetToMeters
+            alt = halfway_pt[2] * convertFeetToMeters
         except AttributeError:
             alt = 0
         altitude_list.append(alt)
@@ -212,11 +223,7 @@ def get_placemark_string(trajectory, a_segment,
     except IndexError:
         pass
 
-
-    if statistics.median(altitude_list) < 100.0:
-        returnString.append(sr.singleLine('altitudeMode', 'relative'))
-    else:
-        returnString.append(sr.singleLine('altitudeMode', 'absolute'))
+    returnString.append(sr.singleLine('altitudeMode', altitude_mode))
     returnString.append(sr.pop()) # 'gx: Track'
 
     returnString.append(sr.pop()) # 'Placemark'
