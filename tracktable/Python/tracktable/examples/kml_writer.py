@@ -4,6 +4,7 @@ from collections import namedtuple
 from tracktable.analysis.symbology_kml import *
 import networkx as nx
 from tracktable.analysis.nx_graph import depth_level_x_gen
+import statistics
 
 lavendar_color = 'FFB57EDC'
 red_color = 'FF0000FF'
@@ -141,7 +142,6 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
         pass
 
     returnString.append(sr.push('gx:Track'))
-    returnString.append(sr.singleLine('altitudeMode', 'relative'))
 
     if with_time:
         for a_point in trajectory[a_segment.start:a_segment.stop]:
@@ -153,9 +153,14 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
     convertFeetToMeters = 0.3048
     formatString = '{0},{1},{2}' if with_altitude \
         else '{0},{1},0.0'
+
+    #Also, if the altitudes are all 0, we msut set altitudeMode to realative.
+    altitude_list = []
+
     for a_point in trajectory[a_segment.start:a_segment.stop+1]:
         # try:
         alt = geomath.altitude(a_point) * convertFeetToMeters
+        altitude_list.append(alt)
         point_str = formatString.format(geomath.longitude(a_point),
                                         geomath.latitude(a_point),
                                             alt)
@@ -164,6 +169,11 @@ def get_placemark_string(trajectory, a_segment, with_altitude=False,
         #                        geomath.latitude(a_point))
         returnString.append(
             sr.singleLine('gx:coord', point_str))
+
+    if statistics.median(altitude_list) < 100.0:
+        returnString.append(sr.singleLine('altitudeMode', 'relative'))
+    else:
+        returnString.append(sr.singleLine('altitudeMode', 'absolute'))
     returnString.append(sr.pop()) # 'gx: Track'
 
     returnString.append(sr.pop()) # 'Placemark'
