@@ -106,7 +106,7 @@ def _compose_traj_name(traj, suffix_str=''):
 
 def _interpolate_points(point1: tuple, point2: tuple) -> tuple:
     long = statistics.mean([point1[0], point2[0]])
-    lat =  statistics.mean([point1[1], point2[1]])
+    lat = statistics.mean([point1[1], point2[1]])
     alt1 = geomath.altitude(point1)
     alt2 = geomath.altitude(point2)
     alt = statistics.mean([alt1, alt2])
