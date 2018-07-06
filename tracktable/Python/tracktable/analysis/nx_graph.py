@@ -41,6 +41,8 @@ except ImportError:
                           "PyGraphviz or pydot. 'pip install pydot' worked"
                           " for me.")
 
+level2_y_adjustment = 600.0
+
 def plot_graph(nxGraph: nx.DiGraph) -> None:
     """
     Plot the graph via matplotlib.
@@ -54,29 +56,46 @@ def plot_graph(nxGraph: nx.DiGraph) -> None:
     level2_nodes_g = nx.DiGraph(); level2_node_labels = {}
     for val in pos:
         level = int(str(val)[-1])
-        try:
-            ycoord = plot_graph.switch[level]
-        except KeyError:
-            level2_label_coords[val] = pos[val]
+        ycoord = plot_graph.switch[level]
+        node_coords = pos[val]
+        pos[val] = (node_coords[0], ycoord)
+        if level == 2:
+            try:
+                y_multipler = val.category.value[0]
+            except TypeError:
+                y_multipler = val.category.value
+            pos[val] = (node_coords[0], ycoord)
+            text_coord = pos[val]
+            text_coord_y_adjust = y_multipler * level2_y_adjustment * -1
+            text_coord = text_coord[0], text_coord[1]+text_coord_y_adjust
+            level2_label_coords[val] = text_coord
             level2_nodes_g.add_node(val)
             cat_str = (str(val.category)).split('.')[-1]\
                 .replace('_', ' ').title()
             level2_node_labels[val] = str(cat_str)
-            # val.key
             continue
-        node_coords = pos[val]
-        pos[val] = (node_coords[0], ycoord)
 
     plt.figure(figsize=(12, 10))
     nx.draw(nxGraph, pos, node_size=20, alpha=0.5, node_color="blue",
             with_labels=False)
-    nx.draw(level2_nodes_g, level2_label_coords, node_size=100, alpha=0.5,
-            labels=level2_node_labels, node_color="red", with_labels=True)
+
+    nx.draw_networkx_labels(nxGraph, level2_label_coords, level2_node_labels,
+                            font_size=10,
+                            bbox=dict(boxstyle="square",
+                                      ec='k',
+                                      fc=(0.5, 0.5, 0.5, 0.10),))
+    # for nx draw labels see
+    # https://networkx.github.io/documentation/networkx-2.0/reference/generate
+    # d/networkx.drawing.nx_pylab.draw_networkx_labels.html
+    # for matplotlib bounding boxes see
+    # https://matplotlib.org/gallery/shapes_and_collections/fancybox_demo.html
+
     plt.axis('off')
     plt.show()
     # plt.savefig(r'/ascldap/users/pschrum/Documents/Getting Close.png')
 plot_graph.switch = {
     0: 10000,
+    2: -3333,
     3: -10000
 }
 
