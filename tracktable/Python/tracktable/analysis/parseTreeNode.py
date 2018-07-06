@@ -222,8 +222,13 @@ class ParseTreeNodeL2(Parse_Tree_Node):
         return 2
 
     @property
+    def point_count(self):
+        return self.stop - self.start + 1
+
+    @property
     def category_str(self) -> str:
-        return self.category
+        pre, post = str(self.category).split('.')
+        return pre[:3] + '.' + post
 
     def report_header_string(self, g: nx.DiGraph) -> str:
         first_successor = next(g.successors(self))
@@ -258,11 +263,26 @@ class Parse_Tree_Leaf(Parse_Tree_Node):
     def my_point(self):
         return self.my_slice[0]
 
+    def _shorten_category_strings(self, the_str: str) -> str:
+        ret_str = ['']
+        str_list = the_str.split('|')
+        for a_str in str_list:
+            if '.' in a_str:
+                tmp = a_str.strip()
+                tmp = tmp.split('.')
+                ret_str.append('.'.join([tmp[0][:3], tmp[1]]))
+            else:
+                ret_str.append('None')
+
+        return '|'.join(ret_str)
+
+
     @property
     def category_str(self) -> str:
         pt = self.my_point
         ret_str = '{0} | {1} | {2}'.format(pt.curvature_cat,pt.deflection_cat,
                                        pt.leg_length_cat)
+        ret_str = self._shorten_category_strings(ret_str)
         return ret_str
 
     def report_header_string(self, g: nx.DiGraph) -> str:
