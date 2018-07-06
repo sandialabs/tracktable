@@ -225,6 +225,14 @@ class ParseTreeNodeL2(Parse_Tree_Node):
     def point_count(self):
         return self.stop - self.start + 1
 
+    def get_point(self, pt_idx: int, leaf_list: "Parse_Tree_Leaf")\
+            -> "ExtendedPoint":
+        if pt_idx >= 0:
+            real_index = pt_idx + self.start
+        else:
+            real_index = self.stop + pt_idx
+        return leaf_list[real_index].my_point
+
     @property
     def category_str(self) -> str:
         pre, post = str(self.category).split('.')

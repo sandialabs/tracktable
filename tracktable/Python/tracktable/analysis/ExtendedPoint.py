@@ -321,6 +321,14 @@ class ExtendedPoint(object):
             return None
 
     @property
+    def defl_sign(self):
+        if self.pt2pt.deflection_deg < 0.0:
+            return -1
+        elif self.pt2pt.deflection_deg > 0.0:
+            return 1
+        return 0
+
+    @property
     def deflection_deg(self):
         try:
             return self.pt2pt.deflection_deg
