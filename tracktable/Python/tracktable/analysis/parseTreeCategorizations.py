@@ -148,8 +148,8 @@ def level2_categorize(leaf_node: ParseTreeNode.Parse_Tree_Leaf) -> Level2Cat:
     l2_cat = None
     leaf: EP = leaf_node.my_point
 
-    if getattr(leaf, "may_be_zigzag", False):
-        raise CategoryStateException('zigzag')
+    # if getattr(leaf, "may_be_zigzag", False):
+    #     raise CategoryStateException('zigzag')
 
     if leaf.curvature_cat < CurvatureCat.normal_left:
         l2_cat = Level2Cat.left_turn
