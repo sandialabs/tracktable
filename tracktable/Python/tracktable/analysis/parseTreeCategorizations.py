@@ -1,7 +1,7 @@
 import enum
 import tracktable.analysis.parseTreeNode as ParseTreeNode
 from typing import Any, Union
-from networkx import DiGraph
+from networkx import NetworkXError
 from tracktable.analysis.ExtendedPoint import ExtendedPoint as EP
 import tracktable.analysis.nx_graph as nxg
 from tracktable.analysis.symbology_kml import kml_symbology
@@ -183,7 +183,10 @@ def _insinuate_new_nodes_into_tree(node_list: ParseTreeNode,
         g.add_node(an_L2_node)
         g.add_edge(root, an_L2_node)
         for a_leaf in leaves[start:stop]:
-            g.remove_edge(root, a_leaf)
+            try:
+                g.remove_edge(root, a_leaf)
+            except NetworkXError:
+                pass
             g.add_edge(an_L2_node, a_leaf)
 
 
@@ -225,6 +228,7 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
 
     #region optional post-processing: Turning segments can steal one point
     # from adjacent straight segments when certain conditions obtain.
+    deflection_threshold = 2.0
     for node_index in range(1, len(l2_node_list)):
         prev: ParseTreeNode.ParseTreeNodeL2 = l2_node_list[node_index - 1]
         curr: ParseTreeNode.ParseTreeNodeL2 = l2_node_list[node_index]
@@ -232,13 +236,15 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
         pt_prev: EP = prev.get_point(-1, lev_3)
         if Level2Cat.straight == curr.category:
             if pt_prev.defl_sign * curr_first_pt.defl_sign > 0 \
-                    and math.fabs(curr_first_pt.deflection_deg) > 2.0:
+                    and math.fabs(curr_first_pt.deflection_deg) \
+                    > deflection_threshold:
                 # current gives the point to previous.
                 prev[1] += 1
                 curr[0] += 1
         elif Level2Cat.straight == prev.category:
             if pt_prev.defl_sign * curr_first_pt.defl_sign > 0 \
-                    and math.fabs(pt_prev.deflection_deg) > 2.0:
+                    and math.fabs(pt_prev.deflection_deg) \
+                    > deflection_threshold:
                 # current gives the point to previous.
                 prev[1] -= 1
                 curr[0] -= 1
