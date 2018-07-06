@@ -10,7 +10,7 @@ class Parse_Tree_Node(list):
                  associatedSlice=None,
                  ndx=-1):
         # self.my_slice = associatedSlice
-        self.my_trajectory = my_traj
+        self.target_collection = my_traj
         if ndx > -1:
             self.index = ndx
         for itm in point_range:
@@ -44,7 +44,7 @@ class Parse_Tree_Node(list):
 
     @property
     def my_slice(self):
-        return self.my_trajectory[self.start:self.stop]
+        return self.target_collection[self.start:self.stop]
 
     @property
     def depth_level(self):
@@ -52,24 +52,24 @@ class Parse_Tree_Node(list):
             self.__class__.__name__)
 
     def _traj_get_time_str(self, idx):
-        return self.my_trajectory[idx].timestamp.strftime('%H:%M:%S')
+        return self.target_collection[idx].timestamp.strftime('%H:%M:%S')
 
     def _traj_get_duration_str(self, start, stop):
-        duration = self.my_trajectory[stop].timestamp - \
-                   self.my_trajectory[start].timestamp
+        duration = self.target_collection[stop].timestamp - \
+                   self.target_collection[start].timestamp
         return str(duration)
 
     def _traj_get_alt_str(self, idx):
-        return str(self.my_trajectory[idx].Z)
+        return str(self.target_collection[idx].Z)
 
     def _traj_get_mid_alt_str(self):
-        traj_mid_point_count = len(self.my_trajectory) // 2
-        return str(self.my_trajectory[traj_mid_point_count].Z)
+        traj_mid_point_count = len(self.target_collection) // 2
+        return str(self.target_collection[traj_mid_point_count].Z)
 
     @property
     def horizontal_distance(self):
         accum_dist = 0.0
-        for a_seg in self.my_trajectory[self.start, self.stop]:
+        for a_seg in self.target_collection[self.start, self.stop]:
             accum_dist += a_seg.pt2pt.distanceBack
         return accum_dist
 
@@ -124,13 +124,13 @@ class Parse_Tree_Node(list):
         return '\n'.join(retList)
 
     def create_debug_report_string1(self):
-        pt1 = self.my_trajectory[self.start]
+        pt1 = self.target_collection[self.start]
         build_string = ''
         if self.start == 0:
             real_start = 1
         else:
             real_start = self.start
-            pt1 = self.my_trajectory[real_start - 1]
+            pt1 = self.target_collection[real_start - 1]
 
         build_string += '{0},{1},'.format(self.index,
                                           self.my_slice.DegreeOfCurve)
@@ -147,7 +147,7 @@ class Parse_Tree_Node(list):
                     pt1.pt2pt.distanceAhead, pt1.pt2pt.seconds_back,
                     pt1.pt2pt.speed_back_mph,
                     pt1.arc.radial_acceleration[0])
-        for pt1 in self.my_trajectory[real_start:self.stop - 2]:
+        for pt1 in self.target_collection[real_start:self.stop - 2]:
             build_string += ',,'
             build_string += main_string \
                 .format(self.index, self.my_slice.DegreeOfCurve,
@@ -169,7 +169,7 @@ class Parse_Tree_Root(Parse_Tree_Node):
     def __init__(self, point_range, my_traj=None, associatedSlice=None,
                  ndx=-1):
         super().__init__(point_range, my_traj, associatedSlice, ndx)
-        self.my_trajectory = None
+        self.target_collection = None
 
     @property
     def depth_level(self):
@@ -197,7 +197,7 @@ class ParseTreeNodeL1(Parse_Tree_Node):
     def __init__(self, point_range, my_traj=None, associatedSlice=None,
                  ndx=-1):
         super().__init__(point_range, my_traj, associatedSlice, ndx)
-        self.my_trajectory = None
+        self.target_collection = None
 
     @property
     def depth_level(self):
@@ -206,7 +206,7 @@ class ParseTreeNodeL1(Parse_Tree_Node):
     def report_header_string(self, g: nx.DiGraph) -> str:
         def report_header_string(self) -> str:
             return 'L1id, L1cat,' \
-                   + self.my_trajectory[self.start].report_header_string
+                   + self.target_collection[self.start].report_header_string
 
     def report_data_lines(self, g: nx.DiGraph) -> str:
         raise NotImplementedError
