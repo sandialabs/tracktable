@@ -403,8 +403,6 @@ class SubTrajerCurvature:
         :rtype: SliceList
         """
 
-        segmentPrimitives = ['straight', 'turn']
-
         def tag_zigzag_segments(aSliceRange):
             aSegment = aSliceRange.getSegment()
 
@@ -412,9 +410,6 @@ class SubTrajerCurvature:
                 if fabs(aSegment[0].arc.degree_curvature) < dcStraightThreshold \
                 else 'turn'
 
-            # aSliceRange.DegreeOfCurve = 'straight' \
-            #     if aSegment[0].may_be_zigzag \
-            #     else 'turn'
             aSliceRange.color = slice_range_class.straight_color
             if aSliceRange.DegreeOfCurve is not 'straight':
                 aSliceRange.color = slice_range_class.turn_color
@@ -487,7 +482,7 @@ class SubTrajerCurvature:
         import  tracktable.analysis.nx_graph as nxg
         leafList = list(nxg.leaves_gen(parse_graph))
         temp_test_str = None
-        if 'CLX4' in aPointList.name:
+        if True: #'CLX4' in aPointList.name:
             temp_test_str = parse_graph.csv_report
         if temp_test_str:
             import os
@@ -501,13 +496,6 @@ class SubTrajerCurvature:
                 print('report written to:  ', outFileName)
             except Exception:
                 print()
-        #         print('Could not write report csv file.')
-        #
-        # llSize = 0
-        # if leafList is not None:
-        #     llSize = len(leafList)
-        #
-        # return leafList, pointCount, llSize
 
         return parse_graph
 
