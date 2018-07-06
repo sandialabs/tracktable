@@ -144,12 +144,12 @@ class CategoryStateException(AttributeError):
 
 
 def level2_categorize(leaf_node: ParseTreeNode.Parse_Tree_Leaf) -> Level2Cat:
-    """If the leaf is zigzag, return None"""
+    """If the leaf is jitter, return None"""
     l2_cat = None
     leaf: EP = leaf_node.my_point
 
-    # if getattr(leaf, "may_be_zigzag", False):
-    #     raise CategoryStateException('zigzag')
+    # if getattr(leaf, "may_be_jitter", False):
+    #     raise CategoryStateException('jitter')
 
     if leaf.curvature_cat <= CurvatureCat.normal_left:
         l2_cat = Level2Cat.left_turn

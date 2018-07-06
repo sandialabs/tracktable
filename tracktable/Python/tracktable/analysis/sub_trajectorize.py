@@ -403,7 +403,7 @@ class SubTrajerCurvature:
         :rtype: SliceList
         """
 
-        def tag_zigzag_segments(aSliceRange):
+        def tag_jitter_segments(aSliceRange):
             aSegment = aSliceRange.getSegment()
 
             aSliceRange.DegreeOfCurve = 'straight' \
@@ -470,7 +470,7 @@ class SubTrajerCurvature:
             return None
 
         aPointList.computeAllPointInformation(account_for_lat_long=True)
-        aPointList.mark_likely_zigzags()
+        aPointList.mark_likely_jitters()
 
         try:
             parse_graph: nx.DiGraph = \

@@ -88,14 +88,14 @@ class ExtendedPointList(list):
         for idx, a_point in enumerate(self):
             a_point.my_index = idx
 
-    def mark_likely_zigzags(self):
+    def mark_likely_jitters(self):
         """
-        Marks every point with may_be_zigzag attribute based on criteria
+        Marks every point with may_be_jitter attribute based on criteria
         in this method
         :return: None
         """
         for pt in self:
-            pt.may_be_zigzag = False
+            pt.may_be_jitter = False
         if len(self) < 26:
             return
 
@@ -118,7 +118,7 @@ class ExtendedPointList(list):
             # speed_mph = pt.pt2pt.speed_back_mph
             if (def_deg >= 75.0 and seconds_ratio > 2.1) or \
                 def_deg >= 125.0:
-                pt.may_be_zigzag = True
+                pt.may_be_jitter = True
             prev_secs = current_secs
             # prev_dist = current_dist
 

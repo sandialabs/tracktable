@@ -338,7 +338,7 @@ if __name__ == '__main__':
         # predicate = lambda a, b: \
         #     math.isclose(a.stdDev, b.stdDev, abs_tol=0.025)
         predicate = lambda a, b: \
-            a.may_be_zigzag ^ b.may_be_zigzag
+            a.may_be_jitter ^ b.may_be_jitter
         aSliceList.consolidateNodeIf(predicate=predicate)
         print(); print('After Consolidating:')
 
