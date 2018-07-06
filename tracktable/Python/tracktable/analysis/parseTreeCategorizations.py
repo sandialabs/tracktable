@@ -189,6 +189,8 @@ def _insinuate_new_nodes_into_tree(node_list: ParseTreeNode,
                 pass
             g.add_edge(an_L2_node, a_leaf)
 
+def _perform_tests(**kwargs):
+    return
 
 def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     """When you see a bunch of functions with numbers in the function names,
@@ -256,7 +258,7 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
             del l2_node_list[node_index]
             dbg = True
 
-    #endregion option post-processing: Turning segments can steal a point
+    #endregion optional post-processing: Turning segments can steal a point
 
     # leaf_successors_of_root_before_insinuation = \
     #     [n for n in g.successors(g.root_node) if n.depth_level == 3]
@@ -264,6 +266,8 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     _insinuate_new_nodes_into_tree(l2_node_list, g, partitioned_tuple)
     # successors_of_root_after_insinuation = \
     #     [n for n in g.successors(g.root_node) if n.depth_level == 3]
+
+    _perform_tests()
 
 
 def _test_run():
