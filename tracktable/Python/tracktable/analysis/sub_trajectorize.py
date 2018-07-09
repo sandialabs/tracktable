@@ -407,7 +407,8 @@ class SubTrajerCurvature:
             aSegment = aSliceRange.getSegment()
 
             aSliceRange.DegreeOfCurve = 'straight' \
-                if fabs(aSegment[0].arc.degree_curvature) < dcStraightThreshold \
+                if fabs(aSegment[0].arc.degree_curvature) < \
+                   dcStraightThreshold \
                 else 'turn'
 
             aSliceRange.color = slice_range_class.straight_color
@@ -418,6 +419,7 @@ class SubTrajerCurvature:
 
         G = aPointList.create_minimal_digraph()
         PTcats.categorize_level3_to_level2(G)
+        PTcats.categorize_level2_to_level1(G)
 
         # print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
         # if request_graph_plot:
@@ -482,20 +484,20 @@ class SubTrajerCurvature:
         import  tracktable.analysis.nx_graph as nxg
         leafList = list(nxg.leaves_gen(parse_graph))
         temp_test_str = None
-        if True: #'CLX4' in aPointList.name:
-            temp_test_str = parse_graph.csv_report
-        if temp_test_str:
-            import os
-            outFileName = os.path.join(os.path.expanduser(
-                '~/Documents/tracktableTesting/testResults/'),
-                aPointList.name + '_report.csv')
-            try:
-                with open(outFileName, 'wt') as outF:
-                    outF.write(temp_test_str)
-                print()
-                print('report written to:  ', outFileName)
-            except Exception:
-                print()
+        # if True: #'CLX4' in aPointList.name:
+        #     temp_test_str = parse_graph.csv_report
+        # if temp_test_str:
+        #     import os
+        #     outFileName = os.path.join(os.path.expanduser(
+        #         '~/Documents/tracktableTesting/testResults/'),
+        #         aPointList.name + '_report.csv')
+        #     try:
+        #         with open(outFileName, 'wt') as outF:
+        #             outF.write(temp_test_str)
+        #         print()
+        #         print('report written to:  ', outFileName)
+        #     except Exception:
+        #         print()
 
         return parse_graph
 

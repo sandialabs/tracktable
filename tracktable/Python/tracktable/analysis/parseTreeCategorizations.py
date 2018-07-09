@@ -122,6 +122,7 @@ class Level1Cat(CategoryBase):
     j_hook = 2,
     u_turn = 3,
     grand_j_hook = 4
+    no_cat = 5
 
 
 class Level2Cat(CategoryBase):
@@ -170,7 +171,7 @@ def _insinuate_new_nodes_into_tree(node_list: ParseTreeNode,
     All functionality is via side effects. No return value.
 
     :param node_list: The list of mid-level nodes to insinuate into the graph
-    :param g: the graph to be ininuated into
+    :param g: the graph to be insinuated into
     :param partitioned_tuple: lists of nodes at different levels
     :return: None
     """
@@ -178,26 +179,93 @@ def _insinuate_new_nodes_into_tree(node_list: ParseTreeNode,
 
     node_list[0]._set_start(0)
 
-    for an_L2_node in node_list:
-        start, stop = an_L2_node.index_range
-        g.add_node(an_L2_node)
-        g.add_edge(root, an_L2_node)
-        for a_leaf in leaves[start:stop]:
-            try:
-                g.remove_edge(root, a_leaf)
-            except NetworkXError:
-                pass
-            g.add_edge(an_L2_node, a_leaf)
+    if not lev_2:
+        for an_L2_node in node_list:
+            start, stop = an_L2_node.index_range
+            g.add_node(an_L2_node)
+            g.add_edge(root, an_L2_node)
+            for a_leaf in leaves[start:stop]:
+                try:
+                    g.remove_edge(root, a_leaf)
+                except NetworkXError:
+                    pass
+                g.add_edge(an_L2_node, a_leaf)
+
+    elif not lev_1:
+        for an_L1_node in node_list:
+            start, stop = an_L1_node.index_range
+            g.add_node(an_L1_node)
+            g.add_edge(root, an_L1_node)
+            for an_L2_node in lev_2[start:stop]:
+                try:
+                    g.remove_edge(root, an_L2_node)
+                except NetworkXError:
+                    pass
+                g.add_edge(an_L1_node, an_L2_node)
+
+        # temporary kludge - remove stray edges
+        edges_to_remove = [e for e in g.edges
+                           if e[0].depth_level == 0 and e[1].depth_level == 2]
+        for e in edges_to_remove:
+            g.remove_edge(e[0], e[1])
+
+
 
 def _perform_tests(**kwargs):
     if len(kwargs) == 0:
         return
-    return
     nodes: ParseTreeNode.Parse_Tree_Node = kwargs.get('node_list', None)
     itm: ParseTreeNode.Parse_Tree_Node
     for itm in nodes:
         length = itm.length_chords
+        total_defl = itm.total_defl_deg_chords
         dbg = True
+
+def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
+    partitioned_tuple = ParseTreeNode.get_all_by_level(g)
+    root, _1, lev_2, _3 = partitioned_tuple
+
+    map_row_length_min = 35.0  # miles
+    u_turn_deflection_range = 1.5  # degrees, left or right
+    s_curve_mid_straight_max_length = 2.0  # miles
+
+    # find s-curves
+    s_curve_list = []
+    for seg_idx in range(len(lev_2)-1):
+        seg1: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx]
+        seg2: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx+1]
+        if seg1.defl_sign * seg2.defl_sign == -1:
+            a_range = (seg_idx, seg_idx+1)
+            s_curve_list.append(a_range)
+
+    # consolidate L1 categories
+    l1_node_list = ParseTreeNode.NodeListAtLevel(1)
+    for l2_node_idx in range(len(lev_2)-1):
+        a_range = (l2_node_idx, l2_node_idx+1)
+        new_l1_node = ParseTreeNode.ParseTreeNodeL1(a_range, my_graph=g)
+        if a_range in s_curve_list:
+            new_l1_node.category = Level1Cat.s_curve
+        else:
+            new_l1_node.category = Level1Cat.no_cat
+        l1_node_list.append(new_l1_node)
+
+    # merge adjacent no_cats into one singles
+    for idx in range(len(l1_node_list)-2, 0, -1):
+        this_node = l1_node_list[idx]
+        next_node = l1_node_list[idx+1]
+        if this_node.category == next_node.category:
+            this_node[1] = next_node[1]
+            l1_node_list.remove(next_node)
+
+
+    # partitioned_tuple = ParseTreeNode.get_all_by_level(g)
+    tmp_list1 = [e for e in g.edges if e[0].depth_level == 0 and e[1].depth_level == 2]
+    _insinuate_new_nodes_into_tree(l1_node_list, g, partitioned_tuple)
+    tmp_list2 = [e for e in g.edges if e[0].depth_level == 0 and e[1].depth_level == 2]
+
+    dbg = True
+
+
 
 def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     """When you see a bunch of functions with numbers in the function names,
@@ -206,9 +274,10 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     root, _1, _2, lev_3 = partitioned_tuple
     # alt_root = g.root_node
     l2_node_list = ParseTreeNode.NodeListAtLevel(2)
-    l2_node_list.start_new_with(lev_3[0], 0)
+    l2_node_list.start_new_with(lev_3[0], 0, owning_graph=g)
     l2_node_list.current.category = level2_categorize(lev_3[1])
     l2_node_list.current.index = node_count = 0
+    # l2_node_list.current
     for a_node in lev_3[1:-1]:
         try:
             prospective_category = level2_categorize(a_node)
@@ -223,7 +292,7 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
         else:
             node_count += 1
             # l2_node_list.current[1] -= 1
-            l2_node_list.start_new_with(a_node)
+            l2_node_list.start_new_with(a_node, owning_graph=g)
             l2_node_list.current.category = prospective_category
             l2_node_list.current.index = node_count
 

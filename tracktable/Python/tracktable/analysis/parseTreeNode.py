@@ -99,11 +99,25 @@ class Parse_Tree_Node(list):
 
     @property
     def length_chords(self):
-        raise NotImplementedError
         accum_dist = 0.0
-        for a_seg in self.target_collection[self.start, self.stop]:
-            accum_dist += a_seg.pt2pt.distanceBack
+        # start = self.start if self.start > 0 else 1
+        for a_seg in self.my_point_list[self.start:self.stop]:
+            accum_dist += a_seg.horizontal_distance
+
         return accum_dist
+
+    @property
+    def total_defl_deg_chords(self):
+        accum_defl_deg = 0.0
+        start = self.start if self.start > 0 else 1
+        for a_seg in self.my_point_list[start:self.stop]:
+            try:
+                accum_defl_deg += a_seg.deflection_deg
+            except TypeError:
+                dbg = True
+
+        return accum_defl_deg
+
 
     def report_header_string(self, g: nx.DiGraph) -> str:
         raise NotImplementedError
@@ -199,8 +213,8 @@ class Parse_Tree_Node(list):
 
 class Parse_Tree_Root(Parse_Tree_Node):
     def __init__(self, point_range, my_traj=None, associatedSlice=None,
-                 ndx=-1):
-        super().__init__(point_range, my_traj, associatedSlice, ndx)
+                 ndx=-1, my_graph: "TreeDiGraph"=None):
+        super().__init__(point_range, my_traj, associatedSlice, ndx, my_graph)
         self.target_collection = None
 
     @property
@@ -227,8 +241,8 @@ class Parse_Tree_Root(Parse_Tree_Node):
 
 class ParseTreeNodeL1(Parse_Tree_Node):
     def __init__(self, point_range, my_traj=None, associatedSlice=None,
-                 ndx=-1):
-        super().__init__(point_range, my_traj, associatedSlice, ndx)
+                 ndx=-1, my_graph: "TreeDiGraph"=None):
+        super().__init__(point_range, my_traj, associatedSlice, ndx, my_graph)
         self.target_collection = None
 
     @property
@@ -241,13 +255,13 @@ class ParseTreeNodeL1(Parse_Tree_Node):
                    + self.target_collection[self.start].report_header_string
 
     def report_data_lines(self, g: nx.DiGraph) -> str:
-        raise NotImplementedError
+        return ''
 
 
 class ParseTreeNodeL2(Parse_Tree_Node):
     def __init__(self, point_range, my_traj=None, associatedSlice=None,
-                 ndx=-1):
-        super().__init__(point_range, my_traj, associatedSlice, ndx)
+                 ndx=-1, my_graph: "TreeDiGraph"=None):
+        super().__init__(point_range, my_traj, associatedSlice, ndx, my_graph)
 
     @property
     def depth_level(self):
@@ -264,6 +278,15 @@ class ParseTreeNodeL2(Parse_Tree_Node):
         else:
             real_index = self.stop + pt_idx
         return leaf_list[real_index].my_point
+
+    @property
+    def defl_sign(self):
+        if self.category.as_int < 0:
+            return -1
+        elif self.category.as_int > 0:
+            return 1
+        return 0
+
 
     @property
     def category_str(self) -> str:
@@ -292,15 +315,15 @@ class ParseTreeNodeL2(Parse_Tree_Node):
 
 class Parse_Tree_Leaf(Parse_Tree_Node):
     def __init__(self, point_range, my_traj=None, associatedSlice=None,
-                 ndx=-1):
-        super().__init__(point_range, my_traj, associatedSlice, ndx)
+                 ndx=-1, my_graph: "TreeDiGraph"=None):
+        super().__init__(point_range, my_traj, associatedSlice, ndx, my_graph)
 
     @property
     def depth_level(self):
         return 3
 
     @property
-    def my_point(self):
+    def my_point(self) -> "ExtendedPoint":
         return self.my_slice[0]
 
     @property
@@ -312,6 +335,10 @@ class Parse_Tree_Leaf(Parse_Tree_Node):
     def point_stopping(self) -> "ExtendedPoint":
         """Returns the stopping point of this Node."""
         return self.my_slice[1]
+
+    @property
+    def defl_sign(self) -> int:
+        return self.my_point.defl_sign
 
     def _shorten_category_strings(self, the_str: str) -> str:
         ret_str = ['']
@@ -374,14 +401,15 @@ class NodeListAtLevel(list):
         self.end_index = self.current[1]
 
     def start_new_with(self, next_child_node: Parse_Tree_Node,
-                       start_index: int = -1):
+                       start_index: int = -1, owning_graph: "TreeDiGraph"=None) :
         if next_child_node.depth_level - self.my_level != 1:
             raise AttributeError("Level mismatch between NodeList and "
                                  "ParseTreeNode.")
         if self.my_level == 2:
-            self.append(ParseTreeNodeL2([0, 1], self))
+            new_L2_node = ParseTreeNodeL2([0, 1], self, my_graph=owning_graph)
+            self.append(new_L2_node)
         elif self.my_level == 1:
-            self.append(ParseTreeNodeL1([0, 1], self))
+            self.append(ParseTreeNodeL1([0, 1], self, my_graph=owning_graph))
         else:
             raise Exception("Should not get to this point in "
                 "parseTreeNode.py")
@@ -425,7 +453,8 @@ def get_all_by_level(g: nx.DiGraph) -> tuple:
     lev_3 = [n for n in g if n.depth_level == 3]
     lev_1 = []
     lev_2 = []
-    if len(lev_0) + len(lev_3) < node_count:
+    l0and3_count = len(lev_0) + len(lev_3) - 1
+    if l0and3_count < node_count:
         lev_1 = [n for n in g if n.depth_level == 1]
         lev_2 = [n for n in g if n.depth_level == 2]
 

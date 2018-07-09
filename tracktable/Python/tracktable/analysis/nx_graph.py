@@ -54,6 +54,7 @@ def plot_graph(nxGraph: nx.DiGraph) -> None:
     pos = graphviz_layout(nxGraph, prog='dot', args='')
     level2_label_coords = {}
     level2_nodes_g = nx.DiGraph(); level2_node_labels = {}
+    l1_adj_counter = 0
     for val in pos:
         level = int(str(val)[-1])
         ycoord = plot_graph.switch[level]
@@ -67,6 +68,20 @@ def plot_graph(nxGraph: nx.DiGraph) -> None:
             pos[val] = (node_coords[0], ycoord)
             text_coord = pos[val]
             text_coord_y_adjust = y_multipler * level2_y_adjustment * -1
+            text_coord = text_coord[0], text_coord[1]+text_coord_y_adjust
+            level2_label_coords[val] = text_coord
+            level2_nodes_g.add_node(val)
+            cat_str = (str(val.category)).split('.')[-1]\
+                .replace('_', ' ').title()
+            level2_node_labels[val] = str(cat_str)
+            continue
+        elif level == 1:
+            l1_adj_counter += 1
+            y_multipler = 600.0
+            pos[val] = (node_coords[0], ycoord)
+            text_coord = pos[val]
+            level1_y_adjustment = (l1_adj_counter % 3) - 1
+            text_coord_y_adjust = y_multipler * level1_y_adjustment * -1
             text_coord = text_coord[0], text_coord[1]+text_coord_y_adjust
             level2_label_coords[val] = text_coord
             level2_nodes_g.add_node(val)
@@ -95,7 +110,7 @@ def plot_graph(nxGraph: nx.DiGraph) -> None:
     # plt.savefig(r'/ascldap/users/pschrum/Documents/Getting Close.png')
 plot_graph.switch = {
     0: 10000,
-    # 1: 3333,
+    1: 3333,
     2: -3333,
     3: -10000
 }

@@ -308,10 +308,12 @@ class ExtendedPoint(object):
 
     @property
     def horizontal_distance(self):
+        if not self.pt2pt:
+            return 0.0
         try:
             return self.pt2pt.distanceBack
         except AttributeError:
-            return None
+            return 0.0
 
     @property
     def degree_curve(self):
@@ -333,7 +335,7 @@ class ExtendedPoint(object):
         try:
             return self.pt2pt.deflection_deg
         except AttributeError:
-            return None
+            return 0.0
 
     def __hash__(self):
         return self.X - self.Y + (self.X % 17)
