@@ -190,7 +190,14 @@ def _insinuate_new_nodes_into_tree(node_list: ParseTreeNode,
             g.add_edge(an_L2_node, a_leaf)
 
 def _perform_tests(**kwargs):
+    if len(kwargs) == 0:
+        return
     return
+    nodes: ParseTreeNode.Parse_Tree_Node = kwargs.get('node_list', None)
+    itm: ParseTreeNode.Parse_Tree_Node
+    for itm in nodes:
+        length = itm.length_chords
+        dbg = True
 
 def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     """When you see a bunch of functions with numbers in the function names,
@@ -267,7 +274,8 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     # successors_of_root_after_insinuation = \
     #     [n for n in g.successors(g.root_node) if n.depth_level == 3]
 
-    _perform_tests()
+    _perform_tests(node_list=l2_node_list)
+    dbg = True
 
 
 def _test_run():

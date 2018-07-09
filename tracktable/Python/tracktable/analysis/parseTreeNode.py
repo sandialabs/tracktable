@@ -8,8 +8,9 @@ class Parse_Tree_Node(list):
 
     def __init__(self, point_range: List[int], my_traj=None,
                  associatedSlice=None,
-                 ndx=-1):
+                 ndx=-1, my_graph: "TreeDiGraph"=None):
         # self.my_slice = associatedSlice
+        self._my_graph = my_graph
         self.target_collection = my_traj
         if ndx > -1:
             self.index = ndx
@@ -29,6 +30,34 @@ class Parse_Tree_Node(list):
 
     def _set_start(self, new_start_val):
         self[0] = new_start_val
+
+    @property
+    def my_graph(self) -> "TreeDiGraph":
+        return self._my_graph
+
+
+    @property
+    def my_point_list(self) -> "ExtendedPointList":
+        return self.my_graph.my_EPL
+
+    @property
+    def point_at(self, pt_idx: int) -> "ExtendedPoint":
+        """Returns any point on the underlying ExtendedPointList."""
+        return  self.my_point_list[pt_idx]
+
+    @property
+    def point_starting(self) -> "ExtendedPoint":
+        """Returns the starting point of this Node."""
+        return self[0].point_starting
+
+    @property
+    def point_stopping(self) -> "ExtendedPoint":
+        """Returns the stopping point of this Node."""
+        return self[0].point_stopping
+
+    @property
+    def point_list(self, start: int, stop: int) -> List["ExtendedPoint"]:
+        return self.my_point_list[start:stop]
 
     @property
     def start(self):
@@ -60,14 +89,17 @@ class Parse_Tree_Node(list):
         return str(duration)
 
     def _traj_get_alt_str(self, idx):
+        """Get the altitude of the given point id as a string."""
         return str(self.target_collection[idx].Z)
 
     def _traj_get_mid_alt_str(self):
+        """Get the altitude of the mid-point of the trajectory as a string."""
         traj_mid_point_count = len(self.target_collection) // 2
         return str(self.target_collection[traj_mid_point_count].Z)
 
     @property
-    def horizontal_distance(self):
+    def length_chords(self):
+        raise NotImplementedError
         accum_dist = 0.0
         for a_seg in self.target_collection[self.start, self.stop]:
             accum_dist += a_seg.pt2pt.distanceBack
@@ -270,6 +302,16 @@ class Parse_Tree_Leaf(Parse_Tree_Node):
     @property
     def my_point(self):
         return self.my_slice[0]
+
+    @property
+    def point_starting(self) -> "ExtendedPoint":
+        """Returns the starting point of this Node."""
+        return self.my_slice[0]
+
+    @property
+    def point_stopping(self) -> "ExtendedPoint":
+        """Returns the stopping point of this Node."""
+        return self.my_slice[1]
 
     def _shorten_category_strings(self, the_str: str) -> str:
         ret_str = ['']

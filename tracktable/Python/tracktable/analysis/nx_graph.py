@@ -95,6 +95,7 @@ def plot_graph(nxGraph: nx.DiGraph) -> None:
     # plt.savefig(r'/ascldap/users/pschrum/Documents/Getting Close.png')
 plot_graph.switch = {
     0: 10000,
+    # 1: 3333,
     2: -3333,
     3: -10000
 }
