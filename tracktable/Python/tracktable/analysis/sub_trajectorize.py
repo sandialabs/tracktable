@@ -251,7 +251,7 @@ class SubTrajerAccel:
 
 
 class SubTrajerSemantic:
-    'Splits a trajectory into straight-ish segments'
+    'Splits a trajectory into phases of flight segments'
     def __init__(self, straightness_threshold=1.1, length_threshold_samples=2): #2 is minimum
         self.threshold = straightness_threshold
         self.length_threshold_samples = length_threshold_samples
