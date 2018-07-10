@@ -56,8 +56,8 @@ class Parse_Tree_Node(list):
         return self[0].point_stopping
 
     @property
-    def point_list(self, start: int, stop: int) -> List["ExtendedPoint"]:
-        return self.my_point_list[start:stop]
+    def point_list(self) -> List["ExtendedPoint"]:
+        return self.my_point_list[self.start:self.stop]
 
     @property
     def start(self):
@@ -99,6 +99,7 @@ class Parse_Tree_Node(list):
 
     @property
     def length_chords(self):
+        """Total length of a segment running along the chords"""
         accum_dist = 0.0
         # start = self.start if self.start > 0 else 1
         for a_seg in self.my_point_list[self.start:self.stop]:
@@ -250,12 +251,23 @@ class ParseTreeNodeL1(Parse_Tree_Node):
         return 1
 
     def report_header_string(self, g: nx.DiGraph) -> str:
-        def report_header_string(self) -> str:
-            return 'L1id, L1cat,' \
-                   + self.target_collection[self.start].report_header_string
+        first_successor = next(g.successors(self))
+        ret_val = 'L1id, L1cat,' + first_successor.report_header_string(g)
+        return ret_val
 
     def report_data_lines(self, g: nx.DiGraph) -> str:
-        return ''
+        ret_str_prefix = '{0} L1,{1},'.format(self.index, self.category_str)
+        successors = list(g.successors(self))
+        successors.sort(key=lambda node: node.start)
+        ret_list = []
+        for a_node in successors:
+            ret_string = ret_str_prefix
+            point_csv = a_node.report_data_lines(g)
+            ret_string = ret_string + point_csv
+            ret_list.append(ret_string)
+            ret_str_prefix = ',,,,'
+
+        return '\n'.join(ret_list)
 
 
 class ParseTreeNodeL2(Parse_Tree_Node):
@@ -308,7 +320,7 @@ class ParseTreeNodeL2(Parse_Tree_Node):
             point_csv = a_node.report_data_lines(g)
             ret_string = ret_string + point_csv
             ret_list.append(ret_string)
-            ret_str_prefix = ',,,,'
+            ret_str_prefix = ',,,,,,'
 
         return '\n'.join(ret_list)
 

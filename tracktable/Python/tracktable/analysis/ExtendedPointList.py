@@ -51,14 +51,23 @@ class ExtendedPointList(list):
             timedelta = a_point.timestamp - prev_point.timestamp
             if a_point.pt2pt:
                 # The following hack is a hack for distance and speed
-                #   adjustment. Do not use it. Do not keep it. Do not
-                #   commit it. It is wrong and a crutch just for today.
+                #   adjustment.
                 distBackMiles = a_point.pt2pt.distanceBack
 
                 a_point.pt2pt.seconds_back = timedelta.seconds
                 speed = distBackMiles / (timedelta.seconds / 3600.0)
                 a_point.pt2pt.speed_back_mph = speed
                 # speed is miles per hour
+
+                # But this part is not a hack. Keep it
+                if a_point.pt2pt.distanceAhead < 0.001 or \
+                    a_point.pt2pt.distanceBack < 0.001:
+                    a_point.pt2pt._ratio_front_over_back = 10000
+                else:
+                    a_point.pt2pt._ratio_front_over_back = \
+                        a_point.pt2pt.distanceAhead / \
+                        a_point.pt2pt.distanceBack
+
             if prev_point.pt2pt:
                 prev_point.pt2pt.speed_ahead_mph = speed
             if a_point.arc:
@@ -94,6 +103,7 @@ class ExtendedPointList(list):
         in this method
         :return: None
         """
+        return
         for pt in self:
             pt.may_be_jitter = False
         if len(self) < 26:
