@@ -96,13 +96,13 @@ def from_dict(dictionary):
         point.object_id = dictionary['object_id']
         point.timestamp = Timestamp.from_string(dictionary['timestamps'][i],
                                                 format_string=
-                                                '%Y-%m-%dT%H:%M:%S')
+                                                '%Y-%m-%dT%H:%M:%S%z')
         for (name, attributes) in dictionary['point_properties'].items():
             if attributes['values'][i] is not None:
                 if attributes['type'] == "timestamp":
                     ts = Timestamp.from_string(attributes['values'][i],
                                                format_string=
-                                               '%Y-%m-%dT%H:%M:%S')
+                                               '%Y-%m-%dT%H:%M:%S%z')
                     point.set_property(name, ts)
                 else:
                     point.set_property(name, attributes['values'][i])
@@ -115,18 +115,18 @@ def from_dict(dictionary):
     for (name, attributes) in dictionary['trajectory_properties'].items():
         if attributes['type'] == "timestamp":
             ts = Timestamp.from_string(attributes['value'],
-                                       format_string='%Y-%m-%dT%H:%M:%S')
+                                       format_string='%Y-%m-%dT%H:%M:%S%z')
             trajectory.set_property(name, ts)
         else:
             trajectory.set_property(name, attributes['value'])
 
     #add segment properties (if they exist)  #just save as trajectory
     # properties.  Names must start with "seg_" may want to check for that.
-    if 'segment_properties' in dictionary: #pnnl only 
+    if 'segment_properties' in dictionary: #pnnl only
         for (name, attributes) in dictionary['segment_properties'].items():
             if attributes['type'] == "timestamp":
                 ts = Timestamp.from_string(attributes['value'],
-                                           format_string='%Y-%m-%dT%H:%M:%S')
+                                           format_string='%Y-%m-%dT%H:%M:%S%z')
                 trajectory.set_property(name, ts)
             else:
                 trajectory.set_property(name, attributes['value'])
