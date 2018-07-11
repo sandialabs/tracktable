@@ -495,12 +495,17 @@ def main():
         trajectoryName = os.path.join(outputDir, trajectoryName)
         # the mymap parameter below is only needed to get the max width or
         # height in terms ov the values used to scale the maps
-        plot_colored_segments_path(traj, G, args.straightness_threshold,
+        #plot_colored_segments_path(traj, G, args.straightness_threshold,
+        #                               bbox, savefig=args.save_fig,
+        #                               insetMap=args.insetMap,
+        #                               altitudePlot=args.altitudePlot,
+        #                               ext='kml',
+        #                               output=trajectoryName)
+        plot_colored_segments_path_old(traj, leaves, args.straightness_threshold,
                                    bbox, savefig=args.save_fig,
                                    insetMap=args.insetMap,
-                                   altitudePlot=args.altitudePlot,
-                                   ext='kml',
-                                   output=trajectoryName)
+                                   altitudePlot=args.altitudePlot, ext=ext,
+                                   output=args.image_file)
         print(plotFileName,"saved.")
         if args.method == Method.straight:
             plot_tree(G, traj, bbox, with_labels=False,
