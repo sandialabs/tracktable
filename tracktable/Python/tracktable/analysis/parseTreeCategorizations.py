@@ -400,8 +400,7 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     root, _1, _2, lev_3 = partitioned_tuple
     # alt_root = g.root_node
     l2_node_list = ParseTreeNode.NodeListAtLevel(2)
-    l2_node_list.start_new_with(lev_3[0], 0, owning_graph=g,
-                                child_collection=lev_3)
+    l2_node_list.start_new_with(lev_3[0], 0, owning_graph=g)
     l2_node_list.current.category = level2_categorize(lev_3[1])
     l2_node_list.current.index = node_count = 0
     # l2_node_list.current
@@ -435,6 +434,7 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
 
     #region This code region is a kludge until I can get my indexing right.
     for cnt, a_node in enumerate(l2_node_list[:-1]):
+        a_node._child_layer = lev_3
         a_node[1] -= 1
         if cnt > 0:
             a_node[0] -= 1

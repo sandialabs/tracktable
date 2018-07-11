@@ -43,6 +43,8 @@ from math import isclose
 from collections import defaultdict
 import tracktable.analysis.nx_graph as nxg
 import tracktable.analysis.parseTreeCategorizations as PTcats
+import tracktable.analysis.parseTreeNode as ParseTreeNode
+
 
 class NormalizedDistanceMatrix:
     """Generates a matrix giving the ratio of the distance along each
@@ -419,7 +421,9 @@ class SubTrajerCurvature:
 
         G = aPointList.create_minimal_digraph()
         PTcats.categorize_level3_to_level2(G)
+        root, Level1, level2, Level3 = ParseTreeNode.get_all_by_level(G)
         PTcats.categorize_level2_to_level1(G)
+        root, Level1, level2, Level3 = ParseTreeNode.get_all_by_level(G)
 
         # print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
         # if request_graph_plot:
@@ -430,14 +434,58 @@ class SubTrajerCurvature:
             except ImportError:
                 pass
 
-        return G
+        if False:
+            summary_file = '' \
+                '/ascldap/users/pschrum/Documents/tracktableTesting/'' \
+                ''testResults/candidate_study_flights/study_flights.csv'
+            ngx.output_short_summary(G, summary_file)
+
+        # At this point, G is a NetworkX graph (Digraph, single root). But
+        # the calling code need it to be a list of
+        # tuples: (start, stop-1, category_string)
+        # so we must convert G to that kind of tuple.
+
+        temp_test_str = None
+        if False:   # 'CLX4' in aPointList.name:
+            temp_test_str = G.csv_report
+        if temp_test_str:
+            import os
+            outFileName = os.path.join(os.path.expanduser(
+                '~/Documents/tracktableTesting/testResults/'),
+                aPointList.name + '_report.csv')
+            try:
+                with open(outFileName, 'wt') as outF:
+                    outF.write(temp_test_str)
+                print()
+                print('report written to:  ', outFileName)
+            except Exception:
+                print()
+
+        return_list = []
+        root, Level1, level2, Level3 = ParseTreeNode.get_all_by_level(G)
+        a_node: ParseTreeNode
+        for a_node in Level1:
+            start = a_node.point_starting
+            stop = a_node.point_stopping
+            category = a_node.category_str
+            return_list.append((start, stop, category))
+
+        return return_list, G
 
 
     def subtrajectorize(self,
                         trajectory,
                         returnGraph=False,
                         useMethod='individualCurvatures_preferred',
-                        request_graph_plot: bool =True) -> nx.DiGraph :
+                        request_graph_plot: bool =True):
+        segments, g = self.splitAndClassify(trajectory, returnGraph=returnGraph)
+        segs = []
+        for seg in segments:
+            segs.append((seg[0], seg[1])) #strip off "segment type"
+        return segs, g
+
+    def splitAndClassify(self, trajectory, returnGraph=False,
+                         useMethod='individualCurvatures_preferred'):
         """
         Decomposes a Trajectory into subtrajectories based on an analysis of
             the curvature of each point triplet. Multiple methods are
@@ -476,29 +524,11 @@ class SubTrajerCurvature:
         aPointList.mark_likely_jitters()
 
         try:
-            parse_graph: nx.DiGraph = \
+            leaves, g = \
                 self._individCurvaturesMethod(aPointList,
-                    request_graph_plot=request_graph_plot)
+                    request_graph_plot=returnGraph)
         except KeyboardInterrupt:
             exit(0)
 
-        import  tracktable.analysis.nx_graph as nxg
-        leafList = list(nxg.leaves_gen(parse_graph))
-        temp_test_str = None
-        if 'CLX4' in aPointList.name:
-            temp_test_str = parse_graph.csv_report
-        if temp_test_str:
-            import os
-            outFileName = os.path.join(os.path.expanduser(
-                '~/Documents/tracktableTesting/testResults/'),
-                aPointList.name + '_report.csv')
-            try:
-                with open(outFileName, 'wt') as outF:
-                    outF.write(temp_test_str)
-                print()
-                print('report written to:  ', outFileName)
-            except Exception:
-                print()
-
-        return parse_graph
+        return leaves, g
 

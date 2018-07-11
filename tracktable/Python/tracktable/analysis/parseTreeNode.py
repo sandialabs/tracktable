@@ -51,17 +51,19 @@ class Parse_Tree_Node(list):
     @property
     def point_at(self, pt_idx: int) -> "ExtendedPoint":
         """Returns any point on the underlying ExtendedPointList."""
-        return  self.my_point_list[pt_idx]
+        return self.my_point_list[pt_idx]
 
     @property
     def point_starting(self) -> "ExtendedPoint":
         """Returns the starting point of this Node."""
-        return self[0].point_starting
+        child_node = self.children[0]
+        return child_node.point_starting
 
     @property
     def point_stopping(self) -> "ExtendedPoint":
         """Returns the stopping point of this Node."""
-        return self[0].point_stopping
+        child_node = self.children[-1]
+        return child_node.point_stopping
 
     @property
     def point_list(self) -> List["ExtendedPoint"]:
@@ -138,7 +140,11 @@ class Parse_Tree_Node(list):
     # _the_category: CategoryBase = None
     @property
     def category_str(self) -> str:
-        return 'No Cat.'
+        try:
+            return (str(self.category)).split('.')[-1].replace('_', ' ') \
+                .title()
+        except (AttributeError, IndexError, ValueError):
+            return 'No Cat.'
     # @category.setter
     # def category(self, value: CategoryBase) -> None:
     #     self._the_category = value
@@ -309,6 +315,26 @@ class ParseTreeNodeL2(Parse_Tree_Node):
             real_index = self.stop + pt_idx
         return leaf_list[real_index].my_point
 
+    # @property
+    # def point_starting(self) -> "ExtendedPoint":
+    #     """Returns the starting point of this Node."""
+    #     try:
+    #         child_node = self.children[self.start]
+    #     except IndexError:
+    #         dbg = True
+    #         raise
+    #     return child_node.start
+    #
+    # @property
+    # def point_stopping(self) -> "ExtendedPoint":
+    #     """Returns the stopping point of this Node."""
+    #     try:
+    #         child_node = self.children[self.stop]
+    #     except:
+    #         dbg = True
+    #         raise
+    #     return child_node.stop
+
     @property
     def defl_sign(self):
         if self.category.as_int < 0:
@@ -359,12 +385,12 @@ class Parse_Tree_Leaf(Parse_Tree_Node):
     @property
     def point_starting(self) -> "ExtendedPoint":
         """Returns the starting point of this Node."""
-        return self.my_slice[0]
+        return self.start
 
     @property
     def point_stopping(self) -> "ExtendedPoint":
         """Returns the stopping point of this Node."""
-        return self.my_slice[1]
+        return self.stop
 
     @property
     def defl_sign(self) -> int:
@@ -438,11 +464,12 @@ class NodeListAtLevel(list):
             raise AttributeError("Level mismatch between NodeList and "
                                  "ParseTreeNode.")
         if self.my_level == 2:
-            new_L2_node = ParseTreeNodeL2([0, 1], self,
+            new_L2_node = ParseTreeNodeL2([0, 1], self, child_collection,
                                           my_graph=owning_graph)
             self.append(new_L2_node)
         elif self.my_level == 1:
-            self.append(ParseTreeNodeL1([0, 1], self, my_graph=owning_graph))
+            self.append(ParseTreeNodeL1([0, 1], self, child_collection,
+                                        my_graph=owning_graph))
         else:
             raise Exception("Should not get to this point in "
                 "parseTreeNode.py")
@@ -469,6 +496,7 @@ class NodeListAtLevel(list):
         pass
 
 
+# This should be a member of nxg.TreeDiGraph. Move it there some time.
 def get_all_by_level(g: nx.DiGraph) -> tuple:
     """
     Performs a "row-based" filter of a tree graph. For every level of a tree

@@ -463,12 +463,14 @@ def main():
         # try:
         if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
+        elif args.method == Method.curvature:
+            leaves, G = subtrajer.subtrajectorize(traj, returnGraph=False)
         else:
-            G: nx.DiGraph = subtrajer.subtrajectorize(traj, returnGraph=False)
+            leaves: nx.DiGraph = subtrajer.subtrajectorize(traj, returnGraph=False)
         # except IntersectionError:
         #     continue
 
-        if G is None: # or pointCount < 3:
+        if leaves is None: # or pointCount < 3:
             continue
 
         pointCount =  -1; leafCount = -1
@@ -495,12 +497,13 @@ def main():
         trajectoryName = os.path.join(outputDir, trajectoryName)
         # the mymap parameter below is only needed to get the max width or
         # height in terms ov the values used to scale the maps
-        plot_colored_segments_path(traj, G, args.straightness_threshold,
-                                   bbox, savefig=args.save_fig,
-                                   insetMap=args.insetMap,
-                                   altitudePlot=args.altitudePlot,
-                                   ext='kml',
-                                   output=trajectoryName)
+        if G:
+            plot_colored_segments_path(traj, G, args.straightness_threshold,
+                                       bbox, savefig=args.save_fig,
+                                       insetMap=args.insetMap,
+                                       altitudePlot=args.altitudePlot,
+                                       ext='kml',
+                                       output=trajectoryName)
         print(plotFileName,"saved.")
         if args.method == Method.straight:
             plot_tree(G, traj, bbox, with_labels=False,
