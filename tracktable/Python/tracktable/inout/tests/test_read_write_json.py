@@ -35,14 +35,14 @@ import io
 import unittest
 import importlib
 
-from tracktable.io.trajectory import from_json
-from tracktable.io.trajectory import to_json
-from tracktable.io.trajectory import to_json_file
-from tracktable.io.trajectory import from_json_file
-from tracktable.io.trajectory import from_json_file_multi
-#from tracktable.io.trajectory import from_json_file_iter
+from tracktable.inout.trajectory import from_json
+from tracktable.inout.trajectory import to_json
+from tracktable.inout.trajectory import to_json_file
+from tracktable.inout.trajectory import from_json_file
+from tracktable.inout.trajectory import from_json_file_multi
+#from tracktable.inout.trajectory import from_json_file_iter
 
-import tracktable.io.trajectory as trajectory
+import tracktable.inout.trajectory as trajectory
 
 import tracktable.domain.terrestrial
 

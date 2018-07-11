@@ -32,7 +32,7 @@
 #may need to include Timezone, include_tz=True at some point?
 
 """
-tracktable.io.trajectory - Read/Write a trajectory from/to a python
+tracktable.inout.trajectory - Read/Write a trajectory from/to a python
 dictionary and from/to a json string or file
 """
 

@@ -31,8 +31,8 @@
 
 import sys
 
-from tracktable.io.trajectory import from_dict
-from tracktable.io.trajectory import to_dict
+from tracktable.inout.trajectory import from_dict
+from tracktable.inout.trajectory import to_dict
 from tracktable.core import Timestamp
 import importlib
 import unittest
