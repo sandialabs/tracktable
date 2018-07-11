@@ -172,6 +172,24 @@ class SubTrajerStraight:
         else:
             return leaves
 
+    def splitAndClassify(self, trajectory, returnGraph=False):
+        if returnGraph:
+            leaves, G = subtrajectorize(trajectory, returnGraph=returnGraph)
+        else:
+            leaves = subtrajectorize(trajectory, returnGraph=returnGraph)
+        segments = []
+        straight=False
+        if self.norm_dist_mat.is_straight(leaves[0][0], leaves[0][1]):
+            straight=True
+
+        for seg in leaves:
+            if straight:
+                segments.append((seg[0], seg[1], "straight"))
+            else:
+                segments.append((seg[0], seg[1], "turn"))
+            straight = not straight #flip boolean
+        return segments
+
 class SubTrajerAccel:
     'Splits a trajectory where the change in accelleration exceeds some threshold'
     def __init__(self, accel_threshold=0.025, tight=False): #not tight means include segment before and after a turn
@@ -258,11 +276,11 @@ class SubTrajerSemantic:
         self.currentNodeIndex = 1 #change to 0
         self.norm_dist_mat = NormalizedDistanceMatrix([]) #todo better way?
 
-    def subtrajectorize(self, trajectory, returnGraph=False): #can take coordinate list or a trajectory.
+    def splitAndClassify(self, trajectory, returnGraph=False): #can take coordinate list or a trajectory.
         coordinates = []
         for point in trajectory: #make into coordinate list    #todo duplicated in example_sub_trajectorize.  Consolidiate
-            if 'altitudes' in point.properties.keys(): #add altitude if exists
-                coordinates.append([point[0], point[1], point.properties['altitudes']])
+            if 'altitude' in point.properties.keys(): #add altitude if exists
+                coordinates.append([point[0], point[1], point.properties['altitude']]) #changed from altitudes not sure why it was wrong
                 #print(len(coordinates)-1, point.properties['altitudes']) #remove
             else:
                 coordinates.append([point[0], point[1], None])
@@ -296,6 +314,7 @@ class SubTrajerSemantic:
 
         cruisingStart = None
         cruisingEnd = None
+        #print(coordinates)
         #todo, below we must quit if there is not altituted values?
         h = np.histogram(list(zip(*coordinates))[2], bins=np.append(np.append(0, np.arange(10500,46500,1000)), 60000), density=True)  #to determine where the cruising altitude was?
         if np.max(h[0]) > cruisingThreshold: #multiply by 1000 to get approx ratio of samples in this bin
@@ -315,7 +334,7 @@ class SubTrajerSemantic:
 
 
         #need to check below if not found
-        segments = [(0,takeOffEnd), (takeOffEnd, cruisingStart), (cruisingStart, cruisingEnd), (cruisingEnd, landingStart), (landingStart, lastSample)] #later add sub setments
+        segments = [(0,takeOffEnd, "takeoff"), (takeOffEnd, cruisingStart, "climb"), (cruisingStart, cruisingEnd, "cruise"), (cruisingEnd, landingStart, "descent"), (landingStart, lastSample, "landing")] #later add sub segments
         return segments
 #        G = nx.DiGraph()
 #        start = takeOffEnd
@@ -340,3 +359,11 @@ class SubTrajerSemantic:
         #cruise
         #descent
         #landing
+
+    def subtrajectorize(self, trajectory, returnGraph=False): #can take coordinate list or a trajectory.
+        segments = self.splitAndClassify(trajectory, returnGraph=returnGraph)
+        segs = []
+        for seg in segments:
+            segs.append((seg[0], seg[1])) #strip off "segment type"
+        return segs
+
