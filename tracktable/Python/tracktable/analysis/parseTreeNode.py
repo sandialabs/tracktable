@@ -6,12 +6,13 @@ from typing import List, Any, Union
 
 class Parse_Tree_Node(list):
 
-    def __init__(self, point_range: List[int], my_traj=None,
+    def __init__(self, point_range: List[int], child_collection=None,
                  associatedSlice=None,
                  ndx=-1, my_graph: "TreeDiGraph"=None):
         # self.my_slice = associatedSlice
         self._my_graph = my_graph
-        self.target_collection = my_traj
+        self.target_collection = child_collection  # deprecated as too vague
+        self._child_layer = child_collection
         if ndx > -1:
             self.index = ndx
         for itm in point_range:
@@ -34,6 +35,13 @@ class Parse_Tree_Node(list):
     @property
     def my_graph(self) -> "TreeDiGraph":
         return self._my_graph
+
+    @property
+    def children(self):
+        try:
+            return self._child_layer[self.start:self.stop]
+        except AttributeError:
+            return None
 
 
     @property
@@ -73,6 +81,7 @@ class Parse_Tree_Node(list):
 
     @property
     def my_slice(self):
+        '''Not sure if I still use this.'''
         return self.target_collection[self.start:self.stop]
 
     @property
@@ -213,9 +222,9 @@ class Parse_Tree_Node(list):
         return build_string
 
 class Parse_Tree_Root(Parse_Tree_Node):
-    def __init__(self, point_range, my_traj=None, associatedSlice=None,
+    def __init__(self, point_range, child_collection=None, associatedSlice=None,
                  ndx=-1, my_graph: "TreeDiGraph"=None):
-        super().__init__(point_range, my_traj, associatedSlice, ndx, my_graph)
+        super().__init__(point_range, child_collection, associatedSlice, ndx, my_graph)
         self.target_collection = None
 
     @property
@@ -241,14 +250,23 @@ class Parse_Tree_Root(Parse_Tree_Node):
         return '\n'.join(ret_list)
 
 class ParseTreeNodeL1(Parse_Tree_Node):
-    def __init__(self, point_range, my_traj=None, associatedSlice=None,
+    def __init__(self, point_range, child_collection=None, associatedSlice=None,
                  ndx=-1, my_graph: "TreeDiGraph"=None):
-        super().__init__(point_range, my_traj, associatedSlice, ndx, my_graph)
+        super().__init__(point_range, child_collection, associatedSlice, ndx, my_graph)
         self.target_collection = None
 
     @property
     def depth_level(self):
         return 1
+
+    @property
+    def defl_sign(self):
+        first_child = self.target_collection[self.start]
+        if first_child.category.as_int < 0:
+            return -1
+        elif first_child.category.as_int > 0:
+            return 1
+        return 0
 
     def report_header_string(self, g: nx.DiGraph) -> str:
         first_successor = next(g.successors(self))
@@ -271,9 +289,9 @@ class ParseTreeNodeL1(Parse_Tree_Node):
 
 
 class ParseTreeNodeL2(Parse_Tree_Node):
-    def __init__(self, point_range, my_traj=None, associatedSlice=None,
+    def __init__(self, point_range, child_collection=None, associatedSlice=None,
                  ndx=-1, my_graph: "TreeDiGraph"=None):
-        super().__init__(point_range, my_traj, associatedSlice, ndx, my_graph)
+        super().__init__(point_range, child_collection, associatedSlice, ndx, my_graph)
 
     @property
     def depth_level(self):
@@ -326,9 +344,9 @@ class ParseTreeNodeL2(Parse_Tree_Node):
 
 
 class Parse_Tree_Leaf(Parse_Tree_Node):
-    def __init__(self, point_range, my_traj=None, associatedSlice=None,
+    def __init__(self, point_range, child_collection=None, associatedSlice=None,
                  ndx=-1, my_graph: "TreeDiGraph"=None):
-        super().__init__(point_range, my_traj, associatedSlice, ndx, my_graph)
+        super().__init__(point_range, child_collection, associatedSlice, ndx, my_graph)
 
     @property
     def depth_level(self):
@@ -413,12 +431,15 @@ class NodeListAtLevel(list):
         self.end_index = self.current[1]
 
     def start_new_with(self, next_child_node: Parse_Tree_Node,
-                       start_index: int = -1, owning_graph: "TreeDiGraph"=None) :
+                       start_index: int = -1,
+                       owning_graph: "TreeDiGraph"=None,
+                       child_collection=None):
         if next_child_node.depth_level - self.my_level != 1:
             raise AttributeError("Level mismatch between NodeList and "
                                  "ParseTreeNode.")
         if self.my_level == 2:
-            new_L2_node = ParseTreeNodeL2([0, 1], self, my_graph=owning_graph)
+            new_L2_node = ParseTreeNodeL2([0, 1], self,
+                                          my_graph=owning_graph)
             self.append(new_L2_node)
         elif self.my_level == 1:
             self.append(ParseTreeNodeL1([0, 1], self, my_graph=owning_graph))
@@ -438,6 +459,7 @@ class NodeListAtLevel(list):
 
     def insert_into_tree_graph(self, g: nx.DiGraph) -> None:
         """
+        Deprecated. Scheduled to be removed.
         Takes the current list of nodes (self), and inserts all in the list
         into graph g at the level of self.
         Side effects: Everything is a side effect, operating on graph g.

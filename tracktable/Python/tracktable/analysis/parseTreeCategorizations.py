@@ -143,13 +143,15 @@ class DeflectionCat(CategoryBase):
     sharp_right = (360, lambda v, this_num: True)
 
 class Level1Cat(CategoryBase):
-    straight_reach = 0,
+    cruise = 0,
     s_curve = 1,
     j_hook = 2,
     u_turn = 3,
     grand_j_hook = 4
     race_track = 5
-    no_cat = 6
+    course_change = 6
+    search_mapping = 7
+    no_cat = 100
 
 
 class Level2Cat(CategoryBase):
@@ -253,26 +255,35 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
     partitioned_tuple = ParseTreeNode.get_all_by_level(g)
     root, _1, lev_2, _3 = partitioned_tuple
 
-    map_row_length_min = 35.0  # miles
+    cruise_length_min = 35.0  # miles
     u_turn_deflection_range = 1.5  # degrees, left or right
     s_curve_mid_straight_max_length = 2.0  # miles
 
     # find s-curves
     s_curve_list = []
     o_curve_list = []
+    cruise_list = []
+    u_turn_list = []
+    u_turn_range = (177.0, 183.0)
     for seg_idx in range(len(lev_2)-1):
         seg1: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx]
         seg2: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx+1]
-        if seg1.defl_sign * seg2.defl_sign == -1:
-            if seg_idx == 77:
-                dfl = seg2.total_defl_deg_chords
+        ttl_defl_mag = abs(seg1.total_defl_deg_chords)
+        if min(u_turn_range) <= ttl_defl_mag <= max(u_turn_range):
+            a_range = (seg_idx, seg_idx+1)
+            u_turn_list.append(a_range)
+        elif seg1.defl_sign * seg2.defl_sign == -1:
             a_range = (seg_idx, seg_idx+1)
             s_curve_list.append(a_range)
         elif seg1.defl_sign * seg2.defl_sign == 1:
-            lth = seg1.length_chords
-            dfl = seg1.total_defl_deg_chords
             a_range = (seg_idx, seg_idx+1)
             o_curve_list.append(a_range)
+        elif seg1.length_chords >= cruise_length_min:
+            a_range  = (seg_idx, seg_idx+1)
+            cruise_list.append(a_range)
+        else:
+            tmp = seg1.length_chords
+            dbg = True
 
 
     # consolidate L1 categories
@@ -282,11 +293,37 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
         new_l1_node = ParseTreeNode.ParseTreeNodeL1(a_range, my_graph=g)
         if a_range in s_curve_list:
             new_l1_node.category = Level1Cat.s_curve
+        elif a_range in u_turn_list:
+            new_l1_node.category = Level1Cat.u_turn
         elif a_range in o_curve_list:
             new_l1_node.category = Level1Cat.race_track
+        elif a_range in cruise_list:
+            new_l1_node.category = Level1Cat.cruise
         else:
             new_l1_node.category = Level1Cat.no_cat
         l1_node_list.append(new_l1_node)
+
+    # merge boustrophedon pattern into search_mapping
+    # del_node_list = []
+    # state = 'not found'  # or 'found' or 'building'
+    # idx = len(l1_node_list) - 1
+    # while idx > 1:
+    #     idx -= 1
+    #     prev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-1]
+    #     curr: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx]
+    #     if curr.category == Level1Cat.cruise and \
+    #         prev.category == Level1Cat.u_turn:
+    #         map_stop = idx
+    #         map_start = idx - 1
+    #         last_defl = prev.defl_sign
+    #         while idx > 3:
+    #             idx -= 2
+    #             curr = ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx]
+    #             prev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-1]
+    #             if curr.category != Level1Cat.cruise and \
+    #                 prev.category != Level1Cat.u_turn and \
+    #                 last_defl * prev.defl_sign < 0:
+    #                 dbg = True
 
     # merge adjacent no_cats into one singles
     for idx in range(len(l1_node_list)-2, 0, -1):
@@ -310,7 +347,8 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     root, _1, _2, lev_3 = partitioned_tuple
     # alt_root = g.root_node
     l2_node_list = ParseTreeNode.NodeListAtLevel(2)
-    l2_node_list.start_new_with(lev_3[0], 0, owning_graph=g)
+    l2_node_list.start_new_with(lev_3[0], 0, owning_graph=g,
+                                child_collection=lev_3)
     l2_node_list.current.category = level2_categorize(lev_3[1])
     l2_node_list.current.index = node_count = 0
     # l2_node_list.current
