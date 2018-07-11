@@ -261,7 +261,7 @@ class ParseTreeNodeL1(Parse_Tree_Node):
 
     @property
     def defl_sign(self):
-        first_child = self.target_collection[self.start]
+        first_child = self.children[0]
         if first_child.category.as_int < 0:
             return -1
         elif first_child.category.as_int > 0:

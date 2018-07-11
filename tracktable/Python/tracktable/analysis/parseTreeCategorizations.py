@@ -150,7 +150,7 @@ class Level1Cat(CategoryBase):
     grand_j_hook = 4
     race_track = 5
     course_change = 6
-    search_mapping = 7
+    boustrophedon = 7
     no_cat = 100
 
 
@@ -290,7 +290,8 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
     l1_node_list = ParseTreeNode.NodeListAtLevel(1)
     for l2_node_idx in range(len(lev_2)-1):
         a_range = (l2_node_idx, l2_node_idx+1)
-        new_l1_node = ParseTreeNode.ParseTreeNodeL1(a_range, my_graph=g)
+        new_l1_node = ParseTreeNode.ParseTreeNodeL1(a_range,
+                                child_collection=lev_2,  my_graph=g)
         if a_range in s_curve_list:
             new_l1_node.category = Level1Cat.s_curve
         elif a_range in u_turn_list:
@@ -303,29 +304,59 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
             new_l1_node.category = Level1Cat.no_cat
         l1_node_list.append(new_l1_node)
 
-    # merge boustrophedon pattern into search_mapping
-    # del_node_list = []
-    # state = 'not found'  # or 'found' or 'building'
-    # idx = len(l1_node_list) - 1
-    # while idx > 1:
-    #     idx -= 1
-    #     prev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-1]
-    #     curr: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx]
-    #     if curr.category == Level1Cat.cruise and \
-    #         prev.category == Level1Cat.u_turn:
-    #         map_stop = idx
-    #         map_start = idx - 1
-    #         last_defl = prev.defl_sign
-    #         while idx > 3:
-    #             idx -= 2
-    #             curr = ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx]
-    #             prev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-1]
-    #             if curr.category != Level1Cat.cruise and \
-    #                 prev.category != Level1Cat.u_turn and \
-    #                 last_defl * prev.defl_sign < 0:
-    #                 dbg = True
+    # merge boustrophedon pattern into boustrophedon category
+    del_node_set = set()
+    state = 'not found'  # or 'found'
+    idx = len(l1_node_list) - 1
+    while idx > 1:
+        idx -= 1
+        prev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-1]
+        curr: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx]
+        if curr.category == Level1Cat.cruise and \
+                    prev.category == Level1Cat.u_turn:
+            map_stop = idx
+            map_start = idx - 1
+            last_defl = prev.defl_sign
+            del_node_set.add(idx)
+            del_node_set.add(idx-1)
+            while idx > 3:
+                idx -= 2
+                curr = ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx]
+                prev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-1]
+                curr_cat = curr.category
+                prev_cat = prev.category
+                this_defl = prev.defl_sign
+                defl_combo = last_defl * this_defl # -1 indicates alternating
+                if curr_cat == Level1Cat.cruise and \
+                        prev_cat == Level1Cat.u_turn and \
+                        defl_combo == -1:
+                    'The map pattern continues'
+                    state = 'found'
+                    map_start = idx - 1
+                    del_node_set.add(idx)
+                    del_node_set.add(idx - 1)
+                    last_defl = this_defl
+                else:
+                    state = 'not found'
+                    lucky_node: ParseTreeNode.ParseTreeNodeL1 = \
+                        l1_node_list[idx]
+                    if lucky_node.category == Level1Cat.cruise:
+                        del_node_set.add(idx)
+                        idx -= 1
+                        lucky_node= l1_node_list[idx]
 
-    # merge adjacent no_cats into one singles
+                    lucky_node[1] = map_stop
+                    lucky_node.category = Level1Cat.boustrophedon
+                    dbg = True
+                    break
+
+
+    del_list = list(del_node_set)
+    del_list.sort(reverse=True)
+    for idx in del_list:
+        del l1_node_list[idx]
+
+    # merge adjacent no_cats into one single no_cat
     for idx in range(len(l1_node_list)-2, 0, -1):
         this_node = l1_node_list[idx]
         next_node = l1_node_list[idx+1]
