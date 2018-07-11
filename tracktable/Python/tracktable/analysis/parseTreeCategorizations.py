@@ -256,7 +256,7 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
     root, _1, lev_2, _3 = partitioned_tuple
 
     cruise_length_min = 35.0  # miles
-    u_turn_deflection_range = 1.5  # degrees, left or right
+    u_turn_deflection_range = 1.25  # degrees, left or right
     s_curve_mid_straight_max_length = 2.0  # miles
 
     # find s-curves
@@ -264,7 +264,7 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
     o_curve_list = []
     cruise_list = []
     u_turn_list = []
-    u_turn_range = (177.0, 183.0)
+    u_turn_range = (180.0 - u_turn_deflection_range, 180.0 + u_turn_deflection_range)
     for seg_idx in range(len(lev_2)-1):
         seg1: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx]
         seg2: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx+1]
@@ -303,6 +303,28 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
         else:
             new_l1_node.category = Level1Cat.no_cat
         l1_node_list.append(new_l1_node)
+
+    # id and merge racetrack/u-turn/racetrack pattern
+    del_node_set = set()
+    idx = len(l1_node_list) - 1
+    while idx > 2:
+        idx -= 1
+        preprev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-2]
+        prev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-1]
+        curr: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx]
+        if curr.category == Level1Cat.race_track and \
+                prev.category == Level1Cat.u_turn and \
+                preprev.category == Level1Cat.race_track:
+            preprev[1] = curr.stop
+            del_node_set.add(idx)
+            del_node_set.add(idx-1)
+            idx -= 2
+
+    del_list = list(del_node_set)
+    del_list.sort(reverse=True)
+    for idx in del_list:
+        del l1_node_list[idx]
+
 
     # merge boustrophedon pattern into boustrophedon category
     del_node_set = set()
