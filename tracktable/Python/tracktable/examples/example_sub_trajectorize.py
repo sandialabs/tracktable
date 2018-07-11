@@ -36,7 +36,7 @@ import tracktable.analysis.sub_trajectorize as st
 import networkx as nx
 from shapely.geometry import Point, LineString
 import numpy as np
-import tracktable.io.trajectory as trajectory
+import tracktable.inout.trajectory as trajectory
 import datetime
 import argparse
 

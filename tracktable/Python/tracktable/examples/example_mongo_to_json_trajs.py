@@ -31,7 +31,7 @@
 
 import argparse
 from pymongo import MongoClient
-import tracktable.io.trajectory as trajectory
+import tracktable.inout.trajectory as trajectory
 
 def main():
     parser = argparse.ArgumentParser(description=

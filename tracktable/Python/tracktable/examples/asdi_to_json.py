@@ -37,7 +37,7 @@
 from tracktable.source.trajectory import AssembleTrajectoryFromPoints
 from tracktable.domain import all_domains as ALL_DOMAINS
 from tracktable.examples import example_point_reader
-from tracktable.io.trajectory import to_json, to_json_file
+from tracktable.inout.trajectory import to_json, to_json_file
 
 import importlib
 import datetime
