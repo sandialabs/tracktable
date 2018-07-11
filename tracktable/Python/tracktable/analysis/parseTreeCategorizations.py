@@ -390,9 +390,15 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
         if node_len > 12:
             continue
 
-        anomaly_count = sum(hasattr(n, "leg_length_cat") and
-                            n.leg_length_cat.as_int < 0
-                            for n in a_node.point_list[1:])
+        try:
+            anomaly_count = sum(hasattr(n, "leg_length_cat") and
+                                n.leg_length_cat.as_int < 0
+                                for n in a_node.point_list)
+        except AttributeError:
+            anomaly_count = sum(hasattr(n, "leg_length_cat") and
+                                n.leg_length_cat.as_int < 0
+                                for n in a_node.point_list[1:])
+
         if node_len == anomaly_count:
             del_list.append(node_index)
 
