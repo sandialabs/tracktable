@@ -90,11 +90,11 @@ def main():
 
     client = MongoClient('localhost', 27017)
     db = client.ASDI
-    segs = db.SegmentsStraightJuly
+    segs = db.LabeledStraightJuly
     if args.method == Method.accel:
-        segs = db.SegmentsAccelJuly
+        segs = db.LabeledAccelJuly
     elif args.method == Method.semantic:
-        segs = db.SegmentsSemanticJuly
+        segs = db.LabeledSemanticJuly
 
     trajs = db.CompleteTrajectories #todo make configurable
 
@@ -115,7 +115,7 @@ def main():
             domain_to_import = 'tracktable.domain.{}'.format(traj.DOMAIN)
             domain_module = importlib.import_module(domain_to_import)
             first_time = False
-        leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
+        leaves = subtrajer.splitAndClassify(traj, returnGraph=False)
         segment_num = 0
         segments = []
         for leaf in leaves:
@@ -125,7 +125,7 @@ def main():
             traj_dict = trajectory.to_dict(domain_module.Trajectory.from_position_list(pts), addId=True)
             traj_dict['_id'] = traj_dict['_id']+'_'+str(segment_num).zfill(3)  #add the segment number to ensure unique ids
             # as there can be duplicate timestamps
-            traj_dict['segment_properties'] = {"seg_num" : segment_num, "seg_parent_id" : traj_json['_id']}
+            traj_dict['segment_properties'] = {"seg_num" : segment_num, "seg_parent_id" : traj_json['_id'], "seg_type" : leaf[2]}
             segments.append(traj_dict)
             segment_num+=1
         entry = {"_id" : traj_json['_id'], "segments" : segments}

@@ -96,13 +96,13 @@ def from_dict(dictionary):
         point.object_id = dictionary['object_id']
         point.timestamp = Timestamp.from_string(dictionary['timestamps'][i],
                                                 format_string=
-                                                '%Y-%m-%dT%H:%M:%S%z')
+                                                '%Y-%m-%dT%H:%M:%S')
         for (name, attributes) in dictionary['point_properties'].items():
             if attributes['values'][i] is not None:
                 if attributes['type'] == "timestamp":
                     ts = Timestamp.from_string(attributes['values'][i],
                                                format_string=
-                                               '%Y-%m-%dT%H:%M:%S%z')
+                                               '%Y-%m-%dT%H:%M:%S')
                     point.set_property(name, ts)
                 else:
                     point.set_property(name, attributes['values'][i])
@@ -115,7 +115,7 @@ def from_dict(dictionary):
     for (name, attributes) in dictionary['trajectory_properties'].items():
         if attributes['type'] == "timestamp":
             ts = Timestamp.from_string(attributes['value'],
-                                       format_string='%Y-%m-%dT%H:%M:%S%z')
+                                       format_string='%Y-%m-%dT%H:%M:%S')
             trajectory.set_property(name, ts)
         else:
             trajectory.set_property(name, attributes['value'])
@@ -126,7 +126,7 @@ def from_dict(dictionary):
         for (name, attributes) in dictionary['segment_properties'].items():
             if attributes['type'] == "timestamp":
                 ts = Timestamp.from_string(attributes['value'],
-                                           format_string='%Y-%m-%dT%H:%M:%S%z')
+                                           format_string='%Y-%m-%dT%H:%M:%S')
                 trajectory.set_property(name, ts)
             else:
                 trajectory.set_property(name, attributes['value'])

@@ -174,9 +174,9 @@ class SubTrajerStraight:
 
     def splitAndClassify(self, trajectory, returnGraph=False):
         if returnGraph:
-            leaves, G = subtrajectorize(trajectory, returnGraph=returnGraph)
+            leaves, G = self.subtrajectorize(trajectory, returnGraph=returnGraph)
         else:
-            leaves = subtrajectorize(trajectory, returnGraph=returnGraph)
+            leaves = self.subtrajectorize(trajectory, returnGraph=returnGraph)
         segments = []
         straight=False
         if self.norm_dist_mat.is_straight(leaves[0][0], leaves[0][1]):
@@ -279,8 +279,8 @@ class SubTrajerSemantic:
     def splitAndClassify(self, trajectory, returnGraph=False): #can take coordinate list or a trajectory.
         coordinates = []
         for point in trajectory: #make into coordinate list    #todo duplicated in example_sub_trajectorize.  Consolidiate
-            if 'altitude' in point.properties.keys(): #add altitude if exists
-                coordinates.append([point[0], point[1], point.properties['altitude']]) #changed from altitudes not sure why it was wrong
+            if 'altitudes' in point.properties.keys(): #add altitude if exists
+                coordinates.append([point[0], point[1], point.properties['altitudes']]) #changed from altitudes not sure why it was wrong
                 #print(len(coordinates)-1, point.properties['altitudes']) #remove
             else:
                 coordinates.append([point[0], point[1], None])
@@ -296,12 +296,12 @@ class SubTrajerSemantic:
         takeOffEnd=0
         if coordinates[0][2]: #has altitude
             if coordinates[0][2] < takeoffThreshold: #starts less than 10k feet
-                print("has alt at start less 10k", coordinates[0][2])
+                #print("has alt at start less 10k", coordinates[0][2])
                 for i in range(1,lastSample):#find where crosses 10k ft
                     if coordinates[i][2] > takeoffThreshold:
                         takeOffEnd = i
                         break
-                print("take off ends at sample ", takeOffEnd)
+                #print("take off ends at sample ", takeOffEnd)
         #isolate landing based on altitude
         landingStart= lastSample
         if coordinates[lastSample][2]: #has altitude
@@ -310,7 +310,7 @@ class SubTrajerSemantic:
                     if coordinates[i][2] > landingThreshold:
                         landingStart = i
                         break
-                print("landing starts at sample ", landingStart)
+                #print("landing starts at sample ", landingStart)
 
         cruisingStart = None
         cruisingEnd = None
@@ -324,12 +324,12 @@ class SubTrajerSemantic:
             for i in range(takeOffEnd, landingStart):
                 if coordinates[i][2] > cruisingMin:
                     cruisingStart = i
-                    print("cruising starts at sample ", cruisingStart)
+                    #print("cruising starts at sample ", cruisingStart)
                     break
             for i in range(landingStart, takeOffEnd, -1):
                 if coordinates[i][2] > cruisingMin:
                     cruisingEnd = i
-                    print("descent starts at sample ", cruisingEnd)
+                    #print("descent starts at sample ", cruisingEnd)
                     break
 
 
