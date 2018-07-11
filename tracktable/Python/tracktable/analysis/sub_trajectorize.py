@@ -423,7 +423,7 @@ class SubTrajerCurvature:
 
         # print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
         # if request_graph_plot:
-        if True:
+        if False:
         # if 'CLX4' in aPointList.name:
             try:
                 nxg.plot_graph(G)
