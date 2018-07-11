@@ -48,6 +48,9 @@ from matplotlib import gridspec
 from tracktable.domain.terrestrial import Trajectory, TrajectoryPoint
 from tracktable.core import geomath
 
+from tracktable.examples.kml_writer import write_kml_graph
+from tracktable.analysis.ExtendedPoint import IntersectionError
+
 #todo.  Uses too much memory when many trajs are processed.  Fix leak.
 #todo may want to try a value of 5 or 4 not 7 for length threshold
 from enum import Enum
@@ -56,9 +59,11 @@ class Method(Enum):   #duplicated from example_sub_trajectoirze_mongo.  Fix todo
     straight = 'straight'
     accel = 'accel'
     semantic = 'semantic'
+    curvature = 'curvature'
 
     def __str__(self):
         return self.value
+
 
 def get_path_altitudes(start, end, coords):
     altitudes = []
@@ -89,9 +94,20 @@ def draw_screen_poly( lats, lons, m):
     poly = Polygon( xy, facecolor='red', alpha=0.4, zorder=10)
     plt.gca().add_patch(poly)
 
-def plot_colored_segments_path(traj, leaves, threshold, bbox,
+def plot_colored_segments_path(traj, tree_graph, threshold=None, bbox=None,
+                               savefig=False, insetMap=False,
+                               altitudePlot=False, ext="kml", output=''):
+    extension = '.' + ext
+
+    # write_kml(output + extension, traj, with_altitude=False)
+    write_kml_graph(output + extension, traj, tree_graph)
+
+
+
+def plot_colored_segments_path_old(traj, leaves, threshold, bbox,
                                savefig=False, insetMap=True,
                                altitudePlot=True, ext="png", output=''):
+
     fig = plt.figure(figsize=(14,14), dpi=150)#dpi=300)
     if (insetMap and not altitudePlot) or (altitudePlot and not insetMap):
         gs = gridspec.GridSpec(1,2,width_ratios=[3,1])
@@ -130,7 +146,21 @@ def plot_colored_segments_path(traj, leaves, threshold, bbox,
         if i%2 == 1:
             color='#A92C00'
         mymap.plot(x, y, color=color, alpha=1.0, linewidth=1, zorder=5)#6) #.67
-        mymap.scatter(x,y, c='#bbbbbb', marker='o', s=2, zorder=4)#7) #eeeeee
+        # if i%4 == 0:
+        #     size = 50
+        #     colr = '#005376'
+        #     marker = 'x'
+        # else:
+        size = 8
+        colr = '#A92C00'
+        marker = 'o'
+        mymap.scatter(x,y, c=color, marker=marker, s=size, zorder=4) #, color=colr)#7) #eeeeee
+        # anXY = (x[-1], y[-1])
+        # ax.annotate(str(i), xy=anXY, xycoords='data',
+        #                xytext=(0.8, 0.95),
+        #                textcoords='figure points',
+        #                color='r')
+
 
     if insetMap:
         ax = fig.add_subplot(gs[1])
@@ -192,10 +222,10 @@ def plot_tree(G, traj, bbox, with_labels=False, node_size=5000,
     for i in range(len(starts)):
         G.node[i+1]['p'] = get_path_piece(starts[i+1], ends[i+1], coords)
 
-    plot_tree_helper(G, traj[0].object_id, traj[0].timestamp,
-                     max_width_height, with_labels=with_labels,
-                     node_size=node_size, threshold=threshold,
-                     savefig=savefig, ext=ext)
+    # plot_tree_helper(G, traj[0].object_id, traj[0].timestamp,
+    #                  max_width_height, with_labels=with_labels,
+    #                  node_size=node_size, threshold=threshold,
+    #                  savefig=savefig, ext=ext)
 
 def plot_tree_helper(G, object_id, timestamp, max_width_height,
                      with_labels=False, node_size=5000, threshold=1.1,
@@ -234,7 +264,7 @@ def plot_tree_helper(G, object_id, timestamp, max_width_height,
     plt.close()
 
 def parse_args():
-    desc = 'Subtrajectorize and render the trajectories in a given json file.'+\
+    desc = 'Subtrajectorize and render the trajectories in a given json file.'\
            ' Example (accel figure for paper) python example_sub_trajectorize.py -f -m accel -t -d -o "accelp025"'\
            ' Example (straight, 2, 1.1 for paper) python example_sub_trajectorize.py -f -m straight -l 2 -s 1.1 -d -o "straight1p1"'\
            ' Example (straight, 2, 1.001 for paper) python example_sub_trajectorize.py -f -m straight -l 2 -s 1.001 -d -o "straight1p001"'\
@@ -264,6 +294,120 @@ def parse_args():
     parser.add_argument('-v', '--verbose', dest='verbose', action="store_true")
     return parser.parse_args()
 
+
+import os
+sandboxDirectory = '/ascldap/users/pschrum/Documents/tracktableTesting'
+flightListFile = os.path.join(sandboxDirectory, 'TrajectoriesToSample.txt')
+summaryJsonFile = os.path.join(sandboxDirectory, 'binSummary.json')
+
+import getpass
+outputDir = os.getcwd()
+if getpass.getuser() == 'pschrum':
+    outputDir = os.path.join(sandboxDirectory, 'testResults')
+
+import json, sys
+import gc
+from collections import deque
+
+
+def get_point_count(aTraj):
+    return sum([1 for x in aTraj])
+
+def readFlistListFile():
+    with open(flightListFile, 'r') as flf:
+        return deque([x.rstrip() for x in flf.readlines()])
+
+def dev_createTrajectiresCustomList(tempV):
+    '''Creates the file, TrajectoriesToSample.txt with entries based on
+    the point count: 70 < size < 140. Don't use for now.'''
+    return None
+    retList = []
+    from collections import defaultdict
+    count=0; successCount = 0
+    import datetime
+    print(datetime.datetime.now())
+    print('started')
+    with open(flightListFile, 'w') as outFile:
+        for aTraj in tempV:
+            if count == 0:
+                print('Now in the loop')
+            count += 1
+
+            if count % 100 == 0:
+                print(count, ' ', end='')
+                sys.stdout.flush()
+
+            oid = _composeName(aTraj)
+
+            size = get_point_count(aTraj)
+            if 70 < size < 140:
+                successCount += 1
+                if successCount < 8:
+                    continue
+                outFile.write('{0}\n'.format(oid))
+                retList.append(oid)
+                if successCount >= 11:
+                    return retList
+
+    print('finished')
+    print(datetime.datetime.now())
+    return retList
+
+
+def dev_getTrajectoresInCustomList(tempV):
+    """Get trajectories into a list, but only the ones in  TrajectoriesToSample.txt
+    It is turned off for now."""
+    return None
+
+    flightsDeque = readFlistListFile()
+    returnList = []
+
+    from collections import defaultdict
+    binDict = defaultdict(lambda: list())
+    count=0; trajDict = {}
+    import datetime
+    print(datetime.datetime.now())
+    print('started')
+    for aTraj in tempV:
+        if count == 0:
+            print('Now in the loop')
+        count += 1
+
+        if count % 100 == 0:
+            print(count, ' ', end='')
+            sys.stdout.flush()
+
+        oid = _composeName(aTraj)
+
+        if oid in flightsDeque:
+            returnList.append(aTraj)
+            flightsDeque.remove(oid)
+
+        gc.collect()
+        if len(flightsDeque) == 0:
+            return returnList
+
+
+    print('finished')
+    print(datetime.datetime.now())
+    return returnList
+
+
+def _composeName(aTraj):
+    ts = aTraj[0].timestamp.strftime('%m%d%H%M')
+    oid = ts + '_' + aTraj[0].object_id
+    return oid
+
+_flightIdList = ['07011121_CLX431', '07011016_UAL651']
+_flightIdList = deque(_flightIdList)
+
+def point_count_greater_than(gen, max_count):
+    for ctr, _ in enumerate(gen):
+        if ctr > max_count:
+            return True
+
+    return False
+
 def main():
     args = parse_args()
 
@@ -282,16 +426,61 @@ def main():
         subtrajer = \
         st.SubTrajerSemantic(straightness_threshold=args.straightness_threshold,
                           length_threshold_samples=args.length_threshold)
+    elif args.method == Method.curvature:
+        subtrajer = \
+        st.SubTrajerCurvature()
     else:
         subtrajer = \
-        st.SubTrajerStraight(straightness_threshold=args.straightness_threshold,
-                          length_threshold_samples=args.length_threshold)
+        st.SubTrajerStraight(
+            straightness_threshold=args.straightness_threshold,
+            length_threshold_samples=args.length_threshold)
 
-    for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
+
+    tempV = trajectory.from_ijson_file_iter(args.json_trajectory_file)
+    # tempV = dev_getTrajectoresInCustomList(tempV)
+    # dev_createTrajectiresCustomList(tempV)
+    # dev_order_the_bin_summary_by_key()
+    counter2 = 0; largeCount = 0; maxPointCount = 0
+    # for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
+    for traj in tempV:
+        # if not point_count_greater_than(traj, 30):
+        #     continue
+        #
+        # if count < 500:
+        #     continue
+        #
+        # if count > 1000:
+        #     break
+
+        trajectoryName = _composeName(traj)
+        if len(_flightIdList) == 0:
+            break
+        elif trajectoryName in _flightIdList:
+            _flightIdList.remove(trajectoryName)
+        # else:
+        #     continue
+
+        # try:
         if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
         else:
-            leaves = subtrajer.subtrajectorize(traj, returnGraph=True)
+            G: nx.DiGraph = subtrajer.subtrajectorize(traj, returnGraph=False)
+        # except IntersectionError:
+        #     continue
+
+        if G is None: # or pointCount < 3:
+            continue
+
+        pointCount =  -1; leafCount = -1
+
+        trajectoryName = _composeName(traj)
+        # counter2 += 1
+        # if counter2 % 20 == 0:
+        #     print("{3} {0}: {1} Points,    {2} Leaves      {4}"
+        #           .format(trajectoryName, pointCount, leafCount, largeCount,
+        #                   maxPointCount))
+
+        # continue
 
         if args.verbose:
             print("Segmentation=", traj[0].object_id, leaves)
@@ -300,13 +489,19 @@ def main():
         bbox = geomath.compute_bounding_box(traj, expand=.05,
                                             expand_zero_length=.1)
 
+        plotFileName = _composeName(traj) + '_' + args.image_file
+
+
+        trajectoryName = os.path.join(outputDir, trajectoryName)
         # the mymap parameter below is only needed to get the max width or
         # height in terms ov the values used to scale the maps
-        plot_colored_segments_path(traj, leaves, args.straightness_threshold,
+        plot_colored_segments_path(traj, G, args.straightness_threshold,
                                    bbox, savefig=args.save_fig,
                                    insetMap=args.insetMap,
-                                   altitudePlot=args.altitudePlot, ext=ext,
-                                   output=args.image_file)
+                                   altitudePlot=args.altitudePlot,
+                                   ext='kml',
+                                   output=trajectoryName)
+        print(plotFileName,"saved.")
         if args.method == Method.straight:
             plot_tree(G, traj, bbox, with_labels=False,
                       node_size=5000, threshold=args.straightness_threshold,

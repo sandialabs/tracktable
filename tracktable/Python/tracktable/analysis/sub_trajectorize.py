@@ -29,9 +29,20 @@
 
 import networkx as nx
 import numpy as np
-from math import sqrt
+from math import sqrt, fabs
 
 import scipy
+from tracktable.analysis.sliceList import SliceList
+from tracktable.analysis.sliceList import sliceRange as slice_range_class
+import tracktable.analysis.ExtendedPoint
+from tracktable.analysis.ExtendedPointList import ExtendedPointList as EPL
+import tracktable.analysis.ExtendedPointList as EPLmod
+import tracktable.analysis.sliceList as SL
+import types
+from math import isclose
+from collections import defaultdict
+import tracktable.analysis.nx_graph as nxg
+import tracktable.analysis.parseTreeCategorizations as PTcats
 
 class NormalizedDistanceMatrix:
     """Generates a matrix giving the ratio of the distance along each
@@ -366,4 +377,154 @@ class SubTrajerSemantic:
         for seg in segments:
             segs.append((seg[0], seg[1])) #strip off "segment type"
         return segs
+
+
+def trajName(traj):
+    return traj[0].object_id
+
+_isSubTrajerCurvatureAvailable = True
+
+def compute_everything_else(aVar: tracktable.analysis.ExtendedPoint)\
+        -> tuple:
+    return 0.0, 0.2
+
+class SubTrajerCurvature:
+    """Breaks up a trajectory into subtrajectories based on curvatures of
+    each point triplet. Multiple approaches to consolidating sequential
+    curvature values into point ranges are available."""
+    def __init__(self):
+        if not _isSubTrajerCurvatureAvailable:
+            raise NotImplementedError(
+                "The class SubTrajerCurvature is not available due " +
+                "to import issues.")
+
+    def _pyramidGrowingWindowMethod(self, aPointList,
+                        request_graph_plot: bool =False):
+        """
+        A possible nuther method which considers growing windows on a pyramid
+            (multipass) sampling approach instead of a sequential sampling
+            approach like movingGrowingWindow does.
+        :param aPointList: sequence of points constituting the trajectory
+        :type aPointList: ExtendedPointList
+        :return: all subtrajectories
+        :rtype: SliceList
+        """
+        raise NotImplementedError('Try this later.')
+
+    def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=4.0,
+                        request_graph_plot: bool =False) -> nx.DiGraph:
+        """
+        First, classifies each point triplet as curved or straight based on
+            a Degree of Curve threshold. Then consolidates slices when two
+            adjacent slices have the same classification.
+            Suggested by Ben Newton.
+        :param aPointList: sequence of points constituting the trajectory
+        :type aPointList: ExtendedPointList
+        :param dcStraightThreshold: border between classifying a point triplet
+            as straight or curved.
+        :type dcStraightThreshold: float (positive)
+        :param request_graph_plot: when True, immediately opens a window of
+            showing the tree graph of the categorized subtrajectories.
+        :return: all subtrajectories
+        :rtype: SliceList
+        """
+
+        def tag_jitter_segments(aSliceRange):
+            aSegment = aSliceRange.getSegment()
+
+            aSliceRange.DegreeOfCurve = 'straight' \
+                if fabs(aSegment[0].arc.degree_curvature) < \
+                   dcStraightThreshold \
+                else 'turn'
+
+            aSliceRange.color = slice_range_class.straight_color
+            if aSliceRange.DegreeOfCurve is not 'straight':
+                aSliceRange.color = slice_range_class.turn_color
+
+        aPointList.categorize_points()
+
+        G = aPointList.create_minimal_digraph()
+        PTcats.categorize_level3_to_level2(G)
+        PTcats.categorize_level2_to_level1(G)
+
+        # print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
+        # if request_graph_plot:
+        if False:
+            try:
+                nxg.plot_graph(G)
+            except ImportError:
+                pass
+
+        return G
+
+
+    def subtrajectorize(self,
+                        trajectory,
+                        returnGraph=False,
+                        useMethod='individualCurvatures_preferred',
+                        request_graph_plot: bool =True) -> nx.DiGraph :
+        """
+        Decomposes a Trajectory into subtrajectories based on an analysis of
+            the curvature of each point triplet. Multiple methods are
+            available for this. Client code indicates which method to use by
+            setting useMethod. See the findMethod dictionary (in this function)
+            to see which methods are currently available.
+        :param trajectory: Trajectory to be processed.
+        :type trajectory: Trajectory
+        :param returnGraph: Return a NetworkX graph of the parse tree (Not
+                Implemented).
+        :type returnGraph: bool
+        :param useMethod:
+            'individualCurvatures_preferred' (default) - compare just the
+                straight/turn classification to grow subtrajectory segments.
+            'movingGrowingWindow' - Overlaps each slice a little, takes mean
+                and stdev of curvature for each slice, compares stdev,
+                consolidates slices when the stdevs of two adjacent slices are
+                close to each other. When they are, the consolidation causes
+                the window to grow towards the right.
+        :type useMethod: str
+        :return: leaves, pointCount, and number of leaves
+        :rtype: list of tuples(startIndex, endIndex) and int and int
+        """
+
+        if returnGraph:
+            raise NotImplementedError("Currently return of a graph "
+                                      "is not implemented. Always pass False "
+                                      "for returnGraph.")
+
+        aPointList = EPLmod.CreateExtendedPointList(trajectory)
+        pointCount = len(aPointList)
+        if pointCount < 4:
+            return None
+
+        aPointList.computeAllPointInformation(account_for_lat_long=True)
+        aPointList.mark_likely_jitters()
+
+        try:
+            parse_graph: nx.DiGraph = \
+                self._individCurvaturesMethod(aPointList,
+                    request_graph_plot=request_graph_plot)
+        except KeyboardInterrupt:
+            exit(0)
+
+        import  tracktable.analysis.nx_graph as nxg
+        leafList = list(nxg.leaves_gen(parse_graph))
+        temp_test_str = None
+        # if True: #'CLX4' in aPointList.name:
+        #     temp_test_str = parse_graph.csv_report
+        # if temp_test_str:
+        #     import os
+        #     outFileName = os.path.join(os.path.expanduser(
+        #         '~/Documents/tracktableTesting/testResults/'),
+        #         aPointList.name + '_report.csv')
+        #     try:
+        #         with open(outFileName, 'wt') as outF:
+        #             outF.write(temp_test_str)
+        #         print()
+        #         print('report written to:  ', outFileName)
+        #     except Exception:
+        #         print()
+
+        return parse_graph
+
 
