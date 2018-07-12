@@ -143,13 +143,15 @@ class DeflectionCat(CategoryBase):
     sharp_right = (360, lambda v, this_num: True)
 
 class Level1Cat(CategoryBase):
-    straight_reach = 0,
+    cruise = 0,
     s_curve = 1,
     j_hook = 2,
     u_turn = 3,
     grand_j_hook = 4
     race_track = 5
-    no_cat = 6
+    course_change = 6
+    boustrophedon = 7
+    no_cat = 100
 
 
 class Level2Cat(CategoryBase):
@@ -253,42 +255,130 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
     partitioned_tuple = ParseTreeNode.get_all_by_level(g)
     root, _1, lev_2, _3 = partitioned_tuple
 
-    map_row_length_min = 35.0  # miles
-    u_turn_deflection_range = 1.5  # degrees, left or right
+    cruise_length_min = 35.0  # miles
+    u_turn_deflection_range = 1.25  # degrees, left or right
     s_curve_mid_straight_max_length = 2.0  # miles
 
     # find s-curves
     s_curve_list = []
     o_curve_list = []
+    cruise_list = []
+    u_turn_list = []
+    u_turn_range = (180.0 - u_turn_deflection_range, 180.0 + u_turn_deflection_range)
     for seg_idx in range(len(lev_2)-1):
         seg1: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx]
         seg2: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx+1]
-        if seg1.defl_sign * seg2.defl_sign == -1:
-            if seg_idx == 77:
-                dfl = seg2.total_defl_deg_chords
+        ttl_defl_mag = abs(seg1.total_defl_deg_chords)
+        if min(u_turn_range) <= ttl_defl_mag <= max(u_turn_range):
+            a_range = (seg_idx, seg_idx+1)
+            u_turn_list.append(a_range)
+        elif seg1.defl_sign * seg2.defl_sign == -1:
             a_range = (seg_idx, seg_idx+1)
             s_curve_list.append(a_range)
         elif seg1.defl_sign * seg2.defl_sign == 1:
-            lth = seg1.length_chords
-            dfl = seg1.total_defl_deg_chords
             a_range = (seg_idx, seg_idx+1)
             o_curve_list.append(a_range)
+        elif seg1.length_chords >= cruise_length_min:
+            a_range  = (seg_idx, seg_idx+1)
+            cruise_list.append(a_range)
+        else:
+            tmp = seg1.length_chords
+            dbg = True
 
 
     # consolidate L1 categories
     l1_node_list = ParseTreeNode.NodeListAtLevel(1)
     for l2_node_idx in range(len(lev_2)-1):
         a_range = (l2_node_idx, l2_node_idx+1)
-        new_l1_node = ParseTreeNode.ParseTreeNodeL1(a_range, my_graph=g)
+        new_l1_node = ParseTreeNode.ParseTreeNodeL1(a_range,
+                                child_collection=lev_2,  my_graph=g)
         if a_range in s_curve_list:
             new_l1_node.category = Level1Cat.s_curve
+        elif a_range in u_turn_list:
+            new_l1_node.category = Level1Cat.u_turn
         elif a_range in o_curve_list:
             new_l1_node.category = Level1Cat.race_track
+        elif a_range in cruise_list:
+            new_l1_node.category = Level1Cat.cruise
         else:
             new_l1_node.category = Level1Cat.no_cat
         l1_node_list.append(new_l1_node)
 
-    # merge adjacent no_cats into one singles
+    # id and merge racetrack/u-turn/racetrack pattern
+    del_node_set = set()
+    idx = len(l1_node_list) - 1
+    while idx > 2:
+        idx -= 1
+        preprev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-2]
+        prev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-1]
+        curr: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx]
+        if curr.category == Level1Cat.race_track and \
+                prev.category == Level1Cat.u_turn and \
+                preprev.category == Level1Cat.race_track:
+            preprev[1] = curr.stop
+            del_node_set.add(idx)
+            del_node_set.add(idx-1)
+            idx -= 2
+
+    del_list = list(del_node_set)
+    del_list.sort(reverse=True)
+    for idx in del_list:
+        del l1_node_list[idx]
+
+
+    # merge boustrophedon pattern into boustrophedon category
+    del_node_set = set()
+    state = 'not found'  # or 'found'
+    idx = len(l1_node_list) - 1
+    while idx > 1:
+        idx -= 1
+        prev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-1]
+        curr: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx]
+        if curr.category == Level1Cat.cruise and \
+                    prev.category == Level1Cat.u_turn:
+            map_stop = idx
+            map_start = idx - 1
+            last_defl = prev.defl_sign
+            del_node_set.add(idx)
+            del_node_set.add(idx-1)
+            while idx > 3:
+                idx -= 2
+                curr = ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx]
+                prev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-1]
+                curr_cat = curr.category
+                prev_cat = prev.category
+                this_defl = prev.defl_sign
+                defl_combo = last_defl * this_defl # -1 indicates alternating
+                if curr_cat == Level1Cat.cruise and \
+                        prev_cat == Level1Cat.u_turn and \
+                        defl_combo == -1:
+                    'The map pattern continues'
+                    state = 'found'
+                    map_start = idx - 1
+                    del_node_set.add(idx)
+                    del_node_set.add(idx - 1)
+                    last_defl = this_defl
+                else:
+                    state = 'not found'
+                    lucky_node: ParseTreeNode.ParseTreeNodeL1 = \
+                        l1_node_list[idx]
+                    if lucky_node.category == Level1Cat.cruise:
+                        del_node_set.add(idx)
+                        idx -= 1
+                        lucky_node= l1_node_list[idx]
+
+                    lucky_node[1] = map_stop
+                    lucky_node.category = Level1Cat.boustrophedon
+                    dbg = True
+                    break
+
+
+    del_list = list(del_node_set)
+    del_list.sort(reverse=True)
+    for idx in del_list:
+        del l1_node_list[idx]
+
+    # merge adjacent no_cats into one single no_cat
     for idx in range(len(l1_node_list)-2, 0, -1):
         this_node = l1_node_list[idx]
         next_node = l1_node_list[idx+1]
@@ -344,6 +434,7 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
 
     #region This code region is a kludge until I can get my indexing right.
     for cnt, a_node in enumerate(l2_node_list[:-1]):
+        a_node._child_layer = lev_3
         a_node[1] -= 1
         if cnt > 0:
             a_node[0] -= 1

@@ -6,12 +6,13 @@ from typing import List, Any, Union
 
 class Parse_Tree_Node(list):
 
-    def __init__(self, point_range: List[int], my_traj=None,
+    def __init__(self, point_range: List[int], child_collection=None,
                  associatedSlice=None,
                  ndx=-1, my_graph: "TreeDiGraph"=None):
         # self.my_slice = associatedSlice
         self._my_graph = my_graph
-        self.target_collection = my_traj
+        self.target_collection = child_collection  # deprecated as too vague
+        self._child_layer = child_collection
         if ndx > -1:
             self.index = ndx
         for itm in point_range:
@@ -35,6 +36,13 @@ class Parse_Tree_Node(list):
     def my_graph(self) -> "TreeDiGraph":
         return self._my_graph
 
+    @property
+    def children(self):
+        try:
+            return self._child_layer[self.start:self.stop]
+        except AttributeError:
+            return None
+
 
     @property
     def my_point_list(self) -> "ExtendedPointList":
@@ -43,17 +51,19 @@ class Parse_Tree_Node(list):
     @property
     def point_at(self, pt_idx: int) -> "ExtendedPoint":
         """Returns any point on the underlying ExtendedPointList."""
-        return  self.my_point_list[pt_idx]
+        return self.my_point_list[pt_idx]
 
     @property
     def point_starting(self) -> "ExtendedPoint":
         """Returns the starting point of this Node."""
-        return self[0].point_starting
+        child_node = self.children[0]
+        return child_node.point_starting
 
     @property
     def point_stopping(self) -> "ExtendedPoint":
         """Returns the stopping point of this Node."""
-        return self[0].point_stopping
+        child_node = self.children[-1]
+        return child_node.point_stopping
 
     @property
     def point_list(self) -> List["ExtendedPoint"]:
@@ -73,6 +83,7 @@ class Parse_Tree_Node(list):
 
     @property
     def my_slice(self):
+        '''Not sure if I still use this.'''
         return self.target_collection[self.start:self.stop]
 
     @property
@@ -129,7 +140,11 @@ class Parse_Tree_Node(list):
     # _the_category: CategoryBase = None
     @property
     def category_str(self) -> str:
-        return 'No Cat.'
+        try:
+            return (str(self.category)).split('.')[-1].replace('_', ' ') \
+                .title()
+        except (AttributeError, IndexError, ValueError):
+            return 'No Cat.'
     # @category.setter
     # def category(self, value: CategoryBase) -> None:
     #     self._the_category = value
@@ -213,9 +228,9 @@ class Parse_Tree_Node(list):
         return build_string
 
 class Parse_Tree_Root(Parse_Tree_Node):
-    def __init__(self, point_range, my_traj=None, associatedSlice=None,
+    def __init__(self, point_range, child_collection=None, associatedSlice=None,
                  ndx=-1, my_graph: "TreeDiGraph"=None):
-        super().__init__(point_range, my_traj, associatedSlice, ndx, my_graph)
+        super().__init__(point_range, child_collection, associatedSlice, ndx, my_graph)
         self.target_collection = None
 
     @property
@@ -241,14 +256,23 @@ class Parse_Tree_Root(Parse_Tree_Node):
         return '\n'.join(ret_list)
 
 class ParseTreeNodeL1(Parse_Tree_Node):
-    def __init__(self, point_range, my_traj=None, associatedSlice=None,
+    def __init__(self, point_range, child_collection=None, associatedSlice=None,
                  ndx=-1, my_graph: "TreeDiGraph"=None):
-        super().__init__(point_range, my_traj, associatedSlice, ndx, my_graph)
+        super().__init__(point_range, child_collection, associatedSlice, ndx, my_graph)
         self.target_collection = None
 
     @property
     def depth_level(self):
         return 1
+
+    @property
+    def defl_sign(self):
+        first_child = self.children[0]
+        if first_child.category.as_int < 0:
+            return -1
+        elif first_child.category.as_int > 0:
+            return 1
+        return 0
 
     def report_header_string(self, g: nx.DiGraph) -> str:
         first_successor = next(g.successors(self))
@@ -271,9 +295,9 @@ class ParseTreeNodeL1(Parse_Tree_Node):
 
 
 class ParseTreeNodeL2(Parse_Tree_Node):
-    def __init__(self, point_range, my_traj=None, associatedSlice=None,
+    def __init__(self, point_range, child_collection=None, associatedSlice=None,
                  ndx=-1, my_graph: "TreeDiGraph"=None):
-        super().__init__(point_range, my_traj, associatedSlice, ndx, my_graph)
+        super().__init__(point_range, child_collection, associatedSlice, ndx, my_graph)
 
     @property
     def depth_level(self):
@@ -290,6 +314,26 @@ class ParseTreeNodeL2(Parse_Tree_Node):
         else:
             real_index = self.stop + pt_idx
         return leaf_list[real_index].my_point
+
+    # @property
+    # def point_starting(self) -> "ExtendedPoint":
+    #     """Returns the starting point of this Node."""
+    #     try:
+    #         child_node = self.children[self.start]
+    #     except IndexError:
+    #         dbg = True
+    #         raise
+    #     return child_node.start
+    #
+    # @property
+    # def point_stopping(self) -> "ExtendedPoint":
+    #     """Returns the stopping point of this Node."""
+    #     try:
+    #         child_node = self.children[self.stop]
+    #     except:
+    #         dbg = True
+    #         raise
+    #     return child_node.stop
 
     @property
     def defl_sign(self):
@@ -326,9 +370,9 @@ class ParseTreeNodeL2(Parse_Tree_Node):
 
 
 class Parse_Tree_Leaf(Parse_Tree_Node):
-    def __init__(self, point_range, my_traj=None, associatedSlice=None,
+    def __init__(self, point_range, child_collection=None, associatedSlice=None,
                  ndx=-1, my_graph: "TreeDiGraph"=None):
-        super().__init__(point_range, my_traj, associatedSlice, ndx, my_graph)
+        super().__init__(point_range, child_collection, associatedSlice, ndx, my_graph)
 
     @property
     def depth_level(self):
@@ -341,12 +385,12 @@ class Parse_Tree_Leaf(Parse_Tree_Node):
     @property
     def point_starting(self) -> "ExtendedPoint":
         """Returns the starting point of this Node."""
-        return self.my_slice[0]
+        return self.start
 
     @property
     def point_stopping(self) -> "ExtendedPoint":
         """Returns the stopping point of this Node."""
-        return self.my_slice[1]
+        return self.stop
 
     @property
     def defl_sign(self) -> int:
@@ -413,15 +457,19 @@ class NodeListAtLevel(list):
         self.end_index = self.current[1]
 
     def start_new_with(self, next_child_node: Parse_Tree_Node,
-                       start_index: int = -1, owning_graph: "TreeDiGraph"=None) :
+                       start_index: int = -1,
+                       owning_graph: "TreeDiGraph"=None,
+                       child_collection=None):
         if next_child_node.depth_level - self.my_level != 1:
             raise AttributeError("Level mismatch between NodeList and "
                                  "ParseTreeNode.")
         if self.my_level == 2:
-            new_L2_node = ParseTreeNodeL2([0, 1], self, my_graph=owning_graph)
+            new_L2_node = ParseTreeNodeL2([0, 1], self, child_collection,
+                                          my_graph=owning_graph)
             self.append(new_L2_node)
         elif self.my_level == 1:
-            self.append(ParseTreeNodeL1([0, 1], self, my_graph=owning_graph))
+            self.append(ParseTreeNodeL1([0, 1], self, child_collection,
+                                        my_graph=owning_graph))
         else:
             raise Exception("Should not get to this point in "
                 "parseTreeNode.py")
@@ -438,6 +486,7 @@ class NodeListAtLevel(list):
 
     def insert_into_tree_graph(self, g: nx.DiGraph) -> None:
         """
+        Deprecated. Scheduled to be removed.
         Takes the current list of nodes (self), and inserts all in the list
         into graph g at the level of self.
         Side effects: Everything is a side effect, operating on graph g.
@@ -447,6 +496,7 @@ class NodeListAtLevel(list):
         pass
 
 
+# This should be a member of nxg.TreeDiGraph. Move it there some time.
 def get_all_by_level(g: nx.DiGraph) -> tuple:
     """
     Performs a "row-based" filter of a tree graph. For every level of a tree

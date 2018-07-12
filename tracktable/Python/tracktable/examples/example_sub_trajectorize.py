@@ -490,13 +490,14 @@ def main():
         if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
         elif args.method == Method.curvature:
-            G: nx.DiGraph = subtrajer.subtrajectorize(traj, returnGraph=False)
+            leaves, G = subtrajer.subtrajectorize(traj, returnGraph=False)
         else:
-            leaves = subtrajer.subtrajectorize(traj, returnGraph=True)
+            leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
+
         # except IntersectionError:
         #     continue
 
-        if G is None: # or pointCount < 3:
+        if leaves is None: # or pointCount < 3:
             continue
 
         pointCount =  -1; leafCount = -1

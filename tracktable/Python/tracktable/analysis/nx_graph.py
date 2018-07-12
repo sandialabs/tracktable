@@ -115,6 +115,13 @@ plot_graph.switch = {
     3: -10000
 }
 
+def output_short_summary(g :nx.DiGraph, out_file: str) -> None:
+    import os
+    the_dir, the_file = os.path.split(out_file)
+    # if not os.path.exists(the_dir)
+    #     os.mkdir(the_dir, mode=)
+
+
 def leaves_gen(g :nx.DiGraph) -> Iterator[Parse_Tree_Leaf]:
     a_node: Parse_Tree_Node
     for a_node in g:
