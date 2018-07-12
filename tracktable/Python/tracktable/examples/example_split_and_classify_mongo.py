@@ -45,6 +45,7 @@ class Method(Enum):
     straight = 'straight'
     accel = 'accel'
     semantic = 'semantic'
+    curvature = 'curvature'
 
     def __str__(self):
         return self.value
@@ -81,6 +82,9 @@ def main():
         subtrajer = \
         st.SubTrajerSemantic(straightness_threshold=args.straightness_threshold,
                              length_threshold_samples=args.length_threshold)
+    elif args.method == Method.curvature:
+        subtrajer = \
+        st.SubTrajerCurvature()
     else:
         subtrajer = \
         st.SubTrajerStraight(straightness_threshold=args.straightness_threshold,
@@ -95,6 +99,8 @@ def main():
         segs = db.LabeledAccelJuly
     elif args.method == Method.semantic:
         segs = db.LabeledSemanticJuly
+    elif args.method == Method.curvature:
+        segs = db.LabeledCurvatureJuly
 
     trajs = db.CompleteTrajectories #todo make configurable
 
@@ -115,7 +121,10 @@ def main():
             domain_to_import = 'tracktable.domain.{}'.format(traj.DOMAIN)
             domain_module = importlib.import_module(domain_to_import)
             first_time = False
-        leaves = subtrajer.splitAndClassify(traj, returnGraph=False)
+        if args.method == Method.curvature:
+            leaves, G = subtrajer.splitAndClassify(traj, returnGraph=False)
+        else: #could remove this if above responded to returnGraph=False todo
+            leaves = subtrajer.splitAndClassify(traj, returnGraph=False)
         segment_num = 0
         segments = []
         for leaf in leaves:

@@ -59,6 +59,7 @@ class Method(Enum):   #duplicated from example_sub_trajectoirze_mongo.  Fix todo
     straight = 'straight'
     accel = 'accel'
     semantic = 'semantic'
+    curvature = 'curvature'
 
     def __str__(self):
         return self.value
@@ -127,6 +128,15 @@ def export_kml(traj, leaves, filename_out='test.kml'):  #Ben's kml exporter vers
             style = style4
         elif leaf[2] == 'landing':
             style = style5
+            ####Curvature coloring
+        elif leaf[2] == 'Cruise': #would be nice to rename, for now case is different? todo
+            style = style3
+        elif leaf[2] == 'Boustrophedon':
+            style = style4
+        elif leaf[2] == 'J Hook':
+            style = style2
+        elif leaf[2] == 'No Cat':
+            style = style6
         else:
             style = style6
 
@@ -188,6 +198,15 @@ def plot_colored_segments_path(traj, leaves, threshold, bbox,
             color = '#ff9933'
         elif leaf[2] == 'landing':
             color = '#009999'
+            ### Curvature colors
+        elif leaf[2] == 'Cruise': #would be nice to rename, for now case is different? todo
+            color = color = '#0066ff'
+        elif leaf[2] == 'Boustrophedon':
+            color = '#ff9933'
+        elif leaf[2] == 'J Hook':
+            color = '#ff0000'
+        elif leaf[2] == 'No Cat':
+            color='#FF00FF'
         else:
             color='#FF00FF'
         mymap.plot(x, y, color=color, alpha=1.0, linewidth=1, zorder=5)#6) #.67
@@ -344,6 +363,9 @@ def main():
         subtrajer = \
         st.SubTrajerSemantic(straightness_threshold=args.straightness_threshold,
                           length_threshold_samples=args.length_threshold)
+    elif args.method == Method.curvature:
+        subtrajer = \
+        st.SubTrajerCurvature()
     else:
         subtrajer = \
         st.SubTrajerStraight(straightness_threshold=args.straightness_threshold,
@@ -352,8 +374,10 @@ def main():
     for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
         if args.method == Method.straight:
             leaves, G = subtrajer.splitAndClassify(traj, returnGraph=True)
+        elif args.method == Method.curvature:
+            leaves, G = subtrajer.splitAndClassify(traj, returnGraph=False)
         else:
-            leaves = subtrajer.splitAndClassify(traj, returnGraph=True)
+            leaves = subtrajer.splitAndClassify(traj, returnGraph=False)
 
         if args.verbose:
             print("Segmentation=", traj[0].object_id, leaves)
