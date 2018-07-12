@@ -51,6 +51,10 @@ from tracktable.core import geomath
 from tracktable.examples.kml_writer import write_kml_graph
 from tracktable.analysis.ExtendedPoint import IntersectionError
 
+from fastkml import kml
+from fastkml import styles
+from fastkml import geometry as fg
+
 #todo.  Uses too much memory when many trajs are processed.  Fix leak.
 #todo may want to try a value of 5 or 4 not 7 for length threshold
 from enum import Enum
@@ -94,17 +98,38 @@ def draw_screen_poly( lats, lons, m):
     poly = Polygon( xy, facecolor='red', alpha=0.4, zorder=10)
     plt.gca().add_patch(poly)
 
-def plot_colored_segments_path(traj, tree_graph, threshold=None, bbox=None,
-                               savefig=False, insetMap=False,
-                               altitudePlot=False, ext="kml", output=''):
+def export_kml(traj, leaves, filename_out='test.kml'):  #Ben's kml exporter version using pyKML
+    lstyle = styles.LineStyle(id="redThick", color='FF0000FF', width=3.0)
+    style = styles.Style(styles = [lstyle])
+    k = kml.KML()
+    ns = '{http://www.opengis.net/kml/2.2}'
+    d = kml.Document(ns, 'docid', 'doc name', 'doc description', styles = [style])
+    k.append(d)
+
+    f = kml.Folder(ns, 'fid', 'f name' , 'f description')
+    d.append(f)
+
+    coords = traj_to_coords(traj)
+    for i in range(len(leaves)):
+        leaf = leaves[i]
+        p2 = kml.Placemark(ns, 'id2', 'name2', 'descriptoin2', styles=[style])#, styleUrl="#redThick")
+        #p2 = kml.Placemark(ns, 'id2', 'name2', 'descriptoin2', styleUrl="#redThick") #why does this not work?
+        p2.geometry = get_path_piece(leaf[0], leaf[1], coords) #fg.LineString([(0,0,0), (1,1,1)])
+        f.append(p2)
+
+    with open(filename_out, 'w') as outfile:
+        outfile.write(k.to_string())#prettyprint=True))
+
+def export_colored_segments_path_kml(traj, tree_graph, threshold=None, bbox=None,
+                                     savefig=False, insetMap=False,
+                                     altitudePlot=False, ext="kml", output=''):
     extension = '.' + ext
 
-    # write_kml(output + extension, traj, with_altitude=False)
     write_kml_graph(output + extension, traj, tree_graph)
 
 
 
-def plot_colored_segments_path_old(traj, leaves, threshold, bbox,
+def plot_colored_segments_path(traj, leaves, threshold, bbox,
                                savefig=False, insetMap=True,
                                altitudePlot=True, ext="png", output=''):
 
@@ -275,6 +300,7 @@ def parse_args():
                         default="../../../..//TestData/mapping_flight.json")
     parser.add_argument('-f', '--saveFigures', dest='save_fig',
                         action="store_true")
+    parser.add_argument('-k', '--kml', dest='export_kml', action="store_true", help="flag to output as kml as well")
     parser.add_argument('-o', '--outputImageFilenameNoExt', dest='image_file', type=str, default='', help="filename and optional path without extension or period")
     parser.add_argument('-m', dest='method', type=Method, choices=list(Method), default='straight')
     parser.add_argument('-s', dest='straightness_threshold', type=float,
@@ -463,8 +489,10 @@ def main():
         # try:
         if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
-        else:
+        elif args.method == Method.curvature:
             G: nx.DiGraph = subtrajer.subtrajectorize(traj, returnGraph=False)
+        else:
+            leaves = subtrajer.subtrajectorize(traj, returnGraph=True)
         # except IntersectionError:
         #     continue
 
@@ -495,17 +523,22 @@ def main():
         trajectoryName = os.path.join(outputDir, trajectoryName)
         # the mymap parameter below is only needed to get the max width or
         # height in terms ov the values used to scale the maps
-        #plot_colored_segments_path(traj, G, args.straightness_threshold,
-        #                               bbox, savefig=args.save_fig,
-        #                               insetMap=args.insetMap,
-        #                               altitudePlot=args.altitudePlot,
-        #                               ext='kml',
-        #                               output=trajectoryName)
-        plot_colored_segments_path_old(traj, leaves, args.straightness_threshold,
+        plot_colored_segments_path(traj, leaves, args.straightness_threshold,
                                    bbox, savefig=args.save_fig,
                                    insetMap=args.insetMap,
                                    altitudePlot=args.altitudePlot, ext=ext,
                                    output=args.image_file)
+        if args.export_kml:
+            if args.method == Method.curvature:
+                export_colored_segments_path_kml(traj, G, args.straightness_threshold,
+                                                 bbox, savefig=args.save_fig,
+                                                 insetMap=args.insetMap,
+                                                 altitudePlot=args.altitudePlot,
+                                                 ext='kml',
+                                                 output=trajectoryName)
+            else:
+                export_kml(traj, leaves, filename_out="test.kml")
+
         print(plotFileName,"saved.")
         if args.method == Method.straight:
             plot_tree(G, traj, bbox, with_labels=False,

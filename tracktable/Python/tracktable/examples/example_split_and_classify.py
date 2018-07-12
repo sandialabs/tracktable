@@ -48,6 +48,9 @@ from matplotlib import gridspec
 from tracktable.domain.terrestrial import Trajectory, TrajectoryPoint
 from tracktable.core import geomath
 
+from fastkml import kml
+from fastkml import styles
+
 #todo.  Uses too much memory when many trajs are processed.  Fix leak.
 #todo may want to try a value of 5 or 4 not 7 for length threshold
 from enum import Enum
@@ -88,6 +91,52 @@ def draw_screen_poly( lats, lons, m):
     xy = list(zip(x,y))
     poly = Polygon( xy, facecolor='red', alpha=0.4, zorder=10)
     plt.gca().add_patch(poly)
+
+#todo this is copied from example_sub_trajectorize  consolidate!
+def export_kml(traj, leaves, filename_out='test.kml'):  #Ben's kml exporter version using pyKML
+    lstyle1 = styles.LineStyle(id="greenThick", color='FF009900', width=3.0)
+    style1 = styles.Style(styles = [lstyle1])
+    lstyle2 = styles.LineStyle(id="redThick", color='FF0000FF', width=3.0)
+    style2 = styles.Style(styles = [lstyle2])
+    lstyle3 = styles.LineStyle(id="blueThick", color='FFFF6600', width=3.0)
+    style3 = styles.Style(styles = [lstyle3])
+    lstyle4 = styles.LineStyle(id="orangeThick", color='FF3399FF', width=3.0)
+    style4 = styles.Style(styles = [lstyle4])
+    lstyle5 = styles.LineStyle(id="tealThick", color='FF999900', width=3.0)
+    style5 = styles.Style(styles = [lstyle5])
+    lstyle6 = styles.LineStyle(id="tealThick", color='FFFF00FF', width=3.0)
+    style6 = styles.Style(styles = [lstyle6])
+    k = kml.KML()
+    ns = '{http://www.opengis.net/kml/2.2}'
+    d = kml.Document(ns, 'docid', 'doc name', 'doc description')#, styles = [style]) #todo fix later to have smaller kml files
+    k.append(d)
+
+    f = kml.Folder(ns, 'fid', 'f name' , 'f description')
+    d.append(f)
+
+    coords = traj_to_coords(traj)
+    for i in range(len(leaves)):
+        leaf = leaves[i]
+        if leaf[2] == 'takeoff':
+            style = style1
+        elif leaf[2] == 'climb':
+            style = style2
+        elif leaf[2] == 'cruise':
+            style = style3
+        elif leaf[2] == 'descent':
+            style = style4
+        elif leaf[2] == 'landing':
+            style = style5
+        else:
+            style = style6
+
+        p2 = kml.Placemark(ns, 'id2', 'name2', 'descriptoin2', styles=[style])#, styleUrl="#redThick")
+        #p2 = kml.Placemark(ns, 'id2', 'name2', 'descriptoin2', styleUrl="#redThick") #why does this not work?
+        p2.geometry = get_path_piece(leaf[0], leaf[1], coords) #fg.LineString([(0,0,0), (1,1,1)])
+        f.append(p2)
+
+    with open(filename_out, 'w') as outfile:
+        outfile.write(k.to_string())#prettyprint=True))
 
 def plot_colored_segments_path(traj, leaves, threshold, bbox,
                                savefig=False, insetMap=True,
@@ -257,6 +306,7 @@ def parse_args():
                         default="../../../..//TestData/mapping_flight.json")
     parser.add_argument('-f', '--saveFigures', dest='save_fig',
                         action="store_true")
+    parser.add_argument('-k', '--kml', dest='export_kml', action="store_true", help="flag to output as kml as well")
     parser.add_argument('-o', '--outputImageFilenameNoExt', dest='image_file', type=str, default='', help="filename and optional path without extension or period")
     parser.add_argument('-m', dest='method', type=Method, choices=list(Method), default='straight')
     parser.add_argument('-s', dest='straightness_threshold', type=float,
@@ -321,6 +371,18 @@ def main():
                                    altitudePlot=args.altitudePlot, ext=ext,
                                    output=args.image_file,
                                    showMeridiansAndParallels=meridiansAndPars)
+
+        if args.export_kml:
+            #if args.method == Method.curvature:
+            #    export_colored_segments_path_kml(traj, G, args.straightness_threshold,
+            #                                     bbox, savefig=args.save_fig,
+            #                                     insetMap=args.insetMap,
+            #                                     altitudePlot=args.altitudePlot,
+            #                                     ext='kml',
+            #                                     output=trajectoryName)
+            #else:
+            export_kml(traj, leaves, filename_out="test.kml")
+
         if args.method == Method.straight:
             plot_tree(G, traj, bbox, with_labels=False,
                       node_size=5000, threshold=args.straightness_threshold,
