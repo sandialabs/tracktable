@@ -208,7 +208,7 @@ def altitude(thing):
         return thing.altitude
     else:
         try:
-            return thing.properties['altitude']
+            return thing.properties['altitudes']
         except IndexError:
             return 0
 
