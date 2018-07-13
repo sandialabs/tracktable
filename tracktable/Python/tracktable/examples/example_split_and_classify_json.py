@@ -102,6 +102,7 @@ def main():
     output_json_path = r'/ascldap/users/pschrum/Documents/tracktableTesting/' \
             r'testResults/From_Joseph/from_Paul_s.json'
     with open(output_json_path, 'w') as out_json:
+        out_json.write('[\n')
         for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
             #print(traj_json['_id']) #remove
             # traj = trajectory.from_dict(traj_json)
@@ -140,9 +141,10 @@ def main():
                 segment_num+=1
             entry = {"_id" : traj[0].object_id, "segments" : segments}
             json_str = json.dumps(entry, sort_keys=True)
-            out_json.write(json_str)
+            out_json.write(json_str + ',\n')
             count_actually_processed += 1
             dbg = True
+        out_json.write(']\n')
 
         # new_result = segs.insert_one(entry)
     print(f"Processed {count_actually_processed} out of {count} trajectories.")
