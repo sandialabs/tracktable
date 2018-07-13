@@ -98,38 +98,54 @@ def main():
     first_time = True
 
     count = 0
-    # for traj_json in traj_iter:
-    for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
-        #print(traj_json['_id']) #remove
-        # traj = trajectory.from_dict(traj_json)
-        count += 1
-        if args.verbose:
-            print(count, traj[0].object_id)
+    count_actually_processed = 0
+    output_json_path = r'/ascldap/users/pschrum/Documents/tracktableTesting/' \
+            r'testResults/From_Joseph/from_Paul_s.json'
+    with open(output_json_path, 'w') as out_json:
+        for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
+            #print(traj_json['_id']) #remove
+            # traj = trajectory.from_dict(traj_json)
+            count += 1
+            if args.verbose:
+                print(count, traj[0].object_id)
 
-        if first_time: #assumes entire file is same domain
-            domain_to_import = 'tracktable.domain.{}'.format(traj.DOMAIN)
-            domain_module = importlib.import_module(domain_to_import)
-            first_time = False
-        if args.method == Method.curvature:
-            leaves, G = subtrajer.splitAndClassify(traj, returnGraph=False)
-        else: #could remove this if above responded to returnGraph=False todo
-            leaves = subtrajer.splitAndClassify(traj, returnGraph=False)
-        segment_num = 0
-        segments = []
-        for leaf in leaves:
-            pts = []
-            for i in range(leaf[0], leaf[1]+1):
-                pts.append(traj[i])
-            traj_dict = trajectory.to_dict(domain_module.Trajectory.from_position_list(pts), addId=True)
-            traj_dict['_id'] = traj_dict['_id']+'_'+str(segment_num).zfill(3)  #add the segment number to ensure unique ids
-            # as there can be duplicate timestamps
-            traj_dict['segment_properties'] = {"seg_num" : segment_num, "seg_parent_id" : traj[0].object_id, "seg_type" : leaf[2]}
-            segments.append(traj_dict)
-            segment_num+=1
-        entry = {"_id" : traj[0].object_id, "segments" : segments}
-        json_str = json.dumps(entry, sort_keys=True)
+            if first_time: #assumes entire file is same domain
+                domain_to_import = 'tracktable.domain.{}'.format(traj.DOMAIN)
+                domain_module = importlib.import_module(domain_to_import)
+                first_time = False
+            # if args.method == Method.curvature:
+            #     leaves, G = subtrajer.splitAndClassify(traj, returnGraph=False)
+            # else: #could remove this if above responded to returnGraph=False todo #
+            try:
+                leaves = subtrajer.splitAndClassify(traj, returnGraph=False)
+            except (IndexError, AttributeError, ZeroDivisionError, TypeError) as ie:
+                # These are all the exceptions I need to deal with eventually
+                # print (count)
+                # # e.args[0] = e.args[0] + f'  count = {count}'
+                # raise IndexError(ie.args[0] + f'  count = {count}')
+                continue
+            if not leaves:
+                continue
+            segment_num = 0
+            segments = []
+            for leaf in leaves:
+                pts = []
+                for i in range(leaf[0], leaf[1]+1):
+                    pts.append(traj[i])
+                traj_dict = trajectory.to_dict(domain_module.Trajectory.from_position_list(pts), addId=True)
+                traj_dict['_id'] = traj_dict['_id']+'_'+str(segment_num).zfill(3)  #add the segment number to ensure unique ids
+                # as there can be duplicate timestamps
+                traj_dict['segment_properties'] = {"seg_num" : segment_num, "seg_parent_id" : traj[0].object_id, "seg_type" : leaf[2]}
+                segments.append(traj_dict)
+                segment_num+=1
+            entry = {"_id" : traj[0].object_id, "segments" : segments}
+            json_str = json.dumps(entry, sort_keys=True)
+            out_json.write(json_str)
+            count_actually_processed += 1
+            dbg = True
 
         # new_result = segs.insert_one(entry)
+    print(f"Processed {count_actually_processed} out of {count} trajectories.")
     #end for trajectory
 
 

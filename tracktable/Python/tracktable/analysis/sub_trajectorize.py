@@ -536,11 +536,6 @@ class SubTrajerCurvature:
         :rtype: list of tuples(startIndex, endIndex) and int and int
         """
 
-        if returnGraph:
-            raise NotImplementedError("Currently return of a graph "
-                                      "is not implemented. Always pass False "
-                                      "for returnGraph.")
-
         aPointList = EPLmod.CreateExtendedPointList(trajectory)
         pointCount = len(aPointList)
         if pointCount < 4:
@@ -556,6 +551,8 @@ class SubTrajerCurvature:
         except KeyboardInterrupt:
             exit(0)
 
-        return leaves, g
+        if returnGraph:
+            return leaves, g
+        return leaves
 
 

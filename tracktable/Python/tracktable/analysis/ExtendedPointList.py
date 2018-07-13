@@ -55,7 +55,10 @@ class ExtendedPointList(list):
                 distBackMiles = a_point.pt2pt.distanceBack
 
                 a_point.pt2pt.seconds_back = timedelta.seconds
-                speed = distBackMiles / (timedelta.seconds / 3600.0)
+                try:
+                    speed = distBackMiles / (timedelta.seconds / 3600.0)
+                except ZeroDivisionError:
+                    speed = float('inf')
                 a_point.pt2pt.speed_back_mph = speed
                 # speed is miles per hour
 
