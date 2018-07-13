@@ -3,6 +3,9 @@ import networkx as nx
 from typing import Any, Iterator
 from collections import defaultdict
 from tracktable.analysis.parseTreeNode import *
+import stat
+import tracktable.analysis.parseTreeNode as ParseTreeNode
+import functools
 
 class TreeDiGraph(nx.DiGraph):
 
@@ -28,6 +31,84 @@ class TreeDiGraph(nx.DiGraph):
         header_str = root.report_header_string(self)
         data_str = root.report_data_lines(self)
         return header_str + data_str
+
+    def get_stats_string(self):
+        ret_list = []
+        root, Lev1, Lev2, leaves = ParseTreeNode.get_all_by_level(self)
+
+        traj_name = self.my_trajecory[0].object_id
+        ts = str(self.my_trajecory[0].timestamp)
+        traj_name = traj_name + '_' + ts[:10]
+
+        ttl_length = self.my_EPL.length_chords()
+
+        cruise_segments, cruise_dist_percent = \
+            self._compute_a_stat_pair(Lev1, ttl_length, 'Cruise')
+
+        u_segments, u_dist_percent = \
+            self._compute_a_stat_pair(Lev1, ttl_length, 'U Turn')
+
+        race_segments, race_dist_percent = \
+            self._compute_a_stat_pair(Lev1, ttl_length, 'Race Track')
+
+        s_segments, s_dist_percent = \
+            self._compute_a_stat_pair(Lev1, ttl_length, 'S Curve')
+
+        bous_segments, bous_dist_percent = \
+            self._compute_a_stat_pair(Lev1, ttl_length, 'Boustrophedon')
+
+        nocat_segments, nocat_dist_percent = \
+            self._compute_a_stat_pair(Lev1, ttl_length, 'No Cat')
+
+        ret_str = \
+            f'{traj_name},' \
+            f'{cruise_segments},{cruise_dist_percent},' \
+            f'{s_segments},{s_dist_percent},' \
+            f'{nocat_segments},{nocat_dist_percent},' \
+            f'{bous_segments},{bous_dist_percent},' \
+            f'{u_segments},{u_dist_percent},' \
+            f'{race_segments},{race_dist_percent},' \
+            '\n'
+        return ret_str
+
+    _hdr = 'Name,Cruise Count,Cruise Percent,S Curve Count,S Curve Percent,' \
+           'No Cat Count,No Cat Percent,Boustophredon Count,' \
+           'Boustophredon Percent,' \
+           'U Turn Count,U Turn Percent,Race Track Count,Race Track Percent' \
+           '\n'
+
+    def output_short_summary(self: nx.DiGraph, out_file: str) -> None:
+        import os, time
+        the_dir, the_file = os.path.split(out_file)
+        if not os.path.exists(the_dir):
+            os.mkdir(the_dir)
+
+        append_or_write = 'at'
+        if os.path.exists(out_file):
+            age_seconds = time.time() - os.stat(out_file)[stat.ST_MTIME]
+            if age_seconds > 12.0:  # seconds
+                append_or_write = 'wt'
+        else:
+            append_or_write = 'wt'
+
+        with open(out_file, append_or_write) as outf:
+            if 'w' in append_or_write:
+                outf.write(self._hdr)
+            outf.write(self.get_stats_string())
+            outf.flush()
+
+
+    def _compute_a_stat_pair(self, collection, ttl_len, cat_str):
+        segs = [x for x in collection if x.category_str == cat_str]
+        segs_count = len(segs)
+        segs_distance_percent = 100.0 * \
+                                functools.reduce(
+                                    lambda acc, seg: acc + seg.length_chords,
+                                    segs, 0.0) / \
+                                ttl_len
+        prct_str = '%0.2f' % segs_distance_percent + ' %'
+        return segs_count, prct_str
+
 
 try:
     import pygraphviz
@@ -115,9 +196,9 @@ plot_graph.switch = {
     3: -10000
 }
 
-def output_short_summary(g :nx.DiGraph, out_file: str) -> None:
-    import os
-    the_dir, the_file = os.path.split(out_file)
+# def output_short_summary(g :nx.DiGraph, out_file: str) -> None:
+#     import os
+#     the_dir, the_file = os.path.split(out_file)
     # if not os.path.exists(the_dir)
     #     os.mkdir(the_dir, mode=)
 

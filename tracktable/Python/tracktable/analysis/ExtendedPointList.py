@@ -9,6 +9,7 @@ import tracktable.analysis.parseTreeNode
 from tracktable.analysis.parseTreeNode import Parse_Tree_Root as PTroot
 from tracktable.analysis.parseTreeNode import Parse_Tree_Leaf as PTleaf
 import tracktable.analysis.nx_graph as nxg
+import functools
 
 __author__ = ['Paul Schrum']
 
@@ -157,7 +158,7 @@ class ExtendedPointList(list):
         g.my_trajecory = self.my_trajectory
 
         trajectory_range = [0, len(self)]
-        root_node = PTroot(trajectory_range, self)
+        root_node = PTroot(trajectory_range, self, my_graph=self)
         g.add_node(root_node)
         g.root = root_node
 
@@ -184,6 +185,20 @@ class ExtendedPointList(list):
             for i, point in enumerate(self):
                 writeStr = str(point)
                 f.write(writeStr + '\n')
+
+    def length_chords(self, start=1, stop=-1):
+        ret_val = functools.reduce(
+            lambda x, y: x+y.pt2pt.distanceBack, self[start:stop], 0.0)
+        ret_val += self[stop-1].pt2pt.distanceAhead
+        return ret_val
+
+
+    def length_chords(self, start=1, stop=-1):
+        ret_val = functools.reduce(
+            lambda x, y: x + y.pt2pt.distanceBack, self[start:stop], 0.0)
+        ret_val += self[stop - 1].pt2pt.distanceAhead
+        return ret_val
+
 
 class _low_high(list):
     def __init__(self):

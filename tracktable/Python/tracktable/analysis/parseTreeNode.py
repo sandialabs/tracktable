@@ -113,8 +113,8 @@ class Parse_Tree_Node(list):
         """Total length of a segment running along the chords"""
         accum_dist = 0.0
         # start = self.start if self.start > 0 else 1
-        for a_seg in self.my_point_list[self.start:self.stop]:
-            accum_dist += a_seg.horizontal_distance
+        for a_seg in self.children:
+            accum_dist += a_seg.length_chords
 
         return accum_dist
 
@@ -254,6 +254,11 @@ class Parse_Tree_Root(Parse_Tree_Node):
             prefix_str = ',,'
 
         return '\n'.join(ret_list)
+
+    @property
+    def length_chords(self):
+        """Total length of a segment running along the chords"""
+        return self.my_graph.my_EPL.length_chords
 
 class ParseTreeNodeL1(Parse_Tree_Node):
     def __init__(self, point_range, child_collection=None, associatedSlice=None,
@@ -396,6 +401,12 @@ class Parse_Tree_Leaf(Parse_Tree_Node):
     def defl_sign(self) -> int:
         return self.my_point.defl_sign
 
+    @property
+    def length_chords(self):
+        """Total length of a segment running along the chords"""
+        mypt = self.my_point
+        return self.my_point.horizontal_distance
+
     def _shorten_category_strings(self, the_str: str) -> str:
         ret_str = ['']
         str_list = the_str.split('|')
@@ -463,13 +474,16 @@ class NodeListAtLevel(list):
         if next_child_node.depth_level - self.my_level != 1:
             raise AttributeError("Level mismatch between NodeList and "
                                  "ParseTreeNode.")
+
         if self.my_level == 2:
             new_L2_node = ParseTreeNodeL2([0, 1], self, child_collection,
                                           my_graph=owning_graph)
             self.append(new_L2_node)
+
         elif self.my_level == 1:
             self.append(ParseTreeNodeL1([0, 1], self, child_collection,
                                         my_graph=owning_graph))
+
         else:
             raise Exception("Should not get to this point in "
                 "parseTreeNode.py")

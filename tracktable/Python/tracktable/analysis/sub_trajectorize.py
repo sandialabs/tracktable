@@ -44,6 +44,7 @@ from collections import defaultdict
 import tracktable.analysis.nx_graph as nxg
 import tracktable.analysis.parseTreeCategorizations as PTcats
 import tracktable.analysis.parseTreeNode as ParseTreeNode
+import tracktable.analysis.nx_graph as nxg
 
 
 class NormalizedDistanceMatrix:
@@ -427,8 +428,8 @@ class SubTrajerCurvature:
         :type dcStraightThreshold: float (positive)
         :param request_graph_plot: when True, immediately opens a window of
             showing the tree graph of the categorized subtrajectories.
-        :return: all subtrajectories
-        :rtype: SliceList
+        :return: all subtrajectories in two forms
+        :rtype: tuple: SliceList, graph
         """
 
         def tag_jitter_segments(aSliceRange):
@@ -460,11 +461,11 @@ class SubTrajerCurvature:
             except ImportError:
                 pass
 
-        if False:
+        if True:
             summary_file = '' \
-                '/ascldap/users/pschrum/Documents/tracktableTesting/'' \
-                ''testResults/candidate_study_flights/study_flights.csv'
-            ngx.output_short_summary(G, summary_file)
+                '/ascldap/users/pschrum/Documents/tracktableTesting/' \
+                'testResults/candidate_study_flights/study_flights.csv'
+            G.output_short_summary(summary_file)
 
         # At this point, G is a NetworkX graph (Digraph, single root). But
         # the calling code need it to be a list of
