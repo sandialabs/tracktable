@@ -48,8 +48,9 @@ def main():
     trajs = db[args.mongo_collection]
 
     json_string = "[\n"
-    for traj in trajs.find():#'{'+args.regex+'}'):   #could make this into an iterator todo duplicate of to_json_multi
-        json_string+=str(traj)+",\n"
+    for traj in trajs.find().limit(1000):#'{'+args.regex+'}'):   #could make this into an iterator todo duplicate of to_json_multi
+        #print(str(traj))
+        json_string+=str(traj).replace("'","\"")+",\n"  #for some reason ' need to be replaced with "
     json_string=json_string[:-2]+"\n]\n" # replace ",\n" with "]"
     args.json_file.write(json_string)
 
