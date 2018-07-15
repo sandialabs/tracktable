@@ -308,6 +308,8 @@ class SubTrajerSemantic:
         lastSample = len(coordinates)-1
         #start out by removing the takeoff and landing.
         takeOffEnd=0
+        landingStart= lastSample
+        includeTakeoff=False
         if coordinates[0][2]: #has altitude
             if coordinates[0][2] < takeoffThreshold: #starts less than 10k feet
                 #print("has alt at start less 10k", coordinates[0][2])
@@ -315,40 +317,72 @@ class SubTrajerSemantic:
                     if coordinates[i][2] > takeoffThreshold:
                         takeOffEnd = i
                         break
-                #print("take off ends at sample ", takeOffEnd)
-        #isolate landing based on altitude
-        landingStart= lastSample
-        if coordinates[lastSample][2]: #has altitude
-            if coordinates[lastSample][2] < landingThreshold: #starts less than 10k feet
+                if takeOffEnd == 0: #it never got over takeoff threshold
+                    if coordinates[0][2] < coordinates[lastSample][2]:  # it rose from start to finish
+                        print("assuming complete flight is a takeoff")
+                        return [(0, lastSample, "takeoff")]
+                    else:
+                        print("assuming complete flight is a landing")
+                        return [(0, lastSample, "landing")]  #could have other category for just flying around below 10k?
+                includeTakeoff=True
+                print("take off ends at sample ", takeOffEnd)
+            #isolate landing based on altitude
+            if coordinates[lastSample][2] < landingThreshold: #ends less than 10k feet
                 for i in range(lastSample,-1, -1):#find where crosses 10k ft
                     if coordinates[i][2] > landingThreshold:
                         landingStart = i
                         break
-                #print("landing starts at sample ", landingStart)
+                print("landing starts at sample ", landingStart)
 
         cruisingStart = None
         cruisingEnd = None
         #print(coordinates)
         #todo, below we must quit if there is not altituted values?
         h = np.histogram(list(zip(*coordinates))[2], bins=np.append(np.append(0, np.arange(10500,46500,1000)), 60000), density=True)  #to determine where the cruising altitude was?
+        #print(h[0]*1000)
+        includeCruise=False
         if np.max(h[0]) > cruisingThreshold: #multiply by 1000 to get approx ratio of samples in this bin
+            includeCruise=True
             cruisingBin = np.argmax(h[0])
             cruisingMin = h[1][cruisingBin]
             cruisingMax = h[1][cruisingBin+1]
             for i in range(takeOffEnd, landingStart):
                 if coordinates[i][2] > cruisingMin:
                     cruisingStart = i
-                    #print("cruising starts at sample ", cruisingStart)
+                    print("cruising starts at sample ", cruisingStart)
                     break
             for i in range(landingStart, takeOffEnd, -1):
                 if coordinates[i][2] > cruisingMin:
                     cruisingEnd = i
-                    #print("descent starts at sample ", cruisingEnd)
+                    print("descent starts at sample ", cruisingEnd)
                     break
 
 
         #need to check below if not found
-        segments = [(0,takeOffEnd, "takeoff"), (takeOffEnd, cruisingStart, "climb"), (cruisingStart, cruisingEnd, "cruise"), (cruisingEnd, landingStart, "descent"), (landingStart, lastSample, "landing")] #later add sub segments
+        if includeTakeoff:
+            if includeCruise:
+                segments = [(0,takeOffEnd, "takeoff"), (takeOffEnd, cruisingStart, "climb"), (cruisingStart, cruisingEnd, "cruise"), (cruisingEnd, landingStart, "descent"), (landingStart, lastSample, "landing")] #later add sub segments
+            else:
+                maxAlt = coordinates[takeOffEnd][2]
+                maxAltInd = takeOffEnd
+                for i in range(takeOffEnd,landingStart):
+                    if coordinates[i][2] > maxAlt:
+                        maxAlt = coordinates[i][2]
+                        maxAltInd = i
+                if maxAltInd == takeOffEnd:
+                    segments = [(0,takeOffEnd, "takeoff"), (takeOffEnd, landingStart, "descent"), (landingStart, lastSample, "landing")]
+                elif maxAltInd ==landingStart:
+                    segments = [(0,takeOffEnd, "takeoff"), (takeOffEnd, landingStart, "climb"), (landingStart, lastSample, "landing")]
+                else:
+                    segments = [(0,takeOffEnd, "takeoff"), (takeOffEnd, maxAltInd, "climb"), (maxAltInd, landingStart, "descent"), (landingStart, lastSample, "landing")] #later add sub segments
+        else:
+            if includeCruise:
+                if cruisingStart == 0:
+                    segments = [(cruisingStart, cruisingEnd, "cruise"), (cruisingEnd, landingStart, "descent"), (landingStart, lastSample, "landing")] #later add sub segments
+                else:
+                    segments = [(0, cruisingStart, "climb"), (cruisingStart, cruisingEnd, "cruise"), (cruisingEnd, landingStart, "descent"), (landingStart, lastSample, "landing")] #later add sub segments
+            else:
+                segments = [(0, landingStart, "descent"), (landingStart, lastSample, "landing")] #assumed the part before is descent.  May need another case here?
         return segments
 #        G = nx.DiGraph()
 #        start = takeOffEnd

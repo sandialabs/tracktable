@@ -131,7 +131,7 @@ def main():
                 continue
             segment_num = 0
             segments = []
-            #print(leaves)
+            print(leaves)
             for leaf in leaves:
                 pts = []
                 #print(leaf[0], leaf[1])
