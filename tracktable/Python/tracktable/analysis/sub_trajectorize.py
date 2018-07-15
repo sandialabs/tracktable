@@ -495,11 +495,11 @@ class SubTrajerCurvature:
             except ImportError:
                 pass
 
-        if True:
-            summary_file = '' \
-                '/ascldap/users/pschrum/Documents/tracktableTesting/' \
-                'testResults/candidate_study_flights/study_flights.csv'
-            G.output_short_summary(summary_file)
+        #if True:
+            #summary_file = "summary.csv" #'' \
+#                '/ascldap/users/pschrum/Documents/tracktableTesting/' \
+#                'testResults/candidate_study_flights/study_flights.csv'
+            #G.output_short_summary(summary_file)
 
         # At this point, G is a NetworkX graph (Digraph, single root). But
         # the calling code need it to be a list of
