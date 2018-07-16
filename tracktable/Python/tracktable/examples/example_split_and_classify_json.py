@@ -99,13 +99,14 @@ def main():
 
     count = 0
     count_actually_processed = 0
-    output_json_path = r'/ascldap/users/pschrum/Documents/tracktableTesting/' \
-            r'testResults/From_Joseph/from_Paul_s.json'
+    #output_json_path = r'/ascldap/users/pschrum/Documents/tracktableTesting/' \
+    #        r'testResults/From_Joseph/from_Paul_s.json'
+    output_json_path = 'testB.json'
     with open(output_json_path, 'w') as out_json:
         pre_str = '\n'
         out_json.write('[')
         for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
-            #print(traj_json['_id']) #remove
+            print("       "+traj[0].object_id) #remove
             # traj = trajectory.from_dict(traj_json)
             count += 1
             if args.verbose:
@@ -130,8 +131,10 @@ def main():
                 continue
             segment_num = 0
             segments = []
+            print(leaves)
             for leaf in leaves:
                 pts = []
+                #print(leaf[0], leaf[1])
                 for i in range(leaf[0], leaf[1]+1):
                     pts.append(traj[i])
                 traj_dict = trajectory.to_dict(domain_module.Trajectory.from_position_list(pts), addId=True)
