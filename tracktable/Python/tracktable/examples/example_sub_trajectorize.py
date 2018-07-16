@@ -490,7 +490,10 @@ def main():
         if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
         elif args.method == Method.curvature:
-            leaves, G = subtrajer.subtrajectorize(traj, returnGraph=False)
+            try:
+                leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
+            except TypeError:
+                dbg = True
         else:
             leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
 
@@ -524,19 +527,30 @@ def main():
         trajectoryName = os.path.join(outputDir, trajectoryName)
         # the mymap parameter below is only needed to get the max width or
         # height in terms ov the values used to scale the maps
-        plot_colored_segments_path(traj, leaves, args.straightness_threshold,
+        print(args.export_kml)
+        if not args.export_kml:
+            plot_colored_segments_path(traj, leaves,
+                                   args.straightness_threshold,
                                    bbox, savefig=args.save_fig,
                                    insetMap=args.insetMap,
                                    altitudePlot=args.altitudePlot, ext=ext,
                                    output=args.image_file)
-        if args.export_kml:
+        else:
             if args.method == Method.curvature:
-                export_colored_segments_path_kml(traj, G, args.straightness_threshold,
-                                                 bbox, savefig=args.save_fig,
-                                                 insetMap=args.insetMap,
-                                                 altitudePlot=args.altitudePlot,
-                                                 ext='kml',
-                                                 output=trajectoryName)
+                plot_this = False
+                if 'VAL27' in trajectoryName and '0711' in trajectoryName:
+                    plot_this = True
+                elif 'RDDL309' in trajectoryName and '0715' in trajectoryName:
+                    plot_this = True
+
+                if plot_this:
+                    export_colored_segments_path_kml(traj, G,
+                                             args.straightness_threshold,
+                                             bbox, savefig=args.save_fig,
+                                             insetMap=args.insetMap,
+                                             altitudePlot=args.altitudePlot,
+                                             ext='kml',
+                                             output=trajectoryName)
             else:
                 export_kml(traj, leaves, filename_out="test.kml")
 

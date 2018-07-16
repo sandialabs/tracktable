@@ -449,7 +449,10 @@ class SubTrajerCurvature:
         G = aPointList.create_minimal_digraph()
         PTcats.categorize_level3_to_level2(G)
         root, Level1, level2, Level3 = ParseTreeNode.get_all_by_level(G)
-        PTcats.categorize_level2_to_level1(G)
+        try:
+            PTcats.categorize_level2_to_level1(G)
+        except IndexError:
+            return
         root, Level1, level2, Level3 = ParseTreeNode.get_all_by_level(G)
 
         # print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
@@ -506,6 +509,9 @@ class SubTrajerCurvature:
                         useMethod='individualCurvatures_preferred',
                         request_graph_plot: bool =True):
         segments, g = self.splitAndClassify(trajectory, returnGraph=returnGraph)
+        if not segments:
+            return None
+
         segs = []
         for seg in segments:
             segs.append((seg[0], seg[1])) #strip off "segment type"
@@ -551,6 +557,9 @@ class SubTrajerCurvature:
                     request_graph_plot=returnGraph)
         except KeyboardInterrupt:
             exit(0)
+        except TypeError as te:
+            leaves = None
+            g = None
 
         if returnGraph:
             return leaves, g
