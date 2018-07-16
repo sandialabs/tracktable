@@ -102,7 +102,13 @@ class LegLengthCat(CategoryBase):
 
 
 class CurvatureCat(CategoryBase):
-    """Categorize the curvature of a leg of a trajectory."""
+    """Categorize the curvature of a leg of a trajectory.
+    Note: the enumeration numerical values are also used as categoization
+    threshold values. If you want to adjust the thresholds, do it there.
+    Also, it is a less than criteria (so long as defaul_criteria is called.
+    That's why hard_right, the last value, defaults if the degree_curve is
+    greater than normal_right, which currently equals 12.
+    """
     hard_left = (-12, lambda v, this_num:
         CategoryBase.default_criteria(v, "degree_curve", this_num))
 
@@ -239,18 +245,6 @@ def _insinuate_new_nodes_into_tree(node_list: ParseTreeNode,
             g.remove_edge(e[0], e[1])
 
 
-
-def _perform_tests(**kwargs):
-    if len(kwargs) == 0:
-        return
-    return
-    # nodes: ParseTreeNode.Parse_Tree_Node = kwargs.get('node_list', None)
-    # itm: ParseTreeNode.Parse_Tree_Node
-    # for itm in nodes:
-    #     length = itm.length_chords
-    #     total_defl = itm.total_defl_deg_chords
-    #     dbg = True
-
 def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
     partitioned_tuple = ParseTreeNode.get_all_by_level(g)
     root, _1, lev_2, _3 = partitioned_tuple
@@ -283,8 +277,6 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
             cruise_list.append(a_range)
         else:
             tmp = seg1.length_chords
-            dbg = True
-
 
     # consolidate L1 categories
     l1_node_list = ParseTreeNode.NodeListAtLevel(1)
@@ -486,9 +478,12 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
                                 n.leg_length_cat.as_int < 0
                                 for n in a_node.point_list)
         except AttributeError:
-            anomaly_count = sum(hasattr(n, "leg_length_cat") and
+            try:
+                anomaly_count = sum(hasattr(n, "leg_length_cat") and
                                 n.leg_length_cat.as_int < 0
                                 for n in a_node.point_list[1:])
+            except AttributeError:
+                continue
 
         if node_len == anomaly_count:
             del_list.append(node_index)
