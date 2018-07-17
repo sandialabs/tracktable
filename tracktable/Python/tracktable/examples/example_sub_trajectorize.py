@@ -59,6 +59,9 @@ from fastkml import geometry as fg
 #todo may want to try a value of 5 or 4 not 7 for length threshold
 from enum import Enum
 
+row_count = 0
+processed_count = 0
+
 class Method(Enum):   #duplicated from example_sub_trajectoirze_mongo.  Fix todo
     straight = 'straight'
     accel = 'accel'
@@ -123,6 +126,9 @@ def export_kml(traj, leaves, filename_out='test.kml'):  #Ben's kml exporter vers
 def export_colored_segments_path_kml(traj, tree_graph, threshold=None, bbox=None,
                                      savefig=False, insetMap=False,
                                      altitudePlot=False, ext="kml", output=''):
+    if len(output) == 0:
+        return
+
     extension = '.' + ext
 
     write_kml_graph(output + extension, traj, tree_graph)
@@ -333,6 +339,7 @@ if getpass.getuser() == 'pschrum':
 
 import json, sys
 import gc
+import psutil
 from collections import deque
 
 
@@ -343,89 +350,11 @@ def readFlistListFile():
     with open(flightListFile, 'r') as flf:
         return deque([x.rstrip() for x in flf.readlines()])
 
-def dev_createTrajectiresCustomList(tempV):
-    '''Creates the file, TrajectoriesToSample.txt with entries based on
-    the point count: 70 < size < 140. Don't use for now.'''
-    return None
-    retList = []
-    from collections import defaultdict
-    count=0; successCount = 0
-    import datetime
-    print(datetime.datetime.now())
-    print('started')
-    with open(flightListFile, 'w') as outFile:
-        for aTraj in tempV:
-            if count == 0:
-                print('Now in the loop')
-            count += 1
-
-            if count % 100 == 0:
-                print(count, ' ', end='')
-                sys.stdout.flush()
-
-            oid = _composeName(aTraj)
-
-            size = get_point_count(aTraj)
-            if 70 < size < 140:
-                successCount += 1
-                if successCount < 8:
-                    continue
-                outFile.write('{0}\n'.format(oid))
-                retList.append(oid)
-                if successCount >= 11:
-                    return retList
-
-    print('finished')
-    print(datetime.datetime.now())
-    return retList
-
-
-def dev_getTrajectoresInCustomList(tempV):
-    """Get trajectories into a list, but only the ones in  TrajectoriesToSample.txt
-    It is turned off for now."""
-    return None
-
-    flightsDeque = readFlistListFile()
-    returnList = []
-
-    from collections import defaultdict
-    binDict = defaultdict(lambda: list())
-    count=0; trajDict = {}
-    import datetime
-    print(datetime.datetime.now())
-    print('started')
-    for aTraj in tempV:
-        if count == 0:
-            print('Now in the loop')
-        count += 1
-
-        if count % 100 == 0:
-            print(count, ' ', end='')
-            sys.stdout.flush()
-
-        oid = _composeName(aTraj)
-
-        if oid in flightsDeque:
-            returnList.append(aTraj)
-            flightsDeque.remove(oid)
-
-        gc.collect()
-        if len(flightsDeque) == 0:
-            return returnList
-
-
-    print('finished')
-    print(datetime.datetime.now())
-    return returnList
-
 
 def _composeName(aTraj):
     ts = aTraj[0].timestamp.strftime('%m%d%H%M')
     oid = ts + '_' + aTraj[0].object_id
     return oid
-
-_flightIdList = ['07011121_CLX431', '07011016_UAL651']
-_flightIdList = deque(_flightIdList)
 
 def point_count_greater_than(gen, max_count):
     for ctr, _ in enumerate(gen):
@@ -435,6 +364,8 @@ def point_count_greater_than(gen, max_count):
     return False
 
 def main():
+    global row_count
+    global processed_count
     args = parse_args()
 
     ext="png"
@@ -455,71 +386,92 @@ def main():
     elif args.method == Method.curvature:
         subtrajer = \
         st.SubTrajerCurvature()
+        curvature_instructions: dict = {}
+        instructions_file = './curvature_instructions.txt'
+        if os.path.exists(instructions_file):
+            with open(instructions_file, 'r') as infile:
+                for a_line in infile:
+                    cmd_line = a_line.split(':')
+                    cmd_type = cmd_line[0].strip()
+                    cmd_val = cmd_line[1].strip()
+                    curvature_instructions[cmd_type] = cmd_val
     else:
         subtrajer = \
         st.SubTrajerStraight(
             straightness_threshold=args.straightness_threshold,
             length_threshold_samples=args.length_threshold)
 
-
-    tempV = trajectory.from_ijson_file_iter(args.json_trajectory_file)
-    # tempV = dev_getTrajectoresInCustomList(tempV)
-    # dev_createTrajectiresCustomList(tempV)
-    # dev_order_the_bin_summary_by_key()
-    counter2 = 0; largeCount = 0; maxPointCount = 0
-    # for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
-    for traj in tempV:
-        # if not point_count_greater_than(traj, 30):
-        #     continue
-        #
-        # if count < 500:
-        #     continue
-        #
-        # if count > 1000:
-        #     break
-
+    process_names_deque = deque()
+    instructions_parsed = False
+    for traj in trajectory.from_json_file_iter(args.json_trajectory_file):
         trajectoryName = _composeName(traj)
-        if len(_flightIdList) == 0:
-            break
-        elif trajectoryName in _flightIdList:
-            _flightIdList.remove(trajectoryName)
-        # else:
-        #     continue
+        row_count += 1
 
-        # try:
         if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
         elif args.method == Method.curvature:
+            kml_file_name = ''
+            if curvature_instructions and \
+                    not instructions_parsed and \
+                    'action' in curvature_instructions.keys():
+                instructions_parsed = True
+                output_path = curvature_instructions['out_path']
+                if curvature_instructions['action'] == 'generate summary':
+                    summary_csv_name = \
+                        os.path.basename(args.json_trajectory_file.name)
+
+                    subtrajer.set_summary_only(output_path,
+                                               summary_csv_name)
+                elif curvature_instructions['action'] == 'generate kml':
+                    if not os.path.exists(output_path):
+                        os.mkdir(output_path)
+                    kml_file_name = os.path.join(output_path, trajectoryName)
+                    process_these_str = curvature_instructions['flights'] \
+                        .strip()
+                    process_these_str = process_these_str.split(',')
+                    for a_name in process_these_str:
+                        process_names_deque.append(a_name.strip())
+
             try:
+                if row_count % 500 == 0:
+                    gc.collect()
+                    mem_report = psutil.virtual_memory()
+                    ttl_mem, free_mem = mem_report[0], mem_report[1]
+                    available_percent = free_mem / ttl_mem
+                    print(f'Processing item {row_count}. {processed_count} pr'\
+                          f'ocessed so far. {available_percent} memory left.')
+                    if available_percent < 0.10:
+                        raise MemoryError
+                if len(process_names_deque) > 0:
+                    if trajectoryName not in process_names_deque:
+                        continue
+                    process_names_deque.remove(trajectoryName)
+                else:
+                    if len(process_these_str) > 0:
+                        print('Process complete.')
+                        print(
+                            f'{processed_count} processed out of {row_count}' \
+                        ' flights.')
+                        exit(0)
+
                 leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
+                processed_count += 1
             except TypeError:
-                dbg = True
+                continue
         else:
             leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
-
-        # except IntersectionError:
-        #     continue
 
         if leaves is None: # or pointCount < 3:
             continue
 
-        pointCount =  -1; leafCount = -1
-
         trajectoryName = _composeName(traj)
-        # counter2 += 1
-        # if counter2 % 20 == 0:
-        #     print("{3} {0}: {1} Points,    {2} Leaves      {4}"
-        #           .format(trajectoryName, pointCount, leafCount, largeCount,
-        #                   maxPointCount))
-
-        # continue
-
         if args.verbose:
             print("Segmentation=", traj[0].object_id, leaves)
 
-        #below expand 5% or .1 degrees when bbox has no expanse in some dim
-        bbox = geomath.compute_bounding_box(traj, expand=.05,
-                                            expand_zero_length=.1)
+        if args.method != Method.curvature:
+            #below expand 5% or .1 degrees when bbox has no expanse in some dim
+            bbox = geomath.compute_bounding_box(traj, expand=.05,
+                                                expand_zero_length=.1)
 
         plotFileName = _composeName(traj) + '_' + args.image_file
 
@@ -527,7 +479,6 @@ def main():
         trajectoryName = os.path.join(outputDir, trajectoryName)
         # the mymap parameter below is only needed to get the max width or
         # height in terms ov the values used to scale the maps
-        print(args.export_kml)
         if not args.export_kml:
             plot_colored_segments_path(traj, leaves,
                                    args.straightness_threshold,
@@ -537,28 +488,23 @@ def main():
                                    output=args.image_file)
         else:
             if args.method == Method.curvature:
-                plot_this = False
-                if 'VAL27' in trajectoryName and '0711' in trajectoryName:
-                    plot_this = True
-                elif 'RDDL309' in trajectoryName and '0715' in trajectoryName:
-                    plot_this = True
-
-                if plot_this:
-                    export_colored_segments_path_kml(traj, G,
-                                             args.straightness_threshold,
-                                             bbox, savefig=args.save_fig,
-                                             insetMap=args.insetMap,
-                                             altitudePlot=args.altitudePlot,
-                                             ext='kml',
-                                             output=trajectoryName)
+                export_colored_segments_path_kml(traj, G,
+                                         args.straightness_threshold,
+                                         None, savefig=args.save_fig,
+                                         insetMap=args.insetMap,
+                                         altitudePlot=args.altitudePlot,
+                                         ext='kml',
+                                         output=kml_file_name)
             else:
                 export_kml(traj, leaves, filename_out="test.kml")
 
-        print(plotFileName,"saved.")
+        if args.method != Method.curvature:
+            print(plotFileName,"saved.")
         if args.method == Method.straight:
             plot_tree(G, traj, bbox, with_labels=False,
                       node_size=5000, threshold=args.straightness_threshold,
                       savefig=args.save_fig, ext=ext)
+    print(f'{processed_count} processed out of {row_count} flights.')
 
 
 if __name__ == '__main__':
