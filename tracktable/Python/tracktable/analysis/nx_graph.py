@@ -9,6 +9,8 @@ import functools
 
 class TreeDiGraph(nx.DiGraph):
 
+    last_pid = 0
+
     _root_node: Any = None
     @property
     def root_node(self):
@@ -32,6 +34,13 @@ class TreeDiGraph(nx.DiGraph):
         data_str = root.report_data_lines(self)
         return header_str + data_str
 
+    @property
+    def trajectory_name(self):
+        aTraj = self.my_trajecory
+        ts = aTraj[0].timestamp.strftime('%m%d%H%M')
+        oid = ts + '_' + aTraj[0].object_id
+        return oid
+
     def get_stats_string(self):
         ret_list = []
         root, Lev1, Lev2, leaves = ParseTreeNode.get_all_by_level(self)
@@ -39,26 +48,47 @@ class TreeDiGraph(nx.DiGraph):
         traj_name = self.my_trajecory[0].object_id
         ts = str(self.my_trajecory[0].timestamp)
         traj_name = traj_name + '_' + ts[:10]
+        traj_name = self.trajectory_name
 
         ttl_length = self.my_EPL.length_chords()
 
-        cruise_segments, cruise_dist_percent = \
+        max_pct = 0.0
+        max_cat = ''
+
+        cruise_segments, cruise_dist_percent, prct = \
             self._compute_a_stat_pair(Lev1, ttl_length, 'Cruise')
+        max_pct = prct
+        max_cat = 'Cruise'
 
-        u_segments, u_dist_percent = \
+        u_segments, u_dist_percent, prct = \
             self._compute_a_stat_pair(Lev1, ttl_length, 'U Turn')
+        if prct > max_pct:
+            max_pct = prct
+            max_cat = 'U Turn'
 
-        race_segments, race_dist_percent = \
+        race_segments, race_dist_percent, prct = \
             self._compute_a_stat_pair(Lev1, ttl_length, 'Race Track')
+        if prct > max_pct:
+            max_pct = prct
+            max_cat = 'Race Track'
 
-        s_segments, s_dist_percent = \
+        s_segments, s_dist_percent, prct = \
             self._compute_a_stat_pair(Lev1, ttl_length, 'S Curve')
+        if prct > max_pct:
+            max_pct = prct
+            max_cat = 'S Curve'
 
-        bous_segments, bous_dist_percent = \
+        bous_segments, bous_dist_percent, prct = \
             self._compute_a_stat_pair(Lev1, ttl_length, 'Boustrophedon')
+        if prct > max_pct:
+            max_pct = prct
+            max_cat = 'Boustrophedon'
 
-        nocat_segments, nocat_dist_percent = \
+        nocat_segments, nocat_dist_percent, prct = \
             self._compute_a_stat_pair(Lev1, ttl_length, 'No Cat')
+        if prct > max_pct:
+            max_pct = prct
+            max_cat = 'No Cat'
 
         ret_str = \
             f'{traj_name},' \
@@ -68,6 +98,7 @@ class TreeDiGraph(nx.DiGraph):
             f'{bous_segments},{bous_dist_percent},' \
             f'{u_segments},{u_dist_percent},' \
             f'{race_segments},{race_dist_percent},' \
+            f'{max_cat},' \
             '\n'
         return ret_str
 
@@ -75,6 +106,7 @@ class TreeDiGraph(nx.DiGraph):
            'No Cat Count,No Cat Percent,Boustophredon Count,' \
            'Boustophredon Percent,' \
            'U Turn Count,U Turn Percent,Race Track Count,Race Track Percent' \
+           ',Max Category' \
            '\n'
 
     def output_short_summary(self: nx.DiGraph, out_file: str) -> None:
@@ -85,8 +117,10 @@ class TreeDiGraph(nx.DiGraph):
 
         append_or_write = 'at'
         if os.path.exists(out_file):
-            age_seconds = time.time() - os.stat(out_file)[stat.ST_MTIME]
-            if age_seconds > 12.0:  # seconds
+            # age_seconds = time.time() - os.stat(out_file)[stat.ST_MTIME]
+            this_pid = os.getpid()
+            if this_pid != TreeDiGraph.last_pid:
+                TreeDiGraph.last_pid = this_pid
                 append_or_write = 'wt'
         else:
             append_or_write = 'wt'
@@ -97,7 +131,6 @@ class TreeDiGraph(nx.DiGraph):
             outf.write(self.get_stats_string())
             outf.flush()
 
-
     def _compute_a_stat_pair(self, collection, ttl_len, cat_str):
         segs = [x for x in collection if x.category_str == cat_str]
         segs_count = len(segs)
@@ -106,8 +139,9 @@ class TreeDiGraph(nx.DiGraph):
                                     lambda acc, seg: acc + seg.length_chords,
                                     segs, 0.0) / \
                                 ttl_len
-        prct_str = '%0.2f' % segs_distance_percent + ' %'
-        return segs_count, prct_str
+        prct = segs_distance_percent / 100.0
+        # prct_str = '%0.2f' % segs_distance_percent + ' %'
+        return segs_count, prct, segs_distance_percent
 
 
 try:
