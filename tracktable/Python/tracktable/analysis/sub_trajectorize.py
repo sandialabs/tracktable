@@ -45,6 +45,7 @@ import tracktable.analysis.nx_graph as nxg
 import tracktable.analysis.parseTreeCategorizations as PTcats
 import tracktable.analysis.parseTreeNode as ParseTreeNode
 import tracktable.analysis.nx_graph as nxg
+import os
 
 
 class NormalizedDistanceMatrix:
@@ -430,23 +431,16 @@ class SubTrajerCurvature:
     each point triplet. Multiple approaches to consolidating sequential
     curvature values into point ranges are available."""
     def __init__(self):
+        self.summary_output = None
         if not _isSubTrajerCurvatureAvailable:
             raise NotImplementedError(
                 "The class SubTrajerCurvature is not available due " +
                 "to import issues.")
 
-    def _pyramidGrowingWindowMethod(self, aPointList,
-                        request_graph_plot: bool =False):
-        """
-        A possible nuther method which considers growing windows on a pyramid
-            (multipass) sampling approach instead of a sequential sampling
-            approach like movingGrowingWindow does.
-        :param aPointList: sequence of points constituting the trajectory
-        :type aPointList: ExtendedPointList
-        :return: all subtrajectories
-        :rtype: SliceList
-        """
-        raise NotImplementedError('Try this later.')
+    def set_summary_only(self, outpath, basename):
+        bname = os.path.splitext(basename)[0]
+        self.summary_output = os.path.join(outpath, bname + '.csv')
+        dbg = True
 
     def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=4.0,
                         request_graph_plot: bool =False) -> nx.DiGraph:
@@ -492,22 +486,10 @@ class SubTrajerCurvature:
         # print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
         # if request_graph_plot:
         if False:
-        # if 'CLX4' in aPointList.name:
-            try:
-                nxg.plot_graph(G)
-            except ImportError:
-                pass
+            nxg.plot_graph(G)
 
-        #if True:
-            #summary_file = "summary.csv" #'' \
-#                '/ascldap/users/pschrum/Documents/tracktableTesting/' \
-#                'testResults/candidate_study_flights/study_flights.csv'
-            #G.output_short_summary(summary_file)
-
-        # At this point, G is a NetworkX graph (Digraph, single root). But
-        # the calling code need it to be a list of
-        # tuples: (start, stop-1, category_string)
-        # so we must convert G to that kind of tuple.
+        if self.summary_output:
+            G.output_short_summary(self.summary_output)
 
         temp_test_str = None
         if False:   # 'CLX4' in aPointList.name:
@@ -525,6 +507,11 @@ class SubTrajerCurvature:
             except Exception:
                 print()
 
+
+        # At this point, G is a NetworkX graph (Digraph, single root). But
+        # the calling code needs it to be a list of
+        # tuples: (start, stop-1, category_string)
+        # so we must convert G to that kind of tuple.
         return_list = []
         root, Level1, level2, Level3 = ParseTreeNode.get_all_by_level(G)
         a_node: ParseTreeNode
@@ -582,8 +569,11 @@ class SubTrajerCurvature:
         if pointCount < 4:
             return None
 
-        aPointList.computeAllPointInformation(account_for_lat_long=True)
-        aPointList.mark_likely_jitters()
+        try:
+            aPointList.computeAllPointInformation(account_for_lat_long=True)
+        except ZeroDivisionError:
+            return None, None
+        # aPointList.mark_likely_jitters()
 
         try:
             leaves, g = \
