@@ -155,8 +155,8 @@ except ImportError:
         raise ImportError("This example needs Graphviz and either "
                           "PyGraphviz or pydot. 'pip install pydot' worked"
                           " for me.")
-
-level2_y_adjustment = 600.0
+figure_y = 5.0
+level2_y_adjustment = 60.0 * figure_y
 
 def plot_graph(nxGraph: nx.DiGraph) -> None:
     """
@@ -182,7 +182,8 @@ def plot_graph(nxGraph: nx.DiGraph) -> None:
                 y_multipler = val.category.value
             pos[val] = (node_coords[0], ycoord)
             text_coord = pos[val]
-            text_coord_y_adjust = y_multipler * level2_y_adjustment * -1
+            text_coord_y_adjust = y_multipler * level2_y_adjustment * -1 \
+                                * (10.0 / figure_y)
             text_coord = text_coord[0], text_coord[1]+text_coord_y_adjust
             label_coords[val] = text_coord
             nodes_g.add_node(val)
@@ -205,7 +206,7 @@ def plot_graph(nxGraph: nx.DiGraph) -> None:
             node_labels[val] = str(cat_str)
             continue
 
-    plt.figure(figsize=(12, 10))
+    plt.figure(figsize=(12, figure_y))
     nx.draw(nxGraph, pos, node_size=20, alpha=0.5, node_color="blue",
             with_labels=False)
 
@@ -224,10 +225,10 @@ def plot_graph(nxGraph: nx.DiGraph) -> None:
     plt.show()
     # plt.savefig(r'/ascldap/users/pschrum/Documents/Getting Close.png')
 plot_graph.switch = {
-    0: 10000,
-    1: 3333,
-    2: -3333,
-    3: -10000
+    0: 1000 * figure_y,
+    1: 333.3 * figure_y,
+    2: -333.3 * figure_y,
+    3: -1000 * figure_y
 }
 
 # def output_short_summary(g :nx.DiGraph, out_file: str) -> None:
