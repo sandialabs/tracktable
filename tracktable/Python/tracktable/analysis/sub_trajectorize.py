@@ -438,11 +438,11 @@ class SubTrajerCurvature:
                 "The class SubTrajerCurvature is not available due " +
                 "to import issues.")
 
-    def set_summary_only(self, outpath, basename):
+    def request_summary_csv(self, outpath, basename):
         bname = os.path.splitext(basename)[0]
         self.summary_output = os.path.join(outpath, bname + '.csv')
 
-    def set_plot_graph(self):
+    def request_plot_graph(self):
         self.plot_graph = True
 
     def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=4.0,

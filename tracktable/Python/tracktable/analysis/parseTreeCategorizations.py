@@ -149,14 +149,15 @@ class DeflectionCat(CategoryBase):
     sharp_right = (360, lambda v, this_num: True)
 
 class Level1Cat(CategoryBase):
-    cruise = 0,
-    s_curve = 1,
-    j_hook = 2,
-    u_turn = 3,
-    grand_j_hook = 4
+    cruise = 0
+    s_curve = 1
+    j_hook = 2  # not implemented
+    u_turn = 3
+    grand_j_hook = 4  # not implemented
     race_track = 5
-    course_change = 6
-    boustrophedon = 7
+    course_turn = 6  # implemented
+    clover_leaf = 7  # not implemented
+    boustrophedon = 8
     no_cat = 100
 
 
@@ -253,17 +254,22 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
     u_turn_deflection_range = 1.25  # degrees, left or right
     s_curve_mid_straight_max_length = 2.0  # miles
 
-    # find s-curves
+    # categorize
     s_curve_list = []
     o_curve_list = []
     cruise_list = []
+    course_turn_list = []
     u_turn_list = []
     u_turn_range = (180.0 - u_turn_deflection_range, 180.0 + u_turn_deflection_range)
+    course_turn_min = 25.0
     for seg_idx in range(len(lev_2)-1):
         seg1: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx]
         seg2: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx+1]
         ttl_defl_mag = abs(seg1.total_defl_deg_chords)
-        if min(u_turn_range) <= ttl_defl_mag <= max(u_turn_range):
+        if course_turn_min <= ttl_defl_mag < min(u_turn_range):
+            a_range  = (seg_idx, seg_idx+1)
+            course_turn_list.append(a_range)
+        elif min(u_turn_range) <= ttl_defl_mag <= max(u_turn_range):
             a_range = (seg_idx, seg_idx+1)
             u_turn_list.append(a_range)
         elif seg1.defl_sign * seg2.defl_sign == -1:
@@ -286,6 +292,8 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
                                 child_collection=lev_2,  my_graph=g)
         if a_range in s_curve_list:
             new_l1_node.category = Level1Cat.s_curve
+        elif a_range in course_turn_list:
+            new_l1_node.category = Level1Cat.course_turn
         elif a_range in u_turn_list:
             new_l1_node.category = Level1Cat.u_turn
         elif a_range in o_curve_list:

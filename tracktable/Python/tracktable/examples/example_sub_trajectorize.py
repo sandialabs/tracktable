@@ -427,14 +427,14 @@ def main():
                 outputDir = output_path
 
                 if 'plot graph'  in curvature_instructions['action']:
-                    subtrajer.set_plot_graph()
+                    subtrajer.request_plot_graph()
 
                 if 'generate summary' in curvature_instructions['action']:
                     summary_csv_name = \
                         os.path.basename(args.json_trajectory_file.name)
 
-                    subtrajer.set_summary_only(output_path,
-                                               summary_csv_name)
+                    subtrajer.request_summary_csv(output_path,
+                                                  summary_csv_name)
                 elif 'generate kml' in curvature_instructions['action']:
                     if not os.path.exists(output_path):
                         os.mkdir(output_path)

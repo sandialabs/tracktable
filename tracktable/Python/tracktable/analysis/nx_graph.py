@@ -60,6 +60,12 @@ class TreeDiGraph(nx.DiGraph):
         max_pct = prct
         max_cat = 'Cruise'
 
+        turn_segments, turn_dist_percent, prct = \
+            self._compute_a_stat_pair(Lev1, ttl_length, 'Course Turn')
+        if prct > max_pct:
+            max_pct = prct
+            max_cat = 'U Turn'
+
         u_segments, u_dist_percent, prct = \
             self._compute_a_stat_pair(Lev1, ttl_length, 'U Turn')
         if prct > max_pct:
@@ -93,6 +99,7 @@ class TreeDiGraph(nx.DiGraph):
         ret_str = \
             f'{traj_name},' \
             f'{cruise_segments},{cruise_dist_percent},' \
+            f'{turn_segments},{turn_dist_percent},' \
             f'{s_segments},{s_dist_percent},' \
             f'{nocat_segments},{nocat_dist_percent},' \
             f'{bous_segments},{bous_dist_percent},' \
@@ -102,7 +109,8 @@ class TreeDiGraph(nx.DiGraph):
             '\n'
         return ret_str
 
-    _hdr = 'Name,Cruise Count,Cruise Percent,S Curve Count,S Curve Percent,' \
+    _hdr = 'Name,Cruise Count,Cruise Percent,Turn Count, Turn Percent,' \
+           'S Curve Count,S Curve Percent,' \
            'No Cat Count,No Cat Percent,Boustophredon Count,' \
            'Boustophredon Percent,' \
            'U Turn Count,U Turn Percent,Race Track Count,Race Track Percent' \
@@ -152,7 +160,7 @@ except ImportError:
         import pydot
         from networkx.drawing.nx_pydot import graphviz_layout
     except ImportError:
-        raise ImportError("This example needs Graphviz and either "
+        raise ImportError("Plotting of graphs requires either "
                           "PyGraphviz or pydot. 'pip install pydot' worked"
                           " for me.")
 figure_y = 5.0
