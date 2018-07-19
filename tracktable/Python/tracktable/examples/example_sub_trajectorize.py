@@ -130,8 +130,11 @@ def export_colored_segments_path_kml(traj, tree_graph, threshold=None, bbox=None
         return
 
     extension = '.' + ext
+    out_file_name = output + extension
 
-    write_kml_graph(output + extension, traj, tree_graph)
+    write_kml_graph(out_file_name, traj, tree_graph)
+    if os.path.exists(out_file_name):
+        print(f'successfully created {out_file_name}')
 
 
 
@@ -391,10 +394,11 @@ def main():
         if os.path.exists(instructions_file):
             with open(instructions_file, 'r') as infile:
                 for a_line in infile:
-                    cmd_line = a_line.split(':')
-                    cmd_type = cmd_line[0].strip()
-                    cmd_val = cmd_line[1].strip()
-                    curvature_instructions[cmd_type] = cmd_val
+                    if ':' in a_line:
+                        cmd_line = a_line.split(':')
+                        cmd_type = cmd_line[0].strip()
+                        cmd_val = cmd_line[1].strip()
+                        curvature_instructions[cmd_type] = cmd_val
     else:
         subtrajer = \
         st.SubTrajerStraight(
@@ -403,26 +407,35 @@ def main():
 
     process_names_deque = deque()
     instructions_parsed = False
-    for traj in trajectory.from_json_file_iter(args.json_trajectory_file):
+    process_these_str = ''
+
+    for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
         trajectoryName = _composeName(traj)
         row_count += 1
 
         if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
         elif args.method == Method.curvature:
+            output_path = './'
             kml_file_name = ''
             if curvature_instructions and \
                     not instructions_parsed and \
                     'action' in curvature_instructions.keys():
                 instructions_parsed = True
-                output_path = curvature_instructions['out_path']
-                if curvature_instructions['action'] == 'generate summary':
+                output_path = \
+                    curvature_instructions.get('out_path', output_path)
+                outputDir = output_path
+
+                if 'plot graph'  in curvature_instructions['action']:
+                    subtrajer.set_plot_graph()
+
+                if 'generate summary' in curvature_instructions['action']:
                     summary_csv_name = \
                         os.path.basename(args.json_trajectory_file.name)
 
                     subtrajer.set_summary_only(output_path,
                                                summary_csv_name)
-                elif curvature_instructions['action'] == 'generate kml':
+                elif 'generate kml' in curvature_instructions['action']:
                     if not os.path.exists(output_path):
                         os.mkdir(output_path)
                     kml_file_name = os.path.join(output_path, trajectoryName)
@@ -456,7 +469,9 @@ def main():
 
                 leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
                 processed_count += 1
+                kml_file_name = os.path.join(output_path, trajectoryName)
             except TypeError:
+                print(f'TypeError examples_sub_trajecorize.py, Line 461, process row= {row_count}.')
                 continue
         else:
             leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
@@ -476,18 +491,19 @@ def main():
         plotFileName = _composeName(traj) + '_' + args.image_file
 
 
-        trajectoryName = os.path.join(outputDir, trajectoryName)
+        # trajectoryName = os.path.join(outputDir, trajectoryName)
         # the mymap parameter below is only needed to get the max width or
         # height in terms ov the values used to scale the maps
-        if not args.export_kml:
+        if args.method != Method.curvature and not args.export_kml:
             plot_colored_segments_path(traj, leaves,
                                    args.straightness_threshold,
-                                   bbox, savefig=args.save_fig,
+                                   None, savefig=args.save_fig,
                                    insetMap=args.insetMap,
                                    altitudePlot=args.altitudePlot, ext=ext,
                                    output=args.image_file)
         else:
             if args.method == Method.curvature:
+                # kml_file_name = os.path.join(output_path, )
                 export_colored_segments_path_kml(traj, G,
                                          args.straightness_threshold,
                                          None, savefig=args.save_fig,

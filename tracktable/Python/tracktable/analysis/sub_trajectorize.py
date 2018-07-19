@@ -432,6 +432,7 @@ class SubTrajerCurvature:
     curvature values into point ranges are available."""
     def __init__(self):
         self.summary_output = None
+        self.plot_graph = False
         if not _isSubTrajerCurvatureAvailable:
             raise NotImplementedError(
                 "The class SubTrajerCurvature is not available due " +
@@ -440,7 +441,9 @@ class SubTrajerCurvature:
     def set_summary_only(self, outpath, basename):
         bname = os.path.splitext(basename)[0]
         self.summary_output = os.path.join(outpath, bname + '.csv')
-        dbg = True
+
+    def set_plot_graph(self):
+        self.plot_graph = True
 
     def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=4.0,
                         request_graph_plot: bool =False) -> nx.DiGraph:
@@ -480,12 +483,13 @@ class SubTrajerCurvature:
         try:
             PTcats.categorize_level2_to_level1(G)
         except IndexError:
+            print('IndexError in sub_trajectorize.py Line 483')
             return
         root, Level1, level2, Level3 = ParseTreeNode.get_all_by_level(G)
 
         # print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
         # if request_graph_plot:
-        if False:
+        if self.plot_graph:
             nxg.plot_graph(G)
 
         if self.summary_output:
@@ -572,6 +576,7 @@ class SubTrajerCurvature:
         try:
             aPointList.computeAllPointInformation(account_for_lat_long=True)
         except ZeroDivisionError:
+            print('ZeroDivError in sub_trajecorize.py Line 576')
             return None, None
         # aPointList.mark_likely_jitters()
 
@@ -582,6 +587,7 @@ class SubTrajerCurvature:
         except KeyboardInterrupt:
             exit(0)
         except TypeError as te:
+            print('TyperError sub_rajectorize.py Line 587')
             leaves = None
             g = None
 
