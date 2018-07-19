@@ -303,18 +303,22 @@ class from_json_file_iter:
             raise StopIteration()
         if line.replace(" ", "") == "[\n":
             line = self.file.readline() #skip [\n and read another line
+            line = line.replace("'", '"')
         if line.strip()[0] == "[":
             line = line.strip()[1:]#skip [ at head of line #todo is this okay?
+        line = line.replace("'", '"')
         if line[-2:] == ",\n" or line[-2:] == "]\n":
             line = line[:-2] #remove ,\n on all but 2nd to last line and ]\n
                              # on last line
+            line = line.replace("'", '"')
         if not line: #line is now empty
             raise StopIteration()
         else:
             if sys.version_info[0] < 3:
                 return from_dict(json.loads_byteified(line))
             else:
-                return from_dict(json.loads(line))
+                rev_line = line.replace('-0000', '')
+                return from_dict(json.loads(rev_line))
 
 def to_json_file(trajectory, json_filename):
     with open(json_filename, 'w') as outfile: #todo handle error

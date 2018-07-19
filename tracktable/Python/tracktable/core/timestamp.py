@@ -161,6 +161,12 @@ class Timestamp(object):
                     format_string = '%Y-%m-%dT%H:%M:%S'
                 else:
                     format_string = '%Y-%m-%d %H:%M:%S'
+            else:
+                if 'T' not in timestring:
+                    format_string = '%Y-%m-%d %H:%M:%S'
+                else:
+                    format_string = '%Y-%m-%dT%H:%M:%S'
+            timestring = timestring.replace('-0000', '')
 
             parsed_time = datetime.datetime.strptime(timestring, format_string)
 

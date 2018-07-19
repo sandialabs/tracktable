@@ -209,7 +209,7 @@ def altitude(thing):
     else:
         try:
             return thing.properties['altitudes']
-        except IndexError:
+        except KeyError:
             return 0
 
 def almost_equal(a, b, relative_tolerance=1e-6):
