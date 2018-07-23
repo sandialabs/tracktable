@@ -168,6 +168,8 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
   def("convex_hull_aspect_ratio", &(tracktable::convex_hull_aspect_ratio<TrajectoryTerrestrial>));
   def("convex_hull_perimeter", &(tracktable::convex_hull_perimeter<TrajectoryTerrestrial>));
 
+  def("radius_of_gyration", &(tracktable::radius_of_gyration<TrajectoryTerrestrial>));
+
   register_intersection_functions<
     BasePointTerrestrial,
     TrajectoryPointTerrestrial,
@@ -223,6 +225,8 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
   def("convex_hull_area", &(tracktable::convex_hull_area<TrajectoryCartesian2D>));
   def("convex_hull_aspect_ratio", &(tracktable::convex_hull_aspect_ratio<TrajectoryCartesian2D>));
   def("convex_hull_perimeter", &(tracktable::convex_hull_perimeter<TrajectoryCartesian2D>));
+
+  def("radius_of_gyration", &(tracktable::radius_of_gyration<TrajectoryCartesian2D>));
 
   register_intersection_functions<
     BasePointCartesian2D,
