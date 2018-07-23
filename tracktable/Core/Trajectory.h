@@ -50,6 +50,7 @@
 
 #include <tracktable/Core/detail/trait_signatures/HasProperties.h>
 
+#include <boost/geometry/algorithms/distance.hpp>
 #include <boost/geometry/geometries/register/linestring.hpp>
 
 #include <cassert>
@@ -728,6 +729,29 @@ struct time_at_fraction< Trajectory< PointT > > : implementations::generic_time_
 template<class PointT>
 struct subset_during_interval< Trajectory<PointT> > : implementations::generic_subset_during_interval< Trajectory<PointT> >
 { };
+
+template<class PointT>
+struct distance< Trajectory<PointT> >
+{
+    typedef Trajectory<PointT> trajectory_type;
+
+    static inline double apply(
+        trajectory_type const& from, trajectory_type const& to
+    )
+    {
+        return boost::geometry::distance(from, to);
+    }
+};
+
+//Used when comparing a point to a compatible trajectory
+template<class PointT, template<class> class TrajectoryT>
+struct point_to_trajectory_distance
+{
+   static double inline apply(PointT const& from, TrajectoryT<PointT> const& to)
+   {
+       return boost::geometry::distance(from, to);
+   }
+};
 
 /**
  * Default implementation of end_to_end_distance

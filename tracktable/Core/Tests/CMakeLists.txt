@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2018 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -31,6 +31,11 @@
 include_directories(
   ${Tracktable_SOURCE_DIR}
 )
+
+add_executable(test_distance
+  test_distance.cpp
+  )
+set_property(TARGET test_distance               PROPERTY FOLDER "Tests")
 
 add_executable(test_convex_hull_area
   test_convex_hull_area.cpp
@@ -121,6 +126,11 @@ set_property(TARGET test_current_length                 PROPERTY FOLDER "Tests")
 
 # ----------------------------------------------------------------------
 
+target_link_libraries(test_distance
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
 target_link_libraries(test_convex_hull_area
   TracktableCore
   ${Boost_LIBRARIES}
@@ -207,6 +217,11 @@ target_link_libraries(test_timestamp_format
   )
 
 # ----------------------------------------------------------------------
+
+add_test(
+ NAME C_Distance
+ COMMAND test_distance
+)
 
 add_test(
  NAME C_ConvexHullArea
