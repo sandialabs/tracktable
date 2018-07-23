@@ -60,3 +60,6 @@ add_python_test(P_TestTrajectoryTypes tracktable.core.tests.test_trajectory_type
 add_python_test(P_TestRadiusGyration tracktable.core.tests.test_trajectory_radius_of_gyration)
 
 add_python_test(P_TestComputeBoundingBox tracktable.core.tests.test_compute_bounding_box)
+
+add_python_test(P_TestDistance tracktable.core.tests.test_distance)
+

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -66,6 +66,27 @@ template<class T>
 double distance(T const& from, T const& to)
 {
   return algorithms::distance<T>::apply(from, to);
+}
+
+// generic for comparing any two different geometry types
+template<class P, class T>
+double distance(P const& from, T const& to)
+{
+    return boost::geometry::distance(from, to);
+}
+
+// Used when comparing things like a point to a trajectory.
+template<class P, template<class> class T>
+double distance(P const& from, T<P> const& to)
+{
+   return algorithms::point_to_trajectory_distance<P, T>::apply(from, to);
+}
+
+// And the inverse
+template<template<class> class T, class P>
+double distance(T<P> const& from, P const& to)
+{
+    return algorithms::point_to_trajectory_distance<P, T>::apply(to, from);
 }
 
 } // namespace tracktable

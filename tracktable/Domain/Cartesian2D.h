@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -67,7 +67,7 @@ namespace tracktable { namespace domain { namespace cartesian2d {
  * yourself.
  */
 
-class TRACKTABLE_DOMAIN_EXPORT CartesianPoint2D : public PointCartesian<2>
+class CartesianPoint2D : public PointCartesian<2>
 {
 public:
   typedef PointCartesian<2> Superclass;
