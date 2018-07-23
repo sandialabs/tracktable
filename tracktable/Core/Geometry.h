@@ -38,10 +38,14 @@
 #include <tracktable/Core/detail/implementations/ConvexHullAreaCartesian.h>
 #include <tracktable/Core/detail/implementations/ConvexHullAspectRatioCartesian.h>
 #include <tracktable/Core/detail/implementations/ConvexHullPerimeterCartesian.h>
-
+#include <tracktable/Core/detail/implementations/ConvexHullCentroidCartesian.h>
 
 #include <tracktable/Core/detail/implementations/ConvexHullAreaTerrestrial.h>
 #include <tracktable/Core/detail/implementations/ConvexHullAspectRatioTerrestrial.h>
 #include <tracktable/Core/detail/implementations/ConvexHullPerimeterTerrestrial.h>
+#include <tracktable/Core/detail/implementations/ConvexHullCentroidTerrestrial.h>
+
+#include <tracktable/Core/detail/algorithm_signatures/RadiusOfGyration.h>
+#include <tracktable/Core/detail/implementations/RadiusOfGyration.h>
 
 #endif
