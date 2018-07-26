@@ -155,7 +155,7 @@ class Level1Cat(CategoryBase):
     u_turn = 3
     grand_j_hook = 4  # not implemented
     race_track = 5
-    course_turn = 6  # implemented
+    course_turn = 6
     clover_leaf = 7  # not implemented
     boustrophedon = 8
     no_cat = 100

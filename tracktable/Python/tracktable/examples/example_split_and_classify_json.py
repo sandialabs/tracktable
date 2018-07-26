@@ -28,6 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 # Author: Ben Newton  - February 26, 2018
+# Author: Paul Schrum - June/July 2018 (added Curvature based analysis)
 
 import tracktable.inout.trajectory as trajectory
 from tracktable.domain import all_domains as ALL_DOMAINS
@@ -99,6 +100,7 @@ def main():
 
     count = 0
     count_actually_processed = 0
+
     #output_json_path = r'/ascldap/users/pschrum/Documents/tracktableTesting/' \
     #        r'testResults/From_Joseph/from_Paul_s.json'
     output_json_path = 'testB.json'
@@ -131,7 +133,6 @@ def main():
                 continue
             segment_num = 0
             segments = []
-            print(leaves)
             for leaf in leaves:
                 pts = []
                 #print(leaf[0], leaf[1])
