@@ -61,6 +61,7 @@ from ._domain_algorithm_overloads import simplify as _simplify
 from ._domain_algorithm_overloads import convex_hull_perimeter as _convex_hull_perimeter
 from ._domain_algorithm_overloads import convex_hull_area as _convex_hull_area
 from ._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
+from ._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
 
 def xcoord(thing):
     """Return what we think is the X-coordinate for an object.
@@ -569,15 +570,20 @@ def sanity_check_distance_less_than(max_distance):
 
 # ----------------------------------------------------------------------
 
-def compute_bounding_box(point_sequence):
+def compute_bounding_box(point_sequence, buffer=()):
     """Compute a bounding box for a sequence of points.
 
     This function will construct a domain-specific bounding box over
     an arbitrary sequence of points.  Those points must all have the
-    same type.
+    same type. It can also produce a buffer of space that extends the
+    bounding box some percentage beyond the min and max points. The
+    implementation is fairly naive and can cause issues if the values
+    extend past max values for the point/map type. 
 
     Args:
       point_sequence: Iterable of points
+      buffer: tuple of ratios to extend the bounding box. This defaults
+              to an empty tuple which means no padding is added.
 
     Returns:
       Bounding box with min_corner, max_corner attributes
@@ -607,7 +613,18 @@ def compute_bounding_box(point_sequence):
             for i in range(len(point)):
                 min_corner[i] = min(min_corner[i], point[i])
                 max_corner[i] = max(max_corner[i], point[i])
-
+    
+    if len(buffer) == 2:
+        horiz_buff = (max_corner[0] - min_corner[0]) * buffer[0]
+        vert_buff = (max_corner[1] - min_corner[1]) * buffer[1]
+        min_corner[0] = min_corner[0] - horiz_buff
+        min_corner[1] = min_corner[1] - vert_buff
+        max_corner[0] = max_corner[0] + horiz_buff
+        max_corner[1] = max_corner[1] + vert_buff
+    elif len(buffer) != 0:
+        print("ERROR: buffer requires exactly 0 or 2 values")
+        return None
+        
     if num_points == 0:
         print("ERROR: Cannot compute bounding box.  No points provided.")
         return None
@@ -780,8 +797,29 @@ def convex_hull_aspect_ratio(trajectory):
       trajectory: Trajectory whose shape you want to measure
 
     Returns:
-      Aspect ratioof the trajectory's convex hull
+      Aspect ratio of the trajectory's convex hull
 
     """
 
     return _convex_hull_aspect_ratio(trajectory)
+
+# ----------------------------------------------------------------------
+
+def radius_of_gyration(trajectory):
+    """Compute the radius of gyration of a trajectory
+
+    Radius of gyration is an indication of the compactness of a trajectory.
+    Technically the result is in radians from the center of mass of 
+    the trajectory. The units of the radius is dependent on the type
+    of trajectory being measured. Terrestrial will return km, while 
+    Cartesian2D returns radians. 
+
+    Args:
+      trajectory: Trajectory whose shape you want to measure
+
+    Returns:
+      Radius of gyration of the trajectory
+
+    """
+
+    return _radius_of_gyration(trajectory)
