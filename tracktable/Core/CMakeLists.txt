@@ -85,10 +85,12 @@ set( Core_Detail_AlgorithmSignatures_HEADERS
   detail/algorithm_signatures/Distance.h
   detail/algorithm_signatures/EndToEndDistance.h
   detail/algorithm_signatures/Interpolate.h
+  detail/algorithm_signatures/Extrapolate.h
   detail/algorithm_signatures/Intersects.h
   detail/algorithm_signatures/Length.h
   detail/algorithm_signatures/PointAtFraction.h
   detail/algorithm_signatures/PointAtTime.h
+  detail/algorithm_signatures/RadiusOfGyration.h
   detail/algorithm_signatures/SpeedBetween.h
   detail/algorithm_signatures/SimplifyLinestring.h
   detail/algorithm_signatures/SphericalCoordinateAccess.h
@@ -116,6 +118,7 @@ set( Core_Detail_Implementations_HEADERS
   detail/implementations/PointAtTime.h
   detail/implementations/PointAtFraction.h
   detail/implementations/ProjectedConvexHullTerrestrial.h
+  detail/implementations/RadiusOfGyration.h
   detail/implementations/SphericalMath.h
   detail/implementations/SphericalPolygons.h
   detail/implementations/SubsetDuringInterval.h
