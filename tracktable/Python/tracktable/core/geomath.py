@@ -44,6 +44,7 @@ import sys
 from ._domain_algorithm_overloads import distance as _distance
 from ._domain_algorithm_overloads import bearing as _bearing
 from ._domain_algorithm_overloads import interpolate as _interpolate
+from ._domain_algorithm_overloads import extrapolate as _extrapolate
 from ._domain_algorithm_overloads import signed_turn_angle as _signed_turn_angle
 from ._domain_algorithm_overloads import unsigned_turn_angle as _unsigned_turn_angle
 from ._domain_algorithm_overloads import speed_between as _speed_between
@@ -534,6 +535,29 @@ def interpolate(start, end, t):
     """
 
     return _interpolate(start, end, t)
+
+# ----------------------------------------------------------------------
+
+def extrapolate(start, end, t):
+    """Extrapolate between two points
+
+    This function will extrapolate linearly between two points.  It is
+    aware of the underlying coordinate system: interpolation on the
+    globe will be done along great circles and interpolation in
+    Cartesian space will be done along a straight line.
+
+    The points being measured must be from the same domain.
+
+    Args:
+      start (BasePoint or TrajectoryPoint): point 1
+      end (BasePoint or TrajectoryPoint): point 2
+      t (float): interpolant
+
+    Returns:
+      New point interpolated between start and end
+    """
+
+    return _extrapolate(start, end, t)
 
 # ----------------------------------------------------------------------
 

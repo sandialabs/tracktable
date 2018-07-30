@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -208,6 +208,21 @@ struct dispatch_interpolate
     }
 };
 
+template<typename value_type>
+struct dispatch_extrapolate
+{
+    static inline tracktable::PropertyValueT apply(tracktable::PropertyValueT const& first,
+        tracktable::PropertyValueT const& second,
+        double interpolant)
+    {
+        value_type const *first_value, *second_value;
+        value_type result;
+        first_value = boost::get<value_type>(&first);
+        second_value = boost::get<value_type>(&second);
+        result = tracktable::extrapolate<value_type>(*first_value, *second_value, interpolant);
+        return tracktable::PropertyValueT(result);
+    }
+};
 
 // ----------------------------------------------------------------------
 
@@ -822,6 +837,19 @@ PropertyValueT interpolate_property(
   calculator.SecondValue = second;
 
   return boost::apply_visitor(calculator, first);
+}
+
+PropertyValueT extrapolate_property(
+    PropertyValueT const& first,
+    PropertyValueT const& second,
+    double t
+)
+{
+    ::InterpolateProperties calculator;
+    calculator.interpolant = t;
+    calculator.SecondValue = second;
+
+    return boost::apply_visitor(calculator, first);
 }
 
 } } // exit namespace tracktable::algorithms

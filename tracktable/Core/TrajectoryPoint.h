@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -47,6 +47,7 @@
 #include <tracktable/Core/detail/algorithm_signatures/Bearing.h>
 #include <tracktable/Core/detail/algorithm_signatures/Distance.h>
 #include <tracktable/Core/detail/algorithm_signatures/Interpolate.h>
+#include <tracktable/Core/detail/algorithm_signatures/Extrapolate.h>
 #include <tracktable/Core/detail/algorithm_signatures/SimplifyLinestring.h>
 #include <tracktable/Core/detail/algorithm_signatures/SpeedBetween.h>
 #include <tracktable/Core/detail/algorithm_signatures/SphericalCoordinateAccess.h>
@@ -439,6 +440,41 @@ struct interpolate< TrajectoryPoint<BasePointT> >
         interpolate<PropertyMap>::apply(left.__properties(), right.__properties(), t)
         );
       return result;
+    }
+};
+
+template<class BasePointT>
+struct extrapolate< TrajectoryPoint<BasePointT> >
+{
+    typedef BasePointT base_point_type;
+
+    template<class trajectory_point_type>
+    static inline trajectory_point_type
+        apply(trajectory_point_type const& left,
+            trajectory_point_type const& right,
+            double t)
+    {
+        // Start off by extrapolating the coordinates with whatever
+        // scheme the base point class provides
+        trajectory_point_type result(
+            extrapolate<base_point_type>::apply(
+                left, right, t
+            )
+        );
+
+        // Now extrapolate the things specific to TrajectoryPoint
+        result.set_timestamp(
+            extrapolate<Timestamp>::apply(left.timestamp(), right.timestamp(), t)
+        );
+
+        result.set_object_id(
+            interpolate<std::string>::apply(left.object_id(), right.object_id(), t)
+        );
+
+        result.__set_properties(
+            extrapolate<PropertyMap>::apply(left.__properties(), right.__properties(), t)
+        );
+        return result;
     }
 };
 
