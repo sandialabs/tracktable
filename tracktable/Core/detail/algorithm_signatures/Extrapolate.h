@@ -29,12 +29,15 @@
 */
 
 /*
-* RadiusOfGyration - Signature for the "radius of gyration of a 
-  trajectory" algorithm.  Must be specialized by subclasses.
+* OtherDefaults: default implementations for algorithms that do not
+* pertain to points or trajectories
+*
+* The most prominent member of this class is the 'extrapolate'
+* algorithm.
 */
 
-#ifndef __tracktable_core_detail_algorithm_signatures_RadiusOfGyration_h
-#define __tracktable_core_detail_algorithm_signatures_RadiusOfGyration_h
+#ifndef __tracktable_core_detail_algorithms_Extrapolate_h
+#define __tracktable_core_detail_algorithms_Extrapolate_h
 
 #include <boost/mpl/assert.hpp>
 
@@ -42,24 +45,42 @@ namespace tracktable {
     namespace algorithms {
 
         template<typename T>
-        struct radius_of_gyration
+        struct extrapolate_linear
         {
-            BOOST_MPL_ASSERT_MSG(
-                sizeof(T) == 0,
-                RADIUS_OF_GYRATION_NOT_IMPLEMENTED_FOR_THIS_TRAJECTORY_TYPE,
-                (types<T>)
-            );
+            static inline T apply(T const& start, T const& end, double interpolant)
+            {
+                if (interpolant >= 0 && interpolant <= 1)
+                {
+                    return end;
+                }
+                else
+                {
+                    T result(end * static_cast<T>(interpolant));
+                    result += start * static_cast<T>(1 - interpolant);
+                    return result;
+                }
+            }
         };
+
+        // By default, we will try linear extrapolation unless we've been told
+        // differently.  This is a sensible default for all numeric POD types.
+        template<typename T>
+        struct extrapolate : extrapolate_linear<T> { };
 
     }
 } // exit namespace tracktable::algorithms
 
+
+  // As usual, here are the driver functions so that we can call
+  // extrapolate() instead of intoning
+  // algorithms::extrapolate<T>::apply().
+
 namespace tracktable {
 
-    template<typename TrajectoryT>
-    double radius_of_gyration(TrajectoryT const& path)
+    template<typename T>
+    T extrapolate(T const& start, T const& finish, double interpolant)
     {
-        return algorithms::compute_radius_of_gyration<TrajectoryT>::apply(path);
+        return algorithms::extrapolate<T>::apply(start, finish, interpolant);
     }
 
 } // exit namespace tracktable

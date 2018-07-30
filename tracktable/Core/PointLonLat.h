@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -40,6 +40,7 @@
 #include <tracktable/Core/detail/algorithm_signatures/Bearing.h>
 #include <tracktable/Core/detail/algorithm_signatures/Distance.h>
 #include <tracktable/Core/detail/algorithm_signatures/Interpolate.h>
+#include <tracktable/Core/detail/algorithm_signatures/Extrapolate.h>
 #include <tracktable/Core/detail/algorithm_signatures/SimplifyLinestring.h>
 #include <tracktable/Core/detail/algorithm_signatures/SphericalCoordinateAccess.h>
 #include <tracktable/Core/detail/algorithm_signatures/TurnAngle.h>
@@ -224,12 +225,13 @@ struct signed_turn_angle<PointLonLat>
 // that behave like PointLonLat.  The template lets us construct and
 // turn whatever point type we're asked for instead of just
 // PointLonLat.
-//
-// BUG: This should do great-circle interpolation instead of linear
-// interpolation.
 
 template<>
 struct interpolate<PointLonLat> : implementations::great_circle_interpolate
+{ };
+
+template<>
+struct extrapolate<PointLonLat> : implementations::great_circle_interpolate
 { };
 
 // ----------------------------------------------------------------------

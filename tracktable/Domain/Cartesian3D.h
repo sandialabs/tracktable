@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -362,9 +362,11 @@ struct unsigned_turn_angle<domain::cartesian3d::base_point_type>
 };
 
 TT_DELEGATE_BASE_POINT_ALGORITHM(interpolate)
+TT_DELEGATE_BASE_POINT_ALGORITHM(extrapolate)
 TT_DELEGATE_BASE_POINT_ALGORITHM(distance)
 
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(interpolate)
+TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(extrapolate)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(distance)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(speed_between)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(unsigned_turn_angle)

@@ -404,11 +404,13 @@ struct unsigned_turn_angle<TT_DOMAIN::base_point_type>
 
 
 TT_DELEGATE_BASE_POINT_ALGORITHM(interpolate)
+TT_DELEGATE_BASE_POINT_ALGORITHM(extrapolate)
 TT_DELEGATE_BASE_POINT_ALGORITHM(distance)
 
 // spherical coordinate access is not appropriate for this point type
 
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(interpolate)
+TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(extrapolate)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(bearing)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(distance)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(signed_turn_angle)
