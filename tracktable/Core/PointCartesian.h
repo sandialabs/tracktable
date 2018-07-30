@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -37,6 +37,7 @@
 
 #include <tracktable/Core/detail/algorithm_signatures/Distance.h>
 #include <tracktable/Core/detail/algorithm_signatures/Interpolate.h>
+#include <tracktable/Core/detail/algorithm_signatures/Extrapolate.h>
 #include <tracktable/Core/detail/algorithm_signatures/TurnAngle.h>
 
 #include <tracktable/Core/detail/points/AssignCoordinates.h>
@@ -147,6 +148,19 @@ struct interpolate< PointCartesian<Dimension> >
       point_type result;
       detail::interpolate_coordinates<Dimension>::apply(left, right, t, result);
       return result;
+    }
+};
+
+template<std::size_t Dimension>
+struct extrapolate< PointCartesian<Dimension> >
+{
+    template<typename point_type>
+    static inline point_type
+        apply(point_type const& left, point_type const& right, double t)
+    {
+        point_type result;
+        detail::interpolate_coordinates<Dimension>::apply(left, right, t, result);
+        return result;
     }
 };
 

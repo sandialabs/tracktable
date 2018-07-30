@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -47,6 +47,7 @@
 #include <tracktable/Core/Timestamp.h>
 
 #include <tracktable/Core/detail/algorithm_signatures/Interpolate.h>
+#include <tracktable/Core/detail/algorithm_signatures/Extrapolate.h>
 
 #include <boost/variant.hpp>
 #include <map>
@@ -292,6 +293,10 @@ namespace tracktable { namespace algorithms {
 TRACKTABLE_CORE_EXPORT PropertyValueT interpolate_property(PropertyValueT const& left,
                                                            PropertyValueT const& right,
                                                            double t);
+TRACKTABLE_CORE_EXPORT PropertyValueT extrapolate_property(PropertyValueT const& left,
+    PropertyValueT const& right,
+    double t);
+
 
 /*! \brief Interpolate between two property maps.
  *
@@ -345,6 +350,55 @@ struct interpolate<PropertyMap>
           }
         }
       return result;
+    }
+};
+
+template<>
+struct extrapolate<PropertyMap>
+{
+    static inline PropertyMap
+        apply(
+            PropertyMap const& first,
+            PropertyMap const& second,
+            double t
+        )
+    {
+        PropertyMap::const_iterator first_iter, second_iter;
+        PropertyMap result;
+
+        for (first_iter = first.begin();
+            first_iter != first.end();
+            ++first_iter)
+        {
+            string_type key((*first_iter).first);
+            second_iter = second.find(key);
+            if (second_iter != second.end())
+            {
+                try
+                {
+                    result[key] = extrapolate_property(
+                        (*first_iter).second,
+                        (*second_iter).second,
+                        t
+                    );
+                }
+                catch (boost::bad_get& /*e*/)
+                {
+                    std::cout << "WARNING: extrapolate<PropertyMap>: "
+                        << "Couldn't retrieve property '"
+                        << key << "' (type "
+                        << property_underlying_type((*first_iter).second)
+                        << ") "
+                        << " from second map. ";
+                    std::cout << "Property is present but has type "
+                        << property_underlying_type((*second_iter).second)
+                        << ". ";
+                    std::cout << "Re-using value from first point.\n";
+                    result[key] = (*first_iter).second;
+                }
+            }
+        }
+        return result;
     }
 };
 
