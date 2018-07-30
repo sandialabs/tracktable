@@ -135,12 +135,14 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
 
   def("distance", & (tracktable::distance<BasePointTerrestrial>));
   def("interpolate", & (tracktable::interpolate<BasePointTerrestrial>));
+  def("extrapolate", &(tracktable::extrapolate<BasePointTerrestrial>));
   def("signed_turn_angle", & (tracktable::signed_turn_angle<BasePointTerrestrial>));
   def("unsigned_turn_angle", & (tracktable::unsigned_turn_angle<BasePointTerrestrial>));
   def("bearing", & (tracktable::bearing<BasePointTerrestrial>));
 
   def("distance", & (tracktable::distance<TrajectoryPointTerrestrial>));
   def("interpolate", & (tracktable::interpolate<TrajectoryPointTerrestrial>));
+  def("extrapolate", &(tracktable::extrapolate<TrajectoryPointTerrestrial>));
   def("signed_turn_angle", & (tracktable::signed_turn_angle<TrajectoryPointTerrestrial>));
   def("unsigned_turn_angle", & (tracktable::unsigned_turn_angle<TrajectoryPointTerrestrial>));
   def("bearing", & (tracktable::bearing<TrajectoryPointTerrestrial>));
@@ -190,6 +192,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
 
   def("distance", & (tracktable::distance<BasePointCartesian2D>));
   def("interpolate", & (tracktable::interpolate<BasePointCartesian2D>));
+  def("extrapolate", &(tracktable::extrapolate<BasePointCartesian2D>));
 
   def("signed_turn_angle", & (tracktable::signed_turn_angle<BasePointCartesian2D>));
   def("unsigned_turn_angle", & (tracktable::unsigned_turn_angle<BasePointCartesian2D>));
@@ -197,6 +200,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
 
   def("distance", & (tracktable::distance<TrajectoryPointCartesian2D>));
   def("interpolate", & (tracktable::interpolate<TrajectoryPointCartesian2D>));
+  def("extrapolate", &(tracktable::extrapolate<TrajectoryPointCartesian2D>));
   def("signed_turn_angle", & (tracktable::signed_turn_angle<TrajectoryPointCartesian2D>));
   def("unsigned_turn_angle", & (tracktable::unsigned_turn_angle<TrajectoryPointCartesian2D>));
   def("bearing", & (tracktable::bearing<TrajectoryPointCartesian2D>));
@@ -248,10 +252,12 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
 
   def("distance", & (tracktable::distance<BasePointCartesian3D>));
   def("interpolate", & (tracktable::interpolate<BasePointCartesian3D>));
+  def("extrapolate", &(tracktable::extrapolate<BasePointCartesian3D>));
   def("unsigned_turn_angle", & (tracktable::unsigned_turn_angle<BasePointCartesian3D>));
 
   def("distance", & (tracktable::distance<TrajectoryPointCartesian3D>));
   def("interpolate", & (tracktable::interpolate<TrajectoryPointCartesian3D>));
+  def("extrapolate", &(tracktable::extrapolate<TrajectoryPointCartesian3D>));
   def("unsigned_turn_angle", & (tracktable::unsigned_turn_angle<TrajectoryPointCartesian3D>));
   def("speed_between", &(tracktable::speed_between<TrajectoryPointCartesian3D>));
 

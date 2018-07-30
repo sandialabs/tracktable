@@ -57,7 +57,8 @@ struct compute_convex_hull_centroid<bg::cs::cartesian, 2>
       typedef bg::model::polygon<point_type> polygon_type;
 
       polygon_type hull;
-      implementations::compute_convex_hull_cartesian(point_begin, point_end, hull);
+      compute_convex_hull<bg::cs::cartesian, 2>::apply(point_begin, point_end, hull);
+
       point_type centroid;
       boost::geometry::centroid(hull, centroid);
       return centroid;

@@ -40,13 +40,11 @@
 #include <tracktable/Core/detail/algorithm_signatures/Length.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtFraction.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtTime.h>
-#include <tracktable/Core/detail/algorithm_signatures/RadiusOfGyration.h>
 #include <tracktable/Core/detail/algorithm_signatures/TimeAtFraction.h>
 #include <tracktable/Core/detail/algorithm_signatures/SubsetDuringInterval.h>
 
 #include <tracktable/Core/detail/implementations/PointAtFraction.h>
 #include <tracktable/Core/detail/implementations/PointAtTime.h>
-#include <tracktable/Core/detail/implementations/RadiusOfGyration.h>
 #include <tracktable/Core/detail/implementations/TimeAtFraction.h>
 #include <tracktable/Core/detail/implementations/SubsetDuringInterval.h>
 

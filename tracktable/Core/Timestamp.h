@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -43,6 +43,7 @@
 
 #include <tracktable/Core/TracktableCommon.h>
 #include <tracktable/Core/detail/algorithm_signatures/Interpolate.h>
+#include <tracktable/Core/detail/algorithm_signatures/Extrapolate.h>
 
 #include <tracktable/Core/TracktableCoreWindowsHeader.h>
 
@@ -304,6 +305,21 @@ struct interpolate<Timestamp>
         boost::posix_time::time_duration delta_t = boost::posix_time::microseconds(usec);
         return( first + delta_t );
         }
+    }
+};
+
+template<>
+struct extrapolate<Timestamp>
+{
+    static inline Timestamp
+        apply(Timestamp const& first, Timestamp const& second, double t)
+    {
+        // A 64-bit integer is enough to track timestamps at microsecond precision
+        // for a little less than 600,000 years.  It provides enough precision
+        // for us here.
+        int64_t usec = static_cast<int64_t>(t * (second - first).total_microseconds());
+        boost::posix_time::time_duration delta_t = boost::posix_time::microseconds(usec);
+        return(first + delta_t);
     }
 };
 
