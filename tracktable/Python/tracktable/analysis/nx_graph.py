@@ -213,6 +213,16 @@ def plot_graph(nxGraph: nx.DiGraph) -> None:
                 .replace('_', ' ').title()
             node_labels[val] = str(cat_str)
             continue
+        elif level == 0:
+            y_multipler = 600.0
+            pos[val] = (node_coords[0], ycoord)
+            text_coord = pos[val]
+            text_coord_y_adjust = y_multipler
+            text_coord = text_coord[0], text_coord[1]+text_coord_y_adjust
+            label_coords[val] = text_coord
+            nodes_g.add_node(val)
+            node_labels[val] = nxGraph.name
+            continue
 
     plt.figure(figsize=(12, figure_y))
     nx.draw(nxGraph, pos, node_size=20, alpha=0.5, node_color="blue",

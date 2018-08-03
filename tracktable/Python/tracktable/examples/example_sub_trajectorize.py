@@ -49,6 +49,7 @@ from tracktable.domain.terrestrial import Trajectory, TrajectoryPoint
 from tracktable.core import geomath
 
 from tracktable.examples.kml_writer import write_kml_graph
+from tracktable.analysis.parseTreeCategorizations import TreeParseError
 from tracktable.analysis.ExtendedPoint import IntersectionError
 
 from fastkml import kml
@@ -378,6 +379,8 @@ def main():
     if args.verbose:
         print("Segmentation method is "+str(args.method))
 
+    should_plot_kml = False
+
     if args.method == Method.accel:
         subtrajer = \
         st.SubTrajerAccel(accel_threshold=args.accel_threshold,
@@ -408,8 +411,9 @@ def main():
     process_names_deque = deque()
     instructions_parsed = False
     process_these_str = ''
+    should_plot_kml = False
 
-    for traj in trajectory.from_ijson_file_iter(args.json_trajectory_file):
+    for traj in trajectory.from_json_file_iter(args.json_trajectory_file):
         trajectoryName = _composeName(traj)
         row_count += 1
 
@@ -439,6 +443,7 @@ def main():
                     if not os.path.exists(output_path):
                         os.mkdir(output_path)
                     kml_file_name = os.path.join(output_path, trajectoryName)
+                    should_plot_kml = True
                     process_these_str = curvature_instructions['flights'] \
                         .strip()
                     process_these_str = process_these_str.split(',')
@@ -470,9 +475,13 @@ def main():
                 leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
                 processed_count += 1
                 kml_file_name = os.path.join(output_path, trajectoryName)
-            except TypeError:
-                print(f'TypeError examples_sub_trajecorize.py, Line 461, process row= {row_count}.')
+            except TreeParseError as TPerror:
+                print (f'{TPerror} for {trajectoryName}')
+            except MemoryError:  # TypeError:
+                print(f'TypeError example_sub_trajecorize.py, Line 461, process row= {row_count}.')
                 continue
+            except Exception as e:
+                dbg = True
         else:
             leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
 
@@ -501,7 +510,7 @@ def main():
                                    insetMap=args.insetMap,
                                    altitudePlot=args.altitudePlot, ext=ext,
                                    output=args.image_file)
-        else:
+        elif  should_plot_kml:
             if args.method == Method.curvature:
                 # kml_file_name = os.path.join(output_path, )
                 export_colored_segments_path_kml(traj, G,
