@@ -160,6 +160,9 @@ class Level1Cat(CategoryBase):
     boustrophedon = 8
     no_cat = 100
 
+    def get_hash_letter(self):
+        return self.value.toupper()[0]
+
 
 class Level2Cat(CategoryBase):
     left_turn = -1,
@@ -250,7 +253,7 @@ class TreeParseError(AttributeError):
         pass
 
 def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
-    partitioned_tuple = ParseTreeNode.get_all_by_level(g)
+    partitioned_tuple = g.get_all_by_level()
     root, _1, lev_2, _3 = partitioned_tuple
 
     cruise_length_min = 35.0  # miles
@@ -403,7 +406,7 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
 def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     """When you see a bunch of functions with numbers in the function names,
         it is a prediction that you will be refactoring later."""
-    partitioned_tuple = ParseTreeNode.get_all_by_level(g)
+    partitioned_tuple = g.get_all_by_level()
     root, _1, _2, lev_3 = partitioned_tuple
     # alt_root = g.root_node
     l2_node_list = ParseTreeNode.NodeListAtLevel(2)

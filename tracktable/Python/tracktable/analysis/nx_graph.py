@@ -34,6 +34,31 @@ class TreeDiGraph(nx.DiGraph):
         data_str = root.report_data_lines(self)
         return header_str + data_str
 
+    def get_all_by_level(self: nx.DiGraph) -> tuple:
+        """
+        Performs a "row-based" filter of a tree graph. For every level of a tree
+        graph (number of edges from root to a node), returns a list of all nodes
+        on that level, then retuns the whole thing in a tuple of those lists.
+        :param self: Graph to operate on.
+        :return: tuple of all nodes for each level
+        """
+        node_count = self.number_of_nodes()
+        lev_0 = None
+        for node in self:
+            if node.depth_level == 0:
+                lev_0 = Parse_Tree_Root(list(node))
+                break
+
+        lev_3 = [n for n in self if n.depth_level == 3]
+        lev_1 = []
+        lev_2 = []
+        l0and3_count = len(lev_0) + len(lev_3) - 1
+        if l0and3_count < node_count:
+            lev_1 = [n for n in self if n.depth_level == 1]
+            lev_2 = [n for n in self if n.depth_level == 2]
+
+        return (lev_0, lev_1, lev_2, lev_3)
+
     @property
     def trajectory_name(self):
         aTraj = self.my_trajecory
@@ -43,7 +68,7 @@ class TreeDiGraph(nx.DiGraph):
 
     def get_stats_string(self):
         ret_list = []
-        root, Lev1, Lev2, leaves = ParseTreeNode.get_all_by_level(self)
+        root, Lev1, Lev2, leaves = self.get_all_by_level()
 
         traj_name = self.my_trajecory[0].object_id
         ts = str(self.my_trajecory[0].timestamp)

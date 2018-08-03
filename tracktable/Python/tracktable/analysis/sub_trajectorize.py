@@ -486,13 +486,13 @@ class SubTrajerCurvature:
         G = aPointList.create_minimal_digraph()
         G.name = aPointList.name
         PTcats.categorize_level3_to_level2(G)
-        root, Level1, level2, Level3 = ParseTreeNode.get_all_by_level(G)
+        root, Level1, level2, Level3 = G.get_all_by_level()
         try:
             PTcats.categorize_level2_to_level1(G)
         except IndexError:
             print('IndexError in sub_trajectorize.py Line 483')
             return
-        root, Level1, level2, Level3 = ParseTreeNode.get_all_by_level(G)
+        root, Level1, level2, Level3 = G.get_all_by_level()
 
         # print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
         # if request_graph_plot:
@@ -525,7 +525,7 @@ class SubTrajerCurvature:
         # tuples: (start, stop-1, category_string)
         # so we must convert G to that kind of tuple.
         return_list = []
-        root, Level1, level2, Level3 = ParseTreeNode.get_all_by_level(G)
+        root, Level1, level2, Level3 = G.get_all_by_level()
         a_node: ParseTreeNode
         for a_node in Level1:
             start = a_node.point_starting

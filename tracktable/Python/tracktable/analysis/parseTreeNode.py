@@ -510,33 +510,6 @@ class NodeListAtLevel(list):
         pass
 
 
-# This should be a member of nxg.TreeDiGraph. Move it there some time.
-def get_all_by_level(g: nx.DiGraph) -> tuple:
-    """
-    Performs a "row-based" filter of a tree graph. For every level of a tree
-    graph (number of edges from root to a node), returns a list of all nodes
-    on that level, then retuns the whole thing in a tuple of those lists.
-    :param g: Graph to operate on.
-    :return: tuple of all nodes for each level
-    """
-    node_count = g.number_of_nodes()
-    lev_0 = None
-    for node in g:
-        if node.depth_level == 0:
-            lev_0 = Parse_Tree_Root(list(node))
-            break
-
-    lev_3 = [n for n in g if n.depth_level == 3]
-    lev_1 = []
-    lev_2 = []
-    l0and3_count = len(lev_0) + len(lev_3) - 1
-    if l0and3_count < node_count:
-        lev_1 = [n for n in g if n.depth_level == 1]
-        lev_2 = [n for n in g if n.depth_level == 2]
-
-    return (lev_0, lev_1, lev_2, lev_3)
-
-
 if __name__ == '__main__':
     print("parseTreeNode successfully loaded and run.")
 
