@@ -245,6 +245,9 @@ def _insinuate_new_nodes_into_tree(node_list: ParseTreeNode,
         for e in edges_to_remove:
             g.remove_edge(e[0], e[1])
 
+class TreeParseError(AttributeError):
+    def __init__(self, msg):
+        pass
 
 def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
     partitioned_tuple = ParseTreeNode.get_all_by_level(g)
@@ -262,6 +265,10 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
     u_turn_list = []
     u_turn_range = (180.0 - u_turn_deflection_range, 180.0 + u_turn_deflection_range)
     course_turn_min = 25.0
+
+    if len(lev_2) <= 1:
+        raise TreeParseError("Not enough Level 2 nodes to process.")
+
     for seg_idx in range(len(lev_2)-1):
         seg1: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx]
         seg2: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx+1]

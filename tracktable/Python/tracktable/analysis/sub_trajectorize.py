@@ -32,6 +32,7 @@ import numpy as np
 from math import sqrt, fabs
 
 import scipy
+import tracktable.inout.trajectory as trajectory
 from tracktable.analysis.sliceList import SliceList
 from tracktable.analysis.sliceList import sliceRange as slice_range_class
 import tracktable.analysis.ExtendedPoint
@@ -417,14 +418,19 @@ class SubTrajerSemantic:
         return segs
 
 
-def trajName(traj):
-    return traj[0].object_id
+def trajName(aTraj):
+    ts = aTraj[0].timestamp.strftime('%m%d%H%M')
+    oid = ts + '_' + aTraj[0].object_id
+    return oid
 
 _isSubTrajerCurvatureAvailable = True
 
 def compute_everything_else(aVar: tracktable.analysis.ExtendedPoint)\
         -> tuple:
     return 0.0, 0.2
+
+counter = 0
+
 
 class SubTrajerCurvature:
     """Breaks up a trajectory into subtrajectories based on curvatures of
@@ -478,6 +484,7 @@ class SubTrajerCurvature:
         aPointList.categorize_points()
 
         G = aPointList.create_minimal_digraph()
+        G.name = aPointList.name
         PTcats.categorize_level3_to_level2(G)
         root, Level1, level2, Level3 = ParseTreeNode.get_all_by_level(G)
         try:
@@ -490,6 +497,7 @@ class SubTrajerCurvature:
         # print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
         # if request_graph_plot:
         if self.plot_graph:
+            # if 'A3A458'in G.name:
             nxg.plot_graph(G)
 
         if self.summary_output:
@@ -533,6 +541,7 @@ class SubTrajerCurvature:
                         returnGraph=False,
                         useMethod='individualCurvatures_preferred',
                         request_graph_plot: bool =True):
+        trName = trajName(trajectory)
         segments, g = self.splitAndClassify(trajectory, returnGraph=returnGraph)
         if not segments:
             return None
@@ -570,26 +579,31 @@ class SubTrajerCurvature:
 
         aPointList = EPLmod.CreateExtendedPointList(trajectory)
         pointCount = len(aPointList)
-        if pointCount < 4:
-            return None
+        if pointCount < 20:
+            return None, None
 
         try:
             aPointList.computeAllPointInformation(account_for_lat_long=True)
         except ZeroDivisionError:
-            print('ZeroDivError in sub_trajecorize.py Line 576')
+            print('ZeroDivError in sub_trajecorize.py Line 583')
             return None, None
         # aPointList.mark_likely_jitters()
 
         try:
+            global counter
+            counter += 1
             leaves, g = \
                 self._individCurvaturesMethod(aPointList,
                     request_graph_plot=returnGraph)
         except KeyboardInterrupt:
             exit(0)
         except TypeError as te:
-            print('TyperError sub_rajectorize.py Line 587')
+            tName = trajectory.traj_name(trajectory)
+            print(f'TyperError sub_rajectorize.py Line 596 count = {counter}' \
+                  f' name is {tName}.')
             leaves = None
             g = None
+            exit(0)
 
         if returnGraph:
             return leaves, g

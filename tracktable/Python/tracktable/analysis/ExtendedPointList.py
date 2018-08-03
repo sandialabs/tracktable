@@ -243,7 +243,8 @@ def _createExtendedPointList_trajectory(trajectory):
         prevRow = aRow
 
     newEPL.z_range = z_range_list
-    newEPL.name = trajectory[0].object_id
+    ts = trajectory[0].timestamp.strftime('%m%d%H%M')
+    newEPL.name = ts + '_' + trajectory[0].object_id
     trajectory.my_EPL = newEPL
     newEPL.my_trajectory = trajectory
     return newEPL
