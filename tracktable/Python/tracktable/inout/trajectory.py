@@ -133,6 +133,11 @@ def from_dict(dictionary):
 
     return trajectory
 
+def traj_name(trajectory):
+    ts = trajectory[0].timestamp.strftime('%m%d%H%M')
+    oid = ts + '_' + trajectory[0].object_id
+    return oid
+
 def to_dict(trajectory, addId=False):
     """Returns a dictionary constructed from the given trajectory
     Args:
