@@ -66,10 +66,19 @@ class TreeDiGraph(nx.DiGraph):
         oid = ts + '_' + aTraj[0].object_id
         return oid
 
-    def get_stats_string(self):
-        ret_list = []
+    @property
+    def L1catHash(self):
+        ret_str = ''
+        Lev1: list
         root, Lev1, Lev2, leaves = self.get_all_by_level()
+        for a_node in Lev1:
+            the_cat = a_node.category
+            ret_str += a_node.hash_letter
+        return ret_str
 
+    def get_stats_string(self):
+        ret_list: list = []
+        root, Lev1, Lev2, leaves = self.get_all_by_level()
         traj_name = self.my_trajecory[0].object_id
         ts = str(self.my_trajecory[0].timestamp)
         traj_name = traj_name + '_' + ts[:10]
