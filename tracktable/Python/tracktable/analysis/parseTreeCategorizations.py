@@ -411,7 +411,7 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
         del l1_node_list[idx]
 
     # merge adjacent no_cats into one single no_cat
-    for idx in range(len(l1_node_list)-2, 0, -1):
+    for idx in range(len(l1_node_list)-2, -1, -1):
         this_node = l1_node_list[idx]
         next_node = l1_node_list[idx+1]
         if this_node.category == next_node.category:
