@@ -12,6 +12,7 @@ build:
   #   - apt update && apt -y install make autoconf 
   script: 
     - echo Hello Script
+    - ctest -C Release
   artifacts:
     paths:
       - C:\Users\pbaxley\Downloads\TrackTable
