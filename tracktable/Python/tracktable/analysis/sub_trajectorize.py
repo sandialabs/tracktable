@@ -538,7 +538,10 @@ class SubTrajerCurvature:
         else:
             a_node: ParseTreeNode
             for a_node in Level1:
-                start = a_node.point_starting
+                try:
+                    start = a_node.point_starting # there is an indexing bug in here which must be fixed.
+                except IndexError:
+                    return None, None
                 stop = a_node.point_stopping
                 category = a_node.category_str
                 return_list.append((start, stop, category))
