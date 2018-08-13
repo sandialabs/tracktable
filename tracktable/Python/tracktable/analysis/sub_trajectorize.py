@@ -472,19 +472,6 @@ class SubTrajerCurvature:
         :rtype: tuple: SliceList, graph
         """
 
-        def tag_jitter_segments(aSliceRange):
-            '''Likely no longer used. Might be deleteable.'''
-            aSegment = aSliceRange.getSegment()
-
-            aSliceRange.DegreeOfCurve = 'straight' \
-                if fabs(aSegment[0].arc.degree_curvature) < \
-                   dcStraightThreshold \
-                else 'turn'
-
-            aSliceRange.color = slice_range_class.straight_color
-            if aSliceRange.DegreeOfCurve is not 'straight':
-                aSliceRange.color = slice_range_class.turn_color
-
         aPointList.categorize_points()
 
         G = aPointList.create_minimal_digraph()
