@@ -27,7 +27,9 @@ class Parse_Tree_Node(list):
                 self[0] == other[0]
 
     def __str__(self):
-        return '{0} Level {1}'.format(super().__str__(), self.depth_level)
+        return '{0}   L {1} {2}'.format(super().__str__(),
+                                               self.depth_level,
+                                      self.category_str)
 
     def _set_start(self, new_start_val):
         self[0] = new_start_val
@@ -269,6 +271,10 @@ class ParseTreeNodeL1(Parse_Tree_Node):
     @property
     def depth_level(self):
         return 1
+
+    @property
+    def hash_letter(self):
+        return self.category.get_hash_letter()
 
     @property
     def defl_sign(self):

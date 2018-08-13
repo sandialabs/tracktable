@@ -161,7 +161,9 @@ class Level1Cat(CategoryBase):
     no_cat = 100
 
     def get_hash_letter(self):
-        return self.value.toupper()[0]
+        if self == Level1Cat.course_turn:
+            return 'T'
+        return self.name.upper()[0]
 
 
 class Level2Cat(CategoryBase):
@@ -208,6 +210,7 @@ def _insinuate_new_nodes_into_tree(node_list: ParseTreeNode,
 
 
     All functionality is via side effects. No return value.
+    Note: Paul thinks there are some bugs in this function.
 
     :param node_list: The list of mid-level nodes to insinuate into the graph
     :param g: the graph to be insinuated into
@@ -256,6 +259,22 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
     partitioned_tuple = g.get_all_by_level()
     root, _1, lev_2, _3 = partitioned_tuple
 
+    if len(lev_2) <= 1:
+        # raise TreeParseError("Not enough Level 2 nodes to process.")
+        new_l1_node = ParseTreeNode.ParseTreeNodeL1([0,1],
+                                                    child_collection=lev_2,
+                                                    my_graph=g)
+        if lev_2[0].category == Level2Cat.straight:
+            new_l1_node.category = Level1Cat.cruise
+        else:
+            new_l1_node.category = Level1Cat.course_turn
+
+        l1_node_list = ParseTreeNode.NodeListAtLevel(1)
+        l1_node_list.append(new_l1_node)
+        _insinuate_new_nodes_into_tree(l1_node_list, g, partitioned_tuple)
+        dbg = True
+        return
+
     cruise_length_min = 35.0  # miles
     u_turn_deflection_range = 1.25  # degrees, left or right
     s_curve_mid_straight_max_length = 2.0  # miles
@@ -267,14 +286,15 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
     course_turn_list = []
     u_turn_list = []
     u_turn_range = (180.0 - u_turn_deflection_range, 180.0 + u_turn_deflection_range)
-    course_turn_min = 25.0
+    course_turn_min = 50.0
 
-    if len(lev_2) <= 1:
-        raise TreeParseError("Not enough Level 2 nodes to process.")
-
-    for seg_idx in range(len(lev_2)-1):
+    lev_2_range = range(len(lev_2))
+    for seg_idx in lev_2_range:
         seg1: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx]
-        seg2: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx+1]
+        try:
+            seg2: ParseTreeNode.ParseTreeNodeL2 = lev_2[seg_idx+1]
+        except IndexError:
+            seg2 = None
         ttl_defl_mag = abs(seg1.total_defl_deg_chords)
         if course_turn_min <= ttl_defl_mag < min(u_turn_range):
             a_range  = (seg_idx, seg_idx+1)
@@ -282,17 +302,19 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
         elif min(u_turn_range) <= ttl_defl_mag <= max(u_turn_range):
             a_range = (seg_idx, seg_idx+1)
             u_turn_list.append(a_range)
-        elif seg1.defl_sign * seg2.defl_sign == -1:
+        elif seg2 and seg1.defl_sign * seg2.defl_sign == -1:
             a_range = (seg_idx, seg_idx+1)
             s_curve_list.append(a_range)
-        elif seg1.defl_sign * seg2.defl_sign == 1:
+        elif seg2 and seg1.defl_sign * seg2.defl_sign == 1:
             a_range = (seg_idx, seg_idx+1)
             o_curve_list.append(a_range)
         elif seg1.length_chords >= cruise_length_min:
-            a_range  = (seg_idx, seg_idx+1)
+            a_range = (seg_idx, seg_idx+1)
             cruise_list.append(a_range)
-        else:
-            tmp = seg1.length_chords
+        else: # elif '08022302_' in g.name:
+            a_range = (seg_idx, seg_idx+1)
+            cruise_list.append(a_range)
+            pass
 
     # consolidate L1 categories
     l1_node_list = ParseTreeNode.NodeListAtLevel(1)
@@ -353,7 +375,7 @@ def categorize_level2_to_level1(g: nxg.TreeDiGraph) -> None:
             del_node_set.add(idx-1)
             while idx > 3:
                 idx -= 2
-                curr = ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx]
+                curr: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx]
                 prev: ParseTreeNode.ParseTreeNodeL1 = l1_node_list[idx-1]
                 curr_cat = curr.category
                 prev_cat = prev.category
@@ -415,7 +437,7 @@ def categorize_level3_to_level2(g: nxg.TreeDiGraph) -> None:
     l2_node_list.current.index = node_count = 0
     # l2_node_list.current
     for a_node in lev_3[1:-1]:
-        apt = a_node.my_point.my_index, a_node.my_point.pt2pt.distanceAhead
+        apt = a_node.my_point.my_index, a_node.my_point.pt2pt.distanceAhead  # apt is unused.
 
         is_anomaly = True \
             if 'anomaly' in str(a_node.my_point.leg_length_cat) \
