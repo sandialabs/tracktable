@@ -2,7 +2,6 @@
 # use the official gcc image, based on debian
 # can use verions as well, like gcc:5.2
 # see https://hub.docker.com/_/gcc/
-image: gcc
 
 build:
   stage: build
@@ -12,7 +11,7 @@ build:
   #   - apt update && apt -y install make autoconf 
   script: 
     - echo Hello Script
-    - ctest -C Release
+    - msbuild ALL_BUILD.vcxproj /t:Rebuild /p:Configuration=Release /m:8
   artifacts:
     paths:
       - C:\Users\pbaxley\Downloads\TrackTable
@@ -26,3 +25,4 @@ test:
   stage: test
   script:
     - echo Testing
+    - ctest -C Release
