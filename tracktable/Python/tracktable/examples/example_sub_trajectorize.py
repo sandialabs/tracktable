@@ -538,7 +538,9 @@ def main():
                 kml_file_name = os.path.join(outputDir, trajectoryName)
                 if write_kml_in_hash_directory:
                     particular_output_path = \
-                        os.path.join(outputDir, G.L1catHash)
+                        os.path.join(outputDir, 'binnedKML')
+                    particular_output_path = \
+                        os.path.join(particular_output_path, G.L1catHash)
                     if not os.path.exists(particular_output_path):
                         os.mkdir(particular_output_path)
                     kml_file_name = os.path.join(particular_output_path, trajectoryName)
