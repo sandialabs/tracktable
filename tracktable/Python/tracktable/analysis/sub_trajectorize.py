@@ -451,6 +451,9 @@ class SubTrajerCurvature:
     def request_plot_graph(self):
         self.plot_graph = True
 
+    def request_no_plot_graph(self):
+        self.plot_graph = False
+
     def _individCurvaturesMethod(self, aPointList, dcStraightThreshold=4.0,
                         request_graph_plot: bool =False) -> nx.DiGraph:
         """
@@ -470,6 +473,7 @@ class SubTrajerCurvature:
         """
 
         def tag_jitter_segments(aSliceRange):
+            '''Likely no longer used. Might be deleteable.'''
             aSegment = aSliceRange.getSegment()
 
             aSliceRange.DegreeOfCurve = 'straight' \
@@ -486,13 +490,13 @@ class SubTrajerCurvature:
         G = aPointList.create_minimal_digraph()
         G.name = aPointList.name
         PTcats.categorize_level3_to_level2(G)
-        root, Level1, level2, Level3 = G.get_all_by_level()
+        root, Level1, Level2, Level3 = G.get_all_by_level()   # may not be necessary
         try:
             PTcats.categorize_level2_to_level1(G)
         except IndexError:
-            print('IndexError in sub_trajectorize.py Line 483')
+            # print('IndexError in sub_trajectorize.py Line 496')
             return
-        root, Level1, level2, Level3 = G.get_all_by_level()
+        root, Level1, Level2, Level3 = G.get_all_by_level()
 
         # print('Nodes:', G.number_of_nodes(), 'Edges:', G.number_of_edges())
         # if request_graph_plot:
@@ -525,13 +529,19 @@ class SubTrajerCurvature:
         # tuples: (start, stop-1, category_string)
         # so we must convert G to that kind of tuple.
         return_list = []
-        root, Level1, level2, Level3 = G.get_all_by_level()
-        a_node: ParseTreeNode
-        for a_node in Level1:
-            start = a_node.point_starting
-            stop = a_node.point_stopping
-            category = a_node.category_str
+        root, Level1, Level2, Level3 = G.get_all_by_level()
+        if len(Level1) == 1:
+            start = 0
+            stop = 1
+            category = Level1[0].category_str
             return_list.append((start, stop, category))
+        else:
+            a_node: ParseTreeNode
+            for a_node in Level1:
+                start = a_node.point_starting
+                stop = a_node.point_stopping
+                category = a_node.category_str
+                return_list.append((start, stop, category))
 
         return return_list, G
 
@@ -544,7 +554,7 @@ class SubTrajerCurvature:
         trName = trajName(trajectory)
         segments, g = self.splitAndClassify(trajectory, returnGraph=returnGraph)
         if not segments:
-            return None
+            return None, None
 
         segs = []
         for seg in segments:
@@ -585,9 +595,8 @@ class SubTrajerCurvature:
         try:
             aPointList.computeAllPointInformation(account_for_lat_long=True)
         except ZeroDivisionError:
-            print('ZeroDivError in sub_trajecorize.py Line 583')
+            print('ZeroDivError in sub_trajecorize.py Line 588')
             return None, None
-        # aPointList.mark_likely_jitters()
 
         try:
             global counter
@@ -597,13 +606,15 @@ class SubTrajerCurvature:
                     request_graph_plot=returnGraph)
         except KeyboardInterrupt:
             exit(0)
-        except TypeError as te:
-            tName = trajectory.traj_name(trajectory)
-            print(f'TyperError sub_rajectorize.py Line 596 count = {counter}' \
-                  f' name is {tName}.')
-            leaves = None
-            g = None
-            exit(0)
+        # except TypeError as te:
+        #     try:
+        #         tName = trajectory.traj_name(trajectory)
+        #     except AttributeError:
+        #         tName = '>> name not available.'
+        #     # print(f'TypeError sub_rajectorize.py Line 607 count = {counter}' \
+        #     #       f' name is {tName}.')
+        #     leaves = None
+        #     g = None
 
         if returnGraph:
             return leaves, g

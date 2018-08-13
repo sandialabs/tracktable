@@ -129,7 +129,7 @@ def main():
                 # # e.args[0] = e.args[0] + f'  count = {count}'
                 # raise IndexError(ie.args[0] + f'  count = {count}')
                 continue
-            if not leaves:
+            if not leaves[0]:
                 continue
             segment_num = 0
             segments = []

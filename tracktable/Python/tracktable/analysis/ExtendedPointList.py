@@ -145,7 +145,7 @@ class ExtendedPointList(list):
             CATs.CurvatureCat.assign_to(a_point, 'curvature_cat')
             CATs.DeflectionCat.assign_to(a_point, 'deflection_cat')
 
-        self[0].leg_length_cat = self[1].leg_length_cat = None
+        self[0].leg_length_cat = self[1].leg_length_cat = None  # check for possible but -- [-1]
         self[0].curvature_cat = self[-1].curvature_cat = None
         self[0].deflection_cat = self[-1].deflection_cat = None
 

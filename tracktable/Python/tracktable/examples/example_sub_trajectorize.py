@@ -344,7 +344,7 @@ if getpass.getuser() == 'pschrum':
 import json, sys
 import gc
 import psutil
-from collections import deque
+from collections import deque, defaultdict
 
 
 def get_point_count(aTraj):
@@ -367,10 +367,33 @@ def point_count_greater_than(gen, max_count):
 
     return False
 
+def output_category_hash_dict(the_dict: defaultdict, outpath: str,
+                              should_write_report: bool = False) -> None:
+    if not should_write_report:
+        return
+
+    keys = the_dict.keys()
+    if len(keys) == 0:
+        return
+    out_file_name = os.path.join(outpath, "hash_report.csv")
+    try:
+        os.mkdir(outpath)
+    except FileExistsError:
+        pass
+    with open(out_file_name, 'w') as fout:
+        for a_key, traj_list in the_dict.items():
+            out_str = a_key + ','
+            out_str += str(len(traj_list)) + ','
+            for a_traj in traj_list:
+                out_str += a_traj + ','
+            fout.write(out_str[:-1] + '\n')
+            fout.flush()
+
 def main():
     global row_count
     global processed_count
     args = parse_args()
+    write_hash_report = False
 
     ext="png"
     if args.pdf:
@@ -383,15 +406,14 @@ def main():
 
     if args.method == Method.accel:
         subtrajer = \
-        st.SubTrajerAccel(accel_threshold=args.accel_threshold,
-                          tight=args.tight)
+            st.SubTrajerAccel(accel_threshold=args.accel_threshold,
+                              tight=args.tight)
     elif args.method == Method.semantic:
         subtrajer = \
-        st.SubTrajerSemantic(straightness_threshold=args.straightness_threshold,
-                          length_threshold_samples=args.length_threshold)
+            st.SubTrajerSemantic(straightness_threshold=args.straightness_threshold,
+                                 length_threshold_samples=args.length_threshold)
     elif args.method == Method.curvature:
-        subtrajer = \
-        st.SubTrajerCurvature()
+        subtrajer = st.SubTrajerCurvature()
         curvature_instructions: dict = {}
         instructions_file = './curvature_instructions.txt'
         if os.path.exists(instructions_file):
@@ -404,18 +426,34 @@ def main():
                         curvature_instructions[cmd_type] = cmd_val
     else:
         subtrajer = \
-        st.SubTrajerStraight(
-            straightness_threshold=args.straightness_threshold,
-            length_threshold_samples=args.length_threshold)
+            st.SubTrajerStraight(
+                straightness_threshold=args.straightness_threshold,
+                length_threshold_samples=args.length_threshold)
 
     process_names_deque = deque()
     instructions_parsed = False
     process_these_str = ''
     should_plot_kml = False
+    category_hashes_dict = defaultdict(list)
 
+    block_step_count = 10000
+    clicks_per_second = 1000000
+    import timeit
+    prev_time = timeit.default_timer() * clicks_per_second
+    skip_count = 0
     for traj in trajectory.from_json_file_iter(args.json_trajectory_file):
-        trajectoryName = _composeName(traj)
         row_count += 1
+        if row_count < skip_count:
+            if row_count == 500:
+                print("500 rows skipped.")
+            elif row_count % block_step_count == 0:
+                # new_time = timeit.default_timer() * clicks_per_second
+                # seconds = new_time - prev_time
+                # prev_time = new_time
+                # rate = block_step_count / seconds
+                print(f"{row_count} rows skipped.") # in {seconds} seconds at {rate} trajs per second.")
+            continue
+        trajectoryName = _composeName(traj)
 
         if args.method == Method.straight:
             leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
@@ -423,65 +461,101 @@ def main():
             output_path = './'
             kml_file_name = ''
             if curvature_instructions and \
-                    not instructions_parsed and \
-                    'action' in curvature_instructions.keys():
+                    not instructions_parsed:
                 instructions_parsed = True
                 output_path = \
                     curvature_instructions.get('out_path', output_path)
                 outputDir = output_path
 
-                if 'plot graph'  in curvature_instructions['action']:
+                if 'plot graph' in curvature_instructions.get('action', []):
                     subtrajer.request_plot_graph()
 
-                if 'generate summary' in curvature_instructions['action']:
+                if 'generate summary' in curvature_instructions.get('action', []):
                     summary_csv_name = \
                         os.path.basename(args.json_trajectory_file.name)
 
                     subtrajer.request_summary_csv(output_path,
                                                   summary_csv_name)
-                elif 'generate kml' in curvature_instructions['action']:
+                if 'generate kml' in curvature_instructions.get('action', []):
                     if not os.path.exists(output_path):
                         os.mkdir(output_path)
                     kml_file_name = os.path.join(output_path, trajectoryName)
                     should_plot_kml = True
+
+                write_hash_report = False
+                if 'generate groupings summary' in \
+                        curvature_instructions.get('action', []):
+                    write_hash_report = True
+
+
+                write_kml_in_hash_directory = False
+                if 'generate kml in grouping directories' in \
+                        curvature_instructions.get('action', []):
+                    write_kml_in_hash_directory = True
+                    should_plot_kml = True
+
+                if 'flights' in curvature_instructions.keys():
                     process_these_str = curvature_instructions['flights'] \
                         .strip()
                     process_these_str = process_these_str.split(',')
                     for a_name in process_these_str:
                         process_names_deque.append(a_name.strip())
 
-            try:
-                if row_count % 500 == 0:
-                    gc.collect()
-                    mem_report = psutil.virtual_memory()
-                    ttl_mem, free_mem = mem_report[0], mem_report[1]
-                    available_percent = free_mem / ttl_mem
-                    print(f'Processing item {row_count}. {processed_count} pr'\
-                          f'ocessed so far. {available_percent} memory left.')
-                    if available_percent < 0.10:
-                        raise MemoryError
-                if len(process_names_deque) > 0:
-                    if trajectoryName not in process_names_deque:
-                        continue
-                    process_names_deque.remove(trajectoryName)
+            # try:
+            if row_count % 500 == 0:
+                mem_report = psutil.virtual_memory()
+                ttl_mem, free_mem = mem_report[0], mem_report[1]
+                available_percent = free_mem / ttl_mem
+                print(f'Processing item {row_count}. {processed_count} pr' \
+                      f'ocessed so far. {available_percent} memory left.')
+                if available_percent < 0.10:
+                    output_category_hash_dict(category_hashes_dict,
+                                              outputDir, write_hash_report)
+                    raise MemoryError
                 else:
-                    if len(process_these_str) > 0:
-                        print('Process complete.')
-                        print(
-                            f'{processed_count} processed out of {row_count}' \
+                    pass
+            if len(process_names_deque) > 0:
+                if trajectoryName not in process_names_deque:
+                    continue
+                process_names_deque.remove(trajectoryName)
+            else:
+                if len(process_these_str) > 0:
+                    print('Process complete.')
+                    print(
+                        f'{processed_count} processed out of {row_count}' \
                         ' flights.')
-                        exit(0)
+                    exit(0)
 
+            try:
                 leaves, G = subtrajer.subtrajectorize(traj, returnGraph=True)
+                if G:
+                    if write_hash_report:
+                        category_hashes_dict[G.L1catHash].append(G.name)
+                else:
+                    processed_count += 1
+                    continue
                 processed_count += 1
-                kml_file_name = os.path.join(output_path, trajectoryName)
+                kml_file_name = os.path.join(outputDir, trajectoryName)
+                if write_kml_in_hash_directory:
+                    particular_output_path = \
+                        os.path.join(outputDir, G.L1catHash)
+                    if not os.path.exists(particular_output_path):
+                        os.mkdir(particular_output_path)
+                    kml_file_name = os.path.join(particular_output_path, trajectoryName)
+
+            except KeyboardInterrupt:
+                output_category_hash_dict(category_hashes_dict, outputDir,
+                                          write_hash_report)
             except TreeParseError as TPerror:
-                print (f'{TPerror} for {trajectoryName}')
-            except MemoryError:  # TypeError:
-                print(f'TypeError example_sub_trajecorize.py, Line 461, process row= {row_count}.')
-                continue
-            except Exception as e:
-                dbg = True
+                # print (f'{TPerror} for {trajectoryName}')
+                pass
+            except IndexError:
+                output_category_hash_dict(category_hashes_dict, outputDir,
+                                          write_hash_report)
+                raise
+            # except TypeError:
+            #     print(f'TypeError example_sub_trajecorize.py, Line 522, process row= {row_count}.')
+            #     continue
         else:
             leaves = subtrajer.subtrajectorize(traj, returnGraph=False)
 
@@ -505,21 +579,21 @@ def main():
         # height in terms ov the values used to scale the maps
         if args.method != Method.curvature and not args.export_kml:
             plot_colored_segments_path(traj, leaves,
-                                   args.straightness_threshold,
-                                   None, savefig=args.save_fig,
-                                   insetMap=args.insetMap,
-                                   altitudePlot=args.altitudePlot, ext=ext,
-                                   output=args.image_file)
-        elif  should_plot_kml:
+                                       args.straightness_threshold,
+                                       None, savefig=args.save_fig,
+                                       insetMap=args.insetMap,
+                                       altitudePlot=args.altitudePlot, ext=ext,
+                                       output=args.image_file)
+        elif should_plot_kml:
             if args.method == Method.curvature:
                 # kml_file_name = os.path.join(output_path, )
                 export_colored_segments_path_kml(traj, G,
-                                         args.straightness_threshold,
-                                         None, savefig=args.save_fig,
-                                         insetMap=args.insetMap,
-                                         altitudePlot=args.altitudePlot,
-                                         ext='kml',
-                                         output=kml_file_name)
+                                                 args.straightness_threshold,
+                                                 None, savefig=args.save_fig,
+                                                 insetMap=args.insetMap,
+                                                 altitudePlot=args.altitudePlot,
+                                                 ext='kml',
+                                                 output=kml_file_name)
             else:
                 export_kml(traj, leaves, filename_out="test.kml")
 
@@ -529,6 +603,8 @@ def main():
             plot_tree(G, traj, bbox, with_labels=False,
                       node_size=5000, threshold=args.straightness_threshold,
                       savefig=args.save_fig, ext=ext)
+    output_category_hash_dict(category_hashes_dict, outputDir,
+                              write_hash_report)
     print(f'{processed_count} processed out of {row_count} flights.')
 
 
