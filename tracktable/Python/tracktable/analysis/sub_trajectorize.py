@@ -591,13 +591,13 @@ class SubTrajerCurvature:
         """
 
         aPointList = EPLmod.CreateExtendedPointList(trajectory)
-        pointCount = len(aPointList)
-        if pointCount < 20:
-            return None, None
+        # pointCount = len(aPointList)
+        # if pointCount < 20:
+        #     return None, None
 
         try:
             aPointList.computeAllPointInformation(account_for_lat_long=True)
-        except ZeroDivisionError:
+        except (ZeroDivisionError, IndexError):
             print('ZeroDivError in sub_trajecorize.py Line 588')
             return None, None
 
