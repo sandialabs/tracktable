@@ -50,6 +50,7 @@ from tracktable.core import geomath
 
 from tracktable.examples.kml_writer import write_kml_graph
 from tracktable.analysis.parseTreeCategorizations import TreeParseError
+import time
 from tracktable.analysis.ExtendedPoint import IntersectionError
 
 from fastkml import kml
@@ -384,8 +385,9 @@ def output_category_hash_dict(the_dict: defaultdict, outpath: str,
         for a_key, traj_list in the_dict.items():
             out_str = a_key + ','
             out_str += str(len(traj_list)) + ','
-            for a_traj in traj_list:
-                out_str += a_traj + ','
+            for idx, a_traj in enumerate(traj_list):
+                if idx < 200:
+                    out_str += a_traj + ','
             fout.write(out_str[:-1] + '\n')
             fout.flush()
 
@@ -438,9 +440,9 @@ def main():
 
     block_step_count = 10000
     clicks_per_second = 1000000
-    import timeit
-    prev_time = timeit.default_timer() * clicks_per_second
+    start_time = time.time()
     skip_count = 0
+
     for traj in trajectory.from_json_file_iter(args.json_trajectory_file):
         row_count += 1
         if row_count < skip_count:
@@ -448,8 +450,8 @@ def main():
                 print("500 rows skipped.")
             elif row_count % block_step_count == 0:
                 # new_time = timeit.default_timer() * clicks_per_second
-                # seconds = new_time - prev_time
-                # prev_time = new_time
+                # seconds = new_time - start_time
+                # start_time = new_time
                 # rate = block_step_count / seconds
                 print(f"{row_count} rows skipped.") # in {seconds} seconds at {rate} trajs per second.")
             continue
@@ -509,6 +511,9 @@ def main():
                 print(f'Processing item {row_count}. {processed_count} pr' \
                       f'ocessed so far. {available_percent} memory left.')
                 if available_percent < 0.10:
+                    ttl_time = time.time() - start_time
+                    print(
+                        f'Took {ttl_time} seconds to process {processed_count} trajectories.')
                     output_category_hash_dict(category_hashes_dict,
                                               outputDir, write_hash_report)
                     raise MemoryError
@@ -605,6 +610,10 @@ def main():
             plot_tree(G, traj, bbox, with_labels=False,
                       node_size=5000, threshold=args.straightness_threshold,
                       savefig=args.save_fig, ext=ext)
+
+    ttl_time = time.time() - start_time
+    print(
+        f'Took {ttl_time} seconds to process {processed_count} trajectories.')
     output_category_hash_dict(category_hashes_dict, outputDir,
                               write_hash_report)
     print(f'{processed_count} processed out of {row_count} flights.')
