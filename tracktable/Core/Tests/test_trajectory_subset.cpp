@@ -28,7 +28,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 
 #include <iostream>
@@ -457,7 +459,7 @@ int run_test()
 
 // ----------------------------------------------------------------------
 
-int main(int /*argc*/, char */*argv*/[])
+int main(int, char *)
 {
   return run_test();
 }

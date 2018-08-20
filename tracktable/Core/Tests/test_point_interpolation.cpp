@@ -29,7 +29,9 @@
  */
 
 // This tells Windows that we want all the #defines from cmath
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 
 #include <iostream>
@@ -572,7 +574,7 @@ int run_test()
   return error_count;
 }
 
-int main(int /*argc*/, char */*argv*/[])
+int main(int, char *)
 {
   return run_test();
 }

@@ -42,7 +42,18 @@
 #include <boost/python/class.hpp>
 #include <boost/python/module.hpp>
 #include <boost/python/def.hpp>
+
+//Suppress conversion warning in boost header. Only in VS for now
+#if defined(_MSC_VER)
+#pragma warning( disable : 4267 )
+#endif
+
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+
+#if defined(_MSC_VER)
+#pragma warning( pop )
+#endif
+
 #include <boost/python/return_internal_reference.hpp>
 #include <Python.h>
 

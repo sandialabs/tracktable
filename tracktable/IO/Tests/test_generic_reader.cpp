@@ -81,9 +81,9 @@ public:
 
   static PointWithId* generate_new_point()
     {
-      int new_id = ::PointWithIdSerialNumber++;
+      std::size_t new_id = ::PointWithIdSerialNumber++;
       std::cout << "generate_new_point: Creating point with ID " << new_id << "\n";
-      return new PointWithId(new_id);
+      return new PointWithId(static_cast<int>(new_id));
     }
 
   int get_id() const { return this->id; }

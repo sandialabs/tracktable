@@ -89,7 +89,7 @@ struct write_property_map_values
   static inline void apply(point_or_trajectory_t const& /*thing*/,
                            PropertyConverter& /*formatter*/,
                            out_iter_t /*where_to_write*/,
-                           int /*num_properties_expected*/)
+                           std::size_t /*num_properties_expected*/)
     {
       // This is the default version - there are no properties to
       // write
@@ -104,7 +104,7 @@ struct write_property_map_values<true>
   static inline void apply(point_or_trajectory_t const& thing,
 			   PropertyConverter& formatter,
 			   out_iter_t where_to_write,
-                           int num_properties_expected)
+               std::size_t num_properties_expected)
     {
       for (PropertyMap::const_iterator property_iter = thing.__properties().begin();
            property_iter != thing.__properties().end();
@@ -113,7 +113,7 @@ struct write_property_map_values<true>
 	  (*where_to_write++) = formatter.property_to_string((*property_iter).second);
         }
       for (std::size_t i = thing.__properties().size();
-           i < static_cast<std::size_t>(num_properties_expected);
+           i < num_properties_expected;
            ++i)
         {
         (*where_to_write++) = string_type("");

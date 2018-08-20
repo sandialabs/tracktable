@@ -150,8 +150,8 @@ generate_trajectory(int trajectory_index,
     tracktable::ostringstream_type id_buf, timestamp_buf;
     trajectory_point_type next_point;
     id_buf << "TestObject";
-    int hour = i / 60;
-    int minute = i % 60;
+    std::size_t hour = i / 60;
+    std::size_t minute = i % 60;
     timestamp_buf << "2000-12-24 "
                   << std::setw(2) << std::setfill('0')
                   << hour

@@ -106,6 +106,7 @@ string_type PropertyConverter::property_to_string(PropertyValueT const& prop)
       std::cout << "ERROR: PropertyConverter::property_to_string: Don't know what to make of property " << prop << "\n";
       return this->NullValue;
     }
+  return this->NullValue;
 }
 
   PropertyValueT PropertyConverter::property_from_string(string_type const& prop_value,
