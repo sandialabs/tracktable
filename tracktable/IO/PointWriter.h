@@ -97,7 +97,7 @@ void do_write_timestamp(point_t const& point, TimestampConverter *formatter, out
 }
 
 template<typename point_t, typename out_iter_t>
-void do_write_properties(point_t const& point, PropertyConverter& formatter, out_iter_t destination, int expected_num_properties)
+void do_write_properties(point_t const& point, PropertyConverter& formatter, out_iter_t destination, std::size_t expected_num_properties)
 {
   write_property_map_values<
     traits::has_properties<point_t>::value
@@ -322,7 +322,7 @@ public:
       while (point_begin != point_end)
         {
         tokens.clear();
-        int num_properties_expected = io::detail::count_properties<
+        std::size_t num_properties_expected = io::detail::count_properties<
           traits::has_properties<point_type>::value
           >::apply(*point_begin);
         this->write_point_tokens(*point_begin, std::back_inserter(tokens),
@@ -428,7 +428,7 @@ private:
 	  this->write_point_header_tokens(*point_begin, output);
         }
 
-      int num_properties_expected = io::detail::count_properties<
+      std::size_t num_properties_expected = io::detail::count_properties<
         traits::has_properties<typename point_iter_type::value_type>::value
         >::apply(*point_begin);
       int num_points_written = 0;
@@ -447,7 +447,7 @@ private:
   template<typename point_type, typename out_iter_type>
   void write_point_tokens(point_type const& point,
                           out_iter_type output,
-                          int num_properties_expected)
+                          std::size_t num_properties_expected)
     {
       io::detail::do_write_object_id(point, output);
       io::detail::do_write_timestamp(point, this->PropertyWriter.timestamp_converter(), output);

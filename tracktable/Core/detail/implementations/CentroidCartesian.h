@@ -31,7 +31,9 @@
 #ifndef __tracktable_cartesian_polygon_centroid_h
 #define __tracktable_cartesian_polygon_centroid_h
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 #include <vector>
 

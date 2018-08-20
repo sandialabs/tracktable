@@ -31,7 +31,9 @@
 #ifndef __tracktable_convex_hull_aspect_ratio_cartesian_h
 #define __tracktable_convex_hull_aspect_ratio_cartesian_h
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 #include <algorithm>
 

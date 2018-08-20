@@ -223,7 +223,7 @@ public:
         }
 
       // std::cout << "DBSCAN: Finished.\n";
-      return this->ClusterMembership.size();
+      return boost::numeric_cast<int>(this->ClusterMembership.size());
     }
 
   /** Return the point IDs belonging to each cluster.
@@ -275,7 +275,7 @@ public:
           {
           int_vector_type::value_type point_id =
             this->ClusterMembership[cluster_id][i];
-          out_labels[point_id] = cluster_id;
+          out_labels[point_id] = boost::numeric_cast<int>(cluster_id);
           }
         }
     }
@@ -598,7 +598,7 @@ protected:
   /// How many neighbors each core point has (performance statistic)
   int_vector_type core_point_avg_num_neighbors;
   int_vector_type total_num_neighbors;
-  int InputPointCount;
+  std::size_t InputPointCount;
 };
 
 } // close namespace tracktable

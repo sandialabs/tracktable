@@ -31,7 +31,9 @@
 #ifndef __tracktable_core_implementations_SphericalPolygons_h
 #define __tracktable_core_implementations_SphericalPolygons_h
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 #include <tracktable/Core/PointCartesian.h>
 #include <tracktable/Core/PointArithmetic.h>

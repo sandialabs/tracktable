@@ -416,7 +416,7 @@ private:
       token_ranges.push_back(header_tokens);
 
       token_iter_type point_range_begin = header_end_token;
-      int num_tokens_in_point_record = header.Dimension
+      std::size_t num_tokens_in_point_record = header.Dimension
         + header.HasObjectId
         + header.HasTimestamp
         + header.PropertyNames.size();
