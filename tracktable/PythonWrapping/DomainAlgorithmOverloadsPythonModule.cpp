@@ -151,6 +151,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
   def("distance", &(tracktable::distance<TrajectoryTerrestrial>));
   def("simplify", &(tracktable::simplify<TrajectoryTerrestrial>));
   def("point_at_fraction", &(tracktable::point_at_fraction<TrajectoryTerrestrial>));
+  def("point_at_length_fraction", &(tracktable::point_at_length_fraction<TrajectoryTerrestrial>));
   def("point_at_time", &(tracktable::point_at_time<TrajectoryTerrestrial>));
   def("time_at_fraction", &(tracktable::time_at_fraction<TrajectoryTerrestrial>));
   def("subset_during_interval", &(tracktable::subset_during_interval<TrajectoryTerrestrial>));
@@ -209,6 +210,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
   def("distance", &(tracktable::distance<TrajectoryCartesian2D>));
   def("simplify", &(tracktable::simplify<TrajectoryCartesian2D>));
   def("point_at_fraction", &(tracktable::point_at_fraction<TrajectoryCartesian2D>));
+  def("point_at_length_fraction", &(tracktable::point_at_length_fraction<TrajectoryCartesian2D>));
   def("point_at_time", &(tracktable::point_at_time<TrajectoryCartesian2D>));
   def("time_at_fraction", &(tracktable::time_at_fraction<TrajectoryCartesian2D>));
   def("subset_during_interval", &(tracktable::subset_during_interval<TrajectoryCartesian2D>));
@@ -264,6 +266,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
   //def("distance", &(tracktable::distance<TrajectoryCartesian3D>));
   def("simplify", &(tracktable::simplify<TrajectoryCartesian3D>));
   def("point_at_fraction", &(tracktable::point_at_fraction<TrajectoryCartesian3D>));
+  def("point_at_length_fraction", &(tracktable::point_at_length_fraction<TrajectoryCartesian3D>));
   def("point_at_time", &(tracktable::point_at_time<TrajectoryCartesian3D>));
   def("time_at_fraction", &(tracktable::time_at_fraction<TrajectoryCartesian3D>));
   def("subset_during_interval", &(tracktable::subset_during_interval<TrajectoryCartesian3D>));
