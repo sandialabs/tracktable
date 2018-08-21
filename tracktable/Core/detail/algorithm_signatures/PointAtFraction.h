@@ -50,6 +50,16 @@ struct point_at_fraction
     );
 };
 
+template<typename T>
+struct point_at_length_fraction
+{
+    BOOST_MPL_ASSERT_MSG(
+        sizeof(T) == 0,
+        POINT_AT_LEN_FRACTION_NOT_IMPLEMENTED_FOR_THIS_TRAJECTORY_TYPE,
+        (types<T>)
+    );
+};
+
 } } // exit namespace tracktable::algorithms
 
 // Now we include the driver functions that let us use the
@@ -57,10 +67,18 @@ struct point_at_fraction
 
 namespace tracktable {
 
+// Fraction of time
 template<typename TrajectoryT>
 typename TrajectoryT::point_type point_at_fraction(TrajectoryT const& path, double fraction)
 {
   return algorithms::point_at_fraction<TrajectoryT>::apply(path, fraction);
+}
+
+//Fraction of length
+template<typename TrajectoryT>
+typename TrajectoryT::point_type point_at_length_fraction(TrajectoryT const& path, double fraction)
+{
+    return algorithms::point_at_length_fraction<TrajectoryT>::apply(path, fraction);
 }
 
 } // exit namespace tracktable
