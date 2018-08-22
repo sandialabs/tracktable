@@ -266,4 +266,11 @@ struct distance<tracktable::traits::domains::generic> : generic_distance<trackta
 // This will make a std::vector of points usable as a linestring all through Tracktable.
 BOOST_GEOMETRY_REGISTER_LINESTRING_TEMPLATED(std::vector)
 
+namespace tracktable { namespace traits {
+
+template<typename point_type>
+struct domain<std::vector<point_type> > : domain<point_type> {};
+
+} }
+
 #endif
