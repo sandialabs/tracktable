@@ -114,11 +114,11 @@ void LLPredict(Trajectories &trajectories, std::vector<my_data> &features,
 
     std::vector<w_pair>::iterator small = 
      std::min_element(weights.begin(),weights.end(),
-     boost::bind(std::less<double>(),
-     boost::bind(tracktable::algorithms::distance<point_ll>::apply,
-      dest,boost::bind(&w_pair::first,_1)),
-     boost::bind(tracktable::algorithms::distance<point_ll>::apply,
-      dest,boost::bind(&w_pair::first,_2))));
+                      boost::bind(std::less<double>(),
+                                  boost::bind(tracktable::distance<point_ll, point_ll>,
+                                              dest,boost::bind(&w_pair::first,_1)),
+                                  boost::bind(tracktable::distance<point_ll, point_ll>,
+                                              dest,boost::bind(&w_pair::first,_2))));
 
     point_ll guess = GetWeightedLatLonSlerp(weights);
 
