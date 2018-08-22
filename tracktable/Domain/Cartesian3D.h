@@ -405,10 +405,27 @@ struct length<TT_DOMAIN::trajectory_type>
 
 } } // exit namespace tracktable::algorithms
 
+
+
+namespace tracktable { namespace traits {
+
+    
+#define TT_DELEGATE_TRAJECTORY_POINT_TRAIT(TRAIT) \
+    TRACKTABLE_DELEGATE(                          \
+    TT_DOMAIN::CartesianTrajectoryPoint3D,        \
+    TrajectoryPoint<TT_DOMAIN::CartesianPoint3D>, \
+    TRAIT                                         \
+    )
+
+    TT_DELEGATE_TRAJECTORY_POINT_TRAIT(domain);
+
+  } } // exit namespace tracktable::traits
+
 #undef TT_DOMAIN
 #undef TT_DELEGATE_BASE_POINT_ALGORITHM
 #undef TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM
 #undef TT_DELEGATE_TRAJECTORY_ALGORITHM
+#undef TT_DELEGATE_TRAJECTORY_POINT_TRAIT
 
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
