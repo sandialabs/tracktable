@@ -33,21 +33,20 @@
 #define __tracktable_PointLonLat_h
 
 #include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/Core/PointBase.h>
 #include <tracktable/Core/TracktableCoreWindowsHeader.h>
 
+#include <tracktable/Core/PointBase.h>
 
-#include <tracktable/Core/detail/algorithm_signatures/Bearing.h>
 #include <tracktable/Core/detail/algorithm_signatures/Distance.h>
 #include <tracktable/Core/detail/algorithm_signatures/Interpolate.h>
+#include <tracktable/Core/detail/algorithm_signatures/Bearing.h>
 #include <tracktable/Core/detail/algorithm_signatures/Extrapolate.h>
 #include <tracktable/Core/detail/algorithm_signatures/SimplifyLinestring.h>
 #include <tracktable/Core/detail/algorithm_signatures/SphericalCoordinateAccess.h>
 #include <tracktable/Core/detail/algorithm_signatures/TurnAngle.h>
 
-#include <tracktable/Core/detail/trait_signatures/PointDomainName.h>
-#include <tracktable/Core/detail/trait_signatures/Tag.h>
 
+#include <tracktable/Core/detail/implementations/GenericDistance.h>
 #include <tracktable/Core/detail/implementations/TurnAngle.h>
 #include <tracktable/Core/detail/implementations/GreatCircleInterpolation.h>
 
@@ -179,6 +178,50 @@ BOOST_GEOMETRY_REGISTER_POINT_2D_GET_SET(
 )
 
 
+namespace tracktable { namespace traits {
+
+template<>
+struct tag<tracktable::PointLonLat>
+{
+  typedef base_point_tag type;
+};
+
+template<>
+struct dimension<PointLonLat> : dimension<PointLonLat::base_type> {};
+
+template<>
+struct point_domain_name<PointLonLat>
+{
+  static inline string_type apply()
+    {
+      return "generic_lonlat";
+    }
+};
+
+template<>
+struct undecorated_point<PointLonLat>
+{
+  typedef PointLonLat type;
+};
+
+template<>
+struct coordinate_system<PointLonLat>
+{
+  typedef boost::geometry::cs::spherical_equatorial<boost::geometry::degree> type;
+};
+
+template<>
+struct domain<PointLonLat>
+{
+  typedef domains::generic type;
+};
+
+
+
+} } // close namespace tracktable::traits
+
+
+
 // ----------------------------------------------------------------------
 //
 // ALGORITHMS
@@ -191,20 +234,9 @@ BOOST_GEOMETRY_REGISTER_POINT_2D_GET_SET(
 
 namespace tracktable { namespace algorithms {
 
-// Distance between two points delegates to boost::geometry and
-// returns its result in radians.
-
-template<>
-struct distance<PointLonLat>
-{
-  static inline double apply(
-    PointLonLat const& from, PointLonLat const& to
-    )
-    {
-      return boost::geometry::distance(from, to);
-    }
-};
-
+// Distance is not defined here because as a member of the generic
+// point domain we inherit the definition in PointBase.h.
+    
 // The signed turn angle is defined so that a right turn is positive.
 
 template<>
@@ -320,35 +352,6 @@ struct spherical_coordinate_access<PointLonLat>
 
 
 } } // exit namespace tracktable::algorithms
-
-namespace tracktable { namespace traits {
-
-template<>
-struct tag< tracktable::PointLonLat >
-{
-  typedef base_point_tag type;
-};
-
-template<>
-struct dimension< PointLonLat > : dimension< PointLonLat::base_type > {};
-
-template<>
-struct point_domain_name< PointLonLat >
-{
-  static inline string_type apply()
-    {
-      return "generic_lonlat";
-    }
-};
-
-template<>
-struct undecorated_point< PointLonLat >
-{
-  typedef PointLonLat type;
-};
-
-} } // close namespace tracktable::traits
-
 
 
 #endif

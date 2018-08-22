@@ -32,15 +32,22 @@
 #define __tracktable_PointBase_h
 
 #include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/Core/detail/algorithm_signatures/Intersects.h>
 #include <tracktable/Core/detail/points/AssignCoordinates.h>
 #include <tracktable/Core/detail/points/CheckCoordinateEquality.h>
+
+#include <tracktable/Core/detail/trait_signatures/CoordinateSystem.h>
 #include <tracktable/Core/detail/trait_signatures/Dimension.h>
-#include <tracktable/Core/detail/trait_signatures/Tag.h>
+#include <tracktable/Core/detail/trait_signatures/Domain.h>
 #include <tracktable/Core/detail/trait_signatures/HasObjectId.h>
 #include <tracktable/Core/detail/trait_signatures/HasProperties.h>
 #include <tracktable/Core/detail/trait_signatures/HasTimestamp.h>
+#include <tracktable/Core/detail/trait_signatures/Tag.h>
 #include <tracktable/Core/detail/trait_signatures/UndecoratedPoint.h>
+#include <tracktable/Core/detail/trait_signatures/PointDomainName.h>
+
+#include <tracktable/Core/detail/algorithm_signatures/Intersects.h>
+#include <tracktable/Core/detail/algorithm_signatures/Distance.h>
+#include <tracktable/Core/detail/implementations/GenericDistance.h>
 
 #include <cstddef>
 #include <cassert>
@@ -229,7 +236,32 @@ struct undecorated_point< PointBase<Dimension> >
   typedef PointBase<Dimension> type;
 };
 
-} }
+template<std::size_t Dimension>
+struct domain<PointBase<Dimension> >
+{
+  typedef domains::generic type;
+};
+
+  } } // exit tracktable::traits
+
+namespace tracktable { namespace algorithms {
+
+// This should cover anything in the generic domain anywhere since
+// this file is so high up in the hierarchy.
+template<>
+struct distance<tracktable::traits::domains::generic> : generic_distance<tracktable::traits::domains::generic> {};
+
+#if 0
+{
+  template<typename Geom1, typename Geom2>
+  static double apply(Geom1 const& from, Geom2 const& to)
+  {
+    return boost::geometry::distance(from, to);
+  }
+};
+#endif
+
+  } } // exit tracktable::algorithms
 
 // This will make a std::vector of points usable as a linestring all through Tracktable.
 BOOST_GEOMETRY_REGISTER_LINESTRING_TEMPLATED(std::vector)
