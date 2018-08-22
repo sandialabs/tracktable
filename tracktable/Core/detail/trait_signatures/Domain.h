@@ -29,58 +29,30 @@
  */
 
 /*
- * BasePointDefaults - Top-level trait structs for things that can be
- * computed for any point type.
+ * Geometric domain -- generic, cartesian2, cartesian3, terrestrial...
  */
 
-#ifndef __tracktable_core_algorithms_detail_DistanceSignature_h
-#define __tracktable_core_algorithms_detail_DistanceSignature_h
-
-#include <tracktable/Core/detail/trait_signatures/Domain.h>
+#ifndef __tracktable_core_detail_traits_domain_h
+#define __tracktable_core_detail_traits_domain_h
 
 #include <boost/mpl/assert.hpp>
-#include <boost/type_traits/is_same.hpp>
-#include <cmath>
 
-//#include <tracktable/Core/detail/trait_signatures/CoordinateSystem.h>
+namespace tracktable { namespace traits {
 
-namespace tracktable { namespace algorithms {
+    namespace domains {
+      struct generic { };
+    } // exit domains
 
-template<typename DomainType>
-struct distance
-{
-  BOOST_MPL_ASSERT_MSG(
-    (sizeof(DomainType) == 0)
-    , TRACKTABLE_DISTANCE_NOT_DEFINED_FOR_DOMAIN
-    , (types<DomainType>)
-  );
-};
+    template<typename T>
+      struct domain
+      {
+        BOOST_MPL_ASSERT_MSG(
+          sizeof(T)==0,
+          TRACKTABLE_DOMAIN_NOT_DEFINED_FOR_THIS_TYPE,
+          (types<T>)
+        );
+      };
 
-    
-} } // namespace tracktable::algorithms
-
-/*
- * Now we have functions that wrap the algorithms structs so that we can
- * call them easily instead of worrying about instantiation.
- */
-
-namespace tracktable {
-
-  template<class Geometry1, class Geometry2>
-  double distance(Geometry1 const& from, Geometry2 const& to)
-  {
-    typedef typename tracktable::traits::domain<Geometry1>::type domain1;
-    typedef typename tracktable::traits::domain<Geometry2>::type domain2;
-
-    BOOST_MPL_ASSERT_MSG(
-      (boost::is_same<domain1, domain2>::value),
-      TRACKTABLE_DISTANCE_CANNOT_BE_COMPUTED_ACROSS_DIFFERENT_DOMAINS,
-      (types<domain1,domain2>)
-    );
-    
-    return algorithms::distance<domain1>::apply(from, to);
-  }
-
-} // namespace tracktable
+} } // exit namespace tracktable::traits
 
 #endif

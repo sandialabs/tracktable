@@ -267,6 +267,16 @@ TRACKTABLE_DOMAIN_EXPORT std::ostream& operator<<(std::ostream& out, trajectory_
 
 namespace tracktable { namespace traits {
 
+namespace domains {
+  struct cartesian2d { };
+}
+    
+template<>
+struct domain<tracktable::domain::cartesian2d::CartesianPoint2D>
+{
+  typedef domains::cartesian2d type;
+};
+
 template<>
 struct point_domain_name<tracktable::domain::cartesian2d::CartesianPoint2D>
 {
@@ -323,7 +333,17 @@ TRACKTABLE_DELEGATE_TRAJECTORY_POINT_TRAITS(tracktable::domain::cartesian2d::Car
 
 namespace tracktable { namespace algorithms {
 
+template<>
+struct distance<traits::domains::cartesian2d>
+{
+  template<typename Geom1, typename Geom2>
+  static inline double apply(Geom1 const& from, Geom2 const& to)
+  {
+    return boost::geometry::distance(from, to);
+  }
+};
 
+    
 template<>
 struct bearing<domain::cartesian2d::base_point_type>
 {
@@ -405,14 +425,14 @@ struct unsigned_turn_angle<TT_DOMAIN::base_point_type>
 
 TT_DELEGATE_BASE_POINT_ALGORITHM(interpolate)
 TT_DELEGATE_BASE_POINT_ALGORITHM(extrapolate)
-TT_DELEGATE_BASE_POINT_ALGORITHM(distance)
+// TT_DELEGATE_BASE_POINT_ALGORITHM(distance)
 
 // spherical coordinate access is not appropriate for this point type
 
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(interpolate)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(extrapolate)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(bearing)
-TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(distance)
+// TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(distance)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(signed_turn_angle)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(speed_between)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(unsigned_turn_angle)
