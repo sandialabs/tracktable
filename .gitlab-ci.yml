@@ -4,18 +4,22 @@ stages:
 
 compile-win:
   stage: build
+  tags: 
+    - windows
   script: 
     - '%comspec% /k "C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\Tools\VsDevCmd.bat"'
     - cd C:\TrackTable
     - msbuild ALL_BUILD.vcxproj /t:Rebuild /p:Configuration=Release /m:8
-  tags: 
-    - windows
+  only:
+    - tags
 
 # run tests using the binary built before
 test-win:
   stage: test
+  tags: 
+    - windows
   script:
     - cd C:\TrackTable
     - msbuild RUN_TESTS.vcxproj
-  tags: 
-    - windows
+  only:
+    -tags
