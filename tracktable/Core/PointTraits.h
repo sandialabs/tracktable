@@ -34,6 +34,7 @@
 #define __tracktable_point_traits_h
 
 #include <tracktable/Core/detail/trait_signatures/Dimension.h>
+#include <tracktable/Core/detail/trait_signatures/Domain.h>
 #include <tracktable/Core/detail/trait_signatures/HasObjectId.h>
 #include <tracktable/Core/detail/trait_signatures/HasProperties.h>
 #include <tracktable/Core/detail/trait_signatures/HasTimestamp.h>
