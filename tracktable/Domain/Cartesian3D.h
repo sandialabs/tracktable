@@ -267,14 +267,6 @@ namespace domains {
   struct cartesian3d { };
 }
     
-      
-template<>
-struct domain<tracktable::domain::cartesian3d::CartesianPoint3D>
-{
-  typedef domains::cartesian3d type;
-};
-
-    
 template<>
 struct point_domain_name<tracktable::domain::cartesian3d::CartesianPoint3D>
 {
@@ -294,6 +286,9 @@ TRACKTABLE_DELEGATE_BASE_POINT_TRAITS(tracktable::domain::cartesian3d::Cartesian
 
 TRACKTABLE_DELEGATE_TRAJECTORY_POINT_TRAITS(tracktable::domain::cartesian3d::CartesianTrajectoryPoint3D,
                                             tracktable::TrajectoryPoint< tracktable::domain::cartesian3d::CartesianPoint3D >)
+
+TRACKTABLE_DELEGATE_DOMAIN_TRAIT(tracktable::domain::cartesian3d,
+                                 tracktable::traits::domains::cartesian3d)
 
 // ----------------------------------------------------------------------
 //
@@ -386,11 +381,9 @@ struct unsigned_turn_angle<domain::cartesian3d::base_point_type>
 
 TT_DELEGATE_BASE_POINT_ALGORITHM(interpolate)
 TT_DELEGATE_BASE_POINT_ALGORITHM(extrapolate)
-// TT_DELEGATE_BASE_POINT_ALGORITHM(distance)
 
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(interpolate)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(extrapolate)
-// TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(distance)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(speed_between)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(unsigned_turn_angle)
 
@@ -404,22 +397,6 @@ struct length<TT_DOMAIN::trajectory_type>
 };
 
 } } // exit namespace tracktable::algorithms
-
-
-
-namespace tracktable { namespace traits {
-
-    
-#define TT_DELEGATE_TRAJECTORY_POINT_TRAIT(TRAIT) \
-    TRACKTABLE_DELEGATE(                          \
-    TT_DOMAIN::CartesianTrajectoryPoint3D,        \
-    TrajectoryPoint<TT_DOMAIN::CartesianPoint3D>, \
-    TRAIT                                         \
-    )
-
-    TT_DELEGATE_TRAJECTORY_POINT_TRAIT(domain);
-
-  } } // exit namespace tracktable::traits
 
 #undef TT_DOMAIN
 #undef TT_DELEGATE_BASE_POINT_ALGORITHM

@@ -270,12 +270,6 @@ namespace tracktable { namespace traits {
 namespace domains {
   struct cartesian2d { };
 }
-    
-template<>
-struct domain<tracktable::domain::cartesian2d::CartesianPoint2D>
-{
-  typedef domains::cartesian2d type;
-};
 
 template<>
 struct point_domain_name<tracktable::domain::cartesian2d::CartesianPoint2D>
@@ -284,6 +278,9 @@ struct point_domain_name<tracktable::domain::cartesian2d::CartesianPoint2D>
 };
 
 } }
+
+TRACKTABLE_DELEGATE_DOMAIN_TRAIT(tracktable::domain::cartesian2d,
+                                 tracktable::traits::domains::cartesian2d)
 
 TRACKTABLE_DELEGATE_BOOST_POINT_TRAITS(tracktable::domain::cartesian2d::CartesianPoint2D,
                                        tracktable::PointCartesian<2>)
@@ -451,20 +448,6 @@ struct length<TT_DOMAIN::trajectory_type>
 
 } } // exit namespace tracktable::algorithms
 
-
-namespace tracktable { namespace traits {
-
-    
-#define TT_DELEGATE_TRAJECTORY_POINT_TRAIT(TRAIT) \
-    TRACKTABLE_DELEGATE(                          \
-    TT_DOMAIN::CartesianTrajectoryPoint2D,        \
-    TrajectoryPoint<TT_DOMAIN::CartesianPoint2D>, \
-    TRAIT                                         \
-    )
-
-    TT_DELEGATE_TRAJECTORY_POINT_TRAIT(domain);
-
-  } } // exit namespace tracktable::traits
 
 #undef TT_DOMAIN
 #undef TT_DELEGATE_BASE_POINT_ALGORITHM
