@@ -66,15 +66,20 @@ namespace tracktable { namespace algorithms {
       
       static inline double apply(TrajectoryT const& path)
       {
+        // Sanity check: if a trajectory has fewer than 3 points its
+        // radius of gyration is by definition zero
+        if (path.size() < 2) return 0;
+        
         point_type centroid = tracktable::convex_hull_centroid(path);
         
         double sum = 0.0;
         double size = 0.0;
-        for (typename TrajectoryT::const_iterator itr = path.begin(); itr != path.end(); itr++) {
-        double dist = tracktable::distance(*itr, centroid);
-        sum += (dist * dist);
-        size += 1.0;
-        }
+        for (typename TrajectoryT::const_iterator itr = path.begin(); itr != path.end(); itr++)
+          {
+          double dist = tracktable::distance(*itr, centroid);
+          sum += (dist * dist);
+          size += 1.0;
+          }
         if (size < 1) return 0;
         return sqrt(sum / size);
       }
