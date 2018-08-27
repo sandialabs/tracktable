@@ -37,6 +37,7 @@
 #ifndef __tracktable_DomainMacros_h
 #define __tracktable_DomainMacros_h
 
+#include <tracktable/Core/PointTraits.h>
 
 #define TRACKTABLE_DELEGATE( NEW_CLASS, DELEGATE_CLASS, TRAIT ) \
   template<>                                                    \
@@ -97,6 +98,14 @@ struct access< NEW_POINT, dim > : access< DELEGATE_POINT, dim > { };
   TRACKTABLE_DELEGATE( NEW_POINT, DELEGATE_POINT, undecorated_point )   \
   } }
 
+#define TRACKTABLE_DELEGATE_DOMAIN_TRAIT(DOMAIN_NS, DOMAIN_TAG)        \
+  namespace tracktable { namespace traits {                             \
+      template<> struct domain<DOMAIN_NS::base_point_type>  { typedef DOMAIN_TAG type; }; \
+      template<> struct domain<DOMAIN_NS::trajectory_point_type> : domain<DOMAIN_NS::base_point_type> {}; \
+      template<> struct domain<DOMAIN_NS::trajectory_type> : domain<DOMAIN_NS::trajectory_point_type> {}; \
+      template<> struct domain<DOMAIN_NS::linestring_type> : domain<DOMAIN_NS::base_point_type> {}; \
+  } }
 
+  
 
 #endif
