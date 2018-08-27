@@ -9,8 +9,6 @@ compile-win:
   script: 
     - cd C:\TrackTable
     - C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe ALL_BUILD.vcxproj /t:Rebuild /p:Configuration=Release /m:8
-  only:
-    - tags
 
 test-win:
   stage: test
@@ -19,5 +17,3 @@ test-win:
   script:
     - cd C:\TrackTable
     - msbuild RUN_TESTS.vcxproj
-  only:
-    - tags
