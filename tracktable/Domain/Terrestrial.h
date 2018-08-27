@@ -288,12 +288,6 @@ struct point_domain_name<tracktable::domain::terrestrial::TerrestrialPoint>
 {
   static inline string_type apply() { return "terrestrial"; }
 };
-
-template<>
-struct domain<tracktable::domain::terrestrial::TerrestrialPoint>
-{
-  typedef domains::terrestrial type;
-};
     
 } }
 
@@ -397,19 +391,7 @@ struct length<tracktable::domain::terrestrial::trajectory_type>
 
 } } // exit namespace tracktable::algorithms
 
-namespace tracktable { namespace traits {
-
-    
-#define TT_DELEGATE_TRAJECTORY_POINT_TRAIT(TRAIT) \
-    TRACKTABLE_DELEGATE(                          \
-    TT_DOMAIN::TerrestrialTrajectoryPoint,        \
-    TrajectoryPoint<TT_DOMAIN::TerrestrialPoint>, \
-    TRAIT                                         \
-    )
-
-    TT_DELEGATE_TRAJECTORY_POINT_TRAIT(domain);
-
-  } } // exit namespace tracktable::traits
+TRACKTABLE_DELEGATE_DOMAIN_TRAIT(tracktable::domain::terrestrial, tracktable::traits::domains::terrestrial)
     
 #undef TT_DOMAIN
 #undef TT_DELEGATE_BASE_POINT_ALGORITHM
