@@ -113,6 +113,7 @@ set( Core_Detail_Implementations_HEADERS
   detail/implementations/ConvexHullCentroidTerrestrial.h
   detail/implementations/ConvexHullPerimeterCartesian.h
   detail/implementations/ConvexHullPerimeterTerrestrial.h
+  detail/implementations/GenericDistance.h
   detail/implementations/GreatCircleInterpolation.h
   detail/implementations/NorthPoleConvexHull.h
   detail/implementations/PointAtTime.h
@@ -129,6 +130,7 @@ set( Core_Detail_Implementations_HEADERS
 
 set( Core_Detail_TraitSignatures_HEADERS
   detail/trait_signatures/Dimension.h
+  detail/trait_signatures/Domain.h
   detail/trait_signatures/HasObjectId.h
   detail/trait_signatures/HasProperties.h
   detail/trait_signatures/HasTimestamp.h
@@ -136,6 +138,7 @@ set( Core_Detail_TraitSignatures_HEADERS
   detail/trait_signatures/PointDomainName.h
   detail/trait_signatures/Tag.h
   detail/trait_signatures/Timestamp.h
+  detail/trait_signatures/UndecoratedPoint.h
 )
 
 add_library( TracktableCore
