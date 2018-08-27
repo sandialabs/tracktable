@@ -22,4 +22,3 @@ test-win:
     - msbuild RUN_TESTS.vcxproj
   only:
     - tags
-
