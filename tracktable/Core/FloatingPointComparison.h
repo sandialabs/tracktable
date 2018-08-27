@@ -50,16 +50,6 @@ const double ZERO_ABSOLUTE_TOLERANCE=1e-5;
 
 }
 
-// ----------------------------------------------------------------------
-
-template<typename T>
-bool almost_zero(
-  T z,
-  T epsilon=settings::EQUALITY_RELATIVE_TOLERANCE
-  )
-{
-  return (std::abs(z) < epsilon);
-}
 
 // ----------------------------------------------------------------------
 
@@ -69,9 +59,9 @@ bool almost_equal(
   T tolerance=settings::EQUALITY_RELATIVE_TOLERANCE
   )
 {
-  T abs_a = std::abs(a);
-  T abs_b = std::abs(b);
-  T diff = std::abs(a-b);
+  T abs_a = std::fabs(a);
+  T abs_b = std::fabs(b);
+  T diff = std::fabs(a-b);
 
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wfloat-equal"
@@ -94,6 +84,17 @@ bool almost_equal(
 
 #pragma clang diagnostic pop
 
+}
+
+// ----------------------------------------------------------------------
+
+template<typename T>
+bool almost_zero(
+  T z,
+  T epsilon=settings::EQUALITY_RELATIVE_TOLERANCE
+  )
+{
+  return almost_equal<T>(z, static_cast<T>(0), epsilon);
 }
 
 } // close namespace tracktable
