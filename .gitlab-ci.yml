@@ -22,4 +22,4 @@ test-win:
     - cd C:\TrackTable
     - msbuild RUN_TESTS.vcxproj
   only:
-    -tags
+    - tags
