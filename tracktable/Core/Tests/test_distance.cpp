@@ -63,11 +63,11 @@ typedef tracktable::Trajectory<TerrestrialTrajectoryPoint> TerrestrialTrajectory
 
 //----------------------------------------------------
 
-int verify_result(double actual, double expected, const char* description)
+int verify_result(double actual, double expected, const char* description, double tolerance_fraction=1e-4)
 {
     std::ostringstream errbuf;
 
-    if (!tracktable::almost_zero(actual-expected))
+    if (!tracktable::almost_equal(actual, expected, tolerance_fraction))
     {
         std::cout << "ERROR: "
                   << description << " distance "
@@ -219,7 +219,7 @@ int run_test()
     actual = distance(sa_to_hou2, albuquerque2);
     error_count += verify_result(actual, expected, "TerrestrialTrajectory to TerrestrialTrajectoryPoint");
 
-    actual = conversions::radians_to_km(distance(albuquerque4, sa_to_hou2));
+    actual = distance(albuquerque4, sa_to_hou2);
     error_count += verify_result(actual, expected, "TerrestrialPoint to TerrestrialTrajectory");
 
     expected = 349.276;
