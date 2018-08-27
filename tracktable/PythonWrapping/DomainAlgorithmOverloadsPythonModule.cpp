@@ -82,34 +82,61 @@ point_type wrap_geometric_mean(point_type const& first_point, boost::python::obj
 
 template<
   typename base_point_type,
-  typename linestring_type,
-  typename trajectory_point_type,
-  typename trajectory_type
+  typename trajectory_point_type
   >
-void register_distance_functions()
+void register_point_point_distance_functions()
 {
   using boost::python::def;
   using tracktable::distance;
 
   def("distance", distance<base_point_type, base_point_type>);
-  def("distance", distance<base_point_type, linestring_type>);
   def("distance", distance<base_point_type, trajectory_point_type>);
-  def("distance", distance<base_point_type, trajectory_type>);
-
-  def("distance", distance<linestring_type, base_point_type>);
-  def("distance", distance<linestring_type, linestring_type>);
-  def("distance", distance<linestring_type, trajectory_point_type>);
-  def("distance", distance<linestring_type, trajectory_type>);
-
   def("distance", distance<trajectory_point_type, base_point_type>);
-  def("distance", distance<trajectory_point_type, linestring_type>);
   def("distance", distance<trajectory_point_type, trajectory_point_type>);
-  def("distance", distance<trajectory_point_type, trajectory_type>);
+}
 
-  def("distance", distance<trajectory_type, base_point_type>);
+template<
+  typename point_type,
+  typename polyline_type
+  >
+void register_point_polyline_distance_functions()
+{
+  using boost::python::def;
+  using tracktable::distance;
+
+  def("distance", distance<point_type, polyline_type>);
+  def("distance", distance<polyline_type, point_type>);
+}
+
+template<
+  typename linestring_type,
+  typename trajectory_type
+  >
+void register_polyline_polyline_distance_functions()
+{
+  using boost::python::def;
+  using tracktable::distance;
+
+  def("distance", distance<linestring_type, linestring_type>);
+  def("distance", distance<linestring_type, trajectory_type>);
   def("distance", distance<trajectory_type, linestring_type>);
-  def("distance", distance<trajectory_type, trajectory_point_type>);
   def("distance", distance<trajectory_type, trajectory_type>);
+}
+
+template<
+  typename base_point_type,
+  typename trajectory_point_type,
+  typename linestring_type,
+  typename trajectory_type
+  >
+void register_distance_functions()
+{
+  register_point_point_distance_functions<base_point_type,trajectory_point_type>();
+  register_point_polyline_distance_functions<base_point_type,linestring_type>();
+  register_point_polyline_distance_functions<base_point_type,trajectory_type>();
+  register_point_polyline_distance_functions<trajectory_point_type,linestring_type>();
+  register_point_polyline_distance_functions<trajectory_point_type,trajectory_type>();
+  register_polyline_polyline_distance_functions<linestring_type, trajectory_type>();
 }
 
 template<
@@ -329,11 +356,31 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
   def("intersects", &(intersects<BoxCartesian3D, TrajectoryCartesian3D>));
   def("intersects", &(intersects<TrajectoryCartesian3D, BoxCartesian3D>));
 
-  register_distance_functions<
-    BasePointCartesian2D,
-    LineStringCartesian2D,
-    TrajectoryPointCartesian2D,
-    TrajectoryCartesian2D
+  using tracktable::distance;
+
+  register_point_point_distance_functions<
+    BasePointCartesian3D,
+    TrajectoryPointCartesian3D
     >();
 
+  register_point_polyline_distance_functions<
+    BasePointCartesian3D,
+    LineStringCartesian3D
+    >();
+
+  register_point_polyline_distance_functions<
+    BasePointCartesian3D,
+    TrajectoryCartesian3D
+    >();
+
+  register_point_polyline_distance_functions<
+    TrajectoryPointCartesian3D,
+    LineStringCartesian3D
+    >();
+
+  register_point_polyline_distance_functions<
+    TrajectoryPointCartesian3D,
+    TrajectoryCartesian3D
+    >();
 }
+
