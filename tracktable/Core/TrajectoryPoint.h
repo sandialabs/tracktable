@@ -554,9 +554,6 @@ struct point_domain_name< TrajectoryPoint<BasePointT> > : point_domain_name<Base
 template<typename BasePointT>
 struct undecorated_point< TrajectoryPoint<BasePointT> > : undecorated_point<BasePointT> { };
 
-template<class BasePointT>
-struct coordinate_system< TrajectoryPoint<BasePointT> > : coordinate_system<BasePointT> { };
-    
 } }
 
 
@@ -578,7 +575,8 @@ template<class BasePointT>
 struct coordinate_type< tracktable::TrajectoryPoint<BasePointT> > : coordinate_type<BasePointT> {};
 
 template<class BasePointT>
-struct coordinate_system< tracktable::TrajectoryPoint<BasePointT> > : coordinate_system<BasePointT> {};
+struct coordinate_system< tracktable::TrajectoryPoint<BasePointT> > : coordinate_system<BasePointT> { };
+    
 
 template<class BasePointT>
 struct dimension< tracktable::TrajectoryPoint<BasePointT> > : dimension<BasePointT> {};

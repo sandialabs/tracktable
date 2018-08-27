@@ -35,7 +35,6 @@
 #include <tracktable/Core/detail/points/AssignCoordinates.h>
 #include <tracktable/Core/detail/points/CheckCoordinateEquality.h>
 
-#include <tracktable/Core/detail/trait_signatures/CoordinateSystem.h>
 #include <tracktable/Core/detail/trait_signatures/Dimension.h>
 #include <tracktable/Core/detail/trait_signatures/Domain.h>
 #include <tracktable/Core/detail/trait_signatures/HasObjectId.h>

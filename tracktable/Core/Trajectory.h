@@ -707,9 +707,6 @@ namespace tracktable { namespace traits {
 template<typename point_type>
 struct has_properties< Trajectory<point_type> > : boost::mpl::bool_<true> {};
 
-    template<typename point_type>
-    struct coordinate_system<Trajectory<point_type> > : coordinate_system<point_type> {};
-
 template<typename point_type>
 struct domain<Trajectory<point_type> > : domain<point_type> {};
     
