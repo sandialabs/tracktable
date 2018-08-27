@@ -200,9 +200,6 @@ struct undecorated_point< PointCartesian<Dimension> >
 };
 
 template<std::size_t Dimension>
-struct coordinate_system<PointCartesian<Dimension> > : boost::geometry::traits::coordinate_system<PointCartesian<Dimension> > {};
-
-template<std::size_t Dimension>
 struct domain<PointCartesian<Dimension> >
 {
   typedef domains::generic type;

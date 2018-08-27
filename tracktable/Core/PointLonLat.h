@@ -205,12 +205,6 @@ struct undecorated_point<PointLonLat>
 };
 
 template<>
-struct coordinate_system<PointLonLat>
-{
-  typedef boost::geometry::cs::spherical_equatorial<boost::geometry::degree> type;
-};
-
-template<>
 struct domain<PointLonLat>
 {
   typedef domains::generic type;
