@@ -269,7 +269,6 @@ class to_string_methods : public boost::python::def_visitor<to_string_methods>
   template<class ClassT>
   void visit(ClassT& c) const
     {
-      typedef typename ClassT::wrapped_type wrapped_type;
       using namespace boost::python;
 
       typed_object_to_string<ClassT>::save_name_for_later(c);
@@ -291,7 +290,6 @@ class point_to_string_methods : public boost::python::def_visitor<point_to_strin
   template<class ClassT>
   void visit(ClassT& c) const
     {
-      typedef typename ClassT::wrapped_type wrapped_type;
       using namespace boost::python;
 
       point_to_string<ClassT>::save_name_for_later(c);
