@@ -43,6 +43,8 @@ inline bool almost_equal(number_type const& a,
                          number_type const& b,
                          number_type const& epsilon)
 {
+  if (a == 0 && b == 0) return true;
+
   number_type delta = fabs(a - b);
   number_type max_abs = std::max(fabs(a), fabs(b));
 
@@ -65,6 +67,6 @@ inline bool almost_equal(number_type const& a,
     }
 }
 
-} } 
+} }
 
 #endif
