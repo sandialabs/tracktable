@@ -70,8 +70,8 @@ struct generic_point_at_time
     )
     {
       typedef typename TrajectoryType::point_type point_type;
-      typedef compare_point_timestamps<point_type> compare_point_type;
       typedef typename TrajectoryType::const_iterator const_iterator;
+      typedef compare_point_timestamps<point_type> compare_point_type;
 
       if (path.empty()) return tracktable::arithmetic::zero<point_type>();
 

@@ -58,7 +58,7 @@ struct compute_convex_hull_perimeter<
       typedef typename iterator::value_type point_type;
       typedef bg::model::polygon<point_type> polygon_type;
 
-      boost::geometry::model::polygon<point_type> hull;
+      polygon_type hull;
       implementations::compute_convex_hull_terrestrial(point_begin, point_end, hull);
 
       return tracktable::conversions::radians_to_km(
