@@ -90,7 +90,7 @@ int test_point_at_fraction()
   return error_count;
 }
 
-int main(int, char *)
+int main(int, char *argv[])
 {
   return test_point_at_fraction();
 }
