@@ -50,7 +50,7 @@
 
 #include <tracktable/Core/detail/trait_signatures/HasProperties.h>
 
-#include <boost/geometry/algorithms/distance.hpp>
+#include <tracktable/Core/GuardedBoostGeometryHeaders.h>
 #include <boost/geometry/geometries/register/linestring.hpp>
 
 #include <cassert>
