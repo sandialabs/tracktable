@@ -59,7 +59,8 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/adapted/boost_tuple.hpp>
-#include <boost/geometry/index/rtree.hpp>
+
+#include <tracktable/Analysis/GuardedBoostGeometryRTreeHeader.h>
 
 #if defined(TIME_CLUSTERING_STEPS)
 # include <boost/timer/timer.hpp>
