@@ -31,7 +31,7 @@
 #include <tracktable/Core/TracktableCommon.h>
 
 #include <tracktable/PythonWrapping/ExplicitInstantiation/RTree_Common.h>
-#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
 BOOST_PYTHON_MODULE(_rtree) {
   install_rtree_wrappers_1_3();

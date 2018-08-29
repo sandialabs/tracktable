@@ -46,7 +46,7 @@
 #include <typeinfo>
 
 #include <tracktable/Core/PropertyMap.h>
-#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 #include <tracktable/PythonWrapping/PropertyMapWrapper.h>
 #include <tracktable/PythonWrapping/PicklePropertyMap.h>
 

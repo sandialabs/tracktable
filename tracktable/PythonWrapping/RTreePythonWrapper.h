@@ -31,7 +31,7 @@
 #ifndef __tracktable_python_rtree_wrapper_h
 #define __tracktable_python_rtree_wrapper_h
 
-#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
 // possible hotfix for compile errors in 1.65.0 and 1.65.1
 #include <boost/geometry/strategies/strategies.hpp>

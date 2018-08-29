@@ -39,7 +39,7 @@
 #define __tracktable_PickleSuites_h
 
 #include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
 #include <boost/python/implicit.hpp>
 #include <boost/mpl/assert.hpp>

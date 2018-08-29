@@ -34,7 +34,7 @@
 
 #include <tracktable/Domain/FeatureVectors.h>
 
-#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 #include <tracktable/PythonWrapping/DomainWrapperTemplates.h>
 #include <tracktable/PythonWrapping/PythonAwarePointReader.h>
 
