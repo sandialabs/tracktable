@@ -17,11 +17,15 @@
 #define __rtree
 #include "Common.h"
 #include <utility>
-#include <boost/geometry.hpp>
+
+// #include <boost/geometry.hpp>
 #include <boost/array.hpp>
 #include <boost/geometry/geometries/point.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/adapted/boost_array.hpp>
+
+#include <tracktable/Analysis/GuardedBoostGeometryRTreeHeader.h>
+
 #include <boost/geometry/index/rtree.hpp>
 
 // Here is the "by hand" thing that needs to be set for each run
