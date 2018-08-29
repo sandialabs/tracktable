@@ -28,6 +28,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma clang diagnostic ignored "-Wshadow"
-#pragma GCC diagnostic ignored "-Wshadow"
+#if defined(__clang__)
+# pragma clang diagnostic ignored "-Wshadow"
+#elif defined(__GNUC__)
+# pragma GCC diagnostic ignored "-Wshadow"
+#endif
 
