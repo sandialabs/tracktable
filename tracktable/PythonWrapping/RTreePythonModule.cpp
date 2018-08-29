@@ -29,12 +29,9 @@
  */
 
 #include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/PythonWrapping/ExplicitInstantiation/RTree_Common.h>
 
-#include <boost/python.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/module.hpp>
-#include <Python.h>
+#include <tracktable/PythonWrapping/ExplicitInstantiation/RTree_Common.h>
+#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
 
 BOOST_PYTHON_MODULE(_rtree) {
   install_rtree_wrappers_1_3();

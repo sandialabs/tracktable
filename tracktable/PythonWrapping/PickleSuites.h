@@ -39,7 +39,9 @@
 #define __tracktable_PickleSuites_h
 
 #include <tracktable/Core/TracktableCommon.h>
-#include <boost/python.hpp>
+#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
+
+#include <boost/python/implicit.hpp>
 #include <boost/mpl/assert.hpp>
 
 namespace tracktable { namespace traits {

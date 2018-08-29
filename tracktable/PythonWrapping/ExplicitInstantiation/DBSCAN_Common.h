@@ -35,14 +35,7 @@
 #include <tracktable/Analysis/ComputeDBSCANClustering.h>
 #include <tracktable/Domain/FeatureVectors.h>
 
-#include <boost/python.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/def_visitor.hpp>
-#include <boost/python/list.hpp>
-#include <boost/python/stl_iterator.hpp>
-
-#include <Python.h>
+#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
 
 #define xstr(s) str(s)
 #define str(s) #s
