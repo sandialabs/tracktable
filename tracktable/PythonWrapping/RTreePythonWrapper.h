@@ -105,7 +105,7 @@ public:
       indexed_point_type query_point(query_location, -1);
       std::vector<indexed_point_type> neighbors;
 
-      this->Tree.find_nearest_neighbors(query_point, num_neighbors, std::back_inserter(neighbors));
+      this->Tree.find_nearest_neighbors(query_point, boost::numeric_cast<int>(num_neighbors), std::back_inserter(neighbors));
       boost::python::list result;
       for (typename std::vector<indexed_point_type>::const_iterator neighbor_iter = neighbors.begin();
            neighbor_iter != neighbors.end();
