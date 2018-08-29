@@ -46,9 +46,16 @@
 #include <algorithm> // std::copy
 #include <iosfwd> // std::streamsize
 #include <boost/iostreams/concepts.hpp>  // boost::iostreams::source
-#include <boost/iostreams/stream.hpp>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-W#pragma-messages"
+#pragma clang diagnostic ignored "-Wunused-local-typedef"
+
+#include <boost/iostreams/stream.hpp>
 #include <boost/python.hpp>
+
+#pragma clang diagnostic pop
+
 
 #include <string.h>
 #include <iostream>

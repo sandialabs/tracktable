@@ -28,11 +28,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <boost/python.hpp>
-#include <boost/python/module.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/stl_iterator.hpp>
-#include <Python.h>
+#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
 
 #include <tracktable/Core/Geometry.h>
 #include <tracktable/Core/GeometricMean.h>
