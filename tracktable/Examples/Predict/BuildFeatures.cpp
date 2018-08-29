@@ -11,6 +11,7 @@
 //  Created by Danny Rintoul
 //
 #include <boost/bind.hpp>
+#include <boost/random.hpp>
 #include <functional>
 #include "BuildFeatures.h"
 #include "Interpolate.h"
@@ -38,9 +39,9 @@ void BuildManyEvenFeatures(Trajectories &trajectories,
 void BuildManyRandomFeatures(Trajectories &trajectories, 
  std::vector<my_data> &features)
 {
-  srand48(time(0));  // use a different long int for other numbers;
+  boost::random::rand48 rand(time(0));  // use a different long int for other numbers;
   for (int i = 2; i <= 8; ++i) {
-    BuildFeatures(trajectories,features,0.2+drand48()*0.6);
+    BuildFeatures(trajectories,features,0.2+rand()*0.6);
   }
 
   return;
@@ -56,12 +57,12 @@ void BuildRandomFeatures(Trajectories &trajectories,
   // it's nicer to use existing routines.  One of many things that would 
   // be done differently in C++11 in many ways.
 
-  srand48(time(0));  // use a different long int for other numbers;
+  boost::random::rand48 rand(time(0));  // use a different long int for other numbers;
   double diff = upper - lower;
   std::transform(trajectories.begin(),trajectories.end(),
    std::back_inserter(features),
    boost::bind(BuildFeature,_1,boost::bind(std::plus<double>(),lower,
-    boost::bind(std::multiplies<double>(),diff,boost::bind(drand48)))));
+    boost::bind(std::multiplies<double>(),diff,boost::bind(rand)))));
 
   return;
 }

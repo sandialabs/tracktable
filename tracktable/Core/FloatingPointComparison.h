@@ -63,9 +63,10 @@ bool almost_equal(
   T abs_b = std::fabs(b);
   T diff = std::fabs(a-b);
 
+#if defined (__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wfloat-equal"
-
+#endif
   if (a == b) // shortcut, handles infinities
     {
     return true;
@@ -81,9 +82,9 @@ bool almost_equal(
     // use relative error
     return (diff / (abs_a + abs_b)) < tolerance;
     }
-
+#if defined (__clang__)
 #pragma clang diagnostic pop
-
+#endif
 }
 
 // ----------------------------------------------------------------------

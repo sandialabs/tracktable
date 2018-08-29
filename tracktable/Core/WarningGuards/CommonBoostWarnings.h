@@ -31,4 +31,4 @@
 #include <tracktable/Core/WarningGuards/UnusedTypedef.h>
 #include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
 #include <tracktable/Core/WarningGuards/PragmaMessages.h>
-
+#include <tracktable/Core/WarningGuards/SizeTConversion.h>

@@ -32,5 +32,7 @@
 # pragma clang diagnostic push
 #elif defined(__GNUC__)
 # pragma GCC diagnostic push
+#elif defined(_MSC_VER)
+# pragma warning( push )
 #endif
 
