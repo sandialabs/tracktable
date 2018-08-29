@@ -28,6 +28,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma clang diagnostic ignored "-W#pragma-messages"
-#pragma GCC diagnostic ignored "-W#pragma-messages"
+#if defined(__clang__)
+# pragma clang diagnostic ignored "-W#pragma-messages"
+#elif defined(__GNUC__)
+# pragma GCC diagnostic ignored "-W#pragma-messages"
+#endif
+
+
 

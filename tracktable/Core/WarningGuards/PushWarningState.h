@@ -28,6 +28,9 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma clang diagnostic push
-#pragma GCC diagnostic push
+#if defined(__clang__)
+# pragma clang diagnostic push
+#elif defined(__GNUC__)
+# pragma GCC diagnostic push
+#endif
 
