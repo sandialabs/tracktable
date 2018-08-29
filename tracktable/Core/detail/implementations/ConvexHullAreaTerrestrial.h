@@ -42,7 +42,6 @@
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 
-#include <boost/geometry.hpp>
 #include <iostream>
 
 namespace tracktable { namespace algorithms {
