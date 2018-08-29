@@ -34,6 +34,8 @@
 #include <boost/geometry/geometries/box.hpp>
 
 #include <tracktable/PythonWrapping/BoostPythonHeaders.h>
+
+#include <boost/python.hpp>
 #if 0
 #include <boost/python.hpp>
 #include <boost/python/class.hpp>

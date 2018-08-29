@@ -45,16 +45,16 @@
 
 #include <algorithm> // std::copy
 #include <iosfwd> // std::streamsize
+
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
+
 #include <boost/iostreams/concepts.hpp>  // boost::iostreams::source
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-W#pragma-messages"
-#pragma clang diagnostic ignored "-Wunused-local-typedef"
-
 #include <boost/iostreams/stream.hpp>
-#include <boost/python.hpp>
 
-#pragma clang diagnostic pop
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
+
+#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
 
 
 #include <string.h>
