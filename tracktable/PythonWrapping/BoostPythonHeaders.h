@@ -38,20 +38,27 @@
 #ifndef __tracktable_BoostPythonHeaders_h
 #define __tracktable_BoostPythonHeaders_h
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-local-typedef"
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
 
-//#include <boost/python.hpp>
+// Sigh.  I don't like including this wholesale.  I don't yet have a
+// good reference for where all the specific bits are.
+#include <boost/python.hpp>
+
 #include <boost/python/class.hpp>
 #include <boost/python/module.hpp>
 #include <boost/python/def.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <boost/python/return_internal_reference.hpp>
+#include <boost/python/def_visitor.hpp>
 
+#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+#include <boost/python/suite/indexing/map_indexing_suite.hpp>
+
+#include <boost/python/dict.hpp>
 #include <boost/python/list.hpp>
 #include <boost/python/str.hpp>
 
-#pragma clang diagnostic pop
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 #include <Python.h>
 
