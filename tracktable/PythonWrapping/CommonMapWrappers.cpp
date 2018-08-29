@@ -33,8 +33,7 @@
 //
 // Boost.Python code to wrap std::map<int, int> and <string, int>
 
-#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
-#include <boost/python/suite/indexing/map_indexing_suite.hpp>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
 #include <tracktable/Core/TracktableCommon.h>
 #include <iostream>

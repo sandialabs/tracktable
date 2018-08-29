@@ -36,7 +36,7 @@
 #include <tracktable/Domain/FeatureVectors.h>
 
 #include <tracktable/PythonWrapping/RTreePythonWrapper.h>
-#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 #include <sstream>
 
 #define WRAP_RTREE(dimension) wrap_rtree<dimension>()

@@ -46,15 +46,8 @@
 #include <algorithm> // std::copy
 #include <iosfwd> // std::streamsize
 
-#include <tracktable/Core/WarningGuards/PushWarningState.h>
-#include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
-
-#include <boost/iostreams/concepts.hpp>  // boost::iostreams::source
-#include <boost/iostreams/stream.hpp>
-
-#include <tracktable/Core/WarningGuards/PopWarningState.h>
-
-#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
+#include <tracktable/PythonWrapping/GuardedBoostStreamHeaders.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
 
 #include <string.h>

@@ -32,3 +32,12 @@
 #ifndef __tracktable_PythonWrapping_GuardedBoostStreamHeaders_h
 #define __tracktable_PythonWrapping_GuardedBoostStreamHeaders_h
 
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
+
+#include <boost/iostreams/concepts.hpp>
+#include <boost/iostreams/stream.hpp>
+
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
+
+#endif

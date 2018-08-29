@@ -33,19 +33,9 @@
 
 #include <boost/geometry/geometries/box.hpp>
 
-#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
-#include <boost/python.hpp>
-#if 0
-#include <boost/python.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/module.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/def_visitor.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <boost/python/return_internal_reference.hpp>
-#include <Python.h>
-#endif
+// #include <boost/python.hpp>
 
 #include <tracktable/Core/PointArithmetic.h>
 #include <tracktable/Core/PointTraits.h>

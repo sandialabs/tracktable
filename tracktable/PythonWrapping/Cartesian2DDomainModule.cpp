@@ -43,7 +43,7 @@
 #include <tracktable/IO/PointWriter.h>
 #include <tracktable/IO/TrajectoryWriter.h>
 
-#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 #include <tracktable/PythonWrapping/PythonFileLikeObjectStreams.h>
 #include <tracktable/PythonWrapping/DomainWrapperTemplates.h>
 #include <tracktable/PythonWrapping/PythonAwarePointReader.h>

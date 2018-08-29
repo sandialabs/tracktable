@@ -35,7 +35,7 @@
 //
 // Created by Danny Rintoul and Andy Wilson.
 
-#include <tracktable/PythonWrapping/BoostPythonHeaders.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
 char const* greet()
 {
