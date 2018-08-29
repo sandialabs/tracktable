@@ -39,8 +39,6 @@
 #include <tracktable/Core/detail/implementations/ConvexHullCentroidTerrestrial.h>
 #include <tracktable/Core/detail/implementations/SphericalPolygons.h>
 
-#include <boost/geometry.hpp>
-
 namespace tracktable { namespace algorithms {
 
 namespace bg = boost::geometry;

@@ -31,7 +31,8 @@
 #ifndef __tracktable_generic_distance_h
 #define __tracktable_generic_distance_h
 
-#include <boost/geometry/algorithms/distance.hpp>
+#include <tracktable/Core/GuardedBoostGeometryHeaders.h>
+
 
 namespace tracktable { namespace algorithms {
 
