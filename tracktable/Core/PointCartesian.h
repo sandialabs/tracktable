@@ -50,9 +50,10 @@
 
 #include <sstream> // for ostringstream in to_string
 
+
+#include <tracktable/Core/GuardedBoostGeometryHeaders.h>
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
-#include <boost/geometry/algorithms/distance.hpp>
 
 namespace tracktable {
 
