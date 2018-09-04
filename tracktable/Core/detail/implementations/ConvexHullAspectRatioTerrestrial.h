@@ -31,15 +31,15 @@
 #ifndef __tracktable_implementations_ConvexHullAspectRatio_terrestrial_h
 #define __tracktable_implementations_ConvexHullAspectRatio_terrestrial_h
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 #include <tracktable/Core/PointCartesian.h>
 #include <tracktable/Core/PointArithmetic.h>
 #include <tracktable/Core/detail/implementations/ConvexHullTerrestrial.h>
 #include <tracktable/Core/detail/implementations/ConvexHullCentroidTerrestrial.h>
 #include <tracktable/Core/detail/implementations/SphericalPolygons.h>
-
-#include <boost/geometry.hpp>
 
 namespace tracktable { namespace algorithms {
 
@@ -56,7 +56,7 @@ struct compute_convex_hull_aspect_ratio<
       typedef typename iterator::value_type point_type;
       typedef boost::geometry::model::polygon<point_type> polygon_type;
       polygon_type hull;
-
+      
       implementations::compute_convex_hull_terrestrial(point_begin, point_end, hull);
       point_type centroid(
         compute_convex_hull_centroid<

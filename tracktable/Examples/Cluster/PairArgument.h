@@ -86,21 +86,21 @@ public:
 
 private:
 
-  std::size_t MinTokenCount;
-  std::size_t MaxTokenCount;
+  unsigned int MinTokenCount;
+  unsigned int MaxTokenCount;
 };
 
 
 template< typename T >
 multiple_tokens_typed_value<T> *
-multiple_tokens_value(std::size_t low, std::size_t high)
+multiple_tokens_value(unsigned int low, unsigned int high)
 {
   return new multiple_tokens_typed_value<T>(0, low, high);
 }
 
 template< typename T >
 multiple_tokens_typed_value<T> *
-multiple_tokens_value(T* t, std::size_t low, std::size_t high)
+multiple_tokens_value(T* t, unsigned int low, unsigned int high)
 {
   return new multiple_tokens_typed_value<T>(t, low, high);
 }

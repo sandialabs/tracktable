@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
 //  LLPredict(trajectories,features,to_be_predicted,num_samples);
 
   // This routine does a prediction based on destination airport
-  Predict(trajectories,features,to_be_predicted,num_samples);
+  Predict(trajectories,features,to_be_predicted,boost::numeric_cast<int>(num_samples));
 
   return 0;
 }

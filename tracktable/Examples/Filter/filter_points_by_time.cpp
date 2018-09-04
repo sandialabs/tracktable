@@ -79,8 +79,6 @@ int main(int argc, char* argv[])
   point_reader_type point_reader;
   point_writer_type point_writer;
 
-  typedef boost::filter_iterator<date_between<point_type>, point_reader_iter> date_filter_iterator;
-
   std::ifstream infile;
   std::ofstream outfile;
 

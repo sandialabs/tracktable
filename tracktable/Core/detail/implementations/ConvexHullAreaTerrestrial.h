@@ -42,7 +42,6 @@
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/geometries/polygon.hpp>
 
-#include <boost/geometry.hpp>
 #include <iostream>
 
 namespace tracktable { namespace algorithms {
@@ -59,7 +58,8 @@ struct compute_convex_hull_area<
     {
       typedef typename iterator::value_type point_type;
       typedef bg::model::polygon<point_type> polygon_type;
-      boost::geometry::model::polygon<point_type> hull;
+
+      polygon_type hull;
 
       implementations::compute_convex_hull_terrestrial
         (point_begin, point_end, hull);
@@ -67,12 +67,7 @@ struct compute_convex_hull_area<
 //      std::cout << "Hull: " << bg::wkt(hull) << "\n";
 
       return tracktable::conversions::steradians_to_km2(
-#if 0
-        spherical_polygons::compute_polygon_area(hull.outer().begin(),
-                                                 hull.outer().end())
-#else
         boost::geometry::area(hull)
-#endif
         );
     }
 };

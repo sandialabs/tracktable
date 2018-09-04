@@ -36,6 +36,7 @@
 #include <tracktable/Core/PropertyMap.h>
 #include <tracktable/Core/Trajectory.h>
 
+#include <tracktable/Core/PointArithmetic.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtFraction.h>
 #include <tracktable/Core/detail/algorithm_signatures/TimeAtFraction.h>
 #include <tracktable/Core/detail/implementations/TimeAtFraction.h>
@@ -67,10 +68,8 @@ struct generic_point_at_fraction
     )
     {
       typedef typename TrajectoryType::point_type point_type;
-      typedef compare_point_distances<point_type> compare_point_type;
-      typedef typename TrajectoryType::const_iterator const_iterator;
 
-      if (path.empty()) return point_type();
+      if (path.empty()) return tracktable::arithmetic::zero<point_type>();
       if (path.size() == 1) return path.front();
 
       if (fraction <= 0)
