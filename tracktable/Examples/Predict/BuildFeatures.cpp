@@ -11,7 +11,12 @@
 //  Created by Danny Rintoul
 //
 #include <boost/bind.hpp>
+
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
 #include <boost/random.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
+
 #include <functional>
 #include "BuildFeatures.h"
 #include "Interpolate.h"
