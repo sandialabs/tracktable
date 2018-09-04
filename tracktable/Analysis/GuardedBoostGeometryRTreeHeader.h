@@ -36,11 +36,16 @@
 #ifndef __tracktable_GuardedBoostGeometryRTreeHeader_h
 #define __tracktable_GuardedBoostGeometryRTreeHeader_h
 
+
+#if defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wshadow"
+#endif
 
 #include <boost/geometry/index/rtree.hpp>
 
+#if defined(__clang__)
 #pragma clang diagnostic pop
+#endif
 
 #endif
