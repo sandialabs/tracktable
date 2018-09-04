@@ -394,6 +394,7 @@ protected:
 
 namespace tracktable { namespace algorithms {
 
+
 /** \brief Interpolate between two points.
  *
  * Interpolate between two different points in a trajectory.  At t <=
@@ -488,7 +489,7 @@ struct speed_between< TrajectoryPoint<BasePointT> >
   typedef TrajectoryPoint<BasePointT> point_type;
   static inline double apply(point_type const& start, point_type const& finish)
     {
-      double units_traveled = distance<point_type>::apply(start, finish);
+      double units_traveled = ::tracktable::distance(start, finish);
       double duration = (finish.timestamp() - start.timestamp()).total_seconds();
       if (std::abs(duration) < 0.001)
         {
@@ -503,8 +504,6 @@ struct speed_between< TrajectoryPoint<BasePointT> >
 
 // We can't blithely delegate these because they're not full
 // specializations.  Still, this gets the job done.
-template<class BasePointT>
-struct distance< TrajectoryPoint<BasePointT> > : distance<BasePointT> { };
 
 template<class BasePointT>
 struct bearing< TrajectoryPoint<BasePointT> > : bearing<BasePointT> { };
@@ -528,6 +527,9 @@ namespace tracktable { namespace traits {
 template<class BasePointT>
 struct dimension< tracktable::TrajectoryPoint<BasePointT> > : dimension< BasePointT > {};
 
+template<class BasePointT>
+struct domain< tracktable::TrajectoryPoint<BasePointT> > : domain<BasePointT> {};
+    
 template<class BasePointT>
 struct tag< TrajectoryPoint<BasePointT> > : tag<BasePointT> { };
 
@@ -573,7 +575,8 @@ template<class BasePointT>
 struct coordinate_type< tracktable::TrajectoryPoint<BasePointT> > : coordinate_type<BasePointT> {};
 
 template<class BasePointT>
-struct coordinate_system< tracktable::TrajectoryPoint<BasePointT> > : coordinate_system<BasePointT> {};
+struct coordinate_system< tracktable::TrajectoryPoint<BasePointT> > : coordinate_system<BasePointT> { };
+    
 
 template<class BasePointT>
 struct dimension< tracktable::TrajectoryPoint<BasePointT> > : dimension<BasePointT> {};

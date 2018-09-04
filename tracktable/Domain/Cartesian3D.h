@@ -263,6 +263,10 @@ TRACKTABLE_DOMAIN_EXPORT std::ostream& operator<<(std::ostream& out, trajectory_
 
 namespace tracktable { namespace traits {
 
+namespace domains {
+  struct cartesian3d { };
+}
+    
 template<>
 struct point_domain_name<tracktable::domain::cartesian3d::CartesianPoint3D>
 {
@@ -282,6 +286,9 @@ TRACKTABLE_DELEGATE_BASE_POINT_TRAITS(tracktable::domain::cartesian3d::Cartesian
 
 TRACKTABLE_DELEGATE_TRAJECTORY_POINT_TRAITS(tracktable::domain::cartesian3d::CartesianTrajectoryPoint3D,
                                             tracktable::TrajectoryPoint< tracktable::domain::cartesian3d::CartesianPoint3D >)
+
+TRACKTABLE_DELEGATE_DOMAIN_TRAIT(tracktable::domain::cartesian3d,
+                                 tracktable::traits::domains::cartesian3d)
 
 // ----------------------------------------------------------------------
 //
@@ -319,6 +326,17 @@ TRACKTABLE_DELEGATE_TRAJECTORY_POINT_TRAITS(tracktable::domain::cartesian3d::Car
 
 namespace tracktable { namespace algorithms {
 
+template<>
+struct distance<traits::domains::cartesian3d>
+{
+  template<typename Geom1, typename Geom2>
+  static inline double apply(Geom1 const& from, Geom2 const& to)
+  {
+    return boost::geometry::distance(from, to);
+  }
+};
+
+    
 template<>
 struct unsigned_turn_angle<domain::cartesian3d::base_point_type>
 {
@@ -363,11 +381,9 @@ struct unsigned_turn_angle<domain::cartesian3d::base_point_type>
 
 TT_DELEGATE_BASE_POINT_ALGORITHM(interpolate)
 TT_DELEGATE_BASE_POINT_ALGORITHM(extrapolate)
-TT_DELEGATE_BASE_POINT_ALGORITHM(distance)
 
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(interpolate)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(extrapolate)
-TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(distance)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(speed_between)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(unsigned_turn_angle)
 
@@ -386,6 +402,7 @@ struct length<TT_DOMAIN::trajectory_type>
 #undef TT_DELEGATE_BASE_POINT_ALGORITHM
 #undef TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM
 #undef TT_DELEGATE_TRAJECTORY_ALGORITHM
+#undef TT_DELEGATE_TRAJECTORY_POINT_TRAIT
 
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 

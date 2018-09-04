@@ -103,7 +103,7 @@ struct assign_coordinates_from_array<0>
 {
   /// Terminate the compile-time unrolling for assignment
   template<class dest_point_type, typename input_coordinate_type>
-  static inline void apply(dest_point_type const& /*dest*/, const input_coordinate_type */*source*/)
+  static inline void apply(dest_point_type const&, const input_coordinate_type *)
     {
       return;
     }

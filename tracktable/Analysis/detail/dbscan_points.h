@@ -33,7 +33,6 @@
 #ifndef __tracktable_dbscan_points_h
 #define __tracktable_dbscan_points_h
 
-#include <boost/geometry.hpp>
 #include <boost/tuple/tuple.hpp>
 
 namespace tracktable { namespace detail {

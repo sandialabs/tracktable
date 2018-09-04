@@ -38,19 +38,13 @@
 // overloads are exposed in AlgorithmOverloadsModule so that
 // Boost.Python can sort out the C++ overloading by itself.
 
-#include <boost/python.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/module.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <boost/python/return_internal_reference.hpp>
-#include <Python.h>
 
 #include <tracktable/Domain/Cartesian2D.h>
 #include <tracktable/Core/Timestamp.h>
 #include <tracktable/IO/PointWriter.h>
 #include <tracktable/IO/TrajectoryWriter.h>
 
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 #include <tracktable/PythonWrapping/PythonFileLikeObjectStreams.h>
 #include <tracktable/PythonWrapping/DomainWrapperTemplates.h>
 #include <tracktable/PythonWrapping/PythonAwarePointReader.h>

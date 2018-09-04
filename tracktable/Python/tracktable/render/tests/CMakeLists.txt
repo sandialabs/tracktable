@@ -38,9 +38,9 @@
 
 include(PythonTest)
 
-add_python_test(P_Mapmaker_Airport
-  tracktable.render.tests.test_mapmaker_airport "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
-)
+#add_python_test(P_Mapmaker_Airport
+#  tracktable.render.tests.test_mapmaker_airport "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
+#)
 
 add_python_test(P_Mapmaker_CONUS
   tracktable.render.tests.test_mapmaker_conus "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"

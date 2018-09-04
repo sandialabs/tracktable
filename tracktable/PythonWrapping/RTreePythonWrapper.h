@@ -31,10 +31,7 @@
 #ifndef __tracktable_python_rtree_wrapper_h
 #define __tracktable_python_rtree_wrapper_h
 
-#include <boost/python.hpp>
-#include <boost/python/object.hpp>
-#include <boost/python/list.hpp>
-#include <boost/python/stl_iterator.hpp>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
 // possible hotfix for compile errors in 1.65.0 and 1.65.1
 #include <boost/geometry/strategies/strategies.hpp>
@@ -108,7 +105,7 @@ public:
       indexed_point_type query_point(query_location, -1);
       std::vector<indexed_point_type> neighbors;
 
-      this->Tree.find_nearest_neighbors(query_point, num_neighbors, std::back_inserter(neighbors));
+      this->Tree.find_nearest_neighbors(query_point, boost::numeric_cast<int>(num_neighbors), std::back_inserter(neighbors));
       boost::python::list result;
       for (typename std::vector<indexed_point_type>::const_iterator neighbor_iter = neighbors.begin();
            neighbor_iter != neighbors.end();

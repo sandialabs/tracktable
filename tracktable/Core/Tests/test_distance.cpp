@@ -29,7 +29,9 @@
 */
 
 // This tells Windows that we want all the #defines from cmath
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 
 #include <iostream>
@@ -63,21 +65,25 @@ typedef tracktable::Trajectory<TerrestrialTrajectoryPoint> TerrestrialTrajectory
 
 //----------------------------------------------------
 
-int verify_result(double actual, double expected, const char* description)
+int verify_result(double actual, double expected, const char* description, double tolerance_fraction=1e-4)
 {
     std::ostringstream errbuf;
 
-    if (abs(actual - expected) > 0.001)
+    if (!tracktable::almost_equal(actual, expected, tolerance_fraction))
     {
-        std::cout << "ERROR: "<< description <<  " distance expected to be " << expected << " units but actual distance is "
-            << actual << " units. The difference is " << abs(actual - expected) << std::endl;
+        std::cout << "ERROR: "
+                  << description << " distance "
+                  << "expected to be " << expected << " units "
+                  << "but actual distance is " << actual << " units. "
+                  << "The difference is " << fabs(actual - expected)
+                  << std::endl;
         return 1;
     }
 
     return 0;
 }
 
-TerrestrialPoint create_terrestrial_point(double lat, double lon, std::string& id = std::string(""))
+TerrestrialPoint create_terrestrial_point(double lat, double lon, std::string const& id=std::string())
 {
     TerrestrialPoint point;
     point.set_longitude(lon);
@@ -86,7 +92,7 @@ TerrestrialPoint create_terrestrial_point(double lat, double lon, std::string& i
     return point;
 }
 
-TerrestrialTrajectoryPoint create_terrestrial_trajectory_point(double lat, double lon, std::string& id = std::string(""))
+TerrestrialTrajectoryPoint create_terrestrial_trajectory_point(double lat, double lon, std::string const& id=std::string())
 {
     TerrestrialTrajectoryPoint point;
     point.set_object_id(id);
@@ -96,7 +102,7 @@ TerrestrialTrajectoryPoint create_terrestrial_trajectory_point(double lat, doubl
     return point;
 }
 
-TrajectoryPointLonLat create_trajectory_point(double lat, double lon, std::string& id=std::string(""))
+TrajectoryPointLonLat create_trajectory_point(double lat, double lon, std::string const& id=std::string())
 {
     TrajectoryPointLonLat point;
     point.set_object_id(id);
@@ -106,7 +112,7 @@ TrajectoryPointLonLat create_trajectory_point(double lat, double lon, std::strin
     return point;
 }
 
-LonLatPoint create_point(double lat, double lon, std::string& id = std::string(""))
+LonLatPoint create_point(double lat, double lon, std::string const& id=std::string())
 {
     LonLatPoint point;
     point.set_longitude(lon);
@@ -115,7 +121,7 @@ LonLatPoint create_point(double lat, double lon, std::string& id = std::string("
     return point;
 }
 
-TrajectoryCartesian2dPoint create_cartesian2d_point(double x, double y, std::string& id = std::string(""))
+TrajectoryCartesian2dPoint create_cartesian2d_point(double x, double y, std::string const& id=std::string())
 {
     TrajectoryCartesian2dPoint point;
     point[0] = x;
@@ -124,7 +130,7 @@ TrajectoryCartesian2dPoint create_cartesian2d_point(double x, double y, std::str
     return point;
 }
 
-TrajectoryCartesian3dPoint create_cartesian3d_point(double x, double y, double z, std::string& id = std::string(""))
+TrajectoryCartesian3dPoint create_cartesian3d_point(double x, double y, double z, std::string const& id=std::string())
 {
     TrajectoryCartesian3dPoint point;
     point[0] = x;
@@ -215,7 +221,7 @@ int run_test()
     actual = distance(sa_to_hou2, albuquerque2);
     error_count += verify_result(actual, expected, "TerrestrialTrajectory to TerrestrialTrajectoryPoint");
 
-    actual = conversions::radians_to_km(distance(albuquerque4, sa_to_hou2));
+    actual = distance(albuquerque4, sa_to_hou2);
     error_count += verify_result(actual, expected, "TerrestrialPoint to TerrestrialTrajectory");
 
     expected = 349.276;
@@ -286,7 +292,7 @@ int run_test()
     return error_count;
 }
 
-int main(int /*argc*/, char */*argv*/[])
+int main(int, char *argv[])
 {
     return run_test();
 }

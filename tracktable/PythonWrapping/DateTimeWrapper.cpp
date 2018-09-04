@@ -49,16 +49,13 @@
 //
 // http://www.boost.org/doc/libs/1_35_0/libs/python/doc/v2/faq.html#custom_string
 
-#include <boost/python.hpp>
-#include <boost/python/object.hpp>
-#include <boost/python/module.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/to_python_converter.hpp>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
+
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 
+// This relies on Python.h
 #include <datetime.h>
-#include <Python.h>
 
 #include <tracktable/Core/Timestamp.h>
 
