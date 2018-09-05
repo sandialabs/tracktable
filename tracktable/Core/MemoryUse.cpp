@@ -43,7 +43,30 @@ std::size_t GetPeakMemoryUse()
   GetProcessMemoryInfo(GetCurrentProcess(), &info, sizeof(info));
   return static_cast<std::size_t>(info.PeakWorkingSetSize);
 
-#elif defined(TT_UNIX) || defined(TT_OSX)
+#elif defined(TT_OSX)
+  /* OSX ------------------------------------------------------ */
+  kern_return_t task_info_status;
+  mach_task_basic_info_data_t info;
+  mach_msg_type_number_t info_count = MACH_TASK_BASIC_INFO_COUNT;
+
+  task_info_status = task_info(
+    mach_task_self(),
+    MACH_TASK_BASIC_INFO,
+    reinterpret_cast<task_info_t>(&info),
+    &info_count);
+
+  if (task_info_status != KERN_SUCCESS)
+    {
+    std::cerr << "WARNING: Can't access Mach task info to get peak memory use in "
+              << __FILE__ << "\n";
+    return static_cast<std::size_t>(0);
+    }
+  else
+    {
+    return static_cast<std::size_t>(info.resident_size_max);
+    }
+
+#elif defined(TT_UNIX)
   /* BSD, Linux, and OSX -------------------------------------- */
   struct rusage rusage;
   getrusage(RUSAGE_SELF, &rusage);

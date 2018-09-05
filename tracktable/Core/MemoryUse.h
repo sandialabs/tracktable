@@ -60,7 +60,7 @@ namespace tracktable {
  *   cannot be determined on this OS.
  */
 
-std::size_t GetMaximumMemoryUse();
+std::size_t GetPeakMemoryUse();
 
 /**
  * Returns the current resident set size (physical memory use)
