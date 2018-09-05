@@ -59,6 +59,7 @@ set( Core_HEADERS
   GeometricMedian.h
   Geometry.h
   MemoryUse.h
+  PlatformDetect.h
   PointArithmetic.h
   PointBase.h
   PointCartesian.h
