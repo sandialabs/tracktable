@@ -49,7 +49,7 @@
 #if defined(_MSC_VER)
 # define TT_VISUAL_STUDIO 1
 # define TT_WINDOWS 1
-# warning "Detected Windows and Visual Studio."
+#pragma message("Detected Windows and Visual Studio.")
 #endif
 
 #if defined(__MINGW32__) || defined(__MINGW64__)
