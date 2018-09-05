@@ -29,68 +29,53 @@
  */
 
 /*
- * tracktable/Core/PlatformDetect.h - Macros to identify what platform we're on
+ * tracktable/Core/MemoryUsage.h - Get current, max process memory usage
  *
- * In order to provide platform-dependent features like a check on
- * memory usage, we need to determine what platform (operating system)
- * we're on.  The cleanest way to do that at compile time is to look
- * at the different symbols defined by the preprocessor.
+ * This is so heavily platform-dependent that I'm isolating it in its
+ * own file but it's useful enough to go through the work of getting
+ * it.
  *
- * The checks in this header file were written with reference to the
- * following web pages:
+ * NOTE: While NTESS holds the copyright for this file,
+ * MemoryUsage.cpp has a different owner and a different license.  See
+ * the file MemoryUsage.cpp for details.
  *
- * http://beefchunk.com/documentation/lang/c/pre-defined-c/precomp.html
- * https://sourceforge.net/p/predef/wiki/OperatingSystems
  */
 
-#ifndef __tracktable_PlatformDetect_h
-#define __tracktable_PlatformDetect_h
+#ifndef __tracktable_MemoryUsage_h
+#define __tracktable_MemoryUsage_h
 
-#if defined(_MSC_VER)
-# define TT_VISUAL_STUDIO 1
-# define TT_WINDOWS 1
-# warning "Detected Windows and Visual Studio."
-#endif
+#include <cstddef>
 
-#if defined(__MINGW32__) || defined(__MINGW64__)
-# define TT_MINGW 1
-# define TT_WINDOWS 1
-# warning "Detected Windows and MinGW."
-#endif
+namespace tracktable {
+  
+/**
+ * Returns the peak (maximum so far) resident set size (physical
+ * memory use) measured in bytes.
+ *
+ * Args:
+ *   none
+ *
+ * Return value: 
+ *   Maximum memory use in bytes or zero if the value
+ *   cannot be determined on this OS.
+ */
 
-#if defined(__linux) || defined(linux) || defined(__linux__)
-# define TT_UNIX 1
-# define TT_LINUX 1
-# warning "Detected Linux."
-#endif
+std::size_t GetMaximumMemoryUse();
 
-#if defined(__APPLE__)
-# define TT_OSX 1
-# define TT_UNIX 1
-# warning "Detected Mac OS X."
-#endif
+/**
+ * Returns the current resident set size (physical memory use)
+ * measured in bytes.
+ *
+ * Args:
+ *   none
+ *
+ * Return value: 
+ *   Current memory use in bytes or zero if the value
+ *   cannot be determined on this OS.
+ */
 
-#if defined(__CYGWIN__)
-# define TT_CYGWIN 1
-# define TT_WINDOWS 1
-# warning "Detected Windows and Cygwin."
-#endif
+std::size_t GetCurrentMemoryUse();
 
-#if defined(_AIX)
-# define TT_AIX 1
-# define TT_UNIX 1
-# warning "Detected AIX."
-#endif
-
-#if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__)
-# define TT_BSD 1
-# define TT_UNIX 1
-# warning "Detected BSD."
-#endif
-
-
-#if 0
-#define TT_UNIX 1
-#endif
+}
 
 #endif

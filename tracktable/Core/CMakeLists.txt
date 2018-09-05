@@ -43,6 +43,7 @@ include_directories(
 # Most of the files in Core are header-only implementations and don't
 # show up here.
 set( Core_SRCS
+  MemoryUse.cpp
   PointLonLat.cpp
   PropertyConverter.cpp
   PropertyMap.cpp
@@ -57,6 +58,7 @@ set( Core_HEADERS
   GeometricMean.h
   GeometricMedian.h
   Geometry.h
+  MemoryUse.h
   PointArithmetic.h
   PointBase.h
   PointCartesian.h
