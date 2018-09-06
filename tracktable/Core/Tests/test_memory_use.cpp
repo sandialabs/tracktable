@@ -53,7 +53,7 @@ int test_memory_use()
   std::cout << "test_memory_use: Memory use after allocating "
             << num_ints
             << " integers ("
-            << num_ints * sizeof(int) << " bytes) is "
+            << num_ints * sizeof(std::size_t) << " bytes) is "
             << current_memory_use
             << " (delta: " << (current_memory_use - initial_memory_use)
             << ")\n";
