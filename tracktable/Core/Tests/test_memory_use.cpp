@@ -43,7 +43,7 @@ int test_memory_use()
             << "\n";
 
   const std::size_t num_ints = 10000000;
-  int* big_chunk = new int[num_ints];
+  std::size_t* big_chunk = new std::size_t[num_ints];
   for (std::size_t i = 0; i < num_ints; ++i)
     {
     big_chunk[i] = i;
