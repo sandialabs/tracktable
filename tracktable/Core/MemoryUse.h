@@ -44,10 +44,12 @@
 #ifndef __tracktable_MemoryUsage_h
 #define __tracktable_MemoryUsage_h
 
+#include <tracktable/Core/TracktableCoreWindowsHeader.h>
+
 #include <cstddef>
 
 namespace tracktable {
-  
+
 /**
  * Returns the peak (maximum so far) resident set size (physical
  * memory use) measured in bytes.
@@ -60,7 +62,7 @@ namespace tracktable {
  *   cannot be determined on this OS.
  */
 
-std::size_t GetPeakMemoryUse();
+    TRACKTABLE_CORE_EXPORT std::size_t GetPeakMemoryUse();
 
 /**
  * Returns the current resident set size (physical memory use)
@@ -73,9 +75,9 @@ std::size_t GetPeakMemoryUse();
  *   Current memory use in bytes or zero if the value
  *   cannot be determined on this OS.
  */
+    
+    TRACKTABLE_CORE_EXPORT std::size_t GetCurrentMemoryUse();
 
-std::size_t GetCurrentMemoryUse();
-
-}
+};
 
 #endif
