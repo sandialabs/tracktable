@@ -28,9 +28,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/* 
+ * No, this isn't a typo.  The warning flags for Clang and GCC really
+ * do differ by a single letter.
+ */
+
 #if defined(__clang__)
 # pragma clang diagnostic ignored "-Wunused-local-typedef"
 #elif defined(__GNUC__)
-/* # pragma GCC diagnostic ignored "-Wunused-local-typedef" */
+# pragma GCC diagnostic ignored "-Wunused-local-typedefs"
 #endif
 
