@@ -50,9 +50,9 @@ public:
   RTreePythonWrapper() { }
   ~RTreePythonWrapper() { }
 
-  void set_points(boost::python::object const& points)
+  void set_points(boost::python::object const& new_points)
     {
-      boost::python::stl_input_iterator<point_type> point_begin(points), point_end;
+      boost::python::stl_input_iterator<point_type> point_begin(new_points), point_end;
       std::vector<indexed_point_type> indexed_points;
       int point_id = 0;
       for (; point_begin != point_end; ++point_begin, ++point_id)
@@ -60,7 +60,7 @@ public:
         point_type next_point(*point_begin);
         indexed_points.push_back(indexed_point_type(*point_begin, point_id));
         }
-      this->Points = points;
+      this->Points = new_points;
       this->Tree = rtree_type(indexed_points.begin(), indexed_points.end());
     }
 
