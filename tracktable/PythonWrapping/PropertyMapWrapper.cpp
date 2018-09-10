@@ -35,8 +35,11 @@
 //
 
 
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 #include <boost/variant/apply_visitor.hpp>
 
