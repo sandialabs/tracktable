@@ -91,10 +91,9 @@ double StraightFraction(trajectory_type const& trajectory)
   const int min_straight_size = 5;
 
   trajectory_type::const_iterator itr1 = trajectory.begin();
-  trajectory_type::const_iterator itr2;
+  trajectory_type::const_iterator itr2 = trajectory.end();
 
   do {
-    itr2 = 
     // The 2.0 below is related to how different the straightness can be from 180
     itr2 = std::adjacent_find(itr1,
                               trajectory.end(),
