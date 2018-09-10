@@ -277,7 +277,7 @@ BOOST_PYTHON_MODULE(_terrestrial)
   using namespace boost::python;
   install_terrestrial_domain_wrappers();
 #if 0
-  def("print_int_int_map", print_map_contents<tracktable::'>);
+  def("print_int_int_map", print_map_contents<tracktable::IntIntMap>);
   def("print_string_map", print_map_contents<tracktable::StringIntMap>);
 #endif
 }
