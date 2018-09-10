@@ -46,7 +46,7 @@ template< typename T, typename charT = char >
 class multiple_tokens_typed_value : public bpo::typed_value< T, charT >
 {
 public:
-  typedef tracktable::string_type string_type;
+  typedef tracktable::string_type tt_string_type;
   typedef bpo::typed_value< T, charT > base_type;
 
   // I feel queasy about using 'unsigned' as a bare type but that's
