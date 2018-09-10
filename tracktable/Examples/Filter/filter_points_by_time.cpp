@@ -37,8 +37,7 @@
 #include <list>
 
 typedef tracktable::domain::terrestrial::trajectory_type trajectory_type;
-typedef trajectory_type::point_type point_type;
-typedef tracktable::PointReader<point_type> point_reader_type;
+typedef tracktable::PointReader<trajectory_type::point_type> point_reader_type;
 typedef tracktable::PointWriter point_writer_type;
 typedef point_reader_type::iterator point_reader_iter;
 
@@ -106,13 +105,12 @@ int main(int argc, char* argv[])
        << argv[3] << " and " << argv[4] << "." << std::endl;
 //  point_writer.add_header_comment(sstr.str());
 
-  date_between<point_type> MyDateFilter(startTime, endTime);
+  date_between<trajectory_type::point_type> MyDateFilter(startTime, endTime);
 
-  std::list<point_type> in_points(point_reader.begin(), point_reader.end());
+  std::list<trajectory_type::point_type> in_points(point_reader.begin(), point_reader.end());
 
   typedef boost::filter_iterator<
-    date_between<point_type>,
-//    std::list<point_type>::iterator
+    date_between<trajectory_type::point_type>,
     point_reader_type::iterator
     > FilterIteratorT;
 
