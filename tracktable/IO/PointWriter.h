@@ -131,10 +131,10 @@ public:
     {
     }
 
-  PointWriter(std::ostream& output)
+  PointWriter(std::ostream& _output)
     {
       this->set_default_configuration();
-      this->set_output(output);
+      this->set_output(_output);
     }
 
   PointWriter& operator=(PointWriter const& other)
@@ -364,9 +364,9 @@ public:
    * @param[in] null_value   Desired string representation of nulls
    */
 
-  void set_null_value(string_type const& null_value)
+  void set_null_value(string_type const& _null_value)
     {
-      this->PropertyWriter.set_null_value(null_value);
+      this->PropertyWriter.set_null_value(_null_value);
     }
 
   string_type null_value() const
@@ -409,11 +409,11 @@ private:
 
   template<typename point_type, typename out_iter_type>
   void write_point_header_tokens(point_type const& example_point,
-                                 out_iter_type output)
+                                 out_iter_type _output)
     {
       io::detail::PointHeader header;
       header.populate_from_point(example_point);
-      header.write_as_tokens(output);
+      header.write_as_tokens(_output);
     }
 
   // ----------------------------------------------------------------------
@@ -421,11 +421,11 @@ private:
   template<typename point_iter_type, typename out_iter_type>
   int write_many_points_to_tokens(point_iter_type point_begin,
                                   point_iter_type point_end,
-                                  out_iter_type output)
+                                  out_iter_type _output)
     {
       if (this->WriteHeader)
         {
-	  this->write_point_header_tokens(*point_begin, output);
+	  this->write_point_header_tokens(*point_begin, _output);
         }
 
       std::size_t num_properties_expected = io::detail::count_properties<
@@ -436,7 +436,7 @@ private:
            here != point_end;
            ++here)
         {
-        this->write_point_tokens(*here, output, num_properties_expected);
+        this->write_point_tokens(*here, _output, num_properties_expected);
         ++num_points_written;
         }
       return num_points_written;
@@ -446,13 +446,13 @@ private:
 
   template<typename point_type, typename out_iter_type>
   void write_point_tokens(point_type const& point,
-                          out_iter_type output,
+                          out_iter_type _output,
                           std::size_t num_properties_expected)
     {
-      io::detail::do_write_object_id(point, output);
-      io::detail::do_write_timestamp(point, this->PropertyWriter.timestamp_converter(), output);
-      io::detail::do_write_coordinates(point, this->CoordinatePrecision, output);
-      io::detail::do_write_properties(point, this->PropertyWriter, output, num_properties_expected);
+      io::detail::do_write_object_id(point, _output);
+      io::detail::do_write_timestamp(point, this->PropertyWriter.timestamp_converter(), _output);
+      io::detail::do_write_coordinates(point, this->CoordinatePrecision, _output);
+      io::detail::do_write_properties(point, this->PropertyWriter, _output, num_properties_expected);
     }
 
   template<typename token_iter_type>

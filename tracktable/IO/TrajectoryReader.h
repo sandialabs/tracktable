@@ -189,10 +189,10 @@ public:
    *
    * @param[in] null_value String to interpret as null
    */
-  void set_null_value(string_type const& null_value)
+  void set_null_value(string_type const& _null_value)
     {
-      this->ParseTrajectoryHeader.set_null_value(null_value);
-      this->PointReader.set_null_value(null_value);
+      this->ParseTrajectoryHeader.set_null_value(_null_value);
+      this->PointReader.set_null_value(_null_value);
     }
 
   /** Get string value for nulls
@@ -212,9 +212,9 @@ public:
    *
    * @param[in] input Stream from which we will read points
    */
-  void set_input(std::istream& input)
+  void set_input(std::istream& _input)
     {
-      this->LineReader.set_input(input);
+      this->LineReader.set_input(_input);
       this->SkipCommentsReader.set_input_range(this->LineReader.begin(),
                                                this->LineReader.end());
       this->StringTokenizer.set_input_range(this->SkipCommentsReader.begin(),

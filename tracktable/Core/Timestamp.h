@@ -47,10 +47,13 @@
 
 #include <tracktable/Core/TracktableCoreWindowsHeader.h>
 
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
 #include <boost/date_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 #include <iostream>
 #include <locale>

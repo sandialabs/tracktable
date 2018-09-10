@@ -56,9 +56,13 @@
 #include <boost/bind.hpp>
 #include <boost/mpl/assert.hpp>
 #include <boost/tuple/tuple.hpp>
+
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/adapted/boost_tuple.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 #include <tracktable/Analysis/GuardedBoostGeometryRTreeHeader.h>
 

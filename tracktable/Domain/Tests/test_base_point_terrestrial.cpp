@@ -127,20 +127,53 @@ int test_boost_point_arithmetic(point_type const& left, point_type const& right)
 int test_point_lonlat()
 {
   typedef tracktable::domain::terrestrial::base_point_type point2_lonlat;
+  int error_count = 0;
 
   point2_lonlat albuquerque, wellington, new_york, north_pole, south_pole, roswell, santa_fe;
   point2_lonlat access_test;
-
+  
   tracktable::set_latitude_from_degrees(access_test, 40.0);
   tracktable::set_longitude_from_degrees(access_test, -120.0);
+
+  if (!tracktable::almost_equal(tracktable::latitude_as_degrees(access_test),
+				40.0))
+    {
+      error_count += 1;
+      std::cout << "ERROR: latitude_as_degrees: Expected 40.0, got "
+		<< tracktable::latitude_as_degrees(access_test)
+		<< "\n";
+    }
+
+  if (!tracktable::almost_equal(tracktable::longitude_as_degrees(access_test),
+				-120.0))
+    {
+      error_count += 1;
+      std::cout << "ERROR: longitude_as_degrees: Expected -120.0, got "
+		<< tracktable::longitude_as_degrees(access_test)
+		<< "\n";
+    }
+				
   tracktable::set_latitude_from_radians(access_test, 1.57);
   tracktable::set_longitude_from_radians(access_test, -1.57);
 
-  double dummy = tracktable::latitude_as_degrees(access_test);
-  dummy = tracktable::longitude_as_degrees(access_test);
-  dummy = tracktable::latitude_as_radians(access_test);
-  dummy = tracktable::longitude_as_radians(access_test);
+  if (!tracktable::almost_equal(tracktable::latitude_as_radians(access_test),
+				1.57))
+    {
+      error_count += 1;
+      std::cout << "ERROR: latitude_as_radians: Expected 1.57, got "
+		<< tracktable::latitude_as_degrees(access_test)
+		<< "\n";
+    }
 
+  if (!tracktable::almost_equal(tracktable::longitude_as_radians(access_test),
+				-1.57))
+    {
+      error_count += 1;
+      std::cout << "ERROR: longitude_as_radians: Expected -1.57, got "
+		<< tracktable::longitude_as_degrees(access_test)
+		<< "\n";
+    }
+  
   santa_fe.set_latitude(35.6672);
   santa_fe.set_longitude(-105.9644);
 
@@ -179,7 +212,6 @@ int test_point_lonlat()
   // If the radius of the Earth is 3959 miles then this comes out to
   // be 1808.099 miles
   double abq_ny_distance = distance(albuquerque, new_york);
-  int error_count = 0;
 
   if (floor(abq_ny_distance) != 2909)
     {
