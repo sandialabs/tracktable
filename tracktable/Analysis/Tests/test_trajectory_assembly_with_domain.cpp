@@ -52,7 +52,9 @@ int read_asdi_trajectories(
   reader_type point_reader;
   assembler_type trajectory_builder;
 
-  int valid_trajectory_count, invalid_trajectory_count, point_count;
+  int valid_trajectory_count = 0;
+  int invalid_trajectory_count = 0;
+  int point_count = 0;
 
   trajectory_builder.set_separation_time(tracktable::minutes(20));
   trajectory_builder.set_separation_distance(100);
