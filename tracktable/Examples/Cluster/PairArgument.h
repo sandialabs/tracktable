@@ -38,7 +38,10 @@
 #ifndef __tracktable_examples_PairArgument_h
 #define __tracktable_examples_PairArgument_h
 
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
 #include <boost/program_options.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 namespace bpo = boost::program_options;
 
