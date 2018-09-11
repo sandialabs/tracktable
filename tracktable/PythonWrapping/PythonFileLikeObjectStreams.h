@@ -63,8 +63,8 @@ public:
   typedef boost::iostreams::source_tag category;
 
   explicit
-  PythonReadSource(boost::python::object& object)
-    : object_(object)
+  PythonReadSource(boost::python::object& object_source)
+    : object_(object_source)
     {}
 
   std::streamsize read(char_type* buffer, std::streamsize buffer_size)

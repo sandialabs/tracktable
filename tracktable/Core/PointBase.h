@@ -123,11 +123,11 @@ public:
    */
 
   template<std::size_t d>
-  void set(coordinate_type const& value)
+  void set(coordinate_type const& new_value)
     {
       BOOST_STATIC_ASSERT(d >= 0);
       BOOST_STATIC_ASSERT(d < Dimension);
-      this->Coordinates[d] = value;
+      this->Coordinates[d] = new_value;
     }
 
   /** Get/set the value of a coordinate

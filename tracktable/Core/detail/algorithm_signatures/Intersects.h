@@ -31,7 +31,10 @@
 #ifndef __tracktable_detail_algorithms_intersects_h
 #define __tracktable_detail_algorithms_intersects_h
 
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
 #include <boost/geometry/algorithms/intersects.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 namespace tracktable { namespace detail { namespace algorithm_signatures {
 

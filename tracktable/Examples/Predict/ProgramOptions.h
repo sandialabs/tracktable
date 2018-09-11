@@ -19,7 +19,10 @@
 #include <string>
 
 // Boost includes
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
 #include <boost/program_options.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 namespace po = boost::program_options;
 
