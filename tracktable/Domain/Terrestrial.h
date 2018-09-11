@@ -129,10 +129,10 @@ public:
    * @param[in] longitude Longitude in degrees
    * @param[in] latitude  Latitude in degrees
    */
-  TerrestrialPoint(double longitude, double latitude)
+  TerrestrialPoint(double _longitude, double _latitude)
     {
-    this->set_longitude(longitude);
-    this->set_latitude(latitude);
+    this->set_longitude(_longitude);
+    this->set_latitude(_latitude);
     }
 };
 
@@ -199,10 +199,10 @@ public:
    * @param[in] longitude Longitude in degrees
    * @param[in] latitude  Latitude in degrees
    */
-  TerrestrialTrajectoryPoint(double longitude, double latitude)
+  TerrestrialTrajectoryPoint(double _longitude, double _latitude)
     {
-    this->set_longitude(longitude);
-    this->set_latitude(latitude);
+    this->set_longitude(_longitude);
+    this->set_latitude(_latitude);
     }
 };
 

@@ -66,10 +66,10 @@ public:
       this->rebuild_delimiter_regex();
     }
 
-  TokenWriter(std::ostream& output)
+  TokenWriter(std::ostream& _output)
     :
     FieldDelimiter("\t"),
-    OutputStream(&output),
+    OutputStream(&_output),
     QuoteCharacter("\""),
     RecordDelimiter("\n")
     {

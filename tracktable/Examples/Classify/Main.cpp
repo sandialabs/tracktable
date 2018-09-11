@@ -30,7 +30,12 @@
 
 #include <algorithm>
 #include <boost/bind.hpp>
+
+
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 #include "Common.h"
 #include "AssignHeadings.h"

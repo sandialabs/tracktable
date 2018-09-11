@@ -31,7 +31,11 @@
 #ifndef __tracktable_Box_h
 #define __tracktable_Box_h
 
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
 #include <boost/geometry/geometries/box.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
+
 #include <tracktable/Core/detail/algorithm_signatures/Intersects.h>
 
 namespace tracktable {
