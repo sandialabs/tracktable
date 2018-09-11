@@ -28,11 +28,14 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <tracktable/Core/FloatingPointComparison.h>
 #include <tracktable/Core/MemoryUse.h>
+#include <boost/cstdint.hpp>
 #include <iostream>
 
 int test_memory_use()
 {
+  int error_count = 0;
 
   std::size_t initial_memory_use = tracktable::GetCurrentMemoryUse();
   std::cout << "test_memory_use: Initial memory use is "
@@ -50,14 +53,30 @@ int test_memory_use()
     }
   
   std::size_t current_memory_use = tracktable::GetCurrentMemoryUse();
+  std::size_t expected_delta = num_ints * sizeof(std::size_t);
+
   std::cout << "test_memory_use: Memory use after allocating "
             << num_ints
             << " integers ("
             << num_ints * sizeof(std::size_t) << " bytes) is "
             << current_memory_use
-            << " (delta: " << (current_memory_use - initial_memory_use)
+            << " (delta: " << (static_cast<boost::int64_t>(current_memory_use) - 
+			       static_cast<boost::int64_t>(initial_memory_use))
             << ")\n";
   delete [] big_chunk;
+
+  if (tracktable::almost_equal(
+			       static_cast<double>(current_memory_use - initial_memory_use),
+			       static_cast<double>(expected_delta),
+			       0.01) == false)
+    {
+      std::cout << "ERROR: test_memory_use: Unexpectedly large delta "
+		<< "between size of block allocated ("
+		<< expected_delta << ") and actual memory use increase ("
+		<< (current_memory_use - initial_memory_use)
+		<< ")\n";
+      error_count += 1;
+    }
 
   std::size_t peak_memory_use = tracktable::GetPeakMemoryUse();
   std::size_t final_memory_use = tracktable::GetCurrentMemoryUse();
@@ -65,7 +84,8 @@ int test_memory_use()
   std::cout << "test_memory_use: Memory use after deleting large array: "
             << final_memory_use
             << " (delta "
-            << (final_memory_use - current_memory_use)
+            << (static_cast<boost::int64_t>(final_memory_use) - 
+		static_cast<boost::int64_t>(current_memory_use))
             << ")\n";
 
   std::cout << "test_memory_use: Peak memory use reported is "
