@@ -37,12 +37,12 @@ int test_memory_use()
 {
   int error_count = 0;
 
-  std::size_t initial_memory_use = tracktable::GetCurrentMemoryUse();
+  std::size_t initial_memory_use = tracktable::current_memory_use();
   std::cout << "test_memory_use: Initial memory use is "
             << initial_memory_use
             << "\n";
   std::cout << "test_memory_use: Peak memory use at startup is "
-            << tracktable::GetPeakMemoryUse()
+            << tracktable::peak_memory_use()
             << "\n";
 
   const std::size_t num_ints = 10000000;
@@ -52,7 +52,7 @@ int test_memory_use()
     big_chunk[i] = i;
     }
   
-  std::size_t current_memory_use = tracktable::GetCurrentMemoryUse();
+  std::size_t current_memory_use = tracktable::current_memory_use();
   std::size_t expected_delta = num_ints * sizeof(std::size_t);
 
   std::cout << "test_memory_use: Memory use after allocating "
@@ -66,9 +66,9 @@ int test_memory_use()
   delete [] big_chunk;
 
   if (tracktable::almost_equal(
-			       static_cast<double>(current_memory_use - initial_memory_use),
-			       static_cast<double>(expected_delta),
-			       0.01) == false)
+        static_cast<double>(current_memory_use - initial_memory_use),
+        static_cast<double>(expected_delta),
+        0.01) == false)
     {
       std::cout << "ERROR: test_memory_use: Unexpectedly large delta "
 		<< "between size of block allocated ("
@@ -78,8 +78,8 @@ int test_memory_use()
       error_count += 1;
     }
 
-  std::size_t peak_memory_use = tracktable::GetPeakMemoryUse();
-  std::size_t final_memory_use = tracktable::GetCurrentMemoryUse();
+  std::size_t peak_memory_use = tracktable::peak_memory_use();
+  std::size_t final_memory_use = tracktable::current_memory_use();
 
   std::cout << "test_memory_use: Memory use after deleting large array: "
             << final_memory_use
