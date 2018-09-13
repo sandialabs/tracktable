@@ -13,12 +13,13 @@ compile-win:
 
 compile-macos:
   stage: build
+  artifacts:
+    untracked: true
   tags: 
     - macos
   script:
-    - pwd
     - cp ~/Library/TrackTableBuildFiles/CMakeLists.txt .
-    - cmake ./
+    - cmake .
     - make -j8
     
 test-win:
@@ -32,10 +33,11 @@ test-win:
     
 test-macos:
   stage: test
+  dependencies:
+    - compile-macos
   tags: 
     - macos
   when: always
   script:
-    - pwd
-    - ls
-    - ctest
+    - cmake .
+    - ctest .
