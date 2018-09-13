@@ -19,7 +19,7 @@
 #elif defined(TT_UNIX)
 # include <unistd.h>
 # include <sys/resource.h>
-#include <stdio.h>
+# include <stdio.h>
 #endif
 
 #include <iostream>
@@ -35,7 +35,7 @@ namespace tracktable {
  * determined on this OS.
  */
   
-std::size_t GetPeakMemoryUse()
+std::size_t peak_memory_use()
 {
 #if defined(TT_WINDOWS)
   /* Windows -------------------------------------------------- */
@@ -86,7 +86,7 @@ std::size_t GetPeakMemoryUse()
  * Returns the current resident set size (physical memory use) measured
  * in bytes, or zero if the value cannot be determined on this OS.
  */
-std::size_t GetCurrentMemoryUse()
+std::size_t current_memory_use()
 {
 #if defined(TT_WINDOWS)
   /* Windows -------------------------------------------------- */

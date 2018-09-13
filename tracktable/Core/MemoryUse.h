@@ -62,7 +62,7 @@ namespace tracktable {
  *   cannot be determined on this OS.
  */
 
-    TRACKTABLE_CORE_EXPORT std::size_t GetPeakMemoryUse();
+TRACKTABLE_CORE_EXPORT std::size_t peak_memory_use();
 
 /**
  * Returns the current resident set size (physical memory use)
@@ -76,7 +76,7 @@ namespace tracktable {
  *   cannot be determined on this OS.
  */
     
-    TRACKTABLE_CORE_EXPORT std::size_t GetCurrentMemoryUse();
+TRACKTABLE_CORE_EXPORT std::size_t current_memory_use();
 
 };
 

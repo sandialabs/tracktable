@@ -68,8 +68,8 @@ BOOST_PYTHON_MODULE(_core_types) {
   // happen.
   def("trigger_args_exception", trigger_args_exception);
 
-  def("current_memory_use", tracktable::GetCurrentMemoryUse);
-  def("peak_memory_use", tracktable::GetPeakMemoryUse);
+  def("current_memory_use", tracktable::current_memory_use);
+  def("peak_memory_use", tracktable::peak_memory_use);
   
 }
 
