@@ -33,6 +33,8 @@
 // CorePythonModule - Expose core types (PropertyMap and Timestamp) to
 // Python
 
+#include <tracktable/Core/MemoryUse.h>
+
 #include <tracktable/PythonWrapping/PropertyMapWrapper.h>
 #include <tracktable/PythonWrapping/DateTimeWrapper.h>
 #include <tracktable/PythonWrapping/CommonMapWrappers.h>
@@ -65,5 +67,9 @@ BOOST_PYTHON_MODULE(_core_types) {
   // to it.  I don't know any other way to do that except to make one
   // happen.
   def("trigger_args_exception", trigger_args_exception);
+
+  def("current_memory_use", tracktable::GetCurrentMemoryUse);
+  def("peak_memory_use", tracktable::GetPeakMemoryUse);
+  
 }
 
