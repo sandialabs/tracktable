@@ -76,7 +76,7 @@
 namespace bgi = boost::geometry::index;
 namespace bg = boost::geometry;
 
-namespace tracktable { namespace analysis { namespace implementation {
+namespace tracktable { namespace analysis { namespace detail { namespace implementation {
 
 /** Cluster points using the DBSCAN algorithm.
  *
@@ -126,7 +126,7 @@ public:
   /// Container for points - convenience typedef only
   typedef std::vector<point_type> point_vector_type;
   /// Internal point type with cluster ID and point ID.
-  typedef detail::IndexedPoint<PointT> indexed_point_type;
+  typedef IndexedPoint<PointT> indexed_point_type;
   typedef std::vector<indexed_point_type> indexed_point_vector_type;
 
   /// Abstraction of index into list of points
@@ -135,7 +135,7 @@ public:
   // combination of point and index -- a glorified pointer by another
   // name. This class handles the 'dereference' operation (actually
   // operator()) to turn an Indexable back into a point.
-  typedef detail::DBSCAN_IndexByIterator<
+  typedef DBSCAN_IndexByIterator<
     indexed_point_vector_type, point_type
     > indexable_getter_type;
 
@@ -465,7 +465,7 @@ protected:
         // being considered
         point_type box_center((*query_point)->point());
         box_type epsilon_box(
-          detail::make_box(box_center, epsilon_box_half_span)
+          make_box(box_center, epsilon_box_half_span)
           );
 
         // Find all points near the seed
@@ -610,6 +610,6 @@ protected:
   std::size_t InputPointCount;
 };
 
-} } } // namespace tracktable::analysis::implementation
+} } } } // namespace tracktable::analysis::detail::implementation
 
 #endif
