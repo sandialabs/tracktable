@@ -69,7 +69,7 @@
 #include <boost/iterator/transform_iterator.hpp>
 
 #include <vector>
-
+#include <map>
 
 namespace tracktable {
 
@@ -143,6 +143,83 @@ int cluster_with_dbscan(
   return num_clusters;
 }
 
+/** Convert cluster labels into cluster membership lists
+ *
+ * The label output from cluster_with_dbscan is a list of (vertex_id,
+ * cluster_id) pairs.  It is often useful to have cluster membership
+ * represented instead as lists of the vertices that belong to each
+ * cluster.  This function converts a list of IDs to a list of
+ * members.  The output will be saved as a sequence of std::vectors
+ * written in order of ascending cluster ID.
+ *
+ * Example:
+ *
+ * typedef std::pair<my_id, my_point> labeled_point_type;
+ * tyepdef std::pair<my_id, int> cluster_label_type;
+ * std::vector<labeled_point_type> my_labeled_points;
+ * std::vector<cluster_label_type> cluster_labels;
+ *
+ * int num_clusters = tracktable::cluster_with_dbscan(
+ *    my_labeled_points.begin(),
+ *    my_labeled_points.end(),
+ *    search_box,
+ *    minimum_cluster_size,
+ *    std::back_inserter(cluster_labels)
+ * );
+ *
+ * typedef std::vector<my_id> cluster_member_list_type;
+ * std::vector<cluster_member_list_type> membership_lists;
+ *
+ * tracktable::build_cluster_membership_lists(
+ *   cluster_labels.begin(),
+ *   cluster_labels.end(),
+ *   std::back_inserter(membership_lists)
+ * );
+ *
+ * @param[in] label_begin   Iterator for beginning of DBSCAN cluster labels
+ * @param[in] input_end     Iterator for end of DBSCAN cluster labels
+ * @param[out] output_cluster_labels  (Vertex ID, Cluster ID) for each point
+ * @return Number of clusters discovered
+ *
+ */
+
+template<typename ClusterLabelIteratorT, typename OutputIteratorT>
+int build_cluster_membership_lists(
+  ClusterLabelIteratorT label_begin,
+  ClusterLabelIteratorT label_end,
+  OutputIteratorT output_membership_lists
+)
+{
+  typedef typename ClusterLabelIteratorT::value_type::first_type vertex_id_type;
+  typedef std::vector<vertex_id_type> vertex_id_vector_type;
+  typedef std::map<int, vertex_id_vector_type> member_map_type;
+  
+  member_map_type membership_lists;
+
+  while (label_begin != label_end)
+    {
+    int cluster_id = label_begin->second;
+    vertex_id_type vertex_id = label_begin->first;
+
+    if (membership_lists.find(cluster_id) == membership_lists.end())
+      {
+      membership_lists[cluster_id] = vertex_id_vector_type();
+      }
+    membership_lists[cluster_id].push_back(vertex_id);
+    }
+
+  // Since std::map keeps its contents sorted by the key (in this case
+  // the cluster ID) we get them back in order here.
+  for (typename member_map_type::const_iterator iter = membership_lists.begin();
+       iter != membership_lists.end();
+       ++iter)
+    {
+    *output_membership_lists = iter->second;
+    ++output_membership_lists;
+    }
+  
+  return membership_lists.size();
+}
 
 
 } // exit namespace tracktable
