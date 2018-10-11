@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -28,50 +28,19 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 // Tracktable Trajectory Library
 //
-// CorePythonModule - Expose core types (PropertyMap and Timestamp) to
-// Python
+// Boost.Python code to wrap std::pair.  Needs to be instantiated
+// explicitly for each pair type.
+//
+// This is from
+//
+// https://stackoverflow.com/questions/16497889/how-to-expose-stdpair-to-python-using-boostpython
 
-#include <tracktable/Core/MemoryUse.h>
+#ifndef __tracktable_pythonwrapping_pair_converter_h
+#define __tracktable_pythonwrapping_pair_converter_h
 
-#include <tracktable/PythonWrapping/PropertyMapWrapper.h>
-#include <tracktable/PythonWrapping/DateTimeWrapper.h>
-#include <tracktable/PythonWrapping/CommonMapWrappers.h>
-#include <tracktable/PythonWrapping/PairToTupleWrapper.h>
-#include <tracktable/PythonWrapping/TrivialFileReader.h>
+void install_pair_wrappers();
 
-#include <boost/python.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/module.hpp>
-#include <Python.h>
-
-void trigger_args_exception(int foo)
-{
-  return;
-}
-
-BOOST_PYTHON_MODULE(_core_types) {
-  install_common_map_wrappers();
-  install_property_map_wrapper();
-  install_datetime_converters();
-  install_pair_wrappers();
-  install_timestamp_functions();
-
-  using namespace boost::python;
-  class_<tracktable::TrivialFileReader>("TrivialFileReader")
-    .def(init<>())
-    .def("read_from_file", &tracktable::TrivialFileReader::read_from_file)
-    ;
-
-  // This function is there so that we can deliberately provoke a
-  // Boost.Python.ArgumentError exception.  This lets us get a pointer
-  // to it.  I don't know any other way to do that except to make one
-  // happen.
-  def("trigger_args_exception", trigger_args_exception);
-
-  def("current_memory_use", tracktable::current_memory_use);
-  def("peak_memory_use", tracktable::peak_memory_use);
-  
-}
-
+#endif
