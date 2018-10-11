@@ -30,7 +30,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <tracktable/Analysis/DBSCAN.h>
+#include <tracktable/Analysis/ComputeDBSCANClustering.h>
 #include <tracktable/Domain/FeatureVectors.h>
 
 
@@ -69,9 +69,10 @@ double random_gaussian(double mean=0, double stddev=1)
 // ----------------------------------------------------------------------
 
 template<int dim>
-tracktable::FeatureVector<dim> random_point_in_sphere(double sphere_radius=1)
+tracktable::domain::feature_vectors::FeatureVector<dim>
+random_point_in_sphere(double sphere_radius=1)
 {
-  typedef tracktable::FeatureVector<dim> point_t;
+  typedef tracktable::domain::feature_vectors::FeatureVector<dim> point_t;
 
   point_t result((tracktable::arithmetic::zero<point_t>()));
   double squared_magnitude = 0;
@@ -113,7 +114,7 @@ void point_cloud_at_hypercube_vertices(int points_per_cloud,
   // We can visit each edge once by watching for the bits that are
   // zero.  Whenever we see one, sample from -1 to 1 along that axis.
 
-  typedef tracktable::FeatureVector<dim> point_t;
+  typedef tracktable::domain::feature_vectors::FeatureVector<dim> point_t;
 
   std::cout << "TEST: Iterating over " << (1 << dim) << " hypercube vertices.\n";
   for (int vertex_id = 0; vertex_id < (1 << dim); ++vertex_id)
@@ -142,8 +143,8 @@ void point_cloud_at_hypercube_vertices(int points_per_cloud,
       point_t new_point(corner_vertex);
       boost::geometry::add_point(new_point, offset);
 
-      *out_points++ = new_point;
-      *out_labels++ = vertex_id;
+      *point_sink++ = new_point;
+      *label_sink++ = vertex_id;
       }
     }
 }
@@ -153,7 +154,7 @@ void point_cloud_at_hypercube_vertices(int points_per_cloud,
 template<int dimension>
 void test_dbscan()
 {
-  typedef tracktable::FeatureVector<dimension> point_type;
+  typedef tracktable::domain::feature_vectors::FeatureVector<dimension> point_type;
   typedef std::pair<int, point_type> labeled_point_type;
   typedef std::pair<int, int> cluster_result_type;
   typedef std::vector<point_type> point_vector_type;
@@ -168,9 +169,12 @@ void test_dbscan()
             << dimension << "-dimensional hypercube\n";
   point_vector_type hd_points;
   label_vector_type vertex_ids;
-  point_cloud_at_hypercube_vertices<dimension>(100, 0.25, hd_points, vertex_ids);
+  point_cloud_at_hypercube_vertices<dimension>(100,
+                                               0.25,
+                                               std::back_inserter(hd_points),
+                                               std::back_inserter(vertex_ids));
 
-  tracktable::DBSCAN<point_type> dbscan;
+  // Construct the search box
   point_type epsilon_halfspan;
   for (int d = 0; d < dimension; ++d)
     {
@@ -179,10 +183,10 @@ void test_dbscan()
 
 
   labeled_point_vector_type labeled_points;
-  point_vector_type::iterator point_iter = hd_points.begin();
-  label_vector_type::iterator vertex_id_iter = vertex_ids.begin();
-
-  std::vector<cluster_result_type> dbscan_results;
+  typename point_vector_type::iterator point_iter = hd_points.begin();
+  typename label_vector_type::iterator vertex_id_iter = vertex_ids.begin();
+  typedef std::pair<int, int> vertex_cluster_label;
+  std::vector<vertex_cluster_label> dbscan_results;
   
   for (; point_iter != hd_points.end(); ++point_iter, ++vertex_id_iter)
     {
@@ -194,9 +198,12 @@ void test_dbscan()
     labeled_points.end(),
     epsilon_halfspan,
     10,
-    std::insert_iterator<std::vector<cluster_result_type> >(dbscan_results,
-                                                            dbscan_results.begin()));
+    std::back_inserter(dbscan_results));
 
+  std::cout << "num_clusters: " << num_clusters << "\n";
+  std::cout << "num_points: " << labeled_points.size() << "\n";
+  
+#if 0
   std::cout << "Vertex ID and cluster label for each point:\n";
 
   for (cluster_result_vector_type::iterator iter = dbscan_results.begin();
@@ -207,7 +214,8 @@ void test_dbscan()
               << iter->second << "\n";
     }
   std::cout << "Done testing DBSCAN with labeled points.";
-
+#endif
+  
 }
 
 // ----------------------------------------------------------------------
