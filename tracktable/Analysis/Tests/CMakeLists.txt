@@ -49,10 +49,10 @@ add_executable(test_dbscan_cartesian
 # puts the target into a folder in Visual studio
 set_property(TARGET test_dbscan_cartesian               PROPERTY FOLDER "Tests")
 
-add_executable(test_dbscan_cs_change
-  test_dbscan_cs_change.cpp
-)
-set_property(TARGET test_dbscan_cs_change               PROPERTY FOLDER "Tests")
+#add_executable(test_dbscan_cs_change
+#  test_dbscan_cs_change.cpp
+#)
+#set_property(TARGET test_dbscan_cs_change               PROPERTY FOLDER "Tests")
 
 add_executable(test_rtree
   test_rtree.cpp
@@ -68,7 +68,7 @@ add_executable(test_trajectory_assembly_with_domain
 set_property(TARGET test_trajectory_assembly_with_domain        PROPERTY FOLDER "Tests")
 
 add_executable(test_dbscan_decorated_points
-  test_dbscan_descorated_points.cpp
+  test_dbscan_decorated_points.cpp
   )
 set_property(
   TARGET test_dbscan_decorated_points
@@ -83,11 +83,11 @@ target_link_libraries(test_dbscan_cartesian
   ${Boost_LIBRARIES}
 )
 
-target_link_libraries(test_dbscan_cs_change
-  TracktableCore
-  TracktableDomain
-  ${Boost_LIBRARIES}
-)
+#target_link_libraries(test_dbscan_cs_change
+#  TracktableCore
+#  TracktableDomain
+#  ${Boost_LIBRARIES}
+#)
 
 target_link_libraries(test_rtree
   TracktableCore
@@ -112,10 +112,10 @@ add_test(
   COMMAND test_dbscan_cartesian
 )
 
-add_test(
-  NAME C_DBSCAN_Coordinate_Change
-  COMMAND test_dbscan_cs_change
-)
+#add_test(
+#  NAME C_DBSCAN_Coordinate_Change
+#  COMMAND test_dbscan_cs_change
+#)
 
 add_test(
   NAME C_DBSCAN_Decorated_Points
