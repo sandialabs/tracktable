@@ -37,9 +37,10 @@
  *
  * We have two goals here.  First, give you a one-function interface
  * to DBSCAN: pass in a list of points, a search box and a minimum
- * cluster size, get back a vector of cluster labels.  Second, make it
- * easy to say "These points are actually on the surface of a sphere
- * but I want you to pretend that they're in Cartesian space."
+ * cluster size, get back a vector of (vertex ID, cluster ID) labels.
+ * Second, make it easy to say "These points are actually on the
+ * surface of a sphere but I want you to pretend that they're in
+ * Cartesian space."
  *
  * Rationale
  * ---------
@@ -62,7 +63,7 @@
 #define __tracktable_COMPUTE_DBSCAN_CLUSTERING_h
 
 #include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/Analysis/DBSCAN.h>
+#include <tracktable/Analysis/detail/dbscan_drivers.h>
 #include <tracktable/Analysis/detail/point_converter.h>
 
 #include <boost/iterator/transform_iterator.hpp>
@@ -88,7 +89,7 @@ namespace tracktable {
  *
  * typedef tracktable::cartesian2d::BasePoint point2d;
  * std::vector<tracktable::cartesian2d::BasePoint> my_points;
- * std::vector<int> cluster_labels;
+ * std::vector<std::pair<int, int>> cluster_labels;
  * point2d search_box(0.5, 0.5);
  * int min_cluster_size = 10;
  *
@@ -98,7 +99,7 @@ namespace tracktable {
  *    my_points.end(),
  *    search_box,
  *    min_cluster_size,
- *    cluster_labels
+ *    std::back_inserter(cluster_labels)
  * );
  *
  * The search box must be specified in the coordinate system in which
@@ -108,114 +109,41 @@ namespace tracktable {
  * @param[in] input_end     Iterator for end of input points
  * @param[in] search_box_half_span  Distance defining "nearby" in all dimensions
  * @param[in] minimum_cluster_size  Minimum number of neighbors for core points
- * @param[out] output_cluster_labels  Cluster ID for each point
+ * @param[out] output_cluster_labels  (Vertex ID, Cluster ID) for each point
  * @return Number of clusters discovered
+ *
+ * You can also pass in points as a std::pair<Foo, MyPoint> where Foo
+ * is your own arbitrary ID.  In that case, the returned labels will
+ * be (Foo, int).
  */
 
-template<class ClusterSpacePointT, class PointIteratorT>
+template<class SearchBoxT, class PointIteratorT, class OutputIteratorT>
 int cluster_with_dbscan(
-  PointIteratorT       input_begin,
-  PointIteratorT       input_end,
-  ClusterSpacePointT   search_box_half_span,
-  int                  minimum_cluster_size,
-  std::vector<int>&    output_cluster_labels
+  PointIteratorT input_begin,
+  PointIteratorT input_end,
+  SearchBoxT search_box_half_span,
+  int minimum_cluster_size,
+  OutputIteratorT output_sink
   )
 {
   typedef typename PointIteratorT::value_type input_point_type;
-  typedef ClusterSpacePointT cluster_point_type;
 
-  typedef detail::PointConverter<
-    input_point_type, cluster_point_type
-    > point_converter_type;
+  // Dispatch on the input point type will happen here so that we can
+  // handle bare points or std::pair<metadata, point> instances.
+  analysis::detail::DBSCAN_Driver<input_point_type> dbscan;
 
-  cluster_point_type actual_search_box;
-  boost::geometry::assign(actual_search_box, search_box_half_span);
-
-  tracktable::DBSCAN<cluster_point_type> dbscan;
-
-  int num_clusters = dbscan.learn_clusters(
-    boost::make_transform_iterator(input_begin, point_converter_type()),
-    boost::make_transform_iterator(input_end, point_converter_type()),
-    actual_search_box,
-    minimum_cluster_size
+  int num_clusters = dbscan(
+    input_begin,
+    input_end,
+    search_box_half_span,
+    minimum_cluster_size,
+    output_sink
     );
 
-  dbscan.point_cluster_labels(output_cluster_labels);
   return num_clusters;
 }
 
 
-/** Generate cluster labels for a set of points.
- *
- * This function runs DBSCAN on a list of points and returns its
- * results as a vector of vectors, each listing members for one cluster.
- *
- * When you call cluster_with_dbscan you must indicate the type of
- * point (and thus the coordinate space) that you want to use for the
- * clustering.  This lets you choose (for example) to run in Cartesian
- * space rather than longitude/latitude space if you're sure your
- * points don't run into the poles or the longitude discontinuity at
- * +/= 180.
- *
- * Here's an example::
- *
- * typedef tracktable::cartesian2d::BasePoint point2d;
- * std::vector<tracktable::cartesian2d::TrajectoryPoint> my_points;
- * std::vector<std::vector<int> > cluster_lists;
- * point2d search_box(0.5, 0.5);
- * int min_cluster_size = 10;
- *
- *
- * int num_clusters = cluster_with_dbscan<point2d>(
- *    my_points.begin(),
- *    my_points.end(),
- *    search_box,
- *    min_cluster_size,
- *    cluster_lists
- * );
- *
- * The search box must be specified in the coordinate system in which
- * you want to do the clustering.
- *
- * @param[in] input_begin   Iterator for beginning of input points
- * @param[in] input_end     Iterator for end of input points
- * @param[in] search_box_half_span  Distance defining "nearby" in all dimensions
- * @param[in] minimum_cluster_size  Minimum number of neighbors for core points
- * @param[out] output_cluster_membership  Points belonging to each cluster
- * @return Number of clusters discovered
- */
-
-template<class ClusterSpacePointT, class PointIteratorT>
-int cluster_with_dbscan(
-  PointIteratorT       input_begin,
-  PointIteratorT       input_end,
-  ClusterSpacePointT   search_box_half_span,
-  int                  minimum_cluster_size,
-  std::vector<std::vector<int> >&    output_cluster_membership
-  )
-{
-  typedef typename PointIteratorT::value_type input_point_type;
-  typedef ClusterSpacePointT cluster_point_type;
-
-  typedef detail::PointConverter<
-    input_point_type, cluster_point_type
-    > point_converter_type;
-
-  cluster_point_type actual_search_box;
-  boost::geometry::assign(actual_search_box, search_box_half_span);
-
-  tracktable::DBSCAN<cluster_point_type> dbscan;
-
-  int num_clusters = dbscan.template learn_clusters(
-    boost::make_transform_iterator(input_begin, point_converter_type()),
-    boost::make_transform_iterator(input_end, point_converter_type()),
-    actual_search_box,
-    minimum_cluster_size
-    );
-
-  dbscan.cluster_membership_lists(output_cluster_membership);
-  return num_clusters;
-}
 
 } // exit namespace tracktable
 
