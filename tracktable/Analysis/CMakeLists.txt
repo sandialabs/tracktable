@@ -43,20 +43,25 @@ include_directories(
 
 set( Analysis_HEADERS
   AssembleTrajectories.h
-  DBSCAN.h
   ComputeDBSCANClustering.h
   RTree.h
+  GuardedBoostGeometryRTreeHeader.h
 )
 
 set( Detail_HEADERS
   detail/dbscan_points.h
   detail/point_converter.h
   detail/AssembleTrajectoriesIterator.h
+  detail/dbscan_implementation.h
+  detail/dbscan_drivers.h
+  detail/point_converter.h
+  detail/extract_pair_member.h
+  detail/transfer_point_coordinates.h
 )
 
 #this adds the project to Visual Studio on Windows so the files are 
 # visible without creating a build command
-add_custom_target( TrackTableAnalysis
+add_custom_target( TracktableAnalysis
   SOURCES
   ${Analysis_HEADERS}
   ${Detail_HEADERS}
