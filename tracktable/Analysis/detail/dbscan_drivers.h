@@ -156,11 +156,6 @@ struct DBSCAN_Driver<
     typedef typename input_point_pair_type::first_type input_metadata_type;
     typedef typename input_point_pair_type::second_type input_point_type;
 
-    typedef typename std::iterator_traits<OutputIteratorT>::value_type output_pair_type;
-    // Weird.  Apparently this member typedef is void.  
-//    typedef typename output_pair_type::first_type output_metadata_type;
-//    typedef typename output_pair_type::second_type output_cluster_id_type;
-
     typedef ExtractSecond<input_point_pair_type> point_extractor_type;
 
     BOOST_MPL_ASSERT_MSG(
