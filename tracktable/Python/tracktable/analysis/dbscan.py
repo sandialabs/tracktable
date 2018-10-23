@@ -63,10 +63,10 @@ def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_si
 
     print("Testing for point decoration.  First point: {}".format(first_point))
     try:
-        if len(first_point) == 2 and len(first_point[1]) > 0:
+        if len(first_point) == 2 and len(first_point[0]) > 0:
             print("DEBUG: Points are decorated.  First point: {}".format(first_point))
             decorated_points = True
-            vertex_ids = [ point[0] for point in feature_vectors ]
+            vertex_ids = [ point[1] for point in feature_vectors ]
     except TypeError:
         # The second element of the point is something that doesn't
         # have a len().  It is probably a coordinate, meaning we've
@@ -77,14 +77,14 @@ def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_si
         print("DEBUG: Points are not decorated.")
 
     if decorated_points:
-        native_feature_vectors = [ convert_to_feature_vector(p[1]) for p in feature_vectors ]
+        native_feature_vectors = [ convert_to_feature_vector(p[0]) for p in feature_vectors ]
     else:
         native_feature_vectors = [ convert_to_feature_vector(p) for p in feature_vectors ]
 
     native_box_half_span = convert_to_feature_vector(search_box_half_span)
 
     if decorated_points:
-        point_size = len(first_point[1])
+        point_size = len(first_point[0])
     else:
         point_size = len(first_point)
 

@@ -112,7 +112,7 @@ namespace tracktable {
  * @param[out] output_cluster_labels  (Vertex ID, Cluster ID) for each point
  * @return Number of clusters discovered
  *
- * You can also pass in points as a std::pair<Foo, MyPoint> where Foo
+ * You can also pass in points as a std::pair<MyPoint, Foo> where Foo
  * is your own arbitrary ID.  In that case, the returned labels will
  * be (Foo, int).
  */
@@ -154,7 +154,7 @@ int cluster_with_dbscan(
  *
  * Example:
  *
- * typedef std::pair<my_id, my_point> labeled_point_type;
+ * typedef std::pair<my_point, my_id> labeled_point_type;
  * tyepdef std::pair<my_id, int> cluster_label_type;
  * std::vector<labeled_point_type> my_labeled_points;
  * std::vector<cluster_label_type> cluster_labels;

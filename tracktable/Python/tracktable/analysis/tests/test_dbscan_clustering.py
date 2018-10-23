@@ -101,7 +101,7 @@ def test_clusters():
     all_points = corner_points + noise_points
 
     vertex_ids_as_strings = [ str(i) for i in range(len(all_points)) ]
-    decorated_points = list(zip(vertex_ids_as_strings, all_points))
+    decorated_points = list(zip(all_points, vertex_ids_as_strings))
     
     print("Learning cluster IDs for bare points.")
     int_cluster_ids = compute_cluster_labels(all_points,

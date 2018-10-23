@@ -139,7 +139,7 @@ struct DBSCAN_Driver
 
 template<class MetadataT, class PointT>
 struct DBSCAN_Driver<
-  std::pair<MetadataT, PointT>
+  std::pair<PointT, MetadataT>
   >
 {
   template<class PointInputIteratorT, class SearchBoxPointT, class OutputIteratorT>
@@ -151,17 +151,17 @@ struct DBSCAN_Driver<
     OutputIteratorT output_sink
   )
   {
-    typedef std::pair<MetadataT, PointT> dispatch_point_type;
+    typedef std::pair<PointT, MetadataT> dispatch_point_type;
     typedef typename PointInputIteratorT::value_type input_point_pair_type;
-    typedef typename input_point_pair_type::first_type input_metadata_type;
-    typedef typename input_point_pair_type::second_type input_point_type;
+    typedef typename input_point_pair_type::first_type input_point_type;
+    typedef typename input_point_pair_type::second_type input_metadata_type;
 
     typedef typename std::iterator_traits<OutputIteratorT>::value_type output_pair_type;
     // Weird.  Apparently this member typedef is void.  
 //    typedef typename output_pair_type::first_type output_metadata_type;
 //    typedef typename output_pair_type::second_type output_cluster_id_type;
 
-    typedef ExtractSecond<input_point_pair_type> point_extractor_type;
+    typedef ExtractFirst<input_point_pair_type> point_extractor_type;
 
     BOOST_MPL_ASSERT_MSG(
       (boost::is_same<dispatch_point_type, input_point_pair_type>::value),
@@ -205,7 +205,7 @@ struct DBSCAN_Driver<
     metadata_vector_t saved_metadata;
     for (; input_begin != input_end; ++input_begin)
       {
-      saved_metadata.push_back(input_begin->first);
+      saved_metadata.push_back(input_begin->second);
       }
     
     for (std::vector<raw_vertex_cluster_label_type>::iterator iter = raw_labels.begin();
