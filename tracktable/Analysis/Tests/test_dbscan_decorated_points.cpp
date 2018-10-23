@@ -155,7 +155,7 @@ template<int dimension>
 void test_dbscan()
 {
   typedef tracktable::domain::feature_vectors::FeatureVector<dimension> point_type;
-  typedef std::pair<int, point_type> labeled_point_type;
+  typedef std::pair<point_type, int> labeled_point_type;
   typedef std::pair<int, int> cluster_result_type;
   typedef std::vector<point_type> point_vector_type;
   typedef std::vector<int> label_vector_type;
@@ -190,7 +190,7 @@ void test_dbscan()
   
   for (; point_iter != hd_points.end(); ++point_iter, ++vertex_id_iter)
     {
-    labeled_points.push_back(labeled_point_type(100 * (*vertex_id_iter),  *point_iter));
+    labeled_points.push_back(labeled_point_type(*point_iter, 100 * (*vertex_id_iter)));
     }
 
   int num_clusters = tracktable::cluster_with_dbscan(
