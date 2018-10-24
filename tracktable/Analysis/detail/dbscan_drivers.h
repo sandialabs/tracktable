@@ -156,7 +156,7 @@ struct DBSCAN_Driver<
     typedef typename input_point_pair_type::first_type input_point_type;
     typedef typename input_point_pair_type::second_type input_metadata_type;
 
-    typedef ExtractSecond<input_point_pair_type> point_extractor_type;
+    typedef ExtractFirst<input_point_pair_type> point_extractor_type;
 
     BOOST_MPL_ASSERT_MSG(
       (boost::is_same<dispatch_point_type, input_point_pair_type>::value),
