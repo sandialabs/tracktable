@@ -19,4 +19,5 @@ compile-macos:
     - cp ~/Library/TrackTableBuildFiles/CMakeLists.txt .
     - cmake .
     - make -j8
+    - cmake .
     - ctest .
