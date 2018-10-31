@@ -127,7 +127,7 @@ struct DBSCAN_Driver
     
     for (std::size_t i = 0; i < vertex_cluster_ids.size(); ++i)
       {
-      *output_sink = std::make_pair(i, vertex_cluster_ids[i]);
+      *output_sink = std::make_pair(boost::numeric_cast<int>(i), vertex_cluster_ids[i]);
       ++output_sink;
       }
     
