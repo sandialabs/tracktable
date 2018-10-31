@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -30,17 +30,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
- * NOTE: We use PointCartesian here as a lowest common denominator.
- * You are cordially discouraged from using PointLonLat and
- * PointCartesian in your own code: we recommend
- * tracktable::domain::terrestrial and tracktable::domain::cartesian2d
- * instead.
- */
-
 #include <tracktable/Analysis/ComputeDBSCANClustering.h>
-#include <tracktable/Core/PointCartesian.h>
-#include <tracktable/Core/PointArithmetic.h>
+#include <tracktable/Domain/FeatureVectors.h>
+
 
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
@@ -57,41 +49,32 @@
 // ----------------------------------------------------------------------
 
 boost::random::mt19937 random_generator;
-boost::random::uniform_real_distribution<> random_die(0);
+boost::random::uniform_real_distribution<> random_die(-1, 1);
 
-inline double random_float(double min=0, double max=1)
+double random_float()
 {
-  double span = max - min;
-  return (random_die(random_generator) * span) + min;
+  return random_die(random_generator) * std::numeric_limits<double>::max();
 }
 
 // ----------------------------------------------------------------------
 
 double random_gaussian(double mean=0, double stddev=1)
 {
-  double u = random_float();
-  double v = random_float();
+  double u1 = random_float();
+  double u2 = random_float();
 
-  // This is the Box-Muller transform.  Given two random numbers u, v
-  // distributed uniformly on [0, 1],
-  //
-  // y1 = sqrt(-2 log u) * cos(2 \pi v)
-  // y2 = sqrt(-2 log u) * sin(2 \pi v)
-  //
-  // y1 and y2 will be independent and normally distributed.
-  
-  return mean + stddev * (sqrt(-2 * log(u)) * sin(2*M_PI*v));
+  return mean + stddev*(sqrt(-2 * log(u1)) * sin(2*M_PI*u2));
 }
 
 // ----------------------------------------------------------------------
 
 template<int dim>
-tracktable::PointCartesian<dim> random_point_in_sphere(double sphere_radius=1)
+tracktable::domain::feature_vectors::FeatureVector<dim>
+random_point_in_sphere(double sphere_radius=1)
 {
-  typedef tracktable::PointCartesian<dim> point_t;
+  typedef tracktable::domain::feature_vectors::FeatureVector<dim> point_t;
 
   point_t result((tracktable::arithmetic::zero<point_t>()));
-  
   double squared_magnitude = 0;
   for (int i = 0; i < dim; ++i)
     {
@@ -101,7 +84,6 @@ tracktable::PointCartesian<dim> random_point_in_sphere(double sphere_radius=1)
     result[i] = rg;
     }
 
-//  std::cout << "raw point: " << result << " mag2: " << squared_magnitude << "\n";
   boost::geometry::divide_value(result, sqrt(squared_magnitude));
 
   // now scale it down to somewhere within the sphere
@@ -111,11 +93,15 @@ tracktable::PointCartesian<dim> random_point_in_sphere(double sphere_radius=1)
 
 // ----------------------------------------------------------------------
 
-template<int dim>
+template<
+  int dim,
+  typename PointOutputIteratorT,
+  typename LabelOutputIteratorT
+  >
 void point_cloud_at_hypercube_vertices(int points_per_cloud,
                                        double cloud_radius,
-                                       std::vector< tracktable::PointCartesian<dim> >& out_points,
-                                       std::vector<int>& out_labels)
+                                       PointOutputIteratorT point_sink,
+                                       LabelOutputIteratorT label_sink)
 {
   // To generate all the edges of a hypercube we use the following
   // procedure:
@@ -128,7 +114,7 @@ void point_cloud_at_hypercube_vertices(int points_per_cloud,
   // We can visit each edge once by watching for the bits that are
   // zero.  Whenever we see one, sample from -1 to 1 along that axis.
 
-  typedef tracktable::PointCartesian<dim> point_t;
+  typedef tracktable::domain::feature_vectors::FeatureVector<dim> point_t;
 
   std::cout << "TEST: Iterating over " << (1 << dim) << " hypercube vertices.\n";
   for (int vertex_id = 0; vertex_id < (1 << dim); ++vertex_id)
@@ -146,19 +132,19 @@ void point_cloud_at_hypercube_vertices(int points_per_cloud,
         }
       }
 
-    out_points.push_back(corner_vertex);
-    out_labels.push_back(vertex_id);
+    *point_sink = corner_vertex;
+    ++point_sink;
+    *label_sink = vertex_id;
+    ++label_sink;
 
     for (int i = 0; i < points_per_cloud; ++i)
       {
       point_t offset(random_point_in_sphere<dim>(cloud_radius));
-//      std::cout << "random point in sphere: " << offset << "\n";
       point_t new_point(corner_vertex);
       boost::geometry::add_point(new_point, offset);
 
-      std::cout << "corner vertex: " << corner_vertex << " offset: " << offset << "\n";
-      out_points.push_back(new_point);
-      out_labels.push_back(vertex_id);
+      *point_sink++ = new_point;
+      *label_sink++ = vertex_id;
       }
     }
 }
@@ -168,50 +154,68 @@ void point_cloud_at_hypercube_vertices(int points_per_cloud,
 template<int dimension>
 void test_dbscan()
 {
-  typedef tracktable::PointCartesian<dimension> point_type;
-  typedef std::pair<int, int> cluster_label_type;
-  std::vector<point_type> hd_points;
-  std::vector<int> labels;
-  std::vector<cluster_label_type> dbscan_results;
+  typedef tracktable::domain::feature_vectors::FeatureVector<dimension> point_type;
+  typedef std::pair<point_type, int> labeled_point_type;
+  typedef std::pair<int, int> cluster_result_type;
+  typedef std::vector<point_type> point_vector_type;
+  typedef std::vector<int> label_vector_type;
   
-  std::cout << "test_dbscan: Generating point clouds at vertices of "
+  typedef std::vector<labeled_point_type> labeled_point_vector_type;
+  typedef std::vector<cluster_result_type> cluster_result_vector_type;
+
+
+  std::cout << "test_dbscan_decorated_points: "
+            << "Generating point clouds at vertices of "
             << dimension << "-dimensional hypercube\n";
-  point_cloud_at_hypercube_vertices<dimension>(100, 0.1, hd_points, labels);
+  point_vector_type hd_points;
+  label_vector_type vertex_ids;
+  point_cloud_at_hypercube_vertices<dimension>(100,
+                                               0.25,
+                                               std::back_inserter(hd_points),
+                                               std::back_inserter(vertex_ids));
 
-  for (typename std::vector<point_type>::iterator iter = hd_points.begin();
-       iter != hd_points.end();
-       ++iter)
-    {
-    std::cout << "point: " << *iter << "\n";
-    }
-  
+  // Construct the search box
   point_type epsilon_halfspan;
-
   for (int d = 0; d < dimension; ++d)
     {
-    epsilon_halfspan[d] = 0.1;
+    epsilon_halfspan[d] = 0.2;
     }
 
 
-  std::cout << "test_dbscan: Learning cluster assignments\n";
-  tracktable::cluster_with_dbscan(
-    hd_points.begin(),
-    hd_points.end(),
+  labeled_point_vector_type labeled_points;
+  typename point_vector_type::iterator point_iter = hd_points.begin();
+  typename label_vector_type::iterator vertex_id_iter = vertex_ids.begin();
+  typedef std::pair<int, int> vertex_cluster_label;
+  std::vector<vertex_cluster_label> dbscan_results;
+  
+  for (; point_iter != hd_points.end(); ++point_iter, ++vertex_id_iter)
+    {
+    labeled_points.push_back(labeled_point_type(*point_iter, 100 * (*vertex_id_iter)));
+    }
+
+  int num_clusters = tracktable::cluster_with_dbscan(
+    labeled_points.begin(),
+    labeled_points.end(),
     epsilon_halfspan,
     10,
     std::back_inserter(dbscan_results));
 
+  std::cout << "num_clusters: " << num_clusters << "\n";
+  std::cout << "num_points: " << labeled_points.size() << "\n";
+  
+#if 0
+  std::cout << "Vertex ID and cluster label for each point:\n";
 
-  std::cout << "Vertex labels of points in each cluster:\n";
-  for (std::size_t i = 0; i < dbscan_results.size(); ++i)
+  for (cluster_result_vector_type::iterator iter = dbscan_results.begin();
+       iter != dbscan_results.end();
+       ++iter)
     {
-    std::cout << "Vertex " << dbscan_results[i].first << ": cluster "
-              << dbscan_results[i].second << "\n";
+    std::cout << "Vertex ID " << iter->first << " belongs to cluster "
+              << iter->second << "\n";
     }
-
-  std::cout << "Done testing DBSCAN in "
-            << dimension << " dimensions.\n";
-
+  std::cout << "Done testing DBSCAN with labeled points.";
+#endif
+  
 }
 
 // ----------------------------------------------------------------------
@@ -219,5 +223,5 @@ void test_dbscan()
 int
 main(int argc, char* argv[])
 {
-  test_dbscan<2>();
+  test_dbscan<3>();
 }

@@ -35,7 +35,7 @@
 
 #include <boost/tuple/tuple.hpp>
 
-namespace tracktable { namespace detail {
+namespace tracktable { namespace analysis { namespace detail {
 
 template< class ContainerT, class PointT >
 class DBSCAN_IndexByIterator
@@ -151,6 +151,6 @@ boost::geometry::model::box<point_type> make_box(const point_type& center, const
   return box_type(min_corner, max_corner);
 }
 
-} } // close namespace tracktable::detail
+} } } // close namespace tracktable::analysis::detail
 
 #endif

@@ -1,6 +1,5 @@
 stages:
   - build
-  - test
 
 compile-win:
   stage: build
@@ -10,34 +9,15 @@ compile-win:
     - xcopy * C:\Git\tracktable /E /H /Y
     - cd C:\TrackTable
     - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" ALL_BUILD.vcxproj /t:Rebuild /p:Configuration=Release /m:8'
+    - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" RUN_TESTS.vcxproj'
 
 compile-macos:
   stage: build
-  artifacts:
-    untracked: true
   tags: 
     - macos
   script:
     - cp ~/Library/TrackTableBuildFiles/CMakeLists.txt .
     - cmake .
     - make -j8
-    
-test-win:
-  stage: test
-  tags: 
-    - windows
-  when: always
-  script:
-    - cd C:\TrackTable
-    - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" RUN_TESTS.vcxproj'
-    
-test-macos:
-  stage: test
-  dependencies:
-    - compile-macos
-  tags: 
-    - macos
-  when: always
-  script:
     - cmake .
     - ctest .
