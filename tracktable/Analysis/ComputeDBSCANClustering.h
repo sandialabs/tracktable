@@ -218,7 +218,7 @@ int build_cluster_membership_lists(
     ++output_membership_lists;
     }
   
-  return membership_lists.size();
+  return boost::numeric_cast<int>(membership_lists.size());
 }
 
 
