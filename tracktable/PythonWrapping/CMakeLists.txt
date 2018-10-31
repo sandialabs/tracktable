@@ -104,6 +104,7 @@ install_python_extension( _tracktable_hello core ${Tracktable_PYTHON_DIR} )
 add_library(_core_types MODULE
   CorePythonModule.cpp
   DateTimeWrapper.cpp
+  PairToTupleWrapper.cpp
   PropertyMapWrapper.cpp
   CommonMapWrappers.cpp
   )
