@@ -46,18 +46,71 @@
 # sure that a new version of CMake will be available in some of the
 # more constrained environments where we build Tracktable.
 
+#find_package(PythonLibs REQUIRED)
+#find_package(NumPy REQUIRED)
+
+# Versions of Boost from 1.57 through 1.66 generate
+# libboost_python3.so for Python 3.  From 1.67 onward we get
+# libboost_pythonXY.so for Python X.Y.  In order to figure out the
+# proper library name we need to know BOTH the Python version and the
+# Boost version.
+
 set(Boost_PYTHON_LIBRARY_SUFFIX "")
 
 find_package(Boost 1.57 COMPONENTS date_time regex REQUIRED)
+
 find_package(PythonInterp)
 if (PYTHONINTERP_FOUND)
+  message("DEBUG: Python interpreter found: ${PYTHON_EXECUTABLE}")
   find_package(PythonLibs)
+else (PYTHONINTERP_FOUND)
+  message("DEBUG: Python interpreter not found.  Not searching for libraries.")
 endif (PYTHONINTERP_FOUND)
 
 
+macro(_MY_PYTHON_GET_VERSION)
+  message(STATUS "_MY_PYTHON_GET_VERSION running")
+  if (NOT EXISTS ${PYTHON_EXECUTABLE})
+    message("DEBUG: _PYTHON_GET_VERSION: No Python executable (value is ${PYTHON_EXECUTABLE})")
+    return()
+  endif()
+
+  if (${Python_VERSION_MAJOR})
+    unset(Python_VERSION_MAJOR)
+  endif()
+
+  if (${Python_VERSION_MINOR})
+    unset(Python_VERSION_MINOR)
+  endif()
+      
+  execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c
+    "import sys; sys.stdout.write(str(sys.version_info[0]))"
+    RESULT_VARIABLE result_major
+    OUTPUT_VARIABLE Python_VERSION_MAJOR
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  execute_process(COMMAND "${PYTHON_EXECUTABLE}" -c
+    "import sys; sys.stdout.write(str(sys.version_info[1]))"
+    RESULT_VARIABLE result_minor
+    OUTPUT_VARIABLE Python_VERSION_MINOR
+    ERROR_QUIET
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+  message("DEBUG: _MY_PYTHON_GET_VERSION: Major version ${Python_VERSION_MAJOR}, minor version ${Python_VERSION_MINOR}")
+  return()
+endmacro(_MY_PYTHON_GET_VERSION)
+
+
 if (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
+#  _MY_PYTHON_GET_VERSION()
+  
+  message("DEBUG: Boost_FOUND ${Boost_FOUND}, Boost_VERSION ${Boost_VERSION}")
+  message("DEBUG: PYTHON_EXECUTABLE ${PYTHON_EXECUTABLE}, PYTHON_VERSION_STRING ${PYTHON_VERSION_STRING}")
+
   if (Boost_VERSION VERSION_LESS 106700)
     # This version of Boost generates libboost_python[3].so.
+    message("DEBUG: Boost.Python library should not be versioned")
     if (PYTHON_VERSION_MAJOR EQUAL 2)
       set(Boost_PYTHON_LIBRARY_SUFFIX "")
     else ()
@@ -71,6 +124,7 @@ if (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
   # Force CMake to go back and find Boost again instead of relying on cached values.
   unset(Boost_FOUND)
   find_package(Boost 1.57 COMPONENTS date_time regex python${Boost_PYTHON_LIBRARY_SUFFIX})
+
 else (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
   message(WARNING "Boost.Python library version cannot be determined until both Boost and Python have been found.")
 endif (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
