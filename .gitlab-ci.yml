@@ -9,7 +9,9 @@ compile-win:
     - xcopy * C:\Git\tracktable /E /H /Y
     - cd C:\TrackTable
     - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" ALL_BUILD.vcxproj /t:Rebuild /p:Configuration=Release /m:8'
-    - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" RUN_TESTS.vcxproj'
+    - cmake .
+    - ctest . --output-on-failure -C Release
+  retry: 2
 
 compile-macos:
   stage: build
@@ -20,4 +22,5 @@ compile-macos:
     - cmake .
     - make -j8
     - cmake .
-    - ctest .
+    - ctest . --output-on-failure
+  retry: 2
