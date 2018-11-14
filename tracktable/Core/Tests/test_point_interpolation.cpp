@@ -1,36 +1,3 @@
-/*
- * Copyright (c) 2014-2018 National Technology and Engineering
- * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
- * with National Technology and Engineering Solutions of Sandia, LLC,
- * the U.S. Government retains certain rights in this software.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-// This tells Windows that we want all the #defines from cmath
-#ifndef _USE_MATH_DEFINES
-#define _USE_MATH_DEFINES
 #endif
 #include <cmath>
 
@@ -47,15 +14,15 @@ typedef tracktable::PointLonLat PointLonLat;
 typedef tracktable::TrajectoryPoint<tracktable::PointLonLat> TrajectoryPointLonLat;
 typedef tracktable::Trajectory<TrajectoryPointLonLat> TrajectoryLonLat;
 
-void print_test_point(TrajectoryPointLonLat const& point, std::ostream& out=std::cout)
+void print_test_point(TrajectoryPointLonLat const& point, std::ostream& out = std::cout)
 {
-  out << "Object ID:       " << point.object_id() << "\n";
-  out << "Timestamp:       " << point.timestamp() << "\n";
-  out << "Longitude:       " << point.longitude() << "\n";
-  out << "Latitude:        " << point.latitude() << "\n";
-  out << "double_property: " << point.property("double_property") << "\n";
-  out << "time_property:   " << point.property("time_property") << "\n";
-  out << "string_property: " << point.property("string_property") << "\n";
+    out << "Object ID:       " << point.object_id() << "\n";
+    out << "Timestamp:       " << point.timestamp() << "\n";
+    out << "Longitude:       " << point.longitude() << "\n";
+    out << "Latitude:        " << point.latitude() << "\n";
+    out << "double_property: " << point.property("double_property") << "\n";
+    out << "time_property:   " << point.property("time_property") << "\n";
+    out << "string_property: " << point.property("string_property") << "\n";
 }
 
 // ----------------------------------------------------------------------
@@ -63,58 +30,58 @@ void print_test_point(TrajectoryPointLonLat const& point, std::ostream& out=std:
 template<typename point_type>
 int verify_result(point_type const& actual, point_type const& expected, const char* description)
 {
-  int error_count = 0;
-  std::ostringstream errbuf;
+    int error_count = 0;
+    std::ostringstream errbuf;
 
-  if (tracktable::distance(actual, expected) > 0.1)
+    if (tracktable::distance(actual, expected) > 0.1)
     {
-    errbuf << "ERROR: Distance between actual and expected points is "
-           << tracktable::distance(actual, expected) << " units.\n";
-    ++error_count;
+        errbuf << "ERROR: Distance between actual and expected points is "
+            << tracktable::distance(actual, expected) << " units.\n";
+        ++error_count;
     }
 
-  if (actual.object_id() != expected.object_id())
+    if (actual.object_id() != expected.object_id())
     {
-    errbuf << "ERROR: Object IDs do not match.\n";
-    ++error_count;
+        errbuf << "ERROR: Object IDs do not match.\n";
+        ++error_count;
     }
 
-  if (actual.timestamp() != expected.timestamp())
+    if (actual.timestamp() != expected.timestamp())
     {
-    errbuf << "ERROR: Timestamps do not match.\n";
-    ++error_count;
+        errbuf << "ERROR: Timestamps do not match.\n";
+        ++error_count;
     }
 
-  if (!(actual.property("double_property") == expected.property("double_property")))
+    if (!(actual.property("double_property") == expected.property("double_property")))
     {
-    errbuf << "ERROR: Numeric properties do not match.\n";
-    ++error_count;
+        errbuf << "ERROR: Numeric properties do not match.\n";
+        ++error_count;
     }
 
-  if (!(actual.property("string_property") == expected.property("string_property")))
+    if (!(actual.property("string_property") == expected.property("string_property")))
     {
-    errbuf << "ERROR: String properties do not match.\n";
-    ++error_count;
+        errbuf << "ERROR: String properties do not match.\n";
+        ++error_count;
     }
 
-  if (!(actual.property("time_property") == expected.property("time_property")))
+    if (!(actual.property("time_property") == expected.property("time_property")))
     {
-    errbuf << "ERROR: Timestamp properties do not match.\n";
-    ++error_count;
+        errbuf << "ERROR: Timestamp properties do not match.\n";
+        ++error_count;
     }
 
-  if (error_count)
+    if (error_count)
     {
-    std::ostringstream finalbuf;
-    finalbuf << "ERROR testing " << description << ": ";
-    errbuf << "\nExpected result:\n";
-    print_test_point(expected, errbuf);
-    errbuf << "\nActual result:\n";
-    print_test_point(actual, errbuf);
-    finalbuf << errbuf.str();
-    std::cout << finalbuf.str();
+        std::ostringstream finalbuf;
+        finalbuf << "ERROR testing " << description << ": ";
+        errbuf << "\nExpected result:\n";
+        print_test_point(expected, errbuf);
+        errbuf << "\nActual result:\n";
+        print_test_point(actual, errbuf);
+        finalbuf << errbuf.str();
+        std::cout << finalbuf.str();
     }
-  return error_count;
+    return error_count;
 }
 
 // ----------------------------------------------------------------------
@@ -416,245 +383,242 @@ int run_test()
         std::cout << "Error: Time at fraction, no points, did not match. Expected time is " <<
             tracktable::Timestamp() << ", Returned time is " << time_no << std::endl;
     }
+
+    std::cout << "\nTesting point at fraction 0.5\n";
+    TrajectoryPointLonLat point_mid = point_at_fraction(surface_trajectory, 0.5);
+    error_count += verify_result(point_mid, expected_result_middle, "midpoint of trajectory");
+
+    std::cout << "\nTesting point at fraction 0.25\n";
+    TrajectoryPointLonLat point_first_quarter = point_at_fraction(surface_trajectory, 0.25);
+    error_count += verify_result(point_first_quarter, expected_result_first_quarter, "halfway between beginning and midpoint");
+
+    std::cout << "\nTesting point at fraction 0.75\n";
+    TrajectoryPointLonLat point_last_quarter = point_at_fraction(surface_trajectory, 0.75);
+    error_count += verify_result(point_last_quarter, expected_result_last_quarter, "halfway between midpoint and end");
+
+    std::cout << "\nTesting point at fraction 0.0\n";
+    TrajectoryPointLonLat point_start = point_at_fraction(surface_trajectory, 0.0);
+    error_count += verify_result(point_start, expected_result_before, "beginning of trajectory");
+
+    std::cout << "\nTesting point at fraction 1.0\n";
+    TrajectoryPointLonLat point_end = point_at_fraction(surface_trajectory, 1.0);
+    error_count += verify_result(point_end, expected_result_after, "end of trajectory");
+
+    std::cout << "\nTesting point at fraction -0.5\n";
+    TrajectoryPointLonLat point_before = point_at_fraction(surface_trajectory, -0.5);
+    error_count += verify_result(point_before, expected_result_before, "before beginning of trajectory");
+
+    std::cout << "\nTesting point at fraction 1.5\n";
+    TrajectoryPointLonLat point_after = point_at_fraction(surface_trajectory, 1.5);
+    error_count += verify_result(point_after, expected_result_after, "after end of trajectory");
+
+    std::cout << "\nTesting point at fraction, no points\n";
+    TrajectoryPointLonLat point_no = point_at_fraction(noPoints, 0.75);
+    if (point_no.timestamp() != tracktable::BeginningOfTime) //Coordinates are trash. Use timestamp instead.
     {
-        std::cout << "\nTesting point at fraction 0.5\n";
-        TrajectoryPointLonLat point_mid = point_at_fraction(surface_trajectory, 0.5);
-        error_count += verify_result(point_mid, expected_result_middle, "midpoint of trajectory");
-
-        std::cout << "\nTesting point at fraction 0.25\n";
-        TrajectoryPointLonLat point_first_quarter = point_at_fraction(surface_trajectory, 0.25);
-        error_count += verify_result(point_first_quarter, expected_result_first_quarter, "halfway between beginning and midpoint");
-
-        std::cout << "\nTesting point at fraction 0.75\n";
-        TrajectoryPointLonLat point_last_quarter = point_at_fraction(surface_trajectory, 0.75);
-        error_count += verify_result(point_last_quarter, expected_result_last_quarter, "halfway between midpoint and end");
-
-        std::cout << "\nTesting point at fraction 0.0\n";
-        TrajectoryPointLonLat point_start = point_at_fraction(surface_trajectory, 0.0);
-        error_count += verify_result(point_start, expected_result_before, "beginning of trajectory");
-
-        std::cout << "\nTesting point at fraction 1.0\n";
-        TrajectoryPointLonLat point_end = point_at_fraction(surface_trajectory, 1.0);
-        error_count += verify_result(point_end, expected_result_after, "end of trajectory");
-
-        std::cout << "\nTesting point at fraction -0.5\n";
-        TrajectoryPointLonLat point_before = point_at_fraction(surface_trajectory, -0.5);
-        error_count += verify_result(point_before, expected_result_before, "before beginning of trajectory");
-
-        std::cout << "\nTesting point at fraction 1.5\n";
-        TrajectoryPointLonLat point_after = point_at_fraction(surface_trajectory, 1.5);
-        error_count += verify_result(point_after, expected_result_after, "after end of trajectory");
-
-        std::cout << "\nTesting point at fraction, no points\n";
-        TrajectoryPointLonLat point_no = point_at_fraction(noPoints, 0.75);
-        if (point_no.timestamp() != tracktable::BeginningOfTime) //Coordinates are trash. Use timestamp instead.
-        {
-            error_count++;
-            std::cout << "Error: Point at fraction, no points, did not match. Expected point timestamp is " <<
-                tracktable::BeginningOfTime << ", Returned point timestamp is " << point_no.timestamp() << std::endl;
-        }
+        error_count++;
+        std::cout << "Error: Point at fraction, no points, did not match. Expected point timestamp is " <<
+            tracktable::BeginningOfTime << ", Returned point timestamp is " << point_no.timestamp() << std::endl;
     }
+    std::cout << "\nTesting point at length fraction 0.5\n";
+    TrajectoryPointLonLat point_mid = point_at_length_fraction(surface_trajectory, 0.5);
+    error_count += verify_result_redux(point_mid, expected_result_middle, "midpoint of trajectory");
+
+    std::cout << "\nTesting point at length fraction 0.25\n";
+    TrajectoryPointLonLat point_first_quarter = point_at_length_fraction(surface_trajectory, 0.25);
+    error_count += verify_result_redux(point_first_quarter, expected_result_first_quarter, "halfway between beginning and midpoint");
+
+    std::cout << "\nTesting point at length fraction 0.75\n";
+    TrajectoryPointLonLat point_last_quarter = point_at_length_fraction(surface_trajectory, 0.75);
+    error_count += verify_result_redux(point_last_quarter, expected_result_last_quarter, "halfway between midpoint and end");
+
+    std::cout << "\nTesting point at length fraction 0.0\n";
+    TrajectoryPointLonLat point_start = point_at_length_fraction(surface_trajectory, 0.0);
+    error_count += verify_result_redux(point_start, expected_result_before, "beginning of trajectory");
+
+    std::cout << "\nTesting point at length fraction 1.0\n";
+    TrajectoryPointLonLat point_end = point_at_length_fraction(surface_trajectory, 1.0);
+    error_count += verify_result_redux(point_end, expected_result_after, "end of trajectory");
+
+    std::cout << "\nTesting point at length fraction -0.5\n";
+    TrajectoryPointLonLat point_before = point_at_length_fraction(surface_trajectory, -0.5);
+    error_count += verify_result_redux(point_before, expected_result_before, "before beginning of trajectory");
+
+    std::cout << "\nTesting point at length fraction 1.5\n";
+    TrajectoryPointLonLat point_after = point_at_length_fraction(surface_trajectory, 1.5);
+    error_count += verify_result_redux(point_after, expected_result_after, "after end of trajectory");
+
+    std::cout << "\nTesting point at length fraction, no points\n";
+    TrajectoryPointLonLat point_no = point_at_length_fraction(noPoints, 0.75);
+    if (point_no.timestamp() != tracktable::BeginningOfTime) //Coordinates are trash. Use timestamp instead.
     {
-        std::cout << "\nTesting point at length fraction 0.5\n";
-        TrajectoryPointLonLat point_mid = point_at_length_fraction(surface_trajectory, 0.5);
-        error_count += verify_result_redux(point_mid, expected_result_middle, "midpoint of trajectory");
-
-        std::cout << "\nTesting point at length fraction 0.25\n";
-        TrajectoryPointLonLat point_first_quarter = point_at_length_fraction(surface_trajectory, 0.25);
-        error_count += verify_result_redux(point_first_quarter, expected_result_first_quarter, "halfway between beginning and midpoint");
-
-        std::cout << "\nTesting point at length fraction 0.75\n";
-        TrajectoryPointLonLat point_last_quarter = point_at_length_fraction(surface_trajectory, 0.75);
-        error_count += verify_result_redux(point_last_quarter, expected_result_last_quarter, "halfway between midpoint and end");
-
-        std::cout << "\nTesting point at length fraction 0.0\n";
-        TrajectoryPointLonLat point_start = point_at_length_fraction(surface_trajectory, 0.0);
-        error_count += verify_result_redux(point_start, expected_result_before, "beginning of trajectory");
-
-        std::cout << "\nTesting point at length fraction 1.0\n";
-        TrajectoryPointLonLat point_end = point_at_length_fraction(surface_trajectory, 1.0);
-        error_count += verify_result_redux(point_end, expected_result_after, "end of trajectory");
-
-        std::cout << "\nTesting point at length fraction -0.5\n";
-        TrajectoryPointLonLat point_before = point_at_length_fraction(surface_trajectory, -0.5);
-        error_count += verify_result_redux(point_before, expected_result_before, "before beginning of trajectory");
-
-        std::cout << "\nTesting point at length fraction 1.5\n";
-        TrajectoryPointLonLat point_after = point_at_length_fraction(surface_trajectory, 1.5);
-        error_count += verify_result_redux(point_after, expected_result_after, "after end of trajectory");
-
-        std::cout << "\nTesting point at length fraction, no points\n";
-        TrajectoryPointLonLat point_no = point_at_length_fraction(noPoints, 0.75);
-        if (point_no.timestamp() != tracktable::BeginningOfTime) //Coordinates are trash. Use timestamp instead.
-        {
-            error_count++;
-            std::cout << "Error: Point at length fraction, no points, did not match. Expected point timestamp is " <<
-                tracktable::BeginningOfTime << ", Returned point timestamp is " << point_no.timestamp() << std::endl;
-        }
+        error_count++;
+        std::cout << "Error: Point at length fraction, no points, did not match. Expected point timestamp is " <<
+            tracktable::BeginningOfTime << ", Returned point timestamp is " << point_no.timestamp() << std::endl;
     }
 
-  PointCartesian2D point1;
-  PointCartesian2D point2;
-  PointCartesian2D expected;
-  point1[0] = 0;
-  point1[1] = 0;
+    PointCartesian2D point1;
+    PointCartesian2D point2;
+    PointCartesian2D expected;
+    point1[0] = 0;
+    point1[1] = 0;
 
-  point2[0] = 10;
-  point2[1] = 10;
-  
-  std::cout << "\nTesting point interpolation, Cartesian2D halfway\n";
-  expected[0] = 5;
-  expected[1] = 5;
-  PointCartesian2D interp_point = tracktable::interpolate(point1, point2, .5);
-  if (interp_point != expected) {
-      error_count++;
-      std::cout << "\nError: Interpolate, Cartesian2D halfway. Expected point is " << expected.to_string() <<
-          ", returned point is " << interp_point.to_string() << std::endl;
-  }
-  
-  std::cout << "\nTesting point interpolation, Cartesian2D first third\n";
-  expected[0] = 3;
-  expected[1] = 3;
-  interp_point = tracktable::interpolate(point1, point2, .3);
-  if (interp_point != expected) {
-      error_count++;
-      std::cout << "\nError: Interpolate, Cartesian2D first third. Expected point is " << expected.to_string() <<
-          ", returned point is " << interp_point.to_string() << std::endl;
-  }
+    point2[0] = 10;
+    point2[1] = 10;
 
-  std::cout << "\nTesting point interpolation, Cartesian2D start\n";
-  expected[0] = 0;
-  expected[1] = 0;
-  interp_point = tracktable::interpolate(point1, point2, 0);
-  if (interp_point != expected) {
-      error_count++;
-      std::cout << "\nError: Interpolate, Cartesian2D start. Expected point is " << expected.to_string() <<
-          ", returned point is " << interp_point.to_string() << std::endl;
-  }
+    std::cout << "\nTesting point interpolation, Cartesian2D halfway\n";
+    expected[0] = 5;
+    expected[1] = 5;
+    PointCartesian2D interp_point = tracktable::interpolate(point1, point2, .5);
+    if (interp_point != expected) {
+        error_count++;
+        std::cout << "\nError: Interpolate, Cartesian2D halfway. Expected point is " << expected.to_string() <<
+            ", returned point is " << interp_point.to_string() << std::endl;
+    }
 
-  std::cout << "\nTesting point interpolation, Cartesian2D end\n";
-  expected[0] = 10;
-  expected[1] = 10;
-  interp_point = tracktable::interpolate(point1, point2, 1);
-  if (interp_point != expected) {
-      error_count++;
-      std::cout << "\nError: Interpolate, Cartesian2D end. Expected point is " << expected.to_string() <<
-          ", returned point is " << interp_point.to_string() << std::endl;
-  }
+    std::cout << "\nTesting point interpolation, Cartesian2D first third\n";
+    expected[0] = 3;
+    expected[1] = 3;
+    interp_point = tracktable::interpolate(point1, point2, .3);
+    if (interp_point != expected) {
+        error_count++;
+        std::cout << "\nError: Interpolate, Cartesian2D first third. Expected point is " << expected.to_string() <<
+            ", returned point is " << interp_point.to_string() << std::endl;
+    }
 
-  std::cout << "\nTesting point extrapolation, Cartesian2D 1.5x\n";
-  expected[0] = 15;
-  expected[1] = 15;
-  interp_point = tracktable::extrapolate(point1, point2, 1.5);
-  if (interp_point != expected) {
-      error_count++;
-      std::cout << "\nError: Extrapolate, Cartesian2D 1.5x. Expected point is " << expected.to_string() <<
-          ", returned point is " << interp_point.to_string() << std::endl;
-  }
+    std::cout << "\nTesting point interpolation, Cartesian2D start\n";
+    expected[0] = 0;
+    expected[1] = 0;
+    interp_point = tracktable::interpolate(point1, point2, 0);
+    if (interp_point != expected) {
+        error_count++;
+        std::cout << "\nError: Interpolate, Cartesian2D start. Expected point is " << expected.to_string() <<
+            ", returned point is " << interp_point.to_string() << std::endl;
+    }
 
-  std::cout << "\nTesting point extrapolation, Cartesian2D -1.5x\n";
-  expected[0] = -15;
-  expected[1] = -15;
-  interp_point = tracktable::extrapolate(point1, point2, -1.5);
-  if (interp_point != expected) {
-      error_count++;
-      std::cout << "\nError: Extrapolate, Cartesian2D -1.5x. Expected point is " << expected.to_string() <<
-          ", returned point is " << interp_point.to_string() << std::endl;
-  }
+    std::cout << "\nTesting point interpolation, Cartesian2D end\n";
+    expected[0] = 10;
+    expected[1] = 10;
+    interp_point = tracktable::interpolate(point1, point2, 1);
+    if (interp_point != expected) {
+        error_count++;
+        std::cout << "\nError: Interpolate, Cartesian2D end. Expected point is " << expected.to_string() <<
+            ", returned point is " << interp_point.to_string() << std::endl;
+    }
 
-  std::cout << "\nTesting point extrapolation, Cartesian2D start\n";
-  expected[0] = 0;
-  expected[1] = 0;
-  interp_point = tracktable::extrapolate(point1, point2, 0);
-  if (interp_point != expected) {
-      error_count++;
-      std::cout << "\nError: Extrapolate, Cartesian2D start. Expected point is " << expected.to_string() <<
-          ", returned point is " << interp_point.to_string() << std::endl;
-  }
+    std::cout << "\nTesting point extrapolation, Cartesian2D 1.5x\n";
+    expected[0] = 15;
+    expected[1] = 15;
+    interp_point = tracktable::extrapolate(point1, point2, 1.5);
+    if (interp_point != expected) {
+        error_count++;
+        std::cout << "\nError: Extrapolate, Cartesian2D 1.5x. Expected point is " << expected.to_string() <<
+            ", returned point is " << interp_point.to_string() << std::endl;
+    }
 
-  std::cout << "\nTesting point extrapolation, Cartesian2D end\n";
-  expected[0] = 10;
-  expected[1] = 10;
-  interp_point = tracktable::extrapolate(point1, point2, 1);
-  if (interp_point != expected) {
-      error_count++;
-      std::cout << "\nError: Extrapolate, Cartesian2D end. Expected point is " << expected.to_string() <<
-          ", returned point is " << interp_point.to_string() << std::endl;
-  }
+    std::cout << "\nTesting point extrapolation, Cartesian2D -1.5x\n";
+    expected[0] = -15;
+    expected[1] = -15;
+    interp_point = tracktable::extrapolate(point1, point2, -1.5);
+    if (interp_point != expected) {
+        error_count++;
+        std::cout << "\nError: Extrapolate, Cartesian2D -1.5x. Expected point is " << expected.to_string() <<
+            ", returned point is " << interp_point.to_string() << std::endl;
+    }
 
-  PointLonLat point3;
-  PointLonLat point4;
-  PointLonLat expected2;
-  point3[0] = 45.0;
-  point3[1] = 45.0;
+    std::cout << "\nTesting point extrapolation, Cartesian2D start\n";
+    expected[0] = 0;
+    expected[1] = 0;
+    interp_point = tracktable::extrapolate(point1, point2, 0);
+    if (interp_point != expected) {
+        error_count++;
+        std::cout << "\nError: Extrapolate, Cartesian2D start. Expected point is " << expected.to_string() <<
+            ", returned point is " << interp_point.to_string() << std::endl;
+    }
 
-  point4[0] = 135.0;
-  point4[1] = 45.0;
+    std::cout << "\nTesting point extrapolation, Cartesian2D end\n";
+    expected[0] = 10;
+    expected[1] = 10;
+    interp_point = tracktable::extrapolate(point1, point2, 1);
+    if (interp_point != expected) {
+        error_count++;
+        std::cout << "\nError: Extrapolate, Cartesian2D end. Expected point is " << expected.to_string() <<
+            ", returned point is " << interp_point.to_string() << std::endl;
+    }
 
-  std::cout << "\nTesting point interpolation, LonLat halfway\n";
-  expected2[0] = 90.0;
-  expected2[1] = 54.7356;
-  PointLonLat interp_point2 = tracktable::interpolate(point3, point4, .5);
-  if (interp_point2 != expected2) {
-      error_count++;
-      std::cout << "\nError: Interpolate, LonLat halfway. Expected point is " << expected2.to_string() <<
-          ", returned point is " << interp_point2.to_string() << std::endl;
-  }
+    PointLonLat point3;
+    PointLonLat point4;
+    PointLonLat expected2;
+    point3[0] = 45.0;
+    point3[1] = 45.0;
 
-  std::cout << "\nTesting point interpolation, LonLat first third\n";
-  expected2[0] = 69.7884;
-  expected2[1] = 53.0018;
-  interp_point2 = tracktable::interpolate(point3, point4, .3);
-  if (interp_point2 != expected2) {
-      error_count++;
-      std::cout << "\nError: Interpolate, LonLat first third. Expected point is " << expected2.to_string() <<
-          ", returned point is " << interp_point2.to_string() << std::endl;
-  }
+    point4[0] = 135.0;
+    point4[1] = 45.0;
 
-  std::cout << "\nTesting point extrapolation, LonLat 2x\n";
-  expected2[0] = 180;
-  expected2[1] = 0;
-  interp_point2 = tracktable::extrapolate(point3, point4, 2);
-  if (interp_point2[0] != expected2[0]) { // Bug: Done because result longitude is close but not exactly zero.
-      error_count++;
-      std::cout << "\nError: Extrapolate, LonLat 2x. Expected point is " << expected2.to_string() <<
-          ", returned point is " << interp_point2.to_string() << std::endl;
-  }
+    std::cout << "\nTesting point interpolation, LonLat halfway\n";
+    expected2[0] = 90.0;
+    expected2[1] = 54.7356;
+    PointLonLat interp_point2 = tracktable::interpolate(point3, point4, .5);
+    if (interp_point2 != expected2) {
+        error_count++;
+        std::cout << "\nError: Interpolate, LonLat halfway. Expected point is " << expected2.to_string() <<
+            ", returned point is " << interp_point2.to_string() << std::endl;
+    }
 
-  std::cout << "\nTesting point interpolation, double halfway\n";
-  double a = 10;
-  double b = 20;
-  double expected3 = 15;
-  double interp_point3 = tracktable::interpolate(a, b, .5);
-  if (interp_point3 != expected3) {
-      error_count++;
-      std::cout << "\nError: Interpolate, double halfway. Expected point is " << expected3 <<
-          ", returned point is " << interp_point3 << std::endl;
-  }
+    std::cout << "\nTesting point interpolation, LonLat first third\n";
+    expected2[0] = 69.7884;
+    expected2[1] = 53.0018;
+    interp_point2 = tracktable::interpolate(point3, point4, .3);
+    if (interp_point2 != expected2) {
+        error_count++;
+        std::cout << "\nError: Interpolate, LonLat first third. Expected point is " << expected2.to_string() <<
+            ", returned point is " << interp_point2.to_string() << std::endl;
+    }
 
-  std::cout << "\nTesting point extrapolation, double 1.5x\n";
-  expected3 = 25;
-  interp_point3 = tracktable::extrapolate(a, b, 1.5);
-  if (interp_point3 != expected3) {
-      error_count++;
-      std::cout << "\nError: Extrapolate, double 1.5x. Expected point is " << expected3 <<
-          ", returned point is " << interp_point3 << std::endl;
-  }
-    
-  std::cout << "\nTesting point interpolation, TrajectoryPointLonLat halfway\n";
-  TrajectoryPointLonLat interp_point4 = tracktable::interpolate(st_point_before, st_point_after, .5);
-  interp_point4.set_property("string_property", s_property_middle);
-  error_count += verify_result(interp_point4, st_point_middle, "interpolate TrajectoryPointLonLat halfway ");
+    std::cout << "\nTesting point extrapolation, LonLat 2x\n";
+    expected2[0] = 180;
+    expected2[1] = 0;
+    interp_point2 = tracktable::extrapolate(point3, point4, 2);
+    if (interp_point2[0] != expected2[0]) { // Bug: Done because result longitude is close but not exactly zero.
+        error_count++;
+        std::cout << "\nError: Extrapolate, LonLat 2x. Expected point is " << expected2.to_string() <<
+            ", returned point is " << interp_point2.to_string() << std::endl;
+    }
 
-  std::cout << "\nTesting point extrapolation, TrajectoryPointLonLat 2x\n";
-  interp_point4 = tracktable::extrapolate(st_point_before, st_point_middle, 2);
-  interp_point4.set_property("string_property", s_property_after);
-  error_count += verify_result(interp_point4, st_point_after, "interpolate TrajectoryPointLonLat 2x ");
+    std::cout << "\nTesting point interpolation, double halfway\n";
+    double a = 10;
+    double b = 20;
+    double expected3 = 15;
+    double interp_point3 = tracktable::interpolate(a, b, .5);
+    if (interp_point3 != expected3) {
+        error_count++;
+        std::cout << "\nError: Interpolate, double halfway. Expected point is " << expected3 <<
+            ", returned point is " << interp_point3 << std::endl;
+    }
 
-  return error_count;
+    std::cout << "\nTesting point extrapolation, double 1.5x\n";
+    expected3 = 25;
+    interp_point3 = tracktable::extrapolate(a, b, 1.5);
+    if (interp_point3 != expected3) {
+        error_count++;
+        std::cout << "\nError: Extrapolate, double 1.5x. Expected point is " << expected3 <<
+            ", returned point is " << interp_point3 << std::endl;
+    }
+
+    std::cout << "\nTesting point interpolation, TrajectoryPointLonLat halfway\n";
+    TrajectoryPointLonLat interp_point4 = tracktable::interpolate(st_point_before, st_point_after, .5);
+    interp_point4.set_property("string_property", s_property_middle);
+    error_count += verify_result(interp_point4, st_point_middle, "interpolate TrajectoryPointLonLat halfway ");
+
+    std::cout << "\nTesting point extrapolation, TrajectoryPointLonLat 2x\n";
+    interp_point4 = tracktable::extrapolate(st_point_before, st_point_middle, 2);
+    interp_point4.set_property("string_property", s_property_after);
+    error_count += verify_result(interp_point4, st_point_after, "interpolate TrajectoryPointLonLat 2x ");
+
+    return error_count;
 }
 
-int main(int, char *)
+int main(int, char *argv[])
 {
-  return run_test();
+    return run_test();
 }

@@ -47,13 +47,13 @@
 #include <tracktable/Core/detail/trait_signatures/PointDomainName.h>
 #include <tracktable/Core/detail/trait_signatures/Tag.h>
 
-// #include <tracktable/Core/detail/implementations/TurnAngle.h>
 
 #include <sstream> // for ostringstream in to_string
 
+
+#include <tracktable/Core/GuardedBoostGeometryHeaders.h>
 #include <boost/geometry/core/cs.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
-#include <boost/geometry/algorithms/distance.hpp>
 
 namespace tracktable {
 
@@ -164,25 +164,6 @@ struct extrapolate< PointCartesian<Dimension> >
     }
 };
 
-/// Compute distance between two PointCartesian objects
-//
-// This is a standard Tracktable algorithm that must be implemented
-// for any two things where you might want to compute a distance.  We
-// default to whatever boost::geometry::distance does (native units).
-// If any unit conversion needs to be done it will be done in the
-// appropriate point domain.
-
-template<std::size_t Dimension>
-struct distance< PointCartesian<Dimension> >
-{
-  template<typename point_type>
-  static inline double
-  apply(point_type const& left, point_type const& right)
-    {
-      return boost::geometry::distance(left, right);
-    }
-};
-
 } } // exit namespace tracktable::algorithms
 
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
@@ -219,6 +200,13 @@ struct undecorated_point< PointCartesian<Dimension> >
   typedef PointCartesian<Dimension> type;
 };
 
+template<std::size_t Dimension>
+struct domain<PointCartesian<Dimension> >
+{
+  typedef domains::generic type;
+};
+      
+    
 } } // exit namespace tracktable::traits
 
 // ----------------------------------------------------------------------

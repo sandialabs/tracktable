@@ -213,7 +213,7 @@ def test_trajectory():
 
     print("Testing point_at_fraction, No Points")
     no_point = geomath.point_at_fraction(empty_trajectory, 0.5)
-    empty_point = TerrestrialTrajectoryPoint()
+    empty_point = TerrestrialTrajectoryPoint.zero()
     error_count += verify_point(no_point,empty_point, "Point at fraction (no points)")  
 
     print("Testing point_at_length_fraction, 0.25")

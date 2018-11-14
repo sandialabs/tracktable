@@ -50,7 +50,7 @@
 
 #include <tracktable/Core/detail/trait_signatures/HasProperties.h>
 
-#include <boost/geometry/algorithms/distance.hpp>
+#include <tracktable/Core/GuardedBoostGeometryHeaders.h>
 #include <boost/geometry/geometries/register/linestring.hpp>
 
 #include <cassert>
@@ -707,6 +707,9 @@ namespace tracktable { namespace traits {
 template<typename point_type>
 struct has_properties< Trajectory<point_type> > : boost::mpl::bool_<true> {};
 
+template<typename point_type>
+struct domain<Trajectory<point_type> > : domain<point_type> {};
+    
 } } // end namespace tracktable::traits
 
 // We get our implementations for trajectory_subset and point_at_time
@@ -733,19 +736,6 @@ struct time_at_fraction< Trajectory< PointT > > : implementations::generic_time_
 template<class PointT>
 struct subset_during_interval< Trajectory<PointT> > : implementations::generic_subset_during_interval< Trajectory<PointT> >
 { };
-
-template<class PointT>
-struct distance< Trajectory<PointT> >
-{
-    typedef Trajectory<PointT> trajectory_type;
-
-    static inline double apply(
-        trajectory_type const& from, trajectory_type const& to
-    )
-    {
-        return boost::geometry::distance(from, to);
-    }
-};
 
 //Used when comparing a point to a compatible trajectory
 template<class PointT, template<class> class TrajectoryT>
@@ -779,7 +769,7 @@ struct end_to_end_distance< Trajectory<PointT> >
         }
       else
         {
-        return distance<typename trajectory_type::point_type>::apply(path.front(), path.back());
+        return ::tracktable::distance(path.front(), path.back());
         }
     }
 };

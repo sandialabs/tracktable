@@ -33,14 +33,9 @@
 
 #include <boost/geometry/geometries/box.hpp>
 
-#include <boost/python.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/module.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/def_visitor.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <boost/python/return_internal_reference.hpp>
-#include <Python.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
+
+// #include <boost/python.hpp>
 
 #include <tracktable/Core/PointArithmetic.h>
 #include <tracktable/Core/PointTraits.h>
@@ -269,7 +264,6 @@ class to_string_methods : public boost::python::def_visitor<to_string_methods>
   template<class ClassT>
   void visit(ClassT& c) const
     {
-      typedef typename ClassT::wrapped_type wrapped_type;
       using namespace boost::python;
 
       typed_object_to_string<ClassT>::save_name_for_later(c);
@@ -291,7 +285,6 @@ class point_to_string_methods : public boost::python::def_visitor<point_to_strin
   template<class ClassT>
   void visit(ClassT& c) const
     {
-      typedef typename ClassT::wrapped_type wrapped_type;
       using namespace boost::python;
 
       point_to_string<ClassT>::save_name_for_later(c);

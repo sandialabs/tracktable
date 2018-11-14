@@ -33,7 +33,7 @@
 
 #include <tracktable/Core/PointCartesian.h>
 #include <tracktable/Core/PointArithmetic.h>
-#include <tracktable/Analysis/DBSCAN.h>
+#include <tracktable/Analysis/ComputeDBSCANClustering.h>
 
 #include "AssignLengths.h"
 #include "Common.h"
@@ -99,15 +99,24 @@ int main(int argc, char* argv[])
     features.push_back(dists);
   }
 
-  tracktable::DBSCAN<feature_vector> dbscan;
   feature_vector search_box;
   for (unsigned int i = 0; i < 15; ++i)
     search_box[i] = 0.1;
+  
+  typedef std::pair<int, int> cluster_label_type;
+  typedef std::vector<cluster_label_type> cluster_label_vector_type;
+  typedef std::vector<int> vertex_id_vector_type;
 
-  dbscan.learn_clusters(features.begin(),features.end(),search_box,3);
+  cluster_label_vector_type vertex_cluster_labels;
+  tracktable::cluster_with_dbscan(
+    features.begin(),
+    features.end(),
+    search_box,
+    3,
+    std::back_inserter(vertex_cluster_labels)
+  );
 
-  std::vector<std::vector<int> > membership;
-  dbscan.cluster_membership_lists(membership);
+  std::vector<vertex_id_vector_type> membership;
   for (unsigned int i = 0; i < membership.size(); ++i) {
     std::cout << i << "(" << membership[i].size() << "):";
     feature_vector avg;

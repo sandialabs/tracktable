@@ -23,7 +23,6 @@
 #include "KmlOut.h"
 #include "BuildTrajectories.h"
 #include "ParseCommandLine.h"
-#include <tracktable/Analysis/DBSCAN.h>
 #include <boost/bind.hpp>
 #include <boost/array.hpp>
 #include <boost/geometry/geometries/adapted/boost_array.hpp>

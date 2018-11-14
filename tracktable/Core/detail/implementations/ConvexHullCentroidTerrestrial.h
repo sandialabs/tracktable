@@ -71,8 +71,6 @@ struct compute_convex_hull_centroid<
   template<typename point_type>
   static inline point_type compute_centroid_from_hull(bg::model::polygon<point_type> const& hull)
     {
-      typedef bg::model::polygon<point_type> polygon_type;
-
       // Start with the center of mass of the vertices of the convex
       // hull (will by definition be inside the hull)
       PointLonLat center_of_mass_lonlat = spherical_math::terrestrial_center_of_mass(hull.outer().begin(), hull.outer().end());

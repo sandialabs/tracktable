@@ -41,8 +41,6 @@
 #include <tracktable/Core/detail/implementations/ConvexHullCentroidTerrestrial.h>
 #include <tracktable/Core/detail/implementations/SphericalPolygons.h>
 
-#include <boost/geometry.hpp>
-
 namespace tracktable { namespace algorithms {
 
 namespace bg = boost::geometry;
@@ -58,7 +56,7 @@ struct compute_convex_hull_aspect_ratio<
       typedef typename iterator::value_type point_type;
       typedef boost::geometry::model::polygon<point_type> polygon_type;
       polygon_type hull;
-
+      
       implementations::compute_convex_hull_terrestrial(point_begin, point_end, hull);
       point_type centroid(
         compute_convex_hull_centroid<
