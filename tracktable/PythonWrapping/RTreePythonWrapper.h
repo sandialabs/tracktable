@@ -31,10 +31,7 @@
 #ifndef __tracktable_python_rtree_wrapper_h
 #define __tracktable_python_rtree_wrapper_h
 
-#include <boost/python.hpp>
-#include <boost/python/object.hpp>
-#include <boost/python/list.hpp>
-#include <boost/python/stl_iterator.hpp>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
 // possible hotfix for compile errors in 1.65.0 and 1.65.1
 #include <boost/geometry/strategies/strategies.hpp>
@@ -53,9 +50,9 @@ public:
   RTreePythonWrapper() { }
   ~RTreePythonWrapper() { }
 
-  void set_points(boost::python::object const& points)
+  void set_points(boost::python::object const& new_points)
     {
-      boost::python::stl_input_iterator<point_type> point_begin(points), point_end;
+      boost::python::stl_input_iterator<point_type> point_begin(new_points), point_end;
       std::vector<indexed_point_type> indexed_points;
       int point_id = 0;
       for (; point_begin != point_end; ++point_begin, ++point_id)
@@ -63,7 +60,7 @@ public:
         point_type next_point(*point_begin);
         indexed_points.push_back(indexed_point_type(*point_begin, point_id));
         }
-      this->Points = points;
+      this->Points = new_points;
       this->Tree = rtree_type(indexed_points.begin(), indexed_points.end());
     }
 

@@ -129,6 +129,11 @@ add_executable(test_current_length
   )
 set_property(TARGET test_current_length                 PROPERTY FOLDER "Tests")
 
+add_executable(test_memory_use
+  test_memory_use.cpp
+  )
+set_property(TARGET test_memory_use                     PROPERTY FOLDER "Tests")
+
 # ----------------------------------------------------------------------
 
 target_link_libraries(test_distance
@@ -226,6 +231,11 @@ target_link_libraries(test_timestamp_format
   ${Boost_LIBRARIES}
   )
 
+target_link_libraries(test_memory_use
+  TracktableCore
+  ${Boost_LIBRARIES}
+  )
+
 # ----------------------------------------------------------------------
 
 add_test(
@@ -252,6 +262,11 @@ add_test(
  NAME C_ConvexHullPerimeter
  COMMAND test_convex_hull_perimeter
 )
+
+add_test(
+  NAME C_MemoryUse
+  COMMAND test_memory_use
+  )
 
 add_test(
  NAME C_PointAtFraction

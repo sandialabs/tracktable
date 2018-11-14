@@ -459,7 +459,7 @@ int run_test()
 
 // ----------------------------------------------------------------------
 
-int main(int, char *)
+int main(int, char *argv[])
 {
   return run_test();
 }

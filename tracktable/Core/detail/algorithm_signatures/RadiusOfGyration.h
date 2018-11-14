@@ -38,28 +38,27 @@
 
 #include <boost/mpl/assert.hpp>
 
+namespace tracktable { namespace algorithms { 
+
+template<typename T>
+struct radius_of_gyration
+{
+  BOOST_MPL_ASSERT_MSG(
+    sizeof(T) == 0,
+    RADIUS_OF_GYRATION_NOT_IMPLEMENTED_FOR_THIS_TRAJECTORY_TYPE,
+    (types<T>)
+  );
+};
+
+} } // exit namespace tracktable::algorithms
+
 namespace tracktable {
-    namespace algorithms {
 
-        template<typename T>
-        struct radius_of_gyration
-        {
-            BOOST_MPL_ASSERT_MSG(
-                sizeof(T) == 0,
-                RADIUS_OF_GYRATION_NOT_IMPLEMENTED_FOR_THIS_TRAJECTORY_TYPE,
-                (types<T>)
-            );
-        };
-    }
-} // exit namespace tracktable::algorithms
-
-namespace tracktable {
-
-    template<typename TrajectoryT>
-    double radius_of_gyration(TrajectoryT const& path)
-    {
-        return algorithms::compute_radius_of_gyration<TrajectoryT>::apply(path);
-    }
+template<typename TrajectoryT>
+double radius_of_gyration(TrajectoryT const& path)
+{
+  return algorithms::radius_of_gyration<TrajectoryT>::apply(path);
+}
 
 } // exit namespace tracktable
 

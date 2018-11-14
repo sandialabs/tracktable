@@ -38,7 +38,7 @@
  * instead.
  */
 
-#include <tracktable/Analysis/DBSCAN.h>
+#include <tracktable/Analysis/ComputeDBSCANClustering.h>
 #include <tracktable/Core/PointCartesian.h>
 #include <tracktable/Core/PointArithmetic.h>
 
@@ -57,21 +57,30 @@
 // ----------------------------------------------------------------------
 
 boost::random::mt19937 random_generator;
-boost::random::uniform_real_distribution<> random_die(-1, 1);
+boost::random::uniform_real_distribution<> random_die(0);
 
-double random_float()
+inline double random_float(double min=0, double max=1)
 {
-  return random_die(random_generator) * std::numeric_limits<double>::max();
+  double span = max - min;
+  return (random_die(random_generator) * span) + min;
 }
 
 // ----------------------------------------------------------------------
 
 double random_gaussian(double mean=0, double stddev=1)
 {
-  double u1 = random_float();
-  double u2 = random_float();
+  double u = random_float();
+  double v = random_float();
 
-  return mean + stddev*(sqrt(-2 * log(u1)) * sin(2*M_PI*u2));
+  // This is the Box-Muller transform.  Given two random numbers u, v
+  // distributed uniformly on [0, 1],
+  //
+  // y1 = sqrt(-2 log u) * cos(2 \pi v)
+  // y2 = sqrt(-2 log u) * sin(2 \pi v)
+  //
+  // y1 and y2 will be independent and normally distributed.
+  
+  return mean + stddev * (sqrt(-2 * log(u)) * sin(2*M_PI*v));
 }
 
 // ----------------------------------------------------------------------
@@ -82,6 +91,7 @@ tracktable::PointCartesian<dim> random_point_in_sphere(double sphere_radius=1)
   typedef tracktable::PointCartesian<dim> point_t;
 
   point_t result((tracktable::arithmetic::zero<point_t>()));
+  
   double squared_magnitude = 0;
   for (int i = 0; i < dim; ++i)
     {
@@ -91,6 +101,7 @@ tracktable::PointCartesian<dim> random_point_in_sphere(double sphere_radius=1)
     result[i] = rg;
     }
 
+//  std::cout << "raw point: " << result << " mag2: " << squared_magnitude << "\n";
   boost::geometry::divide_value(result, sqrt(squared_magnitude));
 
   // now scale it down to somewhere within the sphere
@@ -145,6 +156,7 @@ void point_cloud_at_hypercube_vertices(int points_per_cloud,
       point_t new_point(corner_vertex);
       boost::geometry::add_point(new_point, offset);
 
+      std::cout << "corner vertex: " << corner_vertex << " offset: " << offset << "\n";
       out_points.push_back(new_point);
       out_labels.push_back(vertex_id);
       }
@@ -157,46 +169,44 @@ template<int dimension>
 void test_dbscan()
 {
   typedef tracktable::PointCartesian<dimension> point_type;
+  typedef std::pair<int, int> cluster_label_type;
   std::vector<point_type> hd_points;
   std::vector<int> labels;
-
+  std::vector<cluster_label_type> dbscan_results;
+  
   std::cout << "test_dbscan: Generating point clouds at vertices of "
             << dimension << "-dimensional hypercube\n";
-  point_cloud_at_hypercube_vertices<dimension>(100, 0.25, hd_points, labels);
+  point_cloud_at_hypercube_vertices<dimension>(100, 0.1, hd_points, labels);
 
-  tracktable::DBSCAN<point_type> dbscan;
+  for (typename std::vector<point_type>::iterator iter = hd_points.begin();
+       iter != hd_points.end();
+       ++iter)
+    {
+    std::cout << "point: " << *iter << "\n";
+    }
+  
   point_type epsilon_halfspan;
 
   for (int d = 0; d < dimension; ++d)
     {
-    epsilon_halfspan[d] = 0.2;
+    epsilon_halfspan[d] = 0.1;
     }
 
+
   std::cout << "test_dbscan: Learning cluster assignments\n";
-  dbscan.learn_clusters(hd_points.begin(),
-                        hd_points.end(),
-                        epsilon_halfspan,
-                        10);
+  tracktable::cluster_with_dbscan(
+    hd_points.begin(),
+    hd_points.end(),
+    epsilon_halfspan,
+    10,
+    std::back_inserter(dbscan_results));
 
-  typedef std::vector<int> int_vector;
-  typedef std::vector<int_vector> int_vector_vector;
-
-  std::cout << "test_dbscan: Retrieving cluster membership lists\n";
-  int_vector_vector clusters;
-  dbscan.cluster_membership_lists(clusters);
 
   std::cout << "Vertex labels of points in each cluster:\n";
-
-  for (unsigned int cluster_id = 0; cluster_id < clusters.size(); ++cluster_id)
+  for (std::size_t i = 0; i < dbscan_results.size(); ++i)
     {
-    std::cout << "cluster " << cluster_id << ": "
-              << clusters[cluster_id].size() << " members: ";
-
-    for (unsigned int i = 0; i < clusters[cluster_id].size(); ++i)
-      {
-      std::cout << labels[clusters[cluster_id][i]] << " ";
-      }
-    std::cout << "\n";
+    std::cout << "Vertex " << dbscan_results[i].first << ": cluster "
+              << dbscan_results[i].second << "\n";
     }
 
   std::cout << "Done testing DBSCAN in "

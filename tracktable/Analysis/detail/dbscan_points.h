@@ -33,10 +33,9 @@
 #ifndef __tracktable_dbscan_points_h
 #define __tracktable_dbscan_points_h
 
-#include <boost/geometry.hpp>
 #include <boost/tuple/tuple.hpp>
 
-namespace tracktable { namespace detail {
+namespace tracktable { namespace analysis { namespace detail {
 
 template< class ContainerT, class PointT >
 class DBSCAN_IndexByIterator
@@ -78,8 +77,18 @@ public:
   typedef PointT point_type;
 
   IndexedPoint() : PointId(-1), ClusterId(0) { }
-  IndexedPoint(PointT const& point) : Point(point), PointId(-1), ClusterId(0), Visited(false) { }
-  IndexedPoint(PointT const& point, int index) : Point(point), PointId(index), ClusterId(0), Visited(false) { }
+  IndexedPoint(PointT const& point_to_index) 
+    : Point(point_to_index)
+    , PointId(-1)
+    , ClusterId(0)
+    , Visited(false) { }
+
+  IndexedPoint(PointT const& point_to_index, int index) 
+    : Point(point_to_index)
+    , PointId(index)
+    , ClusterId(0)
+    , Visited(false) { }
+
   ~IndexedPoint() { }
 
   IndexedPoint(IndexedPoint const& other)
@@ -142,6 +151,6 @@ boost::geometry::model::box<point_type> make_box(const point_type& center, const
   return box_type(min_corner, max_corner);
 }
 
-} } // close namespace tracktable::detail
+} } } // close namespace tracktable::analysis::detail
 
 #endif

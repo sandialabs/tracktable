@@ -38,7 +38,10 @@
 #ifndef __tracktable_examples_PairArgument_h
 #define __tracktable_examples_PairArgument_h
 
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
 #include <boost/program_options.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 namespace bpo = boost::program_options;
 
@@ -46,7 +49,7 @@ template< typename T, typename charT = char >
 class multiple_tokens_typed_value : public bpo::typed_value< T, charT >
 {
 public:
-  typedef tracktable::string_type string_type;
+  typedef tracktable::string_type tt_string_type;
   typedef bpo::typed_value< T, charT > base_type;
 
   // I feel queasy about using 'unsigned' as a bare type but that's

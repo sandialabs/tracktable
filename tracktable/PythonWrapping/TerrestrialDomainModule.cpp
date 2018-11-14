@@ -38,30 +38,12 @@
 // overloads are exposed in AlgorithmOverloadsModule so that
 // Boost.Python can sort out the C++ overloading by itself.
 
-#include <boost/python.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/module.hpp>
-#include <boost/python/def.hpp>
-
-//Suppress conversion warning in boost header. Only in VS for now
-#if defined(_MSC_VER)
-#pragma warning( disable : 4267 )
-#endif
-
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-
-#if defined(_MSC_VER)
-#pragma warning( pop )
-#endif
-
-#include <boost/python/return_internal_reference.hpp>
-#include <Python.h>
-
 #include <tracktable/Domain/Terrestrial.h>
 #include <tracktable/Core/Timestamp.h>
 #include <tracktable/IO/PointWriter.h>
 #include <tracktable/IO/TrajectoryWriter.h>
 
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 #include <tracktable/PythonWrapping/PythonFileLikeObjectStreams.h>
 #include <tracktable/PythonWrapping/DomainWrapperTemplates.h>
 #include <tracktable/PythonWrapping/PythonAwarePointReader.h>
@@ -71,7 +53,6 @@
 //#include <tracktable/PythonWrapping/PickleTrajectoryPoints.h>
 
 //#include <tracktable/PythonWrapping/PickleTrajectories.h>
-
 
 using tracktable::domain::terrestrial::base_point_type;
 using tracktable::domain::terrestrial::trajectory_point_type;
@@ -296,7 +277,7 @@ BOOST_PYTHON_MODULE(_terrestrial)
   using namespace boost::python;
   install_terrestrial_domain_wrappers();
 #if 0
-  def("print_int_int_map", print_map_contents<tracktable::'>);
+  def("print_int_int_map", print_map_contents<tracktable::IntIntMap>);
   def("print_string_map", print_map_contents<tracktable::StringIntMap>);
 #endif
 }
