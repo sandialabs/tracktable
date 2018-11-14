@@ -1,3 +1,36 @@
+/*
+* Copyright (c) 2014-2018 National Technology and Engineering
+* Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
+* with National Technology and Engineering Solutions of Sandia, LLC,
+* the U.S. Government retains certain rights in this software.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+*
+* 1. Redistributions of source code must retain the above copyright
+* notice, this list of conditions and the following disclaimer.
+*
+* 2. Redistributions in binary form must reproduce the above copyright
+* notice, this list of conditions and the following disclaimer in the
+* documentation and/or other materials provided with the distribution.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+* A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+* HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+* SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+* LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+* THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+// This tells Windows that we want all the #defines from cmath
+#ifndef _USE_MATH_DEFINES
+#define _USE_MATH_DEFINES
 #endif
 #include <cmath>
 
@@ -421,35 +454,35 @@ int run_test()
             tracktable::BeginningOfTime << ", Returned point timestamp is " << point_no.timestamp() << std::endl;
     }
     std::cout << "\nTesting point at length fraction 0.5\n";
-    TrajectoryPointLonLat point_mid = point_at_length_fraction(surface_trajectory, 0.5);
+    point_mid = point_at_length_fraction(surface_trajectory, 0.5);
     error_count += verify_result_redux(point_mid, expected_result_middle, "midpoint of trajectory");
 
     std::cout << "\nTesting point at length fraction 0.25\n";
-    TrajectoryPointLonLat point_first_quarter = point_at_length_fraction(surface_trajectory, 0.25);
+    point_first_quarter = point_at_length_fraction(surface_trajectory, 0.25);
     error_count += verify_result_redux(point_first_quarter, expected_result_first_quarter, "halfway between beginning and midpoint");
 
     std::cout << "\nTesting point at length fraction 0.75\n";
-    TrajectoryPointLonLat point_last_quarter = point_at_length_fraction(surface_trajectory, 0.75);
+    point_last_quarter = point_at_length_fraction(surface_trajectory, 0.75);
     error_count += verify_result_redux(point_last_quarter, expected_result_last_quarter, "halfway between midpoint and end");
 
     std::cout << "\nTesting point at length fraction 0.0\n";
-    TrajectoryPointLonLat point_start = point_at_length_fraction(surface_trajectory, 0.0);
+    point_start = point_at_length_fraction(surface_trajectory, 0.0);
     error_count += verify_result_redux(point_start, expected_result_before, "beginning of trajectory");
 
     std::cout << "\nTesting point at length fraction 1.0\n";
-    TrajectoryPointLonLat point_end = point_at_length_fraction(surface_trajectory, 1.0);
+    point_end = point_at_length_fraction(surface_trajectory, 1.0);
     error_count += verify_result_redux(point_end, expected_result_after, "end of trajectory");
 
     std::cout << "\nTesting point at length fraction -0.5\n";
-    TrajectoryPointLonLat point_before = point_at_length_fraction(surface_trajectory, -0.5);
+    point_before = point_at_length_fraction(surface_trajectory, -0.5);
     error_count += verify_result_redux(point_before, expected_result_before, "before beginning of trajectory");
 
     std::cout << "\nTesting point at length fraction 1.5\n";
-    TrajectoryPointLonLat point_after = point_at_length_fraction(surface_trajectory, 1.5);
+    point_after = point_at_length_fraction(surface_trajectory, 1.5);
     error_count += verify_result_redux(point_after, expected_result_after, "after end of trajectory");
 
     std::cout << "\nTesting point at length fraction, no points\n";
-    TrajectoryPointLonLat point_no = point_at_length_fraction(noPoints, 0.75);
+    point_no = point_at_length_fraction(noPoints, 0.75);
     if (point_no.timestamp() != tracktable::BeginningOfTime) //Coordinates are trash. Use timestamp instead.
     {
         error_count++;
