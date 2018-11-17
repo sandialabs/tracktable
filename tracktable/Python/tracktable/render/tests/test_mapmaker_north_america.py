@@ -47,7 +47,7 @@ def test_north_america_map(ground_truth_dir,
 
     pyplot.figure(figsize=(8, 6))
     (mymap, artists) = mapmaker(domain='terrestrial',
-                                map_name='north_america',
+                                map_name='region:north_america',
                                 state_color='#FF8080',
                                 country_color='#80FF80',
                                 lonlat_color='#0000FF',

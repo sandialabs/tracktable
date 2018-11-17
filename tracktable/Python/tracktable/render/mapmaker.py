@@ -27,16 +27,17 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""tracktable.render.mapmaker - Convenience wrappers for geographic map creation and decoration
+"""Convenience wrappers for geographic map creation and decoration
 """
 
 from __future__ import print_function
 
 from matplotlib import pyplot
 
-from tracktable.info   import cities
 from tracktable.render import maps
-from tracktable.render import projection
+from tracktable.render.projection import make_projection_cartesian2d
+from tracktable.render import geographic_decoration as decoration
+
 
 def mapmaker(domain, **kwargs):
     if kwargs.get('map_bbox', None) is not None:
@@ -65,7 +66,8 @@ def mapmaker(domain, **kwargs):
                 max_corner = BasePoint(map_bbox[2], map_bbox[3])
                 bbox = BoundingBox(min_corner, max_corner)
                 kwargs['map_bbox'] = bbox
-            except TypeError: # it's already a bbox
+            except TypeError:
+                # it's already a bbox
                 pass
 
         return cartesian_map(**kwargs)
@@ -90,7 +92,7 @@ def cartesian_map(map_bbox=None,
 
     print("DEBUG: cartesian_map: map_bbox is {}".format(map_bbox))
 
-    (proj, artists) = projection.make_projection_cartesian2d()
+    (proj, artists) = make_projection_cartesian2d()
 
     axes.set_aspect(kwargs.get('aspect', 'equal'))
     if map_bbox is not None:
@@ -109,28 +111,35 @@ def terrestrial_map(map_name,
                     draw_countries=True,
                     draw_states=True,
                     draw_lonlat=True,
-                    land_color='#101010',
-                    sea_color='#000000',
+                    fill_land=True,
+                    fill_water=True,
+                    land_fill_color='#101010',
+                    water_fill_color='#000000',
+                    land_zorder=4,
+                    water_zorder=4,
                     lonlat_spacing=10,
                     lonlat_color='#A0A0A0',
                     lonlat_linewidth=0.2,
-                    lonlat_zorder=4,
+                    lonlat_zorder=6,
                     coastline_color='#808080',
                     coastline_linewidth=1,
-                    coastline_zorder=3,
-                    country_color='#606060',
+                    coastline_zorder=5,
+                    country_border_color='#606060',
+                    country_fill_color='#303030',
                     country_linewidth=0.5,
-                    country_zorder=2,
-                    state_color='#404040',
+                    country_zorder=3,
+                    state_border_color='#404040',
+                    state_fill_color='none',
                     state_linewidth=0.3,
-                    state_zorder=1,
+                    state_zorder=2,
                     draw_largest_cities=None,
                     draw_cities_larger_than=None,
                     city_label_size=12,
                     city_dot_size=2,
                     city_dot_color='white',
                     city_label_color='white',
-                    border_resolution='i',
+                    city_zorder=6,
+                    border_resolution='110m',
                     map_bbox=None,
                     map_projection=None,
                     map_scale_length=None,
@@ -146,8 +155,8 @@ def terrestrial_map(map_name,
     borders and cities.
 
     Args:
-      map_name:            Region name (one of the choices in
-                           render.maps.available_maps()) or 'airport:XXX' or 'custom'
+      map_name:            Region name ('region:XXX' or 'airport:XXX' or 'city:XXX' or 'custom').  Available regions are in tracktable.render.maps.available_maps().
+
       draw_coastlines:     Whether or not to draw coastlines on the map
       draw_countries:      Whether or not to draw country borders on the map
       draw_states:         Whether or not to draw US/Canada state borders
@@ -177,7 +186,7 @@ def terrestrial_map(map_name,
       axes:                Matplotlib axes to render into
       map_bbox:            Bounding box for custom map extent
       region_size:         Size of region depicted around an airport (km width x km height)
-      map_projection:      Matplotlib string for map projection
+      map_projection:      Cartopy CRS projection object (optional)
       map_scale_length:    Length of map scale indicator (in km)
 
     Raises:
@@ -188,108 +197,111 @@ def terrestrial_map(map_name,
     """
 
     if map_name == "custom":
-        (mymap, artists) = maps.draw_custom_map(bounding_box=map_bbox,
-                                                projection=map_projection,
-                                                resolution=border_resolution,
-                                                axes=axes)
-    else:
-        (mymap, artists) = draw_basemap(map_name,
-                                        resolution=border_resolution,
-                                        region_size=region_size,
-                                        axes=axes
-                                        )
+        map_axes = maps.instantiate_map(
+            min_corner=map_bbox[0],
+            max_corner=map_bbox[1],
+            projection=map_projection
+            )
+        artists = []
 
-    artists.extend(maps.fill_continents(mymap,
-                                        land_color=land_color,
-                                        sea_color=sea_color,
-                                        zorder=0))
+    else:
+        map_axes = maps.predefined_map(
+            map_name,
+            region_size=region_size,
+            projection=map_projection
+            )
+        artists = []
+
     if draw_coastlines:
-        artists.extend(maps.draw_coastlines(mymap,
-                                            linewidth=coastline_linewidth,
-                                            color=coastline_color,
-                                            zorder=coastline_zorder))
+        artists.extend(
+            decoration.draw_coastlines(
+                map_axes,
+                edgecolor=coastline_color,
+                zorder=coastline_zorder
+            ))
+
+    if fill_land:
+        artists.extend(
+            decoration.fill_land(
+                map_axes,
+                facecolor=land_fill_color,
+                zorder=land_zorder
+                ))
+
+    if fill_water:
+        water_actors = decoration.fill_oceans(
+            map_axes,
+            facecolor=water_fill_color,
+            zorder=water_zorder
+            )
+        lake_actors = decoration.fill_lakes(
+            map_axes,
+            facecolor=water_fill_color,
+            zorder=water_zorder
+            )
+        artists.extend(water_actors)
+        artists.extend(lake_actors)
 
     if draw_countries:
-        artists.extend(maps.draw_countries(mymap,
-                                           linewidth=country_linewidth,
-                                           color=country_color,
-                                           zorder=country_zorder))
+        artists.extend(
+            decoration.draw_countries(
+                map_axes,
+                edgecolor=country_border_color,
+                facecolor=country_fill_color,
+                linewidth=country_linewidth,
+                zorder=country_zorder
+                ))
 
     if draw_states:
-        artists.extend(maps.draw_states(mymap,
-                                        linewidth=state_linewidth,
-                                        color=state_color,
-                                        zorder=state_zorder))
+        artists.extend(
+            decoration.draw_states(
+                map_axes,
+                edgecolor=state_border_color,
+                facecolor=state_fill_color,
+                linewidth=state_linewidth,
+                zorder=state_zorder
+                ))
 
     if draw_lonlat:
-        artists.extend(maps.draw_lonlat(mymap,
-                                        spacing=lonlat_spacing,
-                                        color=lonlat_color,
-                                        linewidth=lonlat_linewidth,
-                                        zorder=lonlat_zorder))
+        artists.extend(
+            decoration.draw_lonlat(
+                map_axes,
+                color=lonlat_color,
+                linewidth=lonlat_linewidth,
+                zorder=lonlat_zorder
+                ))
 
     if draw_largest_cities is not None:
-        artists.extend(maps.draw_largest_cities(mymap,
-                                                draw_largest_cities,
-                                                dot_color=city_dot_color,
-                                                dot_size=city_dot_size,
-                                                label_color=city_label_color,
-                                                label_size=city_label_size))
+        artists.extend(
+            decoration.draw_largest_cities(
+                map_axes,
+                draw_largest_cities,
+                dot_color=city_dot_color,
+                dot_size=city_dot_size,
+                label_color=city_label_color,
+                label_size=city_label_size
+            ))
 
     if draw_cities_larger_than is not None:
-        artists.extend(maps.draw_cities_larger_than(mymap,
-                                                    draw_cities_larger_than,
-                                                    dot_color=city_dot_color,
-                                                    dot_size=city_dot_size,
-                                                    label_color=city_label_color,
-                                                    label_size=city_label_size))
+        artists.extend(
+            decoration.draw_cities_larger_than(
+                map_axes,
+                draw_cities_larger_than,
+                dot_color=city_dot_color,
+                dot_size=city_dot_size,
+                label_color=city_label_color,
+                label_size=city_label_size
+            ))
 
     if map_scale_length is not None:
-        artists.extend(maps.draw_scale(mymap,
-                                       map_scale_length,
-                                       label_color=city_label_color,
-                                       label_size=city_label_size))
+        artists.extend(
+            decoration.draw_scale(
+                map_axes,
+                map_scale_length,
+                label_color=city_label_color,
+                label_size=city_label_size
+            ))
 
-    from tracktable.domain.terrestrial import BoundingBox, BasePoint
-    mymap.bbox = BoundingBox(
-        BasePoint(mymap.llcrnrlon, mymap.llcrnrlat),
-        BasePoint(mymap.urcrnrlon, mymap.urcrnrlat)
-        )
-    return (mymap, artists)
+    return (map_axes, artists)
 
 
-
-# ----------------------------------------------------------------------
-
-def draw_basemap(which_map,
-                 resolution='i',
-                 axes=None,
-                 **kwargs):
-
-    """Set up Basemap projection for a named map
-
-    This function calls out to tracktable.render.maps.predefined_map()
-    to look up and configure the Basemap projection.  You can use a
-    region name chosen from maps.available_maps() or a string of the
-    form 'airport:XXX' where XXX is the 3- or 4-letter airport ID.
-
-    Args:
-       which_map (string): Name of map to draw.  See maps.available_maps() for a list of names.
-
-    Keyword Args:
-       resolution (character): One of None, 'c', 'l', 'i', 'h', 'f' indicating "coarse", "low", "intermediate", "high" and "full" resolution.  This affects the resolution of the shapefile with border and coastline information.  Higher values take more memory and time.
-       axes (matplotlib Axes): Axes to render map information into.
-
-    Returns:
-       ( basemap, list(artists) )
-
-    Raises:
-       KeyError: You asked for a map that isn't defined.
-    """
-
-    if axes is None:
-        axes = pyplot.gca()
-
-    (mymap, artists) = maps.predefined_map(which_map, ax=axes, resolution=resolution, **kwargs)
-
-    return (mymap, artists)
