@@ -870,19 +870,36 @@ def radius_of_gyration(trajectory):
 
     return _radius_of_gyration(trajectory)
 
+# ----------------------------------------------------------------------
 
-def convex_hull_centroid(trajectory):
-    """Compute the centroid of the convex hull of a trajectory
- 
-    Centroid will be returned in the native units of
-    the domain.  This is: latitude, longitude (altitude) for the
-    terrestrial domain; and x, y (z) for Cartesian.
 
-    Args:
-      trajectory: Trajectory whose hull you want to measure
- 
-    Returns:
-      Centroid of the trajectory's convex hull
+def latitude_degree_size(latitude):
     """
- 
-    return _convex_hull_centroid(trajectory)
+    latitude_degree_size(latitude: float between -90 and 90) -> float (in km)
+
+    Compute the distance between adjacent degrees of latitude centered
+    on a given parallel.  This measurement is 111.694km at the equator
+    and 110.574km at the poles.  This is a small enough variation that
+    we'll just use linear interpolation.
+    """
+
+    return (math.fabs(latitude) / 90) * (110.574 - 111.694) + 111.594
+
+# ----------------------------------------------------------------------
+
+def longitude_degree_size(latitude):
+    """
+    longitude_degree_size(longitude: float between -90 and 90) -> float (in km)
+
+    Compute the distance between adjacent degrees of longitude at a
+    given latitude.  This varies from 111.32km at the equator to 0 at
+    the poles and decreases as the cosine of increasing latitude.
+    """
+
+    def d2r(d):
+        return math.pi * d / 180
+
+    return 111.32 * math.cos(d2r(math.fabs(latitude)))
+
+# ----------------------------------------------------------------------
+
