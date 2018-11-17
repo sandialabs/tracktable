@@ -32,6 +32,7 @@
 import sys
 import os.path
 import traceback
+
 import matplotlib
 matplotlib.use('Agg')
 
@@ -44,10 +45,25 @@ def test_europe_map(ground_truth_dir,
                     image_filename='EuropeMap.png'):
 
     pyplot.figure(figsize=(8, 6))
-    (mymap, artists) = mapmaker(domain='terrestrial',
-                                map_name='europe',
-                                lonlat_linewidth=0.25,
-                                lonlat_color='#6060FF')
+    (mymap, artists) = mapmaker(
+        domain='terrestrial',
+        map_name='region:europe',
+        lonlat_linewidth=0.25,
+        lonlat_color='#4040A0',
+        state_border_color='#806060',
+        country_border_color='#408040',
+        draw_coastlines=True,
+        draw_countries=True,
+        draw_states=True,
+        draw_lonlat=True,
+        fill_land=True,
+        fill_water=True,
+        coastline_linewidth=2,
+        coastline_color='#B0B0B0',
+        land_fill_color='#404040',
+        water_fill_color='#000030'
+   )
+
     pyplot.savefig(os.path.join(test_output_dir, image_filename),
                    dpi=150)
     pyplot.close()
