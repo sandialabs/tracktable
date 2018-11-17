@@ -46,7 +46,7 @@ def test_conus_map(ground_truth_dir,
                    image_filename='ConusMap.png'):
 
     pyplot.figure(figsize=(8, 6))
-    (mymap, artists) = mapmaker(map_name='conus', domain='terrestrial')
+    (mymap, artists) = mapmaker(map_name='region:conus', domain='terrestrial')
     pyplot.savefig(os.path.join(test_output_dir, image_filename),
                    dpi=150)
     pyplot.close()
