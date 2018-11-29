@@ -259,7 +259,7 @@ def setup_matplotlib_figure(args, renderer):
     figure_dimensions = [ float(image_resolution[0]) / dpi, float(image_resolution[1]) / dpi ]
     figure = pyplot.figure(figsize=figure_dimensions, facecolor='black', edgecolor='black')
 
-    axes = figure.add_axes([0, 0, 1, 1], frameon=False, axisbg='black')
+    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor='black')
     axes.set_frame_on(False)
 
     renderer.dpi = dpi
