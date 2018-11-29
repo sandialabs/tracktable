@@ -118,7 +118,7 @@ def main():
 
     print("STATUS: Initializing canvas")
     figure = pyplot.figure(figsize=figure_dimensions, facecolor='black', edgecolor='black')
-    axes = figure.add_axes([0, 0, 1, 1], frameon=False, axisbg='black')
+    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor='black')
     axes.set_frame_on(False)
 
     print("STATUS: Initializing trajectory source")
