@@ -31,11 +31,15 @@ sys.path.insert(0, os.path.abspath(os.path.join(tracktable_src, 'tracktable', 'P
 # pretend to have imported already.
 
 autodoc_mock_imports = [
-    'tracktable.core',
     'shapefile',
     'shapely',
     'mpl_toolkits.basemap',
     'matplotlib',
+    'tracktable.core.core_types',
+    'tracktable.core._core_types',
+    'tracktable.core._domain_algorithm_overloads',
+    'tracktable.analysis._dbscan_clustering',
+    'tracktable.analysis._rtree',
     'tracktable.domain._terrestrial',
     'tracktable.domain._cartesian2d',
     'tracktable.domain._cartesian3d'
