@@ -71,8 +71,10 @@ template<std::size_t Dimension>
 class PointCartesian : public PointBase<Dimension>
 {
 public:
+  friend class boost::serialization::access;
+  
   /// Convenient alias for the parent class
-  typedef PointBase<Dimension> base_type;
+  typedef PointBase<Dimension> Superclass;
 
   /// Create an uninitialized point
   PointCartesian() { }
@@ -82,7 +84,7 @@ public:
   /// Make this point into a copy of another
   //
   // \param other Point we want to copy
-  PointCartesian(base_type const& other)
+  PointCartesian(Superclass const& other)
     {
       detail::assign_coordinates<Dimension>::apply(*this, other);
     }
@@ -112,6 +114,14 @@ public:
       outbuf << ")";
       return outbuf.str();
     }
+
+private:
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version)
+  {
+    ar & boost::serialization::base_object<PointBase>(*this);
+  }
+
 };
 
 } // exit namespace tracktable
@@ -183,7 +193,7 @@ struct tag< PointCartesian<Dimension> >
 };
 
 template<std::size_t Dimension>
-struct dimension< PointCartesian<Dimension> > : dimension< typename PointCartesian<Dimension>::base_type > {};
+struct dimension< PointCartesian<Dimension> > : dimension< typename PointCartesian<Dimension>::Superclass > {};
 
 template<std::size_t Dimension>
 struct point_domain_name< PointCartesian<Dimension> >
