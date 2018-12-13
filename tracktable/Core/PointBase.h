@@ -59,6 +59,7 @@
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/mpl/int.hpp>
 #include <boost/serialization/array.hpp>
+#include <boost/serialization/base_object.hpp>
 
 namespace tracktable {
 
