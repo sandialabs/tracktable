@@ -39,44 +39,140 @@
 #include <sstream>
 
 
-int
-test_point_base_serialization()
+template<typename point_type>
+point_type serialized_copy(point_type const& input_point)
 {
-  tracktable::PointBase<2> point, restored_point;
-  point[0] = 1;
-  point[1] = 2;
-
+  point_type restored_point;
+  
   std::ostringstream temp_out;
   boost::archive::text_oarchive archive_out(temp_out);
-  archive_out << point;
+  archive_out << input_point;
 
   std::istringstream temp_in(temp_out.str());
   boost::archive::text_iarchive archive_in(temp_in);
   archive_in >> restored_point;
 
-  if (point != restored_point)
+  return restored_point;
+}
+
+// ----------------------------------------------------------------------
+
+int
+test_point_base_serialization()
+{
+  tracktable::PointBase<2> point, point_copy;
+  point[0] = 1;
+  point[1] = 2;
+
+  point_copy = serialized_copy(point);
+  if (point != point_copy)
     {
     std::cerr << "ERROR: Serialization/deserialization of "
               << "tracktable::PointBase failed.  Original "
               << "point was "
               << point
               << " and restored point was "
-              << restored_point << ".\n";
+              << point_copy << ".\n";
     return 1;
     }
   else
     {
     return 0;
     }
-  
 }
 
+// ----------------------------------------------------------------------
+
+int
+test_point_lonlat_serialization()
+{
+  tracktable::PointLonLat point, point_copy;
+  point[0] = -10;
+  point[1] = 20;
+
+  point_copy = serialized_copy(point);
+  if (point != point_copy)
+    {
+    std::cerr << "ERROR: Serialization/deserialization of "
+              << "tracktable::PointLonLat failed.  Original "
+              << "point was "
+              << point
+              << " and restored point was "
+              << point_copy << ".\n";
+    return 1;
+    }
+  else
+    {
+    return 0;
+    }
+}
+
+// ----------------------------------------------------------------------
+
+int
+test_point_cartesian2d_serialization()
+{
+  tracktable::PointCartesian<2> point, point_copy;
+  point[0] = 3.14;
+  point[1] = 6.28;
+
+  point_copy = serialized_copy(point);
+  if (point != point_copy)
+    {
+    std::cerr << "ERROR: Serialization/deserialization of "
+              << "tracktable::PointCartesian<2> failed.  Original "
+              << "point was "
+              << point
+              << " and restored point was "
+              << point_copy << ".\n";
+    return 1;
+    }
+  else
+    {
+    return 0;
+    }
+}
+
+// ----------------------------------------------------------------------
+
+int
+test_point_cartesian3d_serialization()
+{
+  tracktable::PointCartesian<3> point, point_copy;
+  point[0] = 3.14;
+  point[1] = 6.28;
+  point[2] = 2.71828;
+  
+  point_copy = serialized_copy(point);
+  if (point != point_copy)
+    {
+    std::cerr << "ERROR: Serialization/deserialization of "
+              << "tracktable::PointCartesian<3> failed.  Original "
+              << "point was "
+              << point
+              << " and restored point was "
+              << point_copy << ".\n";
+    return 1;
+    }
+  else
+    {
+    return 0;
+    }
+}
+
+// ----------------------------------------------------------------------
+
+
+  
 int
 main(int argc, char *argv[])
 {
   int num_errors = 0;
 
   num_errors += test_point_base_serialization();
+  num_errors += test_point_lonlat_serialization();
+  num_errors += test_point_cartesian2d_serialization();
+  num_errors += test_point_cartesian3d_serialization();
 
   return num_errors;
 }
