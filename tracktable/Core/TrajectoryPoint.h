@@ -385,7 +385,7 @@ private:
   template<typename archive_t>
   void serialize(archive_t& archive, const unsigned int version)
   {
-    archive & boost::serialization::base_object<TrajectoryPoint>(*this);
+    archive & boost::serialization::base_object<Superclass>(*this);
     archive & this->CurrentLength;
     archive & this->ObjectId;
     archive & this->UpdateTime;
