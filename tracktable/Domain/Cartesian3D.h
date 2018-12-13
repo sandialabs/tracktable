@@ -124,6 +124,13 @@ public:
       return *this;
     }
 
+private:
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version)
+  {
+    ar & boost::serialization::base_object<CartesianPoint3D>(*this);
+  }
+
   // Everything else -- operator==, operator!=, operator<< --
   // delegated implicitly to the superclass
 };
@@ -227,6 +234,13 @@ public:
       this->Superclass::operator=(other);
       return *this;
     }
+
+private:
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version)
+  {
+    ar & boost::serialization::base_object<CartesianTrajectoryPoint3D>(*this);
+  }
 
   // Everything else -- operator==, operator!=, operator<< --
   // delegated to the superclass
