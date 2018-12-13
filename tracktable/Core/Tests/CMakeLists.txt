@@ -109,6 +109,11 @@ add_executable(test_trajectory_lonlat
 )
 set_property(TARGET test_trajectory_lonlat              PROPERTY FOLDER "Tests")
 
+add_executable(test_trajectory_point_serialization
+  test_trajectory_point_serialization.cpp
+  )
+set_property(TARGET test_trajectory_point_serialization            PROPERTY FOLDER "Tests")
+
 add_executable(test_trajectory_point_lonlat
  test_trajectory_point_lonlat.cpp
 )
@@ -222,6 +227,11 @@ target_link_libraries(test_trajectory_lonlat
 )
 
 target_link_libraries(test_trajectory_point_lonlat
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
+target_link_libraries(test_trajectory_point_serialization
   TracktableCore
   ${Boost_LIBRARIES}
 )

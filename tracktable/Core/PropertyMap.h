@@ -68,6 +68,8 @@ typedef enum {
 class NullValue
 {
 public:
+  friend class boost::serialization::access;
+  
   PropertyUnderlyingType ExpectedType;
 
   NullValue()
@@ -95,6 +97,14 @@ public:
     {
       return (this->ExpectedType < other.ExpectedType);
     }
+
+private:
+  template<typename Archive>
+  void serialize(Archive& ar, const unsigned int version)
+  {
+    ar & this->ExpectedType;
+  }
+  
 };
 
 TRACKTABLE_CORE_EXPORT std::ostream& operator<<(std::ostream& out, NullValue const& value);
@@ -403,5 +413,6 @@ struct extrapolate<PropertyMap>
 };
 
 } } // exit namespace tracktable::algorithms
+
 
 #endif
