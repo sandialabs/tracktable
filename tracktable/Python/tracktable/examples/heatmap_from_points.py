@@ -123,7 +123,7 @@ def parse_args():
 
     parser.add_argument('--colormap', '-c',
                         default='gist_heat',
-                        help='Name of colormap for histogram.  Defaults to "bone".  See matplotlib documentation for a list of possibilities.')
+                        help='Name of colormap for histogram.  Defaults to "gist_heat" thermal scale.  See matplotlib documentation for a list of possibilities.')
 
     parser.add_argument('--scale', '-s',
                         default='linear',
