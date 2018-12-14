@@ -220,6 +220,8 @@ def main():
 
     pyplot.close()
 
+    print("Movie render complete. File saved to {}".format(args.movie_file[0]))
+
     return 0
 
 # ----------------------------------------------------------------------
