@@ -144,7 +144,6 @@ options with the ``--help`` argument::
 
    $ python -m "tracktable.examples.heatmap_from_points" --help
 
-
 .. _trajectory-map-example:
 
 --------------------------
@@ -206,6 +205,7 @@ overwhelmed.  Don't forget the backslash (\) in front of the color. ::
 
    $ python -m "tracktable.examples.trajectory_map_from_points"
        --state-color \#80FF80
+       --state-linewidth 2
        --trajectory-linewidth 1
        --trajectory-colormap winter
        --map custom
@@ -244,7 +244,7 @@ and `--map-bbox x y X Y` as follows::
          --map-bbox -100 -100 100 100
          --domain cartesian2d
          TRACKTABLE/examples/data/SamplePointsCartesian.csv
-         TrajectoryMapExample5.png
+	 trajectory_map_cartesian.png
 
 Support for automatically determining the bounding box of the data and
 adding an appropriate margin is coming soon.
@@ -305,6 +305,7 @@ Cartesian Movie
 As with geographic data, we can also make movies from data in flat Cartesian space::
 
     $ python -m "tracktable.examples.movie_from_points"
+
       --domain cartesian2d
       --object-id-column 0
       --timestamp-column 1
@@ -324,3 +325,8 @@ from start to finish and the default colormap ("heat") is black at the
 beginning.  If you would like to see them bright and vivid right from
 the start, add an argument like ``--trajectory-colormap prism`` (or
 any other Matplotib colormap you like).
+=======
+      example_cartesian_trajectory_movie.m4v
+
+
+>>>>>>>  (1) Some filenames changed that didn't propagate to the documentation. (2) Some module dependencies must have changed over time as directory structures changed.
