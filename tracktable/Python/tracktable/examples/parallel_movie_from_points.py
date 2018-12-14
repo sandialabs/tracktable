@@ -69,7 +69,7 @@ import example_trajectory_rendering
 import example_movie_rendering
 
 
-from tracktable.features              import annotations
+from tracktable.feature               import annotations
 from tracktable.filter.trajectory     import ClipToTimeWindow as ClipTrajectoryToTimeWindow, FilterByBoundingBox as FilterTrajectoriesByBoundingBox
 from tracktable.render                import colormaps, mapmaker, paths
 from tracktable.core                  import geomath, Timestamp
