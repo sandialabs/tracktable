@@ -129,6 +129,11 @@ add_executable(test_trajectory_radius_of_gyration
 )
 set_property(TARGET test_trajectory_radius_of_gyration  PROPERTY FOLDER "Tests")
 
+add_executable(test_trajectory_serialization
+  test_trajectory_serialization.cpp
+  )
+set_property(TARGET test_trajectory_serialization PROPERTY FOLDER "Tests")
+
 add_executable(test_trajectory_subset
  test_trajectory_subset.cpp
 )
@@ -251,6 +256,11 @@ target_link_libraries(test_trajectory_radius_of_gyration
   ${Boost_LIBRARIES}
 )
 
+target_link_libraries(test_trajectory_serialization
+  TracktableCore
+  ${Boost_LIBRARIES}
+  )
+
 target_link_libraries(test_trajectory_subset
   TracktableCore
   ${Boost_LIBRARIES}
@@ -367,6 +377,11 @@ add_test(
   NAME C_TrajectoryRadiusOfGyration
   COMMAND test_trajectory_radius_of_gyration
 )
+
+add_test(
+  NAME C_TrajectorySerialization
+  COMMAND test_trajectory_serialization
+  )
 
 add_test(
   NAME C_TimestampFormat
