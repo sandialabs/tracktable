@@ -119,7 +119,7 @@ private:
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
-    ar & boost::serialization::base_object<Superclass>(*this);
+    ar & boost::serialization::make_nvp("Coordinates", this->Coordinates);
   }
 
 };
