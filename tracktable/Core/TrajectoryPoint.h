@@ -385,11 +385,15 @@ private:
   template<typename archive_t>
   void serialize(archive_t& archive, const unsigned int version)
   {
-    archive & boost::serialization::base_object<Superclass>(*this);
-    archive & this->CurrentLength;
-    archive & this->ObjectId;
-    archive & this->UpdateTime;
-    archive & this->Properties;
+/*
+    archive & boost::serialization::make_nvp("Superclass",
+                                             static_cast<Superclass*>(*this)); 
+*/
+    archive & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
+    archive & BOOST_SERIALIZATION_NVP(CurrentLength);
+    archive & BOOST_SERIALIZATION_NVP(ObjectId);
+    archive & BOOST_SERIALIZATION_NVP(UpdateTime);
+    archive & BOOST_SERIALIZATION_NVP(Properties);
   }
   
 };
