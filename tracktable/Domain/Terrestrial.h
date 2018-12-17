@@ -140,7 +140,7 @@ private:
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
-    ar & boost::serialization::base_object<TerrestrialPoint>(*this);
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
   }
 };
 
@@ -177,6 +177,8 @@ private:
 class TerrestrialTrajectoryPoint : public TrajectoryPoint<TerrestrialPoint>
 {
 public:
+  friend class boost::serialization::access;
+  
   typedef TrajectoryPoint<TerrestrialPoint> Superclass;
 
   /// Create an uninitialized point
@@ -217,7 +219,7 @@ private:
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
-    ar & boost::serialization::base_object<TerrestrialTrajectoryPoint>(*this);
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
   }
 
 };
