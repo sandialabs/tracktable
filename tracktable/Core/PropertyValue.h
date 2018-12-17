@@ -105,7 +105,7 @@ private:
   template<typename Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
-    ar & this->ExpectedType;
+    ar & BOOST_SERIALIZATION_NVP(this->ExpectedType);
   }
   
 };
@@ -209,5 +209,46 @@ TRACKTABLE_CORE_EXPORT PropertyValueT extrapolate_property(PropertyValueT const&
                                                            double t);
 } } // namespace tracktable::algorithms
 
+
+namespace boost { namespace serialization {
+
+template<typename Archive>
+void save(Archive& ar, tracktable::PropertyUnderlyingType const& value, const unsigned int version)
+{
+  ar & static_cast<int>(value);
+}
+
+template<typename Archive>
+void load(Archive& ar, tracktable::PropertyUnderlyingType& value, const unsigned int version)
+{
+  int value_as_int;
+  ar & value_as_int;
+
+  switch (value_as_int)
+    {
+    case 0: {
+    value = tracktable::TYPE_UNKNOWN; 
+    }; break;
+    case 1: {
+    value = tracktable::TYPE_REAL;
+    }; break;
+    case 2: {
+    value = tracktable::TYPE_STRING; 
+    }; break;
+    case 3: {
+    value = tracktable::TYPE_TIMESTAMP; 
+    }; break;
+    case 4: {
+    value = tracktable::TYPE_INTEGER; 
+    }; break;
+    case 5: {
+    value = tracktable::TYPE_NULL; 
+    }; break;
+    }
+}
+
+} } // namespace boost::serialization
+
+BOOST_SERIALIZATION_SPLIT_FREE(tracktable::PropertyUnderlyingType)
 
 #endif

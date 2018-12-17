@@ -202,7 +202,7 @@ protected:
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
-    ar & this->Coordinates;
+    ar & boost::serialization::make_nvp("Coordinates", this->Coordinates);
   }
   
 };
