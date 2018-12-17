@@ -47,6 +47,7 @@ set( Core_SRCS
   PointLonLat.cpp
   PropertyConverter.cpp
   PropertyMap.cpp
+  PropertyValue.cpp
   Timestamp.cpp
   TimestampConverter.cpp
   )
@@ -67,6 +68,7 @@ set( Core_HEADERS
   PointTraits.h
   PropertyConverter.h
   PropertyMap.h
+  PropertyValue.h
   Timestamp.h
   TimestampConverter.h
   TracktableCommon.h
