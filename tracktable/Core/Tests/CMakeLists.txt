@@ -99,9 +99,14 @@ add_executable(test_property_map
 )
 set_property(TARGET test_property_map                   PROPERTY FOLDER "Tests")
 
+add_executable(test_serialize_variant
+  test_serialize_variant.cpp
+  )
+set_property(TARGET test_serialize_variant             PROPERTY FOLDER "Tests")
+
 add_executable(test_simplify_linestring
  test_simplify_linestring.cpp
-)
+ )
 set_property(TARGET test_simplify_linestring            PROPERTY FOLDER "Tests")
 
 add_executable(test_trajectory_lonlat
@@ -216,6 +221,11 @@ target_link_libraries(test_property_map
  ${Boost_LIBRARIES}
 )
 
+target_link_libraries(test_serialize_variant
+  TracktableCore
+  ${Boost_LIBRARIES}
+  )
+
 target_link_libraries(test_simplify_linestring
   TracktableCore
   ${Boost_LIBRARIES}
@@ -319,11 +329,6 @@ add_test(
 )
 
 add_test(
- NAME C_PointSerialization
- COMMAND test_point_serialization
-)
-
-add_test(
   NAME C_PropertyMap
   COMMAND test_property_map
 )
@@ -332,6 +337,11 @@ add_test(
   NAME C_PointInterpolation
   COMMAND test_point_interpolation
 )
+
+add_test(
+  NAME C_SerializeVariant
+  COMMAND test_serialize_variant
+  )
 
 add_test(
   NAME C_SimplifyLinestring
