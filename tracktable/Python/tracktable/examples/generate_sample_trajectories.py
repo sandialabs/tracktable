@@ -51,9 +51,10 @@ import sys
 
 from six.moves import range
 
-from tracktable.core import geomath, trajectory, timestamp
+from tracktable.core import geomath, timestamp, conversions
 from tracktable.info import cities, airports
 from tracktable.source import trajectory, path_point_source, combine
+from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -115,7 +116,7 @@ def time_between_positions(start, end, desired_speed=800):
     yon.
     """
 
-    distance = geomath.radians_to_km(geomath.distance_between(start, end))
+    distance = conversions.radians_to_km(geomath.distance(start, end))
     seconds = 3600.0 * (distance / desired_speed)
     return datetime.timedelta(seconds=seconds)
 
@@ -149,9 +150,17 @@ def trajectory_point_generator(start_airport, end_airport, start_time, object_id
     the ending airport with the desired speed and time between points.
     """
 
-    travel_time = time_between_positions(start_airport.position, end_airport.position, desired_speed=desired_speed)
+    start_position = TerrestrialTrajectoryPoint()
+    start_position[0] = start_airport.position[0]
+    start_position[1] = start_airport.position[1]
 
-    num_points = num_points_between_positions(start_airport.position, end_airport.position,
+    end_position = TerrestrialTrajectoryPoint()
+    end_position[0] = end_airport.position[0]
+    end_position[1] = end_airport.position[1]
+
+    travel_time = time_between_positions(start_position, end_position, desired_speed=desired_speed)
+
+    num_points = num_points_between_positions(start_position, end_position,
                                               desired_speed=desired_speed,
                                               seconds_between_points=seconds_between_points)
 
