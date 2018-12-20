@@ -47,6 +47,8 @@ trajectories.  You can render several groups by instantiating several
 of them.
 """
 
+from __future__ import division, absolute_import, print_function
+
 import matplotlib
 matplotlib.use('Agg')
 
@@ -69,7 +71,7 @@ import example_trajectory_rendering
 import example_movie_rendering
 
 
-from tracktable.features              import annotations
+from tracktable.feature               import annotations
 from tracktable.filter.trajectory     import ClipToTimeWindow as ClipTrajectoryToTimeWindow, FilterByBoundingBox as FilterTrajectoriesByBoundingBox
 from tracktable.render                import colormaps, mapmaker, paths
 from tracktable.core                  import geomath, Timestamp
