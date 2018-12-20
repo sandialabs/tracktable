@@ -3,7 +3,7 @@
 Conventions and Principles
 ==========================
 
-1. Point classes in tracktable/Core (e.g. PointBase, PointLonLat and
+1. C++: Point classes in tracktable/Core (e.g. PointBase, PointLonLat and
    PointCartesian) should not be instantiated directly.
 
    Instead of using these, we encourage users to use the classes in
@@ -11,6 +11,16 @@ Conventions and Principles
    `base_point_type`, `trajectory_point_type`, `trajectory_type`,
    `box_type`, `linestring_type`, `base_point_reader_type` and
    `trajectory_point_reader_type`.
+
+   To create a variable that is a trajectory in the Terrestrial
+   domain, use code like the following:
+
+.. code-block:: c++
+
+  #include <tracktable/Domain/terrestrial.h>
+
+  tracktable::domain::terrestrial::trajectory_type my_trajectory;
+
 
 2. Each domain shall be consistent in its use of units.
 
@@ -59,6 +69,9 @@ Conventions and Principles
    dependencies and sticking to stable versions we make it easier to
    use Tracktable in any environment of interest.
 
+   We ruefully acknowledge the fact that Boost is not a minimal
+   dependency.
+   
 .. TODO: Include coding conventions
 
 "Those are my principles, and if you don't like them... well, I have others."
