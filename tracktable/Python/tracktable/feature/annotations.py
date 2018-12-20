@@ -28,7 +28,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""tracktable.features.annotations:
+"""tracktable.feature.annotations:
 
 Annotate points or trajectories (or the points in a trajectory) with useful derived quantities
 """
