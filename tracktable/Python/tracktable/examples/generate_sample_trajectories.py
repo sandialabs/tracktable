@@ -55,6 +55,7 @@ from tracktable.core import geomath, timestamp, conversions
 from tracktable.info import cities, airports
 from tracktable.source import trajectory, path_point_source, combine
 from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
+from tracktable.domain.terrestrial import TrajectoryPointWriter as TerrestrialTrajectoryPointWriter
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -262,7 +263,9 @@ def main():
     single_point_list = combine.interleave_points_by_timestamp(*point_iterables)
 
     with open(args.output[0], 'wb') as outfile:
-        write_points_to_file(single_point_list, outfile)
+        writer = TerrestrialTrajectoryPointWriter(outfile)
+        writer.write(single_point_list)
+#        write_points_to_file(single_point_list, outfile)
 
     return 0
 
