@@ -28,7 +28,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+from __future__ import print_function, absolute_import, division
+
 import pytz
+import sys
 import unittest
 
 from datetime import datetime
@@ -39,28 +42,37 @@ from tracktable.core import Timestamp
 class TestParseTimestampWithTimeZone(unittest.TestCase):
 
     def test_time_zone_non_iso(self):
-        timestring = '2014-12-25 10:12:45-0300'
-        parsed_timestamp = Timestamp.from_string(
-            timestring,
-            format_string='%Y-%m-%d %H:%M:%S%z')
-        constructed_timestamp = datetime(2014, 12, 25,
-                                         hour=13, minute=12, second=45,
-                                         tzinfo=pytz.utc)
+        if sys.version_info[0] == 3:
+            timestring = '2014-12-25 10:12:45-0300'
+            parsed_timestamp = Timestamp.from_string(
+                timestring,
+                format_string='%Y-%m-%d %H:%M:%S%z')
 
-        self.assertTrue(parsed_timestamp.tzinfo is not None)
-        self.assertTrue(parsed_timestamp == constructed_timestamp)
+            constructed_timestamp = datetime(2014, 12, 25,
+                                             hour=13, minute=12, second=45,
+                                             tzinfo=pytz.utc)
+
+            self.assertTrue(parsed_timestamp.tzinfo is not None)
+            self.assertTrue(parsed_timestamp == constructed_timestamp)
+        else:
+            print("Time zone parsing is only supported in Python 3")
+            self.assertTrue(True)
 
     def test_with_time_zone_iso(self):
-        timestring = '2014-12-25T10:12:45-0300'
-        parsed_timestamp = Timestamp.from_string(
-            timestring,
-            format_string='%Y-%m-%dT%H:%M:%S%z')
-        constructed_timestamp = datetime(2014, 12, 25,
-                                         hour=13, minute=12, second=45,
-                                         tzinfo=pytz.utc)
+        if sys.version_info[0] == 3:
+            timestring = '2014-12-25T10:12:45-0300'
+            parsed_timestamp = Timestamp.from_string(
+                timestring,
+                format_string='%Y-%m-%dT%H:%M:%S%z')
+            constructed_timestamp = datetime(2014, 12, 25,
+                                             hour=13, minute=12, second=45,
+                                             tzinfo=pytz.utc)
 
-        self.assertTrue(parsed_timestamp.tzinfo is not None)
-        self.assertTrue(parsed_timestamp == constructed_timestamp)
+            self.assertTrue(parsed_timestamp.tzinfo is not None)
+            self.assertTrue(parsed_timestamp == constructed_timestamp)
+        else:
+            print("Time zone parsing is only supported in Python 3")
+            self.assertTrue(True)
 
 
 if __name__ == '__main__':
