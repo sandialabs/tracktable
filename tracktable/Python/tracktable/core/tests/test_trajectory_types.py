@@ -269,7 +269,7 @@ def test_trajectory():
 
     print("Testing point_at_length_fraction, No Points")
     no_point = geomath.point_at_length_fraction(empty_trajectory, 0.5)
-    empty_point = TerrestrialTrajectoryPoint()
+    empty_point = TerrestrialTrajectoryPoint.zero()
     error_count += verify_point(no_point,empty_point, "Point at length fraction (no points)")   
     
     print("Testing interpolation at timestamp before trajectory")
