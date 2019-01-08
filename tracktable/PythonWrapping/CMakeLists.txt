@@ -34,6 +34,12 @@
 # a single symbol -- its entry point -- and Boost.Python already
 # handles the dllexport/dllimport annotation for that.
 #
+
+
+# ----------------------------------------------------------------------
+#
+# So, what's the Boost.Python library called?
+#
 # Versions of Boost from 1.57 through 1.66 generate
 # libboost_python3.so for Python 3.  From 1.67 onward we get
 # libboost_pythonXY.so for Python X.Y.  In order to figure out the
@@ -75,7 +81,38 @@ else (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
   message(WARNING "Boost.Python library version cannot be determined until both Boost and Python have been found.")
 endif (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
 
+# ----------------------------------------------------------------------
+# 
+# Dealing with Anaconda
+# 
+# The Anaconda Python distribution statically links the Python library
+# into its interpreter on OS X (possibly other platforms as well).
+# This causes a segmentation fault when we try to load one of the
+# compiled C++ extensions that links against Boost.Python and,
+# transitively, libpython.
+# 
+# The solution is to not link against libpython and instead tell the
+# linker to leave unresolved symbols unresolved until load time.
+
+include(DetectAnaconda)
+
+if (APPLE)
+  message("STATUS: Before check_for_anaconda, PYTHON_EXECUTABLE is ${PYTHON_EXECUTABLE}")
+  set(PYTHON_IS_ANACONDA FALSE)
+  check_for_anaconda(${PYTHON_EXECUTABLE} PYTHON_IS_ANACONDA)
+  message("STATUS: After check, PYTHON_IS_ANACONDA is '${PYTHON_IS_ANACONDA}'")
+  if (PYTHON_IS_ANACONDA)
+    # This is an obscure way of using target_link_libraries to pass linker flags
+    set(PYTHON_LIBRARIES "-undefined dynamic_lookup")
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+    message("STATUS: Linker flags: ${CMAKE_SHARED_LINKER_FLAGS}")
+  endif (PYTHON_IS_ANACONDA)
+endif (APPLE)
+
+
 include(PythonExtension)
+
+
 
 set( FEATURE_VECTOR_MAX_DIMENSION 30 CACHE STRING "Maximum dimension of feature vectors for Python wrapping." )
 
