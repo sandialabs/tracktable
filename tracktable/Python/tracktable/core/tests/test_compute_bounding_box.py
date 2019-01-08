@@ -42,10 +42,10 @@ from tracktable.domain.terrestrial import Trajectory as TerrestrialTrajectory
 from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
 from tracktable.domain.cartesian2d import Trajectory as Cartesian2dTrajectory
 from tracktable.domain.cartesian2d import TrajectoryPoint as Cartesian2dTrajectoryPoint
-from tracktable.render.mapmaker import mapmaker
 
-from matplotlib import pyplot
-from matplotlib import colors
+#from tracktable.render.mapmaker import mapmaker
+#from matplotlib import pyplot
+#from matplotlib import colors
 
 def verify_result(expected, actual, test_name):
     if (expected.min_corner[0] != actual.min_corner[0] or
