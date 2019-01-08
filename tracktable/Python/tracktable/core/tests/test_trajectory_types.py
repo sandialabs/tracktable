@@ -34,6 +34,7 @@ import pickle
 import sys
 from six import StringIO
 import datetime
+import pytz
 
 from tracktable.core import geomath
 from tracktable.domain.terrestrial import Trajectory as TerrestrialTrajectory
@@ -55,7 +56,7 @@ def test_trajectory():
     print("Testing Trajectory class.")
     error_count = 0
 
-    right_now = datetime.datetime.now(datetime.timezone.utc)
+    right_now = datetime.datetime.now(pytz.utc)
 
     boston = TerrestrialTrajectoryPoint(-71.0636, 42.3581)
     boston.timestamp = right_now
