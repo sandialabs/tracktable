@@ -21,7 +21,71 @@ or ``...INSTALL_DIR/Python/tracktable`` if installed elsewhere.  We
 further assume that ``python`` is whichever Python executable you
 specified at build time.
 
+--------------
+Before You Run
+--------------
 
+Before you can run the scripts below you have to tell Python (and
+possibly your operating system) where to find the Tracktable
+libraries.  This involves modifying two environment variables.  You
+should only modify them for your own account -- it's not necessary (or
+especially helpful) to change the values system-wide.
+
+1.  ``PYTHONPATH``
+
+    Tell the Python interpreter to search the Tracktable Python
+    directory for its libraries.  To do this, add all but the last
+    component of the ``TRACKTABLE`` directory we described above to the
+    environment variable ``PYTHONPATH``.  For example, if your Tracktable
+    directory is ``/home/wilson/src/tracktable/Python/tracktable``, you
+    would add ``/home/wilson/src/tracktable/Python`` to ``PYTHONPATH``.
+    It doesn't matter whether or not you include the trailing slash.
+
+    If you haven't done this, Python will throw an error similar to
+    "ModuleNotFoundError: No module named 'tracktable'" when you try
+    to do anything that involves Tracktable, including running the
+    examples below.
+
+2.  System path
+
+    Besides the Python code, you will probably have to add the
+    location of the Tracktable compiled libraries to your library
+    search path.  This path is stored in the environment variable
+    ``PATH`` on Windows, ``LD_LIBRARY_PATH`` on Linux (and most Unix
+    variants) and ``DYLD_LIBRARY_PATH`` on Mac OS X.  The value to add
+    to your path differs depending on whether you are running
+    Tracktable from an installation (i.e. you typed 'make install'
+    after building or installed Tracktable from a binary package) or
+    from the source tree (i.e. you have not typed 'make install' or
+    anything similar).
+
+    **Install tree**: Suppose that you have installed Tracktable in
+    ``/usr/local/tracktable``.  Add the path
+    ``/usr/local/tracktable/lib`` to your library search path.
+
+    **Source tree**: Suppose that your build directory (which you
+    specified when you ran ``cmake``) is
+    ``/home/wilson/src/tracktable/build``.  Add the directory
+    ``/home/wilson/src/tracktable/build/lib`` to your library search
+    path.  Be sure to replace ``/home/awilson/tracktable/build`` with
+    the actual build directory that you used.
+
+    If you haven't done this, Python will usually complain that it can't
+    import something from the ``core_types`` module.
+
+    If you still see errors about ``core_types`` after fixing this,
+    make sure your Boost libraries are also on your library search
+    path.
+
+    **Note for OS X**: If you built Tracktable with the system default
+     Python interpreter instead of installing Anaconda or similar, the
+     operating system will ignore any changes you have made to your
+     library search path.  This happens because of a change made to
+     the operating system starting with 10.11 (El Capitan) called
+     System Integrity Protection.  We are working on a fix for this
+     but for the moment the best approach is to use a third-party
+     Python installation.
+    
 .. _heatmap-example:
 
 -----------------------------------
