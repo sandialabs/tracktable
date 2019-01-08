@@ -35,6 +35,7 @@ from tracktable.io.read_write_dictionary import trajectory_from_dictionary
 from tracktable.io.read_write_dictionary import dictionary_from_trajectory
 from tracktable.core import Timestamp
 import importlib
+import pprint
 import unittest
 
 class TestReadWriteDictionary(unittest.TestCase):
@@ -117,24 +118,27 @@ class TestReadWriteDictionary(unittest.TestCase):
         return dictionary, trajectory
 
     def tst_trajectory_from_dictionary(self, domain):
-        print("Testing the conversion of a dictionary to a trajectory in the "+domain+" domain.")
+        print("Testing the conversion of a dictionary to a trajectory in the {} domain.".format(domain))
         dictionary, trajectoryExpected = self.gen_dictionary_and_trajectory(domain)
 
         trajectory = trajectory_from_dictionary(dictionary)
 
         self.assertEqual(trajectory, trajectoryExpected,
-                         msg="Error: The "+domain+" trajectory generated from dictionary does not match what"
-                         "was expected")
+                         msg=("Error: The {} trajectory generated from dictionary "
+                              "does not match what was expected").format(domain))
 
     def tst_dictionary_from_trajectory(self, domain):
-        print("Testing the conversion of a trajectory to a dictionary in the "+domain+" domain.")
+        print("Testing the conversion of a trajectory to a dictionary in the {} domain.".format(domain))
         dictionaryExpected, trajectory = self.gen_dictionary_and_trajectory(domain)
 
         dictionary = dictionary_from_trajectory(trajectory)
 
         self.assertEqual(dictionary, dictionaryExpected,
-                         msg="Error: The "+domain+" dictionary generated from the trajectory does not match "
-                         "what was expected. \nGot     :"+str(dictionary)+"\nExpected:"+str(dictionaryExpected))
+                         msg="Error: The {} dictionary generated from the trajectory does not match "
+                         "what was expected. \nGot:\n{}\nExpected:\n{}".format(
+                             domain,
+                             pprint.pformat(dictionary),
+                             pprint.pformat(dictionaryExpected)))
 
     def tst_dictionary_to_trajectory_to_dictionary(self, domain):
         print("Testing the conversion of a dictionary to a trajectory and back to a dictionary in the "+domain+" domain.")
