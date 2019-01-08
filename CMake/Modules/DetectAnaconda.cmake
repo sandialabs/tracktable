@@ -50,46 +50,18 @@ get_filename_component(
   DIRECTORY
   )
 
-message("DEBUG: DetectAnaconda: Python interpreter is in directory ${_interpreter_directory}")
-
 if (EXISTS "${DIRECTORY}/conda")
-  message("DEBUG: DetectAnaconda: Conda executable found")
   set(${return_variable_name} TRUE PARENT_SCOPE)
 else ()
-  message("DEBUG: DetectAnaconda: Conda executable not found alongside interpreter")
-
   # We might be in Anaconda but in a virtual environment.  If this is
   # the case, the CONDA_EXE environment variable will be set.
   if (DEFINED ENV{CONDA_EXE})
-    message("DEBUG: DetectAnaconda: CONDA_EXE is set")
     set(${return_variable_name} TRUE PARENT_SCOPE)
   else (DEFINED ENV{CONDA_EXE})
     set(${return_variable_name} FALSE PARENT_SCOPE)
   endif (DEFINED ENV{CONDA_EXE})
 
 endif ()
-  
-# execute_process(
-#   COMMAND "conda" #${python_interpreter} "-c" "import conda"
-#   RESULT_VARIABLE _process_return_code
-#   OUTPUT_VARIABLE _test_stdout
-#   ERROR_VARIABLE _test_stderr
-#   )
-
-# message("DEBUG: execute_process returned code ${_process_return_code}")
-# message("DEBUG: Result variable name is ${return_variable_name}")
-# #message("DEBUG: stdout: ${_test_stdout}")
-# #message("DEBUG: stderr: ${_test_stderr}")
-
-# # Unix-like programs return 0 (which is false-ish) on success and 1
-# # (which is true-ish) on error.
-# if (_process_return_code)
-#   message("STATUS: Conda command failed.  This is probably not Anaconda.")
-#   set(${return_variable_name} FALSE PARENT_SCOPE)
-# else (_process_return_code)
-#   message("STATUS: Conda command succeeded.  This is probably Anaconda.")
-#   set(${return_variable_name} TRUE PARENT_SCOPE)
-# endif (_process_return_code)
 
 
 endfunction(check_for_anaconda)
