@@ -82,15 +82,15 @@ else (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
 endif (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
 
 # ----------------------------------------------------------------------
-# 
+#
 # Dealing with Anaconda
-# 
+#
 # The Anaconda Python distribution statically links the Python library
 # into its interpreter on OS X (possibly other platforms as well).
 # This causes a segmentation fault when we try to load one of the
 # compiled C++ extensions that links against Boost.Python and,
 # transitively, libpython.
-# 
+#
 # The solution is to not link against libpython and instead tell the
 # linker to leave unresolved symbols unresolved until load time.
 
