@@ -121,17 +121,19 @@ def test_trajectory():
 
     print("Testing time_at_fraction, 0.25")
     first_quarter_time = geomath.time_at_fraction(my_trajectory, 0.25)
-    expected_first_quarter_time = (right_now + (my_trajectory[-1].timestamp - right_now)/4.0)
+    delta = my_trajectory[-1].timestamp - right_now
+    expected_first_quarter_time = right_now + (delta // 4)
     error_count += verify_time(expected_first_quarter_time, first_quarter_time, "Time at fraction 0.25")
         
     print("Testing time_at_fraction, 0.75")
     last_quarter_time = geomath.time_at_fraction(my_trajectory, 0.75)
-    expected_last_quarter_time = (right_now + 3.0*(my_trajectory[-1].timestamp - right_now)/4.0)
+    delta = my_trajectory[-1].timestamp - right_now
+    expected_last_quarter_time = right_now + ((3*delta) // 4)
     error_count += verify_time(expected_last_quarter_time, last_quarter_time, "Time at fraction 0.75")
 
     print("Testing time_at_fraction, 0.5")
     midpoint_time = geomath.time_at_fraction(my_trajectory, 0.5)
-    expected_midpoint_time = (right_now + (my_trajectory[-1].timestamp - right_now)/2.0)
+    expected_midpoint_time = (right_now + (my_trajectory[-1].timestamp - right_now)//2)
     error_count += verify_time(expected_midpoint_time, midpoint_time, "Time at fraction 0.5")
 
     print("Testing time_at_fraction, 0.0")
@@ -156,13 +158,13 @@ def test_trajectory():
 
     print("Testing time_at_fraction, 0.33")
     first_third_time = geomath.time_at_fraction(my_trajectory, 1.0/3.0)
-    expected_third_quarter_time = (right_now + (my_trajectory[-1].timestamp - right_now)/3.0)
+    expected_third_quarter_time = (right_now + (my_trajectory[-1].timestamp - right_now)//3)
     error_count += verify_time(expected_third_quarter_time, first_third_time, "Time at fraction 0.33")
 
     print("Testing time_at_fraction, No Points")
     empty_trajectory = TerrestrialTrajectory()
     empty_time = geomath.time_at_fraction(empty_trajectory, 0.5)
-    error_count += verify_time(datetime.datetime(1900,1,1,0,0,0,0,datetime.timezone.utc), empty_time, "Time at fraction (no points)")
+    error_count += verify_time(datetime.datetime(1900,1,1,0,0,0,0,pytz.utc), empty_time, "Time at fraction (no points)")
 
     print("Testing point_at_fraction, 0.25")
     first_quarter_point =  geomath.point_at_fraction(my_trajectory, 0.25)
@@ -209,7 +211,7 @@ def test_trajectory():
     print("Testing point_at_fraction, 0.33")
     first_third_point =  geomath.point_at_fraction(my_trajectory, 1.0/3.0)
     expected_first_third_point = TerrestrialTrajectoryPoint(-92.9849, 31.3181)
-    expected_first_third_point.timestamp = (right_now + (my_trajectory[-1].timestamp - right_now)/3.0)
+    expected_first_third_point.timestamp = (right_now + (my_trajectory[-1].timestamp - right_now)//3)
     error_count += verify_point(expected_first_third_point,first_third_point, "Point at fraction 0.33")  
 
     print("Testing point_at_fraction, No Points")
