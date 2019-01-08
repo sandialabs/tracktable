@@ -184,7 +184,7 @@ class TestReadWriteDictionary(unittest.TestCase):
         #print(ctx.exception.message)
 
     def tst_trajectory_from_invalid_timestamps(self, domain):
-        print("Testing the conversion of a dictionary with invalid timestamps in the "+domain, " domain.")
+        print("Testing the conversion of a dictionary with invalid timestamps in the {} domain.".format(domain))
         dictionary, unused = self.gen_dictionary_and_trajectory(domain)
 
         #test a timestamp list that doesn't match length of coordinates by removing last timestamp
