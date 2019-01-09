@@ -36,7 +36,6 @@
 #include <tracktable/Core/PropertyMap.h>
 #include <tracktable/Core/Trajectory.h>
 
-#include <tracktable/Core/PointArithmetic.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtFraction.h>
 #include <tracktable/Core/detail/algorithm_signatures/TimeAtFraction.h>
 #include <tracktable/Core/detail/implementations/TimeAtFraction.h>
@@ -68,8 +67,10 @@ struct generic_point_at_fraction
     )
     {
       typedef typename TrajectoryType::point_type point_type;
+      typedef compare_point_distances<point_type> compare_point_type;
+      typedef typename TrajectoryType::const_iterator const_iterator;
 
-      if (path.empty()) return tracktable::arithmetic::zero<point_type>();
+      if (path.empty()) return point_type();
       if (path.size() == 1) return path.front();
 
       if (fraction <= 0)
@@ -87,6 +88,99 @@ struct generic_point_at_fraction
     }
 };
 
+
+template<typename ContainerT>
+struct generic_point_at_length_fraction
+{
+    template<typename TrajectoryType>
+    static typename TrajectoryType::point_type apply(
+        TrajectoryType const& path,
+        double fraction
+    )
+    {
+        typedef typename TrajectoryType::point_type point_type;
+        typedef compare_point_distances<point_type> compare_point_type;
+        typedef typename TrajectoryType::const_iterator const_iterator;
+
+        if (path.empty()) return point_type();
+        if (path.size() == 1) return path.front();
+
+        if (fraction <= 0)
+        {
+            return path.front();
+        }
+        if (fraction >= 1)
+        {
+            return path.back();
+        }
+
+        double len = fraction * path.back().current_length();
+
+        point_type key;
+        key.set_current_length(len);
+
+        // This will point to the first element that does not compare
+        // less than the key (i.e. is >=)
+        const_iterator equal_or_after = std::lower_bound(
+            path.begin(), path.end(),
+            key,
+            compare_point_type()
+        );
+
+        // This will point to the first element whose time is greater
+        // than the key
+        const_iterator after = std::upper_bound(
+            path.begin(), path.end(),
+            key,
+            compare_point_type()
+        );
+
+        const_iterator before;
+
+        if (after == equal_or_after)
+        {
+            // there is no element that is exactly at the key distance; we'll
+            // have to interpolate between before and after
+            before = equal_or_after -= 1;
+        }
+        else
+        {
+            // Did we find it exactly?
+            if ((*equal_or_after).current_length() == len)
+            {
+                // yes!
+                return (*equal_or_after);
+            }
+            else
+            {
+                std::cerr << "WARNING: Trajectory::point_at_length_fraction: This shouldn't ever happen\n";
+                std::cerr << "before: " << *before << "\n";
+                std::cerr << "after: " << *after << "\n";
+                std::cerr << "equal_or_after: " << *equal_or_after << "\n";
+                before = equal_or_after;
+            }
+        }
+
+        // Neither 'before' nor 'after' can point to an invalid element
+        // like begin-1 or end().  If the length were outside the
+        // range of the trajectory we would have caught it at the top of
+        // the function.
+        assert(after > path.begin() && after < path.end());
+        assert(before >= path.begin() && before < path.end());
+
+        if ((*after).current_length() == len)
+        {
+            return (*after);
+        }
+        else
+        {
+            double before_after_span = ((*after).current_length() - (*before).current_length());
+            double before_key_span = (len - (*before).current_length());
+            double interpolant = before_key_span / before_after_span;
+            return interpolate<point_type>::apply(*before, *after, interpolant);
+        }
+    }
+};
 } } } // exit namespace tracktable::algorithms::implementations
 
 #endif

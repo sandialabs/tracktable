@@ -45,6 +45,7 @@ autodoc_mock_imports = [
     'tracktable.domain._cartesian3d'
 ]
 
+
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
