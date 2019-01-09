@@ -28,18 +28,23 @@ Tracktable has the following required dependencies:
 Python
 ^^^^^^
 
-* Python 2.7, 3.4, 3.5, 3.6, or 3.7 - http://python.org
-  * NOTE: Tracktable 1.1 is the last version that will support Python 2.7.
+* Python 2.7, 3.4, 3.5, 3.6, or 3.7 - http://python.org 
+    * NOTE: Tracktable 1.1 is the last version that will support Python 2.7.
 * numpy 1.7+ - http://numpy.org
 * Matplotlib 2.0+ - http://matplotlib.org
-* Basemap - http://matplotlib.org/basemap
+* Basemap (including hi-res data) - http://matplotlib.org/basemap 
+    * NOTE: Maintenance on BaseMap is scheduled to end soon.  A replacement (likely Cartopy?)
+      will be identified in a future release.
 * PyTZ - https://pypi.python.org/pypi/pytz/
 * Shapely - https://pypi.python.org/pypi/Shapely
+* Six - https://pypi.org/project/six/
+* PyProj - https://pypi.org/project/pyproj/
 
 C++
 ^^^
 
-* Compiler - GCC 4.4.7 or newer (http://gcc.gnu.org), clang 3.5 or newer (http://clang.llvm.org)
+* Compiler - GCC 4.4.7 or newer (http://gcc.gnu.org), clang 3.5 or newer (http://clang.llvm.org), 
+  Visual Studio 14 2015 or newer (https://visualstudio.microsoft.com)
 * Boost 1.61 or newer - http://www.boost.org
 * GEOS library - http://geos.osgeo.org
 
@@ -71,9 +76,11 @@ If you want to build documentation you will also need the following packages:
 
 * Sphinx - http://sphinx-doc.org
 * napoleon - https://sphinxcontrib-napoleon.readthedocs.org/en/latest
-  * This is bundled with Sphinx as of version 1.3.
+   * This is bundled with Sphinx as of version 1.3.
 * Breathe - http://breathe.readthedocs.org/en/latest/
 * Sphinx Read the Docs theme - https://sphinx-rtd-theme.readthedocs.io/en/latest
+* Doxygen - http://www.doxygen.nl/index.html
+* Graphviz (for dot executable)- https://www.graphviz.org/
   
 If you want to render movies you will need FFMPEG:
 
@@ -81,7 +88,9 @@ If you want to render movies you will need FFMPEG:
   - If you build from source please be sure to include the MPEG4 and
   FFV1 codecs.  Both of these are included with the standard FFMPEG
   download.  Tracktable can use other codecs but does not require
-  them.
+  them. 
+  - Windows users can obtain the ffmpeg executable by installing 
+  Image Magick (https://www.imagemagick.org)
 
 Build Notes for Dependencies
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -234,19 +243,21 @@ to ``TRACKTABLE_HOME/tracktable/CMakeLists.txt`` and then rerun CMake as describ
 Step 3: Build and Test
 ----------------------
 
-On Unix-like systems, type ``make``.  For Visual Studio, run ``nmake``
-or open up the project files in your IDE (as appropriate).
+On Unix-like systems, type ``make``.  For Visual Studio, run ``nmake``, run ``msbuild`` on 
+a project file, or open up the project files in your IDE (as appropriate).
 
 Once the build process has finished go to your build directory and run
-``ctest`` (part of CMake) to run all the tests.  They should all
-succeed.  Some of the later Python tests such as P_Mapmaker may take a
-minute or two.
+``ctest`` (part of CMake) to run all the tests.  Optionally, Windows users can run the
+test project but this is just a fancy wrapper for ctest in this case. They should all
+succeed.  Some of the later Python tests such as P_Mapmaker may take a minute or two. 
 
 If you have multiple cores or processors and your build system
 supports it, by all means build in parallel.  GNU Make will do this
 when you say ``make -j <n>`` where <n> is the number of compilers
 you're willing to run.  A bare ``make -j`` will cause it to run as
 many compiler instances as it believes you have cores or processors.
+Windows users using msbuild, can use the ``/m:<n>`` option from the
+command line.
 
 .. warning::
 
