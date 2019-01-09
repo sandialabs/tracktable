@@ -204,6 +204,7 @@ def install_group():
                  help="Color for coastlines (either color name or hex string)")
 
     add_argument("mapmaker", [ "--coastline-linewidth" ],
+                 type=float,
                  default=1,
                  help="Width (in points) for coastlines")
 
@@ -216,6 +217,7 @@ def install_group():
                  help="Color for country borders (either color name or hex string)")
 
     add_argument("mapmaker", [ "--country-linewidth" ],
+                 type=float,
                  default=0.5,
                  help="Linewidth (in points) for country borders")
 
@@ -236,6 +238,7 @@ def install_group():
                  help="Color for state borders (either color name or hex string")
 
     add_argument("mapmaker", [ "--state-linewidth" ],
+                 type=float,
                  default=0.3,
                  help="Line width (in points) for state borders")
 
