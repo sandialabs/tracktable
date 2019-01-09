@@ -209,7 +209,7 @@ class AssembleTrajectoryFromPoints(object):
         print("INFO: Done assembling trajectories.")
         if self.valid_trajectory_count == 0:
             print("INFO: No trajectories produced.  Are you sure your delimiters and your column assignments are correct?")
-        raise StopIteration()
+        return
 
 
     def __iter__(self):

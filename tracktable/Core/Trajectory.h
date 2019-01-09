@@ -726,6 +726,10 @@ struct point_at_fraction< Trajectory< PointT > > : implementations::generic_poin
 { };
 
 template<class PointT>
+struct point_at_length_fraction< Trajectory< PointT > > : implementations::generic_point_at_length_fraction< Trajectory<PointT> >
+{ };
+
+template<class PointT>
 struct time_at_fraction< Trajectory< PointT > > : implementations::generic_time_at_fraction< Trajectory<PointT> >
 { };
 
