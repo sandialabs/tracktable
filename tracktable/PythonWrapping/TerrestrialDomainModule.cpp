@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -38,19 +38,12 @@
 // overloads are exposed in AlgorithmOverloadsModule so that
 // Boost.Python can sort out the C++ overloading by itself.
 
-#include <boost/python.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/module.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <boost/python/return_internal_reference.hpp>
-#include <Python.h>
-
 #include <tracktable/Domain/Terrestrial.h>
 #include <tracktable/Core/Timestamp.h>
 #include <tracktable/IO/PointWriter.h>
 #include <tracktable/IO/TrajectoryWriter.h>
 
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 #include <tracktable/PythonWrapping/PythonFileLikeObjectStreams.h>
 #include <tracktable/PythonWrapping/DomainWrapperTemplates.h>
 #include <tracktable/PythonWrapping/PythonAwarePointReader.h>
@@ -60,7 +53,6 @@
 //#include <tracktable/PythonWrapping/PickleTrajectoryPoints.h>
 
 //#include <tracktable/PythonWrapping/PickleTrajectories.h>
-
 
 using tracktable::domain::terrestrial::base_point_type;
 using tracktable::domain::terrestrial::trajectory_point_type;
@@ -205,6 +197,7 @@ void install_terrestrial_trajectory_wrappers()
     .def("from_position_list", &tracktable::python_wrapping::trajectory_from_position_list<trajectory_type>, return_value_policy<manage_new_object>())
     .staticmethod("from_position_list")
     .def("__iter__", iterator<trajectory_type>())
+    .def(tracktable::python_wrapping::trajectory_methods())
     .def(self==self)
     .def(self!=self)
     .def(vector_indexing_suite<trajectory_type>())

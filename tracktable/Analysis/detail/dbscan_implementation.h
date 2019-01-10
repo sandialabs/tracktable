@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -36,8 +36,8 @@
 // The file ComputeDBSCANClustering.h provides a set of convenient
 // interfaces to this module.
 
-#ifndef __tracktable_DBSCAN_h
-#define __tracktable_DBSCAN_h
+#ifndef __tracktable_DBSCAN_implementation_h
+#define __tracktable_DBSCAN_implementation_h
 
 // This #define causes Boost timers to be instantiated around the
 // expensive steps of clustering.  If this is problematic on your
@@ -56,10 +56,15 @@
 #include <boost/bind.hpp>
 #include <boost/mpl/assert.hpp>
 #include <boost/tuple/tuple.hpp>
+
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/adapted/boost_tuple.hpp>
-#include <boost/geometry/index/rtree.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
+
+#include <tracktable/Analysis/GuardedBoostGeometryRTreeHeader.h>
 
 #if defined(TIME_CLUSTERING_STEPS)
 # include <boost/timer/timer.hpp>
@@ -71,7 +76,7 @@
 namespace bgi = boost::geometry::index;
 namespace bg = boost::geometry;
 
-namespace tracktable {
+namespace tracktable { namespace analysis { namespace detail { namespace implementation {
 
 /** Cluster points using the DBSCAN algorithm.
  *
@@ -117,12 +122,12 @@ class DBSCAN
 {
 public:
   /// This is the point type we will be clustering
-  typedef PointT                                               point_type;
+  typedef PointT point_type;
   /// Container for points - convenience typedef only
-  typedef std::vector<point_type>                              point_vector_type;
+  typedef std::vector<point_type> point_vector_type;
   /// Internal point type with cluster ID and point ID.
-  typedef detail::IndexedPoint<PointT>                         indexed_point_type;
-  typedef std::vector<indexed_point_type>                      indexed_point_vector_type;
+  typedef IndexedPoint<PointT> indexed_point_type;
+  typedef std::vector<indexed_point_type> indexed_point_vector_type;
 
   /// Abstraction of index into list of points
   //
@@ -130,24 +135,31 @@ public:
   // combination of point and index -- a glorified pointer by another
   // name. This class handles the 'dereference' operation (actually
   // operator()) to turn an Indexable back into a point.
-  typedef detail::DBSCAN_IndexByIterator<indexed_point_vector_type, point_type>   indexable_getter_type;
+  typedef DBSCAN_IndexByIterator<
+    indexed_point_vector_type, point_type
+    > indexable_getter_type;
 
   /// Balancing algorithm for rtree
-  typedef bgi::quadratic<16>                                   rtree_parameter_type;
+  typedef bgi::quadratic<16> rtree_parameter_type;
 
   /// This is what will actually be stored in the nodes
-  typedef typename indexed_point_vector_type::iterator         rtree_value_type;
+  typedef typename indexed_point_vector_type::iterator rtree_value_type;
 
   /// ...And here's the rtree itself
-  typedef bgi::rtree<rtree_value_type, rtree_parameter_type, indexable_getter_type>   rtree_type;
+  typedef bgi::rtree<
+    rtree_value_type,
+    rtree_parameter_type,
+    indexable_getter_type
+    > rtree_type;
 
   /// Bounding box for nodes
-  typedef bg::model::box<point_type>                           box_type;
+  typedef bg::model::box<point_type> box_type;
 
-  /// Containers for clustering results
-  typedef std::vector<int>                                     int_vector_type;
-  /// Containers for clustering results
-  typedef std::vector<int_vector_type>                         int_vector_vector_type;
+  /// Container type for clustering results
+  typedef std::vector<int> int_vector_type;
+
+  /// Container type for cluster membership lists
+  typedef std::vector<int_vector_type> int_vector_vector_type;
 
 public:
 
@@ -177,8 +189,7 @@ public:
   int learn_clusters(IteratorT point_begin, IteratorT point_end,
                      point_type const& epsilon_box_half_span,
                      unsigned int min_cluster_size,
-                     bool L2 = false
-    )
+                     bool L2=false)
     {
       // Convert the points into a format that we can use in the R-tree
       indexed_point_vector_type indexed_points;
@@ -195,7 +206,6 @@ public:
       rtree_type rtree(params, indexable_getter_type(indexed_points));
       if (1)
         {
-        // std::cout << "DBSCAN: Building R-tree for fast neighbor lookup\n";
 #if defined(TIME_CLUSTERING_STEPS)
         boost::timer::auto_cpu_timer t;
 #endif
@@ -212,7 +222,6 @@ public:
       if (1)
         {
 #if defined(TIME_CLUSTERING_STEPS)
-        std::cout << "DBSCAN: Learning cluster membership\n";
         boost::timer::auto_cpu_timer t;
 #endif
         this->compute_cluster_membership(indexed_points,
@@ -223,7 +232,7 @@ public:
         }
 
       // std::cout << "DBSCAN: Finished.\n";
-      return this->ClusterMembership.size();
+      return boost::numeric_cast<int>(this->ClusterMembership.size());
     }
 
   /** Return the point IDs belonging to each cluster.
@@ -275,7 +284,7 @@ public:
           {
           int_vector_type::value_type point_id =
             this->ClusterMembership[cluster_id][i];
-          out_labels[point_id] = cluster_id;
+          out_labels[point_id] = boost::numeric_cast<int>(cluster_id);
           }
         }
     }
@@ -456,7 +465,7 @@ protected:
         // being considered
         point_type box_center((*query_point)->point());
         box_type epsilon_box(
-          detail::make_box(box_center, epsilon_box_half_span)
+          make_box(box_center, epsilon_box_half_span)
           );
 
         // Find all points near the seed
@@ -598,9 +607,9 @@ protected:
   /// How many neighbors each core point has (performance statistic)
   int_vector_type core_point_avg_num_neighbors;
   int_vector_type total_num_neighbors;
-  int InputPointCount;
+  std::size_t InputPointCount;
 };
 
-} // close namespace tracktable
+} } } } // namespace tracktable::analysis::detail::implementation
 
 #endif

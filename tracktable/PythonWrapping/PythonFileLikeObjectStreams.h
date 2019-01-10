@@ -45,10 +45,10 @@
 
 #include <algorithm> // std::copy
 #include <iosfwd> // std::streamsize
-#include <boost/iostreams/concepts.hpp>  // boost::iostreams::source
-#include <boost/iostreams/stream.hpp>
 
-#include <boost/python.hpp>
+#include <tracktable/PythonWrapping/GuardedBoostStreamHeaders.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
+
 
 #include <string.h>
 #include <iostream>
@@ -63,8 +63,8 @@ public:
   typedef boost::iostreams::source_tag category;
 
   explicit
-  PythonReadSource(boost::python::object& object)
-    : object_(object)
+  PythonReadSource(boost::python::object& object_source)
+    : object_(object_source)
     {}
 
   std::streamsize read(char_type* buffer, std::streamsize buffer_size)
@@ -137,11 +137,17 @@ public:
     // can do is dump the data out, claim it was all written and
     // hope for the best.
 
+#if PY_MAJOR_VERSION == 2
     boost::python::str data(buffer, n);
 
     boost::python::object write_result(this->Writer(data));
     boost::python::extract<std::streamsize> bytes_written(write_result);
-
+#else
+    boost::python::object data(boost::python::handle<>(PyBytes_FromStringAndSize(buffer, n)));
+    boost::python::object write_result(this->Writer(data));
+    boost::python::extract<std::streamsize> bytes_written(write_result);
+#endif
+    
     return (bytes_written.check() ? bytes_written() : n);
   }
 

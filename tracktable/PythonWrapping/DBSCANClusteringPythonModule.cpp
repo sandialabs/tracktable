@@ -31,10 +31,7 @@
 #include <tracktable/Core/TracktableCommon.h>
 #include <tracktable/PythonWrapping/ExplicitInstantiation/DBSCAN_Common.h>
 
-#include <boost/python.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/module.hpp>
-#include <Python.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
 BOOST_PYTHON_MODULE(_dbscan_clustering) {
   install_dbscan_wrappers_1_3();

@@ -40,6 +40,7 @@ from . import create_points_and_trajectories as tt_generators
 from tracktable.domain.terrestrial import Trajectory, TrajectoryPoint, TrajectoryPointWriter, TrajectoryPointReader, TrajectoryWriter, TrajectoryReader
 
 from tracktable.core import Timestamp
+from tracktable.core.test_utilities import version_appropriate_string_buffer
 
 import datetime
 
@@ -48,7 +49,7 @@ import datetime
 # ----------------------------------------------------------------------
 
 def write_trajectories_to_string(trajectories):
-    output = StringIO()
+    output = version_appropriate_string_buffer()
     writer = TrajectoryWriter(output)
     writer.write(trajectories)
 
@@ -59,7 +60,7 @@ def write_trajectories_to_string(trajectories):
 # ----------------------------------------------------------------------
 
 def read_trajectories_from_string(text):
-    input = StringIO(text)
+    input = version_appropriate_string_buffer(text)
     reader = TrajectoryReader(input)
     points = list(reader)
     return points

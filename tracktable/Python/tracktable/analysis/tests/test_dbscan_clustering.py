@@ -29,6 +29,7 @@
 
 from __future__ import division, print_function, absolute_import
 
+import operator
 import random
 import sys
 from six.moves import range
@@ -99,12 +100,30 @@ def test_clusters():
 
     all_points = corner_points + noise_points
 
-    print("Learning cluster IDs")
-    cluster_ids = compute_cluster_labels(all_points,
-                                         [0.05, 0.05, 0.05],
-                                         4)
+    vertex_ids_as_strings = [ str(i) for i in range(len(all_points)) ]
+    decorated_points = list(zip(all_points, vertex_ids_as_strings))
+    
+    print("Learning cluster IDs for bare points.")
+    int_cluster_ids = compute_cluster_labels(all_points,
+                                             [0.05, 0.05, 0.05],
+                                             4)
 
-    print("Cluster IDs: {}".format(cluster_ids))
+    print("Learning cluster IDs for decorated points.")
+    string_cluster_ids = compute_cluster_labels(decorated_points,
+                                                [0.05, 0.05, 0.05],
+                                                4)
+
+    recomputed_int_ids = [ (int(my_id), cluster_label) for (my_id, cluster_label) in string_cluster_ids ]
+
+    sorted_int_ids = sorted(int_cluster_ids, key=operator.itemgetter(0))
+    sorted_string_ids = sorted(recomputed_int_ids, key=operator.itemgetter(0))
+    
+    if (sorted_int_ids != sorted_string_ids):
+        print("ERROR: Cluster IDs for bare points do not match cluster IDs for decorated points.")
+        print("First 10 for bare points: {}".format(sorted_int_ids[0:10]))
+        print("First 10 for decorated points (result): {}".format(sorted_string_ids[0:10]))
+
+#    print("Cluster IDs: {}".format(cluster_ids))
 
 # ----------------------------------------------------------------------
 

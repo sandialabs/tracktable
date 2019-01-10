@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -30,20 +30,20 @@
 
 from __future__ import print_function, division, absolute_import
 
-from six import StringIO
 import sys
 
 from . import create_points_and_trajectories as tt_generators
 
 from tracktable.domain.cartesian3d import TrajectoryPoint, TrajectoryPointWriter
 from tracktable.core import Timestamp
+from tracktable.core.test_utilities import version_appropriate_string_buffer
 
 import datetime
 
 # ----------------------------------------------------------------------
 
 def write_points_to_string(points):
-    output = StringIO()
+    output = version_appropriate_string_buffer()
     writer = TrajectoryPointWriter(output)
     writer.write(points)
 

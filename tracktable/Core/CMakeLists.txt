@@ -1,6 +1,6 @@
 # -*- Mode: cmake; -*-
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2018 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -43,6 +43,7 @@ include_directories(
 # Most of the files in Core are header-only implementations and don't
 # show up here.
 set( Core_SRCS
+  MemoryUse.cpp
   PointLonLat.cpp
   PropertyConverter.cpp
   PropertyMap.cpp
@@ -57,6 +58,8 @@ set( Core_HEADERS
   GeometricMean.h
   GeometricMedian.h
   Geometry.h
+  MemoryUse.h
+  PlatformDetect.h
   PointArithmetic.h
   PointBase.h
   PointCartesian.h
@@ -85,14 +88,17 @@ set( Core_Detail_AlgorithmSignatures_HEADERS
   detail/algorithm_signatures/Distance.h
   detail/algorithm_signatures/EndToEndDistance.h
   detail/algorithm_signatures/Interpolate.h
+  detail/algorithm_signatures/Extrapolate.h
   detail/algorithm_signatures/Intersects.h
   detail/algorithm_signatures/Length.h
   detail/algorithm_signatures/PointAtFraction.h
   detail/algorithm_signatures/PointAtTime.h
+  detail/algorithm_signatures/RadiusOfGyration.h
   detail/algorithm_signatures/SpeedBetween.h
   detail/algorithm_signatures/SimplifyLinestring.h
   detail/algorithm_signatures/SphericalCoordinateAccess.h
   detail/algorithm_signatures/SubsetDuringInterval.h
+  detail/algorithm_signatures/TimeAtFraction.h
   detail/algorithm_signatures/TransferProperties.h
   detail/algorithm_signatures/TurnAngle.h
 )
@@ -110,20 +116,24 @@ set( Core_Detail_Implementations_HEADERS
   detail/implementations/ConvexHullCentroidTerrestrial.h
   detail/implementations/ConvexHullPerimeterCartesian.h
   detail/implementations/ConvexHullPerimeterTerrestrial.h
+  detail/implementations/GenericDistance.h
   detail/implementations/GreatCircleInterpolation.h
   detail/implementations/NorthPoleConvexHull.h
   detail/implementations/PointAtTime.h
   detail/implementations/PointAtFraction.h
   detail/implementations/ProjectedConvexHullTerrestrial.h
+  detail/implementations/RadiusOfGyration.h
   detail/implementations/SphericalMath.h
   detail/implementations/SphericalPolygons.h
   detail/implementations/SubsetDuringInterval.h
+  detail/implementations/TimeAtFraction.h
   detail/implementations/TrajectoryPointComparison.h
   detail/implementations/TurnAngle.h
 )
 
 set( Core_Detail_TraitSignatures_HEADERS
   detail/trait_signatures/Dimension.h
+  detail/trait_signatures/Domain.h
   detail/trait_signatures/HasObjectId.h
   detail/trait_signatures/HasProperties.h
   detail/trait_signatures/HasTimestamp.h
@@ -131,6 +141,17 @@ set( Core_Detail_TraitSignatures_HEADERS
   detail/trait_signatures/PointDomainName.h
   detail/trait_signatures/Tag.h
   detail/trait_signatures/Timestamp.h
+  detail/trait_signatures/UndecoratedPoint.h
+)
+
+set( Core_WarningGuards_HEADERS
+  WarningGuards/CommonBoostWarnings.h
+  WarningGuards/PopWarningState.h
+  WarningGuards/PragmaMessages.h
+  WarningGuards/PushWarningState.h
+  WarningGuards/ShadowedDeclaration.h
+  WarningGuards/SizeTConversion.h
+  WarningGuards/UnusedTypedef.h
 )
 
 add_library( TracktableCore
@@ -140,13 +161,31 @@ add_library( TracktableCore
   ${Core_Detail_AlgorithmSignatures_HEADERS}
   ${Core_Detail_Implementations_HEADERS}
   ${Core_Detail_TraitSignatures_HEADERS}
+  ${Core_WarningGuards_HEADERS}
 )
 
-#This puts the header files under a separate folder in Visual Studio 
-source_group ("Header Files\\Points" FILES ${Core_Detail_Points_HEADERS})
-source_group ("Header Files\\AlgorithmSignatures" FILES ${Core_Detail_AlgorithmSignatures_HEADERS})
-source_group ("Header Files\\Implementations" FILES ${Core_Detail_Implementations_HEADERS})
-source_group ("Header Files\\TraitSignatures" FILES ${Core_Detail_TraitSignatures_HEADERS})
+
+# The following source_group directives make Visual Studio show the
+# header files in their own sub-folders under the project for
+# TracktableCore.  If you add a new group of headers above, add a new
+# source_group directive with an appropriate sub-folder name
+# (generally agreeing with the name of the header group).
+
+source_group("Header Files\\Points" FILES ${Core_Detail_Points_HEADERS})
+source_group("Header Files\\AlgorithmSignatures" FILES ${Core_Detail_AlgorithmSignatures_HEADERS})
+source_group("Header Files\\Implementations" FILES ${Core_Detail_Implementations_HEADERS})
+source_group("Header Files\\TraitSignatures" FILES ${Core_Detail_TraitSignatures_HEADERS})
+source_group("Header Files\\WarningGuards" FILES ${Core_WarningGuards_HEADERS})
+
+# Windows shared libraries require declarations in the header file of
+# whether a symbol is being exported (provided by a shared library) or
+# imported (used by a program linked to that shared library).  The
+# file TracktableCoreWindowsHeader.h, created below, contains a macro
+# TRACKTABLE_CORE_EXPORT that makes those declarations in TracktableCore.
+#
+# Incidentally, this is also why CMAKE_CURRENT_BINARY_DIRECTORY is on
+# the include path -- since this is a generated file it gets written
+# into the build directory rather than the source tree.
 
 generate_export_header( TracktableCore
    BASE_NAME TRACKTABLE_CORE
@@ -191,6 +230,10 @@ install(
   DESTINATION include/tracktable/Core/detail/trait_signatures
 )
 
+install(
+  FILES ${Core_WarningGuards_HEADERS}
+  DESTINATION include/tracktable/Core/WarningGuards
+)
 
 install(
   TARGETS TracktableCore
