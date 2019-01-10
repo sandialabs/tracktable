@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -129,10 +129,10 @@ public:
    * @param[in] longitude Longitude in degrees
    * @param[in] latitude  Latitude in degrees
    */
-  TerrestrialPoint(double longitude, double latitude)
+  TerrestrialPoint(double _longitude, double _latitude)
     {
-    this->set_longitude(longitude);
-    this->set_latitude(latitude);
+    this->set_longitude(_longitude);
+    this->set_latitude(_latitude);
     }
 };
 
@@ -199,10 +199,10 @@ public:
    * @param[in] longitude Longitude in degrees
    * @param[in] latitude  Latitude in degrees
    */
-  TerrestrialTrajectoryPoint(double longitude, double latitude)
+  TerrestrialTrajectoryPoint(double _longitude, double _latitude)
     {
-    this->set_longitude(longitude);
-    this->set_latitude(latitude);
+    this->set_longitude(_longitude);
+    this->set_latitude(_latitude);
     }
 };
 
@@ -279,12 +279,16 @@ TRACKTABLE_DELEGATE_TRAJECTORY_POINT_TRAITS(
 
 namespace tracktable { namespace traits {
 
+namespace domains {
+  struct terrestrial { };
+}
+    
 template<>
 struct point_domain_name<tracktable::domain::terrestrial::TerrestrialPoint>
 {
   static inline string_type apply() { return "terrestrial"; }
 };
-
+    
 } }
 
 // ----------------------------------------------------------------------
@@ -293,18 +297,22 @@ struct point_domain_name<tracktable::domain::terrestrial::TerrestrialPoint>
 
 namespace tracktable { namespace algorithms {
 
+namespace bg = boost::geometry;
+
 // Distance between points is measured in km, not radians
 template<>
-struct distance<tracktable::domain::terrestrial::TerrestrialPoint>
+struct distance<
+  ::tracktable::traits::domains::terrestrial
+  >
 {
-  typedef tracktable::domain::terrestrial::TerrestrialPoint point_type;
-
-  static inline double apply(point_type const& from, point_type const& to)
+  template<typename Geom1, typename Geom2>
+  static inline double apply(Geom1 const& from, Geom2 const& to)
     {
-      double distance_in_radians = distance<PointLonLat>::apply(from, to);
+      double distance_in_radians = boost::geometry::distance(from, to);
       return conversions::radians_to_km(distance_in_radians);
     }
 };
+
 
 // Speed between points is measured in km/hr, not radians/sec
 template<>
@@ -315,7 +323,7 @@ struct speed_between<tracktable::domain::terrestrial::TerrestrialTrajectoryPoint
 
   inline static double apply(point_type const& from, point_type const& to)
     {
-      double distance_traveled = distance<base_point_type>::apply(from, to);
+      double distance_traveled = tracktable::distance(from, to);
       double seconds_elapsed = (to.timestamp() - from.timestamp()).total_seconds();
       if (!tracktable::almost_zero(seconds_elapsed))
         {
@@ -354,20 +362,20 @@ TT_DOMAIN::TerrestrialTrajectory, \
 Trajectory<TT_DOMAIN::TerrestrialTrajectoryPoint>, \
 ALGORITHM \
 )
-
+    
 TT_DELEGATE_BASE_POINT_ALGORITHM(interpolate)
+TT_DELEGATE_BASE_POINT_ALGORITHM(extrapolate)
 TT_DELEGATE_BASE_POINT_ALGORITHM(bearing)
 TT_DELEGATE_BASE_POINT_ALGORITHM(signed_turn_angle)
 TT_DELEGATE_BASE_POINT_ALGORITHM(spherical_coordinate_access)
 TT_DELEGATE_BASE_POINT_ALGORITHM(unsigned_turn_angle)
 
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(interpolate)
+TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(extrapolate)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(bearing)
-TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(distance)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(signed_turn_angle)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(spherical_coordinate_access)
 TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(unsigned_turn_angle)
-
 
 template<>
 struct length<tracktable::domain::terrestrial::trajectory_type>
@@ -383,11 +391,14 @@ struct length<tracktable::domain::terrestrial::trajectory_type>
 
 } } // exit namespace tracktable::algorithms
 
+TRACKTABLE_DELEGATE_DOMAIN_TRAIT(tracktable::domain::terrestrial, tracktable::traits::domains::terrestrial)
+    
 #undef TT_DOMAIN
 #undef TT_DELEGATE_BASE_POINT_ALGORITHM
 #undef TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM
 #undef TT_DELEGATE_TRAJECTORY_ALGORITHM
-
+#undef TT_DELEGATE_TRAJECTORY_POINT_TRAIT
+    
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif

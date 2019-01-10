@@ -43,7 +43,7 @@ from tracktable.core import Timestamp
 
 def run_test():
     figure = pyplot.figure(figsize=(8, 6), dpi=100)
-    axes = figure.add_axes([0, 0, 1, 1], frameon=False, axisbg='black')
+    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor='black')
     axes.set_frame_on(False)
 
     my_timestamp = Timestamp.from_any('2013-06-07 23:18:54-0500')

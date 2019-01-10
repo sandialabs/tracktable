@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -40,14 +40,17 @@
 #include <tracktable/Core/detail/algorithm_signatures/Length.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtFraction.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtTime.h>
+#include <tracktable/Core/detail/algorithm_signatures/TimeAtFraction.h>
 #include <tracktable/Core/detail/algorithm_signatures/SubsetDuringInterval.h>
 
 #include <tracktable/Core/detail/implementations/PointAtFraction.h>
 #include <tracktable/Core/detail/implementations/PointAtTime.h>
+#include <tracktable/Core/detail/implementations/TimeAtFraction.h>
 #include <tracktable/Core/detail/implementations/SubsetDuringInterval.h>
 
 #include <tracktable/Core/detail/trait_signatures/HasProperties.h>
 
+#include <tracktable/Core/GuardedBoostGeometryHeaders.h>
 #include <boost/geometry/geometries/register/linestring.hpp>
 
 #include <cassert>
@@ -143,6 +146,26 @@ public:
         return ::tracktable::no_such_timestamp();
         }
     }
+
+  /** Return the duration, if available.
+  *
+  * If there are any points in the trajectory, this method will return
+  * the duration of the trajectory.  If not it will return a duration of 0.
+  *
+  * @return the difference of end_time and start_time or 0 if no points.
+  */
+  Duration duration() const
+  {
+	  if (this->Points.size())
+	  {
+		  return this->Points[this->Points.size() - 1].timestamp() -
+			  this->Points[0].timestamp();
+	  }
+	  else
+	  {
+		  return Duration(0,0,0,0);
+	  }
+  }
 
   /** Return the ID of the moving object.
    *
@@ -684,6 +707,9 @@ namespace tracktable { namespace traits {
 template<typename point_type>
 struct has_properties< Trajectory<point_type> > : boost::mpl::bool_<true> {};
 
+template<typename point_type>
+struct domain<Trajectory<point_type> > : domain<point_type> {};
+    
 } } // end namespace tracktable::traits
 
 // We get our implementations for trajectory_subset and point_at_time
@@ -700,8 +726,26 @@ struct point_at_fraction< Trajectory< PointT > > : implementations::generic_poin
 { };
 
 template<class PointT>
+struct point_at_length_fraction< Trajectory< PointT > > : implementations::generic_point_at_length_fraction< Trajectory<PointT> >
+{ };
+
+template<class PointT>
+struct time_at_fraction< Trajectory< PointT > > : implementations::generic_time_at_fraction< Trajectory<PointT> >
+{ };
+
+template<class PointT>
 struct subset_during_interval< Trajectory<PointT> > : implementations::generic_subset_during_interval< Trajectory<PointT> >
 { };
+
+//Used when comparing a point to a compatible trajectory
+template<class PointT, template<class> class TrajectoryT>
+struct point_to_trajectory_distance
+{
+   static double inline apply(PointT const& from, TrajectoryT<PointT> const& to)
+   {
+       return boost::geometry::distance(from, to);
+   }
+};
 
 /**
  * Default implementation of end_to_end_distance
@@ -725,7 +769,7 @@ struct end_to_end_distance< Trajectory<PointT> >
         }
       else
         {
-        return distance<typename trajectory_type::point_type>::apply(path.front(), path.back());
+        return ::tracktable::distance(path.front(), path.back());
         }
     }
 };

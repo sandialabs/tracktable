@@ -87,6 +87,8 @@ cities.py - Locations and population values for many cities of the world
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS DATABASE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import print_function, absolute_import, division
+
 import operator
 
 from tracktable.core.geomath import latitude, longitude

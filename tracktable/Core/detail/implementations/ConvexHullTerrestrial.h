@@ -38,7 +38,6 @@
 #include <tracktable/Core/detail/implementations/NorthPoleConvexHull.h>
 #include <tracktable/Core/detail/implementations/SphericalMath.h>
 #include <tracktable/Core/PointLonLat.h>
-#include <boost/geometry.hpp>
 
 namespace tracktable { namespace algorithms {
 

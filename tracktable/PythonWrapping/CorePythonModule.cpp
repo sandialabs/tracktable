@@ -33,9 +33,12 @@
 // CorePythonModule - Expose core types (PropertyMap and Timestamp) to
 // Python
 
+#include <tracktable/Core/MemoryUse.h>
+
 #include <tracktable/PythonWrapping/PropertyMapWrapper.h>
 #include <tracktable/PythonWrapping/DateTimeWrapper.h>
 #include <tracktable/PythonWrapping/CommonMapWrappers.h>
+#include <tracktable/PythonWrapping/PairToTupleWrapper.h>
 #include <tracktable/PythonWrapping/TrivialFileReader.h>
 
 #include <boost/python.hpp>
@@ -52,6 +55,7 @@ BOOST_PYTHON_MODULE(_core_types) {
   install_common_map_wrappers();
   install_property_map_wrapper();
   install_datetime_converters();
+  install_pair_wrappers();
   install_timestamp_functions();
 
   using namespace boost::python;
@@ -65,5 +69,9 @@ BOOST_PYTHON_MODULE(_core_types) {
   // to it.  I don't know any other way to do that except to make one
   // happen.
   def("trigger_args_exception", trigger_args_exception);
+
+  def("current_memory_use", tracktable::current_memory_use);
+  def("peak_memory_use", tracktable::peak_memory_use);
+  
 }
 

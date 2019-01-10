@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -47,6 +47,7 @@
 #include <tracktable/Core/detail/algorithm_signatures/Bearing.h>
 #include <tracktable/Core/detail/algorithm_signatures/Distance.h>
 #include <tracktable/Core/detail/algorithm_signatures/Interpolate.h>
+#include <tracktable/Core/detail/algorithm_signatures/Extrapolate.h>
 #include <tracktable/Core/detail/algorithm_signatures/SimplifyLinestring.h>
 #include <tracktable/Core/detail/algorithm_signatures/SpeedBetween.h>
 #include <tracktable/Core/detail/algorithm_signatures/SphericalCoordinateAccess.h>
@@ -393,6 +394,7 @@ protected:
 
 namespace tracktable { namespace algorithms {
 
+
 /** \brief Interpolate between two points.
  *
  * Interpolate between two different points in a trajectory.  At t <=
@@ -442,6 +444,41 @@ struct interpolate< TrajectoryPoint<BasePointT> >
     }
 };
 
+template<class BasePointT>
+struct extrapolate< TrajectoryPoint<BasePointT> >
+{
+    typedef BasePointT base_point_type;
+
+    template<class trajectory_point_type>
+    static inline trajectory_point_type
+        apply(trajectory_point_type const& left,
+            trajectory_point_type const& right,
+            double t)
+    {
+        // Start off by extrapolating the coordinates with whatever
+        // scheme the base point class provides
+        trajectory_point_type result(
+            extrapolate<base_point_type>::apply(
+                left, right, t
+            )
+        );
+
+        // Now extrapolate the things specific to TrajectoryPoint
+        result.set_timestamp(
+            extrapolate<Timestamp>::apply(left.timestamp(), right.timestamp(), t)
+        );
+
+        result.set_object_id(
+            interpolate<std::string>::apply(left.object_id(), right.object_id(), t)
+        );
+
+        result.__set_properties(
+            extrapolate<PropertyMap>::apply(left.__properties(), right.__properties(), t)
+        );
+        return result;
+    }
+};
+
 /** Speed between two points in native units per second
  *
  */
@@ -452,7 +489,7 @@ struct speed_between< TrajectoryPoint<BasePointT> >
   typedef TrajectoryPoint<BasePointT> point_type;
   static inline double apply(point_type const& start, point_type const& finish)
     {
-      double units_traveled = distance<point_type>::apply(start, finish);
+      double units_traveled = ::tracktable::distance(start, finish);
       double duration = (finish.timestamp() - start.timestamp()).total_seconds();
       if (std::abs(duration) < 0.001)
         {
@@ -467,8 +504,6 @@ struct speed_between< TrajectoryPoint<BasePointT> >
 
 // We can't blithely delegate these because they're not full
 // specializations.  Still, this gets the job done.
-template<class BasePointT>
-struct distance< TrajectoryPoint<BasePointT> > : distance<BasePointT> { };
 
 template<class BasePointT>
 struct bearing< TrajectoryPoint<BasePointT> > : bearing<BasePointT> { };
@@ -492,6 +527,9 @@ namespace tracktable { namespace traits {
 template<class BasePointT>
 struct dimension< tracktable::TrajectoryPoint<BasePointT> > : dimension< BasePointT > {};
 
+template<class BasePointT>
+struct domain< tracktable::TrajectoryPoint<BasePointT> > : domain<BasePointT> {};
+    
 template<class BasePointT>
 struct tag< TrajectoryPoint<BasePointT> > : tag<BasePointT> { };
 
@@ -537,7 +575,8 @@ template<class BasePointT>
 struct coordinate_type< tracktable::TrajectoryPoint<BasePointT> > : coordinate_type<BasePointT> {};
 
 template<class BasePointT>
-struct coordinate_system< tracktable::TrajectoryPoint<BasePointT> > : coordinate_system<BasePointT> {};
+struct coordinate_system< tracktable::TrajectoryPoint<BasePointT> > : coordinate_system<BasePointT> { };
+    
 
 template<class BasePointT>
 struct dimension< tracktable::TrajectoryPoint<BasePointT> > : dimension<BasePointT> {};

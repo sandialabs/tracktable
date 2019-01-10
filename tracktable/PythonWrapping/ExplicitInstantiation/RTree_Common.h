@@ -34,16 +34,9 @@
 #include <tracktable/Core/TracktableCommon.h>
 #include <tracktable/Analysis/RTree.h>
 #include <tracktable/Domain/FeatureVectors.h>
+
 #include <tracktable/PythonWrapping/RTreePythonWrapper.h>
-
-#include <boost/python.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/def_visitor.hpp>
-#include <boost/python/list.hpp>
-#include <boost/python/stl_iterator.hpp>
-
-#include <Python.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 #include <sstream>
 
 #define WRAP_RTREE(dimension) wrap_rtree<dimension>()

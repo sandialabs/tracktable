@@ -35,14 +35,7 @@
 #include <tracktable/Analysis/ComputeDBSCANClustering.h>
 #include <tracktable/Domain/FeatureVectors.h>
 
-#include <boost/python.hpp>
-#include <boost/python/class.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/def_visitor.hpp>
-#include <boost/python/list.hpp>
-#include <boost/python/stl_iterator.hpp>
-
-#include <Python.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
 #define xstr(s) str(s)
 #define str(s) #s
@@ -56,6 +49,12 @@ using namespace boost::python;
   def( DBSCAN_FUNCTION_NAME(dim), dbscan_learn_cluster_ids< FeatureVector<dim> > )
 
 
+/*
+ * Note: This binding only supports unlabeled points that are given
+ * integer cluster IDs.  If the user supplies anything else we will
+ * handle it in Python-land.
+ */
+
 template<typename point_type>
 boost::python::object
 dbscan_learn_cluster_ids(boost::python::object points,
@@ -66,16 +65,18 @@ dbscan_learn_cluster_ids(boost::python::object points,
 
   point_type search_box_half_span = boost::python::extract<point_type>(_search_box_half_span);
 
-  std::vector<int> result_cluster_ids;
+  typedef std::pair<int, int> cluster_label_type;
+  std::vector<cluster_label_type> result_cluster_labels;
+
   tracktable::cluster_with_dbscan(bp::stl_input_iterator<point_type>(points),
                                   bp::stl_input_iterator<point_type>(),
                                   search_box_half_span,
                                   min_cluster_size,
-                                  result_cluster_ids);
+                                  std::back_inserter(result_cluster_labels));
 
   bp::list result;
-  for (std::vector<int>::const_iterator iter = result_cluster_ids.begin();
-       iter != result_cluster_ids.end();
+  for (typename std::vector<cluster_label_type>::const_iterator iter = result_cluster_labels.begin();
+       iter != result_cluster_labels.end();
        ++iter)
     {
     result.append(*iter);

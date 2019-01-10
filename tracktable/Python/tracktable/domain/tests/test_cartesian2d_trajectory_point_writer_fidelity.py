@@ -37,6 +37,7 @@ import sys
 
 from tracktable.domain.cartesian2d import TrajectoryPoint, TrajectoryPointWriter, TrajectoryPointReader
 from tracktable.core import Timestamp
+from tracktable.core.test_utilities import version_appropriate_string_buffer
 
 import datetime
 
@@ -45,7 +46,7 @@ from . import create_points_and_trajectories as tt_generators
 # ----------------------------------------------------------------------
 
 def write_points_to_string(points):
-    output = StringIO()
+    output = version_appropriate_string_buffer()
     print("Point list contains {} entries".format(len(points)))
     writer = TrajectoryPointWriter(output)
     writer.write(points)
@@ -58,7 +59,7 @@ def write_points_to_string(points):
 
 def read_points_from_string(text):
     print("Input text:\n{}(end)".format(text))
-    input = StringIO(text)
+    input = version_appropriate_string_buffer(text)
     reader = TrajectoryPointReader(input)
     points = list(reader)
     return points

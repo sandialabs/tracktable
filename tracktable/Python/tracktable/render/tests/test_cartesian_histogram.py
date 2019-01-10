@@ -47,7 +47,7 @@ def test_cartesian_histogram(output_dir, ground_truth_dir)
     point_source.num_points = 100000
 
     pyplot.figure()
-    pyplot.subplot(111, aspect='equal', axisbg='black')
+    pyplot.subplot(111, aspect='equal', facecolor='black')
 
     artists = cartesian_histogram(point_source.points(),
                                   bbox_lowerleft=[-5, -5],
