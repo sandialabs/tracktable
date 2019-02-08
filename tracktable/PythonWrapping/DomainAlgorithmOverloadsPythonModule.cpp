@@ -221,6 +221,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
     def("convex_hull_perimeter", &(tracktable::convex_hull_perimeter<TrajectoryTerrestrial>));
 
     def("radius_of_gyration", &(tracktable::radius_of_gyration<TrajectoryTerrestrial>));
+    def("convex_hull_centroid", &(tracktable::convex_hull_centroid<TrajectoryTerrestrial>));
 
 
     register_distance_functions<
