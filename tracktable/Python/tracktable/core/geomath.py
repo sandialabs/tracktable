@@ -63,6 +63,7 @@ from ._domain_algorithm_overloads import convex_hull_perimeter as _convex_hull_p
 from ._domain_algorithm_overloads import convex_hull_area as _convex_hull_area
 from ._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
 from ._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
+from ._domain_algorithm_overloads import convex_hull_centroid as _convex_hull_centroid
 
 def xcoord(thing):
     """Return what we think is the X-coordinate for an object.
@@ -847,3 +848,20 @@ def radius_of_gyration(trajectory):
     """
 
     return _radius_of_gyration(trajectory)
+
+
+def convex_hull_centroid(trajectory):
+    """Compute the centroid of the convex hull of a trajectory
+ 
+    Centroid will be returned in the native units of
+    the domain.  This is: latitude, longitude (altitude) for the
+    terrestrial domain; and x, y (z) for Cartesian.
+
+    Args:
+      trajectory: Trajectory whose hull you want to measure
+ 
+    Returns:
+      Centroid of the trajectory's convex hull
+    """
+ 
+    return _convex_hull_centroid(trajectory)
