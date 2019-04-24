@@ -49,6 +49,7 @@ from ._domain_algorithm_overloads import signed_turn_angle as _signed_turn_angle
 from ._domain_algorithm_overloads import unsigned_turn_angle as _unsigned_turn_angle
 from ._domain_algorithm_overloads import speed_between as _speed_between
 from ._domain_algorithm_overloads import point_at_fraction as _point_at_fraction
+from ._domain_algorithm_overloads import point_at_length_fraction as _point_at_length_fraction
 from ._domain_algorithm_overloads import point_at_time as _point_at_time
 from ._domain_algorithm_overloads import time_at_fraction as _time_at_fraction
 from ._domain_algorithm_overloads import subset_during_interval as _subset_during_interval
@@ -416,6 +417,29 @@ def point_at_fraction(trajectory, fraction):
 
     return _point_at_fraction(trajectory, fraction)
 
+# ----------------------------------------------------------------------
+
+def point_at_length_fraction(trajectory, fraction):
+    """Return a point from a trajectory at a specific fraction of its distance
+
+    This function will estimate a point at a trajectory at some
+    specific fraction of its total travel distance.  If the supplied
+    fraction does not fall exactly on a vertex of the trajectory we
+    will interpolate between the nearest two points.
+
+    Fractions before the beginning or after the end of the trajectory
+    will return the start and end points, respectively.
+
+    Args:
+      trajectory (Trajectory): Path to sample
+      fraction (float): Value between 0 and 1.  0 is the beginning and 1 is the end.
+
+    Returns:
+      TrajectoryPoint at specified fraction
+
+    """
+
+    return _point_at_length_fraction(trajectory, fraction)	
 
 # ----------------------------------------------------------------------
 

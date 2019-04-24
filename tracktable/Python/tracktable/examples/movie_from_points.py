@@ -42,10 +42,10 @@ import os
 import shlex
 import sys
 
-import example_point_reader
-import example_trajectory_builder
-import example_trajectory_rendering
-import example_movie_rendering
+import tracktable.examples.example_point_reader as example_point_reader
+import tracktable.examples.example_trajectory_builder as example_trajectory_builder
+import tracktable.examples.example_trajectory_rendering as example_trajectory_rendering
+import tracktable.examples.example_movie_rendering as example_movie_rendering
 
 from tracktable.feature               import annotations
 from tracktable.filter.trajectory     import ClipToTimeWindow as ClipTrajectoryToTimeWindow, FilterByBoundingBox as FilterTrajectoriesByBoundingBox
@@ -154,7 +154,7 @@ def main():
 
     print("STATUS: Initializing canvas")
     figure = pyplot.figure(figsize=figure_dimensions, facecolor='black', edgecolor='black')
-    axes = figure.add_axes([0, 0, 1, 1], frameon=False, axisbg='black')
+    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor='black')
     axes.set_frame_on(False)
 
     print("STATUS: Initializing point source")
