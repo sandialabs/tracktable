@@ -137,11 +137,17 @@ public:
     // can do is dump the data out, claim it was all written and
     // hope for the best.
 
+#if PY_MAJOR_VERSION == 2
     boost::python::str data(buffer, n);
 
     boost::python::object write_result(this->Writer(data));
     boost::python::extract<std::streamsize> bytes_written(write_result);
-
+#else
+    boost::python::object data(boost::python::handle<>(PyBytes_FromStringAndSize(buffer, n)));
+    boost::python::object write_result(this->Writer(data));
+    boost::python::extract<std::streamsize> bytes_written(write_result);
+#endif
+    
     return (bytes_written.check() ? bytes_written() : n);
   }
 

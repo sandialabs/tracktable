@@ -57,11 +57,18 @@ class IterableWrapper(object):
         by calling __next__() over and over until they raise
         StopIteration to tell you that there's nothing left.
 
+        NOTE: This has changed in Python 3.7.  The proper way to
+        return from a generator is now 'return' instead of 'raise
+        StopIteration()'.  See PEP 0479 for the details:
+
+        https://www.python.org/dev/peps/pep-0479/
+
         Returns:
            Whatever the inner iterator returns
 
         Raises:
            StopIteration
+
         """
 
         return self._inner_iter.next()
