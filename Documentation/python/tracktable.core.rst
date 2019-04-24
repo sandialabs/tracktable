@@ -23,34 +23,35 @@ Module contents
    This is the core geographic point class for Tracktable.  NOTE: The
    'Bases' is not accurate but will do for now.
 
-   This is the core geographic point class for Tracktable.
+   This is the core geographic point class for Tracktable.  You will
+   not instantiate this yourself: instead, use
+   tracktable.domain.<domain>.TrajectoryPoint.
 
    TrajectoryPoint specifies a point on the surface of a sphere that
-   is annotated with an object ID, coordinates, altitude, heading and
-   speed.  Any or all of these may be left uninitialized depending on
-   the user's actions although a point without coordinates is not
+   is annotated with an object ID, coordinates, timestamp, and
+   possibly other attributes (commonly altitude, heading and speed).
+   Any or all of these may be left uninitialized depending on the
+   user's actions although a point without coordinates is not
    especially useful.
-  
-   The altitude value defaults to zero.  Leave it this way when
-   representing objects such as automobiles, trains or surface ships
-   for which altitude doesn't matter.
+   
+   We require that the coordinates be in degrees of longitude and
+   latitude.  The units on all numeric properties are user-defined,
+   although altitude will usually be in either feet or meters
+   (depending on your data source) and heading will usually be in
+   degrees clockwise from due north.
 
    .. note:: TrajectoryPoint is implemented in C++ and exposed to
              Python via the Boost.Python module.  I will include a
              link to the C++ class definition as soon as I figure out
              how to do so within Sphinx, Breathe and Napoleon.
 
-   .. attribute:: longitude
+   .. attribute:: coordinates
 
-		  *float*
+		  *array of floats*
 
-		  Longitude of point (between -180 and 180)
-
-   .. attribute:: latitude
-
-  	          *float*
-
-	          Latitude of point (between -90 and 90)
+                  (longitude, latitude), where longitude is
+                  between -180 and 180 and latitude is between -90 and
+                  90
 
    .. attribute:: object_id
 
@@ -64,34 +65,14 @@ Module contents
 
 		  Timestamp corresponding to this point
 
-   .. attribute:: speed
-
-		  *float*
-
-		  Current speed of object in kilometers per hour
-
-   .. attribute:: heading
-
-		  *float*
-
-		  Current heading of object in degrees.  0 degrees is due
-		  north and angles increase clockwise (90 degrees is due
-		  east).
-
-   .. attribute:: altitude
-
-		  *float*
-
-		  Current altitude of object in feet.
-
-		  TODO: Convert to meters.
-
    .. attribute:: properties
 
 		  *dict*
 
 		  User-defined properties.  Names are strings, values
-		  are numbers, timestamps and strings.
+		  are numbers, timestamps and strings.  All properties
+		  other than object ID, coordinates, and timestamp
+		  will be stored here.
 
    .. py:method:: TrajectoryPoint.has_property(property_name)
       :module: tracktable.core
@@ -195,7 +176,8 @@ Module contents
       noisy or outright wrong.  Sometimes they're missing.  This
       method is for those situations.  When you call it, it will use
       the position and timestamp data to compute a speed at each point
-      in the trajectory.
+      in the trajectory.  This value can be accessed with 
+      :code:`my_speed = my_trajectory[i].properties['speed']`.
 
       .. :note:: If your position/timestamp measurements are also bad
                  then the results from this method will be less than
@@ -208,7 +190,9 @@ Module contents
 
       The heading at each point of a trajectory is the direction to
       the next point.  The heading at the very last point is the same
-      as the heading at the penultimate point.
+      as the heading at the penultimate point.  This value can be accessed with 
+      :code:`my_heading = my_trajectory[i].properties['heading']`.
+      
 
    .. py:method:: Trajectory.intersects_box(southwest_corner, northeast_corner)
       :module: tracktable.core
