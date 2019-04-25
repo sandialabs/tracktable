@@ -90,6 +90,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 option(BUILD_SHARED_LIBS "Build shared libraries.  Required for Python wrapping." ON)
 option(BUILD_PYTHON_WRAPPING "Wrap trajectory classes for use in Python." ON)
 option(BUILD_DOCUMENTATION "Build documentation for Tracktable." OFF)
+option(USE_ANACONDA_LINK_FLAGS "Use Anaconda-specific link flags." OFF)
 
 # ----------------------------------------------------------------------
 
@@ -177,6 +178,9 @@ if (BUILD_PYTHON_WRAPPING)
   if (NOT BUILD_SHARED_LIBS)
     message("Python wrapping requires shared libraries.  Please turn on BUILD_SHARED_LIBS.")
   endif ()
+  if (USE_ANACONDA_LINK_FLAGS)
+    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+  endif (USE_ANACONDA_LINK_FLAGS)
 endif ()
 
 
