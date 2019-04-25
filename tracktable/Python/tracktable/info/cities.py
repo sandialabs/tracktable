@@ -87,6 +87,8 @@ cities.py - Locations and population values for many cities of the world
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS DATABASE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import print_function, absolute_import, division
+
 import operator
 
 from tracktable.core.geomath import latitude, longitude
@@ -136,7 +138,7 @@ def cities_in_bbox(bbox_min=(-180, -90),
 
     global CITY_TABLE
     if not CITY_TABLE:
-        from data.city_table import city_table as cities
+        from tracktable.info.data.city_table import city_table as cities
         CITY_TABLE = cities
 
     result = []

@@ -49,10 +49,10 @@ class AssembleTrajectoryFromPoints(object):
 
     Attributes:
        input (iterable): Sequence of TrajectoryPoint objects sorted by timestamp
-       separation_time (datetime.timedelta): Maximum permissible time
+       separation_time (datetime.timedelta): Maximum permissible time (in MINUTES)
             difference between adjacent points in a trajectory
        separation_distance (float): Maximum permissible geographic
-            distance (in km) between adjacent points in a trajectory
+            distance (in KM) between adjacent points in a trajectory
        minimum_length (integer): Complete trajectories with fewer
             than this many points will be discarded
 
@@ -209,7 +209,7 @@ class AssembleTrajectoryFromPoints(object):
         print("INFO: Done assembling trajectories.")
         if self.valid_trajectory_count == 0:
             print("INFO: No trajectories produced.  Are you sure your delimiters and your column assignments are correct?")
-        raise StopIteration()
+        return
 
 
     def __iter__(self):

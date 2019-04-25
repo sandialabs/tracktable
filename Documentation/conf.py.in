@@ -24,7 +24,26 @@ tracktable_build = '@Tracktable_BINARY_DIR@'
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
-sys.path.insert(0, os.path.abspath(os.path.join(tracktable_src, 'Python')))
+sys.path.insert(0, os.path.abspath(os.path.join(tracktable_src, 'tracktable', 'Python')))
+
+# The autodoc Sphinx extension doesn't need to care about our Python
+# extension modules.  This list contains symbols that it should
+# pretend to have imported already.
+
+autodoc_mock_imports = [
+    'shapefile',
+    'shapely',
+    'mpl_toolkits.basemap',
+    'matplotlib',
+    'tracktable.core.core_types',
+    'tracktable.core._core_types',
+    'tracktable.core._domain_algorithm_overloads',
+    'tracktable.analysis._dbscan_clustering',
+    'tracktable.analysis._rtree',
+    'tracktable.domain._terrestrial',
+    'tracktable.domain._cartesian2d',
+    'tracktable.domain._cartesian3d'
+]
 
 # -- General configuration ------------------------------------------------
 

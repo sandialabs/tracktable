@@ -38,7 +38,12 @@ from __future__ import print_function, division
 
 from tracktable.core import tracktable_logging as tt_logging
 from matplotlib.testing import compare as mpl_compare
+
+import io
 import os.path
+import sys
+if sys.version_info[0] == 2:
+    import StringIO
 
 # useful constants for the rest of the world - the choice of NO_ERROR
 # == 0 is so that we can return it to the shell and have it treated as
@@ -90,4 +95,17 @@ def compare_image_to_ground_truth(filename,
         return ERROR
     else:
         return NO_ERROR
+
+# ----------------------------------------------------------------------
+
+def version_appropriate_string_buffer(contents=None):
+    if sys.version_info[0] == 2:
+        buffer_type = StringIO.StringIO
+    else:
+        buffer_type = io.BytesIO
+
+    if contents is None:
+        return buffer_type()
+    else:
+        return buffer_type(contents)
 
