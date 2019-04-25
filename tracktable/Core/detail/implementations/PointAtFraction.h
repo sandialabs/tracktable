@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2019 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -33,6 +33,7 @@
 #define __tracktable_detail_implementations_PointAtFraction_h
 
 #include <tracktable/Core/TracktableCommon.h>
+#include <tracktable/Core/PointArithmetic.h>
 #include <tracktable/Core/PropertyMap.h>
 #include <tracktable/Core/Trajectory.h>
 
@@ -70,7 +71,7 @@ struct generic_point_at_fraction
       typedef compare_point_distances<point_type> compare_point_type;
       typedef typename TrajectoryType::const_iterator const_iterator;
 
-      if (path.empty()) return point_type();
+      if (path.empty()) return tracktable::arithmetic::zero<point_type>();
       if (path.size() == 1) return path.front();
 
       if (fraction <= 0)
@@ -102,7 +103,7 @@ struct generic_point_at_length_fraction
         typedef compare_point_distances<point_type> compare_point_type;
         typedef typename TrajectoryType::const_iterator const_iterator;
 
-        if (path.empty()) return point_type();
+        if (path.empty()) return tracktable::arithmetic::zero<point_type>();
         if (path.size() == 1) return path.front();
 
         if (fraction <= 0)

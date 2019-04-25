@@ -123,7 +123,7 @@ def parse_args():
 
     parser.add_argument('--colormap', '-c',
                         default='gist_heat',
-                        help='Name of colormap for histogram.  Defaults to "bone".  See matplotlib documentation for a list of possibilities.')
+                        help='Name of colormap for histogram.  Defaults to "gist_heat" thermal scale.  See matplotlib documentation for a list of possibilities.')
 
     parser.add_argument('--scale', '-s',
                         default='linear',
@@ -242,7 +242,7 @@ def main():
 
     print("STATUS: Initializing image")
     figure = pyplot.figure(figsize=figure_dimensions, facecolor='black', edgecolor='black')
-    axes = figure.add_axes([0, 0, 1, 1], frameon=False, axisbg='black')
+    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor='black')
     axes.set_frame_on(False)
 
 

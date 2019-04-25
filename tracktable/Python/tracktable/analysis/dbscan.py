@@ -41,7 +41,7 @@ def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_si
     DBSCAN is a clustering algorithm that looks for regions of high
     density in a set of points.  Connected regions of high density are
     identified as clusters.  Small regions of low density or even
-    ingle points get identified as noise (belonging to no cluster).
+    single points get identified as noise (belonging to no cluster).
 
     There are three arguments to the process.  First, you supply the points
     to cluster.  Second, you ask for cluster labels with respect to

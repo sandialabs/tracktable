@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import print_function, division
-from six import StringIO
+
 from six.moves import range
 import datetime
 import sys
@@ -41,6 +41,7 @@ from .create_points_and_trajectories import generate_random_trajectory
 from tracktable.domain.cartesian3d import Trajectory, TrajectoryPoint, TrajectoryPointWriter, TrajectoryPointReader, TrajectoryWriter, TrajectoryReader
 
 from tracktable.core import Timestamp
+from tracktable.core.test_utilities import version_appropriate_string_buffer
 
 import datetime
 
@@ -102,7 +103,7 @@ def carefully_compare_trajectories(t1, t2):
 # ----------------------------------------------------------------------
 
 def write_trajectories_to_string(trajectories):
-    output = StringIO()
+    output = version_appropriate_string_buffer()
     writer = TrajectoryWriter(output)
     writer.write(trajectories)
 
@@ -113,7 +114,7 @@ def write_trajectories_to_string(trajectories):
 # ----------------------------------------------------------------------
 
 def read_trajectories_from_string(text):
-    input = StringIO(text)
+    input = version_appropriate_string_buffer(text)
     reader = TrajectoryReader(input)
     points = list(reader)
     return points

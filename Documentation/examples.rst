@@ -21,7 +21,71 @@ or ``...INSTALL_DIR/Python/tracktable`` if installed elsewhere.  We
 further assume that ``python`` is whichever Python executable you
 specified at build time.
 
+--------------
+Before You Run
+--------------
 
+Before you can run the scripts below you have to tell Python (and
+possibly your operating system) where to find the Tracktable
+libraries.  This involves modifying two environment variables.  You
+should only modify them for your own account -- it's not necessary (or
+especially helpful) to change the values system-wide.
+
+1.  ``PYTHONPATH``
+
+    Tell the Python interpreter to search the Tracktable Python
+    directory for its libraries.  To do this, add all but the last
+    component of the ``TRACKTABLE`` directory we described above to the
+    environment variable ``PYTHONPATH``.  For example, if your Tracktable
+    directory is ``/home/wilson/src/tracktable/Python/tracktable``, you
+    would add ``/home/wilson/src/tracktable/Python`` to ``PYTHONPATH``.
+    It doesn't matter whether or not you include the trailing slash.
+
+    If you haven't done this, Python will throw an error similar to
+    "ModuleNotFoundError: No module named 'tracktable'" when you try
+    to do anything that involves Tracktable, including running the
+    examples below.
+
+2.  System path
+
+    Besides the Python code, you will probably have to add the
+    location of the Tracktable compiled libraries to your library
+    search path.  This path is stored in the environment variable
+    ``PATH`` on Windows, ``LD_LIBRARY_PATH`` on Linux (and most Unix
+    variants) and ``DYLD_LIBRARY_PATH`` on Mac OS X.  The value to add
+    to your path differs depending on whether you are running
+    Tracktable from an installation (i.e. you typed 'make install'
+    after building or installed Tracktable from a binary package) or
+    from the source tree (i.e. you have not typed 'make install' or
+    anything similar).
+
+    **Install tree**: Suppose that you have installed Tracktable in
+    ``/usr/local/tracktable``.  Add the path
+    ``/usr/local/tracktable/lib`` to your library search path.
+
+    **Source tree**: Suppose that your build directory (which you
+    specified when you ran ``cmake``) is
+    ``/home/wilson/src/tracktable/build``.  Add the directory
+    ``/home/wilson/src/tracktable/build/lib`` to your library search
+    path.  Be sure to replace ``/home/awilson/tracktable/build`` with
+    the actual build directory that you used.
+
+    If you haven't done this, Python will usually complain that it can't
+    import something from the ``core_types`` module.
+
+    If you still see errors about ``core_types`` after fixing this,
+    make sure your Boost libraries are also on your library search
+    path.
+
+    **Note for OS X**: If you built Tracktable with the system default
+     Python interpreter instead of installing Anaconda or similar, the
+     operating system will ignore any changes you have made to your
+     library search path.  This happens because of a change made to
+     the operating system starting with 10.11 (El Capitan) called
+     System Integrity Protection.  We are working on a fix for this
+     but for the moment the best approach is to use a third-party
+     Python installation.
+    
 .. _heatmap-example:
 
 -----------------------------------
@@ -36,7 +100,7 @@ number of other attributes but they will be ignored.
 
 Run the example as follows::
 
-   $ python TRACKTABLE/examples/heatmap_from_csv.py TRACKTABLE/examples/data/SampleHeatmapPoints.csv HeatmapExample1.png
+   $ python TRACKTABLE/examples/heatmap_from_points.py TRACKTABLE/examples/data/SampleHeatmapPoints.csv HeatmapExample1.png
 
 Open the resulting image (``HeatmapExample1.png``) in your favorite
 image viewer.  You will see a map of the Earth with a smattering of
@@ -50,7 +114,7 @@ Now it's time to change things around.  Let's suppose that you want to
 see larger-area patterns with a coarser distribution.  You can change
 the histogram resolution with the ``--histogram-bin-size`` argument::
 
-   $ python TRACKTABLE/examples/heatmap_from_csv.py --histogram-bin-size 5 TRACKTABLE/examples/data/SampleHeatmapPoints.csv HeatmapExample2.png
+   $ python TRACKTABLE/examples/heatmap_from_points.py --histogram-bin-size 5 TRACKTABLE/examples/data/SampleHeatmapPoints.csv HeatmapExample2.png
 
 .. image:: images/HeatmapExample2.png
    :scale: 50%
@@ -60,7 +124,7 @@ large.  The earlier size was good but the histogram is too sparse.  If
 you change the color map to use a logarithmic scale instead of a
 linear one you might get more detail::
 
-   $ python TRACKTABLE/examples/heatmap_from_csv.py --scale logarithmic TRACKTABLE/examples/data/SampleHeatmapPoints.csv HeatmapExample3.png
+   $ python TRACKTABLE/examples/heatmap_from_points.py --scale logarithmic TRACKTABLE/examples/data/SampleHeatmapPoints.csv HeatmapExample3.png
 
 .. image:: images/HeatmapExample3.png
    :scale: 50%
@@ -68,7 +132,7 @@ linear one you might get more detail::
 That doesn't help much.  What if we zoom in on Europe and make the
 bins smaller? ::
 
-   $ python TRACKTABLE/examples/heatmap_from_csv.py --scale logarithmic --map europe --histogram-bin-size 0.5 TRACKTABLE/examples/data/SampleHeatmapPoints.csv HeatmapExample4.png
+   $ python TRACKTABLE/examples/heatmap_from_points.py --scale logarithmic --map europe --histogram-bin-size 0.5 TRACKTABLE/examples/data/SampleHeatmapPoints.csv HeatmapExample4.png
 
 .. image:: images/HeatmapExample4.png
    :scale: 50%
@@ -78,7 +142,7 @@ point domain (geographic or Cartesian), decoration, colors, image
 resolution and input configuration.  You can get a full list of
 options with the ``--help`` argument::
 
-   $ python TRACKTABLE/examples/heatmap_from_csv.py --help
+   $ python TRACKTABLE/examples/heatmap_from_points.py --help
 
 
 .. _trajectory-map-example:
@@ -94,7 +158,7 @@ That's our second example.  We have provided a sample data set of
 trajectories between many of the world's busiest airports for you to
 use. ::
 
-   $ python TRACKTABLE/examples/trajectory_map_from_csv.py
+   $ python TRACKTABLE/examples/trajectory_map_from_points.py
        TRACKTABLE/examples/data/SampleTrajectories.csv
        TrajectoryMapExample1.png
 
@@ -107,7 +171,7 @@ However, the thin lines make them difficult to see with this
 resolution and color map.  Let's make the lines for the trajectories
 wider and change the color map. ::
 
-   $ python TRACKTABLE/examples/trajectory_map_from_csv.py
+   $ python TRACKTABLE/examples/trajectory_map_from_points.py
        --trajectory-linewidth 2
        --trajectory-colormap winter
        TRACKTABLE/examples/data/SampleTrajectories.csv
@@ -123,7 +187,7 @@ that in our longitude-first convention that's (90W, 24N) to (60W,
 50N).  While we're at it, let's also draw and label every city with a
 population over half a million people. ::
 
-   $ python TRACKTABLE/examples/trajectory_map_from_csv.py
+   $ python TRACKTABLE/examples/trajectory_map_from_points.py
        --trajectory-linewidth 2
        --trajectory-colormap winter
        --map custom
@@ -140,8 +204,8 @@ Canadian provinces in bright green lines 2 points wide.  We'll also
 decrease the trajectory width so that the city labels aren't so
 overwhelmed. ::
 
-   $ python TRACKTABLE/examples/trajectory_map_from_csv.py
-       --state-color #80FF80
+   $ python TRACKTABLE/examples/trajectory_map_from_points.py
+       --state-color '#80FF80'
        --state-linewidth 2
        --trajectory-linewidth 1
        --trajectory-colormap winter
@@ -172,15 +236,15 @@ same rendering code that draws on maps of the world to draw data in
 flat 2D Cartesian space.  You need to specify `--domain cartesian2d`
 and `--map-bbox x y X Y` as follows::
 
-    $ python TRACKTABLE/examples/trajectory_map_from_csv.py
+    $ python TRACKTABLE/examples/trajectory_map_from_points.py
          --object-id-column 0
          --timestamp-column 1
 	 --coordinate-column 0 2
          --coordinate-column 1 3
-         --delimiter tab
+         --delimiter ','
 	 --map-bbox -100 -100 100 100
 	 --domain cartesian2d
-	 TRACKTABLE/examples/data/SamplePointsCartesian.tsv
+	 TRACKTABLE/examples/data/SamplePointsCartesian.csv
 	 trajectory_map_cartesian.png
 
 Support for automatically determining the bounding box of the data and
@@ -203,7 +267,7 @@ We'll begin with a short movie (10 seconds long, 10 frames per second)
 where each moving object has a trail showing the last hour of its
 motion::
 
-   $ python TRACKTABLE/examples/movie_from_csv.py --trail-duration 3600 --trajectory-linewidth 2 --fps 10 --duration 10 TRACKTABLE/examples/data/SampleTrajectories.tsv MovieExample1.mp4
+   $ python TRACKTABLE/examples/movie_from_points.py --trail-duration 3600 --trajectory-linewidth 2 --fps 10 --duration 10 TRACKTABLE/examples/data/SampleTrajectories.csv MovieExample1.mp4
 
 This will encode a movie using vanilla MPEG4 that should be playable by
 anything less than ten years old.  `Quicktime Player
@@ -212,7 +276,7 @@ can all handle this.  If you don't already have `VLC <http://www.videolan.org>`_
 
 We have two more features to demonstrate here.  First, instead of having the trajectory lines be of constant width along their length we can have them taper as they get older.  We do this with ``--trajectory-width taper``, ``trajectory-initial-linewidth`` and ``trajectory-final-linewidth``.  We will also put a dot at the head of each trajectory with ``--decorate-trajectory-head`` and ``trajectory-head-dot-size``. ::
 
-   $ python TRACKTABLE/examples/movie_from_csv.py
+   $ python TRACKTABLE/examples/movie_from_points.py
       --trail-duration 3600
       --trajectory-linewidth taper
       --trajectory-initial-linewidth 3
@@ -235,7 +299,7 @@ Cartesian Movie
 
 As with geographic data, we can also make movies from data in flat Cartesian space::
 
-    $ python TRACKTABLE/examples/movie_from_csv.py
+    $ python TRACKTABLE/examples/movie_from_points.py
       --domain cartesian2d
       --object-id-column 0
       --timestamp-column 1
@@ -246,7 +310,7 @@ As with geographic data, we can also make movies from data in flat Cartesian spa
       --trajectory-linewidth taper
       --trajectory-initial-linewidth 4
       --trajectory-final-linewidth 1
-      TRACKTABLE/examples/data/SamplePointsCartesian.tsv
+      TRACKTABLE/examples/data/SamplePointsCartesian.csv
       example_cartesian_trajectory_movie.m4v
 
 

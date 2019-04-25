@@ -1,6 +1,5 @@
-#
-# Copyright (c) 2014-2017 National Technology and Engineering
-# Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
+# Copyright (c) 2014-2019 National Technology and Engineering
+# Solutions of Sandia, LLC . Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
 #
@@ -28,39 +27,42 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import print_function, division, absolute_import
+###
+### DetectAnaconda.cmake: Check whether a python interpreter is part of
+### the Anaconda Python environment
+###
 
-from six.moves import range
-import sys
+# Continuum link their Python interpreters statically with the Python
+# library.  This causes crashes on OS X when we load in a Python
+# extension that is also linked with the Python library.  If we can
+# detect this interpreter we can substitute a different set of link
+# flags.
+# 
+# We do this by trying to import the 'conda' module.  This program is
+# Anaconda's package manager.  It is very unlikely that an Anaconda
+# installation will not have it.
 
-from tracktable.core.test_utilities import version_appropriate_string_buffer
-from tracktable.domain.cartesian2d import BasePoint, BasePointWriter
+function(check_for_anaconda python_interpreter return_variable_name)
 
-def generate_points(howmany):
-    points = []
+get_filename_component(
+  _interpreter_directory
+  ${python_interpreter}
+  DIRECTORY
+  )
 
-    for i in range(howmany):
-        x = 10 * howmany
-        y = 5 * howmany * howmany
+if (EXISTS "${DIRECTORY}/conda")
+  set(${return_variable_name} TRUE PARENT_SCOPE)
+else ()
+  # We might be in Anaconda but in a virtual environment.  If this is
+  # the case, the CONDA_EXE environment variable will be set.
+  if (DEFINED ENV{CONDA_EXE})
+    set(${return_variable_name} TRUE PARENT_SCOPE)
+  else (DEFINED ENV{CONDA_EXE})
+    set(${return_variable_name} FALSE PARENT_SCOPE)
+  endif (DEFINED ENV{CONDA_EXE})
 
-        points.append(BasePoint(x, y))
+endif ()
 
-    return points
 
-def write_points_to_string(points):
-    output = version_appropriate_string_buffer()
-    writer = BasePointWriter(output)
-    writer.write(points)
-
-    return output.getvalue()
-
-def main():
-    points_as_string = write_points_to_string(generate_points(10))
-
-    print("Base points as string:\n{}(end)".format(points_as_string))
-
-    return 0
-
-if __name__ == '__main__':
-    sys.exit(main())
+endfunction(check_for_anaconda)
 
