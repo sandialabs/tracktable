@@ -58,6 +58,7 @@ set( Core_HEADERS
   GeometricMean.h
   GeometricMedian.h
   Geometry.h
+  GuardedBoostGeometryHeaders.h
   MemoryUse.h
   PlatformDetect.h
   PointArithmetic.h
