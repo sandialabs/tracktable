@@ -467,14 +467,15 @@ def draw_traffic(traffic_map,
     return all_artists
 
 
-def unwrapPath(locs):
+def unwrap_path(locs):
     """
     Function:
-        Inspects a list of [lat, lon] coordinates. If the trajectory crosses the antimeridian (180 deg. Long),
-        'unwrap' the trajectory by projecting longitudinal values onto >+180 or <-180. 
-        This will prevent horizontal lines from streaking across a mercator projection, when plotting the trajectory
-        in mapping packages like Folium.
-        Operates by comparing pairs of elements (coord. point tuples) for the entire list.
+        Inspects a list of [lat, lon] coordinates. If the trajectory crosses 
+	the antimeridian (180 deg. Long), 'unwrap' the trajectory by projecting
+	longitudinal values onto >+180 or <-180. This will prevent horizontal
+	lines from streaking across a mercator projection, when plotting the
+	trajectory in mapping packages like Folium. Operates by comparing pairs
+	of elements (coord. point tuples) for the entire list.
     
     Input:
         locs: a list of (lat,lon) tuples
