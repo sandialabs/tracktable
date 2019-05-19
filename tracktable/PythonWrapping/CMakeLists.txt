@@ -48,12 +48,19 @@
 
 set(Boost_PYTHON_LIBRARY_SUFFIX "")
 
+include(CheckForAnacondaPython)
+
 find_package(Boost 1.57 COMPONENTS date_time regex REQUIRED)
 find_package(PythonInterp)
 if (PYTHONINTERP_FOUND)
   find_package(PythonLibs)
 endif (PYTHONINTERP_FOUND)
 
+set(PYTHON_IS_ANACONDA FALSE)
+
+if (EXISTS ${PYTHON_EXECUTABLE})
+  check_for_anaconda_python(${PYTHON_EXECUTABLE} PYTHON_IS_ANACONDA)
+endif (EXISTS ${PYTHON_EXECUTABLE})
 
 if (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
   if (Boost_VERSION VERSION_LESS 106700)
@@ -97,6 +104,12 @@ link_directories(
   ${Tracktable_BINARY_DIR}/lib
 )
 
+if (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
+  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
+else (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
+  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+endif (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
+
 set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable)
 
 # We use Python-like naming for these files for two reasons.  First,
@@ -116,8 +129,7 @@ add_library(_tracktable_hello MODULE
 set_property(TARGET _tracktable_hello           PROPERTY FOLDER "Python")
 
 target_link_libraries(_tracktable_hello
-  ${Boost_LIBRARIES}
-  ${PYTHON_LIBRARIES}
+  ${PYTHON_EXTENSION_LIBRARIES}
   )
 
 install_python_extension( _tracktable_hello core ${Tracktable_PYTHON_DIR} )
@@ -133,9 +145,8 @@ set_property(TARGET _core_types                PROPERTY FOLDER "Python")
 
 target_link_libraries(_core_types
   TracktableCore
-  ${Boost_LIBRARIES}
-  ${PYTHON_LIBRARIES}
-)
+  ${PYTHON_EXTENSION_LIBRARIES}
+  )
 
 install_python_extension(_core_types core ${Tracktable_PYTHON_DIR})
 
@@ -147,9 +158,8 @@ set_property(TARGET _domain_algorithm_overloads PROPERTY FOLDER "Python")
 target_link_libraries(_domain_algorithm_overloads
   TracktableCore
   TracktableDomain
-  ${Boost_LIBRARIES}
-  ${PYTHON_LIBRARIES}
-)
+  ${PYTHON_EXTENSION_LIBRARIES}
+  )
 
 install_python_extension(_domain_algorithm_overloads core ${Tracktable_PYTHON_DIR})
 
@@ -161,9 +171,8 @@ set_property(TARGET _terrestrial                PROPERTY FOLDER "Python")
 target_link_libraries(_terrestrial
   TracktableCore
   TracktableDomain
-  ${Boost_LIBRARIES}
-  ${PYTHON_LIBRARIES}
-)
+  ${PYTHON_EXTENSION_LIBRARIES}
+  )
 
 install_python_extension(_terrestrial domain ${Tracktable_PYTHON_DIR})
 
@@ -176,9 +185,8 @@ set_property(TARGET _cartesian2d                PROPERTY FOLDER "Python")
 target_link_libraries(_cartesian2d
   TracktableCore
   TracktableDomain
-  ${Boost_LIBRARIES}
-  ${PYTHON_LIBRARIES}
-)
+  ${PYTHON_EXTENSION_LIBRARIES}
+  )
 
 install_python_extension(_cartesian2d domain ${Tracktable_PYTHON_DIR})
 
@@ -190,8 +198,7 @@ set_property(TARGET _cartesian3d                PROPERTY FOLDER "Python")
 target_link_libraries(_cartesian3d
   TracktableCore
   TracktableDomain
-  ${Boost_LIBRARIES}
-  ${PYTHON_LIBRARIES}
+  ${PYTHON_EXTENSION_LIBRARIES}
 )
 
 install_python_extension(_cartesian3d domain ${Tracktable_PYTHON_DIR})
@@ -215,13 +222,12 @@ set_property(TARGET _feature_vector_points      PROPERTY FOLDER "Python")
 target_link_libraries(_feature_vector_points
   TracktableCore
   TracktableDomain
-  ${Boost_LIBRARIES}
-  ${PYTHON_LIBRARIES}
+  ${PYTHON_EXTENSION_LIBRARIES}
   )
 
 install_python_extension(_feature_vector_points domain ${Tracktable_PYTHON_DIR})
 
-add_library(_dbscan_clustering
+add_library(_dbscan_clustering MODULE
   DBSCANClusteringPythonModule.cpp
   ExplicitInstantiation/DBSCAN_Wrapper_1_3.cpp
   ExplicitInstantiation/DBSCAN_Wrapper_4_6.cpp
@@ -240,15 +246,14 @@ set_property(TARGET _dbscan_clustering          PROPERTY FOLDER "Python")
 target_link_libraries(_dbscan_clustering
   TracktableCore
   TracktableDomain
-  ${Boost_LIBRARIES}
-  ${PYTHON_LIBRARIES}
+  ${PYTHON_EXTENSION_LIBRARIES}
   )
 
 
 install_python_extension(_dbscan_clustering analysis ${Tracktable_PYTHON_DIR})
 
 
-add_library(_rtree
+add_library(_rtree MODULE
   RTreePythonModule.cpp
   ExplicitInstantiation/RTree_Wrapper_1_3.cpp
   ExplicitInstantiation/RTree_Wrapper_4_6.cpp
@@ -267,8 +272,7 @@ set_property(TARGET _rtree          PROPERTY FOLDER "Python")
 target_link_libraries(_rtree
   TracktableCore
   TracktableDomain
-  ${Boost_LIBRARIES}
-  ${PYTHON_LIBRARIES}
+  ${PYTHON_EXTENSION_LIBRARIES}
   )
 
 
