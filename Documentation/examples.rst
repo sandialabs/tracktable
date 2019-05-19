@@ -138,10 +138,10 @@ population over half a million people. ::
 Last and not least, let's highlight the borders of the US states and
 Canadian provinces in bright green lines 2 points wide.  We'll also
 decrease the trajectory width so that the city labels aren't so
-overwhelmed. ::
+overwhelmed.  Don't forget the backslash (\) in front of the color. ::
 
    $ python -m "tracktable.examples.trajectory_map_from_points"
-       --state-color #80FF80
+       --state-color \#80FF80
        --trajectory-linewidth 1
        --trajectory-colormap winter
        --map custom
