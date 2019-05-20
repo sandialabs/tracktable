@@ -69,14 +69,14 @@ execute_process(
   WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/CMake/Modules"
   )
 
-if (_anaconda_is_python MATCHES 0)
+if (${_anaconda_is_python} MATCHES 0)
   message("STATUS: Python interpreter looks like Anaconda.")
   set(${_RESULT_VARIABLE} TRUE PARENT_SCOPE)
-elseif (ANACONDA_IS_PYTHON MATCHES 1)
+elseif (${_anaconda_is_python} MATCHES 1)
   message("STATUS: Python interpreter does not look like Anaconda")
   # the variable was already set at the top of the function
 else ()
-  message(FATAL_ERROR "Couldn't run Python interpreter to check for Anaconda.  Message: ${ANACONDA_IS_PYTHON}")
+  message(FATAL_ERROR "Couldn't run Python interpreter to check for Anaconda.  Message: (${_anaconda_is_python}")
 endif()
 
 endfunction(check_for_anaconda_python)
