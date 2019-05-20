@@ -202,7 +202,13 @@ We'll begin with a short movie (10 seconds long, 10 frames per second)
 where each moving object has a trail showing the last hour of its
 motion::
 
-   $ python -m "tracktable.examples.movie_from_points" --trail-duration 3600 --trajectory-linewidth 2 --fps 10 --duration 10 TRACKTABLE/examples/data/SampleTrajectories.csv MovieExample1.mp4
+   $ python -m "tracktable.examples.movie_from_points" 
+        --trail-duration 3600 
+        --trajectory-linewidth 2 
+        --fps 10 
+        --duration 10 
+        TRACKTABLE/examples/data/SampleTrajectories.csv 
+        MovieExample1.mp4
 
 This will encode a movie using vanilla MPEG4 that should be playable by
 anything less than ten years old.  `Quicktime Player
@@ -226,7 +232,7 @@ We have two more features to demonstrate here.  First, instead of having the tra
 Too Many Arguments!
 -------------------
 
-Response files are used for managing siutations where many command line arguments need to be used. The use of of these files is documented in the user guide (see :ref:`Tracktable_User_Guide`).
+Response files are used for managing siutations where many command line arguments need to be used. The use of of these files is documented in the user guide (see :ref:`Tracktable_User_-Guide`).
 
 
 Cartesian Movie
@@ -248,4 +254,9 @@ As with geographic data, we can also make movies from data in flat Cartesian spa
       TRACKTABLE/examples/data/SamplePointsCartesian.csv
       MovieExample3.mp4
 
-
+NOTE: The trails won't appear in the movie until several seconds in.
+This is not a bug.  Recall that trails are colored by their progress
+from start to finish and the default colormap ("heat") is black at the
+beginning.  If you would like to see them bright and vivid right from
+the start, add an argument like ``--trajectory-colormap prism`` (or
+any other Matplotib colormap you like).
