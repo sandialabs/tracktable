@@ -27,7 +27,9 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""movie_from_csv.py - Example of how to render a movie of a bunch of trajectories from a CSV file
+"""movie_from_points.py - Example of how to render a movie of
+trajectories built from points in a CSV file
+
 """
 
 import matplotlib
