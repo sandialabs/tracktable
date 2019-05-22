@@ -27,3 +27,7 @@ sphinx:
 build:
   image: latest
   
+python:
+  version: 3.7
+  install: 
+    - requirements: Documentation/readthedocs/dependencies.txt
