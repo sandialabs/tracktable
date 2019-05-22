@@ -556,7 +556,8 @@ public:
    *
    * \return First point in trajectory (mutable reference)
    *
-   * \note TODO: Document behavior if trajectory is empty
+   * \note
+   * If you call this on an empty trajectory the behavior is undefined.
    */
   point_type& front()
     {
@@ -567,7 +568,8 @@ public:
    *
    * \return First point in trajectory (immutable reference)
    *
-   * \note TODO: Document behavior if trajectory is empty
+   * \note
+   * If you call this on an empty trajectory the behavior is undefined.
    */
    point_type const& front() const
     {
@@ -578,7 +580,10 @@ public:
    *
    * \return Last point in trajectory (mutable reference)
    *
-   * \note TODO: Document behavior if trajectory is empty
+   * \note 
+   * If you call this on an empty trajectory the behavior is
+   * undefined.  Dereferencing back() on an empty trajectory will
+   * probably crash your program.
    */
   point_type& back()
     {
@@ -589,7 +594,10 @@ public:
    *
    * \return Last point in trajectory (immutable reference)
    *
-   * \note TODO: Document behavior if trajectory is empty
+   * \note 
+   * If you call this on an empty trajectory the behavior is
+   * undefined.  Dereferencing back() on an empty trajectory will
+   * probably crash your program.
    */
    point_type const& back() const
     {
