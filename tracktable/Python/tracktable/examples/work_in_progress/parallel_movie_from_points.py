@@ -28,23 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-"""example_trajectory_rendering - Arguments and code for drawing trajectories
-
-Once we have a set of trajectories in memory we can make decisions
-about how they should look on screen.  That includes...
-
-* How should the line segments in the trajectory be colored?
-
-* What should the line width for each segment be?
-
-* Should there be a dot at the head of the trajectory?  What size and
-  color?
-
-* What layer (Z-order) should the trajectories live in?
-
-The convenience methods in this file will render a single group of
-trajectories.  You can render several groups by instantiating several
-of them.
+"""parallel_movie_from_points.py - Render a movie of trajectories assembled from points in a CSV file using multiple processes
 """
 
 from __future__ import division, absolute_import, print_function
@@ -65,10 +49,10 @@ import subprocess
 import sys
 import tempfile
 
-import example_point_reader
-import example_trajectory_builder
-import example_trajectory_rendering
-import example_movie_rendering
+import tracktable.examples.example_point_reader as example_point_reader
+import tracktable.examples.example_trajectory_builder as example_trajectory_builder
+import tracktable.examples.example_trajectory_rendering as example_trajectory_rendering
+import tracktable.examples.example_movie_rendering as example_movie_rendering
 
 
 from tracktable.feature               import annotations
