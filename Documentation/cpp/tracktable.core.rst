@@ -3,7 +3,6 @@ TracktableCore module
 
 .. doxygenclass:: tracktable::PointBase
    :members:
-   :protected-members:
    :private-members:
 
 .. doxygenclass:: tracktable::PointCartesian

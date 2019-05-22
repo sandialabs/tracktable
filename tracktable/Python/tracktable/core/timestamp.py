@@ -148,6 +148,7 @@ class Timestamp(object):
 
         Kwargs:
           format_string (string): Format string for datetime.strptime
+
         Returns:
           An aware datetime object.  By default this will be imbued
           with tracktable.core.timestamp.DEFAULT_TIMEZONE.  If you
