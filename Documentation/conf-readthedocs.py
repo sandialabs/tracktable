@@ -14,12 +14,19 @@
 
 from __future__ import print_function
 
+import subprocess
 import sys
 import os
 
-tracktable_src = '..'
-tracktable_build = './_build'
+tracktable_src = '../..'
 
+debugging = True
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+# First, run Doxygen to generate the XML files that Breathe will pick up
+if read_the_docs_build or debugging:
+    subprocess.call('doxygen -f Doxyfile-readthedocs', shell=True)
+    
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
@@ -133,7 +140,7 @@ pygments_style = 'sphinx'
 
 # -- Options for Breathe Doxygen <-> Sphinx bridge
 
-breathe_projects = { "tracktable_cpp": os.path.join(tracktable_build, "Documentation", "doxyxml") }
+breathe_projects = { "tracktable_cpp": './doxyxml' }
 breathe_default_project = "tracktable_cpp"
 
 # -- Options for HTML output ----------------------------------------------
