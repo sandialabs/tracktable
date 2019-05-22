@@ -286,7 +286,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'tracktable', u'Tracktable 1.1.0rc1 Documentation',
+    ('index', 'tracktable', u'Tracktable 1.1.0rc2 Documentation',
      [u'Andy Wilson and Danny Rintoul and Chris Valicka and Ben Newton and Phil Baxley'], 1)
 ]
 
@@ -300,7 +300,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Tracktable', u'Tracktable 1.1.0rc1 Documentation',
+  ('index', 'Tracktable', u'Tracktable 1.1.0rc2 Documentation',
    u'Andy Wilson and Danny Rintoul and Chris Valicka and Ben Newton and Phil Baxley', 'Tracktable', 'Trajectory analysis and rendering.',
    'Miscellaneous'),
 ]
