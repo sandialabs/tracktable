@@ -32,7 +32,9 @@
 #ifndef __tracktable_detail_implementations_GreatCircleInterpolation_h
 #define __tracktable_detail_implementations_GreatCircleInterpolation_h
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 
 #include <tracktable/Core/TracktableCommon.h>

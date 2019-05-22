@@ -34,29 +34,29 @@
 // Implementation details for Python wrapper for our property map.
 //
 
-#include <boost/python.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/module.hpp>
-#include <boost/python/object.hpp>
-#include <boost/python/to_python_converter.hpp>
-#include <boost/python/suite/indexing/map_indexing_suite.hpp>
 
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 #include <boost/variant/apply_visitor.hpp>
 
-#include <datetime.h>
-#include <Python.h>
-#include <patchlevel.h>
 
 #include <map>
 #include <iostream>
 #include <typeinfo>
 
 #include <tracktable/Core/PropertyMap.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 #include <tracktable/PythonWrapping/PropertyMapWrapper.h>
 #include <tracktable/PythonWrapping/PicklePropertyMap.h>
+
+// These have to come after GuardedBoostPythonHeaders because they
+// rely on Python.h
+#include <datetime.h>
+#include <patchlevel.h>
 
 namespace bp = boost::python;
 

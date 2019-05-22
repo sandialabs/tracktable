@@ -34,6 +34,8 @@
 #include <cstdlib>
 #include <algorithm>
 
+#include <cmath>
+
 namespace tracktable { namespace detail {
 
 template<class number_type>
@@ -41,8 +43,10 @@ inline bool almost_equal(number_type const& a,
                          number_type const& b,
                          number_type const& epsilon)
 {
-  number_type delta = std::abs(a - b);
-  number_type max_abs = std::max(std::abs(a), std::abs(b));
+  if (a == 0 && b == 0) return true;
+
+  number_type delta = fabs(a - b);
+  number_type max_abs = std::max(fabs(a), fabs(b));
 
   // Guard against underflow.  In order to avoid underflow, one of our
   // numbers must be larger than 1.0.
@@ -63,6 +67,6 @@ inline bool almost_equal(number_type const& a,
     }
 }
 
-} } 
+} }
 
 #endif

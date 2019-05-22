@@ -39,5 +39,5 @@ imported from the small C extension libraries.
 # boost::posix_time::ptime)
 from . import core_types
 from .core_types import BoostPythonArgumentError, set_default_timezone
-
+from .core_types import current_memory_use, peak_memory_use
 from .timestamp import Timestamp

@@ -37,8 +37,7 @@
 #include <typeinfo>
 #include <boost/iostreams/concepts.hpp>  // boost::iostreams::sink
 #include <boost/iostreams/stream.hpp>
-#include <boost/python.hpp>
-#include <boost/python/stl_iterator.hpp>
+
 
 #include "PythonFileLikeObjectStreams.h"
 

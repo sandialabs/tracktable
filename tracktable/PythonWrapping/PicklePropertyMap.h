@@ -62,21 +62,21 @@ struct pickle_suite< ::tracktable::PropertyValueT > : public boost::python::pick
         double d_value = boost::get<double>(value);
         return bp::make_tuple(d_value);
         }
-      catch (boost::bad_get e)
+      catch (boost::bad_get e1)
         {
         try
           {
           std::string s_value = boost::get<std::string>(value);
           return bp::make_tuple(s_value);
           }
-        catch (boost::bad_get e)
+        catch (boost::bad_get e2)
           {
           try
             {
             tracktable::Timestamp t_value = boost::get<tracktable::Timestamp>(value);
             return bp::make_tuple(t_value);
             }
-          catch (boost::bad_get e)
+          catch (boost::bad_get e3)
             {
             std::cerr << "ERROR: pickle_property_variant: Couldn't downcast the variant to a double, a string or a timestamp\n";
             return bp::make_tuple(0);
