@@ -754,8 +754,7 @@ WARN_LOGFILE           =
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-#INPUT                  = @CMAKE_CURRENT_SOURCE_DIR@/ @CMAKE_CURRENT_SOURCE_DIR@/Python/tracktable
-INPUT                  = ../tracktable/Core ../tracktable/IO ../tracktable/Analysis ../tracktable/Domain
+INPUT                  = ../../tracktable/Core ../../tracktable/IO ../../tracktable/Analysis ../../tracktable/Domain
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1809,7 +1808,7 @@ GENERATE_XML           = YES
 # The default directory is: xml.
 # This tag requires that the tag GENERATE_XML is set to YES.
 
-XML_OUTPUT             = @DOC_BINARY_DIR@/doxyxml
+XML_OUTPUT             = ./doxyxml
 
 # If the XML_PROGRAMLISTING tag is set to YES doxygen will dump the program
 # listings (including syntax highlighting and cross-referencing information) to
