@@ -226,6 +226,28 @@ Now press 'g' or click 'Generate' to confirm all of your choices and
 generate Makefiles, Visual Studio project files or your chosen
 equivalent.
 
+Gotcha: Boost import targets not found
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This happens when your installed version of CMake is too old for your
+installed version of Boost.  
+
+Gotcha: Anaconda does not install ccmake
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This is a known bug that has been fixed in ``conda-forge`` but has not
+yet propagated to the main distribution.  Install ``cmake`` from the
+``conda-forge`` channel as follows:
+
+``$ conda install -c conda-forge cmake``
+
+Gotcha: python3 Boost library not found but I'm using Python 2
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Check your Python CMake variables as listed in #2 above.  They are
+probably pointing to a Python 3 interpreter.
+
+
 Note
 ^^^^
 
