@@ -37,7 +37,7 @@ template<bool point_has_properties>
 struct count_properties
 {
   template<typename point_type>
-  static inline int apply(point_type const& /*point*/)
+  static inline std::size_t apply(point_type const& /*point*/)
     {
       return 0;
     }
@@ -47,7 +47,7 @@ template<>
 struct count_properties<true>
 {
   template<typename point_type>
-  static inline int apply(point_type const& point)
+  static inline std::size_t apply(point_type const& point)
     {
       return point.__properties().size();
     }

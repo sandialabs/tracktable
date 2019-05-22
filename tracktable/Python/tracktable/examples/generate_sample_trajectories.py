@@ -51,9 +51,11 @@ import sys
 
 from six.moves import range
 
-from tracktable.core import geomath, trajectory, timestamp
+from tracktable.core import geomath, timestamp, conversions
 from tracktable.info import cities, airports
 from tracktable.source import trajectory, path_point_source, combine
+from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
+from tracktable.domain.terrestrial import TrajectoryPointWriter as TerrestrialTrajectoryPointWriter
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -115,7 +117,7 @@ def time_between_positions(start, end, desired_speed=800):
     yon.
     """
 
-    distance = geomath.radians_to_km(geomath.distance_between(start, end))
+    distance = geomath.distance(start, end)
     seconds = 3600.0 * (distance / desired_speed)
     return datetime.timedelta(seconds=seconds)
 
@@ -149,24 +151,39 @@ def trajectory_point_generator(start_airport, end_airport, start_time, object_id
     the ending airport with the desired speed and time between points.
     """
 
-    travel_time = time_between_positions(start_airport.position, end_airport.position, desired_speed=desired_speed)
+    start_position = TerrestrialTrajectoryPoint()
+    start_position[0] = start_airport.position[0]
+    start_position[1] = start_airport.position[1]
 
-    num_points = num_points_between_positions(start_airport.position, end_airport.position,
+    end_position = TerrestrialTrajectoryPoint()
+    end_position[0] = end_airport.position[0]
+    end_position[1] = end_airport.position[1]
+
+    travel_time = time_between_positions(start_position, end_position, desired_speed=desired_speed)
+
+    num_points = num_points_between_positions(start_position, end_position,
                                               desired_speed=desired_speed,
                                               seconds_between_points=seconds_between_points)
 
     if num_points < minimum_num_points:
         num_points = minimum_num_points
 
-    point_source = path_point_source.GreatCircleTrajectoryPointSource()
-    point_source.start_time = start_time
-    point_source.end_time = start_time + travel_time
-    point_source.num_points = num_points
-    point_source.start_point = start_airport.position
-    point_source.end_point = end_airport.position
-    point_source.object_id = object_id
+    start_position.object_id = object_id
+    start_position.timestamp = start_time
+    end_position.object_id = object_id
+    end_position.timestamp = start_time + travel_time
 
-    return point_source.points()
+    point_list = [ start_position ]
+    if num_points == 2:
+        point_list.append(end_position)
+    else:
+        interpolant_increment = 1.0 / (num_points - 1)
+        for i in range(1, num_points-1):
+            interpolant = i * interpolant_increment
+            point_list.append(geomath.interpolate(start_position, end_position, interpolant))
+        point_list.append(end_position)
+    
+    return point_list
 
 # ----------------------------------------------------------------------
 
@@ -198,6 +215,8 @@ def all_path_point_generators(airports, num_paths, desired_speed=800, speed_jitt
         flight_counters[flight_id] = flight_number + 1
         full_flight_id = '{}{}'.format(flight_id, flight_number)
 
+        print("INFO: generating sample trajectory for {} - {}".format(start_airport.iata_code,
+                                                                       end_airport.iata_code))
 
         generator = trajectory_point_generator(start_airport, end_airport, 
                                                start_time=datetime.datetime.now(), 
@@ -239,10 +258,14 @@ def main():
                                                 speed_jitter=args.speed_jitter,
                                                 seconds_between_points=args.spacing)
 
+    print("DEBUG: Acquired {} point iterables.".format(len(point_iterables)))
+    
     single_point_list = combine.interleave_points_by_timestamp(*point_iterables)
 
     with open(args.output[0], 'wb') as outfile:
-        write_points_to_file(single_point_list, outfile)
+        writer = TerrestrialTrajectoryPointWriter(outfile)
+        writer.write(single_point_list)
+#        write_points_to_file(single_point_list, outfile)
 
     return 0
 

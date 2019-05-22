@@ -19,7 +19,6 @@
 #include <string>
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/geometries/segment.hpp>
-//#include <boost/geometry/algorithms/distance.hpp>
 #include "Common.h"
 
 int readAirDataFile(std::string &input_file, std::string& sep_char,

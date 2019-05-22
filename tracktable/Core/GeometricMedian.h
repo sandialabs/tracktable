@@ -88,7 +88,7 @@ geometric_median(
   double tolerance = 1e-9 * max_coordinate_span;
   point_type median, new_median, median_estimate;
   double distance_moved = std::numeric_limits<double>::max();
-  int num_points = std::distance(input_begin, input_end);
+  std::size_t num_points = std::distance(input_begin, input_end);
   assert(num_points >= 0);
 
   if (input_begin == input_end)

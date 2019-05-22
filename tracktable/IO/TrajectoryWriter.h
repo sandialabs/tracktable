@@ -68,8 +68,8 @@ public:
 	this->set_default_configuration();
 	}
 
-  TrajectoryWriter(std::ostream& output)
-    : OutputStream(&output)
+  TrajectoryWriter(std::ostream& _output)
+    : OutputStream(&_output)
 	{
 	this->set_default_configuration();
 	}
@@ -178,10 +178,10 @@ public:
    * @param[in] null_value   Desired string representation of nulls
    */
 
-  void set_null_value(string_type const& null_value)
+  void set_null_value(string_type const& new_null_value)
     {
-      this->TrajectoryPointWriter.set_null_value(null_value);
-      this->_TrajectoryHeader.set_null_value(null_value);
+      this->TrajectoryPointWriter.set_null_value(new_null_value);
+      this->_TrajectoryHeader.set_null_value(new_null_value);
     }
 
   string_type null_value() const
@@ -254,10 +254,10 @@ private:
 
   template<typename trajectory_type, typename out_iter_type>
   void write_trajectory_header(trajectory_type const& trajectory,
-                               out_iter_type output)
+                               out_iter_type output_iter)
     {
       this->_TrajectoryHeader.populate_from_trajectory(trajectory);
-      this->_TrajectoryHeader.write_as_tokens(output);
+      this->_TrajectoryHeader.write_as_tokens(output_iter);
     }
 
   void set_default_configuration()

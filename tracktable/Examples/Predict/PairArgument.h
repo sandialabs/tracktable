@@ -38,7 +38,10 @@
 #ifndef __tracktable_examples_PairArgument_h
 #define __tracktable_examples_PairArgument_h
 
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
 #include <boost/program_options.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 namespace bpo = boost::program_options;
 
@@ -46,7 +49,7 @@ template< typename T, typename charT = char >
 class multiple_tokens_typed_value : public bpo::typed_value< T, charT >
 {
 public:
-  typedef tracktable::string_type string_type;
+  typedef tracktable::string_type tt_string_type;
   typedef bpo::typed_value< T, charT > base_type;
 
   // I feel queasy about using 'unsigned' as a bare type but that's
@@ -86,21 +89,21 @@ public:
 
 private:
 
-  std::size_t MinTokenCount;
-  std::size_t MaxTokenCount;
+    unsigned int MinTokenCount;
+    unsigned int MaxTokenCount;
 };
 
 
 template< typename T >
 multiple_tokens_typed_value<T> *
-multiple_tokens_value(std::size_t low, std::size_t high)
+multiple_tokens_value(unsigned int low, unsigned int high)
 {
   return new multiple_tokens_typed_value<T>(0, low, high);
 }
 
 template< typename T >
 multiple_tokens_typed_value<T> *
-multiple_tokens_value(T* t, std::size_t low, std::size_t high)
+multiple_tokens_value(T* t, unsigned int low, unsigned int high)
 {
   return new multiple_tokens_typed_value<T>(t, low, high);
 }

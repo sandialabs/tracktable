@@ -116,7 +116,7 @@ int test_simplify_linestring()
   typedef typename linestring_type::value_type point_type;
   linestring_type linestring;
 
-  for (std::size_t i = 0; i < 9; ++i)
+  for (int i = 0; i < 9; ++i)
     {
     point_type next_point = tracktable::arithmetic::zero<point_type>();
     next_point.template set<0>(i);

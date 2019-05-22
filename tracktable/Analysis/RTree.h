@@ -89,7 +89,8 @@
 
 #include <boost/tuple/tuple.hpp>
 #include <boost/tuple/tuple_comparison.hpp>
-#include <boost/geometry/index/rtree.hpp>
+
+#include <tracktable/Analysis/GuardedBoostGeometryRTreeHeader.h>
 
 namespace bgi = boost::geometry::index;
 

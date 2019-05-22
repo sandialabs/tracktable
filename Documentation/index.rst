@@ -31,11 +31,12 @@ We want to make it easy to...
 
 * Have fun!
 
-We'll warn you up front that this is Tracktable's first public release.
-Version 0.9.9 is a beta test.  Late beta, to be sure, but beta 
-nonetheless.  We've done our best to make everything run smoothly but
-it's safe to expect a few rough edges.  Please tell us about them so
-that we can improve Tracktable!
+Tracktable version 1.1.0 is an incremental update with minor performance
+improvements and feature additions.  Best efforts have been made to
+ensure compatability with multiple environments but it is possible that
+problems can arise with some combinations of supporting packages/software.
+If you come across any noteworthy problems, please tell us about them so
+that we can improve Tracktable in the future!
 
 
 Documentation

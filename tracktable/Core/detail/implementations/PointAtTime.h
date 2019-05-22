@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2019 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -36,6 +36,7 @@
 #include <tracktable/Core/PropertyMap.h>
 #include <tracktable/Core/Timestamp.h>
 
+#include <tracktable/Core/PointArithmetic.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtTime.h>
 #include <tracktable/Core/detail/implementations/TrajectoryPointComparison.h>
 
@@ -69,10 +70,10 @@ struct generic_point_at_time
     )
     {
       typedef typename TrajectoryType::point_type point_type;
-      typedef compare_point_timestamps<point_type> compare_point_type;
       typedef typename TrajectoryType::const_iterator const_iterator;
+      typedef compare_point_timestamps<point_type> compare_point_type;
 
-      if (path.empty()) return point_type();
+      if (path.empty()) return tracktable::arithmetic::zero<point_type>();
 
       if (time <= path.front().timestamp())
         {

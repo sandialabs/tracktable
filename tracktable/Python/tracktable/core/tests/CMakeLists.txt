@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2018 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -54,3 +54,13 @@ add_python_test(P_EchoArgs tracktable.core.tests.echo_args foo bar baz)
 add_python_test(P_ParseTimestampNoTimeZone tracktable.core.tests.parse_timestamp_no_time_zone)
 
 add_python_test(P_ParseTimestampWithTimeZone tracktable.core.tests.parse_timestamp_with_time_zone)
+
+add_python_test(P_TestTrajectoryTypes tracktable.core.tests.test_trajectory_types)
+
+add_python_test(P_TestPointTypes tracktable.core.tests.test_point_types)
+
+add_python_test(P_TestRadiusGyration tracktable.core.tests.test_trajectory_radius_of_gyration)
+
+add_python_test(P_TestComputeBoundingBox tracktable.core.tests.test_compute_bounding_box)
+
+add_python_test(P_TestDistance tracktable.core.tests.test_distance)

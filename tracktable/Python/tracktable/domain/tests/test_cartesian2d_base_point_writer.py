@@ -29,10 +29,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import print_function, division, absolute_import
-from six import StringIO
+
 from six.moves import range
 import sys
 
+from tracktable.core.test_utilities import version_appropriate_string_buffer
 from tracktable.domain.cartesian2d import BasePoint, BasePointWriter
 
 def generate_points(howmany):
@@ -47,7 +48,7 @@ def generate_points(howmany):
     return points
 
 def write_points_to_string(points):
-    output = StringIO()
+    output = version_appropriate_string_buffer()
     writer = BasePointWriter(output)
     writer.write(points)
 

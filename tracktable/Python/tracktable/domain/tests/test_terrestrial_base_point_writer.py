@@ -29,11 +29,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import print_function, division, absolute_import
-from six import StringIO
 from six.moves import range
+import io
 import sys
 
 from tracktable.domain.terrestrial import BasePoint, BasePointWriter
+from tracktable.core.test_utilities import version_appropriate_string_buffer
 
 def generate_points(howmany):
     points = []
@@ -47,7 +48,8 @@ def generate_points(howmany):
     return points
 
 def write_points_to_string(points):
-    output = StringIO()
+    output = version_appropriate_string_buffer()
+
     writer = BasePointWriter(output)
     writer.write(points)
 
