@@ -29,14 +29,9 @@
  */
 
 /*
- * This file does not have the usual Sandia copyright because the code
- * is not originally mine.  It came from a post on Stack Overflow:
- *
+ * This code was inspired by a post on Stack Overflow:
  *
  * http://stackoverflow.com/questions/24225442/converting-python-io-object-to-stdistream-when-using-boostpython
- *
- * TODO: Contact the author and ask him for explicit permission to use
- * his stuff.
  */
 
 
