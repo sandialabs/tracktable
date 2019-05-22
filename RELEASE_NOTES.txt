@@ -1,7 +1,7 @@
 Tracktable Release Notes
 
 VERSION 1.1.0, May 2019
------------------------
+=======================
 
 This version is the last in which we will actively support Python 2.7.
 Python 2 is scheduled to stop support on January 1, 2020
@@ -135,7 +135,7 @@ COMING SOON
 
 
 VERSION 1.0.5, March 2018
--------------------------
+=========================
 
 This is a bug-fix release.
 
@@ -170,7 +170,7 @@ OUTSTANDING ISSUES
 
 
 VERSION 1.0.4, November 2017
-----------------------------
+============================
 
 NEW FEATURES
 ------------
@@ -179,11 +179,16 @@ NEW FEATURES
   dictionaries.  At the moment this is only present in Python.  Check
   out tracktable.io.read_write_dictionary and
   tracktable.io.read_write_json.  
-Notable bugfixes:
+  
+NOTABLE FIXES
+-------------
 
-* References to std::cout are still in Boost's geometry library.  This
+* References to ``std::cout`` are still in Boost's geometry library.  This
   causes compile problems if I don't work around it.
-* tracktable.core.Timestamp.from_string() should now honor %z.
+
+* ``tracktable.core.Timestamp.from_string()`` should now honor ``%z``
+  in Python 3.  Support for the ``%z`` directive is missing in Python
+  2.
 
 ----------------------------------------------------------------------
 ----------------------------------------------------------------------
@@ -219,17 +224,20 @@ There is no Version 1.0.2.
 
 
 VERSION 1.0.1, April 2016
--------------------------
+=========================
 
-New features:
+NEW FEATURES
+------------
 
 * Convex hull measures for 2D spaces (Cartesian and geographic)
 * Support Python 3
 * Property values can now be null
 
-Notable bugfixes:
+NOTABLE FIXES
+-------------
 
-* Minimize calls to std::imbue.  This was 90% or more of the time it took to read trajectories.
+* Minimize calls to ``std::imbue``.  This was 90% or more of the time
+  it took to read trajectories.
 
 
 ----------------------------------------------------------------------
@@ -238,9 +246,10 @@ Notable bugfixes:
 
 
 VERSION 1.0, January 2016
--------------------------
+=========================
 
-New features:
+NEW FEATURES
+------------
 
 * DBSCAN clustering exposed to Python
 * RTree spatial index exposed to Python
@@ -248,7 +257,8 @@ New features:
 * Trajectory writer added to C++
 * Named property values can now be integers
 
-Notable bugfixes:
+NOTABLE FIXES
+-------------
 
 * Python wrappers for feature vectors no longer need quite as much memory at compile time
 * Guard against NaN results for math on the sphere
@@ -261,19 +271,21 @@ Notable bugfixes:
 
 
 VERSION 0.9, September 2015
----------------------------
+===========================
 
 First public alpha release.
 
-New features:
+NEW FEATURES
+------------
 
 * Boost r-tree exposed to C++ and Python for all point types along with common query functions.
-* Convenience method tracktable.core.geomath.recompute_speed added since we have to do this so often
+* Convenience method ``tracktable.core.geomath.recompute_speed`` added since we have to do this so often
 * Configurable timestamp input format
 * Point writer generalized to work with all domains, output to stream instead of requiring filename
 * Add "feature vector" point types (undecorated vectors of doubles) for clustering
 
-Notable bugfixes:
+NOTABLE FIXES
+-------------
 
 * Length of terrestrial trajectories now returned in kilometers instead of radians
 
@@ -284,19 +296,21 @@ Notable bugfixes:
 
 
 VERSION 0.3, March 2015
------------------------
+=======================
 
 Internal release only.
 
-New features:
+NEW FEATURES
+------------
 
 * Tracktable now builds with Visual Studio!
 * Automatic bounding box computation (used for culling during rendering)
 * Tests of image generating code now compare against ground truth image
 
-Notable bugfixes:
+NOTABLE FIXES
+-------------
 
-* Avoid compiler-specific definitions of size_t in favor of std::size_t
+* Avoid compiler-specific definitions of ``size_t`` in favor of ``std::size_t``
 
 
 ----------------------------------------------------------------------
@@ -305,25 +319,27 @@ Notable bugfixes:
 
 
 VERSION 0.2, December 2014
---------------------------
+==========================
 
 Internal release only.
 
-New features:
+NEW FEATURES
+------------
 
 * Allow points in 2D and 3D Cartesian space as well as geographic space
-* tracktable.render.mapmaker - convenience calls for many common map use cases
+* ``tracktable.render.mapmaker`` - convenience calls for many common map use cases
 * Delimited text point writer added to Python
 * Delimited text point reader added to C++, exposed to Python
-* Named properties added to tracktable::Trajectory
-* Code in tracktable.examples can now be used as a module
-* tracktable::Trajectory can now be used with boost::geometry functions
-* Header files install into ${INSTALL}/include/tracktable
+* Named properties added to ``tracktable::Trajectory``
+* Code in ``tracktable.examples`` can now be used as a module
+* ``tracktable::Trajectory`` can now be used with ``boost::geometry`` functions
+* Header files install into ``${INSTALL}/include/tracktable``
 * Add DBSCAN clustering code to C++
 
-Notable bugfixes:
+NOTABLE FIXES
+-------------
 
-* PYTHONPATH was not being set for regression tests.
+* ``PYTHONPATH`` was not being set for regression tests.
 * CMake install path was not being propagated to all modules.
 
 
@@ -332,11 +348,12 @@ Notable bugfixes:
 ----------------------------------------------------------------------
 
 VERSION 0.1, September 2014
----------------------------
+===========================
 
 Internal release only: not released to public.
 
-New features:
+NEW FEATURES
+------------
 
 * Movie-making script can now run in parallel
 * Example scripts all use common command-line arguments, including reading arguments from files
@@ -345,7 +362,8 @@ New features:
 * Overall documentation now builds using Sphinx
 * Decree: distances shall be specified in kilometers
 
-Notable bugfixes:
+NOTABLE FIXES
+-------------
 
 * Histogram buckets have reasonable sizes on both small and large maps
 * City labels were not rendering near cities
@@ -363,7 +381,8 @@ VERSION 0, July 2014
 
 Initial milestone: not released to public.
 
-New features:
+NEW FEATURES
+------------
 
 * Points and trajectories in geographic domain implemented in C++ and exposed to Python.
 * Math on points and trajectories implemented in C++ and exposed to Python.
