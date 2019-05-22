@@ -376,8 +376,8 @@ def length(trajectory):
 def end_to_end_distance(trajectory):
     """Return the distance between a path's endpoints
 
-    This is just the distance between start and end points rather than
-    the total distance traveled.
+    This is just the crow-flight distance between start and end points rather
+    than the total distance traveled.
 
     Args:
       trajectory (Trajectory): Path whose length we want
