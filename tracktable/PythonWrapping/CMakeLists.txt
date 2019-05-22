@@ -54,19 +54,11 @@
 
 set(Boost_PYTHON_LIBRARY_SUFFIX "")
 
-include(CheckForAnacondaPython)
-
 find_package(Boost 1.57 COMPONENTS date_time regex REQUIRED)
 find_package(PythonInterp)
 if (PYTHONINTERP_FOUND)
   find_package(PythonLibs)
 endif (PYTHONINTERP_FOUND)
-
-set(PYTHON_IS_ANACONDA FALSE)
-
-if (EXISTS ${PYTHON_EXECUTABLE})
-  check_for_anaconda_python(${PYTHON_EXECUTABLE} PYTHON_IS_ANACONDA)
-endif (EXISTS ${PYTHON_EXECUTABLE})
 
 if (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
   if (Boost_VERSION VERSION_LESS 106700)
@@ -101,21 +93,22 @@ endif (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
 # The solution is to not link against libpython and instead tell the
 # linker to leave unresolved symbols unresolved until load time.
 
-include(DetectAnaconda)
+set(PYTHON_IS_ANACONDA FALSE)
 
+include(CheckForAnacondaPython)
 if (APPLE)
-  message("STATUS: Before check_for_anaconda, PYTHON_EXECUTABLE is ${PYTHON_EXECUTABLE}")
-  set(PYTHON_IS_ANACONDA FALSE)
-  check_for_anaconda(${PYTHON_EXECUTABLE} PYTHON_IS_ANACONDA)
-  message("STATUS: After check, PYTHON_IS_ANACONDA is '${PYTHON_IS_ANACONDA}'")
-  if (PYTHON_IS_ANACONDA)
-    # This is an obscure way of using target_link_libraries to pass linker flags
-    set(PYTHON_LIBRARIES "-undefined dynamic_lookup")
-    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
-    message("STATUS: Linker flags: ${CMAKE_SHARED_LINKER_FLAGS}")
-  endif (PYTHON_IS_ANACONDA)
+  if (EXISTS ${PYTHON_EXECUTABLE})
+    check_for_anaconda_python(${PYTHON_EXECUTABLE} PYTHON_IS_ANACONDA)
+    if (PYTHON_IS_ANACONDA)
+      set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+      set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
+    else (PYTHON_IS_ANACONDA)
+      set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+    endif (PYTHON_IS_ANACONDA)
+  endif (EXISTS ${PYTHON_EXECUTABLE})
+else (APPLE)
+  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
 endif (APPLE)
-
 
 include(PythonExtension)
 
@@ -141,12 +134,20 @@ link_directories(
   ${Tracktable_BINARY_DIR}/lib
 )
 
-if (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
-  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
-else (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
-  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-endif (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
+# Deprecated: this gets handled up above
+# if (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
+#   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+#   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
+# else (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
+#   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+# endif (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
+
+# if (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
+#   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+#   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
+# else (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
+#   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
+# endif (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
 
 set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable)
 
