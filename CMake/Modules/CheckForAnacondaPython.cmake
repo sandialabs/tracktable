@@ -70,10 +70,10 @@ execute_process(
   )
 
 if (${_anaconda_is_python} MATCHES 0)
-  message("STATUS: Python interpreter looks like Anaconda.")
+  message(STATUS "STATUS: Python interpreter looks like Anaconda.")
   set(${_RESULT_VARIABLE} TRUE PARENT_SCOPE)
 elseif (${_anaconda_is_python} MATCHES 1)
-  message("STATUS: Python interpreter does not look like Anaconda")
+  message(STATUS "STATUS: Python interpreter does not look like Anaconda")
   # the variable was already set at the top of the function
 else ()
   message(FATAL_ERROR "Couldn't run Python interpreter to check for Anaconda.  Message: (${_anaconda_is_python}")
