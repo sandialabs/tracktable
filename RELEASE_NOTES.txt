@@ -1,16 +1,152 @@
 Tracktable Release Notes
 
+VERSION 1.1.0, May 2019
+-----------------------
+
+This version is the last in which we will actively support Python 2.7.
+Python 2 is scheduled to stop support on January 1, 2020
+(https://www.python.org/dev/peps/pep-0373/).  Many packages
+(TensorFlow, Pandas, iPython, Matplotlib, NumPy, SciPy... see
+https://python3statement.org/ for the full list) have already dropped
+support for Python 2.
+
+We also expect that this will be the last version of Tracktable that
+uses Basemap for its back-end rendering layer.  Basemap's maintainer
+has stated that there will be one final release at the end of 2019
+followed by honorable retirement.  We thank the entire Basemap team,
+past and present, for their many years of service.
+
+
+NEW FEATURES
+------------
+
+* Tracktable now has mailing lists!  Send a blank email to
+  <listname>-join@software.sandia.gov to request membership.  The
+  available lists are:
+
+  * tracktable-announce - Very low volume.  New releases of Tracktable
+    will be announced here.
+    
+  * tracktable-develop - Discussions of new features and changes to
+    the library will be conducted here.
+    
+  * tracktable-commit - Commit messages will be forwarded to this list.
+  
+* We are moving the repository to GitHub.  Starting with this release,
+  the canonical URL will be https://github.com/sandialabs/tracktable
+  with documentation at ReadTheDocs.
+
+* As of Version 1.1, we require Boost 1.61 or newer.
+
+* Functions ``tracktable.core.current_memory_use()`` and
+  ``tracktable.core.peak_memory_use()`` are now available.
+  
+* Functions on trajectories:
+
+  * ``time_at_fraction()`` will give you a point along a trajectory at any
+    fraction between beginning and end.
+  
+* Functions on points:
+
+  * ``extrapolate()`` is like ``interpolate()`` in that it takes two
+    points and a floating-point number and interpolates between the
+    start and end points according to that float.  Unlike
+    interpolate(), it doesn't do any bounds checking: it is perfectly
+    legitimate to ask for extrapolate(hither, yon, -1.0).
+  
+  * ``distance()`` now computes distance between any combination of
+    points and trajectories.
+
+* Clustering with DBSCAN:
+
+  * The DBSCAN interface has been cleaned up.  You will no longer
+    instantiate tracktable::DBSCAN.  Instead, call
+    tracktable::cluster_with_dbscan().
+    
+  * You can decorate the points you feed to DBSCAN.  For example, if
+    you want to store your own index, you can pass in a
+    ``std::pair<PointType, int>``.
+    
+* Trajectory I/O using JSON:
+
+  * We now support reading and writing trajectories to JSON in Python.
+    Check out the functions ``json_from_trajectory`` and
+    ``trajectory_from_json`` in the ``tracktable.io.read_write_json``
+    module.  Look for JSON support in C++ in an upcoming version.
+
+* The example scripts in the Python directory now have their own page
+  in the documentation.
+  
+
+NOTABLE FIXES
+-------------
+
+* We can now use Boost versions up to 1.69.  As of Boost 1.67, the
+  name of the Python shared library changed in a way that broke our
+  build process.  Fixed.  Note, however, that we cannot yet deal with
+  CMake-ified versions of Boost.
+
+* We detect Anaconda's Python interpreter on OS X and modify the link
+  flags so that loading Tracktable in Python code does not instantly
+  generate a segmentation fault.
+
+* Many spurious compilation warnings in Boost have been disabled.  
+
+* Distances in the terrestrial domain are now returned properly in
+  kilometers.
+  
+* We use ``sphinx.autodoc_mock_imports`` in our documentation so that you do not
+  need to build the entire toolkit just to create the documentation.
+  This still needs a little work to remove the need for CMake.
+
+
+OUTSTANDING ISSUES
+------------------
+
+* The C++ examples need to be cleaned up and documented.  
+
+* There are several useful scripts in
+  ``tracktable/Python/tracktable/examples/work_in_progress`` that need
+  minor fixes to run with the latest API.
+
+
+COMING SOON
+-----------
+
+* We are experimenting with various replacements for Basemap.  As of
+  May 2019 the leading contenders are Cartopy
+  (https://scitools.org.uk/cartopy/docs/latest/) for offline rendering
+  and either Folium/Leaflet
+  (https://python-visualization.github.io/folium/) or Plotly
+  (https://plot.ly/) for interactive rendering.  We welcome suggestions
+  and discussion!  Please join the tracktable-develop mailing list if
+  you're interested.
+
+* We are almost ready to move our documentation to ReadTheDocs.  Look
+  for an announcement on the ``tracktable-announce`` mailing list.
+  
+* C++11 features will be permitted in new contributions to the library.
+
+
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+
+
 VERSION 1.0.5, March 2018
 -------------------------
 
 This is a bug-fix release.
 
-New features:
+NEW FEATURES
+------------
 
 * No new features.
 
 
-Notable bugfixes:
+NOTABLE FIXES
+-------------
 
 * Writing to files or to file-like objects in Python caused a
   segfault.  See the commit on Feb 21 2018 whose hash begins with
@@ -20,27 +156,39 @@ Notable bugfixes:
   install'.
 
 
-Outstanding issues:
+OUTSTANDING ISSUES
+------------------
 
 * Link errors / segfaults under certain OSX configurations, especially
   the Anaconda Python environment.  
 
 
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+
+
 VERSION 1.0.4, November 2017
 ----------------------------
 
+NEW FEATURES
+------------
+
+* Trajectories can be written to and read from JSON and Python
+  dictionaries.  At the moment this is only present in Python.  Check
+  out tracktable.io.read_write_dictionary and
+  tracktable.io.read_write_json.  
 Notable bugfixes:
 
 * References to std::cout are still in Boost's geometry library.  This
   causes compile problems if I don't work around it.
 * tracktable.core.Timestamp.from_string() should now honor %z.
 
-New features:
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
 
-* Trajectories can be written to and read from JSON and Python
-  dictionaries.  At the moment this is only present in Python.  Check
-  out tracktable.io.read_write_dictionary and
-  tracktable.io.read_write_json.  
 
 VERSION 1.0.3, October 2017
 ---------------------------
@@ -54,11 +202,20 @@ imprecision.
 Copyright notices on all files updated after NTESS replaced Sandia
 Corporation (Lockheed Martin) as the operator of Sandia National Labs.
 
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+
 
 VERSION 1.0.2
 -------------
 
 There is no Version 1.0.2.
+
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
 
 
 VERSION 1.0.1, April 2016
@@ -73,6 +230,12 @@ New features:
 Notable bugfixes:
 
 * Minimize calls to std::imbue.  This was 90% or more of the time it took to read trajectories.
+
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+
 
 VERSION 1.0, January 2016
 -------------------------
@@ -91,6 +254,12 @@ Notable bugfixes:
 * Guard against NaN results for math on the sphere
 * Timestamps are now interpolated with microsecond resolution
 
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+
+
 VERSION 0.9, September 2015
 ---------------------------
 
@@ -108,6 +277,12 @@ Notable bugfixes:
 
 * Length of terrestrial trajectories now returned in kilometers instead of radians
 
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+
+
 VERSION 0.3, March 2015
 -----------------------
 
@@ -122,6 +297,11 @@ New features:
 Notable bugfixes:
 
 * Avoid compiler-specific definitions of size_t in favor of std::size_t
+
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
 
 
 VERSION 0.2, December 2014
@@ -146,6 +326,11 @@ Notable bugfixes:
 * PYTHONPATH was not being set for regression tests.
 * CMake install path was not being propagated to all modules.
 
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+
 VERSION 0.1, September 2014
 ---------------------------
 
@@ -167,6 +352,11 @@ Notable bugfixes:
 * Radius of the Earth was wrong
 * Copyright notice adjusted to use proper Sandia language
 * License file for external data cleaned up
+
+
+----------------------------------------------------------------------
+----------------------------------------------------------------------
+----------------------------------------------------------------------
 
 VERSION 0, July 2014
 ----------------------
