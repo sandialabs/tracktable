@@ -49,7 +49,7 @@ function(check_for_anaconda_python _PYTHON_EXECUTABLE _RESULT_VARIABLE)
 
 set(${_RESULT_VARIABLE} FALSE PARENT_SCOPE)
 
-message("check_for_anaconda_python: Executable is ${PYTHON_EXECUTABLE}")
+# message("check_for_anaconda_python: Executable is ${PYTHON_EXECUTABLE}")
 
 if (NOT EXISTS ${_PYTHON_EXECUTABLE})
   message(FATAL_ERROR "CheckForAnacondaPython: Python executable ${_PYTHON_EXECUTABLE} doesn't exist.")
