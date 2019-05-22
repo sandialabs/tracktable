@@ -25,10 +25,6 @@ read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
 # First, run Doxygen to generate the XML files that Breathe will pick up
 if read_the_docs_build or debugging:
-    old_cwd = os.getcwd()
-    print("Current directory before calling Doxygen: {}".format(old_cwd))
-#    with open('directory.txt', 'w') as outfile:
-#        print("Current directory before calling Doxygen: {}".format(old_cwd), file=outfile)
     subprocess.call(['doxygen', 'readthedocs/Doxyfile-readthedocs'])
     
 # If extensions (or modules to document with autodoc) are in another directory,
