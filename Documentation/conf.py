@@ -29,7 +29,7 @@ if read_the_docs_build or debugging:
     print("Current directory before calling Doxygen: {}".format(old_cwd))
 #    with open('directory.txt', 'w') as outfile:
 #        print("Current directory before calling Doxygen: {}".format(old_cwd), file=outfile)
-    subprocess.call(['doxygen', 'Doxyfile-readthedocs'])
+    subprocess.call(['doxygen', 'readthedocs/Doxyfile-readthedocs'])
     
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -146,7 +146,7 @@ pygments_style = 'sphinx'
 
 # -- Options for Breathe Doxygen <-> Sphinx bridge
 
-breathe_projects = { "tracktable_cpp": 'doxygen/doxyxml' }
+breathe_projects = { "tracktable_cpp": 'readthedocs/doxygen/doxyxml' }
 breathe_default_project = "tracktable_cpp"
 
 # -- Options for HTML output ----------------------------------------------
@@ -186,7 +186,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['../css']
+html_static_path = ['css']
 html_style = "tracktable.css"
 
 # Add any extra paths that contain custom files (such as robots.txt or
