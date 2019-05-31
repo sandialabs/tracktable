@@ -54,6 +54,7 @@ from ._domain_algorithm_overloads import point_at_time as _point_at_time
 from ._domain_algorithm_overloads import time_at_fraction as _time_at_fraction
 from ._domain_algorithm_overloads import subset_during_interval as _subset_during_interval
 from ._domain_algorithm_overloads import length as _length
+from ._domain_algorithm_overloads import current_length as _current_length
 from ._domain_algorithm_overloads import end_to_end_distance as _end_to_end_distance
 from ._domain_algorithm_overloads import intersects as _intersects
 from ._domain_algorithm_overloads import geometric_median as _geometric_median
@@ -373,6 +374,27 @@ def length(trajectory):
 
 # ----------------------------------------------------------------------
 
+def current_length(point):
+
+    """Return the current length of a path in domain-dependent units
+
+    This is the length up to the given point in a trajectory.
+
+    Args:
+      Point (TrajectoryPoint): Point to which we want the length
+
+    Returns:
+      Length in domain-dependent units
+
+    Domain:
+      Terrestrial: distance in km
+      Cartesian2D: distance in units
+      Cartesian3D: distance in units
+    """
+
+    return _current_length(point)
+
+# ----------------------------------------------------------------------
 def end_to_end_distance(trajectory):
     """Return the distance between a path's endpoints
 
