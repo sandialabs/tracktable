@@ -49,6 +49,16 @@ struct length
     );
 };
 
+template<typename P>
+struct current_length
+{
+    BOOST_MPL_ASSERT_MSG(
+        sizeof(P) == 0,
+        CURRENT_LENGTH_NOT_IMPLEMENTED_FOR_THIS_TRAJECTORY_POINT_TYPE,
+        (types<P>)
+    );
+};
+
 } } // exit namespace tracktable::algorithms
 
 // Now we include the driver functions that let us use the
@@ -60,6 +70,12 @@ template<typename TrajectoryT>
 double length(TrajectoryT const& path)
 {
   return algorithms::length<TrajectoryT>::apply(path);
+}
+
+template<typename PointP>
+double current_length(PointP const& point)
+{
+    return point.current_length();
 }
 
 } // exit namespace tracktable
