@@ -36,8 +36,16 @@ ground truth files, including computing differences where appropriate.
 
 from __future__ import print_function, division
 
+import numpy as np
 from tracktable.core import tracktable_logging as tt_logging
-from matplotlib.testing import compare as mpl_compare
+
+try:
+    import PIL
+    from PIL import Image
+    PIL_AVAILABLE=True
+except ImportError:
+    tt_logging('warning', 'Python image library not available.  Image tests will automatically fail.')
+    PIL_AVAILABLE=False
 
 import io
 import os.path
@@ -53,6 +61,22 @@ ERROR = 1
 
 def log_test_output(*args, **kwargs):
     print(*args, **kwargs)
+
+# ----------------------------------------------------------------------
+
+def image_mse(imageA, imageB):
+    # the 'Mean Squared Error' between the two images is the
+    # sum of the squared difference between the two images;
+    # NOTE: the two images must have the same dimension
+    imageA = np.array(imageA)
+    imageB = np.array(imageB)
+
+    err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
+    err /= float(imageA.shape[0] * imageA.shape[1])
+    
+    # return the MSE, the lower the error, the more "similar"
+    # the two images are
+    return err
 
 # ----------------------------------------------------------------------
 
@@ -75,7 +99,17 @@ def compare_images(expected, actual, tolerance=1):
       measurements.  We will bring this in-house if we ever need to.
     """
 
-    return mpl_compare.compare_images(expected, actual, tol=tolerance)
+    global PIL_AVAILABLE
+    if not PIL_AVAILABLE:
+        return False
+    else:
+        expected_image = Image.open(expected)
+        actual_image = Image.open(actual)
+
+        computed_mse = image_mse(expected_image, actual_image)
+        if computed_mse >= tolerance:
+            tt_logging.log('error', 'Image comparison failed: tolerance = {}, computed mean squared error = {}'.format(tolerance, computed_mse))
+        return computed_mse < tolerance
 
 # ----------------------------------------------------------------------
 
@@ -90,8 +124,7 @@ def compare_image_to_ground_truth(filename,
                             test_image_filename,
                             tolerance=tolerance)
 
-    if result is not None:
-        tt_logging.log('error', result)
+    if not result:
         return ERROR
     else:
         return NO_ERROR
