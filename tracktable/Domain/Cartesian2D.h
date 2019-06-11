@@ -126,11 +126,12 @@ public:
       return *this;
     }
 
-private:
+
+public:
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
-    ar & boost::serialization::base_object<CartesianPoint2D>(*this);
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
   }
   
   // Everything else -- operator==, operator!=, operator<< --
@@ -239,11 +240,11 @@ public:
       return *this;
     }
 
-private:
+public:
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
-    ar & boost::serialization::base_object<CartesianTrajectoryPoint2D>(*this);
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
   }
 
   // Everything else -- operator==, operator!=, operator<< --

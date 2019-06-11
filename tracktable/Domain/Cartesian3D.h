@@ -124,11 +124,13 @@ public:
       return *this;
     }
 
-private:
+public:
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
-    ar & boost::serialization::base_object<CartesianPoint3D>(*this);
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
+//    boost::serialization::make_nvp("Coordinates", this->Coordinates);
+    // ar & boost::serialization::base_object<CartesianPoint3D>(*this);
   }
 
   // Everything else -- operator==, operator!=, operator<< --
@@ -235,11 +237,11 @@ public:
       return *this;
     }
 
-private:
+public:
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
-    ar & boost::serialization::base_object<CartesianTrajectoryPoint3D>(*this);
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
   }
 
   // Everything else -- operator==, operator!=, operator<< --
