@@ -35,13 +35,11 @@
 
 #include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
-// #include <boost/python.hpp>
-
 #include <tracktable/Core/PointArithmetic.h>
 #include <tracktable/Core/PointTraits.h>
 #include <tracktable/Core/PropertyMap.h>
 #include <tracktable/PythonWrapping/PythonFileLikeObjectStreams.h>
-
+#include <tracktable/PythonWrapping/GenericSerializablePickleSuite.h>
 
 namespace tracktable { namespace python_wrapping {
 
@@ -181,6 +179,7 @@ class basic_point_methods : public boost::python::def_visitor<basic_point_method
         .def("__rdiv__", divide_scalar<wrapped_type, double>)
         .def("__idiv__", divide_scalar_in_place<wrapped_type, double>)
         .def("zero", zero<wrapped_type>)
+        .def_pickle(GenericSerializablePickleSuite<wrapped_type>())
         .staticmethod("zero")
         .def(self == self)
         .def(self != self)
@@ -314,6 +313,8 @@ class trajectory_point_methods : public boost::python::def_visitor<trajectory_po
         .add_property("timestamp", &wrapped_type::timestamp, &wrapped_type::set_timestamp)
         .def(self == self)
         .def(self != self)
+        .def_pickle(GenericSerializablePickleSuite<wrapped_type>())
+
         ;
     }
 };
@@ -329,10 +330,11 @@ class trajectory_methods : public boost::python::def_visitor<trajectory_methods>
 		using namespace boost::python;
 
 		c
-			.add_property("duration", &wrapped_type::duration)
-			.def(self == self)
-			.def(self != self)
-			;
+                  .add_property("duration", &wrapped_type::duration)
+                  .def(self == self)
+                  .def(self != self)
+                  .def_pickle(GenericSerializablePickleSuite<wrapped_type>())
+                  ;
 	}
 };
 

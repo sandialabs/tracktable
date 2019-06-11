@@ -136,7 +136,7 @@ public:
     this->set_latitude(_latitude);
     }
 
-private:
+public:
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
