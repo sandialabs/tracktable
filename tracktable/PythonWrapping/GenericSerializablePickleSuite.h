@@ -41,6 +41,8 @@
  ***/
 
 
+#define BP_STRING_TYPE boost::python::str
+
 #ifndef __tracktable_GenericSerializablePickleSuite_h
 #define __tracktable_GenericSerializablePickleSuite_h
 
@@ -57,28 +59,48 @@ class GenericSerializablePickleSuite : public boost::python::pickle_suite
 {
 public:
   
-  static boost::python::tuple getstate(native_object_t const& object_to_pickle)
+  static boost::python::tuple getstate(boost::python::object object_to_pickle)
   {
     std::ostringstream outbuf;
     boost::archive::binary_oarchive archive(outbuf);
+    native_object_t const& native_object = boost::python::extract<native_object_t const&>(object_to_pickle);
+    
+    archive << native_object;
+    return boost::python::make_tuple(BP_STRING_TYPE(outbuf.str()),
+                                     object_to_pickle.attr("__dict__"));
 
-    archive << object_to_pickle;
-    return boost::python::make_tuple(boost::python::str(outbuf.str()));
   }                                        
   
-  static void setstate(native_object_t& object_to_restore, boost::python::tuple state)
+  static void setstate(boost::python::object& object_to_restore, boost::python::tuple state)
   {
-    using boost::python::tuple;
+    using boost::python::dict;
+    using boost::python::extract;
     using boost::python::str;
+    using boost::python::tuple;
+
+    if (len(state) != 2)
+      {
+      PyErr_SetObject(PyExc_ValueError,
+                      ("Expected 2-item tuple in call to __setstate__; got %s" % state).ptr());
+      boost::python::throw_error_already_set();
+      }
     
-    str state_as_python_str((boost::python::extract<str>(state)));
+    // Restore the object's __dict__ attribute
+    dict d = extract<dict>(object_to_restore);
+    d.update(state[1]);
+    
+    // Restore the object's C++ attributes
+    native_object_t& native_object = extract<native_object_t&>(object_to_restore);
+    
+    BP_STRING_TYPE state_as_python_str((boost::python::extract<BP_STRING_TYPE>(state[0])));
     std::string state_as_string((boost::python::extract<std::string>(state_as_python_str)));
     std::istringstream inbuf(state_as_string);
     boost::archive::binary_iarchive archive(inbuf);
     
-    
-    archive >> object_to_restore;
+    archive >> native_object;
   }
+  
+  static bool getstate_manages_dict() { return true; }
 };
 
 } } // namespace tracktable::python_wrapping
