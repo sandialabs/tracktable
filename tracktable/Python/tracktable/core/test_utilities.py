@@ -41,6 +41,7 @@ from matplotlib.testing import compare as mpl_compare
 
 import io
 import os.path
+import pickle
 import sys
 if sys.version_info[0] == 2:
     import StringIO
@@ -109,3 +110,14 @@ def version_appropriate_string_buffer(contents=None):
     else:
         return buffer_type(contents)
 
+# ----------------------------------------------------------------------
+
+def pickle_and_unpickle(thing):
+    picklebuf = pickle.dumps(thing)
+    reconstituted = pickle.loads(picklebuf)
+
+    if thing == reconstituted:
+        return NO_ERROR
+    else:
+        print("ERROR: pickle_and_unpickle: Pickling did not reproduce input {}".format(type(thing)))
+        return ERROR
