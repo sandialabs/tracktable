@@ -37,14 +37,19 @@ ground truth files, including computing differences where appropriate.
 from __future__ import print_function, division
 
 from tracktable.core import tracktable_logging as tt_logging
+
 from matplotlib.testing import compare as mpl_compare
 
+import datetime
 import io
 import os.path
 import pickle
+import random
 import sys
 if sys.version_info[0] == 2:
     import StringIO
+
+random.seed(1234)
 
 # useful constants for the rest of the world - the choice of NO_ERROR
 # == 0 is so that we can return it to the shell and have it treated as
@@ -121,3 +126,52 @@ def pickle_and_unpickle(thing):
     else:
         print("ERROR: pickle_and_unpickle: Pickling did not reproduce input {}".format(type(thing)))
         return ERROR
+
+# ----------------------------------------------------------------------
+
+def set_random_properties(thing):
+    thing.properties["my_float"] = random.uniform(-50, 50)
+    thing.properties["my_time"] = datetime.datetime.now() + datetime.timedelta(minutes=random.randint(0, 1439))
+    thing.properties["my_int"] = random.randint(-1000, 1000)
+    thing.properties["my_string"] = "Random String {}".format(random.randint(0, 1000))
+
+# ----------------------------------------------------------------------
+
+def set_random_coordinates(thing, min_coord=-85, max_coord=85):
+    for i in range(len(thing)):
+        thing[i] = random.uniform(min_coord, max_coord)
+
+# ----------------------------------------------------------------------
+
+def create_random_point(point_class, add_properties=False):
+    my_point = point_class()
+    set_random_coordinates(my_point)
+    if add_properties:
+        set_random_properties(my_point)
+    return my_point
+
+# ----------------------------------------------------------------------
+
+def create_random_trajectory(trajectory_class, point_class, min_length=10, max_length=100):
+    object_id = "random_object_id_{}".format(random.randint(1, 1000))
+    starting_timestamp = datetime.datetime.now()
+
+    my_trajectory = trajectory_class()
+    trajectory_length = random.randint(min_length, max_length)
+    for i in range(trajectory_length):
+        my_point = create_random_point(point_class, add_properties=True)
+        my_point.object_id = object_id
+        my_point.timestamp = starting_timestamp + datetime.timedelta(minutes=i)
+        my_trajectory.append(my_point)
+
+    return my_trajectory
+
+# ----------------------------------------------------------------------
+
+def create_random_trajectory_point(point_class):
+    my_point = create_random_point(point_class, add_properties=True)
+    my_point.timestamp = datetime.datetime.now() + datetime.timedelta(minutes=random.randint(1, 1439))
+    my_point.object_id = "random_object_id_{}".format(random.randint(1, 1000))
+
+    return my_point
+

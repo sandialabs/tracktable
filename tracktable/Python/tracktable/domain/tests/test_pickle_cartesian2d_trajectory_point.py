@@ -34,23 +34,11 @@ import datetime
 import pickle
 import sys
 
-from tracktable.core.test_utilities import pickle_and_unpickle
+from tracktable.core.test_utilities import create_random_trajectory_point, pickle_and_unpickle
 from tracktable.domain.cartesian2d import TrajectoryPoint
 
 def test_pickle():
-    my_point = TrajectoryPoint()
-    my_point[0] = 123.45
-    my_point[1] = 456.78
-
-    my_point.object_id = "Cartesian2DTrajectoryPoint"
-    my_point.timestamp = datetime.datetime.now()
-
-    my_point.properties["my_int"] = 12345
-    my_point.properties["my_float"] = 123.45
-    my_point.properties["my_string"] = "Hello world!"
-    my_point.properties["my_timestamp"] = datetime.datetime.now() + datetime.timedelta(hours=12)
-#    my_point.properties["my_none"] = None
-
+    my_point = create_random_trajectory_point(TrajectoryPoint)
     return pickle_and_unpickle(my_point)
 
 def main():
