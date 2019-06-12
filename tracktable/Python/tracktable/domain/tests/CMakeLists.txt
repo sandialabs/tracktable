@@ -51,6 +51,36 @@ add_python_test(
   )
 
 add_python_test(
+  P_Pickle_Cartesian2D_BasePoint
+  ${DOMAIN}.test_pickle_cartesian2d_base_point
+  )
+
+add_python_test(
+  P_Pickle_Cartesian3D_BasePoint
+  ${DOMAIN}.test_pickle_cartesian3d_base_point
+  )
+
+add_python_test(
+  P_Pickle_Terrestrial_BasePoint
+  ${DOMAIN}.test_pickle_terrestrial_base_point
+  )
+
+add_python_test(
+  P_Pickle_Cartesian2D_TrajectoryPoint
+  ${DOMAIN}.test_pickle_cartesian2d_trajectory_point
+  )
+
+add_python_test(
+  P_Pickle_Cartesian3D_TrajectoryPoint
+  ${DOMAIN}.test_pickle_cartesian3d_base_point
+  )
+
+add_python_test(
+  P_Pickle_Terrestrial_TrajectoryPoint
+  ${DOMAIN}.test_pickle_terrestrial_trajectory_point
+  )
+
+add_python_test(
   P_Terrestrial_BasePointWriter
   ${DOMAIN}.test_terrestrial_base_point_writer
   )
@@ -128,7 +158,6 @@ add_python_test(
 add_python_test(
   P_Terrestrial_ManyTrajectoryPointReader
   ${DOMAIN}.test_terrestrial_many_trajectory_point_reader ${Tracktable_SOURCE_DIR}/TestData/Points/tab_separated/SampleHeatmapPoints.tsv 50000
->>>>>>> develop
 )
 
 add_python_test(
