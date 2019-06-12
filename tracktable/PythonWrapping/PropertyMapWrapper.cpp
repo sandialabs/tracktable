@@ -49,9 +49,9 @@
 #include <typeinfo>
 
 #include <tracktable/Core/PropertyMap.h>
+#include <tracktable/PythonWrapping/GenericSerializablePickleSuite.h>
 #include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 #include <tracktable/PythonWrapping/PropertyMapWrapper.h>
-#include <tracktable/PythonWrapping/PicklePropertyMap.h>
 
 // These have to come after GuardedBoostPythonHeaders because they
 // rely on Python.h
@@ -255,7 +255,8 @@ void install_property_map_wrapper()
 
   bp::class_< tracktable::PropertyMap >("PropertyMap")
     .def(boost::python::map_indexing_suite< tracktable::PropertyMap, true > ())
-    .def_pickle(tracktable::traits::pickle_suite<tracktable::PropertyMap>())
+//    .def_pickle(tracktable::traits::property_map_pickle_suite())
+    .def_pickle(tracktable::python_wrapping::GenericSerializablePickleSuite<tracktable::PropertyMap>())
     .def("keys", keys)
     .def("values", values)
     .def("items", items)
