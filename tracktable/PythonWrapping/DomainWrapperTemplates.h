@@ -313,8 +313,6 @@ class trajectory_point_methods : public boost::python::def_visitor<trajectory_po
         .add_property("timestamp", &wrapped_type::timestamp, &wrapped_type::set_timestamp)
         .def(self == self)
         .def(self != self)
-        .def_pickle(GenericSerializablePickleSuite<wrapped_type>())
-
         ;
     }
 };
