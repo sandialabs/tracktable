@@ -200,6 +200,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
     def("unsigned_turn_angle", &(tracktable::unsigned_turn_angle<TrajectoryPointTerrestrial>));
     def("bearing", &(tracktable::bearing<TrajectoryPointTerrestrial>));
     def("speed_between", &(tracktable::speed_between<TrajectoryPointTerrestrial>));
+    def("current_length", &(tracktable::current_length<TrajectoryPointTerrestrial>));
 
     def("simplify", &(tracktable::simplify<TrajectoryTerrestrial>));
     def("point_at_fraction", &(tracktable::point_at_fraction<TrajectoryTerrestrial>));
@@ -262,6 +263,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
     def("unsigned_turn_angle", &(tracktable::unsigned_turn_angle<TrajectoryPointCartesian2D>));
     def("bearing", &(tracktable::bearing<TrajectoryPointCartesian2D>));
     def("speed_between", &(tracktable::speed_between<TrajectoryPointCartesian2D>));
+    def("current_length", &(tracktable::current_length<TrajectoryPointCartesian2D>));
 
     def("simplify", &(tracktable::simplify<TrajectoryCartesian2D>));
     def("point_at_fraction", &(tracktable::point_at_fraction<TrajectoryCartesian2D>));
