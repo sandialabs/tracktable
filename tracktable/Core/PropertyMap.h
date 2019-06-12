@@ -47,6 +47,7 @@
 #include <tracktable/Core/PropertyValue.h>
 
 #include <map>
+#include <boost/serialization/map.hpp>
 
 namespace tracktable {
 
