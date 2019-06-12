@@ -164,6 +164,8 @@ def create_random_trajectory(trajectory_class, point_class, min_length=10, max_l
         my_point.timestamp = starting_timestamp + datetime.timedelta(minutes=i)
         my_trajectory.append(my_point)
 
+    set_random_properties(my_trajectory)
+
     return my_trajectory
 
 # ----------------------------------------------------------------------
