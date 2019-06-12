@@ -34,15 +34,11 @@ import datetime
 import pickle
 import sys
 
-from tracktable.core.test_utilities import pickle_and_unpickle
-
+from tracktable.core.test_utilities import create_random_point, pickle_and_unpickle
 from tracktable.domain.terrestrial import BasePoint
 
 def test_pickle():
-    my_point = BasePoint()
-    my_point[0] = 123.45
-    my_point[1] = 456.78
-
+    my_point = create_random_point(BasePoint)
     return pickle_and_unpickle(my_point)
 
 def main():

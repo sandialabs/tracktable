@@ -34,14 +34,10 @@ import pickle
 import sys
 
 from tracktable.domain.cartesian3d import BasePoint
-from tracktable.core.test_utilities import pickle_and_unpickle
+from tracktable.core.test_utilities import create_random_point, pickle_and_unpickle
 
 def test_pickle():
-    my_point = BasePoint()
-    my_point[0] = 123.45
-    my_point[1] = 456.78
-    my_point[2] = 90.123
-
+    my_point = create_random_point(BasePoint)
     return pickle_and_unpickle(my_point)
 
 def main():
