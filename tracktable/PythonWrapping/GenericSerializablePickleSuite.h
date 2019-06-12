@@ -70,7 +70,7 @@ public:
     // bytes object we have to drop through to the C API.
     boost::python::object archive_bytes(
       boost::python::handle<>(
-        PyBytes_FromString(outbuf.str().c_str())
+        PyBytes_FromStringAndSize(outbuf.str().c_str(), outbuf.str().size())
       )
     );
     
@@ -92,12 +92,16 @@ public:
     // string, though.
     boost::python::object bytes_object = state[0];
     PyObject* bytes = bytes_object.ptr();
+
     const char* bytes_as_c_string = PyBytes_AsString(bytes);
     check_extracted_string(bytes_as_c_string);
 
-    std::string archive_data(bytes_as_c_string);
+    std::string archive_data(bytes_as_c_string, PyBytes_Size(bytes));
     std::istringstream inbuf(archive_data);
     boost::archive::binary_iarchive archive(inbuf);
+    
+    dict object_dict = extract<dict>(object_to_restore.attr("__dict__"));
+    object_dict.update(state[1]);
     
     native_object_t& native_object = extract<native_object_t&>(object_to_restore);
     archive >> native_object;
