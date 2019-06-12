@@ -81,6 +81,21 @@ add_python_test(
   )
 
 add_python_test(
+  P_Pickle_Terrestrial_Trajectory
+  ${DOMAIN}.test_pickle_terrestrial_trajectory
+  )
+
+add_python_test(
+  P_Pickle_Cartesian2D_Trajectory
+  ${DOMAIN}.test_pickle_cartesian2d_trajectory
+  )
+
+add_python_test(
+  P_Pickle_Cartesian3D_Trajectory
+  ${DOMAIN}.test_pickle_cartesian3d_trajectory
+  )
+
+add_python_test(
   P_Terrestrial_BasePointWriter
   ${DOMAIN}.test_terrestrial_base_point_writer
   )
