@@ -52,11 +52,6 @@
 #include <tracktable/PythonWrapping/PythonAwareTrajectoryReader.h>
 #include <tracktable/PythonWrapping/PythonTypedObjectWriter.h>
 
-//#include <tracktable/PythonWrapping/PickleTrajectoryPoints.h>
-
-//#include <tracktable/PythonWrapping/PickleTrajectories.h>
-
-
 using tracktable::domain::cartesian3d::base_point_type;
 using tracktable::domain::cartesian3d::trajectory_point_type;
 using tracktable::domain::cartesian3d::trajectory_type;
