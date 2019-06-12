@@ -172,8 +172,8 @@ int main(int argc, char* argv[])
   std::size_t boost_xml_storage = test_boost_xml_storage(trajectories);
 
   std::cout << "Storage comparison for different serialization formats\n";
-  std::cout << "Trajectories: " << num_trajectories << "\n"
-            << "Points per trajectory: " << points_per_trajectory << "\n";
+  std::cout << "Trajectories: " << num_trajectories << "\n";
+  std::cout << "Points per trajectory: " << points_per_trajectory << "\n";
   
   std::cout << "\ttracktable::TrajectoryWriter: " << tracktable_trajectory_writer_storage << "\n";
   std::cout << "\tboost::text_oarchive: " << boost_text_storage << "\n";
