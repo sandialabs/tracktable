@@ -80,7 +80,9 @@ build_trajectory(int num_points=100)
   initial_point[1] = 20;
 
   initial_point.set_object_id("MyPoint");
+#if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
   initial_point.set_property("test_int_property", 123ll);
+#endif
   initial_point.set_property("test_float_property", 456.789);
   initial_point.set_property("test_string_property", "Frodo lives!");
   initial_point.set_property("test_timestamp_property", tracktable::time_from_string("2000-01-02 03:04:05"));
@@ -91,8 +93,10 @@ build_trajectory(int num_points=100)
     trajectory_point_type my_point(initial_point);
     my_point[0] += 0.1 * i;
     my_point[1] += 0.15 * i;
+#if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
     my_point.set_property("test_int_property",
                           boost::get<int64_t>(my_point.property("test_int_property")) + i);
+#endif
     my_point.set_property("test_float_property",
                           boost::get<double>(my_point.property("test_float_property")) + i * 1.1);
     my_point.set_property("test_timestamp_property",

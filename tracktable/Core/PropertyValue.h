@@ -124,8 +124,15 @@ TRACKTABLE_CORE_EXPORT std::ostream& operator<<(std::ostream& out, NullValue con
  * exactly how Boost does it.
  */
 
-typedef boost::variant<NullValue, double, int64_t, string_type, Timestamp> PropertyValueT;
-typedef boost::variant<NullValue, double, int64_t, string_type, Timestamp> PropertyValue;
+// typedef boost::variant<NullValue, int64_t, double, string_type, Timestamp> PropertyValueT;
+ typedef boost::variant<
+   NullValue,
+   double,
+   string_type,
+   Timestamp
+   >
+   PropertyValueT;
+// typedef PropertyValueT PropertyValue;
 
 inline PropertyValueT make_null(PropertyUnderlyingType null_type)
 {

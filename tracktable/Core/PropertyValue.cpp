@@ -59,6 +59,7 @@ public:
                                         this->interpolant * value2);
     }
 
+#if defined(PROPERTY_VALUE_INCLUDES_INT)
   result_type operator()(int64_t value1)
     {
       if (tracktable::is_property_null(this->SecondValue))
@@ -69,6 +70,7 @@ public:
       int64_t result = static_cast<int64_t>((1-this->interpolant) * value1 + (this->interpolant + value2));
       return tracktable::PropertyValueT(result);
     }
+#endif
 
   result_type operator()(tracktable::string_type const& value1)
     {
@@ -173,10 +175,12 @@ public:
       this->value = tracktable::TYPE_TIMESTAMP;
     }
 
+#if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
   void operator()(int64_t /*value*/)
     {
       this->value = tracktable::TYPE_INTEGER;
     }
+#endif
 
   void operator()(tracktable::NullValue const& /*value*/)
     {
