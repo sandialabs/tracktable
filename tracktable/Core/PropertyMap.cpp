@@ -116,6 +116,7 @@ void set_property(PropertyMap& properties, string_type const& name, Timestamp co
   properties[name] = PropertyValueT(value);
 }
 
+#if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
 /*! \brief Set a property in a collection
  *
  * @param[in] properties  Property map to alter
@@ -126,6 +127,7 @@ void set_property(PropertyMap& properties, string_type const& name, int64_t valu
 {
   properties[name] = PropertyValueT(value);
 }
+#endif
 
 /*! \brief Set a property in a collection
  *
@@ -246,6 +248,8 @@ double real_property(PropertyMap const& properties, string_type const& name, boo
 
 // ----------------------------------------------------------------------
 
+#if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
+
 /*! \brief Retrieve an integer property
  *
  * This accessor will let you retrieve the value of a string
@@ -295,6 +299,8 @@ int64_t integer_property(PropertyMap const& properties, string_type const& name,
     return 0;
     }
 }
+
+#endif
 
 // ----------------------------------------------------------------------
 
@@ -466,6 +472,8 @@ double real_property_with_default(
 
 // ----------------------------------------------------------------------
 
+#if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
+
 int64_t integer_property_with_default(
   PropertyMap const& properties,
   string_type const& name,
@@ -475,6 +483,7 @@ int64_t integer_property_with_default(
   return ::typed_property_with_default<int64_t>(properties, name, default_value);
 }
 
+#endif
 // ----------------------------------------------------------------------
 
 /*! \brief Retrieve a string property or some default value.
