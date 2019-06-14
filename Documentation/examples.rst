@@ -186,7 +186,7 @@ that in our longitude-first convention that's (90W, 24N) to (60W,
 50N).  While we're at it, let's also draw and label every city with a
 population over half a million people. ::
 
-   $ python -m "tracktable.examples.trajectory_map_from_points"
+   $ python TRACKTABLE/examples/trajectory_map_from_points.py
        --trajectory-linewidth 2
        --trajectory-colormap winter
        --map custom
@@ -202,6 +202,7 @@ Last and not least, let's highlight the borders of the US states and
 Canadian provinces in bright green lines 2 points wide.  We'll also
 decrease the trajectory width so that the city labels aren't so
 overwhelmed.  Don't forget the backslash (\) in front of the color. ::
+
 
    $ python -m "tracktable.examples.trajectory_map_from_points"
        --state-color \#80FF80
@@ -325,8 +326,3 @@ from start to finish and the default colormap ("heat") is black at the
 beginning.  If you would like to see them bright and vivid right from
 the start, add an argument like ``--trajectory-colormap prism`` (or
 any other Matplotib colormap you like).
-=======
-      example_cartesian_trajectory_movie.m4v
-
-
->>>>>>>  (1) Some filenames changed that didn't propagate to the documentation. (2) Some module dependencies must have changed over time as directory structures changed.
