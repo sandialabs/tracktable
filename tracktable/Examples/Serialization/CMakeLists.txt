@@ -27,17 +27,22 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+# This is tracktable/Examples/Assemble/CMakeLists.txt
 
-#
-# This is tracktable/Examples/CMakeLists.txt.
-#
+find_package(Boost REQUIRED COMPONENTS serialization regex)
 
-add_subdirectory(Assemble)
-add_subdirectory(Classify)
-add_subdirectory(Cluster)
-add_subdirectory(Filter)
-add_subdirectory(Length)
-# add_subdirectory(Portal)
-add_subdirectory(Predict)
-add_subdirectory(Reduce)
-add_subdirectory(Serialization)
+include_directories(
+  ${Tracktable_SOURCE_DIR}
+  ${Tracktable_BINARY_DIR}
+  ${Boost_INCLUDE_DIR}
+  )
+
+add_executable( serialize_trajectories
+  serialize_trajectories.cpp
+  )
+
+target_link_libraries( serialize_trajectories
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+  )

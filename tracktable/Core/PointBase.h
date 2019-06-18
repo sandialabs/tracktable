@@ -58,7 +58,8 @@
 #include <boost/geometry/geometries/register/linestring.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/mpl/int.hpp>
-
+#include <boost/serialization/array.hpp>
+#include <boost/serialization/base_object.hpp>
 
 namespace tracktable {
 
@@ -79,6 +80,8 @@ template<std::size_t Dimension>
 class PointBase
 {
 public:
+  friend class boost::serialization::access;
+  
   typedef tracktable::settings::point_coordinate_type coordinate_type;
   typedef tracktable::settings::point_coordinate_type element_type;
 
@@ -195,6 +198,13 @@ public:
 protected:
   /// Storage for the coordinate values
   coordinate_type Coordinates[Dimension];
+
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version)
+  {
+    ar & boost::serialization::make_nvp("Coordinates", this->Coordinates);
+  }
+  
 };
 
 } // exit namespace tracktable

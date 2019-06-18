@@ -126,6 +126,14 @@ public:
       return *this;
     }
 
+
+public:
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
+  }
+  
   // Everything else -- operator==, operator!=, operator<< --
   // delegated to the superclass
 };
@@ -231,6 +239,13 @@ public:
       this->Superclass::operator=(other);
       return *this;
     }
+
+public:
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
+  }
 
   // Everything else -- operator==, operator!=, operator<< --
   // delegated to the superclass

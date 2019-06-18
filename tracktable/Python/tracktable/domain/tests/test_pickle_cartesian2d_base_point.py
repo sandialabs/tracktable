@@ -1,4 +1,5 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+#
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -27,17 +28,20 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import absolute_import, division, print_function
 
-#
-# This is tracktable/Examples/CMakeLists.txt.
-#
+import pickle
+import sys
 
-add_subdirectory(Assemble)
-add_subdirectory(Classify)
-add_subdirectory(Cluster)
-add_subdirectory(Filter)
-add_subdirectory(Length)
-# add_subdirectory(Portal)
-add_subdirectory(Predict)
-add_subdirectory(Reduce)
-add_subdirectory(Serialization)
+from tracktable.domain.cartesian2d import BasePoint
+from tracktable.core.test_utilities import create_random_point, pickle_and_unpickle
+
+def test_pickle():
+    my_point = create_random_point(BasePoint)
+    return pickle_and_unpickle(my_point)
+
+def main():
+    return test_pickle()
+
+if __name__ == '__main__':
+    sys.exit(main())

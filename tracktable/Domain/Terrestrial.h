@@ -98,6 +98,7 @@ namespace tracktable { namespace domain { namespace terrestrial {
 class TerrestrialPoint : public PointLonLat
 {
 public:
+  friend class boost::serialization::access;
   typedef PointLonLat Superclass;
 
   /// Create an uninitialized point
@@ -134,6 +135,13 @@ public:
     this->set_longitude(_longitude);
     this->set_latitude(_latitude);
     }
+
+public:
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
+  }
 };
 
 // ----------------------------------------------------------------------
@@ -169,6 +177,8 @@ public:
 class TerrestrialTrajectoryPoint : public TrajectoryPoint<TerrestrialPoint>
 {
 public:
+  friend class boost::serialization::access;
+  
   typedef TrajectoryPoint<TerrestrialPoint> Superclass;
 
   /// Create an uninitialized point
@@ -204,6 +214,14 @@ public:
     this->set_longitude(_longitude);
     this->set_latitude(_latitude);
     }
+
+private:
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
+  }
+
 };
 
 #if defined(WIN32)

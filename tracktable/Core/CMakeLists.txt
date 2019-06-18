@@ -31,7 +31,7 @@
 
 # This is trajectory/C++/Core/CMakeLists.txt
 
-find_package(Boost 1.57.0 REQUIRED COMPONENTS date_time)
+find_package(Boost 1.57.0 REQUIRED COMPONENTS date_time serialization)
 include(GenerateExportHeader)
 
 include_directories(
@@ -47,6 +47,7 @@ set( Core_SRCS
   PointLonLat.cpp
   PropertyConverter.cpp
   PropertyMap.cpp
+  PropertyValue.cpp
   Timestamp.cpp
   TimestampConverter.cpp
   )
@@ -68,6 +69,7 @@ set( Core_HEADERS
   PointTraits.h
   PropertyConverter.h
   PropertyMap.h
+  PropertyValue.h
   Timestamp.h
   TimestampConverter.h
   TracktableCommon.h
