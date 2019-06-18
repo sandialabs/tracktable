@@ -51,11 +51,11 @@ class TestReadWriteDictionary(unittest.TestCase):
                       'trajectory_properties' : {'percent' : {'type': 'float',    'value': 33.333},
                                                  'platform': {'type': 'str',      'value': "Boeing 747"},
                                                  'start'   : {'type': 'datetime', 'value': "2004-12-07 11:36:00"},
-                                                 'tailNum' : {'type': 'int',      'value': 3878}},
-                      'timestamps'            : ['2004-12-07 11:36:18',#-0000',
-                                                 '2004-12-07 11:37:56',#-0000',
-                                                 '2004-12-07 11:39:18'],#-0000'],
-                      'point_properties'      : {'altitude': {'type': 'int',      'values': [2700, 4200, 6700]},
+                                                 'tailNum' : {'type': 'str',      'value': '3878'}},
+                      'timestamps'            : ['2004-12-07 11:36:18',
+                                                 '2004-12-07 11:37:56',
+                                                 '2004-12-07 11:39:18'],
+                      'point_properties'      : {'altitude': {'type': 'float',      'values': [2700, 4200, 6700]},
                                                  'heading' : {'type': 'float',    'values': [108.1, 108.2, 225.3]},
                                                  'note'    : {'type': 'str',      'values': ["hello", "world", "!"]},
                                                  'time2'   : {'type': 'datetime', 'values': ["2004-01-01 00:00:01",
@@ -113,7 +113,7 @@ class TestReadWriteDictionary(unittest.TestCase):
         trajectory.set_property('percent', 33.333)
         trajectory.set_property('platform', "Boeing 747")
         trajectory.set_property('start', Timestamp.from_string('2004-12-07 11:36:00'))
-        trajectory.set_property('tailNum', 3878)
+        trajectory.set_property('tailNum', '3878')
 
         return dictionary, trajectory
 
