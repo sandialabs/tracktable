@@ -418,7 +418,6 @@ public:
    *
    * tracktable::PointReader<MyPointType> reader;
    * reader.set_object_id_column(0);
-   * reader.set_integer_field_column("model_year", 1);
    * reader.set_time_field_column("last_seen", 2);
    * reader.set_string_field_column("model_name", 3);
    * reader.set_real_field_column("mileage", 4);
@@ -442,11 +441,6 @@ public:
       this->PointTokenReader.set_real_field_column(field, column);
     }
 
-  void set_integer_field_column(std::string const& field, int column)
-    {
-      this->PointTokenReader.set_integer_field_column(field, column);
-    }
-
   void set_time_field_column(std::string const& field, int column)
     {
       this->PointTokenReader.set_time_field_column(field, column);
@@ -468,11 +462,6 @@ public:
       return this->PointTokenReader.has_real_field_column(field);
     }
 
-  bool has_integer_field_column(std::string const& field) const
-    {
-      return this->PointTokenReader.has_integer_field_column(field);
-    }
-
   bool has_time_field_column(std::string const& field) const
     {
       return this->PointTokenReader.has_time_field_column(field);
@@ -488,16 +477,6 @@ public:
       return this->PointTokenReader.real_field_column(field);
     }
   
-  /** Retrieve the column assignment for an integer-valued field.
-   *
-   * @param[in] field String name of field
-   * @return Integer column index for field or -1 if not present
-   */
-  int integer_field_column(std::string const& field) const
-    {
-      return this->PointTokenReader.integer_field_column(field);
-    }
-
   /** Retrieve the column assignment for a string field.
    *
    * @param[in] field String name of field

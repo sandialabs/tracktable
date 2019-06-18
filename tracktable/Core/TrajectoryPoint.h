@@ -241,16 +241,6 @@ public:
       return ::tracktable::real_property(this->Properties, name, ok);
     }
 
-  /// Safely retrieve a named property with an integer value
-  //
-  // \param name Name of property to retrieve
-  // \param ok If specified, this will be set to true or false as the property is found/not found
-  // \return Property as an int64_t
-  int64_t integer_property(std::string const& name, bool *ok=0) const
-    {
-      return ::tracktable::integer_property(this->Properties, name, ok);
-    }
-
   /// Safely retrieve a named property with a timestamp value
   //
   // \param name Name of property to retrieve
@@ -281,15 +271,6 @@ public:
       return ::tracktable::real_property_with_default(this->Properties, name, default_value);
     }
 
-  /// Safely retrieve a named property with an integer value
-  //
-  // \param name Name of property to retrieve
-  // \param ok If specified, this will be set to true or false as the property is found/not found
-  // \return Property as an int64_t
-  int64_t integer_property_with_default(std::string const& name, int64_t default_value) const
-    {
-      return ::tracktable::integer_property_with_default(this->Properties, name, default_value);
-    }
 
   /// Safely retrieve a named property with a timestamp value
   //

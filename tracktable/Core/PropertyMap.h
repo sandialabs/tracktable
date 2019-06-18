@@ -110,19 +110,6 @@ TRACKTABLE_CORE_EXPORT string_type string_property(PropertyMap const& properties
 
 TRACKTABLE_CORE_EXPORT double real_property(PropertyMap const& properties, string_type const& name, bool* is_present=0);
 
-/*! \brief Retrieve an integer-valued property from the map.
- *
- * This function will give you back the named property as a 64-bit
- * signed integer if it is present and that is its proper type.  It
- * will not attempt to cast other types to int64_t.
- *
- * On success, returns the requested property as an int64_t and sets
- * *is_present to true.  On failure, returns 0 and sets *is_present to
- * false.
- */
-
-TRACKTABLE_CORE_EXPORT int64_t integer_property(PropertyMap const& properties, string_type const& name, bool* is_present=0);
-
 /*! \brief Retrieve a timestamp-valued property from the map.
  *
  * This function will give you back the named property as a Timestamp
@@ -157,7 +144,6 @@ TRACKTABLE_CORE_EXPORT PropertyValueT property_with_default(PropertyMap const& p
 TRACKTABLE_CORE_EXPORT double real_property_with_default(PropertyMap const& properties, string_type const& name, double default_value);
 TRACKTABLE_CORE_EXPORT string_type string_property_with_default(PropertyMap const& properties, string_type const& name, string_type const& default_value);
 TRACKTABLE_CORE_EXPORT Timestamp timestamp_property_with_default(PropertyMap const& properties, string_type const& name, Timestamp const& default_value);
-TRACKTABLE_CORE_EXPORT int64_t integer_property_with_default(PropertyMap const& properties, string_type const& name, int64_t default_value);
 
 TRACKTABLE_CORE_EXPORT string_type property_map_to_string(PropertyMap const& properties);
 
