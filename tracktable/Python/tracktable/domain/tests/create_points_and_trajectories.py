@@ -74,6 +74,8 @@ def add_real_property(target, property_index, value):
 
 # ----------------------------------------------------------------------
 
+# Integer properties are deprecated as of 2019-06-17.
+
 def add_integer_property(target, property_index, value):
     property_name = 'integer_{}'.format(property_index)
     target.properties[property_name] = int(value)
@@ -134,8 +136,8 @@ def assign_random_properties(target, howmany):
             add_real_property(target, property_index, random.randint(1, 1000))
         elif (property_index % 4 == 1):
             add_string_property(target, property_index, random.randint(1, 1000))
-        elif (property_index % 4 == 2):
-            add_integer_property(target, property_index, random.randint(1, 1000))
+        # elif (property_index % 4 == 2):
+        #     add_integer_property(target, property_index, random.randint(1, 1000))
         else:
             add_timestamp_property(target, property_index, random.randint(0, 365*1440))
 
