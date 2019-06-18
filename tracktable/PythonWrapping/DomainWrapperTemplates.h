@@ -474,7 +474,6 @@ class basic_point_reader_methods : public boost::python::def_visitor<basic_point
          .def("__iter__", iterator<reader_type, return_value_policy<copy_const_reference> >())
          .def("set_string_field_column", &reader_type::set_string_field_column)
          .def("set_real_field_column", &reader_type::set_real_field_column)
-         .def("set_integer_field_column", &reader_type::set_integer_field_column)
          .def("set_time_field_column", &reader_type::set_time_field_column)
          .def("set_longitude_column", &reader_type::set_longitude_column)
          .def("set_latitude_column", &reader_type::set_latitude_column)

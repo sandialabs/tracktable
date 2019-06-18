@@ -34,8 +34,8 @@
  * points/trajectories
  *
  * We allow the user to specify named properties on points and
- * trajectories that take one of five types: null, 64-bit signed
- * integer, double-precision floating point, string, and timestamp.
+ * trajectories that take one of four types: null, double-precision
+ * floating point, string, and timestamp.
  *
  * NOTE: The name of this type will change from
  * tracktable::PropertyValueT to tracktable::PropertyValue in version
@@ -63,8 +63,7 @@ typedef enum {
   TYPE_REAL      = 1,
   TYPE_STRING    = 2,
   TYPE_TIMESTAMP = 3,
-  TYPE_INTEGER   = 4,
-  TYPE_NULL      = 5
+  TYPE_NULL      = 4
 } PropertyUnderlyingType;
 
 
@@ -115,9 +114,14 @@ TRACKTABLE_CORE_EXPORT std::ostream& operator<<(std::ostream& out, NullValue con
 
 /*! \brief Discriminated union type for properties
  *
- * We support five data types for properties: 64-bit integer,
+ * We support four data types for properties: 
  * double-precision float, string, timestamp, and Null.  If you do not
  * initialize a variant then its type will be Null by default.
+ *
+ * Note that there is not a separate integer data type.  You'll need
+ * to use doubles for that.  This is a deliberate decision: we run
+ * into compiler troubles trying to serialize and unserialize property
+ * values if we allow integers as a distinct type.
  *
  * Under the hood this will probably always be a boost::variant but we
  * will provide our own interface so that you don't have to know or care
@@ -132,7 +136,7 @@ TRACKTABLE_CORE_EXPORT std::ostream& operator<<(std::ostream& out, NullValue con
    Timestamp
    >
    PropertyValueT;
-// typedef PropertyValueT PropertyValue;
+typedef PropertyValueT PropertyValue;
 
 inline PropertyValueT make_null(PropertyUnderlyingType null_type)
 {
@@ -191,8 +195,6 @@ PropertyValueT to_property_variant(source_type const& source, PropertyUnderlying
         return PropertyValueT(boost::lexical_cast<double>(source));
       case TYPE_TIMESTAMP:
         return PropertyValueT(time_from_string(boost::lexical_cast<string_type>(source)));
-      case TYPE_INTEGER:
-        return PropertyValueT(boost::lexical_cast<int64_t>(source));
       case TYPE_NULL:
       case TYPE_UNKNOWN:
         return PropertyValueT();
@@ -244,9 +246,6 @@ void load(Archive& ar, tracktable::PropertyUnderlyingType& value, const unsigned
     }; break;
     case 3: {
     value = tracktable::TYPE_TIMESTAMP; 
-    }; break;
-    case 4: {
-    value = tracktable::TYPE_INTEGER; 
     }; break;
     case 5: {
     value = tracktable::TYPE_NULL; 

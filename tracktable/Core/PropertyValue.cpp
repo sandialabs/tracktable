@@ -175,13 +175,6 @@ public:
       this->value = tracktable::TYPE_TIMESTAMP;
     }
 
-#if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
-  void operator()(int64_t /*value*/)
-    {
-      this->value = tracktable::TYPE_INTEGER;
-    }
-#endif
-
   void operator()(tracktable::NullValue const& /*value*/)
     {
       this->value = tracktable::TYPE_NULL;
@@ -210,8 +203,6 @@ tracktable::string_type property_type_as_string(tracktable::PropertyValueT const
       return "string";
     case tracktable::TYPE_TIMESTAMP:
       return "timestamp";
-    case tracktable::TYPE_INTEGER:
-      return "integer";
     case tracktable::TYPE_NULL:
       return "null";
     default:
@@ -257,8 +248,6 @@ std::ostream& operator<<(std::ostream& out, NullValue const& value)
       outbuf << "string"; break;
     case tracktable::TYPE_TIMESTAMP:
       outbuf <<  "timestamp"; break;
-    case tracktable::TYPE_INTEGER:
-      outbuf << "integer"; break;
     case tracktable::TYPE_NULL:
       outbuf << "null"; break;
     default:

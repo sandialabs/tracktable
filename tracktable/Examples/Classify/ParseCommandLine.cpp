@@ -70,7 +70,6 @@ CommandLineOptions ParseCommandLine(int argc, char* argv[])
     ("input", bpo::value<tracktable::string_type>(&result.InputFilename)->default_value("-"), "Filename for input (use '-' for standard input)")
     ("output", bpo::value<tracktable::string_type>(&result.OutputFilename)->default_value("-"), "Filename for output (use '-' for standard output)")
     ("real-field", multiple_tokens_value<string_vector_type>(2, 2), "Field name and column number for a real-valued point field")
-    ("integer-field", multiple_tokens_value<string_vector_type>(2, 2), "Field name and column number for an integer-valued point field")
     ("string-field", multiple_tokens_value<string_vector_type>(2, 2), "Field name and column number for a string point field")
     ("timestamp-field", multiple_tokens_value<string_vector_type>(2, 2), "Field name and column number for a timestamp point field")
     ("object-id-column", bpo::value<std::size_t>(&result.ObjectIdColumn)->default_value(0), "Column containing object ID for points")
@@ -107,17 +106,6 @@ CommandLineOptions ParseCommandLine(int argc, char* argv[])
       field_assignment_type assignment( field_args[i],
                                         boost::lexical_cast<std::size_t>(field_args[i+1]) );
       result.RealFields.push_back(assignment);
-      }
-    }
-
-  if (retrieved_variables.count("integer-field"))
-    {
-    string_vector_type field_args(retrieved_variables["integer-field"].as<string_vector_type>());
-    for (std::size_t i = 0; i < field_args.size(); i += 2)
-      {
-      field_assignment_type assignment( field_args[i],
-                                        boost::lexical_cast<std::size_t>(field_args[i+1]) );
-      result.IntegerFields.push_back(assignment);
       }
     }
 

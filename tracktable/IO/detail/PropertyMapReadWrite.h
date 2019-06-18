@@ -61,11 +61,6 @@ public:
       return ColumnTypeAssignment(_column, TYPE_REAL);
     }
 
-  static ColumnTypeAssignment integer(std::size_t _column)
-    {
-      return ColumnTypeAssignment(_column, TYPE_INTEGER);
-    }
-
   static ColumnTypeAssignment string(std::size_t _column)
     {
       return ColumnTypeAssignment(_column, TYPE_STRING);

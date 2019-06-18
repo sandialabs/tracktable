@@ -62,7 +62,6 @@ int read_air_data_file(int expected_num_points, std::string const& filename)
   reader.set_coordinate_column(1, 3);
   reader.set_real_field_column("speed", 4);
   reader.set_real_field_column("heading", 5);
-  reader.set_integer_field_column("altitude", 6);
 
   reader_type::iterator point_iter = reader.begin();
   int point_index = 0;
