@@ -89,20 +89,35 @@ add_executable(test_point_lonlat
 )
 set_property(TARGET test_point_lonlat                   PROPERTY FOLDER "Tests")
 
+add_executable(test_base_point_serialization
+  test_base_point_serialization.cpp
+  )
+set_property(TARGET test_base_point_serialization            PROPERTY FOLDER "Tests")
+
 add_executable(test_property_map
  test_property_map.cpp
 )
 set_property(TARGET test_property_map                   PROPERTY FOLDER "Tests")
 
+add_executable(test_serialize_variant
+  test_serialize_variant.cpp
+  )
+set_property(TARGET test_serialize_variant             PROPERTY FOLDER "Tests")
+
 add_executable(test_simplify_linestring
  test_simplify_linestring.cpp
-)
+ )
 set_property(TARGET test_simplify_linestring            PROPERTY FOLDER "Tests")
 
 add_executable(test_trajectory_lonlat
  test_trajectory_lonlat.cpp
 )
 set_property(TARGET test_trajectory_lonlat              PROPERTY FOLDER "Tests")
+
+add_executable(test_trajectory_point_serialization
+  test_trajectory_point_serialization.cpp
+  )
+set_property(TARGET test_trajectory_point_serialization            PROPERTY FOLDER "Tests")
 
 add_executable(test_trajectory_point_lonlat
  test_trajectory_point_lonlat.cpp
@@ -113,6 +128,11 @@ add_executable(test_trajectory_radius_of_gyration
  test_trajectory_radius_of_gyration.cpp
 )
 set_property(TARGET test_trajectory_radius_of_gyration  PROPERTY FOLDER "Tests")
+
+add_executable(test_trajectory_serialization
+  test_trajectory_serialization.cpp
+  )
+set_property(TARGET test_trajectory_serialization PROPERTY FOLDER "Tests")
 
 add_executable(test_trajectory_subset
  test_trajectory_subset.cpp
@@ -196,10 +216,20 @@ target_link_libraries(test_point_lonlat
   ${Boost_LIBRARIES}
 )
 
+target_link_libraries(test_base_point_serialization
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
 target_link_libraries(test_property_map
  TracktableCore
  ${Boost_LIBRARIES}
 )
+
+target_link_libraries(test_serialize_variant
+  TracktableCore
+  ${Boost_LIBRARIES}
+  )
 
 target_link_libraries(test_simplify_linestring
   TracktableCore
@@ -216,10 +246,20 @@ target_link_libraries(test_trajectory_point_lonlat
   ${Boost_LIBRARIES}
 )
 
+target_link_libraries(test_trajectory_point_serialization
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
 target_link_libraries(test_trajectory_radius_of_gyration
   TracktableCore
   ${Boost_LIBRARIES}
 )
+
+target_link_libraries(test_trajectory_serialization
+  TracktableCore
+  ${Boost_LIBRARIES}
+  )
 
 target_link_libraries(test_trajectory_subset
   TracktableCore
@@ -309,6 +349,11 @@ add_test(
 )
 
 add_test(
+  NAME C_SerializeVariant
+  COMMAND test_serialize_variant
+  )
+
+add_test(
   NAME C_SimplifyLinestring
   COMMAND test_simplify_linestring
 )
@@ -332,6 +377,11 @@ add_test(
   NAME C_TrajectoryRadiusOfGyration
   COMMAND test_trajectory_radius_of_gyration
 )
+
+add_test(
+  NAME C_TrajectorySerialization
+  COMMAND test_trajectory_serialization
+  )
 
 add_test(
   NAME C_TimestampFormat

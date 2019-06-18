@@ -58,6 +58,10 @@
 
 #include <boost/mpl/bool.hpp>
 #include <boost/geometry/strategies/strategies.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/variant.hpp>
 
 namespace tracktable {
 
@@ -95,11 +99,12 @@ template<class BasePointT>
 class TrajectoryPoint : public BasePointT
 {
 public:
-  typedef BasePointT base_point_type;
-
+  typedef BasePointT Superclass;
+  friend class boost::serialization::access;
+  
   /// Instantiate an uninitialized point
   TrajectoryPoint()
-    : base_point_type()
+    : Superclass()
     ,CurrentLength(-1)
     ,ObjectId("")
     ,UpdateTime(tracktable::BeginningOfTime)
@@ -112,7 +117,7 @@ public:
 
   /// Initialize a TrajectoryPoint as a copy of an existing point
   TrajectoryPoint(TrajectoryPoint const& other)
-    : base_point_type(other)
+    : Superclass(other)
     ,CurrentLength(other.CurrentLength)
     ,ObjectId(other.ObjectId)
     ,Properties(other.Properties)
@@ -121,19 +126,19 @@ public:
     }
 
   /// Initialize with coordinates from a base point
-  TrajectoryPoint(base_point_type const& other)
-    : base_point_type(other)
+  TrajectoryPoint(Superclass const& other)
+    : Superclass(other)
     {
     }
 
   TrajectoryPoint(const double* coords)
-    : base_point_type(coords)
+    : Superclass(coords)
     { }
 
   /// Make this TrajectoryPoint a copy of an existing point
   TrajectoryPoint operator=(TrajectoryPoint const& other)
     {
-      this->base_point_type::operator=(other);
+      this->Superclass::operator=(other);
       this->CurrentLength = other.CurrentLength;
       this->ObjectId = other.ObjectId;
       this->Properties = other.Properties;
@@ -151,7 +156,7 @@ public:
   // * the same user-defined properties
   bool operator==(TrajectoryPoint const& other) const
     {
-      return ( this->base_point_type::operator==(other)
+      return ( this->Superclass::operator==(other)
 //               && this->CurrentLength == other.CurrentLength
                && this->ObjectId == other.ObjectId
                && this->Properties == other.Properties
@@ -314,7 +319,7 @@ public:
       outbuf << "[";
       outbuf << this->object_id() << "@ ";
       outbuf << this->timestamp() << ": ";
-      outbuf << this->base_point_type::to_string();
+      outbuf << this->Superclass::to_string();
       outbuf << " ";
       outbuf << property_map_to_string(this->Properties);
       outbuf << "]";
@@ -375,6 +380,22 @@ protected:
   PropertyMap Properties;
   /// Storage for a point's timestamp
   Timestamp UpdateTime;
+
+private:
+  template<typename archive_t>
+  void serialize(archive_t& archive, const unsigned int version)
+  {
+/*
+    archive & boost::serialization::make_nvp("Superclass",
+                                             static_cast<Superclass*>(*this)); 
+*/
+    archive & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
+    archive & BOOST_SERIALIZATION_NVP(CurrentLength);
+    archive & BOOST_SERIALIZATION_NVP(ObjectId);
+    archive & BOOST_SERIALIZATION_NVP(UpdateTime);
+    archive & BOOST_SERIALIZATION_NVP(Properties);
+  }
+  
 };
 
 } // namespace tracktable
@@ -409,7 +430,7 @@ namespace tracktable { namespace algorithms {
 template<class BasePointT>
 struct interpolate< TrajectoryPoint<BasePointT> >
 {
-  typedef BasePointT base_point_type;
+  typedef BasePointT Superclass;
 
   template<class trajectory_point_type>
   static inline trajectory_point_type
@@ -423,7 +444,7 @@ struct interpolate< TrajectoryPoint<BasePointT> >
       // Start off by interpolating the coordinates with whatever
       // scheme the base point class provides
       trajectory_point_type result(
-        interpolate<base_point_type>::apply(
+        interpolate<Superclass>::apply(
           left, right, t
           )
         );
@@ -447,7 +468,7 @@ struct interpolate< TrajectoryPoint<BasePointT> >
 template<class BasePointT>
 struct extrapolate< TrajectoryPoint<BasePointT> >
 {
-    typedef BasePointT base_point_type;
+    typedef BasePointT Superclass;
 
     template<class trajectory_point_type>
     static inline trajectory_point_type
@@ -458,7 +479,7 @@ struct extrapolate< TrajectoryPoint<BasePointT> >
         // Start off by extrapolating the coordinates with whatever
         // scheme the base point class provides
         trajectory_point_type result(
-            extrapolate<base_point_type>::apply(
+            extrapolate<Superclass>::apply(
                 left, right, t
             )
         );

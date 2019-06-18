@@ -72,6 +72,8 @@ template<std::size_t dim>
 class FeatureVector : public PointCartesian<dim>
 {
 public:
+  typedef PointCartesian<dim> Superclass;
+  
   FeatureVector() { }
   virtual ~FeatureVector() { }
   FeatureVector(FeatureVector const& other)
@@ -87,6 +89,14 @@ public:
       tracktable::detail::assign_coordinates<dim>::apply(*this, other);
       return *this;
     }
+
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version)
+  {
+    // ar & boost::serialization::base_object< PointCartesian<dim> >(*this);
+    ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
+  }
+
 };
 
 

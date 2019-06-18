@@ -47,11 +47,15 @@
 #include <tracktable/Core/detail/implementations/PointAtTime.h>
 #include <tracktable/Core/detail/implementations/TimeAtFraction.h>
 #include <tracktable/Core/detail/implementations/SubsetDuringInterval.h>
-
 #include <tracktable/Core/detail/trait_signatures/HasProperties.h>
 
 #include <tracktable/Core/GuardedBoostGeometryHeaders.h>
 #include <boost/geometry/geometries/register/linestring.hpp>
+
+#include <boost/serialization/string.hpp>
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/vector.hpp>
+#include <boost/serialization/variant.hpp>
 
 #include <cassert>
 #include <ostream>
@@ -77,6 +81,8 @@ namespace tracktable {
 template< class PointT >
 class Trajectory
 {
+  friend class boost::serialization::access;
+  
 public:
   /// Convenient aliases for template parameters and types from internal storage
   //
@@ -680,6 +686,14 @@ protected:
   point_vector_type Points;
   PropertyMap Properties;
 
+private:
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version)
+  {
+    ar & BOOST_SERIALIZATION_NVP(Points);
+    ar & BOOST_SERIALIZATION_NVP(Properties);
+  }
+  
 public:
 
   /** Return an iterator pointing to the beginning of the trajectory
@@ -706,6 +720,7 @@ public:
    */
   const_iterator end() const { return this->Points.end(); }
 
+  
 };
 
 } // exit namespace tracktable

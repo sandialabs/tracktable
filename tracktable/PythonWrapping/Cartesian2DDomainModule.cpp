@@ -51,11 +51,6 @@
 #include <tracktable/PythonWrapping/PythonAwareTrajectoryReader.h>
 #include <tracktable/PythonWrapping/PythonTypedObjectWriter.h>
 
-//#include <tracktable/PythonWrapping/PickleTrajectoryPoints.h>
-
-//#include <tracktable/PythonWrapping/PickleTrajectories.h>
-
-
 using tracktable::domain::cartesian2d::base_point_type;
 using tracktable::domain::cartesian2d::trajectory_point_type;
 using tracktable::domain::cartesian2d::trajectory_type;
@@ -259,6 +254,7 @@ void install_cartesian2d_trajectory_wrappers()
 
   class_< trajectory_type >("TrajectoryCartesian2D")
     .def(tracktable::python_wrapping::property_access_suite())
+    .def(tracktable::python_wrapping::trajectory_methods())
     .def("from_position_list", tracktable::python_wrapping::trajectory_from_position_list<trajectory_type>, return_value_policy<manage_new_object>())
     .staticmethod("from_position_list")
     .def("__iter__", iterator<trajectory_type>())
