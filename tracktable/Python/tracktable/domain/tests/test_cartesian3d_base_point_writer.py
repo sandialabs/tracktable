@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -34,6 +34,7 @@ from six.moves import range
 import sys
 
 from tracktable.domain.cartesian3d import BasePoint, BasePointWriter
+from tracktable.core.test_utilities import version_appropriate_string_buffer
 
 def generate_points(howmany):
     points = []
@@ -48,7 +49,7 @@ def generate_points(howmany):
     return points
 
 def write_points_to_string(points):
-    output = StringIO()
+    output = version_appropriate_string_buffer()
     writer = BasePointWriter(output)
     writer.write(points)
 

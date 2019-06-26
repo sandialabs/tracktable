@@ -125,7 +125,7 @@ public:
   iterator begin()
     {
       return iterator(this->PointBegin, this->PointEnd,
-                      this->MinimumTrajectoryLength,
+                      boost::numeric_cast<int>(this->MinimumTrajectoryLength),
                       this->SeparationDistance,
                       this->SeparationTime,
                       this->CleanupInterval);
@@ -134,7 +134,7 @@ public:
   iterator end()
     {
       return iterator(this->PointEnd, this->PointEnd,
-                      this->MinimumTrajectoryLength,
+                      boost::numeric_cast<int>(this->MinimumTrajectoryLength),
                       this->SeparationDistance,
                       this->SeparationTime,
                       this->CleanupInterval);

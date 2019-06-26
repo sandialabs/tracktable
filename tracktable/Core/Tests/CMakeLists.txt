@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2018 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -31,6 +31,11 @@
 include_directories(
   ${Tracktable_SOURCE_DIR}
 )
+
+add_executable(test_distance
+  test_distance.cpp
+  )
+set_property(TARGET test_distance               PROPERTY FOLDER "Tests")
 
 add_executable(test_convex_hull_area
   test_convex_hull_area.cpp
@@ -104,6 +109,11 @@ add_executable(test_trajectory_point_lonlat
 )
 set_property(TARGET test_trajectory_point_lonlat        PROPERTY FOLDER "Tests")
 
+add_executable(test_trajectory_radius_of_gyration
+ test_trajectory_radius_of_gyration.cpp
+)
+set_property(TARGET test_trajectory_radius_of_gyration  PROPERTY FOLDER "Tests")
+
 add_executable(test_trajectory_subset
  test_trajectory_subset.cpp
 )
@@ -119,7 +129,17 @@ add_executable(test_current_length
   )
 set_property(TARGET test_current_length                 PROPERTY FOLDER "Tests")
 
+add_executable(test_memory_use
+  test_memory_use.cpp
+  )
+set_property(TARGET test_memory_use                     PROPERTY FOLDER "Tests")
+
 # ----------------------------------------------------------------------
+
+target_link_libraries(test_distance
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
 
 target_link_libraries(test_convex_hull_area
   TracktableCore
@@ -196,6 +216,11 @@ target_link_libraries(test_trajectory_point_lonlat
   ${Boost_LIBRARIES}
 )
 
+target_link_libraries(test_trajectory_radius_of_gyration
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
 target_link_libraries(test_trajectory_subset
   TracktableCore
   ${Boost_LIBRARIES}
@@ -206,7 +231,17 @@ target_link_libraries(test_timestamp_format
   ${Boost_LIBRARIES}
   )
 
+target_link_libraries(test_memory_use
+  TracktableCore
+  ${Boost_LIBRARIES}
+  )
+
 # ----------------------------------------------------------------------
+
+add_test(
+ NAME C_Distance
+ COMMAND test_distance
+)
 
 add_test(
  NAME C_ConvexHullArea
@@ -227,6 +262,11 @@ add_test(
  NAME C_ConvexHullPerimeter
  COMMAND test_convex_hull_perimeter
 )
+
+add_test(
+  NAME C_MemoryUse
+  COMMAND test_memory_use
+  )
 
 add_test(
  NAME C_PointAtFraction
@@ -286,6 +326,11 @@ add_test(
 add_test(
   NAME C_TrajectorySubset
   COMMAND test_trajectory_subset
+)
+
+add_test(
+  NAME C_TrajectoryRadiusOfGyration
+  COMMAND test_trajectory_radius_of_gyration
 )
 
 add_test(

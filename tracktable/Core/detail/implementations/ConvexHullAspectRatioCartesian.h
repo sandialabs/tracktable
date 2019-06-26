@@ -31,15 +31,23 @@
 #ifndef __tracktable_convex_hull_aspect_ratio_cartesian_h
 #define __tracktable_convex_hull_aspect_ratio_cartesian_h
 
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 #include <cmath>
 #include <algorithm>
 
 #include <tracktable/Core/PointArithmetic.h>
 #include <tracktable/Core/Conversions.h>
+#include <tracktable/Core/GuardedBoostGeometryHeaders.h>
 #include <tracktable/Core/detail/implementations/ConvexHullCartesian.h>
+
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
+
 #include <boost/geometry/algorithms/centroid.hpp>
-#include <boost/geometry/algorithms/distance.hpp>
+
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 namespace tracktable { namespace algorithms {
 

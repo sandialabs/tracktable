@@ -115,10 +115,10 @@ void BuildTrajectories(CommandLineOptions const& options, Trajectories& trajecto
     trajectory_writer.set_output(outfile);
     }
 */
-  point_reader.set_object_id_column(options.ObjectIdColumn);
-  point_reader.set_timestamp_column(options.TimestampColumn);
-  point_reader.set_x_column(options.FirstCoordinateColumn);
-  point_reader.set_y_column(options.SecondCoordinateColumn);
+  point_reader.set_object_id_column(boost::numeric_cast<int>(options.ObjectIdColumn));
+  point_reader.set_timestamp_column(boost::numeric_cast<int>(options.TimestampColumn));
+  point_reader.set_x_column(boost::numeric_cast<int>(options.FirstCoordinateColumn));
+  point_reader.set_y_column(boost::numeric_cast<int>(options.SecondCoordinateColumn));
   point_reader.set_field_delimiter(options.FieldDelimiter);
   point_reader.set_string_field_column("dest",30);
 
@@ -126,28 +126,28 @@ void BuildTrajectories(CommandLineOptions const& options, Trajectories& trajecto
        iter != options.RealFields.end();
        ++iter)
     {
-    point_reader.set_real_field_column((*iter).first, (*iter).second);
+    point_reader.set_real_field_column((*iter).first, boost::numeric_cast<int>((*iter).second));
     }
 
   for (typename std::vector<field_assignment_type>::const_iterator iter = options.IntegerFields.begin();
        iter != options.IntegerFields.end();
        ++iter)
     {
-    point_reader.set_integer_field_column((*iter).first, (*iter).second);
+    point_reader.set_integer_field_column((*iter).first, boost::numeric_cast<int>((*iter).second));
     }
 
   for (typename std::vector<field_assignment_type>::const_iterator iter = options.StringFields.begin();
        iter != options.StringFields.end();
        ++iter)
     {
-    point_reader.set_string_field_column((*iter).first, (*iter).second);
+    point_reader.set_string_field_column((*iter).first, boost::numeric_cast<int>((*iter).second));
     }
 
   for (typename std::vector<field_assignment_type>::const_iterator iter = options.TimestampFields.begin();
        iter != options.TimestampFields.end();
        ++iter)
     {
-    point_reader.set_time_field_column((*iter).first, (*iter).second);
+    point_reader.set_time_field_column((*iter).first, boost::numeric_cast<int>((*iter).second));
     }
 
   assembler_type trajectory_assembler(point_reader.begin(), point_reader.end());

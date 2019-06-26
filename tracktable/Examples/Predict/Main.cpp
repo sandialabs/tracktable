@@ -23,7 +23,6 @@
 #include "KmlOut.h"
 #include "BuildTrajectories.h"
 #include "ParseCommandLine.h"
-#include <tracktable/Analysis/DBSCAN.h>
 #include <boost/bind.hpp>
 #include <boost/array.hpp>
 #include <boost/geometry/geometries/adapted/boost_array.hpp>
@@ -68,7 +67,7 @@ int main(int argc, char *argv[])
 //  LLPredict(trajectories,features,to_be_predicted,num_samples);
 
   // This routine does a prediction based on destination airport
-  Predict(trajectories,features,to_be_predicted,num_samples);
+  Predict(trajectories,features,to_be_predicted,boost::numeric_cast<int>(num_samples));
 
   return 0;
 }

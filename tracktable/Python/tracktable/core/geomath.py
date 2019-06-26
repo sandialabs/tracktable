@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2018 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -44,11 +44,14 @@ import sys
 from ._domain_algorithm_overloads import distance as _distance
 from ._domain_algorithm_overloads import bearing as _bearing
 from ._domain_algorithm_overloads import interpolate as _interpolate
+from ._domain_algorithm_overloads import extrapolate as _extrapolate
 from ._domain_algorithm_overloads import signed_turn_angle as _signed_turn_angle
 from ._domain_algorithm_overloads import unsigned_turn_angle as _unsigned_turn_angle
 from ._domain_algorithm_overloads import speed_between as _speed_between
 from ._domain_algorithm_overloads import point_at_fraction as _point_at_fraction
+from ._domain_algorithm_overloads import point_at_length_fraction as _point_at_length_fraction
 from ._domain_algorithm_overloads import point_at_time as _point_at_time
+from ._domain_algorithm_overloads import time_at_fraction as _time_at_fraction
 from ._domain_algorithm_overloads import subset_during_interval as _subset_during_interval
 from ._domain_algorithm_overloads import length as _length
 from ._domain_algorithm_overloads import end_to_end_distance as _end_to_end_distance
@@ -59,6 +62,7 @@ from ._domain_algorithm_overloads import simplify as _simplify
 from ._domain_algorithm_overloads import convex_hull_perimeter as _convex_hull_perimeter
 from ._domain_algorithm_overloads import convex_hull_area as _convex_hull_area
 from ._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
+from ._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
 
 def xcoord(thing):
     """Return what we think is the X-coordinate for an object.
@@ -413,6 +417,29 @@ def point_at_fraction(trajectory, fraction):
 
     return _point_at_fraction(trajectory, fraction)
 
+# ----------------------------------------------------------------------
+
+def point_at_length_fraction(trajectory, fraction):
+    """Return a point from a trajectory at a specific fraction of its distance
+
+    This function will estimate a point at a trajectory at some
+    specific fraction of its total travel distance.  If the supplied
+    fraction does not fall exactly on a vertex of the trajectory we
+    will interpolate between the nearest two points.
+
+    Fractions before the beginning or after the end of the trajectory
+    will return the start and end points, respectively.
+
+    Args:
+      trajectory (Trajectory): Path to sample
+      fraction (float): Value between 0 and 1.  0 is the beginning and 1 is the end.
+
+    Returns:
+      TrajectoryPoint at specified fraction
+
+    """
+
+    return _point_at_length_fraction(trajectory, fraction)	
 
 # ----------------------------------------------------------------------
 
@@ -437,6 +464,30 @@ def point_at_time(trajectory, when):
     """
 
     return _point_at_time(trajectory, when)
+
+# ----------------------------------------------------------------------
+
+def time_at_fraction(trajectory, fraction):
+    """Return a time from a trajectory at a specific fraction of its duration
+
+    This function will estimate a time in a trajectory at some
+    specific fraction of its total travel duration.  If the supplied
+    fraction does not fall exactly on a vertex of the trajectory we
+    will interpolate between the nearest two points.
+
+    Fractions before the beginning or after the end of the trajectory
+    will return the start and end times, respectively.
+
+    Args:
+      trajectory (Trajectory): Path to sample
+      fraction (float): Value between 0 and 1.  0 is the beginning and 1 is the end.
+
+    Returns:
+      Timestamp (datetime) at specified fraction
+
+    """
+
+    return _time_at_fraction(trajectory, fraction)
 
 # ----------------------------------------------------------------------
 
@@ -512,6 +563,29 @@ def interpolate(start, end, t):
 
 # ----------------------------------------------------------------------
 
+def extrapolate(start, end, t):
+    """Extrapolate between two points
+
+    This function will extrapolate linearly between two points.  It is
+    aware of the underlying coordinate system: interpolation on the
+    globe will be done along great circles and interpolation in
+    Cartesian space will be done along a straight line.
+
+    The points being measured must be from the same domain.
+
+    Args:
+      start (BasePoint or TrajectoryPoint): point 1
+      end (BasePoint or TrajectoryPoint): point 2
+      t (float): interpolant
+
+    Returns:
+      New point interpolated between start and end
+    """
+
+    return _extrapolate(start, end, t)
+
+# ----------------------------------------------------------------------
+
 def sanity_check_distance_less_than(max_distance):
     def sanity_check(point1, point2):
         return ( distance(point1, point2) < max_distance )
@@ -520,15 +594,20 @@ def sanity_check_distance_less_than(max_distance):
 
 # ----------------------------------------------------------------------
 
-def compute_bounding_box(point_sequence):
+def compute_bounding_box(point_sequence, buffer=()):
     """Compute a bounding box for a sequence of points.
 
     This function will construct a domain-specific bounding box over
     an arbitrary sequence of points.  Those points must all have the
-    same type.
+    same type. It can also produce a buffer of space that extends the
+    bounding box some percentage beyond the min and max points. The
+    implementation is fairly naive and can cause issues if the values
+    extend past max values for the point/map type. 
 
     Args:
       point_sequence: Iterable of points
+      buffer: tuple of ratios to extend the bounding box. This defaults
+              to an empty tuple which means no padding is added.
 
     Returns:
       Bounding box with min_corner, max_corner attributes
@@ -558,7 +637,18 @@ def compute_bounding_box(point_sequence):
             for i in range(len(point)):
                 min_corner[i] = min(min_corner[i], point[i])
                 max_corner[i] = max(max_corner[i], point[i])
-
+    
+    if len(buffer) == 2:
+        horiz_buff = (max_corner[0] - min_corner[0]) * buffer[0]
+        vert_buff = (max_corner[1] - min_corner[1]) * buffer[1]
+        min_corner[0] = min_corner[0] - horiz_buff
+        min_corner[1] = min_corner[1] - vert_buff
+        max_corner[0] = max_corner[0] + horiz_buff
+        max_corner[1] = max_corner[1] + vert_buff
+    elif len(buffer) != 0:
+        print("ERROR: buffer requires exactly 0 or 2 values")
+        return None
+        
     if num_points == 0:
         print("ERROR: Cannot compute bounding box.  No points provided.")
         return None
@@ -731,8 +821,29 @@ def convex_hull_aspect_ratio(trajectory):
       trajectory: Trajectory whose shape you want to measure
 
     Returns:
-      Aspect ratioof the trajectory's convex hull
+      Aspect ratio of the trajectory's convex hull
 
     """
 
     return _convex_hull_aspect_ratio(trajectory)
+
+# ----------------------------------------------------------------------
+
+def radius_of_gyration(trajectory):
+    """Compute the radius of gyration of a trajectory
+
+    Radius of gyration is an indication of the compactness of a trajectory.
+    Technically the result is in radians from the center of mass of 
+    the trajectory. The units of the radius is dependent on the type
+    of trajectory being measured. Terrestrial will return km, while 
+    Cartesian2D returns radians. 
+
+    Args:
+      trajectory: Trajectory whose shape you want to measure
+
+    Returns:
+      Radius of gyration of the trajectory
+
+    """
+
+    return _radius_of_gyration(trajectory)

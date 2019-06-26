@@ -31,7 +31,11 @@
 #ifndef __tracktable_Box_h
 #define __tracktable_Box_h
 
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
 #include <boost/geometry/geometries/box.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
+
 #include <tracktable/Core/detail/algorithm_signatures/Intersects.h>
 
 namespace tracktable {
@@ -41,7 +45,10 @@ namespace tracktable {
  * This class is a thin wrapper around boost::geometry::model::box
  * that holds two points representing opposite corners.
  *
- * TODO: Do we use this anywhere or can we discard it as unused code?
+ * Don't instantiate this class directly.  Instead, use
+ * tracktable::domain::<name>::box_type so that you get the correct
+ * distance functions.
+ *
  */
 template<typename point_type>
 class Box : public boost::geometry::model::box<point_type>

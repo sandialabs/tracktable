@@ -48,15 +48,17 @@
 #include <tracktable/IO/TrajectoryWriter.h>
 #include <tracktable/IO/PointReader.h>
 
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
 #include <boost/program_options.hpp>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 #include <algorithm>
 
 #include "PairArgument.h"
 
-typedef tracktable::string_type string_type;
 typedef tracktable::string_vector_type string_vector_type;
-typedef std::pair<string_type, std::size_t> field_assignment_type;
+typedef std::pair<tracktable::string_type, std::size_t> field_assignment_type;
 
 
 // A helper function to simplify the main part.
@@ -70,10 +72,10 @@ std::ostream& operator<<(std::ostream& os, const std::vector<T>& v)
 
 struct CommandLineOptions
 {
-  string_type InputFilename;
-  string_type OutputFilename;
-  string_type Domain;
-  string_type FieldDelimiter;
+  tracktable::string_type InputFilename;
+  tracktable::string_type OutputFilename;
+  tracktable::string_type Domain;
+  tracktable::string_type FieldDelimiter;
   double      SeparationDistance;
   double      SeparationSeconds;
   std::size_t ObjectIdColumn;
@@ -98,9 +100,9 @@ CommandLineOptions parse_command_line(int argc, char* argv[])
     ("help", "Produce help message")
     ("separation-distance", bpo::value<double>(&result.SeparationDistance)->default_value(100), "Set maximum separation distance for trajectory points")
     ("separation-seconds", bpo::value<double>(&result.SeparationSeconds)->default_value(1200), "Set maximum separation time (in seconds) for trajectory points")
-    ("domain", bpo::value<string_type>(&result.Domain)->default_value("terrestrial"), "Set point domain ('terrestrial' or 'cartesian2d')")
-    ("input", bpo::value<string_type>(&result.InputFilename)->default_value("-"), "Filename for input (use '-' for standard input)")
-    ("output", bpo::value<string_type>(&result.OutputFilename)->default_value("-"), "Filename for output (use '-' for standard output)")
+    ("domain", bpo::value<tracktable::string_type>(&result.Domain)->default_value("terrestrial"), "Set point domain ('terrestrial' or 'cartesian2d')")
+    ("input", bpo::value<tracktable::string_type>(&result.InputFilename)->default_value("-"), "Filename for input (use '-' for standard input)")
+    ("output", bpo::value<tracktable::string_type>(&result.OutputFilename)->default_value("-"), "Filename for output (use '-' for standard output)")
     ("real-field", multiple_tokens_value<string_vector_type>(2, 2), "Field name and column number for a real-valued point field")
     ("integer-field", multiple_tokens_value<string_vector_type>(2, 2), "Field name and column number for an integer-valued point field")
     ("string-field", multiple_tokens_value<string_vector_type>(2, 2), "Field name and column number for a string point field")
@@ -109,7 +111,7 @@ CommandLineOptions parse_command_line(int argc, char* argv[])
     ("timestamp-column", bpo::value<std::size_t>(&result.TimestampColumn)->default_value(1), "Column containing timestamp for points")
     ("x-column", bpo::value<std::size_t>(&result.FirstCoordinateColumn)->default_value(2), "Column containing X / longitude coordinate")
     ("y-column", bpo::value<std::size_t>(&result.SecondCoordinateColumn)->default_value(3), "Column containing Y / latitude coordinate")
-    ("delimiter", bpo::value<string_type>(&result.FieldDelimiter)->default_value(","), "Delimiter for fields in input file")
+    ("delimiter", bpo::value<tracktable::string_type>(&result.FieldDelimiter)->default_value(","), "Delimiter for fields in input file")
     ("min-points", bpo::value<std::size_t>(&result.MinimumNumPoints)->default_value(10), "Trajectories shorter than this will be discarded")
     ;
 
@@ -235,38 +237,38 @@ void build_trajectories(CommandLineOptions const& options)
     trajectory_writer.set_output(outfile);
     }
 
-  point_reader.set_object_id_column(options.ObjectIdColumn);
-  point_reader.set_timestamp_column(options.TimestampColumn);
-  point_reader.set_x_column(options.FirstCoordinateColumn);
-  point_reader.set_y_column(options.SecondCoordinateColumn);
+  point_reader.set_object_id_column(boost::numeric_cast<int>(options.ObjectIdColumn));
+  point_reader.set_timestamp_column(boost::numeric_cast<int>(options.TimestampColumn));
+  point_reader.set_x_column(boost::numeric_cast<int>(options.FirstCoordinateColumn));
+  point_reader.set_y_column(boost::numeric_cast<int>(options.SecondCoordinateColumn));
   point_reader.set_field_delimiter(options.FieldDelimiter);
 
   for (typename std::vector<field_assignment_type>::const_iterator iter = options.RealFields.begin();
        iter != options.RealFields.end();
        ++iter)
     {
-    point_reader.set_real_field_column((*iter).first, (*iter).second);
+    point_reader.set_real_field_column((*iter).first, boost::numeric_cast<int>((*iter).second));
     }
 
   for (typename std::vector<field_assignment_type>::const_iterator iter = options.IntegerFields.begin();
        iter != options.IntegerFields.end();
        ++iter)
     {
-    point_reader.set_integer_field_column((*iter).first, (*iter).second);
+    point_reader.set_integer_field_column((*iter).first, boost::numeric_cast<int>((*iter).second));
     }
 
   for (typename std::vector<field_assignment_type>::const_iterator iter = options.StringFields.begin();
        iter != options.StringFields.end();
        ++iter)
     {
-    point_reader.set_string_field_column((*iter).first, (*iter).second);
+    point_reader.set_string_field_column((*iter).first, boost::numeric_cast<int>((*iter).second));
     }
 
   for (typename std::vector<field_assignment_type>::const_iterator iter = options.TimestampFields.begin();
        iter != options.TimestampFields.end();
        ++iter)
     {
-    point_reader.set_time_field_column((*iter).first, (*iter).second);
+    point_reader.set_time_field_column((*iter).first, boost::numeric_cast<int>((*iter).second));
     }
 
   assembler_type trajectory_assembler(point_reader.begin(), point_reader.end());

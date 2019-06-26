@@ -6,8 +6,19 @@ Credits
 Tracktable
 ----------
 
-Tracktable is written by Andy Wilson and Danny Rintoul at Sandia
-National Laboratories in Albuquerque, New Mexico.
+Tracktable is maintained by a group at Sandia National Laboratories in
+Albuquerque, New Mexico:
+
+* Andy Wilson
+* Chris Valicka
+* Danny Rintoul
+* Ben Newton
+* Phil Baxley
+
+We gratefully acknowledge contributions from our collaborators:
+
+* Paul Schrum
+  
 
 Sandia Corporation is a multi-program laboratory managed and operated
 by National Technology and Engineering Solutions of Sandia, LLC, for
