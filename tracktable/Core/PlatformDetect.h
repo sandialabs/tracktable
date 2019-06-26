@@ -49,48 +49,44 @@
 #if defined(_MSC_VER)
 # define TT_VISUAL_STUDIO 1
 # define TT_WINDOWS 1
-# pragma message("Detected Windows and Visual Studio.")
+// # pragma message("Detected Windows and Visual Studio.")
 #endif
 
 #if defined(__MINGW32__) || defined(__MINGW64__)
 # define TT_MINGW 1
 # define TT_WINDOWS 1
-# pragma message "Detected Windows and MinGW."
+// # pragma message "Detected Windows and MinGW."
 #endif
 
 #if defined(__linux) || defined(linux) || defined(__linux__)
 # define TT_UNIX 1
 # define TT_LINUX 1
-# pragma message "Detected Linux."
+// # pragma message "Detected Linux."
 #endif
 
 #if defined(__APPLE__)
 # define TT_OSX 1
 # define TT_UNIX 1
-# pragma message "Detected Mac OS X."
+// # pragma message "Detected Mac OS X."
 #endif
 
 #if defined(__CYGWIN__)
 # define TT_CYGWIN 1
 # define TT_WINDOWS 1
-# warning "Detected Windows and Cygwin."
+// # warning "Detected Windows and Cygwin."
 #endif
 
 #if defined(_AIX)
 # define TT_AIX 1
 # define TT_UNIX 1
-# warning "Detected AIX."
+// # warning "Detected AIX."
 #endif
 
 #if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__)
 # define TT_BSD 1
 # define TT_UNIX 1
-# warning "Detected BSD."
+// # warning "Detected BSD."
 #endif
 
-
-#if 0
-#define TT_UNIX 1
-#endif
 
 #endif
