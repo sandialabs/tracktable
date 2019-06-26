@@ -50,3 +50,5 @@ except Exception as e:
     BoostPythonArgumentError = type(e)
 
 set_default_timezone = _core_types.set_default_timezone
+current_memory_use = _core_types.current_memory_use
+peak_memory_use = _core_types.peak_memory_use

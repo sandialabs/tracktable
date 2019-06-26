@@ -173,9 +173,9 @@ public:
    *
    * @param[in] input Stream from which we will read points
    */
-  void set_input(std::istream& input)
+  void set_input(std::istream& _input)
     {
-      this->LineReader.set_input(input);
+      this->LineReader.set_input(_input);
       this->SkipCommentsReader.set_input_range(this->LineReader.begin(),
                                                this->LineReader.end());
       this->StringTokenizer.set_input_range(this->SkipCommentsReader.begin(),
@@ -348,7 +348,7 @@ public:
    * @param[in] coordinate  Index of coordinate to set
    * @param[in] column      Index of column in list of tokens
    */
-  void set_coordinate_column(std::size_t coordinate, int column)
+  void set_coordinate_column(int coordinate, int column)
     {
       this->PointTokenReader.set_coordinate_column(coordinate, column);
     }

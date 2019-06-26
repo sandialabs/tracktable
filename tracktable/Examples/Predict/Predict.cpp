@@ -47,7 +47,7 @@ void Predict(
   // doing work on, and an id number that corresponds to the feature.
 
   my_rtree rtree;
-  std::vector<value> data;
+  std::vector<rtree_data_value> data;
 
   // Build the feature vector/id number combo for the rtree.  There is an
   // unused value set to 0 that might be used in the future.
@@ -75,7 +75,7 @@ void Predict(
 
   std::vector<my_data>::iterator orig = to_be_predicted.begin();
   for (; orig != to_be_predicted.end(); ++orig) {
-	  std::vector<value> result_n;
+	  std::vector<rtree_data_value> result_n;
 
     // Note we are getting more results than sample_size.  This is because
     // we will throw out the hit that corresponds to the trajectory itself.
@@ -107,9 +107,9 @@ void Predict(
     // 1/d^2 weight.  The d^2 term comes from the "comparable_distance"
     // function.
 
-	  std::vector<value>::iterator itr = result_n.begin();
+	  std::vector<rtree_data_value>::iterator itr = result_n.begin();
 	  for (; itr != result_n.end(); ++itr) {
-      value found = *itr;
+	    rtree_data_value found = *itr;
       if (found->index == orig->index) continue;
 	    double weight = 1.0/(0.01 + boost::geometry::comparable_distance(
        orig->Point,found->Point));

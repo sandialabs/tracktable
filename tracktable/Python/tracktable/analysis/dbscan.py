@@ -48,12 +48,56 @@ def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_si
     two parameters: the search box size (defining "nearby" points) and
     the minimum number of points that you're willing to call a
     cluster.
+
+    You will get back a list of (vertex_id, cluster_id) pairs.  If you
+    supplied a list of points as input the vertex IDs will be indices
+    into that list.  If you supplied pairs of (my_vertex_id, point)
+    instead, the vertex IDs will be whatever you supplied.
+
     """
 
-    native_feature_vectors = [ convert_to_feature_vector(p) for p in feature_vectors ]
+    # Are we dealing with decorated points?
+    decorated_points = False
+    first_point = feature_vectors[0]
+    vertex_ids = list(range(len(feature_vectors)))
+
+    print("Testing for point decoration.  First point: {}".format(first_point))
+    try:
+        if len(first_point) == 2 and len(first_point[0]) > 0:
+            print("DEBUG: Points are decorated.  First point: {}".format(first_point))
+            decorated_points = True
+            vertex_ids = [ point[1] for point in feature_vectors ]
+    except TypeError:
+        # The second element of the point is something that doesn't
+        # have a len().  It is probably a coordinate, meaning we've
+        # got bare points.
+        pass
+
+    if not decorated_points:
+        print("DEBUG: Points are not decorated.")
+
+    if decorated_points:
+        native_feature_vectors = [ convert_to_feature_vector(p[0]) for p in feature_vectors ]
+    else:
+        native_feature_vectors = [ convert_to_feature_vector(p) for p in feature_vectors ]
+
     native_box_half_span = convert_to_feature_vector(search_box_half_span)
 
+    if decorated_points:
+        point_size = len(first_point[0])
+    else:
+        point_size = len(first_point)
 
-    cluster_engine_name = 'dbscan_learn_cluster_ids_{}'.format(len(feature_vectors[0]))
+    cluster_engine_name = 'dbscan_learn_cluster_ids_{}'.format(point_size)
     dbscan_learn_cluster_labels = getattr(_dbscan_clustering, cluster_engine_name)
-    return dbscan_learn_cluster_labels(native_feature_vectors, native_box_half_span, min_cluster_size)
+    integer_labels = dbscan_learn_cluster_labels(
+        native_feature_vectors,
+        native_box_half_span,
+        min_cluster_size
+        )
+
+    final_labels = []
+    for (vertex_index, cluster_id) in integer_labels:
+        final_labels.append((vertex_ids[vertex_index], cluster_id))
+
+    return final_labels

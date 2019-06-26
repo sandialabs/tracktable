@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2018 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -33,26 +33,30 @@
  * computed for any point type.
  */
 
-#ifndef __tracktable_core_algorithms_detail_BasePointDefaults_h
-#define __tracktable_core_algorithms_detail_BasePointDefaults_h
+#ifndef __tracktable_core_algorithms_detail_DistanceSignature_h
+#define __tracktable_core_algorithms_detail_DistanceSignature_h
+
+#include <tracktable/Core/detail/trait_signatures/Domain.h>
 
 #include <boost/mpl/assert.hpp>
+#include <boost/type_traits/is_same.hpp>
 #include <cmath>
+
+//#include <tracktable/Core/detail/trait_signatures/CoordinateSystem.h>
 
 namespace tracktable { namespace algorithms {
 
-// You must implement this for a point type in order to compute the
-// distance between points.
-template<typename T>
+template<typename DomainType>
 struct distance
 {
   BOOST_MPL_ASSERT_MSG(
-    sizeof(T)==0,
-    DISTANCE_NOT_DEFINED_FOR_THIS_POINT_TYPE,
-    (types<T>)
-    );
+    (sizeof(DomainType) == 0)
+    , TRACKTABLE_DISTANCE_NOT_DEFINED_FOR_DOMAIN
+    , (types<DomainType>)
+  );
 };
 
+    
 } } // namespace tracktable::algorithms
 
 /*
@@ -62,11 +66,20 @@ struct distance
 
 namespace tracktable {
 
-template<class T>
-double distance(T const& from, T const& to)
-{
-  return algorithms::distance<T>::apply(from, to);
-}
+  template<class Geometry1, class Geometry2>
+  double distance(Geometry1 const& from, Geometry2 const& to)
+  {
+    typedef typename tracktable::traits::domain<Geometry1>::type domain1;
+    typedef typename tracktable::traits::domain<Geometry2>::type domain2;
+
+    BOOST_MPL_ASSERT_MSG(
+      (boost::is_same<domain1, domain2>::value),
+      TRACKTABLE_DISTANCE_CANNOT_BE_COMPUTED_ACROSS_DIFFERENT_DOMAINS,
+      (types<domain1,domain2>)
+    );
+    
+    return algorithms::distance<domain1>::apply(from, to);
+  }
 
 } // namespace tracktable
 

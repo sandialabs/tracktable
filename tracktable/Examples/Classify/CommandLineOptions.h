@@ -34,16 +34,17 @@
 #include <tracktable/Core/TracktableCommon.h>
 #include <tracktable/Core/Timestamp.h>
 
-typedef tracktable::string_type string_type;
+namespace tt = tracktable;
+
 typedef tracktable::string_vector_type string_vector_type;
-typedef std::pair<string_type, std::size_t> field_assignment_type;
+typedef std::pair<tt::string_type, std::size_t> field_assignment_type;
 
 struct CommandLineOptions
 {
-  string_type InputFilename;
-  string_type OutputFilename;
-  string_type Domain;
-  string_type FieldDelimiter;
+  tt::string_type InputFilename;
+  tt::string_type OutputFilename;
+  tt::string_type Domain;
+  tt::string_type FieldDelimiter;
   double      SeparationDistance;
   double      SeparationSeconds;
   std::size_t ObjectIdColumn;

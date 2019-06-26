@@ -37,6 +37,7 @@ dictionary
 from tracktable.core import Timestamp
 import importlib
 import datetime
+import sys
 
 def trajectory_from_dictionary(dictionary):
     """Returns a trajectory constructed from the given dictionary.
@@ -58,16 +59,21 @@ def trajectory_from_dictionary(dictionary):
     numPoints = len(dictionary['coordinates'])
     for point in dictionary['coordinates']:
         if len(point) != dimension:
-            raise ValueError("Error: point " + str(point) + " has "+ str(len(point)) + " coordinate(s), expected " + str(dimension)+".")
+            raise ValueError("Error: point {} has {} coordinate(s), expected {}.".format(
+                point, len(point), dimension))
 
     #verify point properties values lists are of equal length
     for (name, attributes) in dictionary['point_properties'].items():
         if len(attributes['values']) != numPoints:
-            raise ValueError("Error: "+name+" property has only " + str(len(attributes['values'])) + " values, but there are " + str(numPoints) + " points in the trajectory.")
+            raise ValueError(("Error: property {} has only {} values but "
+                              "there are {} points in the trajectory.").format(
+                                  name, len(attributes['values']), numPoints))
 
     #verify there are the right number of timestamps
     if len(dictionary['timestamps']) != numPoints:
-        raise ValueError("Error: Only " + str(len(dictionary['timestamps'])) + " timestamp values, but there are " + str(numPoints) + " points in the trajectory.")
+        raise ValueError(("Error: Dictionary contains only {} timestamps but "
+                          "there are {} points in the trajectory.").format(
+                              len(dictionary['timestamps']), numPoints))
 
     #verify object_id is a string
     if not isinstance(dictionary['object_id'], str):
@@ -113,7 +119,15 @@ def dictionary_from_trajectory(trajectory):
         if isinstance(value, datetime.datetime):
             dictionary['trajectory_properties'].update({name: {'type': type(value).__name__, 'value': Timestamp.to_string(value, include_tz=False)}})
         else:
-            dictionary['trajectory_properties'].update({name: {'type': type(value).__name__, 'value': value}})
+            # Python 2 has both 'int' and 'long' data types.  The
+            # first is your system's ordinary integer; the second is
+            # arbitrary-precision.  In Python 3, all integers are of
+            # type 'int' and are of arbitrary precision.
+            if sys.version_info[0] == 2 and type(value) is long:
+                type_name = 'int'
+            else:
+                type_name = type(value).__name__
+            dictionary['trajectory_properties'].update({name: {'type': type_name, 'value': value}})
 
     # initialize timestamps and coordinates
     dictionary['timestamps'] = []
@@ -122,7 +136,14 @@ def dictionary_from_trajectory(trajectory):
     # initialize point properties
     dictionary['point_properties'] = {}
     for (name, value) in trajectory[0].properties.items():
-        dictionary['point_properties'].update({name: {'type': type(value).__name__, 'values': []}})
+        # As above -- Python 2 has a 'long' data type that we will
+        # call 'int'.
+        if sys.version_info[0] == 2 and type(value) is long:
+            type_name = 'int'
+        else:
+            type_name = type(value).__name__
+
+        dictionary['point_properties'].update({name: {'type': type_name, 'values': []}})
 
     # set timestamps, coordinates and point_properties
     for i in range(len(trajectory)):

@@ -56,6 +56,7 @@ set( IO_Headers
 )
 
 set ( IO_Detail_HEADERS
+  detail/CountProperties.h
   detail/HeaderStrings.h
   detail/PointHeader.h
   detail/PointReaderDefaultConfiguration.h
