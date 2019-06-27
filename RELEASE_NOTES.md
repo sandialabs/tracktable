@@ -4,11 +4,12 @@ VERSION 1.1.0, May 2019
 =======================
 
 This version is the last in which we will actively support Python 2.7.
-Python 2 is scheduled to stop support on January 1, 2020
-(https://www.python.org/dev/peps/pep-0373/).  Many packages
-(TensorFlow, Pandas, iPython, Matplotlib, NumPy, SciPy... see
-https://python3statement.org/ for the full list) have already dropped
-support for Python 2.
+Python 2 is scheduled to 
+[end support](https://www.python.org/dev/peps/pep-0373/)
+on January 1, 2020.  
+Many packages (TensorFlow, Pandas, iPython, Matplotlib, NumPy,
+SciPy... see [the Python 3 Statement](https://python3statement.org/)
+for the full list) have already dropped support for Python 2.
 
 We also expect that this will be the last version of Tracktable that
 uses Basemap for its back-end rendering layer.  Basemap's maintainer
@@ -21,7 +22,7 @@ NEW FEATURES
 ------------
 
 * Tracktable now has mailing lists!  Send a blank email to
-  <listname>-join@software.sandia.gov to request membership.  The
+  <listname>-join  at software dot sandia dot gov to request membership.  The
   available lists are:
 
   * tracktable-announce - Very low volume.  New releases of Tracktable
@@ -33,7 +34,8 @@ NEW FEATURES
   * tracktable-commit - Commit messages will be forwarded to this list.
   
 * We are moving the repository to GitHub.  Starting with this release,
-  the canonical URL will be https://github.com/sandialabs/tracktable
+  the canonical URL will be 
+  [https://github.com/sandialabs/tracktable](https://github.com/sandialabs/tracktable)
   with documentation at ReadTheDocs.
 
 * As of Version 1.1, we require Boost 1.61 or newer.
@@ -51,8 +53,8 @@ NEW FEATURES
   * ``extrapolate()`` is like ``interpolate()`` in that it takes two
     points and a floating-point number and interpolates between the
     start and end points according to that float.  Unlike
-    interpolate(), it doesn't do any bounds checking: it is perfectly
-    legitimate to ask for extrapolate(hither, yon, -1.0).
+    ``interpolate()``, it doesn't do any bounds checking: it is perfectly
+    legitimate to ask for ``extrapolate(hither, yon, -1.0)``.
   
   * ``distance()`` now computes distance between any combination of
     points and trajectories.
@@ -60,8 +62,8 @@ NEW FEATURES
 * Clustering with DBSCAN:
 
   * The DBSCAN interface has been cleaned up.  You will no longer
-    instantiate tracktable::DBSCAN.  Instead, call
-    tracktable::cluster_with_dbscan().
+    instantiate ``tracktable::DBSCAN``.  Instead, call
+    ``tracktable::cluster_with_dbscan()``.
     
   * You can decorate the points you feed to DBSCAN.  For example, if
     you want to store your own index, you can pass in a
@@ -103,7 +105,9 @@ NOTABLE FIXES
 OUTSTANDING ISSUES
 ------------------
 
-* The C++ examples need to be cleaned up and documented.  
+* The C++ examples need to be cleaned up and documented.  This would
+  be a good "getting started" exercise for people who are new to the
+  code base.
 
 * There are several useful scripts in
   ``tracktable/Python/tracktable/examples/work_in_progress`` that need
@@ -114,13 +118,13 @@ COMING SOON
 -----------
 
 * We are experimenting with various replacements for Basemap.  As of
-  May 2019 the leading contenders are Cartopy
-  (https://scitools.org.uk/cartopy/docs/latest/) for offline rendering
-  and either Folium/Leaflet
-  (https://python-visualization.github.io/folium/) or Plotly
-  (https://plot.ly/) for interactive rendering.  We welcome suggestions
-  and discussion!  Please join the tracktable-develop mailing list if
-  you're interested.
+  May 2019 the leading contenders are
+  [Cartopy](https://scitools.org.uk/cartopy/docs/latest/) for offline
+  rendering and either
+  [Folium/Leaflet](https://python-visualization.github.io/folium/) or
+  [Plotly](https://plot.ly/) for interactive rendering.  We welcome
+  suggestions and discussion!  Please join the tracktable-develop
+  mailing list if you're interested.
 
 * We are almost ready to move our documentation to ReadTheDocs.  Look
   for an announcement on the ``tracktable-announce`` mailing list.
