@@ -21,7 +21,7 @@ We want to make it easy to...
   - databases to store raw data,
 
   - filtering and cleaning techniques to assemble points into
-  trajectories,
+    trajectories,
 
   - computational geometry to characterize them,
 

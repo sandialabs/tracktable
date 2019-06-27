@@ -296,7 +296,7 @@ We have two more features to demonstrate here.  First, instead of having the tra
 Too Many Arguments!
 -------------------
 
-Response files are used for managing siutations where many command line arguments need to be used. The use of of these files is documented in the user guide (see :ref:`Tracktable_User_-Guide`).
+Response files are used for managing siutations where many command line arguments need to be used. The use of of these files is documented in the user guide (see :ref:`Tracktable_User_Guide`).
 
 
 Cartesian Movie
