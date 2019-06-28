@@ -46,10 +46,8 @@ __description__ = "Trajectory Analysis and Visualization"
 __url__ = "https://tracktable.sandia.gov"
 __uri__ = __url__
 __doc__ = __description__ + " <" + __uri__ + ">"
-
 __author__ = "Andy Wilson, Danny Rintoul, Chris Valicka, Ben Newton, Paul Schrum, Phil Baxley"
 __maintainer__ = "Andy Wilson and Phil Baxley"
-
 __license__ = "BSD"
 __copyright__ = "Copyright (c) 2014-2019 National Technology and Engineering Solutions of Sandia, LLC."
 
