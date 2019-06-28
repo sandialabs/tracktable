@@ -29,7 +29,6 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-
 import argparse
 import codecs
 import glob
@@ -40,6 +39,36 @@ import sys
 
 from setuptools import setup, find_packages
 from setuptools.dist import Distribution
+
+
+###################################################################
+
+NAME = "tracktable"
+PACKAGES = find_packages(where="tracktable/Python")
+META_PATH = os.path.join("tracktable", "Python", "tracktable", "__init__.py")
+
+KEYWORDS = ["trajectory", "analysis", "visualization"]
+
+CLASSIFIERS = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: MacOS :: MacOS X",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Visualization"
+]
+
+###################################################################
+
 
 class BinaryDistribution(Distribution):
     def is_pure(self):
@@ -55,18 +84,14 @@ def read(filename):
         return f.read()
 
 
-def find_meta(meta):
-    """
-    Extract __*meta*__ from META_FILE.
-    """
-    meta_match = re.search(
-        r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=meta),
-        META_FILE, re.M
-    )
-    if meta_match:
-        return meta_match.group(1)
-    raise RuntimeError("Unable to find __{meta}__ string.".format(meta=meta))
+META_FILE = read(META_PATH)
 
+PYTHON_DEPENDENCIES=[
+    'basemap',
+    'matplotlib',
+    'pytz',
+    'pyshp'
+    ]
 # ----------------------------------------------------------------------
 
 def find_metadata_property(text, property_name):
@@ -107,7 +132,7 @@ def main():
         raise RuntimeError(('This script must be run from the root of a '
                             'Tracktable install tree.  Specifically, the file '
                             '<here>/Python/tracktable/__init__.py must exist.'))
-    
+
     init_file_text = read(init_filename)
     # Parse the following properties out of the top-level __init__.py
     # so that they are always current.
@@ -132,7 +157,7 @@ def main():
     binary_extensions = glob.glob(
         os.path.join(here, 'Python', 'tracktable', '*', '*.so'
         ))
-    
+
     # --------------------
 
     # Static properties here
@@ -195,4 +220,3 @@ def main():
 
 if __name__ == '__main__':
     sys.exit(main())
-
