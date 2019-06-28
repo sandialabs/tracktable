@@ -92,6 +92,7 @@ PYTHON_DEPENDENCIES=[
     ]
 
 
+
 def find_metadata_property(filename, property_name):
     """Extract a named property from a Python file.
 
@@ -117,8 +118,6 @@ def find_metadata_property(filename, property_name):
         filename=filename))
 
 # ----------------------------------------------------------------------
-
-
 
 if __name__ == "__main__":
     setup(
