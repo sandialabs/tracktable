@@ -29,6 +29,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+<<<<<<< HEAD
 
 import argparse
 import codecs
@@ -37,24 +38,86 @@ import os
 import os.path
 import re
 import sys
+=======
+import codecs
+import os
+import re
+>>>>>>> For now, packaging scripts belong in root directory
 
 from setuptools import setup, find_packages
 from setuptools.dist import Distribution
 
+<<<<<<< HEAD
+=======
+
+###################################################################
+
+NAME = "tracktable"
+PACKAGES = find_packages(where="tracktable/Python")
+META_PATH = os.path.join("tracktable", "Python", "tracktable", "__init__.py")
+
+KEYWORDS = ["trajectory", "analysis", "visualization"]
+
+CLASSIFIERS = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: MacOS :: MacOS X",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.4",
+    "Programming Language :: Python :: 3.5",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Visualization"
+]
+
+###################################################################
+
+>>>>>>> For now, packaging scripts belong in root directory
 class BinaryDistribution(Distribution):
     def is_pure(self):
         return False
 
+<<<<<<< HEAD
 
 def read(filename):
+=======
+HERE = os.path.abspath(os.path.dirname(__file__))
+
+
+
+def read(*parts):
+>>>>>>> For now, packaging scripts belong in root directory
     """
     Build an absolute path from *parts* and and return the contents of the
     resulting file.  Assume UTF-8 encoding.
     """
+<<<<<<< HEAD
     with codecs.open(filename, "rb", "utf-8") as f:
         return f.read()
 
 
+=======
+    with codecs.open(os.path.join(HERE, *parts), "rb", "utf-8") as f:
+        return f.read()
+
+
+META_FILE = read(META_PATH)
+
+PYTHON_DEPENDENCIES=[
+    'basemap',
+    'matplotlib',
+    'pytz',
+    'pyshp'
+    ]
+
+
+>>>>>>> For now, packaging scripts belong in root directory
 def find_meta(meta):
     """
     Extract __*meta*__ from META_FILE.
@@ -67,6 +130,7 @@ def find_meta(meta):
         return meta_match.group(1)
     raise RuntimeError("Unable to find __{meta}__ string.".format(meta=meta))
 
+<<<<<<< HEAD
 # ----------------------------------------------------------------------
 
 def find_metadata_property(text, property_name):
@@ -196,3 +260,28 @@ def main():
 if __name__ == '__main__':
     sys.exit(main())
 
+=======
+
+if __name__ == "__main__":
+    setup(
+        name=NAME,
+        description=find_meta("description"),
+        license=find_meta("license"),
+        url=find_meta("url"),
+        version=find_meta("version"),
+        author=find_meta("author"),
+        maintainer=find_meta("author"),
+        keywords=KEYWORDS,
+#        long_description=read("README.rst"),
+#        long_description_content_type="text/x-rst",
+        packages=PACKAGES,
+        package_dir={"": "tracktable/Python"},
+        include_package_data=True,
+#        package_data={ 'tracktable': BINARY_MODULES },
+#        python_requires='>=3.4',
+        zip_safe=False,
+        classifiers=CLASSIFIERS,
+        install_requires=PYTHON_DEPENDENCIES,
+        distclass=BinaryDistribution
+    )
+>>>>>>> For now, packaging scripts belong in root directory
