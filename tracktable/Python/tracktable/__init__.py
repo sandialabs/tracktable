@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -39,6 +39,18 @@ in kilometers.
 """
 
 # \defgroup Tracktable_Python Python components of Tracktable
+
+__version__ = "1.1.0"
+__title__ = "Tracktable"
+__description__ = "Trajectory Analysis and Visualization"
+__url__ = "https://tracktable.sandia.gov"
+__uri__ = __url__
+__doc__ = __description__ + " <" + __uri__ + ">"
+
+__author__ = "Andy Wilson, Danny Rintoul, Chris Valicka, Ben Newton, Paul Schrum"
+
+__license__ = "BSD"
+__copyright__ = "Copyright (c) 2014-2019 National Technology and Engineering Solutions of Sandia, LLC."
 
 from .core import register_core_types
 
