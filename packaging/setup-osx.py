@@ -119,7 +119,6 @@ def find_metadata_property(filename, property_name):
 # ----------------------------------------------------------------------
 
 
-
 if __name__ == "__main__":
     setup(
         name=NAME,
