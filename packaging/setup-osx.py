@@ -92,7 +92,10 @@ PYTHON_DEPENDENCIES=[
     ]
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> Remove extra command-line options; change calling syntax
 def find_metadata_property(filename, property_name):
     """Extract a named property from a Python file.
 
@@ -116,6 +119,12 @@ def find_metadata_property(filename, property_name):
     raise RuntimeError("Unable to find __{meta}__ string in file {filename}.".format(
         meta=property_name,
         filename=filename))
+<<<<<<< HEAD
+=======
+
+# ----------------------------------------------------------------------
+
+>>>>>>> Remove extra command-line options; change calling syntax
 
 # ----------------------------------------------------------------------
 

@@ -101,6 +101,7 @@ def find_metadata_property(text, property_name):
 
 def main():
     here = os.getcwd()
+
     tracktable_home = os.path.join(here, 'Python', 'tracktable')
     init_filename = os.path.join(tracktable_home, '__init__.py')
 
