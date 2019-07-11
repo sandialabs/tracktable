@@ -92,17 +92,32 @@ PYTHON_DEPENDENCIES=[
     ]
 
 
-def find_meta(meta):
+def find_metadata_property(filename, property_name):
+    """Extract a named property from a Python file.
+
+    Suppose that you have a Python file (or, indeed, any text file)
+    bunch of metadata properties with filenames like '__property1__',
+    '__foo__', and '__bar__' in a file.  The lines in question look
+    like:
+
+    __foo__ = 'value of property Foo'
+    __bar__ = "value of property Bar"
+
+    This function will find those properties and return their values.
     """
-    Extract __*meta*__ from META_FILE.
-    """
+
     meta_match = re.search(
-        r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=meta),
-        META_FILE, re.M
+        r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=property_name),
+        filename, re.M
     )
     if meta_match:
         return meta_match.group(1)
-    raise RuntimeError("Unable to find __{meta}__ string.".format(meta=meta))
+    raise RuntimeError("Unable to find __{meta}__ string in file {filename}.".format(
+        meta=property_name,
+        filename=filename))
+
+# ----------------------------------------------------------------------
+
 
 
 if __name__ == "__main__":
