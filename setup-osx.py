@@ -45,16 +45,13 @@ class BinaryDistribution(Distribution):
     def is_pure(self):
         return False
 
-HERE = os.path.abspath(os.path.dirname(__file__))
 
-
-
-def read(*parts):
+def read(filename):
     """
     Build an absolute path from *parts* and and return the contents of the
     resulting file.  Assume UTF-8 encoding.
     """
-    with codecs.open(os.path.join(HERE, *parts), "rb", "utf-8") as f:
+    with codecs.open(filename, "rb", "utf-8") as f:
         return f.read()
 
 
@@ -97,44 +94,28 @@ def find_metadata_property(text, property_name):
             "Unable to find __{meta}__ string in text.".format(meta=property_name)
             )
 
-# ----------------------------------------------------------------------
-
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--tracktable-build',
-                        default='tracktable',
-                        help='Root of Tracktable install that will be used to build wheel')
-    parser.add_argument('--output-dir',
-                        help='Directory where wheel should be written',
-                        default='.')
-
-    return parser.parse_known_args()
-
 # --------------------------------------------------------------------
 
 def main():
-    (known_args, unrecognized_args) = parse_args()
-
-    metadata_from_init = {}
-
-    if 'bdist_wheel' not in known_args:
-        raise RuntimeError('This script can only be used to build wheels.')
-
-    if known_args.tracktable_build is None:
-        raise RuntimeError('To build a wheel, you must supply the path to an installed Tracktable with "--tracktable-build".')
-
-
-    init_filename = os.path.join(known_args.tracktable_build,
+    here = os.getcwd()
+    init_filename = os.path.join(here,
                                  'Python',
                                  'tracktable',
                                  '__init__.py')
 
+    if not (os.path.exists(init_filename) and os.path.isfile(init_filename)):
+        raise RuntimeError(('This script must be run from the root of a '
+                            'Tracktable install tree.  Specifically, the file '
+                            '<here>/Python/tracktable/__init__.py must exist.'))
+    
     init_file_text = read(init_filename)
     # Parse the following properties out of the top-level __init__.py
     # so that they are always current.
     properties_in_init = [
         'author', 'description', 'license', 'maintainer', 'url', 'version'
     ]
+
+    metadata_from_init = {}
     for key in properties_in_init:
         metadata_from_init[key] = find_metadata_property(init_file_text, key)
 
@@ -143,14 +124,15 @@ def main():
 
     # Computed properties here
 
-    tracktable_path = os.path.join(known_args.tracktable_build, 'Python')
+    here = os.getcwd()
+    tracktable_path = os.path.join(here, 'Python')
     package_directory = { '': tracktable_path }
     tracktable_contents = find_packages(where=tracktable_path)
     # XXX this line will have to change for Windows
-    binary_extensions = glob.glob(os.path.join(
-        tracktable_path, 'tracktable', '*', '*.so'
+    binary_extensions = glob.glob(
+        os.path.join(here, 'Python', 'tracktable', '*', '*.so'
         ))
-
+    
     # --------------------
 
     # Static properties here
@@ -191,8 +173,6 @@ def main():
     # --------------------
 
     setup(
-        script_args=unrecognized_args,
-
         # Static properties
         name=package_name,
         classifiers=classifiers,
@@ -209,11 +189,6 @@ def main():
         # Assembly information and system parameters
         distclass=BinaryDistribution,
         zip_safe=False
-
-        # long_description=read('README.rst'),
-        # long_description_content_type='text/x-rst',
-
-
     )
 
 # ----------------------------------------------------------------------
