@@ -157,7 +157,7 @@ def main():
     binary_extensions = glob.glob(
         os.path.join(here, 'Python', 'tracktable', '*', '*.so'
         ))
-
+    
     # --------------------
 
     # Static properties here
