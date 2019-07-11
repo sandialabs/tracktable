@@ -1,3 +1,0 @@
-#recursive-include *.so
-include tracktable/Python/tracktable/*/*.so
-
