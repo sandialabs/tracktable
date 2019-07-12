@@ -27,9 +27,9 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-### 
+###
 ### BuildWheel.cmake: Build a Python wheel
-### 
+###
 
 
 # This module can be called with 'cmake -P'.  This makes it suitable
@@ -138,7 +138,6 @@ endfunction(_get_python_abi_tag)
 # ----------------------------------------------------------------------
 
 function(build_wheel _base_directory _output_directory _setup_py _python_interpreter _fixwheel)
-
   set(_platform "PLATFORM_NOT_FOUND")
   set(_abi "ABI_NOT_FOUND")
   set(_implementation_version "IMPLEMENTATION_VERSION_TAG_NOT_FOUND")
@@ -194,13 +193,13 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
   if (APPLE)
     message(STATUS "INFO: You probably just saw a lot of warnings about being unable to find libc++, libicudata, and libicui18n, among others.  It is safe to ignore those warnings.")
   endif (APPLE)
-  
+
   #  syntax of foreach:
   #
   #  foreach(<loop_var> <items>)
   #    <commands>
   #  endforeach()
-  
+
   # execute_process(
   #   COMMAND
   #   ${_fixwheel} ${_wheel_filename}
@@ -211,7 +210,7 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
   # if (NOT ${_fixwheel_result} EQUAL 0)
   #   message(ERROR "Error while adding libraries to wheel: ${_fixwheel_result}")
   # endif ()
-  
+
 endfunction(build_wheel)
 
 
@@ -241,5 +240,3 @@ build_wheel(${INSTALL_TREE_ROOT} ${OUTPUT_DIRECTORY} ${SETUP_SCRIPT} ${PYTHON_IN
 ######################################################################
 ######################################################################
 ######################################################################
-
-
