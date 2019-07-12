@@ -34,8 +34,6 @@
 # a single symbol -- its entry point -- and Boost.Python already
 # handles the dllexport/dllimport annotation for that.
 #
-
-
 # ----------------------------------------------------------------------
 #
 # So, what's the Boost.Python library called?
@@ -314,4 +312,22 @@ target_link_libraries(_rtree
   )
 
 
+
 install_python_extension(_rtree lib ${Tracktable_PYTHON_DIR})
+
+message(STATUS "Adding wheel target.")
+message(STATUS "INFO: Python executable is ${PYTHON_EXECUTABLE}")
+message(STATUS "INFO: Install prefix is ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "INFO: Wheel should go in ${CMAKE_BINARY_DIR}/wheel")
+
+add_custom_target( wheel
+  COMMAND
+  ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
+  ${PYTHON_EXECUTABLE}
+  ${CMAKE_INSTALL_PREFIX}
+  ${CMAKE_BINARY_DIR}/wheel
+  ${Tracktable_SOURCE_DIR}/setup-osx.py
+  WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+#  DEPENDS install
+  )
+
