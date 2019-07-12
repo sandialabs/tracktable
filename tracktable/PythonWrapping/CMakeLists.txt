@@ -283,7 +283,9 @@ target_link_libraries(_rtree
   )
 
 
+
 install_python_extension(_rtree lib ${Tracktable_PYTHON_DIR})
+
 
 get_filename_component(
   PYTHON_EXECUTABLE_DIRECTORY
@@ -306,7 +308,6 @@ if (APPLE)
     "delocate-wheel executable: OS X utility to add libraries to Python wheels"
     )
 endif (APPLE)
-
 
 add_custom_target( wheel
 #  COMMAND
