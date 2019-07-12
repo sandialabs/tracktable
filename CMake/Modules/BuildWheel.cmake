@@ -138,7 +138,6 @@ endfunction(_get_python_abi_tag)
 # ----------------------------------------------------------------------
 
 function(build_wheel _base_directory _output_directory _setup_py _python_interpreter _fixwheel)
-
   set(_platform "PLATFORM_NOT_FOUND")
   set(_abi "ABI_NOT_FOUND")
   set(_implementation_version "IMPLEMENTATION_VERSION_TAG_NOT_FOUND")
@@ -211,7 +210,6 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
   # if (NOT ${_fixwheel_result} EQUAL 0)
   #   message(ERROR "Error while adding libraries to wheel: ${_fixwheel_result}")
   # endif ()
-  
 endfunction(build_wheel)
 
 
