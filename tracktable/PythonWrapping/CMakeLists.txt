@@ -34,8 +34,6 @@
 # a single symbol -- its entry point -- and Boost.Python already
 # handles the dllexport/dllimport annotation for that.
 #
-
-
 # ----------------------------------------------------------------------
 #
 # So, what's the Boost.Python library called?
@@ -81,13 +79,13 @@ else (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
 endif (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
 
 # ----------------------------------------------------------------------
-# 
+#
 # (Not) Linking against libpython
-# 
+#
 # Some Python interpreters link statically against libpython.  Some
 # link dynamically.  If we link to a different libpython than the one
 # in/alongside the interpreter, we get segfaults at runtime.
-# 
+#
 # The solution is to not link against libpython and instead tell the
 # linker to leave unresolved symbols unresolved until load time.  GCC
 # and Visual C++ do this by default.  Clang has an applicable link
