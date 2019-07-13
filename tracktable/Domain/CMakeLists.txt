@@ -65,6 +65,16 @@ target_link_libraries( TracktableDomain
   TracktableCore
 )
 
+set_property(
+  TARGET TracktableDomain
+  PROPERTY SOVERSION ${Tracktable_VERSION}
+  )
+
+set_property(
+  TARGET TracktableDomain
+  PROPERTY VERSION ${Tracktable_VERSION}
+  )
+
 generate_export_header( TracktableDomain
    BASE_NAME TRACKTABLE_DOMAIN
    EXPORT_MACRO_NAME TRACKTABLE_DOMAIN_EXPORT
