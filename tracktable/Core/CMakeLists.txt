@@ -167,6 +167,16 @@ add_library( TracktableCore
   ${Core_WarningGuards_HEADERS}
 )
 
+set_property(
+  TARGET TracktableCore
+  PROPERTY SOVERSION ${Tracktable_VERSION}
+  )
+
+set_property(
+  TARGET TracktableCore
+  PROPERTY VERSION ${Tracktable_VERSION}
+  )
+
 
 # The following source_group directives make Visual Studio show the
 # header files in their own sub-folders under the project for

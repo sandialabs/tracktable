@@ -81,6 +81,7 @@ IF("${isSystemDir}" STREQUAL "-1")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 set(MACOSX_RPATH ON)
+set(CMAKE_MACOSX_RPATH ON)
 
 # ----------------------------------------------------------------------
 
@@ -98,6 +99,7 @@ if (BUILD_SHARED_LIBS)
   message(STATUS "Building shared libraries.")
   add_definitions(-DBUILDING_SHARED_LIBS)
   add_definitions(-DBOOST_ALL_DYN_LINK)
+  set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
   set(Boost_USE_STATIC_LIBS OFF)
 else (BUILD_SHARED_LIBS)
   if (BUILD_PYTHON_WRAPPING)
@@ -172,7 +174,10 @@ endif (BUILD_DOCUMENTATION)
 
 # ----------------------------------------------------------------------
 
+install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/Python/tracktable)
 
+# ----------------------------------------------------------------------
 
 if (BUILD_PYTHON_WRAPPING)
   if (NOT BUILD_SHARED_LIBS)
