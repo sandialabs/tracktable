@@ -282,9 +282,18 @@ target_link_libraries(_rtree
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-
-
 install_python_extension(_rtree lib ${Tracktable_PYTHON_DIR})
+
+
+
+
+
+get_filename_component(
+  PYTHON_EXECUTABLE_DIRECTORY
+  ${PYTHON_EXECUTABLE}
+  DIRECTORY
+  )
+
 
 
 get_filename_component(
