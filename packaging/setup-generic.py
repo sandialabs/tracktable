@@ -101,7 +101,6 @@ def find_metadata_property(text, property_name):
 
 def main():
     here = os.getcwd()
-
     tracktable_home = os.path.join(here, 'Python', 'tracktable')
     init_filename = os.path.join(tracktable_home, '__init__.py')
 
@@ -109,7 +108,7 @@ def main():
         raise RuntimeError(('This script must be run from the root of a '
                             'Tracktable install tree.  Specifically, the file '
                             '<here>/Python/tracktable/__init__.py must exist.'))
-    
+
     init_file_text = read(init_filename)
     # Parse the following properties out of the top-level __init__.py
     # so that they are always current.
@@ -130,7 +129,7 @@ def main():
     directory_containing_tracktable = os.path.join(here, 'Python')
     package_directory = { '': directory_containing_tracktable }
     tracktable_contents = find_packages(where=directory_containing_tracktable)
-    
+
     system = platform.system()
 
     if system == 'Linux':
@@ -147,9 +146,9 @@ def main():
         os_classifier = 'Operating System :: Microsoft :: Windows'
     else:
         raise RuntimeError('Unknown operating system: {}'.format(system))
-        
+
     binary_extensions = glob.glob(
-        os.path.join(here, 'Python', 'tracktable', '*', 
+        os.path.join(here, 'Python', 'tracktable', '*',
                      '*.{}'.format(extension_suffix))
         )
 
@@ -162,9 +161,9 @@ def main():
                              '*.{}'.format(shared_library_suffix))
                 )
             )
-        
+
     license_files = [ os.path.join(tracktable_home, 'LICENSE.txt') ]
-    
+
     # --------------------
 
     # Static properties here
@@ -194,7 +193,6 @@ def main():
 
     dependencies = [
         'basemap',
-#        'basemap-data-hires',
         'matplotlib',
         'pyshp',
         'pytz'
@@ -218,7 +216,7 @@ def main():
         # Computed properties
         package_dir=package_directory,
         packages=tracktable_contents,
-        package_data={ 'tracktable': 
+        package_data={ 'tracktable':
                        binary_extensions + support_libraries + license_files },
 
         # Assembly information and system parameters
@@ -230,4 +228,3 @@ def main():
 
 if __name__ == '__main__':
     sys.exit(main())
-
