@@ -166,6 +166,7 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
     message(STATUS "Wheel build succeeded.  Now you might need to run delocate/auditwheel.")
   endif ()
 
+
   message(STATUS "Globbing pattern ${_output_directory}/tracktable-*-${_implementation_version}-none-${_platform}.whl")
   file(
     GLOB _wheel_files

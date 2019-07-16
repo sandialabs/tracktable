@@ -282,9 +282,18 @@ target_link_libraries(_rtree
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-
-
 install_python_extension(_rtree lib ${Tracktable_PYTHON_DIR})
+
+
+
+
+
+get_filename_component(
+  PYTHON_EXECUTABLE_DIRECTORY
+  ${PYTHON_EXECUTABLE}
+  DIRECTORY
+  )
+
 
 
 get_filename_component(
@@ -298,7 +307,10 @@ message(STATUS "INFO: Python executable is ${PYTHON_EXECUTABLE}")
 message(STATUS "INFO: Install prefix is ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "INFO: Wheel should go in ${CMAKE_BINARY_DIR}/wheel")
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> Add delocate-wheel argument to wheel building script
 if (APPLE)
   find_program(
     FIX_WHEEL_EXECUTABLE
@@ -310,13 +322,18 @@ if (APPLE)
     )
 endif (APPLE)
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> Add delocate-wheel argument to wheel building script
 add_custom_target( wheel
   COMMAND
   ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
   ${PYTHON_EXECUTABLE}
   ${CMAKE_INSTALL_PREFIX}
   ${CMAKE_BINARY_DIR}/wheel
-  ${Tracktable_SOURCE_DIR}/setup-osx.py
+  ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
+  ${FIX_WHEEL_EXECUTABLE}
   WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
 #  DEPENDS install
   )
