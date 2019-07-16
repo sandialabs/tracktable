@@ -137,7 +137,7 @@ endfunction(_get_python_abi_tag)
 
 # ----------------------------------------------------------------------
 
-function(build_wheel _base_directory _output_directory _setup_py _python_interpreter)
+function(build_wheel _base_directory _output_directory _setup_py _python_interpreter _fixwheel)
 
   set(_platform "PLATFORM_NOT_FOUND")
   set(_abi "ABI_NOT_FOUND")
@@ -166,7 +166,30 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
   else ()
     message(STATUS "Wheel build succeeded.  Now you might need to run delocate/auditwheel.")
   endif ()
-      
+
+  file(
+    GLOB _wheel_files
+    ${_output_directory}/*.whl
+    LIST_DIRECTORIES false
+    )
+
+  #  syntax of foreach:
+  #
+  #  foreach(<loop_var> <items>)
+  #    <commands>
+  #  endforeach()
+  
+  # execute_process(
+  #   COMMAND
+  #   ${_fixwheel} ${_wheel_filename}
+  #   RESULT_VARIABLE _fixwheel_result
+  #   WORKING_DIRECTORY ${_base_directory}
+  #   )
+
+  # if (NOT ${_fixwheel_result} EQUAL 0)
+  #   message(ERROR "Error while adding libraries to wheel: ${_fixwheel_result}")
+  # endif ()
+  
 endfunction(build_wheel)
 
 
@@ -180,14 +203,16 @@ set(PYTHON_INTERPRETER ${CMAKE_ARGV3})
 set(INSTALL_TREE_ROOT ${CMAKE_ARGV4})
 set(OUTPUT_DIRECTORY ${CMAKE_ARGV5})
 set(SETUP_SCRIPT ${CMAKE_ARGV6})
+set(FIX_WHEEL_EXECUTABLE ${CMAKE_ARGV7})
 
 message(STATUS "BuildWheel running.")
 message(STATUS "INFO: Python interpreter is ${PYTHON_INTERPRETER}")
 message(STATUS "INFO: Install tree is at ${INSTALL_TREE_ROOT}")
 message(STATUS "INFO: Output directory is ${OUTPUT_DIRECTORY}")
 message(STATUS "INFO: Setup script is ${SETUP_SCRIPT}")
+message(STATUS "INFO: Wheel fixer is ${FIX_WHEEL_EXECUTABLE}")
 
-build_wheel(${INSTALL_TREE_ROOT} ${OUTPUT_DIRECTORY} ${SETUP_SCRIPT} ${PYTHON_INTERPRETER})
+build_wheel(${INSTALL_TREE_ROOT} ${OUTPUT_DIRECTORY} ${SETUP_SCRIPT} ${PYTHON_INTERPRETER} ${FIX_WHEEL_EXECUTABLE})
 
 ######################################################################
 ######################################################################
