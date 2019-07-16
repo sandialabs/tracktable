@@ -284,3 +284,39 @@ target_link_libraries(_rtree
 
 
 install_python_extension(_rtree lib ${Tracktable_PYTHON_DIR})
+
+get_filename_component(
+  PYTHON_EXECUTABLE_DIRECTORY
+  ${PYTHON_EXECUTABLE}
+  DIRECTORY
+  )
+
+message(STATUS "Adding wheel target.")
+message(STATUS "INFO: Python executable is ${PYTHON_EXECUTABLE}")
+message(STATUS "INFO: Install prefix is ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "INFO: Wheel should go in ${CMAKE_BINARY_DIR}/wheel")
+
+if (APPLE)
+  find_program(
+    FIX_WHEEL_EXECUTABLE
+    delocate-wheel
+    HINTS
+    ${PYTHON_EXECUTABLE_DIRECTORY}
+    DOC
+    "delocate-wheel executable: OS X utility to add libraries to Python wheels"
+    )
+endif (APPLE)
+
+
+add_custom_target( wheel
+  COMMAND
+  ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
+  ${PYTHON_EXECUTABLE}
+  ${CMAKE_BINARY_DIR}
+  ${CMAKE_INSTALL_PREFIX}
+  ${CMAKE_BINARY_DIR}/wheel
+  ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
+  ${FIX_WHEEL_EXECUTABLE}
+  WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+#  DEPENDS install
+  )
