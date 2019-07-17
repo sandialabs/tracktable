@@ -309,6 +309,10 @@ endif (APPLE)
 
 
 add_custom_target( wheel
+#  COMMAND
+#  ${CMAKE_COMMAND} -E make_directory ${CMAKE_INSTALL_PREFIX}
+#  COMMAND
+#  ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target install
   COMMAND
   ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
   ${PYTHON_EXECUTABLE}
