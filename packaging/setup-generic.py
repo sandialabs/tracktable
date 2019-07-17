@@ -193,7 +193,7 @@ def main():
 
     dependencies = [
         'basemap',
-        'basemap-data-hires',
+#        'basemap-data-hires',
         'matplotlib',
         'pyshp',
         'pytz'
