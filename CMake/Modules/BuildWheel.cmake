@@ -167,12 +167,34 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
     message(STATUS "Wheel build succeeded.  Now you might need to run delocate/auditwheel.")
   endif ()
 
+  message(STATUS "Globbing pattern ${_output_directory}/tracktable-*-${_implementation_version}-none-${_platform}.whl")
   file(
     GLOB _wheel_files
-    ${_output_directory}/*.whl
+    ${_output_directory}/tracktable-*-${_implementation_version}-none-${_platform}.whl
     LIST_DIRECTORIES false
     )
 
+  # We don't know what the exact filename is going to be.  It depends
+  # on information scattered in several different locations.  Let's
+  # just fix them all.
+
+  foreach(_wheel_to_fix ${_wheel_files})
+    message(STATUS "Adding external libraries to ${_wheel_to_fix}.")
+    execute_process(
+      COMMAND
+      ${_fixwheel} ${_wheel_to_fix}
+      RESULT_VARIABLE _fixwheel_result
+      WORKING_DIRECTORY ${_output_directory}
+      )
+    if (NOT ${_fixwheel_result} EQUAL 0)
+      message(ERROR "Error while adding external libraries to wheel: ${_fixwheel_result}")
+    endif ()
+  endforeach ()
+
+  if (APPLE)
+    message(STATUS "INFO: You probably just saw a lot of warnings about being unable to find libc++, libicudata, and libicui18n, among others.  It is safe to ignore those warnings.")
+  endif (APPLE)
+  
   #  syntax of foreach:
   #
   #  foreach(<loop_var> <items>)
@@ -200,13 +222,15 @@ endfunction(build_wheel)
 # This block contains the commands that actually execute.
 
 set(PYTHON_INTERPRETER ${CMAKE_ARGV3})
-set(INSTALL_TREE_ROOT ${CMAKE_ARGV4})
-set(OUTPUT_DIRECTORY ${CMAKE_ARGV5})
-set(SETUP_SCRIPT ${CMAKE_ARGV6})
-set(FIX_WHEEL_EXECUTABLE ${CMAKE_ARGV7})
+set(BUILD_TREE_ROOT ${CMAKE_ARGV4})
+set(INSTALL_TREE_ROOT ${CMAKE_ARGV5})
+set(OUTPUT_DIRECTORY ${CMAKE_ARGV6})
+set(SETUP_SCRIPT ${CMAKE_ARGV7})
+set(FIX_WHEEL_EXECUTABLE ${CMAKE_ARGV8})
 
 message(STATUS "BuildWheel running.")
 message(STATUS "INFO: Python interpreter is ${PYTHON_INTERPRETER}")
+message(STATUS "INFO: Build tree is at ${BUILD_TREE_ROOT}.")
 message(STATUS "INFO: Install tree is at ${INSTALL_TREE_ROOT}")
 message(STATUS "INFO: Output directory is ${OUTPUT_DIRECTORY}")
 message(STATUS "INFO: Setup script is ${SETUP_SCRIPT}")
