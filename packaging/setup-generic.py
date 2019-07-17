@@ -193,11 +193,7 @@ def main():
 
     dependencies = [
         'basemap',
-<<<<<<< HEAD
 #        'basemap-data-hires',
-=======
-        'basemap-data-hires',
->>>>>>> Common setup script for Linux, OS X
         'matplotlib',
         'pyshp',
         'pytz'
