@@ -41,28 +41,28 @@ import math
 import sys
 
 
-from ._domain_algorithm_overloads import distance as _distance
-from ._domain_algorithm_overloads import bearing as _bearing
-from ._domain_algorithm_overloads import interpolate as _interpolate
-from ._domain_algorithm_overloads import extrapolate as _extrapolate
-from ._domain_algorithm_overloads import signed_turn_angle as _signed_turn_angle
-from ._domain_algorithm_overloads import unsigned_turn_angle as _unsigned_turn_angle
-from ._domain_algorithm_overloads import speed_between as _speed_between
-from ._domain_algorithm_overloads import point_at_fraction as _point_at_fraction
-from ._domain_algorithm_overloads import point_at_length_fraction as _point_at_length_fraction
-from ._domain_algorithm_overloads import point_at_time as _point_at_time
-from ._domain_algorithm_overloads import time_at_fraction as _time_at_fraction
-from ._domain_algorithm_overloads import subset_during_interval as _subset_during_interval
-from ._domain_algorithm_overloads import length as _length
-from ._domain_algorithm_overloads import end_to_end_distance as _end_to_end_distance
-from ._domain_algorithm_overloads import intersects as _intersects
-from ._domain_algorithm_overloads import geometric_median as _geometric_median
-from ._domain_algorithm_overloads import geometric_mean as _geometric_mean
-from ._domain_algorithm_overloads import simplify as _simplify
-from ._domain_algorithm_overloads import convex_hull_perimeter as _convex_hull_perimeter
-from ._domain_algorithm_overloads import convex_hull_area as _convex_hull_area
-from ._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
-from ._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
+from tracktable.lib._domain_algorithm_overloads import distance as _distance
+from tracktable.lib._domain_algorithm_overloads import bearing as _bearing
+from tracktable.lib._domain_algorithm_overloads import interpolate as _interpolate
+from tracktable.lib._domain_algorithm_overloads import extrapolate as _extrapolate
+from tracktable.lib._domain_algorithm_overloads import signed_turn_angle as _signed_turn_angle
+from tracktable.lib._domain_algorithm_overloads import unsigned_turn_angle as _unsigned_turn_angle
+from tracktable.lib._domain_algorithm_overloads import speed_between as _speed_between
+from tracktable.lib._domain_algorithm_overloads import point_at_fraction as _point_at_fraction
+from tracktable.lib._domain_algorithm_overloads import point_at_length_fraction as _point_at_length_fraction
+from tracktable.lib._domain_algorithm_overloads import point_at_time as _point_at_time
+from tracktable.lib._domain_algorithm_overloads import time_at_fraction as _time_at_fraction
+from tracktable.lib._domain_algorithm_overloads import subset_during_interval as _subset_during_interval
+from tracktable.lib._domain_algorithm_overloads import length as _length
+from tracktable.lib._domain_algorithm_overloads import end_to_end_distance as _end_to_end_distance
+from tracktable.lib._domain_algorithm_overloads import intersects as _intersects
+from tracktable.lib._domain_algorithm_overloads import geometric_median as _geometric_median
+from tracktable.lib._domain_algorithm_overloads import geometric_mean as _geometric_mean
+from tracktable.lib._domain_algorithm_overloads import simplify as _simplify
+from tracktable.lib._domain_algorithm_overloads import convex_hull_perimeter as _convex_hull_perimeter
+from tracktable.lib._domain_algorithm_overloads import convex_hull_area as _convex_hull_area
+from tracktable.lib._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
+from tracktable.lib._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
 
 def xcoord(thing):
     """Return what we think is the X-coordinate for an object.
