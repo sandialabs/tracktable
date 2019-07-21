@@ -35,8 +35,8 @@ find_package(Boost 1.57.0 REQUIRED COMPONENTS date_time)
 include(GenerateExportHeader)
 
 include_directories(
-  ${Tracktable_SOURCE_DIR}
-  ${Tracktable_BINARY_DIR}
+  ${PROJECT_SOURCE_DIR}
+  ${PROJECT_BINARY_DIR}
   ${Boost_INCLUDE_DIR}
   )
 
