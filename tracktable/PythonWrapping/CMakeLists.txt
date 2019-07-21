@@ -169,7 +169,7 @@ target_link_libraries(_tracktable_hello
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-install_python_extension( _tracktable_hello core ${Tracktable_PYTHON_DIR} )
+install_python_extension(_tracktable_hello lib ${Tracktable_PYTHON_DIR})
 
 add_library(_core_types MODULE
   CorePythonModule.cpp
@@ -178,14 +178,14 @@ add_library(_core_types MODULE
   PropertyMapWrapper.cpp
   CommonMapWrappers.cpp
   )
-set_property(TARGET _core_types                PROPERTY FOLDER "Python")
+set_property(TARGET _core_types PROPERTY FOLDER "Python")
 
 target_link_libraries(_core_types
   TracktableCore
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-install_python_extension(_core_types core ${Tracktable_PYTHON_DIR})
+install_python_extension(_core_types lib ${Tracktable_PYTHON_DIR})
 
 add_library(_domain_algorithm_overloads MODULE
   DomainAlgorithmOverloadsPythonModule.cpp
@@ -198,12 +198,12 @@ target_link_libraries(_domain_algorithm_overloads
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-install_python_extension(_domain_algorithm_overloads core ${Tracktable_PYTHON_DIR})
+install_python_extension(_domain_algorithm_overloads lib ${Tracktable_PYTHON_DIR})
 
 add_library(_terrestrial MODULE
   TerrestrialDomainModule.cpp
 )
-set_property(TARGET _terrestrial                PROPERTY FOLDER "Python")
+set_property(TARGET _terrestrial PROPERTY FOLDER "Python")
 
 target_link_libraries(_terrestrial
   TracktableCore
@@ -211,13 +211,12 @@ target_link_libraries(_terrestrial
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-install_python_extension(_terrestrial domain ${Tracktable_PYTHON_DIR})
-
+install_python_extension(_terrestrial lib ${Tracktable_PYTHON_DIR})
 
 add_library(_cartesian2d MODULE
   Cartesian2DDomainModule.cpp
 )
-set_property(TARGET _cartesian2d                PROPERTY FOLDER "Python")
+set_property(TARGET _cartesian2d PROPERTY FOLDER "Python")
 
 target_link_libraries(_cartesian2d
   TracktableCore
@@ -225,7 +224,7 @@ target_link_libraries(_cartesian2d
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-install_python_extension(_cartesian2d domain ${Tracktable_PYTHON_DIR})
+install_python_extension(_cartesian2d lib ${Tracktable_PYTHON_DIR})
 
 add_library(_cartesian3d MODULE
   Cartesian3DDomainModule.cpp
@@ -238,7 +237,7 @@ target_link_libraries(_cartesian3d
   ${PYTHON_EXTENSION_LIBRARIES}
 )
 
-install_python_extension(_cartesian3d domain ${Tracktable_PYTHON_DIR})
+install_python_extension(_cartesian3d lib ${Tracktable_PYTHON_DIR})
 
 
 add_library(_feature_vector_points MODULE
@@ -254,7 +253,7 @@ add_library(_feature_vector_points MODULE
 If(MSVC)
   set_property(SOURCE FeatureVectorModule.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " /bigobj ")
 Endif(MSVC)
-set_property(TARGET _feature_vector_points      PROPERTY FOLDER "Python")
+set_property(TARGET _feature_vector_points PROPERTY FOLDER "Python")
 
 target_link_libraries(_feature_vector_points
   TracktableCore
@@ -262,7 +261,7 @@ target_link_libraries(_feature_vector_points
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-install_python_extension(_feature_vector_points domain ${Tracktable_PYTHON_DIR})
+install_python_extension(_feature_vector_points lib ${Tracktable_PYTHON_DIR})
 
 add_library(_dbscan_clustering MODULE
   DBSCANClusteringPythonModule.cpp
@@ -278,7 +277,7 @@ add_library(_dbscan_clustering MODULE
   ExplicitInstantiation/DBSCAN_Wrapper_28_30.cpp
   ExplicitInstantiation/DBSCAN_Wrapper_Extra.cpp
   )
-set_property(TARGET _dbscan_clustering          PROPERTY FOLDER "Python")
+set_property(TARGET _dbscan_clustering PROPERTY FOLDER "Python")
 
 target_link_libraries(_dbscan_clustering
   TracktableCore
@@ -287,7 +286,7 @@ target_link_libraries(_dbscan_clustering
   )
 
 
-install_python_extension(_dbscan_clustering analysis ${Tracktable_PYTHON_DIR})
+install_python_extension(_dbscan_clustering lib ${Tracktable_PYTHON_DIR})
 
 
 add_library(_rtree MODULE
@@ -304,7 +303,7 @@ add_library(_rtree MODULE
   ExplicitInstantiation/RTree_Wrapper_28_30.cpp
   ExplicitInstantiation/RTree_Wrapper_Extra.cpp
   )
-set_property(TARGET _rtree          PROPERTY FOLDER "Python")
+set_property(TARGET _rtree PROPERTY FOLDER "Python")
 
 target_link_libraries(_rtree
   TracktableCore
@@ -313,7 +312,7 @@ target_link_libraries(_rtree
   )
 
 
-install_python_extension(_rtree analysis ${Tracktable_PYTHON_DIR})
+install_python_extension(_rtree lib ${Tracktable_PYTHON_DIR})
 
 get_filename_component(
   PYTHON_EXECUTABLE_DIRECTORY
