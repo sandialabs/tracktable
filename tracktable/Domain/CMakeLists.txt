@@ -34,8 +34,8 @@ find_package( Boost REQUIRED )
 include(GenerateExportHeader)
 
 include_directories(
-  ${Tracktable_SOURCE_DIR}
-  ${Tracktable_BINARY_DIR}
+  ${PROJECT_SOURCE_DIR}
+  ${PROJECT_BINARY_DIR}
   ${Boost_INCLUDE_DIR}
 )
 
@@ -79,7 +79,7 @@ generate_export_header( TracktableDomain
    BASE_NAME TRACKTABLE_DOMAIN
    EXPORT_MACRO_NAME TRACKTABLE_DOMAIN_EXPORT
    STATIC_DEFINE TRACKTABLE_DOMAIN_STATIC_LIBRARY
-   EXPORT_FILE_NAME ${Tracktable_BINARY_DIR}/tracktable/Domain/TracktableDomainWindowsHeader.h
+   EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/tracktable/Domain/TracktableDomainWindowsHeader.h
    )
 
 
@@ -96,6 +96,6 @@ install(
 )
 
 install(
-  FILES ${CMAKE_BINARY_DIR}/tracktable/Domain/TracktableDomainWindowsHeader.h
+  FILES ${PROJECT_BINARY_DIR}/tracktable/Domain/TracktableDomainWindowsHeader.h
   DESTINATION include/tracktable/Domain
   )

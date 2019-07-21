@@ -28,16 +28,16 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from ._terrestrial import BasePointTerrestrial as BasePoint
-from ._terrestrial import TrajectoryPointTerrestrial as TrajectoryPoint
-from ._terrestrial import TrajectoryTerrestrial as Trajectory
-from ._terrestrial import BasePointReaderTerrestrial as BasePointReader
-from ._terrestrial import TrajectoryPointReaderTerrestrial as TrajectoryPointReader
-from ._terrestrial import TrajectoryReaderTerrestrial as TrajectoryReader
-from ._terrestrial import BoundingBoxTerrestrial as BoundingBox
-from ._terrestrial import BasePointWriterTerrestrial as BasePointWriter
-from ._terrestrial import TrajectoryPointWriterTerrestrial as TrajectoryPointWriter
-from ._terrestrial import TrajectoryWriterTerrestrial as TrajectoryWriter
+from tracktable.lib._terrestrial import BasePointTerrestrial as BasePoint
+from tracktable.lib._terrestrial import TrajectoryPointTerrestrial as TrajectoryPoint
+from tracktable.lib._terrestrial import TrajectoryTerrestrial as Trajectory
+from tracktable.lib._terrestrial import BasePointReaderTerrestrial as BasePointReader
+from tracktable.lib._terrestrial import TrajectoryPointReaderTerrestrial as TrajectoryPointReader
+from tracktable.lib._terrestrial import TrajectoryReaderTerrestrial as TrajectoryReader
+from tracktable.lib._terrestrial import BoundingBoxTerrestrial as BoundingBox
+from tracktable.lib._terrestrial import BasePointWriterTerrestrial as BasePointWriter
+from tracktable.lib._terrestrial import TrajectoryPointWriterTerrestrial as TrajectoryPointWriter
+from tracktable.lib._terrestrial import TrajectoryWriterTerrestrial as TrajectoryWriter
 
 DIMENSION = 2
 

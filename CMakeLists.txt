@@ -47,8 +47,8 @@ set(CMAKE_MODULE_PATH
   "${CMAKE_CURRENT_SOURCE_DIR}/CMake/Modules")
 
 # Generic output paths for build systems with one output directory
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${Tracktable_BINARY_DIR}/lib )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${Tracktable_BINARY_DIR}/lib )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${Tracktable_BINARY_DIR}/bin )
 
 # Build-type-specific output paths for things like MSVC, XCode
@@ -197,3 +197,5 @@ if (BUILD_TESTING)
 endif (BUILD_TESTING)
 
 add_subdirectory(tracktable)
+
+message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")
