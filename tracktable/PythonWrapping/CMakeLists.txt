@@ -294,8 +294,6 @@ get_filename_component(
   DIRECTORY
   )
 
-
-
 get_filename_component(
   PYTHON_EXECUTABLE_DIRECTORY
   ${PYTHON_EXECUTABLE}
