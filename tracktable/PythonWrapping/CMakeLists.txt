@@ -81,38 +81,26 @@ else (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
 endif (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
 
 # ----------------------------------------------------------------------
-#
-# Dealing with Anaconda
-#
-# The Anaconda Python distribution statically links the Python library
-# into its interpreter on OS X (possibly other platforms as well).
-# This causes a segmentation fault when we try to load one of the
-# compiled C++ extensions that links against Boost.Python and,
-# transitively, libpython.
-#
+# 
+# (Not) Linking against libpython
+# 
+# Some Python interpreters link statically against libpython.  Some
+# link dynamically.  If we link to a different libpython than the one
+# in/alongside the interpreter, we get segfaults at runtime.
+# 
 # The solution is to not link against libpython and instead tell the
-# linker to leave unresolved symbols unresolved until load time.
+# linker to leave unresolved symbols unresolved until load time.  GCC
+# and Visual C++ do this by default.  Clang has an applicable link
+# flag: "-undefined dynamic_lookup".
 
-set(PYTHON_IS_ANACONDA FALSE)
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # using regular Clang or AppleClang
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+endif()
 
-include(CheckForAnacondaPython)
-if (APPLE)
-  if (EXISTS ${PYTHON_EXECUTABLE})
-    check_for_anaconda_python(${PYTHON_EXECUTABLE} PYTHON_IS_ANACONDA)
-    if (PYTHON_IS_ANACONDA)
-      set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-      set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
-    else (PYTHON_IS_ANACONDA)
-      set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-    endif (PYTHON_IS_ANACONDA)
-  endif (EXISTS ${PYTHON_EXECUTABLE})
-else (APPLE)
-  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-endif (APPLE)
+set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
 
 include(PythonExtension)
-
-
 
 set( FEATURE_VECTOR_MAX_DIMENSION 30 CACHE STRING "Maximum dimension of feature vectors for Python wrapping." )
 
@@ -133,21 +121,6 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
   ${Tracktable_BINARY_DIR}/lib
 )
-
-# Deprecated: this gets handled up above
-# if (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
-#   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-#   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
-# else (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
-#   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-# endif (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
-
-# if (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
-#   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-#   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
-# else (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
-#   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-# endif (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
 
 set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable)
 
@@ -242,7 +215,6 @@ target_link_libraries(_cartesian3d
 
 install_python_extension(_cartesian3d domain ${Tracktable_PYTHON_DIR})
 
-
 add_library(_feature_vector_points MODULE
   FeatureVectorModule.cpp
   ExplicitInstantiation/FeatureVectorWrapper_1_5.cpp
@@ -253,6 +225,7 @@ add_library(_feature_vector_points MODULE
   ExplicitInstantiation/FeatureVectorWrapper_26_30.cpp
   ExplicitInstantiation/FeatureVectorWrapper_Extra.cpp
   )
+
 If(MSVC)
   set_property(SOURCE FeatureVectorModule.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " /bigobj ")
 Endif(MSVC)
@@ -288,7 +261,6 @@ target_link_libraries(_dbscan_clustering
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-
 install_python_extension(_dbscan_clustering analysis ${Tracktable_PYTHON_DIR})
 
 
@@ -313,6 +285,5 @@ target_link_libraries(_rtree
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
   )
-
 
 install_python_extension(_rtree analysis ${Tracktable_PYTHON_DIR})
