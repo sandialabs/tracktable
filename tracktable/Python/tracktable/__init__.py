@@ -52,4 +52,3 @@ __license__ = "BSD"
 __copyright__ = "Copyright (c) 2014-2019 National Technology and Engineering Solutions of Sandia, LLC."
 
 from .core import register_core_types
-
