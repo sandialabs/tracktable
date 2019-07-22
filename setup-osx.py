@@ -40,36 +40,6 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.dist import Distribution
 
-
-###################################################################
-
-NAME = "tracktable"
-PACKAGES = find_packages(where="tracktable/Python")
-META_PATH = os.path.join("tracktable", "Python", "tracktable", "__init__.py")
-
-KEYWORDS = ["trajectory", "analysis", "visualization"]
-
-CLASSIFIERS = [
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
-    "Natural Language :: English",
-    "License :: OSI Approved :: BSD License",
-    "Operating System :: MacOS :: MacOS X",
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.4",
-    "Programming Language :: Python :: 3.5",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: C++",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Topic :: Scientific/Engineering :: Information Analysis",
-    "Topic :: Scientific/Engineering :: Visualization"
-]
-
-###################################################################
-
-
 class BinaryDistribution(Distribution):
     def is_pure(self):
         return False
@@ -84,14 +54,6 @@ def read(filename):
         return f.read()
 
 
-META_FILE = read(META_PATH)
-
-PYTHON_DEPENDENCIES=[
-    'basemap',
-    'matplotlib',
-    'pytz',
-    'pyshp'
-    ]
 # ----------------------------------------------------------------------
 
 def find_metadata_property(text, property_name):

@@ -31,15 +31,10 @@
 ### BuildWheel.cmake: Build a Python wheel
 ###
 
-
 # This module can be called with 'cmake -P'.  This makes it suitable
 # for use in add_custom_command().  Its purpose is to construct a
 # Python wheel (binary install package) fully tagged with the version,
 # platform, and ABI of the interpreter used to create it.
-
-
-
-
 
 # Python binary install packages are called 'wheels'.  These are
 # allowed to include not only Python code but also compiled extensions
@@ -193,7 +188,7 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
   if (APPLE)
     message(STATUS "INFO: You probably just saw a lot of warnings about being unable to find libc++, libicudata, and libicui18n, among others.  It is safe to ignore those warnings.")
   endif (APPLE)
-  
+
   #  syntax of foreach:
   #
   #  foreach(<loop_var> <items>)
@@ -210,7 +205,7 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
   # if (NOT ${_fixwheel_result} EQUAL 0)
   #   message(ERROR "Error while adding libraries to wheel: ${_fixwheel_result}")
   # endif ()
-  
+
 endfunction(build_wheel)
 
 
