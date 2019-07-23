@@ -68,7 +68,6 @@ struct generic_point_at_fraction
     )
     {
       typedef typename TrajectoryType::point_type point_type;
-      typedef compare_point_distances<point_type> compare_point_type;
       typedef typename TrajectoryType::const_iterator const_iterator;
 
       if (path.empty()) return tracktable::arithmetic::zero<point_type>();
