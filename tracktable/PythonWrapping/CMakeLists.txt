@@ -318,8 +318,8 @@ add_custom_target( wheel
   COMMAND
   ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
   ${PYTHON_EXECUTABLE}
-  ${CMAKE_BINARY_DIR}
   ${CMAKE_INSTALL_PREFIX}
+  ${CMAKE_BINARY_DIR}
   ${CMAKE_BINARY_DIR}/wheel
   ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
   ${FIX_WHEEL_EXECUTABLE}
