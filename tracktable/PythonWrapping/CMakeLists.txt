@@ -316,6 +316,15 @@ if (APPLE)
     )
 endif (APPLE)
 
+if (UNIX AND NOT APPLE)
+  find_program(
+    FIX_WHEEL_EXECUTABLE
+    auditwheel
+    DOC
+    "auditwheel: add libraries to a wheel"
+    )
+endif (UNIX AND NOT APPLE)
+
 add_custom_target( wheel
 #  COMMAND
 #  ${CMAKE_COMMAND} -E make_directory ${CMAKE_INSTALL_PREFIX}

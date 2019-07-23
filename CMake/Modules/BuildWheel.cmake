@@ -132,7 +132,7 @@ endfunction(_get_python_abi_tag)
 
 # ----------------------------------------------------------------------
 
-function(build_wheel _base_directory _output_directory _setup_py _python_interpreter _fixwheel)
+function(build_wheel _python_interpreter _base_directory _output_directory _setup_py _python_interpreter _fixwheel)
   set(_platform "PLATFORM_NOT_FOUND")
   set(_abi "ABI_NOT_FOUND")
   set(_implementation_version "IMPLEMENTATION_VERSION_TAG_NOT_FOUND")
