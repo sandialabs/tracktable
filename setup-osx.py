@@ -29,7 +29,6 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-
 import argparse
 import codecs
 import glob
@@ -54,18 +53,6 @@ def read(filename):
     with codecs.open(filename, "rb", "utf-8") as f:
         return f.read()
 
-
-def find_meta(meta):
-    """
-    Extract __*meta*__ from META_FILE.
-    """
-    meta_match = re.search(
-        r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=meta),
-        META_FILE, re.M
-    )
-    if meta_match:
-        return meta_match.group(1)
-    raise RuntimeError("Unable to find __{meta}__ string.".format(meta=meta))
 
 # ----------------------------------------------------------------------
 
@@ -107,7 +94,7 @@ def main():
         raise RuntimeError(('This script must be run from the root of a '
                             'Tracktable install tree.  Specifically, the file '
                             '<here>/Python/tracktable/__init__.py must exist.'))
-    
+
     init_file_text = read(init_filename)
     # Parse the following properties out of the top-level __init__.py
     # so that they are always current.
@@ -195,4 +182,3 @@ def main():
 
 if __name__ == '__main__':
     sys.exit(main())
-
