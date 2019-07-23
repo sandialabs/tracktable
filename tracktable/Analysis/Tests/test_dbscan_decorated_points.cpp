@@ -156,13 +156,10 @@ void test_dbscan()
 {
   typedef tracktable::domain::feature_vectors::FeatureVector<dimension> point_type;
   typedef std::pair<point_type, int> labeled_point_type;
-  typedef std::pair<int, int> cluster_result_type;
   typedef std::vector<point_type> point_vector_type;
   typedef std::vector<int> label_vector_type;
   
   typedef std::vector<labeled_point_type> labeled_point_vector_type;
-  typedef std::vector<cluster_result_type> cluster_result_vector_type;
-
 
   std::cout << "test_dbscan_decorated_points: "
             << "Generating point clouds at vertices of "
