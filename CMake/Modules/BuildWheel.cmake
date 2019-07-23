@@ -168,20 +168,39 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
     LIST_DIRECTORIES false
     )
 
+  # Auditwheel and fixwheel need slightly different arguments.
+  string(FIND ${_fixwheel} "auditwheel" _fixwheel_is_auditwheel)
+  if (NOT ${_fixwheel_is_auditwheel EQUAL -1)
+    set(_using_auditwheel 1)
+  else ()
+    set(_using_auditwheel 0)
+  endif()
+
   # We don't know what the exact filename is going to be.  It depends
   # on information scattered in several different locations.  Let's
   # just fix them all.
 
   foreach(_wheel_to_fix ${_wheel_files})
     message(STATUS "Adding external libraries to ${_wheel_to_fix}.")
-    execute_process(
-      COMMAND
-      ${_fixwheel} ${_wheel_to_fix}
-      RESULT_VARIABLE _fixwheel_result
-      WORKING_DIRECTORY ${_output_directory}
-      )
+    if (_using_auditwheel)
+      execute_process(
+        COMMAND
+        ${_fixwheel} repair ${_wheel_to_fix}
+        RESULT_VARIABLE _fixwheel_result
+        WORKING_DIRECTORY ${_output_directory}
+        )
+    else (_using_auditwheel)
+      execute_process(
+        COMMAND
+        ${_fixwheel} repair ${_wheel_to_fix}
+        RESULT_VARIABLE _fixwheel_result
+        WORKING_DIRECTORY ${_output_directory}
+        )
+    endif (_using_auditwheel)
+
     if (NOT ${_fixwheel_result} EQUAL 0)
-      message(ERROR "Error while adding external libraries to wheel: ${_fixwheel_result}")
+      message(SEND_ERROR "Error while adding external libraries to wheel: ${_fixwheel_result}")
+      return()
     endif ()
   endforeach ()
 
