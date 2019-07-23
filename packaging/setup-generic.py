@@ -196,7 +196,8 @@ def main():
 #        'basemap-data-hires',
         'matplotlib',
         'pyshp',
-        'pytz'
+        'pytz',
+        'six'
     ]
 
     package_name = 'tracktable'
