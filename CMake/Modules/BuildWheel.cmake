@@ -31,15 +31,10 @@
 ### BuildWheel.cmake: Build a Python wheel
 ###
 
-
 # This module can be called with 'cmake -P'.  This makes it suitable
 # for use in add_custom_command().  Its purpose is to construct a
 # Python wheel (binary install package) fully tagged with the version,
 # platform, and ABI of the interpreter used to create it.
-
-
-
-
 
 # Python binary install packages are called 'wheels'.  These are
 # allowed to include not only Python code but also compiled extensions

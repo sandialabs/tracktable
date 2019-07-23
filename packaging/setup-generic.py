@@ -195,7 +195,8 @@ def main():
         'basemap',
         'matplotlib',
         'pyshp',
-        'pytz'
+        'pytz',
+        'six'
     ]
 
     package_name = 'tracktable'
