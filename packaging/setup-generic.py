@@ -212,7 +212,6 @@ def main():
         install_requires=dependencies,
         keywords=keywords,
         python_requires=version_required,
-        **metadata_from_init,
 
         # Computed properties
         package_dir=package_directory,
@@ -222,7 +221,10 @@ def main():
 
         # Assembly information and system parameters
         distclass=BinaryDistribution,
-        zip_safe=False
+        zip_safe=False,
+
+        # All the other stuff we collected
+        **metadata_from_init
     )
 
 # ----------------------------------------------------------------------
