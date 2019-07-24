@@ -175,7 +175,7 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
 
   # Auditwheel and fixwheel need slightly different arguments.
   string(FIND ${_fixwheel} "auditwheel" _fixwheel_is_auditwheel)
-  if (NOT ${_fixwheel_is_auditwheel EQUAL -1)
+  if (NOT ${_fixwheel_is_auditwheel} EQUAL -1)
     set(_using_auditwheel 1)
   else ()
     set(_using_auditwheel 0)
