@@ -197,7 +197,7 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
     else (_using_auditwheel)
       execute_process(
         COMMAND
-        ${_fixwheel} repair ${_wheel_to_fix}
+        ${_fixwheel} repair --plat manylinux2010_x86_64 ${_wheel_to_fix}
         RESULT_VARIABLE _fixwheel_result
         WORKING_DIRECTORY ${_output_directory}
         )
