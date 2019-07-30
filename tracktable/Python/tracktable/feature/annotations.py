@@ -34,7 +34,7 @@ Annotate points or trajectories (or the points in a trajectory) with useful deri
 """
 
 from __future__ import print_function, division, absolute_import
-from ..core import geomath
+from tracktable.core import geomath
 import numpy
 
 from six.moves import range
