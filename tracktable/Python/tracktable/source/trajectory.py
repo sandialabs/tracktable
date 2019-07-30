@@ -32,7 +32,7 @@ tracktable.source.trajectory - Sources that turn a sequence of points into a seq
 """
 
 import datetime
-from ..core.geomath import distance
+from tracktable.core.geomath import distance
 import sys
 
 class AssembleTrajectoryFromPoints(object):
