@@ -76,9 +76,11 @@ namespace tracktable {
 class TRACKTABLE_CORE_EXPORT PointLonLat : public PointBase<2>
 {
 public:
+  friend class boost::serialization::access;
+  
   /// Convenient alias for superclass
-  typedef PointBase<2> base_type;
-  typedef base_type::coordinate_type coord_type;
+  typedef PointBase<2> Superclass;
+  typedef Superclass::coordinate_type coord_type;
 
   /// Create an uninitialized point
   PointLonLat() { }
@@ -108,7 +110,7 @@ public:
   ~PointLonLat() { }
 
   /// Make this point a copy of a generic 2D point
-  PointLonLat(base_type const& other)
+  PointLonLat(Superclass const& other)
     {
       detail::assign_coordinates<2>::apply(*this, other);
     }
@@ -157,6 +159,12 @@ public:
     return outbuf.str();
     }
 
+private:
+  template<class Archive>
+  void serialize(Archive& ar, const unsigned int version)
+  {
+    ar & boost::serialization::make_nvp("Coordinates", this->Coordinates);
+  }
 };
 
 
@@ -187,7 +195,7 @@ struct tag<tracktable::PointLonLat>
 };
 
 template<>
-struct dimension<PointLonLat> : dimension<PointLonLat::base_type> {};
+struct dimension<PointLonLat> : dimension<PointLonLat::Superclass> {};
 
 template<>
 struct point_domain_name<PointLonLat>

@@ -39,13 +39,11 @@ test_property_map()
   tracktable::PropertyMap properties;
 
   double test_double_input = 3.14159;
-  int64_t test_int_input = 123456789012345;
   std::string test_string_input("Four score and seven years ago...");
   tracktable::Timestamp test_time_input(tracktable::time_from_string("1969-06-20 16:17:40"));
 
   tracktable::set_property(properties, "real_test", test_double_input);
 
-  tracktable::set_property(properties, "int_test", test_int_input);
   tracktable::set_property(properties, "string_test", test_string_input);
   tracktable::set_property(properties, "time_test", test_time_input);
 
@@ -53,11 +51,6 @@ test_property_map()
   if (tracktable::has_property(properties, "real_test") == false)
     {
     std::cerr << "ERROR: Property 'real_test' should be present\n";
-    ++error_count;
-    }
-  if (tracktable::has_property(properties, "int_test") == false)
-    {
-    std::cerr << "ERROR: Property 'int_test' should be present\n";
     ++error_count;
     }
   if (tracktable::has_property(properties, "string_test") == false)
@@ -78,7 +71,6 @@ test_property_map()
 
   double test_double;
   std::string test_string;
-  int64_t test_int;
   tracktable::Timestamp test_time;
   bool ok;
 
@@ -98,19 +90,6 @@ test_property_map()
     ++error_count;
     }
 
-  test_int = tracktable::integer_property(properties, "int_test", &ok);
-  if (ok == false)
-    {
-    std::cerr << "ERROR: OK flag was set to false when retrieving integer property\n";
-    ++error_count;
-    }
-  if (test_int != test_int_input)
-    {
-    std::cerr << "ERROR: Test int value was not what we put in.  Started with "
-              << test_int_input << ", got back "
-              << test_int << "\n";
-    ++error_count;
-    }
 
   test_string = tracktable::string_property(properties, "string_test", &ok);
   if (ok == false)

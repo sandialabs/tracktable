@@ -47,7 +47,7 @@ from tracktable.core import Timestamp
 class TestReadWriteDictionary(unittest.TestCase):
     def gen_json_and_trajectory(self):
         domain = tracktable.domain.terrestrial
-        json = "{\"coordinates\": [[26.995, -81.9731], [27.0447, -81.9844], [27.1136, -82.0458]], \"domain\": \"terrestrial\", \"object_id\": \"AAA001\", \"point_properties\": {\"altitude\": {\"type\": \"int\", \"values\": [2700, 4200, 6700]}, \"heading\": {\"type\": \"float\", \"values\": [108.1, 108.2, 225.3]}, \"note\": {\"type\": \"str\", \"values\": [\"hello\", \"world\", \"!\"]}, \"time2\": {\"type\": \"datetime\", \"values\": [\"2004-01-01 00:00:01\", \"2004-01-01 00:00:02\", \"2004-01-01 00:00:03\"]}}, \"timestamps\": [\"2004-12-07 11:36:18\", \"2004-12-07 11:37:56\", \"2004-12-07 11:39:18\"], \"trajectory_properties\": {\"percent\": {\"type\": \"float\", \"value\": 33.333}, \"platform\": {\"type\": \"str\", \"value\": \"Boeing 747\"}, \"start\": {\"type\": \"datetime\", \"value\": \"2004-12-07 11:36:00\"}, \"tailNum\": {\"type\": \"int\", \"value\": 3878}}}"
+        json = "{\"coordinates\": [[26.995, -81.9731], [27.0447, -81.9844], [27.1136, -82.0458]], \"domain\": \"terrestrial\", \"object_id\": \"AAA001\", \"point_properties\": {\"altitude\": {\"type\": \"float\", \"values\": [2700.0, 4200.0, 6700.0]}, \"heading\": {\"type\": \"float\", \"values\": [108.1, 108.2, 225.3]}, \"note\": {\"type\": \"str\", \"values\": [\"hello\", \"world\", \"!\"]}, \"time2\": {\"type\": \"datetime\", \"values\": [\"2004-01-01 00:00:01\", \"2004-01-01 00:00:02\", \"2004-01-01 00:00:03\"]}}, \"timestamps\": [\"2004-12-07 11:36:18\", \"2004-12-07 11:37:56\", \"2004-12-07 11:39:18\"], \"trajectory_properties\": {\"percent\": {\"type\": \"float\", \"value\": 33.333}, \"platform\": {\"type\": \"str\", \"value\": \"Boeing 747\"}, \"start\": {\"type\": \"datetime\", \"value\": \"2004-12-07 11:36:00\"}, \"tailNum\": {\"type\": \"str\", \"value\": \"3878\"}}}"
 
         # Manually set up a matching Trajectory object
         p1 = domain.TrajectoryPoint()
@@ -93,7 +93,7 @@ class TestReadWriteDictionary(unittest.TestCase):
         trajectory.set_property('percent', 33.333)
         trajectory.set_property('platform', "Boeing 747")
         trajectory.set_property('start', Timestamp.from_string('2004-12-07 11:36:00'))
-        trajectory.set_property('tailNum', 3878)
+        trajectory.set_property('tailNum', '3878')
 
         return json, trajectory
 
@@ -125,6 +125,7 @@ class TestReadWriteDictionary(unittest.TestCase):
         self.assertEqual(trajectory, trajectoryExpected,
                          msg="Error: The trajectory read in from the file does not match the original trajectory written to the file")
     def test_json(self):
+        self.maxDiff = 10240
         self.tst_trajectory_from_json()
         self.tst_json_from_trajectory()
         self.tst_trajectory_from_json_file_from_trajectory()

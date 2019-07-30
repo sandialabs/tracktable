@@ -177,10 +177,12 @@ public:
     this->FieldMap[field] = io::detail::ColumnTypeAssignment::real(column);
   }
 
+#if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
   void set_integer_field_column(std::string const& field, int column)
   {
     this->FieldMap[field] = io::detail::ColumnTypeAssignment::integer(column);
   }
+#endif
 
   void set_time_field_column(std::string const& field, int column)
   {
@@ -218,6 +220,7 @@ public:
         }
     }
 
+#if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
   int integer_field_column(std::string const& field) const
     {
       if (this->has_integer_field_column(field))
@@ -230,7 +233,8 @@ public:
         return -1;
         }
     }
-
+#endif
+  
   int string_field_column(std::string const& field) const
     {
       if (this->has_string_field_column(field))
@@ -269,13 +273,15 @@ public:
             (*iter).second.type == TYPE_REAL);
   }
 
+#if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
   bool has_integer_field_column(std::string const& field) const
     {
       PropertyAssignmentMap::const_iterator iter = this->FieldMap.find(field);
       return (iter != this->FieldMap.end() &&
               (*iter).second.type == TYPE_INTEGER);
     }
-
+#endif
+  
   bool has_string_field_column(std::string const& field) const
   {
     PropertyAssignmentMap::const_iterator iter = this->FieldMap.find(field);

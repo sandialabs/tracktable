@@ -138,7 +138,7 @@ def cities_in_bbox(bbox_min=(-180, -90),
 
     global CITY_TABLE
     if not CITY_TABLE:
-        from .data.city_table import city_table as cities
+        from tracktable.info.data.city_table import city_table as cities
         CITY_TABLE = cities
 
     result = []

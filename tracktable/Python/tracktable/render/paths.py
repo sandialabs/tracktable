@@ -51,7 +51,7 @@ import pdb
 from six.moves import range
 import numpy
 
-from ..core import geomath
+from tracktable.core import geomath
 from . import colormaps
 
 
@@ -465,3 +465,37 @@ def draw_traffic(traffic_map,
 #        num_trajectories_examined,
 #        num_trajectories_rendered))
     return all_artists
+
+
+def unwrap_path(locs):
+    """
+    Function:
+        Inspects a list of [lat, lon] coordinates. If the trajectory crosses 
+	the antimeridian (180 deg. Long), 'unwrap' the trajectory by projecting
+	longitudinal values onto >+180 or <-180. This will prevent horizontal
+	lines from streaking across a mercator projection, when plotting the
+	trajectory in mapping packages like Folium. Operates by comparing pairs
+	of elements (coord. point tuples) for the entire list.
+    
+    Input:
+        locs: a list of (lat,lon) tuples
+
+    Output: 
+        None
+        modifies the locs[] list in-place.
+    """
+
+    # 't' is an arbitrary threshold for comparing suqsequent points. If they are 'far enough' apart, 
+    #   then we assume they must be on opposite sides of the antimeridian.
+    t = 320
+    for i in range(1,len(locs)):
+        if abs(locs[i][1] - locs[i-1][1]) > t:
+            if locs[i-1][1] < 0:
+                # i-1 point in Western Hemisphere
+                locs[i] = (locs[i][0],locs[i][1]-360)
+            else:
+                # i-1 point in Eastern Hemisphere
+                locs[i] = (locs[i][0],locs[i][1]+360)
+    
+    return
+
