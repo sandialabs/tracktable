@@ -51,7 +51,7 @@ import pdb
 from six.moves import range
 import numpy
 
-from ..core import geomath
+from tracktable.core import geomath
 from . import colormaps
 
 
