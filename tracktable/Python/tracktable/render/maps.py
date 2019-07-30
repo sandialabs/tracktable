@@ -54,7 +54,7 @@ import sys
 
 from mpl_toolkits.basemap import Basemap
 from matplotlib import pyplot
-from ..info import airports, cities
+from tracktable.info import airports, cities
 from . import paths
 
 CONVENIENCE_MAPS = {

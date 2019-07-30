@@ -53,6 +53,7 @@
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/date_time/posix_time/time_serialize.hpp>
 #include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 #include <iostream>
@@ -327,5 +328,15 @@ struct extrapolate<Timestamp>
 };
 
 } } // exit namespace tracktable::algorithms
+
+// ----------------------------------------------------------------------
+//
+// Boost serialization support
+//
+// Timestamps don't have serialization by default.  Here we include
+// support just for boost::date_time::posix_time.
+//
+// ----------------------------------------------------------------------
+
 
 #endif

@@ -52,14 +52,6 @@ void add_real_property(std::size_t property_index, thing_with_properties& destin
 }
 
 template<class thing_with_properties>
-void add_integer_property(std::size_t property_index, thing_with_properties& destination)
-{
-  tracktable::ostringstream_type namebuf;
-  namebuf << "test_integer_property_" << property_index;
-  destination.set_property(namebuf.str(), (int64_t)(property_index*property_index));
-}
-
-template<class thing_with_properties>
 void add_string_property(std::size_t property_index, thing_with_properties& destination)
 {
   tracktable::ostringstream_type namebuf, valuebuf;
@@ -94,14 +86,12 @@ void generate_arbitrary_properties(std::size_t how_many,
 {
   for (std::size_t i = 0; i < how_many; ++i)
     {
-    int i_property_type = (i % 4) + 1;
+    int i_property_type = (i % 3) + 1;
     tracktable::PropertyUnderlyingType property_type = static_cast<tracktable::PropertyUnderlyingType>(i_property_type);
     switch (property_type)
       {
       case tracktable::TYPE_REAL:
         add_real_property(i, destination); break;
-      case tracktable::TYPE_INTEGER:
-        add_integer_property(i, destination); break;
       case tracktable::TYPE_STRING:
         add_string_property(i, destination); break;
       case tracktable::TYPE_TIMESTAMP:

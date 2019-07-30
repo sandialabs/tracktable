@@ -129,13 +129,6 @@ void BuildTrajectories(CommandLineOptions const& options, Trajectories& trajecto
     point_reader.set_real_field_column((*iter).first, boost::numeric_cast<int>((*iter).second));
     }
 
-  for (typename std::vector<field_assignment_type>::const_iterator iter = options.IntegerFields.begin();
-       iter != options.IntegerFields.end();
-       ++iter)
-    {
-    point_reader.set_integer_field_column((*iter).first, boost::numeric_cast<int>((*iter).second));
-    }
-
   for (typename std::vector<field_assignment_type>::const_iterator iter = options.StringFields.begin();
        iter != options.StringFields.end();
        ++iter)

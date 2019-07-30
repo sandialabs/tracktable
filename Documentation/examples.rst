@@ -144,7 +144,6 @@ options with the ``--help`` argument::
 
    $ python -m "tracktable.examples.heatmap_from_points" --help
 
-
 .. _trajectory-map-example:
 
 --------------------------
@@ -187,7 +186,7 @@ that in our longitude-first convention that's (90W, 24N) to (60W,
 50N).  While we're at it, let's also draw and label every city with a
 population over half a million people. ::
 
-   $ python -m "tracktable.examples.trajectory_map_from_points"
+   $ python TRACKTABLE/examples/trajectory_map_from_points.py
        --trajectory-linewidth 2
        --trajectory-colormap winter
        --map custom
@@ -204,8 +203,10 @@ Canadian provinces in bright green lines 2 points wide.  We'll also
 decrease the trajectory width so that the city labels aren't so
 overwhelmed.  Don't forget the backslash (\) in front of the color. ::
 
+
    $ python -m "tracktable.examples.trajectory_map_from_points"
        --state-color \#80FF80
+       --state-linewidth 2
        --trajectory-linewidth 1
        --trajectory-colormap winter
        --map custom
@@ -244,7 +245,7 @@ and `--map-bbox x y X Y` as follows::
          --map-bbox -100 -100 100 100
          --domain cartesian2d
          TRACKTABLE/examples/data/SamplePointsCartesian.csv
-         TrajectoryMapExample5.png
+	 trajectory_map_cartesian.png
 
 Support for automatically determining the bounding box of the data and
 adding an appropriate margin is coming soon.
@@ -305,6 +306,7 @@ Cartesian Movie
 As with geographic data, we can also make movies from data in flat Cartesian space::
 
     $ python -m "tracktable.examples.movie_from_points"
+
       --domain cartesian2d
       --object-id-column 0
       --timestamp-column 1

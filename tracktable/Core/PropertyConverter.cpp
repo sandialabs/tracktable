@@ -92,12 +92,14 @@ string_type PropertyConverter::property_to_string(PropertyValueT const& prop)
 	this->OutputBuf << boost::get<double>(prop);
 	return this->OutputBuf.str();
       };
+#if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
     case TYPE_INTEGER:
       {
 	this->OutputBuf.str(string_type());
 	this->OutputBuf << boost::get<int64_t>(prop);
 	return this->OutputBuf.str();
       };
+#endif
     case TYPE_STRING:
       return boost::get<string_type>(prop);
     case TYPE_NULL:
@@ -135,11 +137,13 @@ string_type PropertyConverter::property_to_string(PropertyValueT const& prop)
 	  double actual_value = boost::lexical_cast<double>(prop_value);
 	  result = PropertyValueT(actual_value);
 	}; break;
+#if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
       case TYPE_INTEGER:
 	{
 	  int64_t actual_value = boost::lexical_cast<int64_t>(prop_value);
 	  result = PropertyValueT(actual_value);
 	}; break;
+#endif
       case TYPE_TIMESTAMP:
 	{
 	  result = PropertyValueT(this->TimestampReadWrite.timestamp_from_string(prop_value));

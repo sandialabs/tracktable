@@ -54,6 +54,7 @@ from ._domain_algorithm_overloads import point_at_time as _point_at_time
 from ._domain_algorithm_overloads import time_at_fraction as _time_at_fraction
 from ._domain_algorithm_overloads import subset_during_interval as _subset_during_interval
 from ._domain_algorithm_overloads import length as _length
+from ._domain_algorithm_overloads import current_length as _current_length
 from ._domain_algorithm_overloads import end_to_end_distance as _end_to_end_distance
 from ._domain_algorithm_overloads import intersects as _intersects
 from ._domain_algorithm_overloads import geometric_median as _geometric_median
@@ -63,6 +64,7 @@ from ._domain_algorithm_overloads import convex_hull_perimeter as _convex_hull_p
 from ._domain_algorithm_overloads import convex_hull_area as _convex_hull_area
 from ._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
 from ._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
+from ._domain_algorithm_overloads import convex_hull_centroid as _convex_hull_centroid
 
 def xcoord(thing):
     """Return what we think is the X-coordinate for an object.
@@ -372,11 +374,32 @@ def length(trajectory):
 
 # ----------------------------------------------------------------------
 
+def current_length(point):
+
+    """Return the current length of a path in domain-dependent units
+
+    This is the length up to the given point in a trajectory.
+
+    Args:
+      Point (TrajectoryPoint): Point to which we want the length
+
+    Returns:
+      Length in domain-dependent units
+
+    Domain:
+      Terrestrial: distance in km
+      Cartesian2D: distance in units
+      Cartesian3D: distance in units
+    """
+
+    return _current_length(point)
+
+# ----------------------------------------------------------------------
 def end_to_end_distance(trajectory):
     """Return the distance between a path's endpoints
 
-    This is just the distance between start and end points rather than
-    the total distance traveled.
+    This is just the crow-flight distance between start and end points rather
+    than the total distance traveled.
 
     Args:
       trajectory (Trajectory): Path whose length we want
@@ -847,3 +870,20 @@ def radius_of_gyration(trajectory):
     """
 
     return _radius_of_gyration(trajectory)
+
+
+def convex_hull_centroid(trajectory):
+    """Compute the centroid of the convex hull of a trajectory
+ 
+    Centroid will be returned in the native units of
+    the domain.  This is: latitude, longitude (altitude) for the
+    terrestrial domain; and x, y (z) for Cartesian.
+
+    Args:
+      trajectory: Trajectory whose hull you want to measure
+ 
+    Returns:
+      Centroid of the trajectory's convex hull
+    """
+ 
+    return _convex_hull_centroid(trajectory)

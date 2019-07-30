@@ -44,81 +44,12 @@
 #include <tracktable/Core/TracktableCoreWindowsHeader.h>
 
 #include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/Core/Timestamp.h>
+#include <tracktable/Core/PropertyValue.h>
 
-#include <tracktable/Core/detail/algorithm_signatures/Interpolate.h>
-#include <tracktable/Core/detail/algorithm_signatures/Extrapolate.h>
-
-#include <boost/variant.hpp>
 #include <map>
+#include <boost/serialization/map.hpp>
 
 namespace tracktable {
-
-
-typedef enum {
-  TYPE_UNKNOWN   = 0,
-  TYPE_REAL      = 1,
-  TYPE_STRING    = 2,
-  TYPE_TIMESTAMP = 3,
-  TYPE_INTEGER   = 4,
-  TYPE_NULL      = 5
-} PropertyUnderlyingType;
-
-
-class NullValue
-{
-public:
-  PropertyUnderlyingType ExpectedType;
-
-  NullValue()
-    : ExpectedType(TYPE_UNKNOWN)
-    { }
-  NullValue(PropertyUnderlyingType my_type)
-    : ExpectedType(my_type)
-    { }
-  NullValue(NullValue const& other) :
-    ExpectedType(other.ExpectedType)
-    { }
-  void operator=(NullValue const& other)
-    {
-      this->ExpectedType = other.ExpectedType;
-    }
-  bool operator==(NullValue const& /*other*/) const
-    {
-      return false;
-    }
-  bool operator!=(NullValue const& /*other*/) const
-    {
-      return true;
-    }
-  bool operator<(NullValue const& other) const
-    {
-      return (this->ExpectedType < other.ExpectedType);
-    }
-};
-
-TRACKTABLE_CORE_EXPORT std::ostream& operator<<(std::ostream& out, NullValue const& value);
-
-
-/*! \brief Discriminated union type for properties
- *
- * In this release we support exactly three data types for properties:
- * a timestamp, a string and a floating-point number.  We will never
- * support less than this.  In the future we might add an integer
- * if it proves necessary.
- *
- * Under the hood this will probably always be a boost::variant but we
- * will provide our own interface so that you don't have to know or care
- * exactly how Boost does it.
- */
-
-typedef boost::variant<NullValue, double, int64_t, string_type, Timestamp> PropertyValueT;
-
-inline PropertyValueT make_null(PropertyUnderlyingType null_type)
-{
-  NullValue my_value(null_type);
-  return PropertyValueT(my_value);
-}
 
 /*! \brief Name -> property map
  *
@@ -138,12 +69,6 @@ typedef std::map<std::string, PropertyValueT> PropertyMap;
  */
 TRACKTABLE_CORE_EXPORT bool has_property(PropertyMap const& properties, string_type const& name);
 
-/*! \brief Check to see whether a property value is null.
- *
- * @return True/false depending on whether or not the supplied value is null
- */
-
-TRACKTABLE_CORE_EXPORT bool is_property_null(PropertyValueT const& value);
 
 /*! \brief Retrieve a property from a map whatever its type.
  *
@@ -185,19 +110,6 @@ TRACKTABLE_CORE_EXPORT string_type string_property(PropertyMap const& properties
 
 TRACKTABLE_CORE_EXPORT double real_property(PropertyMap const& properties, string_type const& name, bool* is_present=0);
 
-/*! \brief Retrieve an integer-valued property from the map.
- *
- * This function will give you back the named property as a 64-bit
- * signed integer if it is present and that is its proper type.  It
- * will not attempt to cast other types to int64_t.
- *
- * On success, returns the requested property as an int64_t and sets
- * *is_present to true.  On failure, returns 0 and sets *is_present to
- * false.
- */
-
-TRACKTABLE_CORE_EXPORT int64_t integer_property(PropertyMap const& properties, string_type const& name, bool* is_present=0);
-
 /*! \brief Retrieve a timestamp-valued property from the map.
  *
  * This function will give you back the named property as a Timestamp
@@ -210,14 +122,6 @@ TRACKTABLE_CORE_EXPORT int64_t integer_property(PropertyMap const& properties, s
  */
 
 TRACKTABLE_CORE_EXPORT Timestamp timestamp_property(PropertyMap const& properties,  string_type const& name, bool* is_present=0);
-
-/*! \brief Get a property's underlying type.
- *
- * Retrieve a numeric constant that specifies the type stored in a
- * property.  This function is meant to help with serialization.
- */
-
-TRACKTABLE_CORE_EXPORT PropertyUnderlyingType property_underlying_type(PropertyValueT const& value);
 
 /*! \brief Add a value to the map.
  *
@@ -240,63 +144,14 @@ TRACKTABLE_CORE_EXPORT PropertyValueT property_with_default(PropertyMap const& p
 TRACKTABLE_CORE_EXPORT double real_property_with_default(PropertyMap const& properties, string_type const& name, double default_value);
 TRACKTABLE_CORE_EXPORT string_type string_property_with_default(PropertyMap const& properties, string_type const& name, string_type const& default_value);
 TRACKTABLE_CORE_EXPORT Timestamp timestamp_property_with_default(PropertyMap const& properties, string_type const& name, Timestamp const& default_value);
-TRACKTABLE_CORE_EXPORT int64_t integer_property_with_default(PropertyMap const& properties, string_type const& name, int64_t default_value);
 
 TRACKTABLE_CORE_EXPORT string_type property_map_to_string(PropertyMap const& properties);
 
-
-/*! \brief Utility method: convert a string to a PropertyUnderlyingType.
- */
-
-template<typename text_type>
-PropertyUnderlyingType string_to_property_type(text_type const& input)
-{
-  int i_property_type = boost::lexical_cast<int>(input);
-  return static_cast<PropertyUnderlyingType>(i_property_type);
-}
-
-/*! \brief Utility method: convert a source type (usually a string) to a PropertyValueT.
- *
- */
-
-template<typename source_type>
-PropertyValueT to_property_variant(source_type const& source, PropertyUnderlyingType thing_type)
-{
-  try
-    {
-    switch (thing_type)
-      {
-      case TYPE_STRING:
-        return PropertyValueT(boost::lexical_cast<string_type>(source));
-      case TYPE_REAL:
-        return PropertyValueT(boost::lexical_cast<double>(source));
-      case TYPE_TIMESTAMP:
-        return PropertyValueT(time_from_string(boost::lexical_cast<string_type>(source)));
-      case TYPE_INTEGER:
-        return PropertyValueT(boost::lexical_cast<int64_t>(source));
-      case TYPE_NULL:
-      case TYPE_UNKNOWN:
-        return PropertyValueT();
-      }
-    }
-  catch (boost::bad_lexical_cast&)
-    {
-    return make_null(thing_type);
-    }
-}
 
 
 } // exit namespace tracktable
 
 namespace tracktable { namespace algorithms {
-
-TRACKTABLE_CORE_EXPORT PropertyValueT interpolate_property(PropertyValueT const& left,
-                                                           PropertyValueT const& right,
-                                                           double t);
-TRACKTABLE_CORE_EXPORT PropertyValueT extrapolate_property(PropertyValueT const& left,
-    PropertyValueT const& right,
-    double t);
-
 
 /*! \brief Interpolate between two property maps.
  *
@@ -403,5 +258,6 @@ struct extrapolate<PropertyMap>
 };
 
 } } // exit namespace tracktable::algorithms
+
 
 #endif
