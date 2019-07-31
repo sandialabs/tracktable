@@ -4,3 +4,5 @@
 *.so
 Documentation/conf.py
 Documentation/Makefile
+.ipnyb_checkpoints
+__pycache__
