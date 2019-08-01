@@ -461,7 +461,7 @@ def point_at_length_fraction(trajectory, fraction):
 
     """
 
-    return _point_at_length_fraction(trajectory, fraction)	
+    return _point_at_length_fraction(trajectory, fraction)
 
 # ----------------------------------------------------------------------
 
@@ -624,7 +624,7 @@ def compute_bounding_box(point_sequence, buffer=()):
     same type. It can also produce a buffer of space that extends the
     bounding box some percentage beyond the min and max points. The
     implementation is fairly naive and can cause issues if the values
-    extend past max values for the point/map type. 
+    extend past max values for the point/map type.
 
     Args:
       point_sequence: Iterable of points
@@ -643,7 +643,7 @@ def compute_bounding_box(point_sequence, buffer=()):
     bbox_type = None
 
     num_points = 0
-    
+
     for point in point_sequence:
         num_points += 1
         if bbox_type is None:
@@ -659,7 +659,7 @@ def compute_bounding_box(point_sequence, buffer=()):
             for i in range(len(point)):
                 min_corner[i] = min(min_corner[i], point[i])
                 max_corner[i] = max(max_corner[i], point[i])
-    
+
     if len(buffer) == 2:
         horiz_buff = (max_corner[0] - min_corner[0]) * buffer[0]
         vert_buff = (max_corner[1] - min_corner[1]) * buffer[1]
@@ -670,7 +670,7 @@ def compute_bounding_box(point_sequence, buffer=()):
     elif len(buffer) != 0:
         print("ERROR: buffer requires exactly 0 or 2 values")
         return None
-        
+
     if num_points == 0:
         print("ERROR: Cannot compute bounding box.  No points provided.")
         return None
@@ -695,7 +695,7 @@ def recompute_speed(trajectory, target_attribute_name="speed"):
 
     Args:
       trajectory: Any Tracktable trajectory
-      target_attribute_name: Speed will be stored in this property at 
+      target_attribute_name: Speed will be stored in this property at
           each point.  Defaults to 'speed'.
 
     The trajectory will be modified in place instead of returning a
@@ -855,10 +855,10 @@ def radius_of_gyration(trajectory):
     """Compute the radius of gyration of a trajectory
 
     Radius of gyration is an indication of the compactness of a trajectory.
-    Technically the result is in radians from the center of mass of 
+    Technically the result is in radians from the center of mass of
     the trajectory. The units of the radius is dependent on the type
-    of trajectory being measured. Terrestrial will return km, while 
-    Cartesian2D returns radians. 
+    of trajectory being measured. Terrestrial will return km, while
+    Cartesian2D returns radians.
 
     Args:
       trajectory: Trajectory whose shape you want to measure
@@ -902,4 +902,3 @@ def longitude_degree_size(latitude):
     return 111.32 * math.cos(d2r(math.fabs(latitude)))
 
 # ----------------------------------------------------------------------
-
