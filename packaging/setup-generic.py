@@ -192,9 +192,8 @@ def main():
     ]
 
     dependencies = [
-        'basemap',
+        'cartopy',
         'matplotlib',
-        'pyshp',
         'pytz',
         'six'
     ]
