@@ -31,7 +31,7 @@
 from __future__ import print_function, division, absolute_import
 
 try:
-  from . import _core_types
+  from tracktable.lib import _core_types
 except ImportError:
   print("Error importing core types.  Path information follows.")
   import os

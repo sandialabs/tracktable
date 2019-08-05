@@ -99,6 +99,16 @@ public:
     return *(this->Stream);
   }
 
+  bool operator==(LineReader const& other)
+  {
+    return (this->Stream == other.Stream);
+  }
+
+  bool operator!=(LineReader const& other)
+  {
+    return !(*this == other);
+  }
+
 private:
   istream_type* Stream;
 
