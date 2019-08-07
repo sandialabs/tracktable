@@ -33,8 +33,11 @@ def draw_largest_cities(map_axes,
        A list of artists added to the map
     """
 
-    map_bbox_lowerleft = map_axes.viewLim[0]
-    map_bbox_upperright = map_axes.viewLim[1]
+#    map_extent = map_axes.get_extent(map_axes.tracktable_projection)
+    map_extent = map_axes.get_extent()
+    map_bbox_lowerleft = (map_extent[0], map_extent[2])
+    map_bbox_upperright = (map_extent[1], map_extent[3])
+
     _ensure_cities_loaded()
     all_cities = cities.cities_in_bbox(map_bbox_lowerleft, map_bbox_upperright)
 
@@ -80,8 +83,11 @@ def draw_cities_larger_than(map_axes,
 
     """
 
-    map_bbox_lowerleft = map_axes.viewLim[0]
-    map_bbox_upperright = map_axes.viewLim[1]
+    map_extent = map_axes.get_extent()
+    map_bbox_lowerleft = (map_extent[0], map_extent[2])
+    map_bbox_upperright = (map_extent[1], map_extent[3])
+#    map_bbox_lowerleft = map_axes.viewLim[0]
+#    map_bbox_upperright = map_axes.viewLim[1]
     _ensure_cities_loaded()
     all_cities = cities.cities_in_bbox(map_bbox_lowerleft, map_bbox_upperright)
 
@@ -152,7 +158,6 @@ def draw_countries(map_axes,
                    resolution='10m',
                    **kwargs):
 
-    print("DEBUG: draw_countries")
     country_borders = cartopy.feature.NaturalEarthFeature(
         'cultural',
         'admin_0_boundary_lines_land',
@@ -178,7 +183,6 @@ def draw_states(map_axes,
                 edgecolor='#A0A0A0',
                 **kwargs):
 
-    print("DEBUG: draw_states")
     return [map_axes.add_feature(
         cartopy.feature.STATES.with_scale(resolution),
         linewidth=linewidth,
@@ -336,7 +340,6 @@ def draw_lonlat(map_axes,
                 linewidth=0.25,
                 color='#C0C0C0'):
 
-    print("DEBUG: draw_lonlat")
     artist = map_axes.gridlines(
         color=color,
         linewidth=linewidth,
