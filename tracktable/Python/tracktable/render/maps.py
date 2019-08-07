@@ -43,6 +43,7 @@
 from __future__ import print_function, division, absolute_import
 
 import cartopy
+import cartopy.crs
 
 from tracktable.core import geomath
 
@@ -90,13 +91,13 @@ CONVENIENCE_MAPS = {
 def _ensure_airports_loaded():
     global airports
     if airports is None:
-        from ..info import airports
+        from tracktable.info import airports
 
 
 def _ensure_cities_loaded():
     global cities
     if cities is None:
-        from ..info import cities
+        from tracktable.info import cities
 
 # ----------------------------------------------------------------------
 
@@ -227,6 +228,10 @@ def instantiate_map(min_corner,
 
     if projection is None:
         projection = cartopy.crs.Miller
+    else:
+        projection = getattr(cartopy.crs, projection)
+        
+    print("DEBUG: Map projection is {}, type {}".format(projection, type(projection)))
 
     axes = plt.axes(projection=projection())
     if min_corner is not None and max_corner is not None:
@@ -239,6 +244,7 @@ def instantiate_map(min_corner,
 
     print("DEBUG: map successfully instantiated")
     print("DEBUG: axes are {}".format(axes))
+    axes.tracktable_projection = projection
     return axes
 
 
@@ -281,17 +287,17 @@ def predefined_map(mapname,
     if region_size is None:
         region_size = (200, 200)
         
-    mapname_lower = mapname.lower()
-    if mapname_lower.startswith('airport:'):
-        airport_id = mapname_lower.split(':')[1]
+    mapname_upper = mapname.upper()
+    if mapname_upper.startswith('AIRPORT:'):
+        airport_id = mapname_upper.split(':')[1]
         return airport_map(airport_id, region_size, projection=projection)
 
-    elif mapname_lower.startswith('city:'):
-        city_name = mapname_lower.split(':')[1]
+    elif mapname_upper.startswith('CITY:'):
+        city_name = mapname_upper.split(':')[1]
         return city_map(city_name, region_size, projection=projection)
 
-    elif mapname_lower.startswith('region:'):
-        region_name = mapname_lower.split(':')[1]
+    elif mapname_upper.startswith('REGION:'):
+        region_name = mapname_upper.split(':')[1]
         return region_map(region_name, projection=projection)
 
     else:
@@ -332,7 +338,10 @@ def region_map(region_name,
     params = CONVENIENCE_MAPS[region_name]
 
     if projection is None:
-        projection = cartopy.crs.Miller
+        projection = getattr(cartopy.crs, projection)
+#        projection = cartopy.crs.Miller
+
+    print("DEBUG: region_map: projection is {}".format(projection))
 
     map_axes = instantiate_map(
         min_corner=params['min_corner'],
