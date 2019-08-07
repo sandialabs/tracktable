@@ -364,13 +364,14 @@ def draw_traffic(traffic_map,
             local_x_world[i] = trajectory[i][0]
             local_y_world[i] = trajectory[i][1]
 
-        (local_x, local_y) = traffic_map(local_x_world, local_y_world)
+            # Basemap-ism.  Cartopy now does this on its own.
+            #        (local_x, local_y) = traffic_map(local_x_world, local_y_world)
 
         # Now we turn that list of n points into a list of n-1 line
         # segments.  We shouldn't have any degenerate segments because
         # of the call to remove_duplicate_points() earlier.
 
-        local_segments = points_to_segments(zip(local_x, local_y), maximum_distance=max_segment_length)
+        local_segments = points_to_segments(zip(local_x_world, local_y_world), maximum_distance=max_segment_length)
 
         if len(local_segments) > 0:
             # Save the line segments, linewidths, scalars for the
@@ -436,7 +437,7 @@ def draw_traffic(traffic_map,
         current_batch_paths = []
 
     if len(lead_point_x_world) > 0:
-        lead_point_x, lead_point_y = traffic_map(lead_point_x_world, lead_point_y_world)
+#        lead_point_x, lead_point_y = traffic_map(lead_point_x_world, lead_point_y_world)
         if dot_size:
             if zorder:
                 dot_zorder = zorder+1
@@ -449,7 +450,7 @@ def draw_traffic(traffic_map,
             else:
                 dot_color_kwargs = { 'c': dot_color }
 
-            dot_collection = traffic_map.scatter(lead_point_x, lead_point_y,
+            dot_collection = traffic_map.scatter(lead_point_x_world, lead_point_y_world,
                                                  s=dot_size,
                                                  linewidth=0,
                                                  marker='o',
@@ -458,7 +459,7 @@ def draw_traffic(traffic_map,
             all_artists.append(dot_collection)
 
         if label_objects:
-            for (x, y, label) in zip(lead_point_x, lead_point_y, lead_point_labels):
+            for (x, y, label) in zip(lead_point_x_world, lead_point_y_world, lead_point_labels):
                 all_artists.append(axes.text(x, y, label, **label_kwargs))
 
 #    print("DEBUG: draw_traffic: {} trajectories examined and {} rendered".format(
