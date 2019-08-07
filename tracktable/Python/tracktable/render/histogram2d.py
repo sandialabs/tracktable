@@ -46,8 +46,6 @@ import string
 import pdb
 from six.moves import range
 
-from mpl_toolkits.basemap import Basemap
-
 def render_histogram(map_projection,
                      point_source,
                      bounding_box,
