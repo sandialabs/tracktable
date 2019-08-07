@@ -100,7 +100,9 @@ from __future__ import print_function
 # else so that we can be sure that no other package can initialize
 # Matplotlib to default to a window system.
 import matplotlib
-matplotlib.use('Agg')
+
+if __name__ == '__main__':
+    matplotlib.use('Agg')
 
 
 import csv
@@ -213,6 +215,31 @@ def render_trajectories(basemap,
                                                      trajectory_source,
                                                      **render_args)
 
+def initialize_matplotlib_figure(figure_size_in_inches,
+                                 axis_span=[0, 0, 1, 1],
+                                 facecolor='black',
+                                 edgecolor='black'):
+    """Initialize a figure for Matplotlib to draw into.
+
+    Args:
+       figure_size_in_inches: 2-tuple of floats (width, height)
+       axis_span: list of 4 floats (left, bottom, width, height) with size of axes in figure.
+           Quantities are in fractions of figure width and height.
+       facecolor: string (default 'black') - what's the background color of the plot?
+       edgecolor: string (default 'black') - color of edge aroudn the figure
+
+    Returns:
+       (figure, axes) - both Matplotlib data structures
+    """
+
+    figure = pyplot.figure(figsize=figure_size_in_inches,
+                           facecolor='black',
+                           edgecolor='black')
+    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor='black')
+    axes.set_frame_on(False)
+
+    return (figure, axes)
+
 # ----------------------------------------------------------------------
 
 def main():
@@ -225,10 +252,7 @@ def main():
     figure_dimensions = [ float(image_resolution[0]) / dpi, float(image_resolution[1]) / dpi ]
 
     print("STATUS: Initializing canvas")
-    figure = pyplot.figure(figsize=figure_dimensions, facecolor='black', edgecolor='black')
-
-    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor='black')
-    axes.set_frame_on(False)
+    (figure, axes) = initialize_matplotlib_figure(figure_dimensions)
 
     print("STATUS: Initializing point source")
     point_source = setup_point_source(args.point_data_file[0], args)
