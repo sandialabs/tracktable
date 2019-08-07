@@ -164,7 +164,7 @@ def airport_map(airport_id,
 
     airport_location = airport_info.position
 
-    latitude_span = height / geomath.latitude_degree_km(airport_location[1])
+    latitude_span = height / geomath.latitude_degree_size(airport_location[1])
 
     bottom_latitude = airport_location[1] - latitude_span / 2
     top_latitude = airport_location[1] + latitude_span / 2
@@ -176,10 +176,10 @@ def airport_map(airport_id,
         bottom_latitude = -180 - bottom_latitude
 
     longitude_width_at_top = max(
-        geomath.longitude_degree_km(top_latitude), 1
+        geomath.longitude_degree_size(top_latitude), 1
         )
     longitude_width_at_bottom = max(
-        geomath.longitude_degree_km(bottom_latitude), 1
+        geomath.longitude_degree_size(bottom_latitude), 1
         )
 
     # This could go wrong at very high latitudes but seems OK for now
