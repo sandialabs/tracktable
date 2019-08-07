@@ -227,7 +227,7 @@ def instantiate_map(min_corner,
 
     if projection is None:
         projection = cartopy.crs.Miller
-    else:
+    elif isinstance(projection, str):
         projection = getattr(cartopy.crs, projection)
         
     print("DEBUG: Map projection is {}, type {}".format(projection, type(projection)))
@@ -337,8 +337,8 @@ def region_map(region_name,
     params = CONVENIENCE_MAPS[region_name]
 
     if projection is None:
-        projection = getattr(cartopy.crs, projection)
-#        projection = cartopy.crs.Miller
+        projection = cartopy.crs.Miller
+
 
     print("DEBUG: region_map: projection is {}".format(projection))
 
