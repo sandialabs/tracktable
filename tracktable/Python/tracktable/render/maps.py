@@ -288,15 +288,15 @@ def predefined_map(mapname,
         
     mapname_upper = mapname.upper()
     if mapname_upper.startswith('AIRPORT:'):
-        airport_id = mapname_upper.split(':')[1]
+        airport_id = mapname.split(':')[1].upper()
         return airport_map(airport_id, region_size, projection=projection)
 
     elif mapname_upper.startswith('CITY:'):
-        city_name = mapname_upper.split(':')[1]
+        city_name = mapname.split(':')[1]
         return city_map(city_name, region_size, projection=projection)
 
     elif mapname_upper.startswith('REGION:'):
-        region_name = mapname_upper.split(':')[1]
+        region_name = mapname.split(':')[1]
         return region_map(region_name, projection=projection)
 
     else:
