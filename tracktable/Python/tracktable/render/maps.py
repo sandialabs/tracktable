@@ -91,13 +91,21 @@ CONVENIENCE_MAPS = {
 def _ensure_airports_loaded():
     global airports
     if airports is None:
+<<<<<<< HEAD
         from tracktable.info import airports
+=======
+        from ..info import airports
+>>>>>>> 6e1db84949e31bea8fca44025a573de986b76620
 
 
 def _ensure_cities_loaded():
     global cities
     if cities is None:
+<<<<<<< HEAD
         from tracktable.info import cities
+=======
+        from ..info import cities
+>>>>>>> 6e1db84949e31bea8fca44025a573de986b76620
 
 # ----------------------------------------------------------------------
 
