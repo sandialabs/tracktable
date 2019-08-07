@@ -225,7 +225,9 @@ def instantiate_map(min_corner,
 
     """
 
-    if type(projection) == str:
+    if projection is None:
+        projection = cartopy.crs.Miller
+    elif isinstance(projection, str):
         projection = getattr(cartopy.crs, projection)
     elif projection is None:
         projection = cartopy.crs.Miller
