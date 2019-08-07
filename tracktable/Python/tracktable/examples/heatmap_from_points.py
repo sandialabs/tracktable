@@ -105,7 +105,6 @@ from tracktable.domain.cartesian2d import BoundingBox as BoundingBox2D
 from tracktable.examples import example_point_reader
 
 from matplotlib import pyplot
-from mpl_toolkits.basemap import Basemap
 
 
 # ----------------------------------------------------------------------
