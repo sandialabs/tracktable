@@ -870,7 +870,8 @@ def radius_of_gyration(trajectory):
 
     return _radius_of_gyration(trajectory)
 
-<<<<<<< HEAD
+# ----------------------------------------------------------------------
+
 def convex_hull_centroid(trajectory):
     """Compute the centroid of the convex hull of a trajectory
  
@@ -881,6 +882,7 @@ def convex_hull_centroid(trajectory):
     
     return _convex_hull_centroid(trajectory)
 
+# ----------------------------------------------------------------------
 
 def latitude_degree_size(latitude):
     """
