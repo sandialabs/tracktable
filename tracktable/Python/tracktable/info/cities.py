@@ -183,8 +183,10 @@ def largest_cities_in_bbox(bbox_min=(-180, -90),
       A list of CityInfo objects.
     """
 
-    all_cities = cities_in_bbox(bbox_lowerleft, bbox_upperright)
-    sorted_cities = sorted(all_cities, key=lambda city: city.population, reverse=True)
+    all_cities = cities_in_bbox(bbox_min, bbox_max)
+    sorted_cities = sorted(all_cities, 
+                           key=lambda city: city.population, 
+                           reverse=True)
     return sorted_cities[0:count]
 
 
