@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -27,75 +27,14 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+"""Tracktable Trajectory Library - Compiled extensions and external libraries
 
-# This is tracktable/Domain/CMakeLists.txt
+All compiled C++ extensions and their necessary libraries will go in
+this directory... and NOTHING ELSE.
 
-find_package( Boost REQUIRED )
-include(GenerateExportHeader)
+You should never need to import the contents of this directory
+yourself.  They will be pulled in automatically from other modules
+when necessary.
+"""
 
-include_directories(
-  ${PROJECT_SOURCE_DIR}
-  ${PROJECT_BINARY_DIR}
-  ${Boost_INCLUDE_DIR}
-)
-
-if (BUILD_TESTING)
-   add_subdirectory(Tests)
-endif (BUILD_TESTING)
-
-
-set( Domain_SRCS
-  PrintFunctions.cpp
-)
-
-set( Domain_HEADERS
-  Cartesian2D.h
-  Cartesian3D.h
-  DomainMacros.h
-  FeatureVectors.h
-  Terrestrial.h
-)
-
-add_library( TracktableDomain
-  ${Domain_SRCS}
-  ${Domain_HEADERS}
-)
-
-target_link_libraries( TracktableDomain
-  TracktableCore
-)
-
-set_property(
-  TARGET TracktableDomain
-  PROPERTY SOVERSION ${Tracktable_VERSION}
-  )
-
-set_property(
-  TARGET TracktableDomain
-  PROPERTY VERSION ${Tracktable_VERSION}
-  )
-
-generate_export_header( TracktableDomain
-   BASE_NAME TRACKTABLE_DOMAIN
-   EXPORT_MACRO_NAME TRACKTABLE_DOMAIN_EXPORT
-   STATIC_DEFINE TRACKTABLE_DOMAIN_STATIC_LIBRARY
-   EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/tracktable/Domain/TracktableDomainWindowsHeader.h
-   )
-
-
-install(
-  TARGETS TracktableDomain
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
-)
-
-install(
-  FILES ${Domain_HEADERS}
-  DESTINATION include/tracktable/Domain
-)
-
-install(
-  FILES ${PROJECT_BINARY_DIR}/tracktable/Domain/TracktableDomainWindowsHeader.h
-  DESTINATION include/tracktable/Domain
-  )
+### TODO: add current directory to Windows path
