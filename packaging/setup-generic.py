@@ -101,6 +101,7 @@ def find_metadata_property(text, property_name):
 
 def main():
     here = os.getcwd()
+    print(here)
     tracktable_home = os.path.join(here, 'Python', 'tracktable')
     init_filename = os.path.join(tracktable_home, '__init__.py')
 
@@ -151,6 +152,7 @@ def main():
         os.path.join(here, 'Python', 'tracktable', '*', 
                      '*.{}'.format(extension_suffix))
         )
+        
 
     support_libraries = []
     # On Windows we will also want to pick up support DLLs.
@@ -161,6 +163,18 @@ def main():
                              '*.{}'.format(shared_library_suffix))
                 )
             )
+    # TODO: Use editbin.exe to get dependencies of pyd files on windows instead of using this behavior
+    # This will work but has the potential to include more than it needs to. Also, has to be 
+    # maintained as dependencies change.
+    if system == 'Windows':
+        for dir in os.environ['Path'].split(';'):
+            support_libraries.extend(glob.glob(dir + '/Tracktable*.'+ shared_library_suffix))
+            support_libraries.extend(glob.glob(dir + '/boost_date_time*.'+ shared_library_suffix))
+            support_libraries.extend(glob.glob(dir + '/boost_python*.'+ shared_library_suffix))
+            support_libraries.extend(glob.glob(dir + '/boost_regex*.'+ shared_library_suffix))
+        
+    print(support_libraries)
+    print(binary_extensions)
         
     license_files = [ os.path.join(tracktable_home, 'LICENSE.txt') ]
     
@@ -219,7 +233,8 @@ def main():
         packages=tracktable_contents,
         package_data={ 'tracktable': 
                        binary_extensions + support_libraries + license_files },
-
+        # TODO: Make sure using datafiles doesnt eff up osx and linux builds
+        data_files=[("lib", support_libraries)],
         # Assembly information and system parameters
         distclass=BinaryDistribution,
         zip_safe=False,

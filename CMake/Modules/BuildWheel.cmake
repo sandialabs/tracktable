@@ -162,8 +162,10 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
 
   if (NOT ${_wheel_build_result} EQUAL 0)
     message(ERROR "Error while building wheel: ${_wheel_build_result}")
-  else ()
+  elseif (NOT WIN32)
     message(STATUS "Wheel build succeeded.  Now you might need to run delocate/auditwheel.")
+  else ()
+    message(STATUS "Wheel build succeeded.")
   endif ()
 
   message(STATUS "Globbing pattern ${_output_directory}/tracktable-*-${_implementation_version}-none-${_platform}.whl")
@@ -172,44 +174,46 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
     ${_output_directory}/tracktable-*-${_implementation_version}-none-${_platform}.whl
     LIST_DIRECTORIES false
     )
+    
+  if (NOT WIN32)
+    # Auditwheel and fixwheel need slightly different arguments.
+    string(FIND ${_fixwheel} "auditwheel" _fixwheel_is_auditwheel)
+    if (NOT ${_fixwheel_is_auditwheel} EQUAL -1)
+      set(_using_auditwheel 1)
+    else ()
+      set(_using_auditwheel 0)
+    endif()
 
-  # Auditwheel and fixwheel need slightly different arguments.
-  string(FIND ${_fixwheel} "auditwheel" _fixwheel_is_auditwheel)
-  if (NOT ${_fixwheel_is_auditwheel} EQUAL -1)
-    set(_using_auditwheel 1)
-  else ()
-    set(_using_auditwheel 0)
-  endif()
+    # We don't know what the exact filename is going to be.  It depends
+    # on information scattered in several different locations.  Let's
+    # just fix them all.
 
-  # We don't know what the exact filename is going to be.  It depends
-  # on information scattered in several different locations.  Let's
-  # just fix them all.
-
-  foreach(_wheel_to_fix ${_wheel_files})
-    message(STATUS "Adding external libraries to ${_wheel_to_fix}.")
-    if (_using_auditwheel)
-      execute_process(
-        COMMAND
-#        ${_fixwheel} repair --plat manylinux2010_x86_64 ${_wheel_to_fix}
-        ${_fixwheel} repair ${_wheel_to_fix}
-        RESULT_VARIABLE _fixwheel_result
-        WORKING_DIRECTORY ${_output_directory}
+    foreach(_wheel_to_fix ${_wheel_files})
+      message(STATUS "Adding external libraries to ${_wheel_to_fix}.")
+      if (_using_auditwheel)
+        execute_process(
+          COMMAND
+#          ${_fixwheel} repair --plat manylinux2010_x86_64 ${_wheel_to_fix}
+          ${_fixwheel} repair ${_wheel_to_fix}
+          RESULT_VARIABLE _fixwheel_result
+          WORKING_DIRECTORY ${_output_directory}
+          )
+      else (_using_auditwheel)
+        execute_process(
+          COMMAND
+          ${_fixwheel} ${_wheel_to_fix}
+          RESULT_VARIABLE _fixwheel_result
+          WORKING_DIRECTORY ${_output_directory}
         )
-    else (_using_auditwheel)
-      execute_process(
-        COMMAND
-        ${_fixwheel} ${_wheel_to_fix}
-        RESULT_VARIABLE _fixwheel_result
-        WORKING_DIRECTORY ${_output_directory}
-        )
-    endif (_using_auditwheel)
+      endif (_using_auditwheel)
 
-    if (NOT ${_fixwheel_result} EQUAL 0)
-      message(SEND_ERROR "Error while adding external libraries to wheel: ${_fixwheel_result}")
-      return()
-    endif ()
-  endforeach ()
-
+      if (NOT ${_fixwheel_result} EQUAL 0)
+        message(SEND_ERROR "Error while adding external libraries to wheel: ${_fixwheel_result}")
+        return()
+      endif ()
+    endforeach ()
+  endif ()
+    
   if (APPLE)
     message(STATUS "INFO: You probably just saw a lot of warnings about being unable to find libc++, libicudata, and libicui18n, among others.  It is safe to ignore those warnings.")
   endif (APPLE)
