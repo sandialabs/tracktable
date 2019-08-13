@@ -91,7 +91,9 @@ from __future__ import print_function
 # else so that we can be sure that no other package can initialize
 # Matplotlib to default to a window system.
 import matplotlib
-matplotlib.use('Agg')
+if __name__ == '__main__':
+    print("STATUS: Matplotlib will use Agg backend.")
+    matplotlib.use('Agg')
 
 import numpy
 import pprint
@@ -161,7 +163,7 @@ def parse_args():
 def render_histogram(mymap,
                      domain,
                      point_source,
-                     bounding_box,
+                     bounding_box=None,
                      bin_size=2,
                      color_map='gist_gray',
                      scale_type='linear',
