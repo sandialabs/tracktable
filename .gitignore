@@ -7,3 +7,5 @@ Documentation/Makefile
 .ipnyb_checkpoints
 *-checkpoint.ipynb
 __pycache__
+*.project
+*.pydevproject
