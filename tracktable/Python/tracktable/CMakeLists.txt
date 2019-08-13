@@ -48,6 +48,13 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}
 )
 
+
+file(GLOB analysis_files "analysis/*.py")
+install(
+  FILES ${analysis_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/analysis
+)
+
 file(GLOB core_files "core/*.py")
 install(
   FILES ${core_files}
