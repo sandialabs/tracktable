@@ -67,6 +67,8 @@ def configure_point_reader(infile, **kwargs):
     'my_point.properties["prop_name"]'.
     
   """
+  
+  # Set domain as terrestrial or cartesian2d
   domain = kwargs['domain']
   if domain.lower() not in ALL_DOMAINS:
     raise KeyError("Domain '{}' is not in list of installed domains ({}).".format(domain, ', '.join(ALL_DOMAINS)))
@@ -74,6 +76,7 @@ def configure_point_reader(infile, **kwargs):
     domain_to_import = 'tracktable.domain.{}'.format(domain.lower())
     domain_module = importlib.import_module(domain_to_import)
   
+  # Create a default reader and give it the required arguments
   reader = domain_module.TrajectoryPointReader()
   reader.input = infile
   reader.comment_character = kwargs['comment_character']
@@ -89,17 +92,19 @@ def configure_point_reader(infile, **kwargs):
     reader.coordinates[1] = int(kwargs['coordinate1'])
   if kwargs['coordinate2'] is not None:
     reader.coordinates[2] = int(kwargs['coordinate2'])
-  if (kwargs['string_field_column'] is not None and
+  
+  # Additional optional columns for altitude, airline, and other information.  
+  if ('string_field_name' in kwargs.keys() and kwargs['string_field_column'] is not None and
     len(kwargs['string_field_column']) > 0):
     for (field, column) in group(kwargs['string_field_column'], 2):
       reader.string_fields[field] = column
 
-  if (kwargs['time_field_column'] is not None and
+  if ('time_field_name' in kwargs.keys() and kwargs['time_field_column'] is not None and
     len(kwargs['time_field_column']) > 0):
     for (field, column) in group(kwargs['time_field_column'], 2):
       reader.time_fields[field] = column
 
-  if (kwargs['numeric_field_column'] is not None and
+  if ('numeric_field_name' in kwargs.keys() and kwargs['numeric_field_column'] is not None and
     len(kwargs['numeric_field_column']) > 0):
     for (field, column) in group(kwargs['numeric_field_column'], 2):
       reader.numeric_fields[field] = column
