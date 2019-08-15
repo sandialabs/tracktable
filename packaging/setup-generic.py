@@ -43,6 +43,7 @@ import sys
 
 from setuptools import setup, find_packages
 from setuptools.dist import Distribution
+import winlocate
 
 class BinaryDistribution(Distribution):
     def is_pure(self):
@@ -167,14 +168,13 @@ def main():
     # This will work but has the potential to include more than it needs to. Also, has to be 
     # maintained as dependencies change.
     if system == 'Windows':
-        for dir in os.environ['Path'].split(';'):
-            support_libraries.extend(glob.glob(dir + '/Tracktable*.'+ shared_library_suffix))
-            support_libraries.extend(glob.glob(dir + '/boost_date_time*.'+ shared_library_suffix))
-            support_libraries.extend(glob.glob(dir + '/boost_python*.'+ shared_library_suffix))
-            support_libraries.extend(glob.glob(dir + '/boost_regex*.'+ shared_library_suffix))
-        
-    print(support_libraries)
-    print(binary_extensions)
+        dlls = winlocate.locate_dir(tracktable_home+"\\lib", extension_suffix)
+        for file in dlls:
+            for dir in os.environ['Path'].split(';'):
+                found_depends = glob.glob(dir + "\\" + file)
+                if len(found_depends) > 0:
+                    support_libraries.extend(found_depends)
+                    break
         
     license_files = [ os.path.join(tracktable_home, 'LICENSE.txt') ]
     
@@ -234,7 +234,7 @@ def main():
         package_data={ 'tracktable': 
                        binary_extensions + support_libraries + license_files },
         # TODO: Make sure using datafiles doesnt eff up osx and linux builds
-        data_files=[("lib", support_libraries)],
+        data_files=[("", support_libraries)],
         # Assembly information and system parameters
         distclass=BinaryDistribution,
         zip_safe=False,
