@@ -132,9 +132,9 @@ def generate_trajectory_from_endpoints(
 
 def assign_random_properties(target, howmany):
     for property_index in range(howmany):
-        if (property_index % 4 == 0):
+        if (property_index % 3 == 0):
             add_real_property(target, property_index, random.randint(1, 1000))
-        elif (property_index % 4 == 1):
+        elif (property_index % 3 == 1):
             add_string_property(target, property_index, random.randint(1, 1000))
         # elif (property_index % 4 == 2):
         #     add_integer_property(target, property_index, random.randint(1, 1000))
