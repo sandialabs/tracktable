@@ -31,13 +31,12 @@ We want to make it easy to...
 
 * Have fun!
 
-Tracktable version 1.1.0 is an incremental update with minor performance
-improvements and feature additions.  Best efforts have been made to
-ensure compatability with multiple environments but it is possible that
-problems can arise with some combinations of supporting packages/software.
-If you come across any noteworthy problems, please tell us about them so
-that we can improve Tracktable in the future!
+Tracktable version 1.1 is a milestone release.  It is the last version
+that will use the ```basemap``` geospatial rendering library.  It is
+also the last version that will support Python 2.7.
 
+If you come across problems, please tell us about them so that we can
+improve Tracktable in the future!
 
 Documentation
 =============
