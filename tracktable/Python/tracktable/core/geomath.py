@@ -40,7 +40,6 @@ from six.moves import range
 import math
 import sys
 
-
 from tracktable.lib._domain_algorithm_overloads import distance as _distance
 from tracktable.lib._domain_algorithm_overloads import bearing as _bearing
 from tracktable.lib._domain_algorithm_overloads import interpolate as _interpolate
