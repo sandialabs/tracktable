@@ -29,16 +29,16 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-from ._cartesian2d import BasePointCartesian2D as BasePoint
-from ._cartesian2d import TrajectoryPointCartesian2D as TrajectoryPoint
-from ._cartesian2d import TrajectoryCartesian2D as Trajectory
-from ._cartesian2d import BasePointReaderCartesian2D as BasePointReader
-from ._cartesian2d import TrajectoryPointReaderCartesian2D as TrajectoryPointReader
-from ._cartesian2d import BoundingBoxCartesian2D as BoundingBox
-from ._cartesian2d import TrajectoryReaderCartesian2D as TrajectoryReader
-from ._cartesian2d import BasePointWriterCartesian2D as BasePointWriter
-from ._cartesian2d import TrajectoryPointWriterCartesian2D as TrajectoryPointWriter
-from ._cartesian2d import TrajectoryWriterCartesian2D as TrajectoryWriter
+from tracktable.lib._cartesian2d import BasePointCartesian2D as BasePoint
+from tracktable.lib._cartesian2d import TrajectoryPointCartesian2D as TrajectoryPoint
+from tracktable.lib._cartesian2d import TrajectoryCartesian2D as Trajectory
+from tracktable.lib._cartesian2d import BasePointReaderCartesian2D as BasePointReader
+from tracktable.lib._cartesian2d import TrajectoryPointReaderCartesian2D as TrajectoryPointReader
+from tracktable.lib._cartesian2d import BoundingBoxCartesian2D as BoundingBox
+from tracktable.lib._cartesian2d import TrajectoryReaderCartesian2D as TrajectoryReader
+from tracktable.lib._cartesian2d import BasePointWriterCartesian2D as BasePointWriter
+from tracktable.lib._cartesian2d import TrajectoryPointWriterCartesian2D as TrajectoryPointWriter
+from tracktable.lib._cartesian2d import TrajectoryWriterCartesian2D as TrajectoryWriter
 
 DIMENSION = 2
 
