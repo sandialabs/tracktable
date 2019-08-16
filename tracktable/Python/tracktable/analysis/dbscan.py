@@ -31,7 +31,7 @@
 
 from __future__ import division, absolute_import, print_function
 
-from . import _dbscan_clustering
+from tracktable.lib import _dbscan_clustering
 
 from tracktable.domain.feature_vectors import convert_to_feature_vector
 
