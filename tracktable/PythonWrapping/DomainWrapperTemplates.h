@@ -311,6 +311,7 @@ class trajectory_point_methods : public boost::python::def_visitor<trajectory_po
       c
         .add_property("object_id", &wrapped_type::object_id, &wrapped_type::set_object_id)
         .add_property("timestamp", &wrapped_type::timestamp, &wrapped_type::set_timestamp)
+        .add_property("current_length", &wrapped_type::current_length)
         .def(self == self)
         .def(self != self)
         ;

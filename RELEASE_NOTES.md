@@ -1,5 +1,16 @@
 Tracktable Release Notes
 
+VERSION 1.1.1, August 2019
+==========================
+
+This version includes two bugfixes since 1.1.0:
+
+* The Python module ```tracktable.analysis``` was not being installed
+  during ```make install```.
+  
+* The ```current_length``` property was not exposed on TrajectoryPoint
+  instances.
+
 VERSION 1.1.0, May 2019
 =======================
 
