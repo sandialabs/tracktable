@@ -184,8 +184,9 @@ def render_histogram(mymap,
         # Deduce bounding box from map.  Whatever the user requested
         # has already been figured out there.
         from tracktable.domain.terrestrial import BasePoint, BoundingBox
-        min_corner = BasePoint(mymap.llcrnrlon, mymap.llcrnrlat)
-        max_corner = BasePoint(mymap.urcrnrlon, mymap.urcrnrlat)
+        extent = mymap.get_extent()
+        min_corner = BasePoint(extent[0], extent[2])
+        max_corner = BasePoint(extent[1], extent[3])
         bounding_box = BoundingBox(min_corner, max_corner)
 
         return histogram2d.render_histogram(map_projection=mymap,
