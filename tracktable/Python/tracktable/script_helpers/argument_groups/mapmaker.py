@@ -152,7 +152,7 @@ def install_group():
                  help="Point domain for your data.  This should be 'terrestrial' if your points are in longitude/latitude format or 'cartesian' if your points are in regular 2D space.")
 
     add_argument("mapmaker", [ "--map" ],
-                 default="world",
+                 default="region:world",
                  dest='map_name',
                  help="Which map do you want to use?  This must be one of {} or else a string of the form 'airport:XXX' where XXX is the 3- or 4-letter abbreviation for that airport.".format(list(maps.available_maps()) + ["custom"]))
 
@@ -270,7 +270,7 @@ def install_group():
                  help="Custom bounding box for map")
 
     add_argument("mapmaker", [ "--map-projection" ],
-                 default="mill",
+                 default="PlateCarree",
                  help="Custom projection for map")
 
     add_argument("mapmaker", [ "--map-scale-length" ],
