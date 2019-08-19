@@ -39,7 +39,6 @@ test_property_map()
   tracktable::PropertyMap properties;
 
   double test_double_input = 3.14159;
-  int64_t test_int_input = 123456789012345;
   std::string test_string_input("Four score and seven years ago...");
   tracktable::Timestamp test_time_input(tracktable::time_from_string("1969-06-20 16:17:40"));
 
@@ -72,7 +71,6 @@ test_property_map()
 
   double test_double;
   std::string test_string;
-  int64_t test_int;
   tracktable::Timestamp test_time;
   bool ok;
 

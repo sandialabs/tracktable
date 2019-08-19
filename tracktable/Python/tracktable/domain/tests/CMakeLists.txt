@@ -189,3 +189,8 @@ add_python_test(
   P_SimplifyTrajectory
   ${DOMAIN}.test_simplify_trajectory
   )
+
+add_python_test(
+  P_CurrentLengthAvailable
+  ${DOMAIN}.test_current_length
+  )
