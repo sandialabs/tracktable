@@ -43,13 +43,15 @@
 #
 
 import csv
+import itertools
 import math
 import random
 import sys
 
 from tracktable.core import geomath
 from tracktable.info import cities
-from tracktable.source import random_point_source, combine
+from tracktable.source import scatter
+from tracktable.domain import terrestrial
 
 def n_largest_cities(howmany):
     """
@@ -89,15 +91,15 @@ def write_points_to_file(point_source, outfile):
 # ----------------------------------------------------------------------
 
 def points_near_city(city, num_points):
-    center = ( city.longitude, city.latitude )
-    radius = point_radius_for_city(city)
+    center = terrestrial.BasePoint()
+    center[0] = city.longitude
+    center[1] = city.latitude
 
-    source = random_point_source.ConePointsNearPosition()
-    source.center = center
-    source.max_radius = geomath.km_to_radians(radius)
-    source.num_points = num_points
+    max_radius = point_radius_for_city(city)
 
-    return source.points()
+    return scatter.linear_falloff_scattered_points(center,
+                                                   num_points,
+                                                   max_radius)
 
 # ----------------------------------------------------------------------
 

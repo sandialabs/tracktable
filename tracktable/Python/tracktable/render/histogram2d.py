@@ -122,7 +122,7 @@ def render_histogram(map_projection,
     # Use basemap to convert the bin coordinates into world
     # (geographic) coordinates
 
-    xcoords, ycoords = map_projection(x_bins_2d, y_bins_2d)
+#    xcoords, ycoords = map_projection(x_bins_2d, y_bins_2d)
 #    print("RH: map_xcoords: {}".format(xcoords))
 #    print("RH: map_ycoords: {}".format(ycoords))
 
@@ -337,9 +337,7 @@ def geographic(map_projection,
 
     # Use basemap to convert the bin coordinates into world
     # (geographic) coordinates
-
-
-    xcoords, ycoords = map_projection(x_bins_2d, y_bins_2d)
+#    xcoords, ycoords = map_projection(x_bins_2d, y_bins_2d)
 
 #    pdb.set_trace()
 
@@ -423,13 +421,13 @@ def draw_density_array(density,
 
     x_bins_mesh, y_bins_mesh = numpy.meshgrid(x_bins, y_bins)
 
-    xcoords_map, ycoords_map = map_projection(x_bins_mesh, y_bins_mesh)
+#    xcoords_map, ycoords_map = map_projection(x_bins_mesh, y_bins_mesh)
 #    print("DDA: map_xcoords: {}".format(xcoords_map))
 #    print("DEBUG: draw_density_array: array min, max are {}, {}".format(density.min(), density.max()))
 
     # And finally render it onto the map.
-    return [ matplotlib.pyplot.pcolormesh(xcoords_map,
-                                          ycoords_map,
+    return [ matplotlib.pyplot.pcolormesh(x_bins_mesh,
+                                          y_bins_mesh,
                                           density,
                                           cmap=colormap,
                                           norm=colorscale,

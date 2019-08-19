@@ -36,7 +36,7 @@ from __future__ import division, print_function, absolute_import
 
 import datetime
 import random
-from ..core import geomath
+from tracktable.core import geomath
 from six.moves import range
 
 class TrajectoryPointSource(object):

@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -28,48 +27,14 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+"""Tracktable Trajectory Library - Compiled extensions and external libraries
 
-import sys
-import os.path
-import traceback
-import matplotlib
-matplotlib.use('Agg')
+All compiled C++ extensions and their necessary libraries will go in
+this directory... and NOTHING ELSE.
 
-from matplotlib import pyplot
-from tracktable.render.mapmaker import mapmaker
-from tracktable.core import test_utilities
+You should never need to import the contents of this directory
+yourself.  They will be pulled in automatically from other modules
+when necessary.
+"""
 
-# ----------------------------------------------------------------------
-
-def test_conus_map(ground_truth_dir,
-                   test_output_dir,
-                   image_filename='ConusMap.png'):
-
-    pyplot.figure(figsize=(8, 6))
-    (mymap, artists) = mapmaker(map_name='region:conus', domain='terrestrial')
-    pyplot.savefig(os.path.join(test_output_dir, image_filename),
-                   dpi=150)
-    pyplot.close()
-    return test_utilities.compare_image_to_ground_truth(image_filename,
-                                                        ground_truth_dir,
-                                                        test_output_dir)
-
-
-# ----------------------------------------------------------------------
-
-def test_mapmaker(ground_truth_path, test_output_path):
-
-    return test_conus_map(ground_truth_path, test_output_path)
-
-# ----------------------------------------------------------------------
-
-def main():
-    if len(sys.argv) != 3:
-        print("usage: {} ground_truth_dir test_output_dir".format(sys.argv[0]))
-
-    return test_mapmaker(sys.argv[1], sys.argv[2])
-
-# ----------------------------------------------------------------------
-
-if __name__ == '__main__':
-    sys.exit(main())
+### TODO: add current directory to Windows path

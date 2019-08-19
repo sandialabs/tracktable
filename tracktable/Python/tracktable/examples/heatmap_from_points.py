@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""heatmap_from_csv.py - Example of how to render a 2D geographic heatmap using points in a CSV file
+"""heatmap_from_points.py - Example of how to render a 2D geographic heatmap using points in a CSV file
 
 
 This is both an example of how to use the library and a convenient
@@ -91,7 +91,9 @@ from __future__ import print_function
 # else so that we can be sure that no other package can initialize
 # Matplotlib to default to a window system.
 import matplotlib
-matplotlib.use('Agg')
+if __name__ == '__main__':
+    print("STATUS: Matplotlib will use Agg backend.")
+    matplotlib.use('Agg')
 
 import numpy
 import pprint
@@ -162,7 +164,7 @@ def parse_args():
 def render_histogram(mymap,
                      domain,
                      point_source,
-                     bounding_box,
+                     bounding_box=None,
                      bin_size=2,
                      color_map='gist_gray',
                      scale_type='linear',
@@ -182,8 +184,9 @@ def render_histogram(mymap,
         # Deduce bounding box from map.  Whatever the user requested
         # has already been figured out there.
         from tracktable.domain.terrestrial import BasePoint, BoundingBox
-        min_corner = BasePoint(mymap.llcrnrlon, mymap.llcrnrlat)
-        max_corner = BasePoint(mymap.urcrnrlon, mymap.urcrnrlat)
+        extent = mymap.get_extent()
+        min_corner = BasePoint(extent[0], extent[2])
+        max_corner = BasePoint(extent[1], extent[3])
         bounding_box = BoundingBox(min_corner, max_corner)
 
         return histogram2d.render_histogram(map_projection=mymap,
@@ -227,6 +230,32 @@ def setup_point_source(filename, command_line_args):
 
     return point_source
 
+# ----------------------------------------------------------------------
+
+def initialize_matplotlib_figure(figure_size_in_inches,
+                                 axis_span=[0, 0, 1, 1],
+                                 facecolor='black',
+                                 edgecolor='black'):
+    """Initialize a figure for Matplotlib to draw into.
+
+    Args:
+       figure_size_in_inches: 2-tuple of floats (width, height)
+       axis_span: list of 4 floats (left, bottom, width, height) with size of axes in figure.
+           Quantities are in fractions of figure width and height.
+       facecolor: string (default 'black') - what's the background color of the plot?
+       edgecolor: string (default 'black') - color of edge aroudn the figure
+
+    Returns:
+       (figure, axes) - both Matplotlib data structures
+    """
+
+    figure = pyplot.figure(figsize=figure_size_in_inches,
+                           facecolor='black',
+                           edgecolor='black')
+    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor='black')
+    axes.set_frame_on(False)
+
+    return (figure, axes)
 
 # ----------------------------------------------------------------------
 
@@ -241,9 +270,8 @@ def main():
     ]
 
     print("STATUS: Initializing image")
-    figure = pyplot.figure(figsize=figure_dimensions, facecolor='black', edgecolor='black')
-    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor='black')
-    axes.set_frame_on(False)
+    (figure, axes) = initialize_matplotlib_figure(figure_dimensions,
+                                                  [0, 0, 1, 1])
 
 
     print("STATUS: Initializing point source")
