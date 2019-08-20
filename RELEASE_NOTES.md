@@ -1,7 +1,7 @@
-Tracktable Release Notes
+## Tracktable Release Notes
 
 VERSION 1.1.1, August 2019
-==========================
+--------------------------
 
 This version includes two bugfixes since 1.1.0:
 
@@ -12,7 +12,7 @@ This version includes two bugfixes since 1.1.0:
   instances.
 
 VERSION 1.1.0, May 2019
-=======================
+-----------------------
 
 This version is the last in which we will actively support Python 2.7.
 Python 2 is scheduled to 
@@ -29,8 +29,7 @@ followed by honorable retirement.  We thank the entire Basemap team,
 past and present, for their many years of service.
 
 
-NEW FEATURES
-------------
+### NEW FEATURES
 
 * Tracktable now has mailing lists!  Send a blank email to
   <listname>-join  at software dot sandia dot gov to request membership.  The
@@ -49,7 +48,7 @@ NEW FEATURES
   [https://github.com/sandialabs/tracktable](https://github.com/sandialabs/tracktable)
   with documentation at ReadTheDocs.
 
-* As of Version 1.1, we require Boost 1.61 or newer.
+* As of Version 1.1, we require Boost 1.61 or newer and CMake 3.0 or newer.
 
 * Functions ``tracktable.core.current_memory_use()`` and
   ``tracktable.core.peak_memory_use()`` are now available.
@@ -91,8 +90,7 @@ NEW FEATURES
   in the documentation.
   
 
-NOTABLE FIXES
--------------
+### NOTABLE FIXES
 
 * We can now use Boost versions up to 1.69.  As of Boost 1.67, the
   name of the Python shared library changed in a way that broke our
@@ -113,8 +111,7 @@ NOTABLE FIXES
   This still needs a little work to remove the need for CMake.
 
 
-OUTSTANDING ISSUES
-------------------
+### OUTSTANDING ISSUES
 
 * The C++ examples need to be cleaned up and documented.  This would
   be a good "getting started" exercise for people who are new to the
@@ -125,8 +122,7 @@ OUTSTANDING ISSUES
   minor fixes to run with the latest API.
 
 
-COMING SOON
------------
+### COMING SOON
 
 * We are experimenting with various replacements for Basemap.  As of
   May 2019 the leading contenders are
@@ -143,14 +139,11 @@ COMING SOON
 * C++11 features will be permitted in new contributions to the library.
 
 
-
-----------------------------------------------------------------------
-----------------------------------------------------------------------
-----------------------------------------------------------------------
+--------------------------------------------------------------------
 
 
 VERSION 1.0.5, March 2018
-=========================
+-------------------------
 
 This is a bug-fix release.
 
@@ -180,12 +173,10 @@ OUTSTANDING ISSUES
 
 
 ----------------------------------------------------------------------
-----------------------------------------------------------------------
-----------------------------------------------------------------------
 
 
 VERSION 1.0.4, November 2017
-============================
+----------------------------
 
 NEW FEATURES
 ------------
@@ -206,8 +197,6 @@ NOTABLE FIXES
   2.
 
 ----------------------------------------------------------------------
-----------------------------------------------------------------------
-----------------------------------------------------------------------
 
 
 VERSION 1.0.3, October 2017
@@ -223,8 +212,6 @@ Copyright notices on all files updated after NTESS replaced Sandia
 Corporation (Lockheed Martin) as the operator of Sandia National Labs.
 
 ----------------------------------------------------------------------
-----------------------------------------------------------------------
-----------------------------------------------------------------------
 
 
 VERSION 1.0.2
@@ -234,12 +221,10 @@ There is no Version 1.0.2.
 
 
 ----------------------------------------------------------------------
-----------------------------------------------------------------------
-----------------------------------------------------------------------
 
 
 VERSION 1.0.1, April 2016
-=========================
+-------------------------
 
 NEW FEATURES
 ------------
@@ -254,14 +239,11 @@ NOTABLE FIXES
 * Minimize calls to ``std::imbue``.  This was 90% or more of the time
   it took to read trajectories.
 
-
-----------------------------------------------------------------------
-----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
 
 VERSION 1.0, January 2016
-=========================
+-------------------------
 
 NEW FEATURES
 ------------
@@ -279,19 +261,16 @@ NOTABLE FIXES
 * Guard against NaN results for math on the sphere
 * Timestamps are now interpolated with microsecond resolution
 
-
-----------------------------------------------------------------------
-----------------------------------------------------------------------
 ----------------------------------------------------------------------
 
 
 VERSION 0.9, September 2015
-===========================
+---------------------------
 
 First public alpha release.
 
-NEW FEATURES
-------------
+### NEW FEATURES
+
 
 * Boost r-tree exposed to C++ and Python for all point types along with common query functions.
 * Convenience method ``tracktable.core.geomath.recompute_speed`` added since we have to do this so often
@@ -299,47 +278,43 @@ NEW FEATURES
 * Point writer generalized to work with all domains, output to stream instead of requiring filename
 * Add "feature vector" point types (undecorated vectors of doubles) for clustering
 
-NOTABLE FIXES
--------------
+
+### NOTABLE FIXES
 
 * Length of terrestrial trajectories now returned in kilometers instead of radians
 
 
 ----------------------------------------------------------------------
-----------------------------------------------------------------------
-----------------------------------------------------------------------
 
 
 VERSION 0.3, March 2015
-=======================
+-----------------------
 
 Internal release only.
 
-NEW FEATURES
-------------
+
+### NEW FEATURES
 
 * Tracktable now builds with Visual Studio!
 * Automatic bounding box computation (used for culling during rendering)
 * Tests of image generating code now compare against ground truth image
 
-NOTABLE FIXES
--------------
+
+### NOTABLE FIXES
 
 * Avoid compiler-specific definitions of ``size_t`` in favor of ``std::size_t``
 
 
 ----------------------------------------------------------------------
-----------------------------------------------------------------------
-----------------------------------------------------------------------
 
 
 VERSION 0.2, December 2014
-==========================
+--------------------------
 
 Internal release only.
 
-NEW FEATURES
-------------
+### NEW FEATURES
+
 
 * Allow points in 2D and 3D Cartesian space as well as geographic space
 * ``tracktable.render.mapmaker`` - convenience calls for many common map use cases
@@ -351,24 +326,23 @@ NEW FEATURES
 * Header files install into ``${INSTALL}/include/tracktable``
 * Add DBSCAN clustering code to C++
 
-NOTABLE FIXES
--------------
+### NOTABLE FIXES
+
 
 * ``PYTHONPATH`` was not being set for regression tests.
 * CMake install path was not being propagated to all modules.
 
 
 ----------------------------------------------------------------------
-----------------------------------------------------------------------
-----------------------------------------------------------------------
+
 
 VERSION 0.1, September 2014
-===========================
+---------------------------
 
 Internal release only: not released to public.
 
-NEW FEATURES
-------------
+### NEW FEATURES
+
 
 * Movie-making script can now run in parallel
 * Example scripts all use common command-line arguments, including reading arguments from files
@@ -377,8 +351,8 @@ NEW FEATURES
 * Overall documentation now builds using Sphinx
 * Decree: distances shall be specified in kilometers
 
-NOTABLE FIXES
--------------
+### NOTABLE FIXES
+
 
 * Histogram buckets have reasonable sizes on both small and large maps
 * City labels were not rendering near cities
@@ -388,16 +362,13 @@ NOTABLE FIXES
 
 
 ----------------------------------------------------------------------
-----------------------------------------------------------------------
-----------------------------------------------------------------------
 
 VERSION 0, July 2014
 ----------------------
 
 Initial milestone: not released to public.
 
-NEW FEATURES
-------------
+### NEW FEATURES
 
 * Points and trajectories in geographic domain implemented in C++ and exposed to Python.
 * Math on points and trajectories implemented in C++ and exposed to Python.
