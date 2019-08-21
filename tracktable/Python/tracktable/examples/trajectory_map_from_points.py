@@ -122,7 +122,6 @@ from tracktable.examples import example_trajectory_builder
 from tracktable.examples import example_trajectory_rendering
 
 from matplotlib import pyplot
-from mpl_toolkits.basemap import Basemap
 
 
 # ----------------------------------------------------------------------

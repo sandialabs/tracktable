@@ -43,6 +43,7 @@
 from __future__ import print_function, division, absolute_import
 
 import cartopy
+import cartopy.crs
 
 from tracktable.core import geomath
 
@@ -91,7 +92,6 @@ def _ensure_airports_loaded():
     global airports
     if airports is None:
         from tracktable.info import airports
-
 
 def _ensure_cities_loaded():
     global cities
@@ -163,7 +163,7 @@ def airport_map(airport_id,
 
     airport_location = airport_info.position
 
-    latitude_span = height / geomath.latitude_degree_km(airport_location[1])
+    latitude_span = height / geomath.latitude_degree_size(airport_location[1])
 
     bottom_latitude = airport_location[1] - latitude_span / 2
     top_latitude = airport_location[1] + latitude_span / 2
@@ -175,10 +175,10 @@ def airport_map(airport_id,
         bottom_latitude = -180 - bottom_latitude
 
     longitude_width_at_top = max(
-        geomath.longitude_degree_km(top_latitude), 1
+        geomath.longitude_degree_size(top_latitude), 1
         )
     longitude_width_at_bottom = max(
-        geomath.longitude_degree_km(bottom_latitude), 1
+        geomath.longitude_degree_size(bottom_latitude), 1
         )
 
     # This could go wrong at very high latitudes but seems OK for now
@@ -229,8 +229,6 @@ def instantiate_map(min_corner,
         projection = cartopy.crs.Miller
     elif isinstance(projection, str):
         projection = getattr(cartopy.crs, projection)
-    elif projection is None:
-        projection = cartopy.crs.Miller
 
     axes = plt.axes(projection=projection())
     if min_corner is not None and max_corner is not None:
@@ -243,6 +241,7 @@ def instantiate_map(min_corner,
 
     print("DEBUG: map successfully instantiated")
     print("DEBUG: axes are {}".format(axes))
+    axes.tracktable_projection = projection
     return axes
 
 
@@ -285,17 +284,17 @@ def predefined_map(mapname,
     if region_size is None:
         region_size = (200, 200)
         
-    mapname_lower = mapname.lower()
-    if mapname_lower.startswith('airport:'):
-        airport_id = mapname_lower.split(':')[1]
+    mapname_upper = mapname.upper()
+    if mapname_upper.startswith('AIRPORT:'):
+        airport_id = mapname.split(':')[1].upper()
         return airport_map(airport_id, region_size, projection=projection)
 
-    elif mapname_lower.startswith('city:'):
-        city_name = mapname_lower.split(':')[1]
+    elif mapname_upper.startswith('CITY:'):
+        city_name = mapname.split(':')[1]
         return city_map(city_name, region_size, projection=projection)
 
-    elif mapname_lower.startswith('region:'):
-        region_name = mapname_lower.split(':')[1]
+    elif mapname_upper.startswith('REGION:'):
+        region_name = mapname.split(':')[1]
         return region_map(region_name, projection=projection)
 
     else:
@@ -337,6 +336,9 @@ def region_map(region_name,
 
     if projection is None:
         projection = cartopy.crs.Miller
+
+
+    print("DEBUG: region_map: projection is {}".format(projection))
 
     map_axes = instantiate_map(
         min_corner=params['min_corner'],
