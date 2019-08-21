@@ -194,8 +194,8 @@ def main():
         "License :: OSI Approved :: BSD License",
         os_classifier,
         "Programming Language :: Python",
+        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
@@ -206,8 +206,7 @@ def main():
     ]
 
     dependencies = [
-        'basemap',
-#        'basemap-data-hires',
+        'cartopy',
         'matplotlib',
         'pyshp',
         'pytz',
@@ -215,7 +214,6 @@ def main():
     ]
 
     package_name = 'tracktable'
-
     version_required = '>=3.4'
 
     # --------------------
