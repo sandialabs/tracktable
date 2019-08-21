@@ -146,20 +146,36 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
   _get_python_abi_tag(${_python_interpreter} _abi)
   _get_python_version_tag(${_python_interpreter} _implementation_version)
 
-  execute_process(
-    COMMAND
-    ${_python_interpreter}
-    ${_setup_py}
-    "bdist_wheel"
-    "--bdist-dir" ${_base_directory}/wheel_build_temp
-    "--plat-name" ${_platform}
-    "--dist-dir" ${_output_directory}
-    "--python-tag" ${_implementation_version}
-    "--py-limited-api" ${_implementation_version}${_abi}
-    RESULT_VARIABLE _wheel_build_result
-    WORKING_DIRECTORY ${_base_directory}
-    )
-
+  # Python 2.7 does not have defined ABI tags.
+  if (_implementation_version STREQUAL "cp27")
+    execute_process(
+      COMMAND
+      ${_python_interpreter}
+      ${_setup_py}
+      "bdist_wheel"
+      "--bdist-dir" ${_base_directory}/wheel_build_temp
+      "--plat-name" ${_platform}
+      "--dist-dir" ${_output_directory}
+      "--python-tag" ${_implementation_version}
+        RESULT_VARIABLE _wheel_build_result
+      WORKING_DIRECTORY ${_base_directory}
+      )
+  else()
+    execute_process(
+      COMMAND
+      ${_python_interpreter}
+      ${_setup_py}
+      "bdist_wheel"
+      "--bdist-dir" ${_base_directory}/wheel_build_temp
+      "--plat-name" ${_platform}
+      "--dist-dir" ${_output_directory}
+      "--python-tag" ${_implementation_version}
+      "--py-limited-api" ${_implementation_version}${_abi}
+      RESULT_VARIABLE _wheel_build_result
+      WORKING_DIRECTORY ${_base_directory}
+      )
+  endif()
+  
   if (NOT ${_wheel_build_result} EQUAL 0)
     message(ERROR "Error while building wheel: ${_wheel_build_result}")
   elseif (NOT WIN32)
