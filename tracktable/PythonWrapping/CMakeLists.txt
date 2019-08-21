@@ -284,7 +284,6 @@ target_link_libraries(_rtree
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-
 install_python_extension(_rtree lib ${Tracktable_PYTHON_DIR})
 
 get_filename_component(
@@ -309,12 +308,17 @@ if (APPLE)
     )
 endif (APPLE)
 
+if (UNIX AND NOT APPLE)
+  find_program(
+    FIX_WHEEL_EXECUTABLE
+    auditwheel
+    DOC
+    "auditwheel: add libraries to a wheel"
+    )
+endif (UNIX AND NOT APPLE)
+
 
 add_custom_target( wheel
-#  COMMAND
-#  ${CMAKE_COMMAND} -E make_directory ${CMAKE_INSTALL_PREFIX}
-#  COMMAND
-#  ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target install
   COMMAND
   ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
   ${PYTHON_EXECUTABLE}

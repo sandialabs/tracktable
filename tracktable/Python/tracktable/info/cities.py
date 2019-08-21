@@ -143,14 +143,26 @@ def cities_in_bbox(bbox_min=(-180, -90),
 
     result = []
 
+    print("DEBUG: cities_in_bbox: bbox_min is {}, bbox_max is {}".format(bbox_min, bbox_max))
+    print("DEBUG: min_longitude is {}, min_latitude is {}, max_longitude is {}, max_latitude is {}".format(
+        longitude(bbox_min),
+        latitude(bbox_min),
+        longitude(bbox_max),
+        latitude(bbox_max)))
+
+    min_longitude = longitude(bbox_min)
+    max_longitude = longitude(bbox_max)
+    min_latitude = latitude(bbox_min)
+    max_latitude = latitude(bbox_max)
+    
     for row in CITY_TABLE:
         lat = row[3]
         lon = row[4]
-        if ( lon >= longitude(bbox_min) and 
-             lon <= longitude(bbox_max) and
-             lat >= latitude(bbox_min) and
-             lat <= latitude(bbox_max) and
-             (not minimum_population) or (row[2] >= minimum_population) ):
+        if ( lon >= min_longitude and
+             lon <= max_longitude and
+             lat >= min_latitude and
+             lat <= max_latitude and
+             ((not minimum_population) or (row[2] >= minimum_population)) ):
 
             info = CityInfo()
             info.country_code = row[0]

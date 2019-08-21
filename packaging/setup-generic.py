@@ -58,19 +58,6 @@ def read(filename):
     with codecs.open(filename, "rb", "utf-8") as f:
         return f.read()
 
-
-def find_meta(meta):
-    """
-    Extract __*meta*__ from META_FILE.
-    """
-    meta_match = re.search(
-        r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=meta),
-        META_FILE, re.M
-    )
-    if meta_match:
-        return meta_match.group(1)
-    raise RuntimeError("Unable to find __{meta}__ string.".format(meta=meta))
-
 # ----------------------------------------------------------------------
 
 def find_metadata_property(text, property_name):
@@ -102,7 +89,6 @@ def find_metadata_property(text, property_name):
 
 def main():
     here = os.getcwd()
-    print(here)
     tracktable_home = os.path.join(here, 'Python', 'tracktable')
     init_filename = os.path.join(tracktable_home, '__init__.py')
 
@@ -110,7 +96,7 @@ def main():
         raise RuntimeError(('This script must be run from the root of a '
                             'Tracktable install tree.  Specifically, the file '
                             '<here>/Python/tracktable/__init__.py must exist.'))
-    
+
     init_file_text = read(init_filename)
     # Parse the following properties out of the top-level __init__.py
     # so that they are always current.
@@ -131,7 +117,7 @@ def main():
     directory_containing_tracktable = os.path.join(here, 'Python')
     package_directory = { '': directory_containing_tracktable }
     tracktable_contents = find_packages(where=directory_containing_tracktable)
-    
+
     system = platform.system()
 
     if system == 'Linux':
@@ -148,12 +134,11 @@ def main():
         os_classifier = 'Operating System :: Microsoft :: Windows'
     else:
         raise RuntimeError('Unknown operating system: {}'.format(system))
-        
+
     binary_extensions = glob.glob(
-        os.path.join(here, 'Python', 'tracktable', '*', 
+        os.path.join(here, 'Python', 'tracktable', '*',
                      '*.{}'.format(extension_suffix))
         )
-        
 
     support_libraries = []
     # On Windows we will also want to pick up support DLLs.
@@ -163,9 +148,10 @@ def main():
                 os.path.join(here, 'Python', 'tracktable', '*',
                              '*.{}'.format(shared_library_suffix))
                 )
-            )
+        )
+
     # TODO: Use editbin.exe to get dependencies of pyd files on windows instead of using this behavior
-    # This will work but has the potential to include more than it needs to. Also, has to be 
+    # This will work but has the potential to include more than it needs to. Also, has to be
     # maintained as dependencies change.
     if system == 'Windows':
         dlls = winlocate.locate_dir(tracktable_home+"\\lib", extension_suffix)
@@ -175,9 +161,9 @@ def main():
                 if len(found_depends) > 0:
                     support_libraries.extend(found_depends)
                     break
-        
+
     license_files = [ os.path.join(tracktable_home, 'LICENSE.txt') ]
-    
+
     # --------------------
 
     # Static properties here
@@ -229,7 +215,7 @@ def main():
         # Computed properties
         package_dir=package_directory,
         packages=tracktable_contents,
-        package_data={ 'tracktable': 
+        package_data={ 'tracktable':
                        binary_extensions + support_libraries + license_files },
         # TODO: Make sure using datafiles doesnt eff up osx and linux builds
         data_files=[("", support_libraries)],
@@ -245,4 +231,3 @@ def main():
 
 if __name__ == '__main__':
     sys.exit(main())
-

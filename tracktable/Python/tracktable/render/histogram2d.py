@@ -46,8 +46,6 @@ import string
 import pdb
 from six.moves import range
 
-from mpl_toolkits.basemap import Basemap
-
 def render_histogram(map_projection,
                      point_source,
                      bounding_box,
@@ -119,8 +117,8 @@ def render_histogram(map_projection,
 #    print("RH: x_bin_boundaries {}".format(x_bin_boundaries[0:10]))
 #    print("RH: y_bin_boundaries {}".format(y_bin_boundaries[0:10]))
 
-    # Use basemap to convert the bin coordinates into world
-    # (geographic) coordinates
+    xcoords = x_bins_2d
+    ycoords = y_bins_2d
 
 #    xcoords, ycoords = map_projection(x_bins_2d, y_bins_2d)
 #    print("RH: map_xcoords: {}".format(xcoords))
