@@ -146,20 +146,36 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
   _get_python_abi_tag(${_python_interpreter} _abi)
   _get_python_version_tag(${_python_interpreter} _implementation_version)
 
-  execute_process(
-    COMMAND
-    ${_python_interpreter}
-    ${_setup_py}
-    "bdist_wheel"
-    "--bdist-dir" ${_base_directory}/wheel_build_temp
-    "--plat-name" ${_platform}
-    "--dist-dir" ${_output_directory}
-    "--python-tag" ${_implementation_version}
-    "--py-limited-api" ${_implementation_version}${_abi}
-    RESULT_VARIABLE _wheel_build_result
-    WORKING_DIRECTORY ${_base_directory}
-    )
-
+  # Python 2.7 does not have defined ABI tags.
+  if (_implementation_version STREQUAL "cp27")
+    execute_process(
+      COMMAND
+      ${_python_interpreter}
+      ${_setup_py}
+      "bdist_wheel"
+      "--bdist-dir" ${_base_directory}/wheel_build_temp
+      "--plat-name" ${_platform}
+      "--dist-dir" ${_output_directory}
+      "--python-tag" ${_implementation_version}
+      RESULT_VARIABLE _wheel_build_result
+      WORKING_DIRECTORY ${_base_directory}
+      )
+  else()
+    execute_process(
+      COMMAND
+      ${_python_interpreter}
+      ${_setup_py}
+      "bdist_wheel"
+      "--bdist-dir" ${_base_directory}/wheel_build_temp
+      "--plat-name" ${_platform}
+      "--dist-dir" ${_output_directory}
+      "--python-tag" ${_implementation_version}
+      "--py-limited-api" ${_implementation_version}${_abi}
+      RESULT_VARIABLE _wheel_build_result
+      WORKING_DIRECTORY ${_base_directory}
+      )
+  endif()
+  
   if (NOT ${_wheel_build_result} EQUAL 0)
     message(ERROR "Error while building wheel: ${_wheel_build_result}")
   elseif (NOT WIN32)
@@ -193,10 +209,11 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
       if (_using_auditwheel)
         execute_process(
           COMMAND
-#          ${_fixwheel} repair --plat manylinux2010_x86_64 ${_wheel_to_fix}
           ${_fixwheel} repair ${_wheel_to_fix}
           RESULT_VARIABLE _fixwheel_result
           WORKING_DIRECTORY ${_output_directory}
+          OUTPUT_VARIABLE _fixwheel_output
+          ERROR_VARIABLE _fixwheel_error
           )
       else (_using_auditwheel)
         execute_process(
@@ -204,20 +221,18 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
           ${_fixwheel} ${_wheel_to_fix}
           RESULT_VARIABLE _fixwheel_result
           WORKING_DIRECTORY ${_output_directory}
+          OUTPUT_VARIABLE _fixwheel_output
+          ERROR_VARIABLE _fixwheel_error
         )
       endif (_using_auditwheel)
 
       if (NOT ${_fixwheel_result} EQUAL 0)
-        message(SEND_ERROR "Error while adding external libraries to wheel: ${_fixwheel_result}")
+        message(SEND_ERROR "Error while adding external libraries to wheel: ${_fixwheel_error}")
         return()
       endif ()
     endforeach ()
   endif ()
     
-  if (APPLE)
-    message(STATUS "INFO: You probably just saw a lot of warnings about being unable to find libc++, libicudata, and libicui18n, among others.  It is safe to ignore those warnings.")
-  endif (APPLE)
-  
   #  syntax of foreach:
   #
   #  foreach(<loop_var> <items>)
