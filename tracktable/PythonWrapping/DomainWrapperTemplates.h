@@ -471,16 +471,7 @@ class basic_point_reader_methods : public boost::python::def_visitor<basic_point
          .def("clear_coordinate_assignments", &reader_type::clear_coordinate_assignments)
          .add_property("coordinates", make_function(&reader_type::__coordinate_assignments, return_internal_reference<>()), &reader_type::__set_coordinate_assignments)
          .add_property("input", &reader_type::input_as_python_object, &reader_type::set_input_from_python_object)
-//         .def("__iter__", iterator<reader_type, return_value_policy<copy_non_const_reference> >())
          .def("__iter__", iterator<reader_type, return_value_policy<copy_const_reference> >())
-         .def("set_string_field_column", &reader_type::set_string_field_column)
-         .def("set_real_field_column", &reader_type::set_real_field_column)
-         .def("set_time_field_column", &reader_type::set_time_field_column)
-         .def("set_longitude_column", &reader_type::set_longitude_column)
-         .def("set_latitude_column", &reader_type::set_latitude_column)
-         .def("set_x_column", &reader_type::set_x_column)
-         .def("set_y_column", &reader_type::set_y_column)
-         .def("set_z_column", &reader_type::set_z_column)
          ;
     }
 };
@@ -500,7 +491,14 @@ class trajectory_point_reader_methods : public boost::python::def_visitor<trajec
       c
 	.add_property("object_id_column", &reader_type::object_id_column, &reader_type::set_object_id_column)
 	.add_property("timestamp_column", &reader_type::timestamp_column, &reader_type::set_timestamp_column)
-	;
+        .add_property("timestamp_format", &reader_type::timestamp_format, &reader_type::set_timestamp_format)
+        .def("set_real_field_column", &reader_type::set_real_field_column)
+        .def("real_field_column", &reader_type::real_field_column)
+        .def("set_string_field_column", &reader_type::set_string_field_column)
+        .def("string_field_column", &reader_type::string_field_column)
+        .def("set_time_field_column", &reader_type::set_time_field_column)
+        .def("time_field_column", &reader_type::time_field_column)
+ 	;
     }
 };
 
