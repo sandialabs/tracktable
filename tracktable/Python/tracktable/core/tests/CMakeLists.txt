@@ -49,6 +49,8 @@
 
 include(PythonTest)
 
+add_python_test(P_DataDirectory tracktable.core.tests.test_data_directory)
+
 add_python_test(P_EchoArgs tracktable.core.tests.echo_args foo bar baz)
 
 add_python_test(P_ParseTimestampNoTimeZone tracktable.core.tests.parse_timestamp_no_time_zone)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -28,41 +28,24 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""
-TrailMix Trajectory Library - Core
-
-Basic types (point, trajectory) live in this module.  They are in turn
-imported from the small C extension libraries.
-"""
-
-# This will register the converters for PropertyMap and Timestamp (aka
-# boost::posix_time::ptime)
-from . import core_types
-from .core_types import BoostPythonArgumentError, set_default_timezone
-from .core_types import current_memory_use, peak_memory_use
-from .timestamp import Timestamp
+from __future__ import print_function, division, absolute_import
 
 import os.path
+import sys
+from tracktable.core import data_directory
 
-def data_directory():
-    """Return path to Tracktable example data files
+def main():
+    # Can we read a data file from the standard data directory?  If
+    # this succeeds, we've read it successfully.
+    with open(os.path.join(data_directory(), 'SampleFlightsUS.csv')) as infile:
+        data = infile.read()
 
-    We bundle a few example data files inside Tracktable.  This
-    function will give you the path to those.  Use it as follows:
+    if len(data) == 0:
+        return 1
+    else:
+        return 0
 
-    import os.path
-    from tracktable.core import data_directory
 
-    with open(os.path.join(data_directory(), "SampleASDI.csv")) as asdi_file:
-         # Do your own stuff with the data
+if __name__ == '__main__':
+    sys.exit(main())
 
-    Arguments:
-        No arguments.
-
-    Returns:
-        Path to Tracktable example data files.
-    """
-
-    data_directory = os.path.join(os.path.dirname(__file__), '..', 'examples', 'data')
-    normalized_dir = os.path.normpath(data_directory)
-    return normalized_dir
