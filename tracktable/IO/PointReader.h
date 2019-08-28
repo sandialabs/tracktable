@@ -538,10 +538,15 @@ public:
     }
 
   void set_timestamp_format(string_type const& format)
-  {
-    this->PointTokenReader.set_timestamp_format(format);
-  }
+    {
+      this->PointTokenReader.set_timestamp_format(format);
+    }
 
+  string_type timestamp_format() const
+    {
+      return this->PointTokenReader.timestamp_format();
+    }
+  
   void set_null_value(string_type const& value)
     {
       this->PointTokenReader.set_null_value(value);
