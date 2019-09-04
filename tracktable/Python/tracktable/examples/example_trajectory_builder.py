@@ -29,7 +29,9 @@
 
 """example_trajectory_builder - Sample code to assemble points into trajectories
 """
-
+from tracktable.domain import all_domains as ALL_DOMAINS
+import importlib
+import itertools
 import datetime
 
 from tracktable.source.trajectory import AssembleTrajectoryFromPoints
@@ -64,3 +66,26 @@ def configure_trajectory_builder(separation_distance=100,
         source.minimum_length = minimum_length
 
     return source
+
+def example_trajectory_builder(inputFile=None):
+
+    if inputFile == None:
+        inputFile = './data/SampleFlight.csv';
+
+    inFile = open(inputFile)
+    domain = 'terrestrial'                 # we want to create a terrestrial point reader
+    if domain.lower() not in ALL_DOMAINS:  #Format domain and make sure it is an available domain
+        raise KeyError("Domain '{}' is not in list of installed domains ({}).".format(domain, ', '.join(ALL_DOMAINS)))
+    else:
+        domain_to_import = 'tracktable.domain.{}'.format(domain.lower())
+        domain_module = importlib.import_module(domain_to_import)
+
+    point_source = domain_module.TrajectoryPointReader()
+    point_source.input = inFile
+    point_source.comment_character = '#'
+    point_source.field_delimiter = ','
+
+    source = configure_trajectory_builder(separation_distance=50, separation_time=10, minimum_length=5)
+
+    source.input = point_source
+    return source.trajectories()
