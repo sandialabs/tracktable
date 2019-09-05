@@ -49,6 +49,12 @@ class BinaryDistribution(Distribution):
     def is_pure(self):
         return False
 
+# ----------------------------------------------------------------------
+
+def files_from_components(*components):
+    return glob.glob(os.path.join(*components))
+
+# ----------------------------------------------------------------------
 
 def read(filename):
     """
@@ -165,11 +171,15 @@ def main():
     # Include any auxiliary data files such as the stuff in
     # tracktable.info
     aux_data_directory = os.path.join(tracktable_home, 'info', 'data')
-    tz_shapefiles = glob.glob(
-        os.path.join(aux_data_directory, 'tz_world.*')
-    )
+    tz_shapefiles = files_from_components(aux_data_directory, 'tz_world.*')
     aux_data_files = tz_shapefiles
     aux_data_files.append(os.path.join(aux_data_directory, 'airports.csv'))
+
+    example_data_directory = os.path.join(tracktable_home, 'examples', 'data')
+    example_data_files = (
+        files_from_components(example_data_directory, '*.csv') +
+        files_from_components(example_data_directory, '*.traj')
+        )
 
     license_files = [ os.path.join(tracktable_home, 'LICENSE.txt') ]
 
@@ -228,7 +238,8 @@ def main():
                        (binary_extensions +
                         support_libraries +
                         license_files +
-                        aux_data_files) },
+                        aux_data_files +
+                        example_data_files) },
         # TODO: Make sure using datafiles doesnt eff up osx and linux builds
         data_files=[("", support_libraries)],
         # Assembly information and system parameters
