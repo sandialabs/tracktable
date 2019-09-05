@@ -156,14 +156,18 @@ def main():
                 )
         )
 
-    # TODO: Use editbin.exe to get dependencies of pyd files on windows instead of using this behavior
-    # This will work but has the potential to include more than it needs to. Also, has to be
+    # TODO: Use editbin.exe to get dependencies of pyd files on
+    # windows instead of using this behavior This will work but has
+    # the potential to include more than it needs to. Also, has to be
     # maintained as dependencies change.
     if system == 'Windows':
-        dlls = winlocate.locate_dir(tracktable_home+"\\lib", extension_suffix)
+        dlls = winlocate.locate_dir(
+            os.path.join(tracktable_home, 'lib'),
+            extension_suffix
+            )
         for file in dlls:
             for dir in os.environ['Path'].split(';'):
-                found_depends = glob.glob(dir + "\\" + file)
+                found_depends = glob.glob(os.path.join(dir, file))
                 if len(found_depends) > 0:
                     support_libraries.extend(found_depends)
                     break
