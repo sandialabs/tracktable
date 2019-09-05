@@ -162,6 +162,15 @@ def main():
                     support_libraries.extend(found_depends)
                     break
 
+    # Include any auxiliary data files such as the stuff in
+    # tracktable.info
+    aux_data_directory = os.path.join(tracktable_home, 'info', 'data')
+    tz_shapefiles = glob.glob(
+        os.path.join(aux_data_directory, 'tz_world.*')
+    )
+    aux_data_files = tz_shapefiles
+    aux_data_files.append(os.path.join(aux_data_directory, 'airports.csv'))
+
     license_files = [ os.path.join(tracktable_home, 'LICENSE.txt') ]
 
     # --------------------
@@ -216,7 +225,10 @@ def main():
         package_dir=package_directory,
         packages=tracktable_contents,
         package_data={ 'tracktable':
-                       binary_extensions + support_libraries + license_files },
+                       (binary_extensions +
+                        support_libraries +
+                        license_files +
+                        aux_data_files) },
         # TODO: Make sure using datafiles doesnt eff up osx and linux builds
         data_files=[("", support_libraries)],
         # Assembly information and system parameters
