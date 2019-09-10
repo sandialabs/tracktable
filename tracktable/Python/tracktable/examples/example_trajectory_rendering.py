@@ -54,6 +54,68 @@ from tracktable.render import paths
 
 import numpy
 
+from tracktable.examples.trajectory_map_from_points import initialize_matplotlib_figure
+from tracktable.examples.example_trajectory_rendering import render_trajectories
+from tracktable.examples.example_trajectory_builder import example_trajectory_builder
+from tracktable.domain import terrestrial
+from tracktable.render import mapmaker
+from matplotlib import pyplot
+
+# ----------------------------------------------------------------------
+
+def example_trajectory_rendering():
+    '''Sample code to render assembled trajectories
+        In some cases, you may wish to read in trajectories with certain constraints. For example, we can have trajectories with a minimum number of points. Or we acknowledge that the points in the
+        trajectory should be within a certain time and/or distance threshold to belong to the same trajectory. The Trajectory Builder does this.'''
+
+    # First, We will need data points built into trajectories. Replace the following with your own code to build the trajectories or use the provided example.
+    fileName = './data/SampleTrajectories.csv'
+    trajectories = example_trajectory_builder(fileName)
+    
+    # Set up the canvas and map projection
+    dpi = 160
+    figure = pyplot.figure(figsize=[20, 15])
+    axes = figure.add_subplot(1, 1, 1)
+    #(figure, axes) = initialize_matplotlib_figure([10, 7.5])
+    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
+                                        map_name='region:conus')
+
+    color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1)
+    render_trajectories(mymap, trajectories, trajectory_linewidth=2)
+    
+    print("STATUS: Saving figure to file")
+    savefig_kwargs = { 'figsize': [800,600],
+                       'dpi': dpi,
+                       'frameon': False,
+                       'facecolor': 'black'
+                       }
+    pyplot.savefig('./Example_Trajectory_Rendering_CONUS.png',
+                   **savefig_kwargs)
+
+    pyplot.close()
+    
+    '''By setting map_name to 'custom', you can provide a bounding box to narrow or expand your view. 
+        In the following example, we will narrow our view to the southern half of Florida. '''
+
+    trajectories = example_trajectory_builder(fileName)
+    # Set up the canvas and map projection
+    dpi = 160
+    figure = pyplot.figure(figsize=[20, 15])
+    axes = figure.add_subplot(1, 1, 1)
+    #(figure, axes) = initialize_matplotlib_figure([10, 7.5])
+    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
+                                        map_name='custom',
+                                        map_bbox=[(-80,25),(-84,30)])
+
+    color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1)
+    render_trajectories(mymap, trajectories, trajectory_linewidth=2)
+    
+    print("STATUS: Saving figure to file")
+    pyplot.savefig('./Example_Trajectory_Rendering_FL.png',
+                   **savefig_kwargs)
+
+    pyplot.close()
+    
 # ----------------------------------------------------------------------
 
 def make_constant_colormap(color):
