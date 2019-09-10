@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""example_point_reader - Common code to configure a DelimitedText point reader
+"""example_trajectory_reader - Common code to configure a trajectory reader
 """
 
 from tracktable.domain import all_domains as ALL_DOMAINS
@@ -35,6 +35,26 @@ from tracktable.script_helpers.argument_groups import extract_arguments
 
 import importlib
 import itertools
+
+# ----------------------------------------------------------------------
+
+def example_trajectory_reader():
+    '''Another basic data structure is the trajectory reader. In some cases, navigational points are organized and filtered to create a series of time sequential points belonging to the same flight, otherwise known as a trajectory. Instead of reading individual points, you can read in all points belonging to each trajectory.'''
+    
+    inFile = open("./data/SampleTrajectories.traj")
+    domain = 'terrestrial'     # Give a domain and make sure the domain exists.
+    if domain.lower() not in ALL_DOMAINS:
+        raise KeyError("Domain '{}' is not in list of installed domains ({}).".format(domain, ', '.join(ALL_DOMAINS)))
+    else:
+        domain_to_import = 'tracktable.domain.{}'.format(domain.lower())
+        domain_module = importlib.import_module(domain_to_import)
+    reader = domain_module.TrajectoryReader()
+    reader.input = inFile
+    
+    for x in reader:      #Each object in the reader is an iterator pointer here
+        print(*x)
+        print("\n")
+    
 
 # ----------------------------------------------------------------------
 
