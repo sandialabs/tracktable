@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -36,6 +36,62 @@ from tracktable.script_helpers.argument_groups import extract_arguments
 import importlib
 import itertools
 
+# ----------------------------------------------------------------------
+
+def example_point_reader():
+
+    '''To create a point, we create a generic TrajectoryPointReader object and give it the following:
+    input file - File stream connected to a data file  delimiter - The character separating fields in the fileie, a csv will have ',' as a delimiter)
+    comment character - The character marking comments in the file and will be ignored by the point reader
+    domain - Which domain the points come from. Options are 'terrestrial', 'Cartesian2d', and 'Cartesian3d'''
+
+    inFile = open('./data/SampleASDI.csv')
+    domain = 'terrestrial'                 # we want to create a terrestrial point reader
+    
+    if domain.lower() not in ALL_DOMAINS:  #Format domain and make sure it is an available domain
+        raise KeyError("Domain '{}' is not in list of installed domains ({}).".format(domain, ', '.join(ALL_DOMAINS)))
+    else:
+        domain_to_import = 'tracktable.domain.{}'.format(domain.lower())
+        domain_module = importlib.import_module(domain_to_import)
+
+    reader = domain_module.TrajectoryPointReader()
+    reader.input = inFile
+    reader.comment_character = '#'
+    reader.field_delimiter = ','
+    
+    # In order to view the points the reader has read, we iterate over the reader. 
+    for x in reader:
+        print(x)
+        
+    '''So what happens in the background?
+    The reader has several attributes that can be set. Some of these attributes are:
+     object_id_column - Column in dataset holding the object id
+     timestamp_column - Column in dataset holding the timestamp
+     coordinate0 - Column in dataset holding the longitude
+     coordinate1 - Column in dataset holding the latitude
+     coordinate2 - Column in dataset holding the z-order
+
+    Note: Coordinates are referenced like a list and there are three, coordinates[0], coordinates[1], and coordinates[2] representing longitude, latitude, and z-order respectively.
+    In addition to these attributes, custom columns can be set such as 'altitude', 'speed', 'airline', etc so long as it is numeric, timestamp, or string. Any columns not given values will be assigned the default, or 'None'. 
+
+    In the next example, we set a numeric field (speed) and a string field(status) and see the results.'''
+    
+    inFile.close()
+      
+    
+    inFile = open('./data/SampleASDI.csv')
+    reader.input = inFile
+    reader.object_id_column = 0
+    reader.timestamp_column = 1
+    reader.coordinates[0] = 2
+    reader.coordinates[1] = 3
+    reader.set_real_field_column('speed', 4)
+    reader.set_string_field_column('status', 9)
+    
+    for x in reader:
+        print(x)
+
+    inFile.close()
 # ----------------------------------------------------------------------
 
 def configure_point_reader(infile, **kwargs):
