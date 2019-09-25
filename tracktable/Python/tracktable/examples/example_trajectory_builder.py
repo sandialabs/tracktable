@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -29,7 +29,9 @@
 
 """example_trajectory_builder - Sample code to assemble points into trajectories
 """
-
+from tracktable.domain import all_domains as ALL_DOMAINS
+import importlib
+import itertools
 import datetime
 
 from tracktable.source.trajectory import AssembleTrajectoryFromPoints
@@ -64,3 +66,32 @@ def configure_trajectory_builder(separation_distance=100,
         source.minimum_length = minimum_length
 
     return source
+
+def example_trajectory_builder(inputFile=None):
+
+    '''In some cases, you may wish to read in trajectories with certain constraints. For example, we can have trajectories with a minimum number of points. Or we acknowledge that the points in the trajectory should be within a certain time and/or distance threshold to belong to the same trajectory. The Trajectory Builder does this.'''
+
+    '''Set up a trajectory builder using the specified parameters '''
+    source = configure_trajectory_builder(separation_distance=50, separation_time=10, minimum_length=5)
+    
+    '''In order to use the trajectory builder, we need a source that gives us data points in time sequential order. As with before, we can use the Trajectory Reader.'''
+    if inputFile == None:
+        inputFile = './data/SampleFlight.csv';
+
+    inFile = open(inputFile)
+    domain = 'terrestrial'                 # we want to create a terrestrial point reader
+    if domain.lower() not in ALL_DOMAINS:  #Format domain and make sure it is an available domain
+        raise KeyError("Domain '{}' is not in list of installed domains ({}).".format(domain, ', '.join(ALL_DOMAINS)))
+    else:
+        domain_to_import = 'tracktable.domain.{}'.format(domain.lower())
+        domain_module = importlib.import_module(domain_to_import)
+
+    point_source = domain_module.TrajectoryPointReader()
+    point_source.input = inFile
+    point_source.comment_character = '#'
+    point_source.field_delimiter = ','
+
+    '''Now we can apply the source of our points (the point reader we created above) and generate the trajectories by iterating over them. You will notice the output confirms the contrainsts we set in the previous step. Also, note only a single trajectory was created.'''
+
+    source.input = point_source
+    return source.trajectories()
