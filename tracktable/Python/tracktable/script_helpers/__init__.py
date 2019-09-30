@@ -46,9 +46,8 @@ def n_at_a_time(iterable, howmany, fillvalue=None):
     objects N at a time instead of one at a time.  
 
     Example:
-
-		my_iterable = range(10)
-		triples = n_at_a_time(my_iterable, 3, -1)
+		>>> list(n_at_a_time(range(10), 3, -1))
+		[(0, 1, 2), (3, 4, 5), (6, 7, 8), (9, -1, -1)]
 
 	Args:
 		iterable {sequence}: Data source
