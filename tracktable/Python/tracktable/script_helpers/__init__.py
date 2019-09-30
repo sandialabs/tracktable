@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -32,3 +32,35 @@
 Tracktable Trajectory Toolkit - Helper functions for creating scripts
 """
 
+
+import sys
+if sys.version_info[0] == 2:
+	from itertools import izip_longest
+else:
+	from itertools import zip_longest as izip_longest
+
+def n_at_a_time(iterable, howmany, fillvalue=None):
+    """Collect data into fixed-length chunks or blocks
+
+    This function is an adapter for an iterable that returns
+    objects N at a time instead of one at a time.  
+
+    Example:
+
+		my_iterable = range(10)
+		triples = n_at_a_time(my_iterable, 3, -1)
+
+	Args:
+		iterable {sequence}: Data source
+		howmany {int}: How many elements to take at a time
+		fillvalue {any}: Value to pad with if the iterable runs out
+
+	Returns:
+		New sequence whose elements are tuples of elements from
+		the original iterable
+	"""
+    args = [ iter(iterable) ] * howmany
+    return izip_longest(fillvalue=fillvalue, *args)
+
+
+# ----------------------------------------------------------------------
