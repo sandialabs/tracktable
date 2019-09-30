@@ -106,50 +106,9 @@ from tracktable.render import colormaps, histogram2d, mapmaker, projection
 from tracktable.domain.cartesian2d import BasePoint as Point2D
 from tracktable.domain.cartesian2d import BoundingBox as BoundingBox2D
 from tracktable.examples import example_point_reader
-from tracktable.examples import generate_heatmap_sample_data as gen_sample
 
 from matplotlib import pyplot
 
-# ----------------------------------------------------------------------
-
-def example_heatmap_rendering():
-
-    #Sample code to render heatmap of points
-    
-    # In this example, data points are filtered and only a set number of cities are represented.
-    num_cities = 40
-    num_points_per_city = 1000
-    cities = gen_sample.n_largest_cities(num_cities)
-        
-    all_sources = [ gen_sample.points_near_city(city, num_points_per_city)
-                   for city in cities ]
-    all_points = list(itertools.chain(*all_sources))
-
-    #The type of map, colors, scaling can be customised depending the on the desired look and feel of the finished map. 
-    (figure, axes) = initialize_matplotlib_figure([20, 15])
-    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
-                                        map_name='region:world')
-
-    render_histogram(mymap,
-        domain='terrestrial',
-        point_source=all_points,
-        bin_size=0.25,
-        color_map='gist_heat',
-        scale_type='logarithmic')
-    
-    print("STATUS: Saving figure to file")
-    savefig_kwargs = { 'figsize': [800,600],
-                       'dpi': 72,
-                       'frameon': False,
-                       'facecolor': 'black'
-                       }
-    pyplot.savefig('./Example_Heatmap_Rendering.png',
-                   **savefig_kwargs)
-
-    pyplot.close()
-
-    return 0
-    
 # ----------------------------------------------------------------------
 
 # Note: There is more work to do here to expose options for the
@@ -317,7 +276,7 @@ def main():
     print("STATUS: Initializing point source")
     point_source = setup_point_source(args.point_data_file[0], args)
 
-    # This is a little bit ugly but I don't yet know of a better way
+    # This is a little bit ugly but I don't yet have a better way
     # to do it.  If we want to automatically compute the bounding box
     # of the data points before we render anything we must read all the
     # points at least once.
