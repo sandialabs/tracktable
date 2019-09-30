@@ -139,10 +139,10 @@ def example_heatmap_rendering():
     savefig_kwargs = { 
                        }
     pyplot.savefig('Example_Heatmap_Rendering.png',
-        'figsize': [800,600],
-        'dpi': 72,
-        'frameon': False,
-        'facecolor': 'black'
+        figsize=[800,600],
+        dpi=72,
+        frameon=False,
+        facecolor='black'
         )
 
     pyplot.close()
