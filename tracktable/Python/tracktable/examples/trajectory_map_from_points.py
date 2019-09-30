@@ -166,6 +166,105 @@ def parse_args():
 
     return args
 
+
+
+def configure_trajectory_point_reader_from_argument_group(infile,
+                                                          parsed_args,
+                                                          **kwargs):
+    """Configure a point reader from command-line arguments
+
+    In the module `tracktable.script_helpers.argument_groups`, we define
+    related sets of command-line arguments in blocks called *argument
+    groups*.  This function takes the argument namespace returned by
+    argparse.parse_args(), extracts the relevant parameters (being mindful
+    of defaults), and passes them to configure_trajectory_point_reader()
+    along with anything else you might want to supply.
+
+    Arguments that you pass in will override those in the command-line
+    arguments.
+
+    NOTE: This is all boring bookkeeping code.  There's nothing interesting
+    going on, just conversion from one format (command-line arguments) to 
+    the dicts and parameters that our functions expect.  I wish it could
+    be cleaner.
+
+    Arguments:
+        parsed_args {namespace}: Result of argparse.parse_args() call
+
+    Keyword arguments:
+        All of the arguments that configure_trajectory_point_reader()
+        takes are valid here.
+
+    Returns:
+        Brand new tracktable.domain.<domain>.trajectory_point_reader
+        with all of the arguments applied to its configuration.
+    """
+
+
+    reader_args = vars(extract_arguments('delimited_text_point_reader', parsed_args))
+    user_args = dict(kwargs)
+
+    # Rename a few things in the parsed command-line arguments so that we
+    # can easily overwrite them with whatever the user passed in.  We do
+    # this for all domains (terrestrial, cartesian2d, cartesian3d) without
+    # checking because configure_trajectory_point_reader() will pick
+    # the ones it wants.
+    if reader_args['coordinate0'] is not None:
+        reader_args['longitude_column'] = reader_args['coordinate0']
+        reader_args['x_column'] = reader_args['coordinate0']
+    if reader_args['coordinate1'] is not None:
+        reader_args['latitude_column'] = reader_args['coordinate1']
+        reader_args['y_column'] = reader_args['coordinate1']
+    if reader_args['coordinate2'] is not None:
+        reader_args['z_column'] = reader_args['coordinate2']
+
+    del reader_args['coordinate0']
+    del reader_args['coordinate1']
+    del reader_args['coordinate2']
+
+    # Filter out any remaining None entries
+    copy_dict = dict()
+    for (key, value) in reader_args:
+        if value is not None:
+            copy_dict[key] = value
+    reader_args = copy_dict
+
+    # Grab the field specifications and convert them into the map format that
+    # configure_trajectory_point_reader wants
+    if 'string_field_column' in reader_args:
+        string_fields = dict()
+        if len(reader_args['string_field_column']) > 0:     
+            for (field, column) in group(reader_args['string_field_column'], 2):
+                string_fields[field] = column
+            user_args['string_fields'] = string_fields
+        del reader_args['string_field_column']
+
+    if 'real_field_column' in reader_args:
+        real_fields = dict()
+        if len(reader_args['real_field_column']) > 0:     
+            for (field, column) in group(reader_args['real_field_column'], 2):
+                real_fields[field] = column
+            user_args['real_fields'] = real_fields
+        del reader_args['real_field_column']
+ 
+    if 'time_field_column' in reader_args:
+        time_fields = dict()
+        if len(reader_args['time_field_column']) > 0:     
+            for (field, column) in group(reader_args['time_field_column'], 2):
+                time_fields[field] = column
+            user_args['time_fields'] = time_fields
+        del reader_args['time_field_column']
+
+
+    # That's all the command-line arguments processed.  Now we take whatever's 
+    # left, add in anything the user supplied, and go get a reader.
+    final_args = reader_args
+    final_args.update(user_args)
+    return configure_trajectory_point_reader(infile, **final_args)
+
+
+# ----------------------------------------------------------------------
+
 # ----------------------------------------------------------------------
 
 def setup_point_source(filename, args):
