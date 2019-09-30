@@ -36,7 +36,6 @@ given the name of the domain and the parameters you want to apply.
 TODO: Add support for point writers as well.
 """
 
-
 def trajectory_point_reader(
     infile,
     comment_character='#',
@@ -138,7 +137,7 @@ def trajectory_point_reader(
     reader = domain_module.TrajectoryPointReader()
     reader.input = infile
 
-    _configure_coordinates(
+    _configure_reader_coordinates(
         reader,
         domain.lower(),
         longitude_column=longitude_column,
@@ -148,7 +147,7 @@ def trajectory_point_reader(
         z_column=z_column
         )
 
-    _configure_trajectory_point_fields(reader,
+    _configure_reader_trajectory_point_fields(reader,
         object_id_column=object_id_column,
         timestamp_column=timestamp_column,
         string_fields=string_fields,
@@ -156,12 +155,168 @@ def trajectory_point_reader(
         time_fields=time_fields
         )
 
-    _configure_file_info(reader,
+    _configure_reader_file_info(reader,
         comment_character=comment_character,
         delimiter=delimiter
         )
 
     return reader
+
+# ---------------------------------------------------------------------
+
+
+def base_point_reader(
+    infile,
+    comment_character='#',
+    domain='terrestrial',
+    delimiter=',',
+    object_id_column=0,
+    timestamp_column=1,
+    longitude_column=2,
+    latitude_column=3,
+    x_column=2,
+    y_column=3,
+    z_column=4, 
+    string_fields=dict(),
+    real_fields=dict(),
+    time_fields=dict()
+    ):
+    """Instantiate and configure an undecoated point reader.
+
+    Tracktable point readers live in the domain modules:
+    `tracktable.domain.<domain_name>.PointReader`
+    where `domain_name` is one of `terrestrial`, `cartesian2d`
+    or `cartesian3d`.  This is a convenience function to set 
+    one up.
+
+    A base (undecorated) point must have all of the following elements:
+
+    1.  Coordinates.  For the terrestrial domain, these coordinates are
+        longitude and latitude.  For the cartesian2d domain, these are
+        x and y.  The cartesian3d domain adds z.
+
+    By default, we expect longitude (or x) in column 2, latitude (or y) 
+    in column 3, and the Z coordinate in column 4.  We only pay attention 
+    to the coordinate assignments for the selected point domain.
+
+    The difference between base points and trajectory points is that base
+    points don't have an object ID, a timestamp, or any metadata fields:
+    just coordinates.
+
+    This function will probably move into the main library at some point 
+    soon.  We will keep a binding here to avoid breaking existing code.
+
+    Arguments:
+        infile {file-like object}: Source for trajectory point data
+
+    Keyword arguments:
+        comment_character {character}: Any row where this is the first
+            non-whitespace character will be ignored.  (default '#')
+        delimiter {character}: What character separates columns? 
+            (default ',')
+        domain {string}: Which point domain will the points belong to? 
+            (default 'terrestrial')
+        longitude_column {int}: Which column contains the longitude for
+            each point? (default 2, assumes terrestrial domain)
+        latitude_column {int}: Which column contains the latitude for
+            each point? (default 3, assumes terrestrial domain)
+        x_column {int}: Which column contains the X coordinate for
+            each point? (default 2, assumes cartesian2d or cartesian3d)
+        y_column {int}: Which column contains the Y coordinate for
+            each point? (default 3, assumes cartesian2d or cartesian3d)
+        z_column {int}: Which column contains the X coordinate for
+            each point? (default 4, assumes cartesian3d)
+    
+    Returns:
+        Base point reader from the appropriate domain with all fields
+        configured according to arguments.  Iterate over the reader object
+        to retrieve the points.
+    """
+
+    domain = select_domain_from_name(domain)
+    reader = domain.BasePointReader()
+    reader.input = infile
+    _configure_reader_file(reader,
+        comment_character=comment_character,
+        delimiter=delimiter
+        )
+    _configure_reader_coordinates(reader,
+        domain.lower(),
+        x_column=x_column,
+        y_column=y_column,
+        z_column=z_column,
+        longitude_column=longitude_column,
+        latitude_column=latitude_column)
+
+    return reader
+
+###
+### Below this point are the utility functions that apply arguments 
+### to readers.
+###
+
+def _configure_reader_trajectory_point_fields(
+    reader,
+    object_id_column=0,
+    timestamp_column=1,
+    string_fields=dict(),
+    real_fields=dict(),
+    time_fields=dict()
+    ):
+
+    """Configure a point reader to load metadata fields
+    
+    This is a utility function.  See the arguments for 
+    configure_trajectory_point_reader for information on
+    the parameters here.
+    """
+
+    reader.object_id_column = object_id_column
+    reader.timestamp_column = timestamp_column
+
+    for (field, column) in string_fields.items():
+        reader.set_string_field_column(field, column)
+    
+    for (field, column) in real_fields.items():
+        reader.set_real_field_column(field, column)
+
+    for (field, column) in time_fields.items():
+        reader.set_time_field_column(field, column)
+
+
+def _configure_reader_coordinates(
+    reader,
+    domain,
+    **kwargs):
+    """Configure coordinate fields on a point reader
+
+    This is a utility function.  This is where we select
+    which coordinate arguments the reader should have.
+
+    """
+
+    if domain == 'terrestrial':
+        reader.coordinates[0] = kwargs['longitude_column']
+        reader.coordinates[1] = kwargs['latitude_column']
+    elif domain in ['cartesian2d', 'cartesian3d']:
+        reader.coordinates[0] = kwargs['x_column']
+        reader.coordinates[1] = kwargs['y_column']
+        if domain == 'cartesian3d':
+            reader.coordinates[2] = kwargs['z_column']
+    else:
+        raise KeyError('Unsupported domain: {}'.format(domain))
+    
+
+def _configure_reader_file_properties(reader,
+    comment_character='#',
+    delimiter=','
+    ):
+    """Configure delimiter and comment character for a reader
+
+    This is a utility function.
+    """
+    reader.comment_character = comment_character
+    reader.delimiter = delimiter
 
 
 
