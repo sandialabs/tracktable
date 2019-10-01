@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""trajectory_map_from_csv.py - Example of how to render trajectories on top of a geographic map using points in a CSV file
+"""trajectory_map_from_csv.py - Render trajectories on a map
 
 
 This is both an example of how to use the library and a convenient
@@ -95,16 +95,6 @@ memory at once.
 
 from __future__ import print_function
 
-# Tell Matplotlib to use the non-interactive backend so that we can
-# run this script without a window system.  We do this before anything
-# else so that we can be sure that no other package can initialize
-# Matplotlib to default to a window system.
-import matplotlib
-
-if __name__ == '__main__':
-    matplotlib.use('Agg')
-
-
 import csv
 import datetime
 import numpy
@@ -112,12 +102,20 @@ import os.path
 import pprint
 import sys
 
+# Tell Matplotlib to use the non-interactive backend so that we can
+# run this script without a window system.  We do this before anything
+# else so that we can be sure that no other package can initialize
+# Matplotlib to default to a window system.
+import matplotlib
+if __name__ == '__main__':
+    matplotlib.use('Agg')
+
 from tracktable.core import geomath
 from tracktable.feature import annotations
 from tracktable.info import cities
+from tracktable.io.point import trajectory_point_reader
 from tracktable.render import colormaps, mapmaker, paths
-from tracktable.script_helpers import argument_groups, argparse
-from tracktable.examples import example_point_reader
+from tracktable.script_helpers import argument_groups, argparse, n_at_a_time
 from tracktable.examples import example_trajectory_builder
 from tracktable.examples import example_trajectory_rendering
 
@@ -201,7 +199,8 @@ def configure_trajectory_point_reader_from_argument_group(infile,
     """
 
 
-    reader_args = vars(extract_arguments('delimited_text_point_reader', parsed_args))
+    reader_args = argument_groups.extract_arguments('delimited_text_point_reader', 
+                                                    parsed_args)
     user_args = dict(kwargs)
 
     # Rename a few things in the parsed command-line arguments so that we
@@ -224,7 +223,7 @@ def configure_trajectory_point_reader_from_argument_group(infile,
 
     # Filter out any remaining None entries
     copy_dict = dict()
-    for (key, value) in reader_args:
+    for (key, value) in reader_args.items():
         if value is not None:
             copy_dict[key] = value
     reader_args = copy_dict
@@ -234,7 +233,7 @@ def configure_trajectory_point_reader_from_argument_group(infile,
     if 'string_field_column' in reader_args:
         string_fields = dict()
         if len(reader_args['string_field_column']) > 0:     
-            for (field, column) in group(reader_args['string_field_column'], 2):
+            for (field, column) in n_at_a_time(reader_args['string_field_column'], 2):
                 string_fields[field] = column
             user_args['string_fields'] = string_fields
         del reader_args['string_field_column']
@@ -242,7 +241,7 @@ def configure_trajectory_point_reader_from_argument_group(infile,
     if 'real_field_column' in reader_args:
         real_fields = dict()
         if len(reader_args['real_field_column']) > 0:     
-            for (field, column) in group(reader_args['real_field_column'], 2):
+            for (field, column) in n_at_a_time(reader_args['real_field_column'], 2):
                 real_fields[field] = column
             user_args['real_fields'] = real_fields
         del reader_args['real_field_column']
@@ -250,7 +249,7 @@ def configure_trajectory_point_reader_from_argument_group(infile,
     if 'time_field_column' in reader_args:
         time_fields = dict()
         if len(reader_args['time_field_column']) > 0:     
-            for (field, column) in group(reader_args['time_field_column'], 2):
+            for (field, column) in n_at_a_time(reader_args['time_field_column'], 2):
                 time_fields[field] = column
             user_args['time_fields'] = time_fields
         del reader_args['time_field_column']
@@ -260,10 +259,8 @@ def configure_trajectory_point_reader_from_argument_group(infile,
     # left, add in anything the user supplied, and go get a reader.
     final_args = reader_args
     final_args.update(user_args)
-    return configure_trajectory_point_reader(infile, **final_args)
+    return trajectory_point_reader(infile, **final_args)
 
-
-# ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
 
@@ -273,21 +270,8 @@ def setup_point_source(filename, args):
     filename and parameters supplied by the user.
     """
 
-    config_reader = example_point_reader.configure_point_reader
-    arg_dict = vars(args)
-
     infile = open(os.path.expanduser(filename), 'rb')
-    point_source = config_reader(infile, **arg_dict)
-
-                                 # delimiter=args.delimiter,
-                                 # comment_character=args.comment_character,
-                                 # object_id_column=args.object_id_column,
-                                 # timestamp_column=args.timestamp_column,
-                                 # string_field_assignments=args.string_field_column,
-                                 # time_field_assignments=args.time_field_column,
-                                 # numeric_field_assignments=args.numeric_field_column,
-                                 # coordinate_assignments=args.coordinate_column,
-                                 # domain=args.domain)
+    return configure_trajectory_point_reader_from_argument_group(infile, args)
 
     return point_source
 
