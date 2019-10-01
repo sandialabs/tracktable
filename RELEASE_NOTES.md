@@ -1,5 +1,47 @@
 ## Tracktable Release Notes
 
+VERSION 1.2.0, October 2019
+---------------------------
+
+This is a major update.
+
+### NEW FEATURES
+
+* We are now using [Cartopy](https://scitools.org.uk/cartopy/docs/latest/) instead of Basemap to render geographic maps.  Basemap no longer works with recent versions of Matplotlib and is at end-of-life along with Python 2.7.  
+
+* We can now build wheels (Python binary install packages) for Python versions 3.5, 3.6, 3.7, and possibly even 2.7.  We will be uploading these to PyPI so that you can `pip install tracktable` instead of building from source.  We will also make these available for download on our web site.
+
+* Jupyter notebook examples!  They are in the `notebooks` subdirectory under the Python examples, or you can get them as a separate zip file on [our web site](https://tracktable.sandia.gov).
+
+* We finally have a web site!  Visit us at <https://tracktable.sandia.gov>.
+
+* Documentation is now hosted at <https://tracktable.readthedocs.io>.
+
+* Python examples are getting overhauled one by one.  A file named `example_foo.py` will have a fully self-contained example of how to use some specific capability in the library.  The other examples (`heatmap_from_points`, `trajectory_map_from_points` and `movie_from_points`) are ready to run on your own data.
+
+* New module tracktable.io.point with a convenient interface for instantiating point readers (trajectory points and base points).  Soon this will get bindings for point writers as well.
+
+* Points and trajectories can now be serialized using `boost::serialization` or Python's `pickle` module.
+
+### NOTABLE FIXES
+
+* Examples were relying on the nonexistent module `tracktable.source.random_point_source`.  It has been replaced with `tracktable.source.scatter`.  
+
+* `tracktable.io` and `tracktable.analysis` modules were not getting installed by `make install`.  
+
+* Data files for `tracktable.info` were not getting installed by `make install`.
+
+* Timestamp format was not configurable on Python trajectory point reader.
+
+* Point metadata properties are now on trajectory point reader (where they belong) instead of base point reader.
+
+### OUTSTANDING ISSUES
+
+* We expect a few rough edges on the Cartopy support, especially decoration features in `tracktable.render.mapmaker` that don't quite work like they should.
+
+* C++ examples still need cleanup.
+
+
 VERSION 1.1.1, August 2019
 --------------------------
 
