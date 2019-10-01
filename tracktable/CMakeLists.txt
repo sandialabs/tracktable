@@ -35,7 +35,7 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-set(Tracktable_VERSION 1.1.0)
+set(Tracktable_VERSION 1.2.0)
 
 add_subdirectory(Core)
 add_subdirectory(Domain)
