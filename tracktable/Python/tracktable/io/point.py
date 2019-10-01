@@ -36,6 +36,8 @@ given the name of the domain and the parameters you want to apply.
 TODO: Add support for point writers as well.
 """
 
+from tracktable.domain import select_domain_from_name
+
 def trajectory_point_reader(
     infile,
     comment_character='#',
@@ -147,7 +149,8 @@ def trajectory_point_reader(
         z_column=z_column
         )
 
-    _configure_reader_trajectory_point_fields(reader,
+    _configure_reader_trajectory_point_fields(
+        reader,
         object_id_column=object_id_column,
         timestamp_column=timestamp_column,
         string_fields=string_fields,
@@ -155,7 +158,8 @@ def trajectory_point_reader(
         time_fields=time_fields
         )
 
-    _configure_reader_file_info(reader,
+    _configure_reader_file_properties(
+        reader,
         comment_character=comment_character,
         delimiter=delimiter
         )
@@ -233,14 +237,16 @@ def base_point_reader(
         to retrieve the points.
     """
 
-    domain = select_domain_from_name(domain)
-    reader = domain.BasePointReader()
+    domain_module = select_domain_from_name(domain)
+    reader = domain_module.BasePointReader()
     reader.input = infile
-    _configure_reader_file(reader,
+    _configure_reader_file_properties(
+        reader,
         comment_character=comment_character,
         delimiter=delimiter
         )
-    _configure_reader_coordinates(reader,
+    _configure_reader_coordinates(
+        reader,
         domain.lower(),
         x_column=x_column,
         y_column=y_column,
@@ -307,10 +313,10 @@ def _configure_reader_coordinates(
         raise KeyError('Unsupported domain: {}'.format(domain))
     
 
-def _configure_reader_file_properties(reader,
-    comment_character='#',
-    delimiter=','
-    ):
+def _configure_reader_file_properties(reader,                        
+                                      comment_character='#',
+                                      delimiter=','):
+   
     """Configure delimiter and comment character for a reader
 
     This is a utility function.
