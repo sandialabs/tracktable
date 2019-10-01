@@ -1,5 +1,3 @@
-### THIS FILE IS NOT READY FOR PRODUCTION.
-
 # Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC . Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
@@ -203,7 +201,6 @@ def main():
         "License :: OSI Approved :: BSD License",
         os_classifier,
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
@@ -223,7 +220,7 @@ def main():
     ]
 
     package_name = 'tracktable'
-    version_required = '>=3.4'
+    version_required = '>=3.5'
 
     # --------------------
 
