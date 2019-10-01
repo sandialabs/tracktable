@@ -40,12 +40,12 @@ import importlib
 all_domains = [ 'terrestrial', 'cartesian2d', 'cartesian3d' ]
 
 def select_domain_from_name(_domain):
-	global all_domains
-	domain = _domain.lower()
-	if domain not in all_domains:
-		raise KeyError(('Requested domain {} is not in list of '
-			'available domains: {}').format(_domain,
-			                                all_domains))
+    global all_domains
+    domain = _domain.lower()
+    if domain not in all_domains:
+        raise KeyError(('Requested domain {} is not in list of '
+                        'available domains: {}').format(_domain,
+                                                        all_domains))
     
     domain_to_import = 'tracktable.domain.{}'.format(domain)
     domain_module = importlib.import_module(domain_to_import)
