@@ -105,51 +105,9 @@ from tracktable.script_helpers import argparse, argument_groups
 from tracktable.render import colormaps, histogram2d, mapmaker, projection
 from tracktable.domain.cartesian2d import BasePoint as Point2D
 from tracktable.domain.cartesian2d import BoundingBox as BoundingBox2D
-from tracktable.examples import example_point_reader
-from tracktable.examples import generate_heatmap_sample_data as gen_sample
-
+from tracktable.io.point import base_point_reader
 from matplotlib import pyplot
 
-# ----------------------------------------------------------------------
-
-def example_heatmap_rendering():
-
-    #Sample code to render heatmap of points
-    
-    # In this example, data points are filtered and only a set number of cities are represented.
-    num_cities = 40
-    num_points_per_city = 1000
-    cities = gen_sample.n_largest_cities(num_cities)
-        
-    all_sources = [ gen_sample.points_near_city(city, num_points_per_city)
-                   for city in cities ]
-    all_points = list(itertools.chain(*all_sources))
-
-    #The type of map, colors, scaling can be customised depending the on the desired look and feel of the finished map. 
-    (figure, axes) = initialize_matplotlib_figure([20, 15])
-    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
-                                        map_name='region:world')
-
-    render_histogram(mymap,
-        domain='terrestrial',
-        point_source=all_points,
-        bin_size=0.25,
-        color_map='gist_heat',
-        scale_type='logarithmic')
-    
-    print("STATUS: Saving figure to file")
-    savefig_kwargs = { 'figsize': [800,600],
-                       'dpi': 72,
-                       'frameon': False,
-                       'facecolor': 'black'
-                       }
-    pyplot.savefig('./Example_Heatmap_Rendering.png',
-                   **savefig_kwargs)
-
-    pyplot.close()
-
-    return 0
-    
 # ----------------------------------------------------------------------
 
 # Note: There is more work to do here to expose options for the
@@ -198,6 +156,125 @@ def parse_args():
         args.delimiter = '\t'
 
     return args
+
+
+def configure_base_point_reader_from_argument_group(infile,
+                                                    parsed_args,
+                                                    **kwargs):
+    """Configure a base point reader from command-line arguments
+
+    In the module `tracktable.script_helpers.argument_groups`, we define
+    related sets of command-line arguments in blocks called *argument
+    groups*.  This function takes the argument namespace returned by
+    argparse.parse_args(), extracts the relevant parameters (being mindful
+    of defaults), and passes them to configure_base_point_reader()
+    along with anything else you might want to supply.
+
+    Arguments that you pass in will override those in the command-line
+    arguments.
+
+    NOTE: This is all boring bookkeeping code.  There's nothing interesting
+    going on, just conversion from one format (command-line arguments) to 
+    the dicts and parameters that our functions expect.  I wish it could
+    be cleaner.
+
+    Arguments:
+        parsed_args {namespace}: Result of argparse.parse_args() call
+
+    Keyword arguments:
+        All of the arguments that configure_trajectory_point_reader()
+        takes are valid here.
+
+    Returns:
+        Brand new tracktable.domain.<domain>.trajectory_point_reader
+        with all of the arguments applied to its configuration.
+    """
+
+
+    reader_args = argument_groups.extract_arguments('delimited_text_point_reader', parsed_args)
+    user_args = dict(kwargs)
+
+    # Rename a few things in the parsed command-line arguments so that we
+    # can easily overwrite them with whatever the user passed in.  We do
+    # this for all domains (terrestrial, cartesian2d, cartesian3d) without
+    # checking because configure_trajectory_point_reader() will pick
+    # the ones it wants.
+    if reader_args['coordinate0'] is not None:
+        reader_args['longitude_column'] = reader_args['coordinate0']
+        reader_args['x_column'] = reader_args['coordinate0']
+    if reader_args['coordinate1'] is not None:
+        reader_args['latitude_column'] = reader_args['coordinate1']
+        reader_args['y_column'] = reader_args['coordinate1']
+    if reader_args['coordinate2'] is not None:
+        reader_args['z_column'] = reader_args['coordinate2']
+
+    del reader_args['coordinate0']
+    del reader_args['coordinate1']
+    del reader_args['coordinate2']
+
+    # Filter out any remaining None entries
+    copy_dict = dict()
+    for (key, value) in reader_args.items():
+        if value is not None:
+            copy_dict[key] = value
+    reader_args = copy_dict
+
+    # That's all the command-line arguments processed.  Now we take whatever's 
+    # left, add in anything the user supplied, and go get a reader.
+    final_args = reader_args
+    final_args.update(user_args)
+    return base_point_reader(infile, **final_args)
+
+# ----------------------------------------------------------------------
+
+# Note: There is more work to do here to expose options for the
+# linewidths, line colors, Z-order and background color for the map.
+# That work will happen once we get this script up and running in the
+# first place.
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    argument_groups.use_argument_group("mapmaker", parser)
+    argument_groups.use_argument_group("delimited_text_point_reader", parser)
+    argument_groups.use_argument_group("image", parser)
+
+    parser.add_argument('--colormap', '-c',
+                        default='gist_heat',
+                        help='Name of colormap for histogram.  Defaults to "gist_heat" thermal scale.  See matplotlib documentation for a list of possibilities.')
+
+    parser.add_argument('--scale', '-s',
+                        default='linear',
+                        choices=['linear', 'log', 'logarithmic'],
+                        help='Mapping from histogram counts to colors.  Defaults to "linear" but can also be "log" or "logarithmic".')
+
+    parser.add_argument('--histogram-bin-size', '-b',
+                        type=float,
+                        default=1,
+                        help='Resolution of underlying histogram: each bin is this many degrees on a side.')
+
+    parser.add_argument('--bgcolor', '-bg',
+                        default='black',
+                        help='Background color for image')
+
+    parser.add_argument('--title',
+                        help='Title for figure.  Will be rendered at top.')
+
+    parser.add_argument('point_data_file',
+                        nargs=1,
+                        help='Delimited text file containing point data')
+    parser.add_argument('image_file',
+                        nargs=1,
+                        help='Filename for histogram image')
+
+    args = parser.parse_args()
+    if args.resolution is None:
+        args.resolution = [ 800, 600 ]
+    if args.delimiter == 'tab':
+        args.delimiter = '\t'
+
+    return args
+
+# ----------------------------------------------------------------------
 
 # ----------------------------------------------------------------------
 
@@ -257,16 +334,10 @@ def setup_point_source(filename, command_line_args):
     filename and parameters supplied by the user.
     """
 
-    config_reader = example_point_reader.configure_point_reader
-    field_map = {}
-    coordinate_map = {}
-
-    print("setup_point_source: args:\n{}".format(pprint.pformat(vars(command_line_args))))
-
     infile = open(filename, 'rb')
 
     # Note that we only need coordinates in order to draw a heatmap.
-    point_source = config_reader(infile, **vars(command_line_args))
+    point_source = configure_base_point_reader_from_argument_group(infile, command_line_args)
 
     return point_source
 
@@ -317,7 +388,7 @@ def main():
     print("STATUS: Initializing point source")
     point_source = setup_point_source(args.point_data_file[0], args)
 
-    # This is a little bit ugly but I don't yet know of a better way
+    # This is a little bit ugly but I don't yet have a better way
     # to do it.  If we want to automatically compute the bounding box
     # of the data points before we render anything we must read all the
     # points at least once.

@@ -107,6 +107,12 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/info/data
 )
 
+file(GLOB io_files "io/*.py")
+install(
+  FILES ${io_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/io
+)
+
 file(GLOB render_files "render/*.py")
 install(
   FILES ${render_files}
