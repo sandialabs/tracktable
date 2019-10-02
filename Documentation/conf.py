@@ -44,6 +44,7 @@ autodoc_mock_imports = [
     'numpy',
     'shapefile',
     'shapely',
+    'tracktable.core.core_types', # for BoostPythonArgumentError
     'tracktable.lib._domain_algorithm_overloads',
     'tracktable.lib._core_types',
     'tracktable.lib._terrestrial',
