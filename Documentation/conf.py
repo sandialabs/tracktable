@@ -38,6 +38,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(tracktable_src, 'tracktable', 'P
 # pretend to have imported already.
 
 autodoc_mock_imports = [
+    'cartopy',
     'matplotlib',
     'mpl_toolkits',
     'mpl_toolkits.basemap',
