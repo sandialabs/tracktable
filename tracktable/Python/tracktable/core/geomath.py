@@ -40,31 +40,28 @@ from six.moves import range
 import math
 import sys
 
-
-from ._domain_algorithm_overloads import distance as _distance
-from ._domain_algorithm_overloads import bearing as _bearing
-from ._domain_algorithm_overloads import interpolate as _interpolate
-from ._domain_algorithm_overloads import extrapolate as _extrapolate
-from ._domain_algorithm_overloads import signed_turn_angle as _signed_turn_angle
-from ._domain_algorithm_overloads import unsigned_turn_angle as _unsigned_turn_angle
-from ._domain_algorithm_overloads import speed_between as _speed_between
-from ._domain_algorithm_overloads import point_at_fraction as _point_at_fraction
-from ._domain_algorithm_overloads import point_at_length_fraction as _point_at_length_fraction
-from ._domain_algorithm_overloads import point_at_time as _point_at_time
-from ._domain_algorithm_overloads import time_at_fraction as _time_at_fraction
-from ._domain_algorithm_overloads import subset_during_interval as _subset_during_interval
-from ._domain_algorithm_overloads import length as _length
-from ._domain_algorithm_overloads import current_length as _current_length
-from ._domain_algorithm_overloads import end_to_end_distance as _end_to_end_distance
-from ._domain_algorithm_overloads import intersects as _intersects
-from ._domain_algorithm_overloads import geometric_median as _geometric_median
-from ._domain_algorithm_overloads import geometric_mean as _geometric_mean
-from ._domain_algorithm_overloads import simplify as _simplify
-from ._domain_algorithm_overloads import convex_hull_perimeter as _convex_hull_perimeter
-from ._domain_algorithm_overloads import convex_hull_area as _convex_hull_area
-from ._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
-from ._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
-from ._domain_algorithm_overloads import convex_hull_centroid as _convex_hull_centroid
+from tracktable.lib._domain_algorithm_overloads import distance as _distance
+from tracktable.lib._domain_algorithm_overloads import bearing as _bearing
+from tracktable.lib._domain_algorithm_overloads import interpolate as _interpolate
+from tracktable.lib._domain_algorithm_overloads import extrapolate as _extrapolate
+from tracktable.lib._domain_algorithm_overloads import signed_turn_angle as _signed_turn_angle
+from tracktable.lib._domain_algorithm_overloads import unsigned_turn_angle as _unsigned_turn_angle
+from tracktable.lib._domain_algorithm_overloads import speed_between as _speed_between
+from tracktable.lib._domain_algorithm_overloads import point_at_fraction as _point_at_fraction
+from tracktable.lib._domain_algorithm_overloads import point_at_length_fraction as _point_at_length_fraction
+from tracktable.lib._domain_algorithm_overloads import point_at_time as _point_at_time
+from tracktable.lib._domain_algorithm_overloads import time_at_fraction as _time_at_fraction
+from tracktable.lib._domain_algorithm_overloads import subset_during_interval as _subset_during_interval
+from tracktable.lib._domain_algorithm_overloads import length as _length
+from tracktable.lib._domain_algorithm_overloads import end_to_end_distance as _end_to_end_distance
+from tracktable.lib._domain_algorithm_overloads import intersects as _intersects
+from tracktable.lib._domain_algorithm_overloads import geometric_median as _geometric_median
+from tracktable.lib._domain_algorithm_overloads import geometric_mean as _geometric_mean
+from tracktable.lib._domain_algorithm_overloads import simplify as _simplify
+from tracktable.lib._domain_algorithm_overloads import convex_hull_perimeter as _convex_hull_perimeter
+from tracktable.lib._domain_algorithm_overloads import convex_hull_area as _convex_hull_area
+from tracktable.lib._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
+from tracktable.lib._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
 
 def xcoord(thing):
     """Return what we think is the X-coordinate for an object.
@@ -462,7 +459,7 @@ def point_at_length_fraction(trajectory, fraction):
 
     """
 
-    return _point_at_length_fraction(trajectory, fraction)	
+    return _point_at_length_fraction(trajectory, fraction)
 
 # ----------------------------------------------------------------------
 
@@ -625,7 +622,7 @@ def compute_bounding_box(point_sequence, buffer=()):
     same type. It can also produce a buffer of space that extends the
     bounding box some percentage beyond the min and max points. The
     implementation is fairly naive and can cause issues if the values
-    extend past max values for the point/map type. 
+    extend past max values for the point/map type.
 
     Args:
       point_sequence: Iterable of points
@@ -644,7 +641,7 @@ def compute_bounding_box(point_sequence, buffer=()):
     bbox_type = None
 
     num_points = 0
-    
+
     for point in point_sequence:
         num_points += 1
         if bbox_type is None:
@@ -660,7 +657,7 @@ def compute_bounding_box(point_sequence, buffer=()):
             for i in range(len(point)):
                 min_corner[i] = min(min_corner[i], point[i])
                 max_corner[i] = max(max_corner[i], point[i])
-    
+
     if len(buffer) == 2:
         horiz_buff = (max_corner[0] - min_corner[0]) * buffer[0]
         vert_buff = (max_corner[1] - min_corner[1]) * buffer[1]
@@ -671,7 +668,7 @@ def compute_bounding_box(point_sequence, buffer=()):
     elif len(buffer) != 0:
         print("ERROR: buffer requires exactly 0 or 2 values")
         return None
-        
+
     if num_points == 0:
         print("ERROR: Cannot compute bounding box.  No points provided.")
         return None
@@ -696,7 +693,7 @@ def recompute_speed(trajectory, target_attribute_name="speed"):
 
     Args:
       trajectory: Any Tracktable trajectory
-      target_attribute_name: Speed will be stored in this property at 
+      target_attribute_name: Speed will be stored in this property at
           each point.  Defaults to 'speed'.
 
     The trajectory will be modified in place instead of returning a
@@ -856,10 +853,10 @@ def radius_of_gyration(trajectory):
     """Compute the radius of gyration of a trajectory
 
     Radius of gyration is an indication of the compactness of a trajectory.
-    Technically the result is in radians from the center of mass of 
+    Technically the result is in radians from the center of mass of
     the trajectory. The units of the radius is dependent on the type
-    of trajectory being measured. Terrestrial will return km, while 
-    Cartesian2D returns radians. 
+    of trajectory being measured. Terrestrial will return km, while
+    Cartesian2D returns radians.
 
     Args:
       trajectory: Trajectory whose shape you want to measure
@@ -871,6 +868,7 @@ def radius_of_gyration(trajectory):
 
     return _radius_of_gyration(trajectory)
 
+# ----------------------------------------------------------------------
 
 def convex_hull_centroid(trajectory):
     """Compute the centroid of the convex hull of a trajectory
@@ -878,12 +876,38 @@ def convex_hull_centroid(trajectory):
     Centroid will be returned in the native units of
     the domain.  This is: latitude, longitude (altitude) for the
     terrestrial domain; and x, y (z) for Cartesian.
-
-    Args:
-      trajectory: Trajectory whose hull you want to measure
- 
-    Returns:
-      Centroid of the trajectory's convex hull
     """
- 
+    
     return _convex_hull_centroid(trajectory)
+
+# ----------------------------------------------------------------------
+
+def latitude_degree_size(latitude):
+    """
+    latitude_degree_size(latitude: float between -90 and 90) -> float (in km)
+
+    Compute the distance between adjacent degrees of latitude centered
+    on a given parallel.  This measurement is 111.694km at the equator
+    and 110.574km at the poles.  This is a small enough variation that
+    we'll just use linear interpolation.
+    """
+
+    return (math.fabs(latitude) / 90) * (110.574 - 111.694) + 111.594
+
+# ----------------------------------------------------------------------
+
+def longitude_degree_size(latitude):
+    """
+    longitude_degree_size(longitude: float between -90 and 90) -> float (in km)
+
+    Compute the distance between adjacent degrees of longitude at a
+    given latitude.  This varies from 111.32km at the equator to 0 at
+    the poles and decreases as the cosine of increasing latitude.
+    """
+
+    def d2r(d):
+        return math.pi * d / 180
+
+    return 111.32 * math.cos(d2r(math.fabs(latitude)))
+
+# ----------------------------------------------------------------------

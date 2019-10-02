@@ -35,8 +35,8 @@ find_package(Boost 1.57.0 REQUIRED COMPONENTS date_time serialization)
 include(GenerateExportHeader)
 
 include_directories(
-  ${Tracktable_SOURCE_DIR}
-  ${Tracktable_BINARY_DIR}
+  ${PROJECT_SOURCE_DIR}
+  ${PROJECT_BINARY_DIR}
   ${Boost_INCLUDE_DIR}
   )
 
@@ -166,6 +166,16 @@ add_library( TracktableCore
   ${Core_Detail_TraitSignatures_HEADERS}
   ${Core_WarningGuards_HEADERS}
 )
+
+set_property(
+  TARGET TracktableCore
+  PROPERTY SOVERSION ${Tracktable_VERSION}
+  )
+
+set_property(
+  TARGET TracktableCore
+  PROPERTY VERSION ${Tracktable_VERSION}
+  )
 
 
 # The following source_group directives make Visual Studio show the

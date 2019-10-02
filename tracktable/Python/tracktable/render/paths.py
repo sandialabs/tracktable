@@ -52,7 +52,7 @@ from six.moves import range
 import numpy
 
 from tracktable.core import geomath
-from . import colormaps
+from tracktable.render import colormaps
 
 
 # ----------------------------------------------------------------------
@@ -187,9 +187,9 @@ def draw_traffic(traffic_map,
     Parameters in more detail:
 
 
-    ``traffic_map``: Basemap instance (no default)
+    ``traffic_map``: Map instance (no default)
 
-    Basemap instance of the space in which trajectories will be
+    Cartopy GeoAxes instance of the space in which trajectories will be
     rendered.  We don't actually render into this object.  Instead we
     use it to project points from longitude/latitude space down into
     the map's local coordinate system.  Take a look at
@@ -292,8 +292,8 @@ def draw_traffic(traffic_map,
     all_artists = []
 
     lead_point_scalars = []
-    lead_point_x_world = []
-    lead_point_y_world = []
+    lead_point_x = []
+    lead_point_y = []
     lead_point_labels = []
 
     # If the user hasn't specified a custom linewidth function then we
@@ -324,10 +324,10 @@ def draw_traffic(traffic_map,
     current_batch_linewidths = []
 
     # We want to ignore segments that span most of the way across the map.
-    if hasattr(traffic_map, 'llcrnrx'):
-        # This is a Basemap instance.  We can ask it directly what its spans are.
-        x_span = traffic_map.urcrnrx - traffic_map.llcrnrx
-        y_span = traffic_map.urcrnry - traffic_map.llcrnry
+    if hasattr(traffic_map, 'get_extent'):
+        map_extent = traffic_map.get_extent()
+        x_span = map_extent[2] - map_extent[0]
+        y_span = map_extent[3] - map_extent[1]
         max_segment_length = 0.5 * max(x_span, y_span)
     else:
         # The above kluge is really only there for terrestrial maps so
@@ -349,8 +349,8 @@ def draw_traffic(traffic_map,
 
         trajectory = remove_duplicate_points(trajectory)
 
-        local_x_world = numpy.zeros(len(trajectory))
-        local_y_world = numpy.zeros(len(trajectory))
+        local_x = numpy.zeros(len(trajectory))
+        local_y = numpy.zeros(len(trajectory))
 
         trajectory_number += 1
         num_trajectories_rendered += 1
@@ -361,10 +361,8 @@ def draw_traffic(traffic_map,
         # trajectory to coordinates in the map projection's native
         # space
         for i in range(len(trajectory)):
-            local_x_world[i] = trajectory[i][0]
-            local_y_world[i] = trajectory[i][1]
-
-        (local_x, local_y) = traffic_map(local_x_world, local_y_world)
+            local_x[i] = trajectory[i][0]
+            local_y[i] = trajectory[i][1]
 
         # Now we turn that list of n points into a list of n-1 line
         # segments.  We shouldn't have any degenerate segments because
@@ -383,8 +381,8 @@ def draw_traffic(traffic_map,
 
             # The lead point is the last point in the trajectory
             lead_point_labels.append(label_generator(trajectory[-1]))
-            lead_point_x_world.append(local_x_world[-1])
-            lead_point_y_world.append(local_y_world[-1])
+            lead_point_x.append(local_x[-1])
+            lead_point_y.append(local_y[-1])
             lead_point_scalars.append(local_scalars[-1])
 
             # things look OK up to this point
@@ -435,8 +433,7 @@ def draw_traffic(traffic_map,
         current_batch_linewidths = []
         current_batch_paths = []
 
-    if len(lead_point_x_world) > 0:
-        lead_point_x, lead_point_y = traffic_map(lead_point_x_world, lead_point_y_world)
+    if len(lead_point_x) > 0:
         if dot_size:
             if zorder:
                 dot_zorder = zorder+1
@@ -458,7 +455,7 @@ def draw_traffic(traffic_map,
             all_artists.append(dot_collection)
 
         if label_objects:
-            for (x, y, label) in zip(lead_point_x, lead_point_y, lead_point_labels):
+            for (x, y, label) in zip(lead_point_x_world, lead_point_y_world, lead_point_labels):
                 all_artists.append(axes.text(x, y, label, **label_kwargs))
 
 #    print("DEBUG: draw_traffic: {} trajectories examined and {} rendered".format(

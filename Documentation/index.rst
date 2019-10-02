@@ -31,10 +31,6 @@ We want to make it easy to...
 
 * Have fun!
 
-Tracktable version 1.1 is a milestone release.  It is the last version
-that will use the ```basemap``` geospatial rendering library.  It is
-also the last version that will support Python 2.7.
-
 If you come across problems, please tell us about them so that we can
 improve Tracktable in the future!
 
