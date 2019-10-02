@@ -44,14 +44,15 @@ autodoc_mock_imports = [
     'numpy',
     'shapefile',
     'shapely',
-    'tracktable.core.core_types',
-    'tracktable.core._core_types',
-    'tracktable.core._domain_algorithm_overloads',
-    'tracktable.analysis._dbscan_clustering',
-    'tracktable.analysis._rtree',
-    'tracktable.domain._terrestrial',
-    'tracktable.domain._cartesian2d',
-    'tracktable.domain._cartesian3d'
+    'tracktable.lib._domain_algorithm_overloads',
+    'tracktable.lib._core_types',
+    'tracktable.lib._terrestrial',
+    'tracktable.lib._cartesian2d',
+    'tracktable.lib._cartesian3d',
+    'tracktable.lib._dbscan_clustering',
+    'tracktable.lib._rtree',
+    'tracktable.lib._tracktable_hello',
+    'tracktable.lib._feature_vector_points'
 ]
 
 # -- General configuration ------------------------------------------------
