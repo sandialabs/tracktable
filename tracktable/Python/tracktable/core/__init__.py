@@ -41,3 +41,28 @@ from . import core_types
 from .core_types import BoostPythonArgumentError, set_default_timezone
 from .core_types import current_memory_use, peak_memory_use
 from .timestamp import Timestamp
+
+import os.path
+
+def data_directory():
+    """Return path to Tracktable example data files
+
+    We bundle a few example data files inside Tracktable.  This
+    function will give you the path to those.  Use it as follows:
+
+    import os.path
+    from tracktable.core import data_directory
+
+    with open(os.path.join(data_directory(), "SampleASDI.csv")) as asdi_file:
+         # Do your own stuff with the data
+
+    Arguments:
+        No arguments.
+
+    Returns:
+        Path to Tracktable example data files.
+    """
+
+    data_directory = os.path.join(os.path.dirname(__file__), '..', 'examples', 'data')
+    normalized_dir = os.path.normpath(data_directory)
+    return normalized_dir

@@ -33,7 +33,6 @@
 if (BUILD_TESTING)
   add_subdirectory(analysis/tests)
   add_subdirectory(core/tests)
-  add_subdirectory(examples/tests)
   add_subdirectory(source/tests)
   add_subdirectory(render/tests)
   add_subdirectory(domain/tests)
@@ -72,6 +71,12 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/examples
 )
 
+file(GLOB example_notebooks "examples/notebooks/*.py")
+install(
+  FILES ${example_noteboos}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/notebooks
+  )
+
 file(GLOB example_data_files "examples/data/*.*")
 install(
   FILES ${example_data_files}
@@ -102,6 +107,12 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/info/data
 )
 
+file(GLOB io_files "io/*.py")
+install(
+  FILES ${io_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/io
+)
+
 file(GLOB render_files "render/*.py")
 install(
   FILES ${render_files}
@@ -118,6 +129,12 @@ file (GLOB script_helper_argument_groups_files "script_helpers/argument_groups/*
 install(
   FILES ${script_helper_argument_groups_files}
   DESTINATION ${PYTHON_INSTALL_PREFIX}/script_helpers/argument_groups
+)
+
+file(GLOB analysis_files "analysis/*.py")
+install(
+  FILES ${analysis_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/analysis
 )
 
 file(GLOB source_files "source/*.py")

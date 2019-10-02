@@ -332,6 +332,11 @@ public:
     this->PropertyReadWrite.set_timestamp_input_format(format);
   }
 
+  string_type timestamp_format() const
+  {
+    return this->PropertyReadWrite.timestamp_input_format();
+  }
+  
   void set_null_value(string_type const& value)
     {
       this->PropertyReadWrite.set_null_value(value);

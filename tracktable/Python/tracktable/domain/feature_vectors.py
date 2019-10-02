@@ -30,7 +30,7 @@
 
 from __future__ import print_function, division, absolute_import
 from six.moves import range
-from . import _feature_vector_points
+from tracktable.lib import _feature_vector_points
 
 POINT_TYPES = [ None,
                 _feature_vector_points.FeatureVector1,

@@ -31,7 +31,7 @@
 
 from __future__ import division, print_function, absolute_import
 
-from . import _rtree
+from tracktable.lib import _rtree
 
 from tracktable.domain.feature_vectors import convert_to_feature_vector
 

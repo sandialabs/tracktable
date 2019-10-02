@@ -28,13 +28,11 @@ Tracktable has the following required dependencies:
 Python
 ^^^^^^
 
-* Python 2.7, 3.4, 3.5, 3.6, or 3.7 - http://python.org 
+* Python 2.7, 3.5, 3.6, or 3.7 - http://python.org 
     * NOTE: Tracktable 1.1 is the last version that will support Python 2.7.
 * numpy 1.7+ - http://numpy.org
 * Matplotlib 2.0+ - http://matplotlib.org
-* Basemap (including hi-res data) - http://matplotlib.org/basemap 
-    * NOTE: Maintenance on BaseMap is scheduled to end soon.  A replacement (likely Cartopy?)
-      will be identified in a future release.
+* Cartopy - https://scitools.org.uk/cartopy/docs/latest/
 * PyTZ - https://pypi.python.org/pypi/pytz/
 * Shapely - https://pypi.python.org/pypi/Shapely
 * Six - https://pypi.org/project/six/
@@ -45,14 +43,14 @@ C++
 
 * Compiler - GCC 4.4.7 or newer (http://gcc.gnu.org), clang 3.5 or newer (http://clang.llvm.org), 
   Visual Studio 14 2015 or newer (https://visualstudio.microsoft.com)
-* Boost 1.61 or newer - http://www.boost.org
+* Boost 1.67 or newer - http://www.boost.org
 * GEOS library - http://geos.osgeo.org
 
   - You must build Boost with Boost.Python enabled using the headers
     from the same Python installation you will use to run Tracktable.
 
   - We rely on the r-tree and distance computation code available in
-    recent versions of Boost.  Use 1.61 or newer.
+    recent versions of Boost.  Use 1.67 or newer.
 
   - With respect to C++11: if you want to call Tracktable from code
     built with C++11 turned on, you must also build Tracktable with
@@ -70,7 +68,7 @@ C++
 Other
 ^^^^^
 
-* CMake 3.0+ - http://www.cmake.org
+* CMake 3.12+ - http://www.cmake.org
 
 If you want to build documentation you will also need the following packages:
 
@@ -101,14 +99,6 @@ package managers like ``conda`` (Anaconda's built-in package manager),
 common in Linux environments), MacPorts (http://macports.org) or
 Homebrew (http://brew.sh).  The notes in this section are for cases
 when you have no choice but to build external packages from source.
-
-Building Python
-***************
-
-The option we care about the most if you build your own Python is
-``--enabled-shared``.  This will leave you with a shared library
-version of the Python C API.  Tracktable links against this for the
-Python bindings of its C++ components.
 
 Building Boost
 **************

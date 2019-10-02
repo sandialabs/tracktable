@@ -29,7 +29,7 @@
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.12)
 if (POLICY CMP0042)
   cmake_policy(SET CMP0042 NEW)
   set(CMAKE_MACOSX_RPATH ${Tracktable_BINARY_DIR}/lib)
@@ -47,8 +47,8 @@ set(CMAKE_MODULE_PATH
   "${CMAKE_CURRENT_SOURCE_DIR}/CMake/Modules")
 
 # Generic output paths for build systems with one output directory
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${Tracktable_BINARY_DIR}/lib )
-set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${Tracktable_BINARY_DIR}/lib )
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib )
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${Tracktable_BINARY_DIR}/bin )
 
 # Build-type-specific output paths for things like MSVC, XCode
@@ -81,6 +81,7 @@ IF("${isSystemDir}" STREQUAL "-1")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 set(MACOSX_RPATH ON)
+set(CMAKE_MACOSX_RPATH ON)
 
 # ----------------------------------------------------------------------
 
@@ -98,6 +99,7 @@ if (BUILD_SHARED_LIBS)
   message(STATUS "Building shared libraries.")
   add_definitions(-DBUILDING_SHARED_LIBS)
   add_definitions(-DBOOST_ALL_DYN_LINK)
+  set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
   set(Boost_USE_STATIC_LIBS OFF)
 else (BUILD_SHARED_LIBS)
   if (BUILD_PYTHON_WRAPPING)
@@ -172,7 +174,10 @@ endif (BUILD_DOCUMENTATION)
 
 # ----------------------------------------------------------------------
 
+install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/Python/tracktable)
 
+# ----------------------------------------------------------------------
 
 if (BUILD_PYTHON_WRAPPING)
   if (NOT BUILD_SHARED_LIBS)
@@ -192,3 +197,5 @@ if (BUILD_TESTING)
 endif (BUILD_TESTING)
 
 add_subdirectory(tracktable)
+
+message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")

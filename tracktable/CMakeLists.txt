@@ -35,6 +35,8 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+set(Tracktable_VERSION 1.2.0)
+
 add_subdirectory(Core)
 add_subdirectory(Domain)
 add_subdirectory(IO)
@@ -45,4 +47,3 @@ if (BUILD_PYTHON_WRAPPING)
   add_subdirectory(Python)
   add_subdirectory(PythonWrapping)
 endif (BUILD_PYTHON_WRAPPING)
-

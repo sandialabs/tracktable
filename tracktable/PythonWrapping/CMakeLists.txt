@@ -34,8 +34,6 @@
 # a single symbol -- its entry point -- and Boost.Python already
 # handles the dllexport/dllimport annotation for that.
 #
-
-
 # ----------------------------------------------------------------------
 #
 # So, what's the Boost.Python library called?
@@ -82,37 +80,25 @@ endif (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
 
 # ----------------------------------------------------------------------
 #
-# Dealing with Anaconda
+# (Not) Linking against libpython
 #
-# The Anaconda Python distribution statically links the Python library
-# into its interpreter on OS X (possibly other platforms as well).
-# This causes a segmentation fault when we try to load one of the
-# compiled C++ extensions that links against Boost.Python and,
-# transitively, libpython.
+# Some Python interpreters link statically against libpython.  Some
+# link dynamically.  If we link to a different libpython than the one
+# in/alongside the interpreter, we get segfaults at runtime.
 #
 # The solution is to not link against libpython and instead tell the
-# linker to leave unresolved symbols unresolved until load time.
+# linker to leave unresolved symbols unresolved until load time.  GCC
+# and Visual C++ do this by default.  Clang has an applicable link
+# flag: "-undefined dynamic_lookup".
 
-set(PYTHON_IS_ANACONDA FALSE)
+if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  # using regular Clang or AppleClang
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+endif()
 
-include(CheckForAnacondaPython)
-if (APPLE)
-  if (EXISTS ${PYTHON_EXECUTABLE})
-    check_for_anaconda_python(${PYTHON_EXECUTABLE} PYTHON_IS_ANACONDA)
-    if (PYTHON_IS_ANACONDA)
-      set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-      set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
-    else (PYTHON_IS_ANACONDA)
-      set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-    endif (PYTHON_IS_ANACONDA)
-  endif (EXISTS ${PYTHON_EXECUTABLE})
-else (APPLE)
-  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-endif (APPLE)
+set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
 
 include(PythonExtension)
-
-
 
 set( FEATURE_VECTOR_MAX_DIMENSION 30 CACHE STRING "Maximum dimension of feature vectors for Python wrapping." )
 
@@ -133,21 +119,6 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
   ${Tracktable_BINARY_DIR}/lib
 )
-
-# Deprecated: this gets handled up above
-# if (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
-#   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-#   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
-# else (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
-#   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-# endif (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
-
-# if (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
-#   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-#   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
-# else (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
-#   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-# endif (USE_ANACONDA_LINK_FLAGS OR PYTHON_IS_ANACONDA)
 
 set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable)
 
@@ -171,7 +142,7 @@ target_link_libraries(_tracktable_hello
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-install_python_extension( _tracktable_hello core ${Tracktable_PYTHON_DIR} )
+install_python_extension(_tracktable_hello lib ${Tracktable_PYTHON_DIR})
 
 add_library(_core_types MODULE
   CorePythonModule.cpp
@@ -180,14 +151,14 @@ add_library(_core_types MODULE
   PropertyMapWrapper.cpp
   CommonMapWrappers.cpp
   )
-set_property(TARGET _core_types                PROPERTY FOLDER "Python")
+set_property(TARGET _core_types PROPERTY FOLDER "Python")
 
 target_link_libraries(_core_types
   TracktableCore
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-install_python_extension(_core_types core ${Tracktable_PYTHON_DIR})
+install_python_extension(_core_types lib ${Tracktable_PYTHON_DIR})
 
 add_library(_domain_algorithm_overloads MODULE
   DomainAlgorithmOverloadsPythonModule.cpp
@@ -200,12 +171,12 @@ target_link_libraries(_domain_algorithm_overloads
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-install_python_extension(_domain_algorithm_overloads core ${Tracktable_PYTHON_DIR})
+install_python_extension(_domain_algorithm_overloads lib ${Tracktable_PYTHON_DIR})
 
 add_library(_terrestrial MODULE
   TerrestrialDomainModule.cpp
 )
-set_property(TARGET _terrestrial                PROPERTY FOLDER "Python")
+set_property(TARGET _terrestrial PROPERTY FOLDER "Python")
 
 target_link_libraries(_terrestrial
   TracktableCore
@@ -213,13 +184,12 @@ target_link_libraries(_terrestrial
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-install_python_extension(_terrestrial domain ${Tracktable_PYTHON_DIR})
-
+install_python_extension(_terrestrial lib ${Tracktable_PYTHON_DIR})
 
 add_library(_cartesian2d MODULE
   Cartesian2DDomainModule.cpp
 )
-set_property(TARGET _cartesian2d                PROPERTY FOLDER "Python")
+set_property(TARGET _cartesian2d PROPERTY FOLDER "Python")
 
 target_link_libraries(_cartesian2d
   TracktableCore
@@ -227,7 +197,7 @@ target_link_libraries(_cartesian2d
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-install_python_extension(_cartesian2d domain ${Tracktable_PYTHON_DIR})
+install_python_extension(_cartesian2d lib ${Tracktable_PYTHON_DIR})
 
 add_library(_cartesian3d MODULE
   Cartesian3DDomainModule.cpp
@@ -240,8 +210,7 @@ target_link_libraries(_cartesian3d
   ${PYTHON_EXTENSION_LIBRARIES}
 )
 
-install_python_extension(_cartesian3d domain ${Tracktable_PYTHON_DIR})
-
+install_python_extension(_cartesian3d lib ${Tracktable_PYTHON_DIR})
 
 add_library(_feature_vector_points MODULE
   FeatureVectorModule.cpp
@@ -253,10 +222,11 @@ add_library(_feature_vector_points MODULE
   ExplicitInstantiation/FeatureVectorWrapper_26_30.cpp
   ExplicitInstantiation/FeatureVectorWrapper_Extra.cpp
   )
+
 If(MSVC)
   set_property(SOURCE FeatureVectorModule.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " /bigobj ")
 Endif(MSVC)
-set_property(TARGET _feature_vector_points      PROPERTY FOLDER "Python")
+set_property(TARGET _feature_vector_points PROPERTY FOLDER "Python")
 
 target_link_libraries(_feature_vector_points
   TracktableCore
@@ -264,7 +234,7 @@ target_link_libraries(_feature_vector_points
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
-install_python_extension(_feature_vector_points domain ${Tracktable_PYTHON_DIR})
+install_python_extension(_feature_vector_points lib ${Tracktable_PYTHON_DIR})
 
 add_library(_dbscan_clustering MODULE
   DBSCANClusteringPythonModule.cpp
@@ -280,7 +250,7 @@ add_library(_dbscan_clustering MODULE
   ExplicitInstantiation/DBSCAN_Wrapper_28_30.cpp
   ExplicitInstantiation/DBSCAN_Wrapper_Extra.cpp
   )
-set_property(TARGET _dbscan_clustering          PROPERTY FOLDER "Python")
+set_property(TARGET _dbscan_clustering PROPERTY FOLDER "Python")
 
 target_link_libraries(_dbscan_clustering
   TracktableCore
@@ -289,7 +259,7 @@ target_link_libraries(_dbscan_clustering
   )
 
 
-install_python_extension(_dbscan_clustering analysis ${Tracktable_PYTHON_DIR})
+install_python_extension(_dbscan_clustering lib ${Tracktable_PYTHON_DIR})
 
 
 add_library(_rtree MODULE
@@ -306,7 +276,7 @@ add_library(_rtree MODULE
   ExplicitInstantiation/RTree_Wrapper_28_30.cpp
   ExplicitInstantiation/RTree_Wrapper_Extra.cpp
   )
-set_property(TARGET _rtree          PROPERTY FOLDER "Python")
+set_property(TARGET _rtree PROPERTY FOLDER "Python")
 
 target_link_libraries(_rtree
   TracktableCore
@@ -314,5 +284,49 @@ target_link_libraries(_rtree
   ${PYTHON_EXTENSION_LIBRARIES}
   )
 
+install_python_extension(_rtree lib ${Tracktable_PYTHON_DIR})
 
-install_python_extension(_rtree analysis ${Tracktable_PYTHON_DIR})
+get_filename_component(
+  PYTHON_EXECUTABLE_DIRECTORY
+  ${PYTHON_EXECUTABLE}
+  DIRECTORY
+  )
+
+message(STATUS "Adding wheel target.")
+message(STATUS "INFO: Python executable is ${PYTHON_EXECUTABLE}")
+message(STATUS "INFO: Install prefix is ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "INFO: Wheel should go in ${CMAKE_BINARY_DIR}/wheel")
+
+if (APPLE)
+  find_program(
+    FIX_WHEEL_EXECUTABLE
+    delocate-wheel
+    HINTS
+    ${PYTHON_EXECUTABLE_DIRECTORY}
+    DOC
+    "delocate-wheel executable: OS X utility to add libraries to Python wheels"
+    )
+endif (APPLE)
+
+if (UNIX AND NOT APPLE)
+  find_program(
+    FIX_WHEEL_EXECUTABLE
+    auditwheel
+    DOC
+    "auditwheel: add libraries to a wheel"
+    )
+endif (UNIX AND NOT APPLE)
+
+
+add_custom_target( wheel
+  COMMAND
+  ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
+  ${PYTHON_EXECUTABLE}
+  ${CMAKE_BINARY_DIR}
+  ${CMAKE_INSTALL_PREFIX}
+  ${CMAKE_BINARY_DIR}/wheel
+  ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
+  ${FIX_WHEEL_EXECUTABLE}
+  WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+#  DEPENDS install
+  )

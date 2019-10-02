@@ -30,21 +30,17 @@
 
 """example_trajectory_rendering - Arguments and code for drawing trajectories
 
-Once we have a set of trajectories in memory we can make decisions
-about how they should look on screen.  That includes...
+This file contains a complete, runnable example of how to render
+trajectories onto a map (example_trajectory_rendering()) as well as 
+utility functions that you can use in your own code.  Those functions 
+address questions such as...
 
 * How should the line segments in the trajectory be colored?
-
 * What should the line width for each segment be?
-
 * Should there be a dot at the head of the trajectory?  What size and
   color?
-
 * What layer (Z-order) should the trajectories live in?
 
-The convenience methods in this file will render a single group of
-trajectories.  You can render several groups by instantiating several
-of them.
 """
 
 import matplotlib.colors
@@ -53,11 +49,111 @@ from tracktable.feature import annotations
 from tracktable.render import paths
 
 import numpy
+import sys
+from tracktable.examples.example_trajectory_builder import example_trajectory_builder
+from tracktable.domain import terrestrial
+from tracktable.render import mapmaker
+from matplotlib import pyplot
+
+# ----------------------------------------------------------------------
+
+def example_trajectory_rendering():
+    '''Sample code to render trajectories from points
+
+        In some cases, you may wish to read in trajectories with certain constraints. For example, we can have trajectories with a minimum number of points. Or we acknowledge that the points in the
+        trajectory should be within a certain time and/or distance threshold to belong to the same trajectory. The Trajectory Builder does this.'''
+
+    # First, We will need data points built into trajectories. Replace the following with your own code to build the trajectories or use the provided example.
+    fileName = './tracktable/examples/data/SampleTrajectories.csv'
+    trajectories = example_trajectory_builder(fileName)
+    
+    # Set up the canvas and map projection
+    dpi = 160
+    figure = pyplot.figure(figsize=[20, 15])
+    axes = figure.add_subplot(1, 1, 1)
+    #(figure, axes) = initialize_matplotlib_figure([10, 7.5])
+    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
+                                            map_name='region:conus',
+                                            draw_coastlines=True,
+                                            draw_countries=True,
+                                            draw_states=True,
+                                            draw_lonlat=True,
+                                            fill_land=True,
+                                            fill_water=True,
+                                            land_fill_color='#101010',
+                                            water_fill_color='#222222',
+                                            land_zorder=0,
+                                            water_zorder=0,
+                                            lonlat_spacing=90,
+                                            lonlat_color='#A0A0A0',
+                                            lonlat_linewidth=0.2,
+                                            lonlat_zorder=2,
+                                            coastline_color='#808080',
+                                            coastline_linewidth=1,
+                                            coastline_zorder=5,
+                                            country_border_color='#606060',
+                                            country_fill_color='#FFFF80',
+                                            country_linewidth=0.5,
+                                            country_zorder=5,
+                                            state_border_color='#404040',
+                                            state_fill_color='none',
+                                            state_linewidth=0.3,
+                                            state_zorder=2,
+                                            draw_largest_cities=50,
+                                            draw_cities_larger_than=None,
+                                            city_label_size=12,
+                                            city_dot_size=2,
+                                            city_dot_color='white',
+                                            city_label_color='white',
+                                            city_zorder=6,
+                                            border_resolution='110m',
+                                            axes=axes,
+                                            map_projection='PlateCarree')
+
+    color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1)
+    render_trajectories(mymap, trajectories, trajectory_linewidth=2)
+    
+    print("STATUS: Saving figure to file")
+    pyplot.savefig('./Example_Trajectory_Rendering_CONUS.png',
+                   figsize=[800,600],
+                   dpi=dpi,
+                   frameon=False,
+                   facecolor='black')
+
+    pyplot.close()
+    
+
+# ----------------------------------------------------------------------
+
+def initialize_matplotlib_figure(figure_size_in_inches,
+                                 axis_span=[0, 0, 1, 1],
+                                 facecolor='black',
+                                 edgecolor='black'): 
+    """Initialize a figure for Matplotlib to draw into.
+
+    Args:
+       figure_size_in_inches: 2-tuple of floats (width, height)
+       axis_span: list of 4 floats (left, bottom, width, height) with size of axes in figure.
+           Quantities are in fractions of figure width and height.
+       facecolor: string (default 'black') - what's the background color of the plot?
+       edgecolor: string (default 'black') - color of edge aroudn the figure
+
+    Returns:
+       (figure, axes) - both Matplotlib data structures
+    """
+
+    figure = pyplot.figure(figsize=figure_size_in_inches,
+                           facecolor='black',
+                           edgecolor='black')
+    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor='black')
+    axes.set_frame_on(False)
+
+    return (figure, axes)
 
 # ----------------------------------------------------------------------
 
 def make_constant_colormap(color):
-    colormap = matplotlib.colors.ListedColormap([ color ], 'dummy colormap')
+    colormap = matplotlib.colors.ListedColormap([color], 'dummy colormap')
     return colormap
 
 # ----------------------------------------------------------------------
@@ -77,13 +173,13 @@ def render_trajectories(basemap,
                         scalar_min=0,
                         scalar_max=1,
                         axes=None):
-    """Render decorated trajectories onto a Basemap instance.
+    """Render decorated trajectories onto a map instance.
 
-    Given a Basemap instance and an iterable containing trajectories,
-    draw the trajectories onto the map with the specified appearance
-    parameters.  You can control the trajectory color, linewidth,
-    z-order and whether or not a dot is drawn at the head of each
-    path.
+    Given a map instance (usually axes from Cartopy) and an iterable 
+    containing trajectories, draw the trajectories onto the map with 
+    the specified appearance parameters.  You can control the trajectory 
+    color, linewidth, z-order and whether or not a dot is drawn at the
+    head of each path.
 
     Args:
        basemap:                  Basemap instance to draw into
@@ -117,21 +213,15 @@ def render_trajectories(basemap,
     NOTE: This function is an adapter between the trajectory_rendering
     argument group and the draw_traffic() function in the
     tracktable.render.paths module.
-
     """
-
-#    print("DEBUG: Is trajectory generator running in render_trajectories before we set up the annotation generator?")
-#    print("DEBUG: trajectory count: {}".format(len(list(trajectory_source))))
-    # generator is *not* running at this point!
 
     trajectories_to_render = None
 
     if trajectory_color_type == 'scalar':
         annotator = annotations.retrieve_feature_function(trajectory_color)
+        
         def annotation_generator(traj_source):
             for trajectory in traj_source:
-#                print("annotation_generator: next trajectory being accessed from traceback:")
-#                traceback.print_stack()
                 yield(annotator(trajectory))
 
         trajectories_to_render = annotation_generator(trajectory_source)
@@ -186,16 +276,16 @@ def render_annotated_trajectories(basemap,
                                   scalar_max=1,
                                   axes=None):
 
-    """Render decorated trajectories onto a Basemap instance.  The trajectory scalars must already be set.
+    """Render decorated trajectories (with scalars) onto a map instance.
 
-    Given a Basemap instance and an iterable containing trajectories,
+    Given a map instance and an iterable containing trajectories,
     draw the trajectories onto the map with the specified appearance
     parameters.  You can control the trajectory color, linewidth,
     z-order and whether or not a dot is drawn at the head of each
     path.
 
     Args:
-       basemap:                  Basemap instance to draw into
+       basemap:                  Map instance to draw into
        trajectory_source:        Iterable of Trajectory objects
        trajectory_scalar_accessor: Return a list of scalars for a trajectory
        trajectory_colormap:      Colormap to map between scalars and colors
@@ -245,12 +335,6 @@ def render_annotated_trajectories(basemap,
                               color_scale=matplotlib.colors.Normalize(vmin=scalar_min, vmax=scalar_max),
                               dot_size=dot_size,
                               dot_color=dot_color,
-#                              label_objects=True,
-#                              label_generator=lambda t: '@{}'.format(t.object_id),
-#                              label_kwargs={
-#                                  'color': 'white',
-#                                  'size': 'small'
-#                              },
                               axes=axes)
 
 
@@ -314,3 +398,5 @@ def _make_constant_linewidth_generator(linewidth):
 
     return linewidth_generator
 
+if __name__ == '__main__':
+    sys.exit(example_trajectory_rendering())

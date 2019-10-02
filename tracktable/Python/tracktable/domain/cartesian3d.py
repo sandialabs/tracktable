@@ -28,17 +28,17 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from ._cartesian3d import BasePointCartesian3D as BasePoint
-from ._cartesian3d import TrajectoryPointCartesian3D as TrajectoryPoint
-from ._cartesian3d import TrajectoryCartesian3D as Trajectory
-from ._cartesian3d import BasePointReaderCartesian3D as BasePointReader
-from ._cartesian3d import TrajectoryPointReaderCartesian3D as TrajectoryPointReader
-from ._cartesian3d import TrajectoryReaderCartesian3D as TrajectoryReader
-from ._cartesian3d import BoundingBoxCartesian3D as BoundingBox
-from ._cartesian3d import TrajectoryReaderCartesian3D as TrajectoryReader
-from ._cartesian3d import BasePointWriterCartesian3D as BasePointWriter
-from ._cartesian3d import TrajectoryPointWriterCartesian3D as TrajectoryPointWriter
-from ._cartesian3d import TrajectoryWriterCartesian3D as TrajectoryWriter
+from tracktable.lib._cartesian3d import BasePointCartesian3D as BasePoint
+from tracktable.lib._cartesian3d import TrajectoryPointCartesian3D as TrajectoryPoint
+from tracktable.lib._cartesian3d import TrajectoryCartesian3D as Trajectory
+from tracktable.lib._cartesian3d import BasePointReaderCartesian3D as BasePointReader
+from tracktable.lib._cartesian3d import TrajectoryPointReaderCartesian3D as TrajectoryPointReader
+from tracktable.lib._cartesian3d import TrajectoryReaderCartesian3D as TrajectoryReader
+from tracktable.lib._cartesian3d import BoundingBoxCartesian3D as BoundingBox
+from tracktable.lib._cartesian3d import TrajectoryReaderCartesian3D as TrajectoryReader
+from tracktable.lib._cartesian3d import BasePointWriterCartesian3D as BasePointWriter
+from tracktable.lib._cartesian3d import TrajectoryPointWriterCartesian3D as TrajectoryPointWriter
+from tracktable.lib._cartesian3d import TrajectoryWriterCartesian3D as TrajectoryWriter
 
 DIMENSION = 3
 
