@@ -32,13 +32,7 @@
 
 from tracktable.io.point import trajectory_point_reader, base_point_reader
 from tracktable.script_helpers.argument_groups import extract_arguments
-
-# TODO: remove this once we're in a version of TT that has data_directory()
-try:
-    from tracktable.core import data_directory
-except ImportError:
-    def data_directory():
-        return '/Users/atwilso/projects/tracktable/example_cleanup/tracktable/tracktable/Python/tracktable/examples/data'
+from tracktable.core import data_directory
 
 import os.path
 import sys
