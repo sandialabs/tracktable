@@ -176,6 +176,8 @@ endif (BUILD_DOCUMENTATION)
 
 install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX})
 install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/Python/tracktable)
+install(FILES README.md DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(FILES README.md DESTINATION ${CMAKE_INSTALL_PREFIX}/Python/tracktable)
 
 # ----------------------------------------------------------------------
 
