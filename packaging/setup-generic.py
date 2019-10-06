@@ -231,6 +231,8 @@ def main():
         install_requires=dependencies,
         keywords=keywords,
         python_requires=version_required,
+        long_description=read(os.path.join(tracktable_home, 'README.md')),
+        long_description_content_type='text/markdown',
 
         # Computed properties
         package_dir=package_directory,
