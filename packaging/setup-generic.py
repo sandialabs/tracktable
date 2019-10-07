@@ -127,11 +127,11 @@ def main():
     if system == 'Linux':
         extension_suffix = 'so'
         shared_library_suffix = None
-        os_classifier = 'Operating System :: Linux'
+        os_classifier = 'Operating System :: POSIX :: Linux'
     elif system == 'Darwin':
         extension_suffix = 'so'
         shared_library_suffix = None
-        os_classifier = 'Operating System :: Linux'
+        os_classifier = 'Operating System :: MacOS :: MacOS X'
     elif system == 'Windows':
         extension_suffix = 'pyd'
         shared_library_suffix = 'dll'
