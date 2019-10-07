@@ -37,38 +37,38 @@ matplotlib.use('Agg')
 import sys
 import traceback
 
-from tracktable.source.random_point_source import UniformRandomPointSource
-from tracktable.render.histogram2d import geographic
-from tracktable.domain.terrestrial import BasePoint
+from tracktable.source.scatter import uniform
+from tracktable.render import histogram2d
+from tracktable.domain.terrestrial import BasePoint, BoundingBox
+from tracktable.render.mapmaker import mapmaker
+from tracktable.source.point import random_box_uniform
 
-from mpl_toolkits.basemap import Basemap
 from matplotlib import pyplot
 from matplotlib import colors
 
 def test_geographic_histogram(outfilename):
-    tropics = UniformRandomPointSource(BasePoint)
-    tropics.num_points = 100000
-    tropics.bbox_min = ( -180, -23.4378 )
-    tropics.bbox_max = ( 180, 23.4378 )
+    min_corner = BasePoint(-180, -23.4378)
+    max_corner = BasePoint(180, 23.4378)
+    bbox = BoundingBox(min_corner, max_corner)
+    num_points = 100000
 
-    try:
-        pyplot.figure()
-        pyplot.subplot(111, aspect='equal')
+    points_in_tropics = random_box_uniform(min_corner, max_corner, num_points)
 
-        mymap = Basemap(projection='moll',
-                        lon_0=0,
-                        resolution='l')
-        mymap.drawcoastlines(color='white', zorder=5)
-        mymap.fillcontinents(color='black', lake_color='white')
+   
+    pyplot.figure()
+    pyplot.subplot(111, aspect='equal')
 
-        artists = geographic( mymap, tropics.points() )
+    mymap = mapmaker(domain='terrestrial', map_name='region:world')
 
-        pyplot.savefig(outfilename, figsize=(4, 4), dpi=150)
-        return True
-    except Exception, e:
-        traceback.print_exc()
-        return False
-
+    histogram2d.render_histogram(map_projection=mymap,
+                                 point_source=points_in_tropics,
+                                 bounding_box=bbox,
+                                 bin_size=0.5,
+                                 colormap='gist_heat',
+                                 colorscale=matplotlib.colors.LogNorm())
+    pyplot.savefig(outfilename, figsize=(4, 4), dpi=150)
+    return True
+    
 # ----------------------------------------------------------------------
 
 def main():
