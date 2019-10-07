@@ -39,7 +39,7 @@ from tracktable.render.projection import make_projection_cartesian2d
 from tracktable.render import geographic_decoration as decoration
 
 
-def mapmaker(domain, **kwargs):
+def mapmaker(domain='terrestrial', *args, **kwargs):
     if kwargs.get('map_bbox', None) is not None:
         map_bbox = kwargs['map_bbox']
     else:
@@ -56,7 +56,7 @@ def mapmaker(domain, **kwargs):
                 kwargs['map_bbox'] = bbox
             except TypeError: # it's already a bbox
                 pass
-        return terrestrial_map(**kwargs)
+        return terrestrial_map(*args, **kwargs)
     elif domain == 'cartesian' or domain == 'cartesian2d':
         if map_bbox is not None:
             try:
@@ -70,7 +70,7 @@ def mapmaker(domain, **kwargs):
                 # it's already a bbox
                 pass
 
-        return cartesian_map(**kwargs)
+        return cartesian_map(*args, **kwargs)
 
 # ----------------------------------------------------------------------
 
