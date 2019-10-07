@@ -119,6 +119,12 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/render
 )
 
+file (GLOB source_files "source/*.py")
+install(
+  FILES ${source_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/source
+)
+
 file (GLOB script_helper_files "script_helpers/*.py")
 install(
   FILES ${script_helper_files}
