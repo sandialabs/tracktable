@@ -131,6 +131,11 @@ def random_circle_linear_falloff(seed_point,
         )
 
         new_point = seed_point.__class__()
+        try:
+            new_point.object_id = seed_point.object_id
+            new_point.timestamp = seed_point.timestamp
+        except AttributeError:
+            pass
         new_point[0] = r2d(end_lon)
         new_point[1] = r2d(end_lat)
 
