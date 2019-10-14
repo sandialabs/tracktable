@@ -898,7 +898,7 @@ def latitude_degree_size(latitude):
 
 def longitude_degree_size(latitude):
     """
-    longitude_degree_size(longitude: float between -90 and 90) -> float (in km)
+    longitude_degree_size(latitude: float between -90 and 90) -> float (in km)
 
     Compute the distance between adjacent degrees of longitude at a
     given latitude.  This varies from 111.32km at the equator to 0 at
@@ -911,3 +911,27 @@ def longitude_degree_size(latitude):
     return 111.32 * math.cos(d2r(math.fabs(latitude)))
 
 # ----------------------------------------------------------------------
+
+def kms_to_lon(kms, latitude):
+    """
+    kms_to_lon(kms: float, latitude: float between -90 and 90) -> float (in longitude)
+    
+    Compute the degrees-longitude conversion for a distance in km, at a given latitude.
+    This is because as you move towards the poles, the km/longitude ratio decreases 
+    """
+
+    return kms / longitude_degree_size(latitude)
+
+# ----------------------------------------------------------------------
+
+def kms_to_lat(kms, latitude):
+    """
+    kms_to_lat(kms: float, latitude: float between -90 and 90) -> float (in latitude)
+    
+    Compute the degrees-latitude conversion for a distance in km, at a given latitude.
+    """
+
+    return kms / latitude_degree_size(latitude)
+
+# ----------------------------------------------------------------------
+
