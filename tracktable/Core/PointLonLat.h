@@ -36,6 +36,7 @@
 #include <tracktable/Core/TracktableCoreWindowsHeader.h>
 
 #include <tracktable/Core/PointBase.h>
+#include <tracktable/Core/PointCartesian.h>
 
 #include <tracktable/Core/detail/algorithm_signatures/Distance.h>
 #include <tracktable/Core/detail/algorithm_signatures/Interpolate.h>
@@ -150,6 +151,18 @@ public:
   void set_latitude(coord_type const& new_latitude)
     {
       this->set<1>(new_latitude);
+    }
+
+  PointCartesian<3> ECEF() const
+    {
+      coord_type lon = conversions::radians(this->get<0>());
+      coord_type lat = conversions::radians(this->get<1>());
+      coord_type pt[3];
+      pt[0] = cos(lat)*cos(lon);
+      pt[1] = cos(lat)*sin(lon);
+      pt[2] = sin(lat);
+
+      return PointCartesian<3>(pt);
     }
 
   std::string to_string() const
