@@ -1,20 +1,19 @@
-#
 # Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
-# the U.S. Government retains certain rights in this software.
-#
+# the U.S. Government retains certain rights in this software.    
+#     
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
-# are met:
-#
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-#
-# 2. Redistributions in binary form must reproduce the above copyright
+# are met:    
+#     
+#    1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.    
+#     
+#    2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
-#    documentation and/or other materials provided with the distribution.
-#
+#    documentation and/or other materials provided with the distribution.    
+#     
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -27,71 +26,67 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""example_trajectory_builder - Sample code to assemble points into trajectories
-"""
-from tracktable.domain import all_domains as ALL_DOMAINS
-import importlib
-import itertools
-import datetime
+# Purpose: Sample code to assemble points into trajectories    
+# When you read in points from a file, you need to build those points into 
+# trajectories. As we know, data can be noisy, therefore we want to filter our 
+# trajectories to have a minimum number of points and/or a certain time or 
+# distance between points in a trajectory. The trajectory builder does all of this. 
 
-from tracktable.source.trajectory import AssembleTrajectoryFromPoints
-from tracktable.core import geomath
+# Imports
+from tracktable.domain.terrestrial import TrajectoryPointReader        # Read points from file
+from tracktable.source.trajectory import AssembleTrajectoryFromPoints  # Turn points into trajectories
 
-# ----------------------------------------------------------------------
+# Requirements: In order to use the trajectory builder, we need a source that gives 
+# us data points in time sequential order. As with before, we can use the Point Reader.
 
-def configure_trajectory_builder(separation_distance=100,
-                                 separation_time=20,
-                                 minimum_length=10):
-    """Set up a trajectory builder using the specified parameters
+inFile = open('data/SampleFlightsUS.csv')
+reader = TrajectoryPointReader()
+reader.input = inFile
+reader.comment_character = '#'
+reader.field_delimiter = ','
+# Set columns for data we care about
+reader.object_id_column = 0
+reader.timestamp_column = 1
+reader.coordinates[0] = 2
+reader.coordinates[1] = 3
+reader.set_real_field_column('Heading', 5)  # Picked arbitrary data column for example purposes
 
-    Instantiate and configure an AssembleTrajectoryFromPoints.  You
-    will still need to set its 'input' member before it's ready to go.
 
-    Args:
-       separation_distance:  Two successive points that are at least this far apart (in KM) will be placed in separate trajectories.
-       separation_time:      Two successive points with at least this many minutes between them will be placed in separate trajectories.
-       minimum_length:       Trajectories with fewer than this many points will be discarded.
+# Now that we have our points ready to be read, we need to create a builder to 
+# take those points and form trajectories.    
+# For now, we are going to leave the parameters at default. 
 
-    Returns:
-       A new instance of AssembleTrajectoryFromPoints
-    """
+builder = AssembleTrajectoryFromPoints()
+builder.input = reader
+builder.minumum_length = 3                  # An example of how to set the minimum number of points for each trajectory. Default is 2.
 
-    source = AssembleTrajectoryFromPoints()
 
-    if separation_distance is not None:
-        source.separation_distance = float(separation_distance)
-    if separation_time is not None:
-        source.separation_time = datetime.timedelta(minutes=separation_time)
-    if minimum_length is not None:
-        source.minimum_length = minimum_length
+# That's it! Now we can play with the trajectories. As before with the point 
+# reader by itself, no data is loaded until you interact with the data.         
+# Let's start with seeing how many trajectories we have. We can do this, and 
+# see what they look like by dumping the trajectories to a list.  
 
-    return source
+traj = list(builder.trajectories())
+print(len(traj))
 
-def example_trajectory_builder(inputFile=None):
+# Looking at our first trajectory, we can see all the points included. See how 
+# they are in time sequential order and share the same object_id, which is what 
+# we would expect from a trajectory. 
 
-    '''In some cases, you may wish to read in trajectories with certain constraints. For example, we can have trajectories with a minimum number of points. Or we acknowledge that the points in the trajectory should be within a certain time and/or distance threshold to belong to the same trajectory. The Trajectory Builder does this.'''
+print(*traj[0])
 
-    '''Set up a trajectory builder using the specified parameters '''
-    source = configure_trajectory_builder(separation_distance=50, separation_time=10, minimum_length=5)
-    
-    '''In order to use the trajectory builder, we need a source that gives us data points in time sequential order. As with before, we can use the Trajectory Reader.'''
-    if inputFile == None:
-        inputFile = './data/SampleFlight.csv';
+# Here is an example of how to access specific information within a trajectory. We show how to get:    
+#  1. Core data such as object_id    
+#  2. Longitude and Latitude    
+#  3. Custom columns such as 'Heading'    
 
-    inFile = open(inputFile)
-    domain = 'terrestrial'                 # we want to create a terrestrial point reader
-    if domain.lower() not in ALL_DOMAINS:  #Format domain and make sure it is an available domain
-        raise KeyError("Domain '{}' is not in list of installed domains ({}).".format(domain, ', '.join(ALL_DOMAINS)))
-    else:
-        domain_to_import = 'tracktable.domain.{}'.format(domain.lower())
-        domain_module = importlib.import_module(domain_to_import)
+print('Object_id: ' + traj[0][0].object_id)                     # Trajectory 0 in list, point 0 in trajectory
+print('Latitude: ' + str(traj[0][0][1]))                        # Trajectory 0 in list, point 0 in trajectory, coordinate[1]
+print('Heading: ' + str(traj[0][0].properties['Heading']))      
 
-    point_source = domain_module.TrajectoryPointReader()
-    point_source.input = inFile
-    point_source.comment_character = '#'
-    point_source.field_delimiter = ','
+inFile.close()
 
-    '''Now we can apply the source of our points (the point reader we created above) and generate the trajectories by iterating over them. You will notice the output confirms the contrainsts we set in the previous step. Also, note only a single trajectory was created.'''
-
-    source.input = point_source
-    return source.trajectories()
+# The builder has multiple parameters that can be changed. For example, we can    
+#  1. Change the minimum number of points needed to form a trajectory. (builder.minimum_length = 10)    
+#  2. Change the minimum distance between points. (builder.separation_stance = 100)    
+#  3. Change the minimum time between points. (builder.separation_time = datetime.timedelta(minutes=30))    
