@@ -52,7 +52,7 @@ with open('data/SampleHeatmapPoints.csv', 'r') as inFile:
 # Now we generate a map and create a heatmap from the points we generated.
 # Set up the canvas and map projection
 (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
-                                        map_name='world')
+                                        map_name='region:world')
 
 heatmap.render_histogram(mymap, 
                          domain = 'terrestrial',
