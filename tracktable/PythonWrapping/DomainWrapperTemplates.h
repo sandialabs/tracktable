@@ -101,18 +101,47 @@ make_box(point_type const& p1, point_type const& p2)
   return box;
 }
 
+// NOTE: I could combine these two functions if I used boost::geometry::assign
+// instead of copying the coordinates manually
+
 template<typename box_type>
 boost::shared_ptr<box_type>
 make_box_2d_from_objects(boost::python::object& min_corner, boost::python::object& max_corner)
 {
   using boost::python::extract;
-  typedef typename boost::geometry::traits::point_type<box_type>::type::coordinate_type coordinate_type;
+  typedef typename boost::geometry::traits::point_type<box_type>::type point_type;
+  typedef typename point_type::coordinate_type coordinate_type;
 
   boost::shared_ptr<box_type> box(new box_type);
-  box->min_corner()[0] = extract<coordinate_type>(min_corner[0]);
-  box->min_corner()[1] = extract<coordinate_type>(min_corner[1]);
-  box->max_corner()[0] = extract<coordinate_type>(max_corner[0]);
-  box->max_corner()[1] = extract<coordinate_type>(max_corner[1]);
+  point_type& box_min_corner(box->min_corner());
+  point_type& box_max_corner(box->max_corner());
+
+  box_min_corner[0] = extract<coordinate_type>(min_corner[0]);
+  box_min_corner[1] = extract<coordinate_type>(min_corner[1]);
+  box_max_corner[0] = extract<coordinate_type>(max_corner[0]);
+  box_max_corner[1] = extract<coordinate_type>(max_corner[1]);
+  
+  return box;
+}
+
+template<typename box_type>
+boost::shared_ptr<box_type>
+make_box_3d_from_objects(boost::python::object& min_corner, boost::python::object& max_corner)
+{
+  using boost::python::extract;
+  typedef typename boost::geometry::traits::point_type<box_type>::type point_type;
+  typedef typename point_type::coordinate_type coordinate_type;
+
+  boost::shared_ptr<box_type> box(new box_type);
+  point_type& box_min_corner(box->min_corner());
+  point_type& box_max_corner(box->max_corner());
+
+  box_min_corner[0] = extract<coordinate_type>(min_corner[0]);
+  box_min_corner[1] = extract<coordinate_type>(min_corner[1]);
+  box_min_corner[2] = extract<coordinate_type>(min_corner[2]);
+  box_max_corner[0] = extract<coordinate_type>(max_corner[0]);
+  box_max_corner[1] = extract<coordinate_type>(max_corner[1]);
+  box_max_corner[2] = extract<coordinate_type>(max_corner[2]);
   return box;
 }
 
