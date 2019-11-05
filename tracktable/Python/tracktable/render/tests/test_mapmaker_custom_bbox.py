@@ -46,7 +46,7 @@ def test_florida_map(ground_truth_dir,
 
     pyplot.figure(figsize=(8, 8))
     # This is approximately Florida
-    bounding_box = [-88, 24, -79.5, 31]
+    bounding_box = [-88, -79.5, 24, 31]
     (mymap, artists) = mapmaker(domain='terrestrial',
                                 map_name='custom',
                                 map_bbox=bounding_box,
