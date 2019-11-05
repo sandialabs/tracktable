@@ -1,5 +1,16 @@
 ## Tracktable Release Notes
 
+Hotfixes since 1.2.0
+--------------------
+
+* The module `tracktable.source.random_point_source` has been replaced by `tracktable.source.point`, formerly known as `tracktable.source.scatter`.
+* The module `tracktable.source` is now included in the installer.
+* Link syntax in Markdown README fixed.
+* PyPI classifier strings for Linux and OS X fixed.
+* Auditwheel now correctly requests `manylinux1` platform tag on Linux.
+* README.md now included in wheel.
+* Windows build now correctly links against libpython.
+
 VERSION 1.2.0, October 2019
 ---------------------------
 
