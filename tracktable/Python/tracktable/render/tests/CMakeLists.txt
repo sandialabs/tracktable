@@ -50,8 +50,8 @@ add_python_test(P_Mapmaker_CONUS
 #  tracktable.render.tests.test_mapmaker_north_america "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
 #)
 
-add_python_test(P_Mapmaker_Custom_Bounding_Box
-  tracktable.render.tests.test_mapmaker_custom_bbox "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput"
+add_python_test(P_Mapmaker_Custom_Bounding_Box_Object
+  tracktable.render.tests.test_mapmaker_custom_bbox_object "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput"
 )
 
 add_python_test(P_Mapmaker_Custom_Bounding_Box_Floats
