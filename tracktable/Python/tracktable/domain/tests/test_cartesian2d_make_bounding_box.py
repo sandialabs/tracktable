@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -28,36 +28,35 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import print_function, division
+import sys
 
-# This is tracktable/Python/tracktable/render/tests/CMakeLists.txt
-#
-# Here we list the Python tests that we need to run to make sure that
-# our rendering code is working.  These are basically "smoke tests" --
-# we don't yet have the ability to verify the content of an image.
+from tracktable.domain import cartesian2d
+
+def test_make_bounding_box():
+    min_corner_base = cartesian2d.BasePoint(12, 34)
+    max_corner_base = cartesian2d.BasePoint(56, 78)
+    
+    min_corner_trajectory = cartesian2d.TrajectoryPoint(12, 34)
+    max_corner_trajectory = cartesian2d.TrajectoryPoint(56, 78)
+
+#    bbox1 = cartesian2d.make_bounding_box(min_corner=(12, 34), max_corner=(56, 78))
+    bbox2 = cartesian2d.BoundingBox([12, 34], [56, 78])
+    bbox3 = cartesian2d.BoundingBox((12, 34), (56, 78))
+    bbox4 = cartesian2d.BoundingBox(min_corner_base, max_corner_base)
+    bbox5 = cartesian2d.BoundingBox(min_corner_trajectory, max_corner_trajectory)
+
+#    print("make_bounding_box: {} {}".format(str(bbox1), repr(bbox1)))
+    print("BoundingBox(list): {} {}".format(str(bbox2), repr(bbox2)))
+    print("BoundingBox(tuples): {} {}".format(str(bbox3), repr(bbox3)))
+    print("BoundingBox(BasePoint): {} {}".format(str(bbox4), repr(bbox4)))
+    print("BoundingBox(TrajectoryPoint): {} {}".format(str(bbox5), repr(bbox5)))
+
+    return 0
 
 
-include(PythonTest)
+def main():
+    return test_make_bounding_box()
 
-#add_python_test(P_Mapmaker_Airport
-#  tracktable.render.tests.test_mapmaker_airport "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
-#)
-
-add_python_test(P_Mapmaker_CONUS
-  tracktable.render.tests.test_mapmaker_conus "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
-)
-
-#add_python_test(P_Mapmaker_NorthAmerica
-#  tracktable.render.tests.test_mapmaker_north_america "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
-#)
-
-add_python_test(P_Mapmaker_Custom_Bounding_Box_Object
-  tracktable.render.tests.test_mapmaker_custom_bbox_object "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput"
-)
-
-add_python_test(P_Mapmaker_Custom_Bounding_Box_Floats
-  tracktable.render.tests.test_mapmaker_custom_bbox_float "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput"
-)
-
-add_python_test(P_Mapmaker_Europe
-  tracktable.render.tests.test_mapmaker_europe "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
-)
+if __name__ == '__main__':
+    sys.exit(main())

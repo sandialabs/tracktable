@@ -39,6 +39,7 @@
 // Boost.Python can sort out the C++ overloading by itself.
 
 #include <tracktable/Domain/Terrestrial.h>
+#include <tracktable/Core/Box.h>
 #include <tracktable/Core/Timestamp.h>
 #include <tracktable/IO/PointWriter.h>
 #include <tracktable/IO/TrajectoryWriter.h>
@@ -108,12 +109,14 @@ operator<<(std::ostream& out, box_type const& box)
 void install_terrestrial_box_wrappers()
 {
   using namespace boost::python;
+  using namespace tracktable::python_wrapping;
+
   class_<box_type>("BoundingBoxTerrestrial")
-    .def("__init__", make_constructor(tracktable::python_wrapping::make_box<base_point_type, box_type>))
-    .def("__init__", make_constructor(tracktable::python_wrapping::make_box<trajectory_point_type, box_type>))
-//    .def(tracktable::python_wrapping::to_string_methods())
-    .add_property("min_corner", ::min_corner, ::set_min_corner)
-    .add_property("max_corner", ::max_corner, ::set_max_corner);
+    .def("__init__", make_constructor(make_box<base_point_type, box_type>))
+    .def("__init__", make_constructor(make_box<trajectory_point_type, box_type>))
+    .def("__init__", make_constructor(make_box_2d_from_objects<box_type>))
+    .def(tracktable::python_wrapping::bounding_box_methods())
+    ;
 }
 
 // ----------------------------------------------------------------------
