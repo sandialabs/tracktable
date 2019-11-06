@@ -101,6 +101,50 @@ make_box(point_type const& p1, point_type const& p2)
   return box;
 }
 
+// NOTE: I could combine these two functions if I used boost::geometry::assign
+// instead of copying the coordinates manually
+
+template<typename box_type>
+boost::shared_ptr<box_type>
+make_box_2d_from_objects(boost::python::object& min_corner, boost::python::object& max_corner)
+{
+  using boost::python::extract;
+  typedef typename boost::geometry::traits::point_type<box_type>::type point_type;
+  typedef typename point_type::coordinate_type coordinate_type;
+
+  boost::shared_ptr<box_type> box(new box_type);
+  point_type& box_min_corner(box->min_corner());
+  point_type& box_max_corner(box->max_corner());
+
+  box_min_corner[0] = extract<coordinate_type>(min_corner[0]);
+  box_min_corner[1] = extract<coordinate_type>(min_corner[1]);
+  box_max_corner[0] = extract<coordinate_type>(max_corner[0]);
+  box_max_corner[1] = extract<coordinate_type>(max_corner[1]);
+  
+  return box;
+}
+
+template<typename box_type>
+boost::shared_ptr<box_type>
+make_box_3d_from_objects(boost::python::object& min_corner, boost::python::object& max_corner)
+{
+  using boost::python::extract;
+  typedef typename boost::geometry::traits::point_type<box_type>::type point_type;
+  typedef typename point_type::coordinate_type coordinate_type;
+
+  boost::shared_ptr<box_type> box(new box_type);
+  point_type& box_min_corner(box->min_corner());
+  point_type& box_max_corner(box->max_corner());
+
+  box_min_corner[0] = extract<coordinate_type>(min_corner[0]);
+  box_min_corner[1] = extract<coordinate_type>(min_corner[1]);
+  box_min_corner[2] = extract<coordinate_type>(min_corner[2]);
+  box_max_corner[0] = extract<coordinate_type>(max_corner[0]);
+  box_max_corner[1] = extract<coordinate_type>(max_corner[1]);
+  box_max_corner[2] = extract<coordinate_type>(max_corner[2]);
+  return box;
+}
+
 // These functions give us [] in Python
 
 template<class point_type>
@@ -277,6 +321,61 @@ class to_string_methods : public boost::python::def_visitor<to_string_methods>
 // ----------------------------------------------------------------------
 
 
+template<typename ClassT>
+class bbox_to_string
+{
+public:
+  static void save_name_for_later(ClassT const& c)
+    {
+      _name = boost::python::extract<std::string>(c.attr("__name__"));
+    }
+
+  static std::string str(typename ClassT::wrapped_type const& thing)
+    {
+      std::ostringstream outbuf;
+      outbuf << "BoundingBox(" << thing.min_corner()
+             << " - " 
+             << thing.max_corner()
+             << ")";
+      return outbuf.str();
+    }
+
+  static std::string repr(typename ClassT::wrapped_type const& thing)
+    {
+      std::ostringstream outbuf;
+      outbuf << _name << "(" << &thing << ")"; // str(thing);
+      return outbuf.str();
+    }
+
+private:
+  static std::string _name;
+};
+
+template<typename ClassT> std::string bbox_to_string<ClassT>::_name;
+
+
+// ---------------------------------------------------------------------
+// 
+class bbox_to_string_methods : public boost::python::def_visitor<bbox_to_string_methods>
+{
+  friend class boost::python::def_visitor_access;
+
+  template<class ClassT>
+  void visit(ClassT& c) const
+    {
+      using namespace boost::python;
+
+      bbox_to_string<ClassT>::save_name_for_later(c);
+      c
+        .def("__str__", &bbox_to_string<ClassT>::str)
+        .def("__repr__", &bbox_to_string<ClassT>::repr)
+        ;
+    }
+};
+
+// ----------------------------------------------------------------------
+
+
 class point_to_string_methods : public boost::python::def_visitor<point_to_string_methods>
 {
   friend class boost::python::def_visitor_access;
@@ -292,6 +391,29 @@ class point_to_string_methods : public boost::python::def_visitor<point_to_strin
         .def("__repr__", &point_to_string<ClassT>::repr)
         ;
     }
+};
+
+// ----------------------------------------------------------------------
+
+class bounding_box_methods : public boost::python::def_visitor<bounding_box_methods>
+{
+  friend class boost::python::def_visitor_access;
+
+  template<class ClassT>
+  void visit(ClassT& c) const
+  {
+    typedef typename ClassT::wrapped_type wrapped_type;
+    typedef typename boost::geometry::traits::point_type<wrapped_type>::type point_type;
+    using namespace boost::python;
+
+    point_type& (wrapped_type::*min_corner)() = &wrapped_type::min_corner;
+    point_type& (wrapped_type::*max_corner)() = &wrapped_type::max_corner;
+    c
+    .def(bbox_to_string_methods())
+    .add_property("min_corner", make_function(min_corner, return_internal_reference<>()))
+    .add_property("max_corner", make_function(max_corner, return_internal_reference<>()))
+    ;
+  }
 };
 
 // ----------------------------------------------------------------------
