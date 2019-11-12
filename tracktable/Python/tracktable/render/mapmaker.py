@@ -41,36 +41,15 @@ from tracktable.render import geographic_decoration as decoration
 
 def mapmaker(domain='terrestrial', *args, **kwargs):
     if kwargs.get('map_bbox', None) is not None:
-        map_bbox = kwargs['map_bbox']
-    else:
-        map_bbox = None
+        kwargs['map_bbox'] = _make_bounding_box(kwargs['map_bbox'], domain)
 
     if domain == 'terrestrial':
-        if map_bbox is not None:
-            try:
-                # Convert to a native-typed bounding box
-                from tracktable.domain.terrestrial import BoundingBox, BasePoint
-                min_corner = BasePoint(map_bbox[0], map_bbox[1])
-                max_corner = BasePoint(map_bbox[2], map_bbox[3])
-                bbox = BoundingBox(min_corner, max_corner)
-                kwargs['map_bbox'] = bbox
-            except TypeError: # it's already a bbox
-                pass
         return terrestrial_map(*args, **kwargs)
     elif domain == 'cartesian' or domain == 'cartesian2d':
-        if map_bbox is not None:
-            try:
-                # Convert to a native-typed bounding box
-                from tracktable.domain.cartesian2d import BoundingBox, BasePoint
-                min_corner = BasePoint(map_bbox[0], map_bbox[1])
-                max_corner = BasePoint(map_bbox[2], map_bbox[3])
-                bbox = BoundingBox(min_corner, max_corner)
-                kwargs['map_bbox'] = bbox
-            except TypeError:
-                # it's already a bbox
-                pass
-
         return cartesian_map(*args, **kwargs)
+    else:
+        raise ValueError(('Mapmaker only works on the terrestrial and '
+                          ' cartesian2d domains, not "{}".').format(domain))
 
 # ----------------------------------------------------------------------
 
@@ -198,8 +177,8 @@ def terrestrial_map(map_name,
 
     if map_name == "custom":
         map_axes = maps.instantiate_map(
-            min_corner=map_bbox[0],
-            max_corner=map_bbox[1],
+            min_corner=map_bbox.min_corner,
+            max_corner=map_bbox.max_corner,
             projection=map_projection
             )
         artists = []
@@ -304,4 +283,24 @@ def terrestrial_map(map_name,
 
     return (map_axes, artists)
 
+def _make_bounding_box(bbox_args, domain):
+    """Make a sensible bounding box out of whatever the user gave us."""
+
+    # Case 1: Is it a list of coordinates from the command line?
+    if type(bbox_args) is list and len(bbox_args) == 4:
+        if domain == 'terrestrial':
+            from tracktable.domain.terrestrial import BoundingBox as TerrestrialBoundingBox
+            min_corner = (bbox_args[0], bbox_args[2])
+            max_corner = (bbox_args[1], bbox_args[3])
+            return TerrestrialBoundingBox(min_corner, max_corner)
+        elif domain == 'cartesian2d':
+            from tracktable.domain.cartesian2d import BoundingBox as Cartesian2DBoundingBox
+            min_corner = (bbox_args[0], bbox_args[2])
+            max_corner = (bbox_args[1], bbox_args[3])
+            return Cartesian2DBoundingBox(min_corner, max_corner)
+        else:
+            raise ValueError('Custom bounding box for domain {} is not defined.'.format(domain))
+    # Case 2: is it a bbox already?
+    else:
+        return bbox_args # hope for the best
 

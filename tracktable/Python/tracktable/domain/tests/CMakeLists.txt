@@ -101,6 +101,21 @@ add_python_test(
   )
 
 add_python_test(
+  P_Terrestrial_MakeBoundingBox
+  ${DOMAIN}.test_terrestrial_make_bounding_box
+  )
+
+add_python_test(
+  P_Cartesian2D_MakeBoundingBox
+  ${DOMAIN}.test_cartesian2d_make_bounding_box
+  )
+
+add_python_test(
+  P_Cartesian3D_MakeBoundingBox
+  ${DOMAIN}.test_cartesian3d_make_bounding_box
+  )
+
+add_python_test(
   P_Terrestrial_TrajectoryPointWriter
   ${DOMAIN}.test_terrestrial_trajectory_point_writer
   )
