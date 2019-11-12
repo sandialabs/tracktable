@@ -1,12 +1,40 @@
 .. _Tracktable_Installation:
 
-Installation
-============
+Installing Pre-Built Packages
+=============================
 
-We currently use CMake to manage building Tracktable and running its
-tests.  We hope to someday have a Python-centric install as simple as
-'pip install tracktable' but that's still over the horizon.  For now,
-you'll need a little bit more expertise.
+As of Version 1.2, Tracktable is available on the Python Package Index
+(PyPI, https://pypi.org) and can be installed with ``pip`` as long as
+you're running Python 3.5 or newer.  Use the following command:
+
+``pip install tracktable``
+
+If this fails, look carefully at the error message.  It is most
+probably an error while trying to install `Cartopy
+<https://scitools.org.uk/cartopy/docs/latest/>`_, a map rendering
+toolkit that Tracktable uses to render images.  This will show up as a
+complaint about a GEOS version or a request for Proj 4.9.0.
+
+The solution is to install Cartopy yourself before you try to install
+Tracktable.  If you are using `Anaconda
+<https://www.anaconda.com/distribution/>`_, the command ``conda install
+cartopy`` should do it.  
+
+After you have installed Cartopy, retry ``pip install tracktable``.
+
+
+Installing from Source
+======================
+
+There are a few cases where you might want to build from source.  For
+example:
+
+- You might need access to features on the development branch.
+- You might be running a version of Python for which we do not build wheels (binary packages).
+- You might be on an unsupported platform. 
+- You might not have permission to use binary packages on your system.
+
+In that case, this section is for you.
 
 
 Step 0: Audience
@@ -28,13 +56,12 @@ Tracktable has the following required dependencies:
 Python
 ^^^^^^
 
-* Python 2.7, 3.4, 3.5, 3.6, or 3.7 - http://python.org 
-    * NOTE: Tracktable 1.1 is the last version that will support Python 2.7.
-* numpy 1.7+ - http://numpy.org
+* Python 3.5, 3.6, or 3.7 - http://python.org 
+    * NOTE: Tracktable 1.1 was the last version to officially support Python 2.7.
+* NumPy 1.7+ - http://numpy.org
 * Matplotlib 2.0+ - http://matplotlib.org
-* Basemap (including hi-res data) - http://matplotlib.org/basemap 
-    * NOTE: Maintenance on BaseMap is scheduled to end soon.  A replacement (likely Cartopy?)
-      will be identified in a future release.
+* Cartopy - https://scitools.org.uk/cartopy/docs/latest/
+    * NOTE: Tracktable 1.1 and earlier used Basemap (http://matplotlib.org/basemap) for rendering.
 * PyTZ - https://pypi.python.org/pypi/pytz/
 * Shapely - https://pypi.python.org/pypi/Shapely
 * Six - https://pypi.org/project/six/
@@ -45,19 +72,19 @@ C++
 
 * Compiler - GCC 4.4.7 or newer (http://gcc.gnu.org), clang 3.5 or newer (http://clang.llvm.org), 
   Visual Studio 14 2015 or newer (https://visualstudio.microsoft.com)
-* Boost 1.61 or newer - http://www.boost.org
+* Boost 1.67 or newer - http://www.boost.org
 * GEOS library - http://geos.osgeo.org
 
   - You must build Boost with Boost.Python enabled using the headers
     from the same Python installation you will use to run Tracktable.
 
   - We rely on the r-tree and distance computation code available in
-    recent versions of Boost.  Use 1.61 or newer.
+    recent versions of Boost.  Use 1.67 or newer.
 
   - With respect to C++11: if you want to call Tracktable from code
     built with C++11 turned on, you must also build Tracktable with
-    C++11 turned on.  The implementation of boost::variant (which we
-    use for PropertyValueT) is entirely different between the two
+    C++11 turned on.  The implementation of ``boost::variant`` (which we
+    use for ``tracktable::PropertyValueT``) is entirely different between the two
     language versions.  This causes link errors if you try to mix
     versions.
 
@@ -70,7 +97,7 @@ C++
 Other
 ^^^^^
 
-* CMake 3.0+ - http://www.cmake.org
+* CMake 3.12+ - http://www.cmake.org
 
 If you want to build documentation you will also need the following packages:
 
@@ -102,22 +129,14 @@ common in Linux environments), MacPorts (http://macports.org) or
 Homebrew (http://brew.sh).  The notes in this section are for cases
 when you have no choice but to build external packages from source.
 
-Building Python
-***************
-
-The option we care about the most if you build your own Python is
-``--enabled-shared``.  This will leave you with a shared library
-version of the Python C API.  Tracktable links against this for the
-Python bindings of its C++ components.
-
 Building Boost
 **************
 
-We need several of Boost's compiled libraries including chrono,
-date_time, iostreams, log, random, timer and especially Boost.Python.
-As with other dependencies, check your operating system's package
-manager first.  It's possible that you can install Boost with all its
-optional components from there.
+We need several of Boost's compiled libraries including ``chrono``,
+``date_time``, ``iostreams``, ``log``, ``random``, ``timer`` and
+especially Boost.Python.  As with other dependencies, check your
+operating system's package manager first.  It's possible that you can
+install Boost with all its optional components from there.
 
 If you already have a recent Boost installation you can check for
 Boost.Python by looking for files named
@@ -129,7 +148,7 @@ If you really do have to build Boost from source -- for example, if
 you had to build your own Python installation -- then make sure to
 configure it to use the proper Python installation.  Information about
 how to do this can be found in the Boost.Python documentation at
-http://www.boost.org/doc/libs/1_61_0/libs/python/doc/building.html
+http://www.boost.org/doc/libs/1_67_0/libs/python/doc/building.html
 
 One final note: We know that it's a pain to try to keep up with recent
 versions of a library as big as Boost.  We will not require a newer
@@ -165,7 +184,7 @@ directory where you unpacked the Tracktable source.::
 (You can also put your build directory anywhere else you please.)
 
 Next, use CMake's configuration utility ``ccmake`` (or its GUI tool if
-you prefer) to configure compile settings:
+you prefer) to configure compile settings.
 
 If you made your build directory inside the source directory::
 
@@ -193,7 +212,7 @@ need to check:
 
 1.  ``Boost_INCLUDE_DIR`` and ``Boost_LIBRARY_DIR``.
 
-    These should point to your Boost 1.61 install with Boost.Python.
+    These should point to your Boost install with Boost.Python.
     Filenames for the ``boost_date_time`` and ``boost_python``
     libraries should appear automatically.
 
@@ -230,7 +249,7 @@ Gotcha: Boost import targets not found
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 This happens when your installed version of CMake is too old for your
-installed version of Boost.  
+installed version of Boost.  Please upgrade CMake to at least 3.12.
 
 Gotcha: Anaconda does not install ccmake
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -247,6 +266,10 @@ Gotcha: python3 Boost library not found but I'm using Python 2
 Check your Python CMake variables as listed in #2 above.  They are
 probably pointing to a Python 3 interpreter.
 
+Gotcha: Old version of Boost found in /usr/lib or /usr/lib64
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Set the ``Boost_INCLUDE_DIR`` variable in CMake to point to the location of the include files for your preferred Boost installation.  The filenames for the compiled libraries will be updated the next time you press 'c' or 'Configure'.
 
 Note
 ^^^^
@@ -346,7 +369,9 @@ Step 4: Install
 
 You can use Tracktable as-is from its build directory or install it
 elsewhere on your system.  To install it, type ``make install`` in the
-build directory (or, again, your IDE's equivalent).
+build directory (or, again, your IDE's equivalent).  You can choose
+the install destination by changing the ``CMAKE_INSTALL_PREFIX``
+variable in CMake.
 
 You will also need to add Tracktable to your system's Python search
 path, usually stored in an environment variable named ``PYTHONPATH``.
@@ -363,7 +388,7 @@ Finally, you will need to tell your system where to find the
 Tracktable C++ libraries.
 
 * If you are running from your build tree (common during development) then the libraries will be in ``BUILD/lib`` and ``BUILD/bin`` (XXX Check where Windows puts its DLLs).
-* If you are running from an installed location the libraries will be in ``INSTALL_DIR/lib`` and ``INSTALL_DIR/bin`` (XXX same check).
+* If you are running from an installed location the libraries will be in ``INSTALL_DIR/lib`` and ``INSTALL_DIR/bin``.
 
 * On Windows, add the library directory to your ``PATH`` environment variable.
 * On Linux and most Unix-like systems, add the library directory to your ``LD_LIBRARY_PATH`` environment variable.
