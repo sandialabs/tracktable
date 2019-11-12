@@ -1,3 +1,4 @@
+#
 # Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
@@ -27,28 +28,35 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Tracktable Trajectory Library - Top-level module
+from __future__ import print_function, division
+import sys
 
-Welcome to Tracktable!
+from tracktable.domain import cartesian3d
 
-UNITS:
+def test_make_bounding_box():
+    min_corner_base = cartesian3d.BasePoint(12, 34, 56)
+    max_corner_base = cartesian3d.BasePoint(78, 90, 12)
+    
+    min_corner_trajectory = cartesian3d.TrajectoryPoint(12, 34, 56)
+    max_corner_trajectory = cartesian3d.TrajectoryPoint(78, 90, 12)
 
-All user-facing functions will measure angles in degrees and distances
-in kilometers.
+#    bbox1 = cartesian2d.make_bounding_box(min_corner=(12, 34), max_corner=(56, 78))
+    bbox2 = cartesian3d.BoundingBox([12, 34, 56], [78, 90, 12])
+    bbox3 = cartesian3d.BoundingBox((12, 34, 56), (78, 90, 12))
+    bbox4 = cartesian3d.BoundingBox(min_corner_base, max_corner_base)
+    bbox5 = cartesian3d.BoundingBox(min_corner_trajectory, max_corner_trajectory)
 
-"""
+#    print("make_bounding_box: {} {}".format(str(bbox1), repr(bbox1)))
+    print("BoundingBox(list): {} {}".format(str(bbox2), repr(bbox2)))
+    print("BoundingBox(tuples): {} {}".format(str(bbox3), repr(bbox3)))
+    print("BoundingBox(BasePoint): {} {}".format(str(bbox4), repr(bbox4)))
+    print("BoundingBox(TrajectoryPoint): {} {}".format(str(bbox5), repr(bbox5)))
 
-# \defgroup Tracktable_Python Python components of Tracktable
+    return 0
 
-__version__ = "1.2.1"
-__title__ = "Tracktable"
-__description__ = "Trajectory Analysis and Visualization"
-__url__ = "https://tracktable.sandia.gov"
-__uri__ = __url__
-__doc__ = __description__ + " <" + __uri__ + ">"
-__author__ = "Andy Wilson, Danny Rintoul, Chris Valicka, Ben Newton, Paul Schrum, Phil Baxley, Kat Ward"
-__maintainer__ = "Andy Wilson and Phil Baxley"
-__license__ = "BSD"
-__copyright__ = "Copyright (c) 2014-2019 National Technology and Engineering Solutions of Sandia, LLC."
 
-from .core import register_core_types
+def main():
+    return test_make_bounding_box()
+
+if __name__ == '__main__':
+    sys.exit(main())
