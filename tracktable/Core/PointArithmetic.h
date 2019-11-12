@@ -160,7 +160,10 @@ template<class PointT>
 PointT zero()
 {
   PointT result;
-  boost::geometry::assign_value(result, 0);
+  for (std::size_t i = 0; i < result.size(); ++i)
+  {
+    result[i] = 0;
+  }
   return result;
 }
 
