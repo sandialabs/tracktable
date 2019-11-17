@@ -37,11 +37,13 @@ sys.path.insert(0, os.path.abspath(os.path.join(tracktable_src, 'tracktable', 'P
 # pretend to have imported already.
 
 autodoc_mock_imports = [
+    'cartopy',
     'matplotlib',
     'mpl_toolkits',
     'numpy',
     'shapefile',
     'shapely',
+    'tracktable.core.core_types', # for BoostPythonArgumentError
     'tracktable.lib._cartesian2d',
     'tracktable.lib._cartesian3d',
     'tracktable.lib._core_types',
