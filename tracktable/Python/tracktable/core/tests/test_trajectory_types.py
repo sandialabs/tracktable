@@ -306,7 +306,7 @@ def test_trajectory():
     
     print("Testing interpolation at timestamp with no points trajectory")
     no_point = geomath.point_at_time(empty_trajectory, right_now + datetime.timedelta(hours = 8))
-    empty_point = TerrestrialTrajectoryPoint()
+    empty_point = TerrestrialTrajectoryPoint.zero()
     error_count += verify_point(empty_point,no_point, "Point at time (no points)")
 
 #    print("Testing pickle support")

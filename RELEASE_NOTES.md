@@ -1,7 +1,23 @@
 ## Tracktable Release Notes
 
-Hotfixes since 1.2.0
---------------------
+VERSION 1.2.1, Mid-November 2019
+--------------------------------
+
+This is a bug-fix/documentation release.
+
+### DOCUMENTATION UPDATES
+
+* The Installation page in the documentation has had its list of dependencies brought up to date.  It also now contains a recommendation that you install from binary packages on Pip wherever possible.
+* There are now Jupyter notebooks in `tracktable/Python/tracktable/examples/notebook_examples`.  We are working through the Python examples one at a time to bring them up to date and provide Jupyter versions.
+
+### NOTABLE FIXES
+
+* Custom map bounding boxes were not working in `tracktable.render.mapmaker.mapmaker()`.  
+* Bounding boxes (`tracktable.domain.<domain>.BoundingBox`) were not printing correctly.
+* Bounding box corners could not be correctly accessed from Python.  They now show up as properties min_corner and max_corner.
+* Bounding boxes can now be constructed from two point-like objects.  A point-like object is anything that can be treated like an array of coordinates.
+
+### HOTFIXES SINCE 1.2.0
 
 * The module `tracktable.source.random_point_source` has been replaced by `tracktable.source.point`, formerly known as `tracktable.source.scatter`.
 * The module `tracktable.source` is now included in the installer.
@@ -10,6 +26,7 @@ Hotfixes since 1.2.0
 * Auditwheel now correctly requests `manylinux1` platform tag on Linux.
 * README.md now included in wheel.
 * Windows build now correctly links against libpython.
+
 
 VERSION 1.2.0, October 2019
 ---------------------------
