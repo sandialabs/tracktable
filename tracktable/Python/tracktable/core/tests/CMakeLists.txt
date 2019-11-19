@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2018 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -48,6 +48,14 @@
 #)
 
 include(PythonTest)
+
+add_python_test(P_TestConvexHullArea tracktable.core.tests.test_convex_hull_area)
+
+add_python_test(P_TestConvexHullAspectRatio tracktable.core.tests.test_convex_hull_aspect_ratio)
+
+add_python_test(P_TestConvexHullCentroid tracktable.core.tests.test_convex_hull_centroid)
+
+add_python_test(P_TestConvexHullPerimeter tracktable.core.tests.test_convex_hull_perimeter)
 
 add_python_test(P_DataDirectory tracktable.core.tests.test_data_directory)
 
