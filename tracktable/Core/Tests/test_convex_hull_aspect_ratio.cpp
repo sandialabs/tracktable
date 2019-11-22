@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2019 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -68,5 +68,5 @@ int main(int /*argc*/, char* /*argv*/[])
   cartesian_trajectory.push_back(Point2D(corners[3]));
 
   int error_count = 0;
-  error_count += test_convex_hull_aspect_ratio(cartesian_trajectory, 1.4142);
+  error_count += test_convex_hull_aspect_ratio(cartesian_trajectory, 0.707107);
 }
