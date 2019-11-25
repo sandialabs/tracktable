@@ -418,35 +418,35 @@ int run_test()
     }
 
     std::cout << "\nTesting point at fraction 0.5\n";
-    TrajectoryPointLonLat point_mid = point_at_fraction(surface_trajectory, 0.5);
+    TrajectoryPointLonLat point_mid = point_at_time_fraction(surface_trajectory, 0.5);
     error_count += verify_result(point_mid, expected_result_middle, "midpoint of trajectory");
 
     std::cout << "\nTesting point at fraction 0.25\n";
-    TrajectoryPointLonLat point_first_quarter = point_at_fraction(surface_trajectory, 0.25);
+    TrajectoryPointLonLat point_first_quarter = point_at_time_fraction(surface_trajectory, 0.25);
     error_count += verify_result(point_first_quarter, expected_result_first_quarter, "halfway between beginning and midpoint");
 
     std::cout << "\nTesting point at fraction 0.75\n";
-    TrajectoryPointLonLat point_last_quarter = point_at_fraction(surface_trajectory, 0.75);
+    TrajectoryPointLonLat point_last_quarter = point_at_time_fraction(surface_trajectory, 0.75);
     error_count += verify_result(point_last_quarter, expected_result_last_quarter, "halfway between midpoint and end");
 
     std::cout << "\nTesting point at fraction 0.0\n";
-    TrajectoryPointLonLat point_start = point_at_fraction(surface_trajectory, 0.0);
+    TrajectoryPointLonLat point_start = point_at_time_fraction(surface_trajectory, 0.0);
     error_count += verify_result(point_start, expected_result_before, "beginning of trajectory");
 
     std::cout << "\nTesting point at fraction 1.0\n";
-    TrajectoryPointLonLat point_end = point_at_fraction(surface_trajectory, 1.0);
+    TrajectoryPointLonLat point_end = point_at_time_fraction(surface_trajectory, 1.0);
     error_count += verify_result(point_end, expected_result_after, "end of trajectory");
 
     std::cout << "\nTesting point at fraction -0.5\n";
-    TrajectoryPointLonLat point_before = point_at_fraction(surface_trajectory, -0.5);
+    TrajectoryPointLonLat point_before = point_at_time_fraction(surface_trajectory, -0.5);
     error_count += verify_result(point_before, expected_result_before, "before beginning of trajectory");
 
     std::cout << "\nTesting point at fraction 1.5\n";
-    TrajectoryPointLonLat point_after = point_at_fraction(surface_trajectory, 1.5);
+    TrajectoryPointLonLat point_after = point_at_time_fraction(surface_trajectory, 1.5);
     error_count += verify_result(point_after, expected_result_after, "after end of trajectory");
 
     std::cout << "\nTesting point at fraction, no points\n";
-    TrajectoryPointLonLat point_no = point_at_fraction(noPoints, 0.75);
+    TrajectoryPointLonLat point_no = point_at_time_fraction(noPoints, 0.75);
     if (point_no.timestamp() != tracktable::BeginningOfTime) //Coordinates are trash. Use timestamp instead.
     {
         error_count++;
