@@ -41,11 +41,11 @@
 namespace tracktable { namespace algorithms {
 
 template<typename T>
-struct point_at_fraction
+struct point_at_time_fraction
 {
   BOOST_MPL_ASSERT_MSG(
     sizeof(T)==0,
-    POINT_AT_FRACTION_NOT_IMPLEMENTED_FOR_THIS_TRAJECTORY_TYPE,
+    POINT_AT_TIME_FRACTION_NOT_IMPLEMENTED_FOR_THIS_TRAJECTORY_TYPE,
     (types<T>)
     );
 };
@@ -55,7 +55,7 @@ struct point_at_length_fraction
 {
     BOOST_MPL_ASSERT_MSG(
         sizeof(T) == 0,
-        POINT_AT_LEN_FRACTION_NOT_IMPLEMENTED_FOR_THIS_TRAJECTORY_TYPE,
+        POINT_AT_LENGTH_FRACTION_NOT_IMPLEMENTED_FOR_THIS_TRAJECTORY_TYPE,
         (types<T>)
     );
 };
@@ -69,9 +69,9 @@ namespace tracktable {
 
 // Fraction of time
 template<typename TrajectoryT>
-typename TrajectoryT::point_type point_at_fraction(TrajectoryT const& path, double fraction)
+typename TrajectoryT::point_type point_at_time_fraction(TrajectoryT const& path, double fraction)
 {
-  return algorithms::point_at_fraction<TrajectoryT>::apply(path, fraction);
+  return algorithms::point_at_time_fraction<TrajectoryT>::apply(path, fraction);
 }
 
 //Fraction of length
