@@ -203,7 +203,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
     def("current_length", &(tracktable::current_length<TrajectoryPointTerrestrial>));
 
     def("simplify", &(tracktable::simplify<TrajectoryTerrestrial>));
-    def("point_at_fraction", &(tracktable::point_at_fraction<TrajectoryTerrestrial>));
+    def("point_at_time_fraction", &(tracktable::point_at_time_fraction<TrajectoryTerrestrial>));
     def("point_at_length_fraction", &(tracktable::point_at_length_fraction<TrajectoryTerrestrial>));
     def("point_at_time", &(tracktable::point_at_time<TrajectoryTerrestrial>));
     def("time_at_fraction", &(tracktable::time_at_fraction<TrajectoryTerrestrial>));
@@ -266,7 +266,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
     def("current_length", &(tracktable::current_length<TrajectoryPointCartesian2D>));
 
     def("simplify", &(tracktable::simplify<TrajectoryCartesian2D>));
-    def("point_at_fraction", &(tracktable::point_at_fraction<TrajectoryCartesian2D>));
+    def("point_at_time_fraction", &(tracktable::point_at_time_fraction<TrajectoryCartesian2D>));
     def("point_at_length_fraction", &(tracktable::point_at_length_fraction<TrajectoryCartesian2D>));
     def("point_at_time", &(tracktable::point_at_time<TrajectoryCartesian2D>));
     def("time_at_fraction", &(tracktable::time_at_fraction<TrajectoryCartesian2D>));
@@ -323,7 +323,7 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
     def("unsigned_turn_angle", &(tracktable::unsigned_turn_angle<TrajectoryPointCartesian3D>));
     def("speed_between", &(tracktable::speed_between<TrajectoryPointCartesian3D>));
     def("simplify", &(tracktable::simplify<TrajectoryCartesian3D>));
-    def("point_at_fraction", &(tracktable::point_at_fraction<TrajectoryCartesian3D>));
+    def("point_at_time_fraction", &(tracktable::point_at_time_fraction<TrajectoryCartesian3D>));
     def("point_at_length_fraction", &(tracktable::point_at_length_fraction<TrajectoryCartesian3D>));
     def("point_at_time", &(tracktable::point_at_time<TrajectoryCartesian3D>));
     def("time_at_fraction", &(tracktable::time_at_fraction<TrajectoryCartesian3D>));

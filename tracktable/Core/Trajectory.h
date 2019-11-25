@@ -735,7 +735,7 @@ struct point_at_time< Trajectory< PointT > > : implementations::generic_point_at
 { };
 
 template<class PointT>
-struct point_at_fraction< Trajectory< PointT > > : implementations::generic_point_at_fraction< Trajectory<PointT> >
+struct point_at_time_fraction< Trajectory< PointT > > : implementations::generic_point_at_time_fraction< Trajectory<PointT> >
 { };
 
 template<class PointT>

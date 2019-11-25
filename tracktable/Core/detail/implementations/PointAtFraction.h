@@ -59,7 +59,7 @@ namespace tracktable { namespace algorithms { namespace implementations {
  */
 
 template<typename ContainerT>
-struct generic_point_at_fraction
+struct generic_point_at_time_fraction
 {
   template<typename TrajectoryType>
   static typename TrajectoryType::point_type apply(
