@@ -74,7 +74,7 @@ struct compute_convex_hull_centroid<
       // Start with the center of mass of the vertices of the convex
       // hull (will by definition be inside the hull)
       PointLonLat center_of_mass_lonlat = spherical_math::terrestrial_center_of_mass(hull.outer().begin(), hull.outer().end());
-//      std::cout << "center of mass lonlat: " << center_of_mass_lonlat.to_string() << "\n";
+//      TRACKTABLE_LOG(debug) << "center of mass lonlat: " << center_of_mass_lonlat.to_string();
       Point3D center_of_mass_cartesian = spherical_math::to_cartesian(center_of_mass_lonlat);
 
       // Our spherical math routines assume that we have points on the
@@ -111,8 +111,9 @@ struct compute_convex_hull_centroid<
               *previous_point, *this_point, center_of_mass_cartesian
               ));
 #if 0
-          std::cout << "centroid: latest area is " << area << ", center of mass is "
-                    << spherical_math::to_terrestrial<point_type>(center_of_mass).to_string() << "\n";
+          TRACKTABLE_LOG(debug) 
+             << "centroid: latest area is " << area << ", center of mass is "
+             << spherical_math::to_terrestrial<point_type>(center_of_mass).to_string();
 #endif
           tracktable::arithmetic::multiply_scalar_in_place(center_of_mass, area);
           weighted_centroids.push_back(center_of_mass);

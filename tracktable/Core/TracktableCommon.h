@@ -43,8 +43,8 @@
 #include <string>
 #include <vector>
 
+#include <tracktable/Core/Logging.h>
 #include <tracktable/Core/UnfortunateWorkarounds.h>
-
 #include <tracktable/Core/detail/algorithm_signatures/Interpolate.h>
 
 #if defined(WIN32)

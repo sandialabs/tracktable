@@ -95,11 +95,11 @@ struct compute_convex_hull_aspect_ratio<
         }
 
 #if 0
-    std::cout << "aspect ratio: short axis "
+    TRACKTABLE_LOG(debug) 
+              << "aspect ratio: short axis "
               << short_axis
               << ", long axis "
-              << long_axis
-              << "\n";
+              << long_axis;
 #endif
 
     if (std::abs(long_axis) < 1e-5)
