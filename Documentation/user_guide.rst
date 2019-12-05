@@ -155,8 +155,8 @@ observed.  These are the main differences between BasePoint and TrajectoryPoint.
     from tracktable.core import Timestamp
 
     my_point = TrajectoryPoint()
-    my_point[0] = my_longitude
-    my_point[1] = my_latitude
+    my_point.coordinates[0] = my_longitude
+    my_point.coordinates[1] = my_latitude
 
     my_point.object_id = 'FlyingThing01'
     my_point.timestamp = Timestamp.from_any('2015-02-01 12:23:56')
@@ -311,15 +311,15 @@ Python Example
 
 	    # Columns 0 and 1 are the object ID and timestamp
 	    reader.object_id_column = 0
-	    reader.timestamp_bolumn = 1
+	    reader.timestamp_column = 1
 
 	    # Columns 2 and 3 are the longitude and
 	    # latitude (coordinates 0 and 1)
-	    reader.coordinate_column[0] = 2
-	    reader.coordinate_column[1] = 3
+	    reader.coordinates[0] = 2
+	    reader.coordinates[1] = 3
 
 	    # Column 4 is the altitude
-	    reader.numeric_fields["altitude"] = 4
+	    reader.set_real_field_column("altitude", 4)
 
 	    for point in reader:
                  # Do whatever you want with the points here
