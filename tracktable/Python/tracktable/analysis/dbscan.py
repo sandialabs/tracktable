@@ -34,6 +34,7 @@ from __future__ import division, absolute_import, print_function
 from tracktable.lib import _dbscan_clustering
 
 from tracktable.domain.feature_vectors import convert_to_feature_vector
+from tracktable.core.logging import getLogger, LogLevel
 
 def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_size):
     """Use DBSCAN to compute clusters for a set of points.
@@ -61,10 +62,14 @@ def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_si
     first_point = feature_vectors[0]
     vertex_ids = list(range(len(feature_vectors)))
 
-    print("Testing for point decoration.  First point: {}".format(first_point))
+    logger = getLogger(__name__)
+    logger.log(LogLevel.TRACE, ("Testing for point decoration.  "
+                                "First point: {}").format(first_point))
     try:
         if len(first_point) == 2 and len(first_point[0]) > 0:
-            print("DEBUG: Points are decorated.  First point: {}".format(first_point))
+            logger.log(LogLevel.DEBUG, 
+                       ("Points are decorated.  "
+                        "First point: {}").format(first_point))
             decorated_points = True
             vertex_ids = [ point[1] for point in feature_vectors ]
     except TypeError:
@@ -74,8 +79,8 @@ def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_si
         pass
 
     if not decorated_points:
-        print("DEBUG: Points are not decorated.")
-
+        logger.log(LogLevel.DEBUG, "Points are not decorated.")
+        
     if decorated_points:
         native_feature_vectors = [ convert_to_feature_vector(p[0]) for p in feature_vectors ]
     else:
