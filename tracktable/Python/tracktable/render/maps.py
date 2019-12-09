@@ -241,9 +241,8 @@ def instantiate_map(min_corner,
         )
 
     logger = logging.getLogger(__name__)
-    logging.trace(logger,
-        ("instantiate_map: Map successfully instantiated.  "
-         "Axes: {}").format(axes))
+    logger.debug(("instantiate_map: Map successfully instantiated.  "
+                  "Axes: {}").format(axes))
     axes.tracktable_projection = projection
     return axes
 
@@ -341,7 +340,7 @@ def region_map(region_name,
         projection = cartopy.crs.Miller
 
     logger = logging.getLogger(__name__)
-    logging.debug(logger, "region_map: projection is {}".format(projection))
+    logger.debug("region_map: projection is {}".format(projection))
 
     map_axes = instantiate_map(
         min_corner=params['min_corner'],
@@ -349,5 +348,5 @@ def region_map(region_name,
         projection=projection
         )
 
-    logging.debug(logger, "region_map: map_axes are {}".format(map_axes))
+    logger.debug("region_map: map_axes are {}".format(map_axes))
     return map_axes

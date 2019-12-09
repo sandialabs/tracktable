@@ -118,12 +118,12 @@ class AssembleTrajectoryFromPoints(object):
         self.invalid_trajectory_count = 0
         self.points_processed_count = 0
 
-        logging.info(logger, ("New trajectories will be declared after a separation "
-                              "of {} distance units or {} seconds.").format(
+        logger.info(("New trajectories will be declared after a separation "
+                     "of {} distance units or {} seconds.").format(
                                   self.separation_distance,
                                   self.separation_time))
-        logging.info(logger, ("Trajectories with fewer than {} points will "
-                              "be discarded.").format(self.minimum_length))
+        logger.info(("Trajectories with fewer than {} points will "
+                     "be discarded.").format(self.minimum_length))
 
         for point in self.input:
             self.points_processed_count += 1
@@ -152,8 +152,7 @@ class AssembleTrajectoryFromPoints(object):
                         yield(new_trajectory)
                         self.valid_trajectory_count += 1
                         if self.valid_trajectory_count > 0 and self.valid_trajectory_count % 100 == 0:
-                            logging.trace(
-                                logger, 
+                            logger.debug(
                                 ("(1) {} trajectories announced and {} "
                                  "discarded for having fewer than {} "
                                  "points").format(
@@ -163,8 +162,7 @@ class AssembleTrajectoryFromPoints(object):
                     else:
                         self.invalid_trajectory_count += 1
                         if self.invalid_trajectory_count > 0 and self.invalid_trajectory_count % 100 == 0:
-                            logging.trace(
-                                logger,
+                            logger.debug(
                                 ("(2) STATUS: {} trajectories announced and {} "
                                  "discarded for having fewer than {} "
                                  "points").format(
@@ -198,8 +196,7 @@ class AssembleTrajectoryFromPoints(object):
                                 yield(new_trajectory)
                                 self.valid_trajectory_count += 1
                                 if self.valid_trajectory_count > 0 and self.valid_trajectory_count % 100 == 0:
-                                    logging.trace(
-                                        logger,
+                                    logger.debug(
                                         ("(3) {} trajectories "
                                          "announced and {} discarded for "
                                          "having fewer than {} points").format(
@@ -209,8 +206,7 @@ class AssembleTrajectoryFromPoints(object):
                             else:
                                 self.invalid_trajectory_count += 1
                                 if self.invalid_trajectory_count > 0 and self.invalid_trajectory_count % 100 == 0:
-                                    logging.trace(
-                                        logger,
+                                    logger.debug(
                                         ("(4) {} trajectories" 
                                          "announced and {} discarded for "
                                          "having fewer than {} points").format(
@@ -230,8 +226,7 @@ class AssembleTrajectoryFromPoints(object):
                 yield(new_trajectory)
                 self.valid_trajectory_count += 1
                 if self.valid_trajectory_count > 0 and self.valid_trajectory_count % 100 == 0:
-                    logging.trace(
-                        logger,
+                    logger.debug(
                         ("{} trajectories announced and {} discarded for "
                          "having fewer than {} points").format(
                             self.valid_trajectory_count, 
@@ -240,8 +235,7 @@ class AssembleTrajectoryFromPoints(object):
             else:
                 self.invalid_trajectory_count += 1
                 if self.invalid_trajectory_count > 0 and self.invalid_trajectory_count % 100 == 0:
-                    logging.trace(
-                        logger,
+                    logger.debug(
                         ("{} trajectories announced and {} discarded for "
                          "having fewer than {} points").format(
                              self.valid_trajectory_count, 
@@ -249,17 +243,15 @@ class AssembleTrajectoryFromPoints(object):
                              self.minimum_length))
 
 
-        logging.info(
-            logger,
+        logger.info(
             ("Done assembling trajectories.  {} trajectories produced and "
              "{} discarded for having fewer than {} points.").format(
                  self.valid_trajectory_count,
-                 self.invalid_trajectory_point,
+                 self.invalid_trajectory_count,
                  self.minimum_length))
 
         if self.valid_trajectory_count == 0:
-            logging.warning(
-                logger, 
+            logger.warning(
                 ("No trajectories produced.  Are you sure your delimiters and "
                  "your column assignments are correct?"))
         return

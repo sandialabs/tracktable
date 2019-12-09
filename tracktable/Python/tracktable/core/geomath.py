@@ -39,7 +39,7 @@ from six.moves import range
 import math
 
 from tracktable.core import logging
-from tracktable.core.logging import LogLevel
+LOGGER = logging.getLogger(__name__)
 
 from tracktable.lib._domain_algorithm_overloads import distance as _distance
 from tracktable.lib._domain_algorithm_overloads import bearing as _bearing
@@ -65,7 +65,6 @@ from tracktable.lib._domain_algorithm_overloads import convex_hull_aspect_ratio 
 from tracktable.lib._domain_algorithm_overloads import convex_hull_centroid as _convex_hull_centroid
 from tracktable.lib._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
 
-from tracktable.logging import loglevel
 
 
 
@@ -711,12 +710,12 @@ def compute_bounding_box(point_sequence, buffer=()):
     if num_points == 0:
         raise ValueError("Cannot compute bounding box.  No points provided.")
     else:
-        logger = logging.getLogger(__name__)
-        logger.log(LogLevel.TRACE, "Bounding box points: {}, {}".format(
+        global LOGGER
+        LOGGER.debug("Bounding box points: {}, {}".format(
             min_corner, 
             max_corner))
         result = bbox_type(min_corner, max_corner)
-        logger.log(LogLevel.TRACE, "Final bounding box: {}".format(result))
+        LOGGER.debug("Final bounding box: {}".format(result))
         return result
 
 
