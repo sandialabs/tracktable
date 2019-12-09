@@ -72,10 +72,8 @@ def climb_rate(trajectory, max_climb=2000):
 
             if time_delta == 0:
                 time_delta = 1
-#            print("climb_rate: altitude_delta is {}. scalar is {}".format(altitude_delta, (float(altitude_delta) / (time_delta / 60.0))))
-            # feet per minute
             climb_rate = float(altitude_delta) / (time_delta / 60.0)
-            trajectory[i].set_property('climb_rate', float(altitude_delta) / (time_delta / 60.0))
+            trajectory[i].set_property('climb_rate', climb_rate)
 
         trajectory[-1].set_property('climb_rate', trajectory[-2].properties['climb_rate'])
 
@@ -95,9 +93,6 @@ def get_climb_rate(trajectory, max_velocity=2000):
 
         value = 0.5 * ( climb_rate + 1 )
         scalars[i] = value
-
-#    print("get_climb_rate: returned scalars are {}".format(scalars))
-
     return scalars
 
 # ----------------------------------------------------------------------

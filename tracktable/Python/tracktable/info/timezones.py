@@ -28,23 +28,26 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import print_function, division, absolute_import
-import os.path
-from mpl_toolkits.basemap import shapefile
-import pytz
-from six.moves import range
 
-from tracktable.core import Timestamp
+import os.path
+import pytz
 
 from shapely.geometry.polygon import Polygon
 from shapely.geometry import Point, MultiPolygon
+from six.moves import range
+
+from tracktable.core import logging
+
 
 TIMEZONE_BOUNDARIES = None
 TIMEZONE_STRUCTS = dict()
 
 def load_timezone_shapefile():
+    raise NotImplementedError("load_timezone_shapefile needs a shapefile reader!")
     global TIMEZONE_BOUNDARIES
+    logger = logging.getLogger(__name__)
     full_path = os.path.join(os.path.dirname(__file__), 'data', 'tz_world')
-    print("Loading timezone shapefile")
+    logging.trace(logger, "Loading timezone shapefile")
     reader = shapefile.Reader(full_path)
     timezone_names = [ record[0] for record in reader.records() ]
     shapes = reader.shapes()
@@ -59,8 +62,8 @@ def load_timezone_shapefile():
     sorted_timezones = america_timezones + canada_timezones + all_other_timezones
 
     boundaries = []
-    print("Converting shapefile to polygons")
-
+    logging.trace(logger, "Converting shapefile to polygons")
+    
     TIMEZONE_BOUNDARIES = []
     for named_shape in sorted_timezones:
         shape = named_shape[0]

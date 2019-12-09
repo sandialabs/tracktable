@@ -37,14 +37,16 @@ ground truth files, including computing differences where appropriate.
 from __future__ import print_function, division
 
 import numpy as np
-from tracktable.core import tracktable_logging as tt_logging
+from tracktable.core.logging import get_logger, LogLevel
 
 try:
     import PIL
     from PIL import Image
     PIL_AVAILABLE=True
 except ImportError:
-    tt_logging('warning', 'Python image library not available.  Image tests will automatically fail.')
+    get_logger(__name__).log(LogLevel.WARNING, 
+        ("Python image library (PIL or Pillow) not available. "
+         "Image tests will automatically fail."))
     PIL_AVAILABLE=False
 
 import datetime
@@ -113,7 +115,11 @@ def compare_images(expected, actual, tolerance=1):
 
         computed_mse = image_mse(expected_image, actual_image)
         if computed_mse >= tolerance:
-            tt_logging.log('error', 'Image comparison failed: tolerance = {}, computed mean squared error = {}'.format(tolerance, computed_mse))
+            get_logger(__name__).log(
+                LogLevel.ERROR, 
+                ("Image comparison failed: tolerance = {}, "
+                 "computed mean squared error = {}").format(tolerance, 
+                                                            computed_mse))
         return computed_mse < tolerance
 
 # ----------------------------------------------------------------------
@@ -156,7 +162,10 @@ def pickle_and_unpickle(thing):
     if thing == reconstituted:
         return NO_ERROR
     else:
-        print("ERROR: pickle_and_unpickle: Pickling did not reproduce input {}".format(type(thing)))
+        get_logger(__name__).log(
+            LogLevel.ERROR, 
+            "pickle_and_unpickle: Pickling did not reproduce input {}".format(
+                type(thing)))
         return ERROR
 
 # ----------------------------------------------------------------------

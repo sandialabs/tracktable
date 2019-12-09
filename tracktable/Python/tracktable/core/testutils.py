@@ -32,13 +32,16 @@
 from __future__ import print_function, division
 
 import filecmp
+from tracktable.logging import get_logger, LogLevel
 
 def compare_text_files(file1, file2):
     result = filecmp.cmp(file1, file2)
+    logger = get_logger(__name__)
     if result:
-        print("Test output agrees with ground truth")
+        logger.log(LogLevel.INFO, "Test output agrees with ground truth")
     else:
-        print("ERROR: Test output in {} differs from ground truth in {}".format(file1, file2))
+        logger.log(LogLevel.ERROR, ("Test output in {} differs from ground "
+                                    "truth in {}").format(file1, file2))
 
     return result
 
