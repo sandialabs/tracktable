@@ -37,7 +37,6 @@ ground truth files, including computing differences where appropriate.
 from __future__ import print_function, division
 
 import numpy as np
-from tracktable.core.logging import get_logger, LogLevel
 
 try:
     import PIL
@@ -65,9 +64,6 @@ random.seed(1234)
 # a result code
 NO_ERROR = 0
 ERROR = 1
-
-def log_test_output(*args, **kwargs):
-    print(*args, **kwargs)
 
 # ----------------------------------------------------------------------
 
@@ -115,11 +111,9 @@ def compare_images(expected, actual, tolerance=1):
 
         computed_mse = image_mse(expected_image, actual_image)
         if computed_mse >= tolerance:
-            get_logger(__name__).log(
-                LogLevel.ERROR, 
-                ("Image comparison failed: tolerance = {}, "
-                 "computed mean squared error = {}").format(tolerance, 
-                                                            computed_mse))
+            print(("Image comparison failed: tolerance = {}, "
+                  "computed mean squared error = {}").format(tolerance, 
+                                                             computed_mse))
         return computed_mse < tolerance
 
 # ----------------------------------------------------------------------
@@ -162,8 +156,7 @@ def pickle_and_unpickle(thing):
     if thing == reconstituted:
         return NO_ERROR
     else:
-        get_logger(__name__).log(
-            LogLevel.ERROR, 
+        print(
             "pickle_and_unpickle: Pickling did not reproduce input {}".format(
                 type(thing)))
         return ERROR
