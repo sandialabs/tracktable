@@ -122,10 +122,11 @@ struct generic_point_at_time
           }
         else
           {
-          std::cerr << "WARNING: Trajectory::point_at_time: This shouldn't ever happen\n";
-          std::cerr << "before: " << *before << "\n";
-          std::cerr << "after: " << *after << "\n";
-          std::cerr << "equal_or_after: " << *equal_or_after << "\n";
+          TRACKTABLE_LOG(warning)
+            << "WARNING: Trajectory::point_at_time: This shouldn't ever happen.  "
+            << "before: " << *before << " " 
+            << "after: " << *after << " "
+            << "equal_or_after: " << *equal_or_after;
           before = equal_or_after;
           }
         }

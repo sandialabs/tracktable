@@ -69,8 +69,10 @@ T typed_property_with_default(
       }
     catch (boost::bad_get e)
       {
-      std::cerr << "WARNING: PropertyMap: Property '"
-                << name << "' is present but is not of the requested type\n";
+      TRACKTABLE_LOG(warning) 
+        << "PropertyMap: Property '"
+        << name 
+        << "' is present but is not of the requested type";
       return default_value;
       }
     }
@@ -233,8 +235,9 @@ double real_property(PropertyMap const& properties, string_type const& name, boo
       }
     catch (boost::bad_get e)
       {
-      std::cerr << "WARNING: PropertyMap: Property '"
-                << name << "' is present but is not real-valued\n";
+      TRACKTABLE_LOG(warning) 
+        << "PropertyMap: Property '"
+        << name << "' is present but is not real-valued\n";
       if (is_present) *is_present = false;
       return 0;
       }
@@ -287,8 +290,9 @@ int64_t integer_property(PropertyMap const& properties, string_type const& name,
       }
     catch (boost::bad_get e)
       {
-      std::cerr << "WARNING: PropertyMap: Property '"
-                << name << "' is present but is not integer-valued\n";
+      TRACKTABLE_LOG(warning) 
+        << "PropertyMap: Property '"
+        << name << "' is present but is not integer-valued";
       if (is_present) *is_present = false;
       return 0;
       }
@@ -341,8 +345,9 @@ string_type string_property(PropertyMap const& properties, string_type const& na
       }
     catch (boost::bad_get e)
       {
-      std::cerr << "WARNING: PropertyMap: Property '"
-                << name << "' is present but is not a string\n";
+      TRACKTABLE_LOG(warning) 
+        << "PropertyMap: Property '"
+        << name << "' is present but is not a string";
       if (is_present) *is_present = false;
       return string_type();
       }
@@ -393,8 +398,9 @@ Timestamp timestamp_property(PropertyMap const& properties, string_type const& n
       }
     catch (boost::bad_get e)
       {
-      std::cerr << "WARNING: PropertyMap: Property '"
-                << name << "' is present but is not a timestamp\n";
+      TRACKTABLE_LOG(warning) 
+        << "PropertyMap: Property '"
+        << name << "' is present but is not a timestamp";
       if (is_present) *is_present = false;
       return Timestamp();
       }

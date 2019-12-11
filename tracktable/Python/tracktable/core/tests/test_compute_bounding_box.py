@@ -152,42 +152,39 @@ def test_compute_bounding_box():
     error_count += verify_result(expected, map_bbox, "Buffered cartesian box")
 
     # Test error conditions
-    map_bbox = geomath.compute_bounding_box([])
-    if(map_bbox != None):
-        sys.stderr.write('ERROR: Empty point sequence did not return None')
+    try:
+        map_bbox = geomath.compute_bounding_box([])
+    except ValueError:
+        pass  # this is what we expect
+    except Exception as other_exception:
+        sys.stderr.write(
+            ('ERROR: Expected ValueError from compute_bounding_box '
+             'on empty input but got {}.').format(other_exception))
         error_count += 1
 
-    map_bbox = geomath.compute_bounding_box(long_traj.points(),(1.0,))
-    if(map_bbox != None):
-        sys.stderr.write('ERROR: Buffer tuple length of 1 did not return None')
+    try:
+        map_bbox = geomath.compute_bounding_box(
+            long_traj.points(),
+            (1.0,))
+    except ValueError:
+        pass  # this is what we want
+    except Exception as other_exception:
+        sys.stderr.write(
+            ('ERROR: Expected ValueError from compute_bounding_box '
+             'with buffer tuple length 1 but got {}.').format(other_exception))
         error_count += 1
 
-    map_bbox = geomath.compute_bounding_box(long_traj.points(),(1.0,2.0,3.0))
-    if(map_bbox != None):
-        sys.stderr.write('ERROR: Buffer tuple length of 3 did not return None')
+    try:
+        map_bbox = geomath.compute_bounding_box(long_traj.points(),(1.0,2.0,3.0))
+    except ValueError:
+        pass  # this is what we want
+    except Exception as other_exception:
+        sys.stderr.write(
+            ('ERROR: Expected ValueError from compute_bounding_box '
+             'with buffer tuple length 3 but got {}.').format(other_exception))
         error_count += 1
-
+    
     return error_count
-
-    #try:
-    #    pyplot.figure()
-    #    pyplot.subplot(111, aspect='equal')
-
-    #    pyplot.figure(figsize=(8, 6))
-    #    (mymap, artists) = mapmaker(map_name='custom',
-    #                                domain='terrestrial',
-    #                                map_projection="merc",
-    #                                draw_coastlines=True,
-    #                                map_bbox=map_bbox)
-
-     #   pyplot.savefig("Buffer_Test.png",
-     #                  dpi=150)
-     #   pyplot.close()
-
-     #   return True
-    #except Exception:
-     #   traceback.print_exc()
-     #   return False
 
 # ----------------------------------------------------------------------
 

@@ -28,6 +28,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <tracktable/Core/Logging.h>
 #include <tracktable/Core/PointLonLat.h>
 #include <tracktable/Core/PointCartesian.h>
 #include <tracktable/Core/Trajectory.h>
@@ -35,14 +36,27 @@
 #include <tracktable/Core/PointArithmetic.h>
 
 #include <iostream>
+#include <sstream>
 #include <typeinfo>
 
 template<typename iter_type>
-void dump_linestring(iter_type _begin, iter_type _end)
+std::string linestring_to_string(iter_type _begin, iter_type _end)
+{
+  std::ostringstream out;
+  while (_begin != _end)
+    {
+      out << (*_begin).to_string() << " ||| ";
+      ++_begin;
+    }
+  return out.str();
+}
+
+template<typename iter_type, typename out_type>
+void dump_linestring(iter_type _begin, iter_type _end, out_type& output)
 {
   while (_begin != _end)
     {
-    std::cout << (*_begin).to_string() << "\n";
+    output << (*_begin).to_string() << "\n";
     ++_begin;
     }
 }
@@ -132,83 +146,95 @@ int test_simplify_linestring()
   int error_count = 0;
   if (simplified.size() != 5)
     {
-    std::cout << "ERROR: test_simplify_linestring on "
-              << typeid(linestring_type).name()
-              << ": Simplified linestring has "
-              << simplified.size() << " points.  We were expecting 5.\n";
-    std::cout << "Simplified geometry:\n";
-    dump_linestring(simplified.begin(), simplified.end());
-    ++error_count;
+      TRACKTABLE_LOG(error) 
+          << "test_simplify_linestring on "
+			    << typeid(linestring_type).name()
+			    << ": Simplified linestring has "
+			    << simplified.size() << " points.  We were expecting 5.  "
+			    << "Simplified geometry:  "
+          << linestring_to_string(simplified.begin(), simplified.end());
+      ++error_count;
     }
 
   if (simplified[0] != linestring[0])
     {
-    std::cout << "ERROR: test_simplify_linestring on "
-              << typeid(linestring_type).name()
-              << ": Expected first point to be the same as from the input.\n";
-    std::cout << "Original first point: " << linestring[0].to_string() << "\n";
-    std::cout << "Simplified first point: " << simplified[0].to_string() << "\n";
+      TRACKTABLE_LOG(error) 
+          << "test_simplify_linestring on "
+			    << typeid(linestring_type).name()
+			    << ": Expected first point to be the same as from the input.  "
+			    << "Original first point: " << linestring[0].to_string() 
+          << "  "
+			    << "Simplified first point: " << simplified[0].to_string();
     ++error_count;
     }
 
 
   if (simplified[1] != linestring[3])
     {
-    std::cout << "ERROR: test_simplify_linestring on "
-              << typeid(linestring_type).name()
-              << ": Expected second point to be the same as point 3 from the input.\n";
-    std::cout << "Original point: " << linestring[3].to_string() << "\n";
-    std::cout << "Simplified first point: " << simplified[1].to_string() << "\n";
+    TRACKTABLE_LOG(error) 
+      << "test_simplify_linestring on "
+      << typeid(linestring_type).name()
+      << ": Expected second point to be the same as point 3 from the input.  "
+      << "Original point: " << linestring[3].to_string() 
+      << "  "
+      << "Simplified first point: " << simplified[1].to_string();
     ++error_count;
     }
 
 
   if (simplified[2] != linestring[4])
     {
-    std::cout << "ERROR: test_simplify_linestring on "
-              << typeid(linestring_type).name()
-              << ": Expected middle point to be the same as point 4 from the input.\n";
-    std::cout << "Original point: " << linestring[4].to_string() << "\n";
-    std::cout << "Simplified first point: " << simplified[2].to_string() << "\n";
+    TRACKTABLE_LOG(error)
+      << "test_simplify_linestring on "
+      << typeid(linestring_type).name()
+      << ": Expected middle point to be the same as point 4 from the input.  "
+      << "Original point: " << linestring[4].to_string() 
+      << "  "
+      << "Simplified first point: " << simplified[2].to_string();
     ++error_count;
     }
 
 
   if (simplified[3] != linestring[5])
     {
-    std::cout << "ERROR: test_simplify_linestring on "
-              << typeid(linestring_type).name()
-              << ": Expected point 3 to be the same as point 5 from the input.\n";
-    std::cout << "Original point: " << linestring[5].to_string() << "\n";
-    std::cout << "Simplified first point: " << simplified[3].to_string() << "\n";
+    TRACKTABLE_LOG(error)
+      << "test_simplify_linestring on "
+      << typeid(linestring_type).name()
+      << ": Expected point 3 to be the same as point 5 from the input.  "
+      << "Original point: " << linestring[5].to_string()
+      << "  "
+      << "Simplified first point: " << simplified[3].to_string();
     ++error_count;
     }
 
 
   if (simplified[4] != linestring[8])
     {
-    std::cout << "ERROR: test_simplify_linestring on "
-              << typeid(linestring_type).name()
-              << ": Expected point 4 to be the same as point 8 from the input.\n";
-    std::cout << "Original point: " << linestring[8].to_string() << "\n";
-    std::cout << "Simplified first point: " << simplified[4].to_string() << "\n";
+    TRACKTABLE_LOG(error)
+      << "test_simplify_linestring on "
+      << typeid(linestring_type).name()
+      << ": Expected point 4 to be the same as point 8 from the input."
+      << "Original point: " << linestring[8].to_string() 
+      << "  "
+      << "Simplified first point: " << simplified[4].to_string();
     ++error_count;
     }
 
   if (check_property_equality<linestring_type>::apply(simplified, linestring) == false)
     {
-    std::cout << "ERROR: test_simplify_linestring on "
-              << typeid(linestring_type).name()
-              << ": Property maps do not match.\n";
+      TRACKTABLE_LOG(error)
+        << "ERROR: test_simplify_linestring on "
+        << typeid(linestring_type).name()
+        << ": Property maps do not match.";
     ++error_count;
     }
 
   if (error_count != 0)
     {
-    std::cout << "DEBUG: Original linestring:\n";
-    dump_linestring(linestring.begin(), linestring.end());
-    std::cout << "DEBUG: Simplified linestring:\n";
-    dump_linestring(simplified.begin(), simplified.end());
+    TRACKTABLE_LOG(debug) << "Original linestring: " 
+                          << linestring_to_string(linestring.begin(), linestring.end());
+    TRACKTABLE_LOG(debug) << "Simplified linestring: "
+                          << linestring_to_string(simplified.begin(), simplified.end());
     }
 
   return error_count;

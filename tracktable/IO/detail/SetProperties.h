@@ -56,12 +56,13 @@ struct set_properties
     {
       if (field_map.size() > 0)
         {
-        std::cerr << "WARNING: You are attempting to set "
-                  << "properties on a point of type "
-                  << typeid(point).name()
-                  << ", which does not have properties "
-                  << "(or at least does not have the "
-                  << "has_properties tag defined).\n";
+        TRACKTABLE_LOG(warning) 
+          << "You are attempting to set "
+          << "properties on a point of type "
+          << typeid(point).name()
+          << ", which does not have properties "
+          << "(or at least does not have the "
+          << "has_properties tag defined).";
         }
     }
 };
@@ -96,10 +97,11 @@ struct set_properties<PointT, true>
           }
         catch (std::exception& e)
           {
-          std::cerr << "WARNING: Parse error while trying to set field '"
-                    << field_name << "' from string '"
-                    << raw_value << "': "
-                    << e.what() << "\n";
+          TRACKTABLE_LOG(warning) 
+            << "WARNING: Parse error while trying to set field '"
+            << field_name << "' from string '"
+            << raw_value << "': "
+            << e.what();
           }
         }
     }
@@ -120,12 +122,13 @@ struct set_object_id
     {
       if (ObjectIdColumn != -1)
         {
-        std::cerr << "WARNING: You are attempting to set "
+        TRACKTABLE_LOG(warning) 
+                  << "WARNING: You are attempting to set "
                   << "an object ID on a point of type "
                   << typeid(point).name()
                   << ", which does not have properties "
                   << "(or at least does not have the "
-                  << "has_object_id tag defined).\n";
+                  << "has_object_id tag defined).";
         }
     }
 };
@@ -161,12 +164,13 @@ struct set_timestamp
     {
       if (TimestampColumn != -1)
         {
-        std::cerr << "WARNING: You are attempting to set "
+        TRACKTABLE_LOG(warning) 
+                  << "WARNING: You are attempting to set "
                   << "a timestamp on a point of type "
                   << typeid(point).name()
                   << ", which does not have properties "
                   << "(or at least does not have the "
-                  << "has_timestamp tag defined).\n";
+                  << "has_timestamp tag defined).";
         }
     }
 };
@@ -191,11 +195,12 @@ struct set_timestamp<PointT, true>
         }
       catch (std::exception& e)
         {
-        std::cerr << "ERROR while setting timestamp: "
+        TRACKTABLE_LOG(warning) 
+                  << "Error while setting timestamp: "
                   << e.what() << "\n"
                   << "Timestamp string was '"
                   << tokens[TimestampColumn]
-                  << "'.\n";
+                  << "'.";
         }
     }
 };

@@ -41,18 +41,17 @@ pointed in the right direction.
 
 from __future__ import print_function, absolute_import, division
 
+from tracktable.core import logging
+
 import math
 import sys
 import matplotlib
 import matplotlib.collections
 import matplotlib.colors
+from io import StringIO
 from matplotlib.collections import LineCollection
-import pdb
 from six.moves import range
 import numpy
-
-from tracktable.core import geomath
-from tracktable.render import colormaps
 
 
 # ----------------------------------------------------------------------
@@ -86,22 +85,13 @@ def remove_duplicate_points(trajectory):
     if len(new_points) == 1:
         new_points.append(trajectory[-1])
 
-#    print("remove_duplicate_points: old trajectory has length {}, new trajectory has length {}".format(
-#        len(trajectory), len(new_points)))
-
+    logger = logging.getLogger(__name__)
+    logging.debug(logger,
+                  ("remove_duplicate_points: old trajectory has length {}, "
+                   "new trajectory has length {}").format(
+                        len(trajectory), len(new_points)))
 
     return type(trajectory).from_position_list(new_points)
-
-
-# ----------------------------------------------------------------------
-
-def dump_trajectory(trajectory, out=sys.stdout):
-    print("trajectory {} has {} points:".format(trajectory[0].object_id,
-                                                len(trajectory)),
-          file=out)
-    for point in trajectory:
-        print("\t{} ".format(point), file=out)
-
 
 # ----------------------------------------------------------------------
 
@@ -127,6 +117,7 @@ def points_to_segments(point_list, maximum_distance=None):
     # Now that we know the thresholds, we can go through and build the actual segments.
     segments = []
     segment_lengths = []
+
     # Python 3: An object of type zip does not have a len() so we need
     # to turn this into an actual list
     point_list = list(point_list)
@@ -135,7 +126,14 @@ def points_to_segments(point_list, maximum_distance=None):
         point2 = point_list[i+1]
         segment_length = cart2_distance(point_list[i], point_list[i+1])
         if maximum_distance and segment_length > maximum_distance:
-#            print("WARNING: Discarding outlier line segment with length {}, {} times the median length of {}.".format(distance, distance/median_distance, median_distance))
+            logger = logging.getLogger(__name__)
+            logging.debug(
+                logger, 
+                ("WARNING: Discarding outlier line segment with length {}, {} "
+                 "times the median length of {}.").format(
+                     distance, 
+                     distance/median_distance, 
+                     median_distance))
             segments.append(( point1, point1 ))
         else:
             segments.append( (point1, point2) )
@@ -342,9 +340,7 @@ def draw_traffic(traffic_map,
     for trajectory in trajectory_iterable:
         num_trajectories_examined += 1
 
-#        print("Processing trajectory with object ID {} and {} points".format(trajectory[0].object_id, len(trajectory)))
         if len(trajectory) < 2:
-#            print("Discarding trajectory with {} points".format(len(trajectory)))
             continue
 
         trajectory = remove_duplicate_points(trajectory)
@@ -385,17 +381,10 @@ def draw_traffic(traffic_map,
             lead_point_y.append(local_y[-1])
             lead_point_scalars.append(local_scalars[-1])
 
-            # things look OK up to this point
-#            print("DEBUG: local_scalars first 10: {}".format(local_scalars[0:10]))
-#            print("DEBUG: local_segments first 10: {}".format(local_segments[0:10]))
-#            print("DEBUG: local_x_world first 10: {}".format(local_x_world[0:10]))
-#            print("DEBUG: local_y_world first 10: {}".format(local_y_world[0:10]))
-
         if len(current_batch_paths) >= max_batch_size:
             # Now we've processed some traffic and made it into line
             # segments.  Time to create the line segment collection that we
             # can plot.
-#            print("Rendering latest batch of {} paths with colormap {}".format(len(current_batch_paths), color_map))
             segment_collection = LineCollection(numpy.vstack(current_batch_paths),
                                                 norm=color_scale,
                                                 cmap=color_map,
@@ -414,8 +403,6 @@ def draw_traffic(traffic_map,
 
     # one more batch now that we're done
     if len(current_batch_paths) > 0:
-#        print("Rendering final batch of {} paths with colormap {}".format(len(current_batch_paths), color_map))
-#        print("current batch linewidths: {}".format(current_batch_linewidths))
         segment_collection = LineCollection(numpy.vstack(current_batch_paths),
                                             norm=color_scale,
                                             cmap=color_map,
@@ -458,9 +445,6 @@ def draw_traffic(traffic_map,
             for (x, y, label) in zip(lead_point_x_world, lead_point_y_world, lead_point_labels):
                 all_artists.append(axes.text(x, y, label, **label_kwargs))
 
-#    print("DEBUG: draw_traffic: {} trajectories examined and {} rendered".format(
-#        num_trajectories_examined,
-#        num_trajectories_rendered))
     return all_artists
 
 
