@@ -231,7 +231,6 @@ public:
                                          L2);
         }
 
-      // std::cout << "DBSCAN: Finished.\n";
       return boost::numeric_cast<int>(this->ClusterMembership.size());
     }
 
@@ -367,7 +366,7 @@ protected:
       this->build_cluster_membership_lists(points, next_cluster_id);
 
 #if defined(COMPUTE_CLUSTER_STATISTICS)
-      std::cout << "Constructing cluster statistics...\n";
+      TRACKTABLE_LOG(info) << "Constructing cluster statistics...";
       this->num_core_points.resize(next_cluster_id, 0);
       this->core_point_avg_num_neighbors.resize(next_cluster_id, 0);
       this->total_num_neighbors.resize(next_cluster_id, 0);
@@ -410,10 +409,11 @@ protected:
             static_cast<double>(this->num_core_points[cluster_id]);
           }
         }
-      std::cout << "Cluster statistics:\n";
+      TRACKTABLE_LOG(info) << "Cluster statistics:";
       for (size_t i = 0; i < this->num_core_points.size(); ++i)
         {
-        std::cout << "C " << i << ": "
+        TRACKTABLE_LOG(info) 
+                  << "C " << i << ": "
                   << this->ClusterMembership[i].size() << " points, "
                   << this->num_core_points[i] << " core points, "
                   << this->core_point_avg_num_neighbors[i]

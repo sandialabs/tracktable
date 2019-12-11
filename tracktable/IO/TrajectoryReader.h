@@ -352,11 +352,12 @@ private:
         this->ParseTrajectoryHeader.read_from_tokens(tokens.begin(), tokens.end());
         trajectory->__set_properties(this->ParseTrajectoryHeader.Properties);
 #if 0
-        std::cout << "DEBUG: parse_trajectory: Header contains "
-                  << header.Properties.size() << " properties\n";
+        TRACKTABLE_LOG(debug) 
+                  << "parse_trajectory: Header contains "
+                  << header.Properties.size() << " properties";
 
-        std::cout << "DEBUG: parse_trajectory: Expecting "
-                  << header.NumPoints << " points\n";
+        TRACKTABLE_LOG(debug) << "parse_trajectory: Expecting "
+                  << header.NumPoints << " points";
 #endif
         string_vector_type::const_iterator points_begin = tokens.begin();
         string_vector_type::const_iterator points_end = tokens.end();
@@ -377,11 +378,8 @@ private:
         }
       catch (std::exception& e)
         {
-        if (this->WarningsEnabled)
-          {
-          std::cerr << "WARNING: Error parsing trajectory: "
-                    << e.what() << "\n";
-          }
+        TRACKTABLE_LOG(warning)
+           << "Error parsing trajectory: " << e.what();
         return trajectory_shared_ptr_type();
         }
     }
@@ -400,8 +398,9 @@ private:
       io::detail::PointHeader header;
       header.read_from_tokens(token_begin, token_end);
 #if 0
-      std::cout << "DEBUG: Point header says that we have "
-                << header.PropertyNames.size() << " properties per point\n";
+      TRACKTABLE_LOG(debug)
+        << "DEBUG: Point header says that we have "
+        << header.PropertyNames.size() << " properties per point";
 #endif
       typedef std::pair<token_iter_type, token_iter_type> token_range_type;
       typedef std::vector<token_range_type> token_range_vector_type;
@@ -426,13 +425,16 @@ private:
         token_iter_type point_range_end = point_range_begin;
         if (std::distance(point_range_end, token_end) < num_tokens_in_point_record)
           {
-          std::cout << "ERROR: Trajectory reader fell off the end of tokens for points.  There is probably a missing property value in one of the point records.\n";
-          std::cout << "DEBUG: Trajectory tokens:\n";
+          TRACKTABLE_LOG(error)
+             << "Trajectory reader fell off the end of tokens for points.  "
+             << "There is probably a missing property value in one of the point records.\n";
+          std::ostringstream outbuf;
+          outbuf << "Trajectory tokens: ";
           for (; point_range_begin != token_end; ++point_range_begin)
             {
-            std::cout << *point_range_begin << " ||| ";
+            outbuf << *point_range_begin << " ||| ";
             }
-          std::cout << "\n";
+          TRACKTABLE_LOG(debug) << outbuf.str();
           trajectory->clear();
           return;
           }
@@ -448,7 +450,8 @@ private:
                                                          trajectory);
       if (trajectory != 0 && trajectory->size() != num_points)
         {
-        std::cout << "ERROR: Trajectory reader tried to populate a new trajectory from tokens but got "
+        TRACKTABLE_LOG(error) 
+                  << "Trajectory reader tried to populate a new trajectory from tokens but got "
                   << trajectory->size()
                   << " points.  We were expecting "
                   << num_points << ".\n";
@@ -467,7 +470,8 @@ private:
                                         input_range_end);
       trajectory->assign(this->PointReader.begin(), this->PointReader.end());
 #if 0
-      std::cout << "DEBUG: populate_trajectory_points: Trajectory now contains "
+     TRACKTABLE_LOG(debug) 
+                << "populate_trajectory_points: Trajectory now contains "
                 << trajectory->size() << " points\n";
 #endif
     }
