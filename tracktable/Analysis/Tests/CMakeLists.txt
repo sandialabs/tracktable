@@ -76,6 +76,13 @@ set_property(
   )
 
   
+add_executable(test_dg
+  test_dg.cpp
+  )
+set_property(
+  TARGET test_dg
+  PROPERTY FOLDER "Tests"
+  )
 
 target_link_libraries(test_dbscan_cartesian
   TracktableCore
@@ -107,6 +114,11 @@ target_link_libraries(test_dbscan_decorated_points
   ${Boost_LIBRARIES}
   )
 
+target_link_libraries(test_dg
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+  )
 add_test(
   NAME C_DBSCAN_Cartesian
   COMMAND test_dbscan_cartesian
@@ -125,6 +137,11 @@ add_test(
 add_test(
   NAME C_Rtree
   COMMAND test_rtree
+  )
+
+add_test(
+  NAME C_DG
+  COMMAND test_dg
   )
 
 add_test(
