@@ -45,6 +45,7 @@
 #include <tracktable/Domain/Terrestrial.h>
 
 typedef tracktable::domain::terrestrial::TerrestrialPoint TerrestrialPoint;
+typedef tracktable::domain::terrestrial::TerrestrialTrajectoryPoint TerrestrialTrajectoryPoint;
 
 //----------------------------------------------------
 
@@ -75,9 +76,9 @@ int verify_result(tracktable::PointCartesian<3> actual, tracktable::PointCartesi
     return 0;
 }
 
-TerrestrialPoint create_terrestrial_point(double lat, double lon, std::string const& id=std::string())
+TerrestrialTrajectoryPoint create_terrestrial_point(double lat, double lon, std::string const& id=std::string())
 {
-    TerrestrialPoint point;
+    TerrestrialTrajectoryPoint point;
     point.set_longitude(lon);
     point.set_latitude(lat);
 
@@ -96,11 +97,12 @@ int run_test()
     
     std::cout << "Testing ECEF function" << std::endl;
 
-    TerrestrialPoint lonlatzero = create_terrestrial_point(0.0, 0.0);
-    TerrestrialPoint equatorpoint = create_terrestrial_point(0.0, 90.0);
-    TerrestrialPoint northpole = create_terrestrial_point(90.0, 0.0);
-    TerrestrialPoint northpole2 = create_terrestrial_point(90.0, -135.0);
-    TerrestrialPoint albuquerque = create_terrestrial_point(35.0844, -106.6504);
+    TerrestrialTrajectoryPoint lonlatzero = create_terrestrial_point(0.0, 0.0);
+    TerrestrialTrajectoryPoint equatorpoint = create_terrestrial_point(0.0, 90.0);
+    TerrestrialTrajectoryPoint northpole = create_terrestrial_point(90.0, 0.0);
+    TerrestrialTrajectoryPoint northpole2 = create_terrestrial_point(90.0, -135.0);
+    northpole2.set_property("altitude",100);
+    TerrestrialTrajectoryPoint albuquerque = create_terrestrial_point(35.0844, -106.6504);
 
     tracktable::PointCartesian<3> actual, expected;
     actual = lonlatzero.ECEF();
@@ -124,7 +126,7 @@ int run_test()
     actual = northpole2.ECEF();
     expected[0] = 0.0;
     expected[1] = 0.0;
-    expected[2] = 6356.75231;
+    expected[2] = 6456.75231;
     error_count += verify_result(actual, expected, "NorthPole2",1e-4);
         
     actual = albuquerque.ECEF();

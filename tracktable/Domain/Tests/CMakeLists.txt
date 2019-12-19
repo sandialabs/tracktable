@@ -56,6 +56,11 @@ add_executable(test_trajectory_terrestrial
 )
 set_property(TARGET test_trajectory_terrestrial         PROPERTY FOLDER "Tests")
 
+add_executable(test_trajectory_point_terrestrial_ECEF
+  test_trajectory_point_terrestrial_ECEF.cpp
+)
+set_property(TARGET test_trajectory_point_terrestrial_ECEF         PROPERTY FOLDER "Tests")
+
 
 target_link_libraries(test_domain_terrestrial
   TracktableCore
@@ -81,6 +86,12 @@ target_link_libraries(test_trajectory_terrestrial
   ${Boost_LIBRARIES}
 )
 
+target_link_libraries(test_trajectory_point_terrestrial_ECEF
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+)
+
 add_test(
   NAME C_TerrestrialDomain
   COMMAND test_domain_terrestrial
@@ -99,4 +110,9 @@ add_test(
 add_test(
   NAME C_TrajectoryTerrestrial
   COMMAND test_trajectory_terrestrial
+)
+
+add_test(
+  NAME C_TrajectoryPointTerrestrialECEF
+  COMMAND test_trajectory_point_terrestrial_ECEF
 )
