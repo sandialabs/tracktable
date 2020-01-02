@@ -1,5 +1,19 @@
 ## Tracktable Release Notes
 
+VERSION 1.2.2, 2 January 2019
+-----------------------------
+
+This is a quality-of-life release.
+
+### UPDATES SINCE 1.2.1
+
+* The C++ function `tracktable::point_at_fraction` and the Python function `tracktable.core.geomath.point_at_fraction` have both been renamed to `point_at_length_fraction` to remove confusion about what they do.  The previous name was ambiguous: was the interpolation fraction being computed with respect to trajectory duration or with respect to travel distance?  In Python, `point_at_fraction` will print a deprecation warning.  In C++, `point_at_fraction` is simply gone.  The deprecated Python binding will be removed in release 1.3.
+* Tracktable should be much quieter.  All debug/info/warning/error messages are now directed to a logger instead of writing directly to standard output or standard error.  Right now the C++ and Python messages go to different destinations.  Log messages in C++ go to `boost::log`.  Log messages in Python go to the standard `logging` module.  We will unify these in a future release.  
+### HOTFIXES SINCE 1.2.1
+
+No hotfixes have been deployed since the last release.
+
+
 VERSION 1.2.1, Mid-November 2019
 --------------------------------
 
