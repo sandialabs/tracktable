@@ -32,11 +32,10 @@
 
 
 from __future__ import print_function, division, absolute_import
-from matplotlib import pyplot, collections, lines, patches, text
-import datetime
-import sys
+
 import math
-import pprint
+
+from matplotlib import pyplot, collections, lines, patches, text
 from six.moves import range
 
 def draw_analog_clock_on_map(time,

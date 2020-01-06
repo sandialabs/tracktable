@@ -28,45 +28,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <tracktable/Core/FloatingPointComparison.h>
-#include <tracktable/Core/PointCartesian.h>
-#include <tracktable/Core/TrajectoryPoint.h>
-#include <tracktable/Core/Trajectory.h>
-#include <tracktable/Core/Geometry.h>
+/** Logging: configurable log messages in C++
+ *
+ * We're going to fall through to Boost's logging library here.
+ * 
+ * I would love to have a solution that works for both C++
+ * and Python but I don't currently know how to do that.
+ */
 
-#include <cmath>
-#include <iostream>
+#ifndef __tracktable_Logging_h
+#define __tracktable_Logging_h
 
+#include <boost/log/trivial.hpp>
 
-template<typename path_type>
-int test_convex_hull_aspect_ratio(path_type const& path, double expected_answer)
-{
-  double actual_ratio = tracktable::convex_hull_aspect_ratio(path);
-  double residual = fabs(actual_ratio - expected_answer);
+#define TRACKTABLE_LOG BOOST_LOG_TRIVIAL
+#if 0
+namespace logging = boost::log;
+namespace sinks = boost::log::sinks;
+namespace src = boost::log::sources;
+namespace expr = boost::log::expressions;
+namespace attrs = boost::log::attributes;
+namespace keywords = boost::log::keywords;
+#endif
 
-  if (tracktable::almost_zero(actual_ratio))
-    {
-    return tracktable::almost_zero(residual, 1e-5);
-    }
-  else
-    {
-    return tracktable::almost_zero((residual / expected_answer), 1e-5);
-    }
-}
+#endif
 
-int main(int /*argc*/, char* /*argv*/[])
-{
-  typedef tracktable::PointCartesian<2> Point2D;
-  typedef tracktable::TrajectoryPoint<Point2D> TrajectoryPoint2D;
-  typedef tracktable::Trajectory<TrajectoryPoint2D> Trajectory2D;
-
-  double corners[4][2] = { { 0, 0 }, { 1, 0 }, { 1, 1 }, { 0, 1 } };
-  Trajectory2D cartesian_trajectory;
-  cartesian_trajectory.push_back(Point2D(corners[0]));
-  cartesian_trajectory.push_back(Point2D(corners[1]));
-  cartesian_trajectory.push_back(Point2D(corners[2]));
-  cartesian_trajectory.push_back(Point2D(corners[3]));
-
-  int error_count = 0;
-  error_count += test_convex_hull_aspect_ratio(cartesian_trajectory, 0.707107);
-}

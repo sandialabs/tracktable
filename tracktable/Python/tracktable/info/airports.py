@@ -30,11 +30,9 @@
 
 
 from __future__ import print_function, absolute_import, division
-import csv
 import operator
 import os
 import os.path
-import sys
 
 from tracktable.core.compatibility import UnicodeCSVDictReader
 
@@ -110,14 +108,6 @@ def build_airport_dict():
 
 #        with open(data_filename, mode='r', encoding='utf-8') as infile:
         with open(data_filename, mode='r') as infile:
-
-
-            # csvreader = csv.DictReader(UTF8Recoder(infile, "utf-8"),
-            #                            fieldnames=openflight_field_names,
-            #                            delimiter=',',
-            #                            quotechar='"')
-
-#            csvreader = UnicodeReader(infile, encoding="utf-8", delimiter=',', quotechar='"', reader_class=csv.DictReader, fieldnames=openflight_field_names)
             csvreader = UnicodeCSVDictReader(
                 infile,
                 delimiter=',',
@@ -137,8 +127,6 @@ def build_airport_dict():
                                      float(row['altitude']) )
                 airport.utc_offset = float(row['utc_offset'])
                 airport.daylight_savings = row['daylight_savings']
-
-#                print("Latest airport: %s" % airport)
 
                 if len(airport.iata_code) == 0:
                     airport.iata_code = None

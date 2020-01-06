@@ -64,8 +64,6 @@ struct compute_convex_hull_area<
       implementations::compute_convex_hull_terrestrial
         (point_begin, point_end, hull);
 
-//      std::cout << "Hull: " << bg::wkt(hull) << "\n";
-
       return tracktable::conversions::steradians_to_km2(
         boost::geometry::area(hull)
         );
