@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2018 National Technology and Engineering
+# Copyright (c) 2014-2019 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -33,12 +33,13 @@ related to geography such as 'find the distance between these two
 points on the globe'.
 """
 
-from __future__ import division, print_function, absolute_import
+from __future__ import division, absolute_import
+
 from six.moves import range
-
-
 import math
-import sys
+
+from tracktable.core import logging
+LOGGER = logging.getLogger(__name__)
 
 from tracktable.lib._domain_algorithm_overloads import distance as _distance
 from tracktable.lib._domain_algorithm_overloads import bearing as _bearing
@@ -47,7 +48,7 @@ from tracktable.lib._domain_algorithm_overloads import extrapolate as _extrapola
 from tracktable.lib._domain_algorithm_overloads import signed_turn_angle as _signed_turn_angle
 from tracktable.lib._domain_algorithm_overloads import unsigned_turn_angle as _unsigned_turn_angle
 from tracktable.lib._domain_algorithm_overloads import speed_between as _speed_between
-from tracktable.lib._domain_algorithm_overloads import point_at_fraction as _point_at_fraction
+from tracktable.lib._domain_algorithm_overloads import point_at_time_fraction as _point_at_time_fraction
 from tracktable.lib._domain_algorithm_overloads import point_at_length_fraction as _point_at_length_fraction
 from tracktable.lib._domain_algorithm_overloads import point_at_time as _point_at_time
 from tracktable.lib._domain_algorithm_overloads import time_at_fraction as _time_at_fraction
@@ -61,7 +62,12 @@ from tracktable.lib._domain_algorithm_overloads import simplify as _simplify
 from tracktable.lib._domain_algorithm_overloads import convex_hull_perimeter as _convex_hull_perimeter
 from tracktable.lib._domain_algorithm_overloads import convex_hull_area as _convex_hull_area
 from tracktable.lib._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
+from tracktable.lib._domain_algorithm_overloads import convex_hull_centroid as _convex_hull_centroid
 from tracktable.lib._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
+
+
+
+
 
 def xcoord(thing):
     """Return what we think is the X-coordinate for an object.
@@ -415,31 +421,65 @@ def end_to_end_distance(trajectory):
 
 # ----------------------------------------------------------------------
 
-def point_at_fraction(trajectory, fraction):
-    """Return a point from a trajectory at a specific fraction of its distance
+def point_at_fraction(trajectory, time_fraction):
+    """Return a point from a trajectory at a specific fraction of its duration
 
     This function will estimate a point at a trajectory at some
-    specific fraction of its total travel distance.  If the supplied
+    specific fraction of its total duration.  If the supplied
     fraction does not fall exactly on a vertex of the trajectory we
     will interpolate between the nearest two points.
 
     Fractions before the beginning or after the end of the trajectory
     will return the start and end points, respectively.
 
+    WARNING: This function is deprecated.  Use point_at_time_fraction instead.
+
     Args:
       trajectory (Trajectory): Path to sample
-      fraction (float): Value between 0 and 1.  0 is the beginning and 1 is the end.
+      time_fraction (float): Value between 0 and 1.  0 is the beginning and 1 is the end.
 
     Returns:
       TrajectoryPoint at specified fraction
 
     """
 
-    return _point_at_fraction(trajectory, fraction)
+    logging.warn_deprecated(("tracktable.core.geomath.point_at_fraction is "
+                             "deprecated and will be removed in a future "
+                             "release.  Use tracktable.core.geomath."
+                             "point_at_time_fraction or tracktable.core."
+                             "geomath.point_at_length_fraction instead."))
+
+    return _point_at_time_fraction(trajectory, time_fraction)
 
 # ----------------------------------------------------------------------
 
-def point_at_length_fraction(trajectory, fraction):
+
+def point_at_time_fraction(trajectory, time_fraction):
+    """Return a point from a trajectory at a specific fraction of its duration
+
+    This function will estimate a point at a trajectory at some
+    specific fraction of its total duration.  If the supplied
+    fraction does not fall exactly on a vertex of the trajectory we
+    will interpolate between the nearest two points.
+
+    Fractions before the beginning or after the end of the trajectory
+    will return the start and end points, respectively.
+
+    Args:
+      trajectory (Trajectory): Path to sample
+      time_fraction (float): Value between 0 and 1.  0 is the beginning and 1
+          is the end.
+
+    Returns:
+      TrajectoryPoint at specified fraction
+
+    """
+
+    return _point_at_time_fraction(trajectory, time_fraction)
+
+# ----------------------------------------------------------------------
+
+def point_at_length_fraction(trajectory, length_fraction):
     """Return a point from a trajectory at a specific fraction of its distance
 
     This function will estimate a point at a trajectory at some
@@ -452,14 +492,14 @@ def point_at_length_fraction(trajectory, fraction):
 
     Args:
       trajectory (Trajectory): Path to sample
-      fraction (float): Value between 0 and 1.  0 is the beginning and 1 is the end.
+      length_fraction (float): Value between 0 and 1.  0 is the beginning and 1 is the end.
 
     Returns:
       TrajectoryPoint at specified fraction
 
     """
 
-    return _point_at_length_fraction(trajectory, fraction)
+    return _point_at_length_fraction(trajectory, length_fraction)
 
 # ----------------------------------------------------------------------
 
@@ -666,16 +706,16 @@ def compute_bounding_box(point_sequence, buffer=()):
         max_corner[0] = max_corner[0] + horiz_buff
         max_corner[1] = max_corner[1] + vert_buff
     elif len(buffer) != 0:
-        print("ERROR: buffer requires exactly 0 or 2 values")
-        return None
-
+        raise ValueError("Buffer must contain exactly 0 or 2 values.")
     if num_points == 0:
-        print("ERROR: Cannot compute bounding box.  No points provided.")
-        return None
+        raise ValueError("Cannot compute bounding box.  No points provided.")
     else:
-        print("Bounding box points: {}, {}".format(min_corner, max_corner))
+        global LOGGER
+        LOGGER.debug("Bounding box points: {}, {}".format(
+            min_corner, 
+            max_corner))
         result = bbox_type(min_corner, max_corner)
-        print("Final bounding box: {}".format(result))
+        LOGGER.debug("Final bounding box: {}".format(result))
         return result
 
 
@@ -934,4 +974,3 @@ def kms_to_lat(kms, latitude):
     return kms / latitude_degree_size(latitude)
 
 # ----------------------------------------------------------------------
-

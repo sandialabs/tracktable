@@ -29,6 +29,7 @@
  */
 
 #include <tracktable/Core/FloatingPointComparison.h>
+#include <tracktable/Core/Logging.h>
 #include <tracktable/Core/MemoryUse.h>
 #include <boost/cstdint.hpp>
 #include <iostream>
@@ -38,10 +39,11 @@ int test_memory_use()
   int error_count = 0;
 
   std::size_t initial_memory_use = tracktable::current_memory_use();
-  std::cout << "test_memory_use: Initial memory use is "
-            << initial_memory_use
-            << "\n";
-  std::cout << "test_memory_use: Peak memory use at startup is "
+  TRACKTABLE_LOG(info) 
+            << "test_memory_use: Initial memory use is "
+            << initial_memory_use;
+  TRACKTABLE_LOG(info)
+            << "test_memory_use: Peak memory use at startup is "
             << tracktable::peak_memory_use()
             << "\n";
 
@@ -55,7 +57,8 @@ int test_memory_use()
   std::size_t current_memory_use = tracktable::current_memory_use();
   std::size_t expected_delta = num_ints * sizeof(std::size_t);
 
-  std::cout << "test_memory_use: Memory use after allocating "
+  TRACKTABLE_LOG(info) 
+            << "test_memory_use: Memory use after allocating "
             << num_ints
             << " integers ("
             << num_ints * sizeof(std::size_t) << " bytes) is "
@@ -63,35 +66,46 @@ int test_memory_use()
             << " (delta: " << (static_cast<boost::int64_t>(current_memory_use) - 
 			       static_cast<boost::int64_t>(initial_memory_use))
             << ")\n";
-  delete [] big_chunk;
 
   if (tracktable::almost_equal(
         static_cast<double>(current_memory_use - initial_memory_use),
         static_cast<double>(expected_delta),
         0.01) == false)
     {
-      std::cout << "ERROR: test_memory_use: Unexpectedly large delta "
-		<< "between size of block allocated ("
-		<< expected_delta << ") and actual memory use increase ("
-		<< (current_memory_use - initial_memory_use)
-		<< ")\n";
+      TRACKTABLE_LOG(error)
+        << "ERROR: test_memory_use: Unexpectedly large delta "
+		    << "between size of block allocated ("
+		    << expected_delta << ") and actual memory use increase ("
+		    << (current_memory_use - initial_memory_use)
+		    << ")";
       error_count += 1;
     }
 
+  // This line actually matters.  If it's not here, the optimizer
+  // will notice that we're not actually doing anything with the
+  // contents of big_chunk and never allocate it in the first place.
+  // That causes the test to fail because the numbers reported by
+  // the OS don't make sense in the context of what we think our 
+  // code is doing.
+  big_chunk[0] = big_chunk[0] * 2;
+  
   std::size_t peak_memory_use = tracktable::peak_memory_use();
   std::size_t final_memory_use = tracktable::current_memory_use();
 
-  std::cout << "test_memory_use: Memory use after deleting large array: "
+  TRACKTABLE_LOG(info)
+            << "test_memory_use: Memory use after deleting large array: "
             << final_memory_use
             << " (delta "
             << (static_cast<boost::int64_t>(final_memory_use) - 
-		static_cast<boost::int64_t>(current_memory_use))
-            << ")\n";
+		            static_cast<boost::int64_t>(current_memory_use))
+            << ")";
 
-  std::cout << "test_memory_use: Peak memory use reported is "
-            << peak_memory_use
-            << "\n";
-  return 0;  
+  TRACKTABLE_LOG(info) 
+            << "test_memory_use: Peak memory use reported is "
+            << peak_memory_use;
+
+
+  return error_count;  
 }
 
 

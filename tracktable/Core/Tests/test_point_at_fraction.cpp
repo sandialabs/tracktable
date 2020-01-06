@@ -43,7 +43,7 @@ typedef tracktable::PointCartesian<2> Point2D;
 typedef tracktable::TrajectoryPoint<Point2D> TrajectoryPoint2D;
 typedef tracktable::Trajectory<TrajectoryPoint2D> Trajectory2D;
 
-int test_point_at_fraction()
+int test_point_at_time_fraction()
 {
   Trajectory2D test_trajectory;
 
@@ -68,7 +68,7 @@ int test_point_at_fraction()
   test_trajectory.push_back(points[2]);
 
   int error_count = 0;
-  Point2D halfway = tracktable::point_at_fraction(test_trajectory, 0.5);
+  Point2D halfway = tracktable::point_at_time_fraction(test_trajectory, 0.5);
   if (halfway != points[1])
     {
     std::cout << "ERROR: Expected halfway point to return exactly the second point.\n";
@@ -77,7 +77,7 @@ int test_point_at_fraction()
     ++error_count;
     }
 
-  Point2D one_quarter = tracktable::point_at_fraction(test_trajectory, 0.25);
+  Point2D one_quarter = tracktable::point_at_time_fraction(test_trajectory, 0.25);
   if (!(tracktable::almost_equal(one_quarter[0], 2.0) &&
         tracktable::almost_equal(one_quarter[1], 0.5)))
     {
@@ -92,5 +92,5 @@ int test_point_at_fraction()
 
 int main(int, char *argv[])
 {
-  return test_point_at_fraction();
+  return test_point_at_time_fraction();
 }

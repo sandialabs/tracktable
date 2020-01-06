@@ -31,7 +31,7 @@
 
 # This is trajectory/C++/Core/CMakeLists.txt
 
-find_package(Boost 1.57.0 REQUIRED COMPONENTS date_time serialization)
+find_package(Boost 1.57.0 REQUIRED COMPONENTS date_time log serialization)
 include(GenerateExportHeader)
 
 include_directories(
@@ -60,6 +60,7 @@ set( Core_HEADERS
   GeometricMedian.h
   Geometry.h
   GuardedBoostGeometryHeaders.h
+  Logging.h
   MemoryUse.h
   PlatformDetect.h
   PointArithmetic.h

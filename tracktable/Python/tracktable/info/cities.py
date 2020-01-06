@@ -92,6 +92,7 @@ from __future__ import print_function, absolute_import, division
 import operator
 
 from tracktable.core.geomath import latitude, longitude
+from tracktable.core import logging
 
 CITY_TABLE = None
 CITY_HEADERS = None
@@ -143,12 +144,18 @@ def cities_in_bbox(bbox_min=(-180, -90),
 
     result = []
 
-    print("DEBUG: cities_in_bbox: bbox_min is {}, bbox_max is {}".format(bbox_min, bbox_max))
-    print("DEBUG: min_longitude is {}, min_latitude is {}, max_longitude is {}, max_latitude is {}".format(
-        longitude(bbox_min),
-        latitude(bbox_min),
-        longitude(bbox_max),
-        latitude(bbox_max)))
+    logger = logging.getLogger(__name__)
+    logging.trace(logger, ("cities_in_bbox: bbox_min is {}, "
+                           "bbox_max is {}".format(bbox_min, bbox_max)))
+  
+    logging.trace(
+      logger, 
+      ("DEBUG: min_longitude is {}, min_latitude is {}, "
+       "max_longitude is {}, max_latitude is {}").format(
+            longitude(bbox_min),
+            latitude(bbox_min),
+            longitude(bbox_max),
+            latitude(bbox_max)))
 
     min_longitude = longitude(bbox_min)
     max_longitude = longitude(bbox_max)

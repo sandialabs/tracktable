@@ -42,11 +42,11 @@
 #include <tracktable/IO/detail/SetProperties.h>
 
 #include <iterator>
-#include <iostream>
 #include <istream>
 #include <string>
 #include <cassert>
 #include <map>
+#include <sstream>
 #include <stdexcept>
 #include <vector>
 
@@ -417,14 +417,15 @@ protected:
           this->get_tokens_from_input(_tokens);
 
 #if defined(COPIOUS_DEBUG_OUTPUT)
-          std::cout << "DEBUG: Token list has " << _tokens.size() << " entries: ";
+          std::ostringstream outbuf;
+          outbuf << "Token list has " << _tokens.size() << " entries: ";
           for (string_vector_type::iterator iter = _tokens.begin();
                iter != _tokens.end();
                ++iter)
             {
-            std::cout << "'" << *iter << "' ";
+            outbuf << "'" << *iter << "' ";
             }
-          std::cout << "\n";
+          TRACKTABLE_LOG(debug) << outbuf.str();
 #endif
           if (_tokens.size() == 0)
             {
@@ -435,7 +436,7 @@ protected:
 
           if (_tokens[0] == io::detail::PointFileMagicString && this->IgnoreHeader)
             {
-            std::cout << "WARNING: Found point header but IgnoreHeader is enabled.\n";
+            TRACKTABLE_LOG(debug) << "Found point header but IgnoreHeader is enabled.\n";
             }
 
           if (_tokens[0] == io::detail::PointFileMagicString
@@ -459,36 +460,29 @@ protected:
               }
             else
               {
-              if (this->WarningsEnabled)
-                {
-                std::cout << "WARNING: Not enough tokens to assemble point.  Expected " << required_num_tokens << ", found " << _tokens.size() << ".  Point will be skipped.\n";
-                }
+              TRACKTABLE_LOG(warning) 
+                << "WARNING: Not enough tokens to assemble point.  Expected " 
+                << required_num_tokens << ", found " << _tokens.size() 
+                << ".  Point will be skipped.";
               ++(this->SourceBegin);
               }
             }
           }
         catch (ParseError const& e)
           {
-          if (this->WarningsEnabled)
-            {
-            std::cout << "ERROR: " << e.what() << "\n";
-            NextPoint = point_shared_ptr_type();
-            }
+          // We might need to back this off to a debug message instead of a warning.
+          TRACKTABLE_LOG(warning) << e.what() << "\n";
+          NextPoint = point_shared_ptr_type();
           ++(this->SourceBegin);
           }
         catch (boost::bad_lexical_cast& e)
           {
-          if (this->WarningsEnabled)
-            {
-            std::cout << "WARNING: Cast error while parsing point: " << e.what() << "\n";
-            }
+          TRACKTABLE_LOG(warning) << "Cast error while parsing point: " << e.what();
           ++(this->SourceBegin);
           }
         catch (std::exception& e)
           {
-          if (this->WarningsEnabled)
-            std::cout << "WARNING: Exception while parsing point: "
-                      << e.what() << "\n";
+          TRACKTABLE_LOG(warning) << "Exception while parsing point: " << e.what();
           ++(this->SourceBegin);
           }
         }
@@ -504,12 +498,12 @@ protected:
 
       if (
         header.Dimension != std::size_t(traits::dimension<point_type>::value)
-        && this->WarningsEnabled
         )
         {
-        std::cout << "WARNING: PointFromTokensIterator: Header indicates points with dimension "
+        TRACKTABLE_LOG(warning) 
+                  << "PointFromTokensIterator: Header indicates points with dimension "
                   << header.Dimension << " but reader's point type has dimension "
-                  << traits::dimension<point_type>::value << ".\n";
+                  << traits::dimension<point_type>::value << ".";
         }
 
       if (header.HasObjectId)

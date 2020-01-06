@@ -190,16 +190,17 @@ struct interpolate<PropertyMap>
             }
           catch (boost::bad_get& /*e*/)
             {
-            std::cout << "WARNING: interpolate<PropertyMap>: "
+            TRACKTABLE_LOG(warning) 
+                      << "WARNING: interpolate<PropertyMap>: "
                       << "Couldn't retrieve property '"
                       << key << "' (type "
                       << property_underlying_type((*first_iter).second)
                       << ") "
-                      << " from second map. ";
-            std::cout << "Property is present but has type "
+                      << " from second map. "
+                      << "Property is present but has type "
                       << property_underlying_type((*second_iter).second)
-                      << ". ";
-            std::cout << "Re-using value from first point.\n";
+                      << ". "
+                      << "Re-using value from first point.";
             result[key] = (*first_iter).second;
             }
           }
@@ -239,16 +240,17 @@ struct extrapolate<PropertyMap>
                 }
                 catch (boost::bad_get& /*e*/)
                 {
-                    std::cout << "WARNING: extrapolate<PropertyMap>: "
+                    TRACKTABLE_LOG(warning) 
+                        << "WARNING: extrapolate<PropertyMap>: "
                         << "Couldn't retrieve property '"
                         << key << "' (type "
                         << property_underlying_type((*first_iter).second)
                         << ") "
-                        << " from second map. ";
-                    std::cout << "Property is present but has type "
+                        << " from second map. "
+                        << "Property is present but has type "
                         << property_underlying_type((*second_iter).second)
-                        << ". ";
-                    std::cout << "Re-using value from first point.\n";
+                        << ". "
+                        << "Re-using value from first point.";
                     result[key] = (*first_iter).second;
                 }
             }
