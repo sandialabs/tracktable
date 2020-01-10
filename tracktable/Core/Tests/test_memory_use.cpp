@@ -66,7 +66,6 @@ int test_memory_use()
             << " (delta: " << (static_cast<boost::int64_t>(current_memory_use) - 
 			       static_cast<boost::int64_t>(initial_memory_use))
             << ")\n";
-  delete [] big_chunk;
 
   if (tracktable::almost_equal(
         static_cast<double>(current_memory_use - initial_memory_use),
@@ -82,6 +81,14 @@ int test_memory_use()
       error_count += 1;
     }
 
+  // This line actually matters.  If it's not here, the optimizer
+  // will notice that we're not actually doing anything with the
+  // contents of big_chunk and never allocate it in the first place.
+  // That causes the test to fail because the numbers reported by
+  // the OS don't make sense in the context of what we think our 
+  // code is doing.
+  big_chunk[0] = big_chunk[0] * 2;
+  
   std::size_t peak_memory_use = tracktable::peak_memory_use();
   std::size_t final_memory_use = tracktable::current_memory_use();
 
@@ -96,6 +103,7 @@ int test_memory_use()
   TRACKTABLE_LOG(info) 
             << "test_memory_use: Peak memory use reported is "
             << peak_memory_use;
+
 
   return error_count;  
 }
