@@ -154,10 +154,7 @@ def main():
                 )
         )
 
-    # TODO: Use editbin.exe to get dependencies of pyd files on
-    # windows instead of using this behavior This will work but has
-    # the potential to include more than it needs to. Also, has to be
-    # maintained as dependencies change.
+    # TODO: update to do more than second level dependencies. This will be more future proof
     if system == 'Windows':
         dlls = winlocate.locate_dir(
             os.path.join(tracktable_home, 'lib'),
@@ -169,6 +166,19 @@ def main():
                 if len(found_depends) > 0:
                     support_libraries.extend(found_depends)
                     break
+        second_support_libraries = []
+        for support_library in support_libraries:
+            second_lvl_dlls = winlocate.locate_file(support_library)
+            for file in second_lvl_dlls:
+                for dir in os.environ['Path'].split(';'):
+                    found_depends = glob.glob(os.path.join(dir, file))
+                    if len(found_depends) > 0:
+                        second_support_libraries.extend(found_depends)
+                        break
+        support_libraries.extend(second_support_libraries)
+        support_libraries_set = set(support_libraries)
+        support_libraries = list(support_libraries_set)
+        print(support_libraries)
 
     # Include any auxiliary data files such as the stuff in
     # tracktable.info

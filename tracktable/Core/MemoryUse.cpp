@@ -8,6 +8,7 @@
  * coding standards.
  */
 
+#include <tracktable/Core/Logging.h>
 #include <tracktable/Core/PlatformDetect.h>
 #include <tracktable/Core/MemoryUse.h>
 
@@ -57,8 +58,9 @@ std::size_t peak_memory_use()
 
   if (task_info_status != KERN_SUCCESS)
     {
-    std::cerr << "WARNING: Can't access Mach task info to get peak memory use in "
-              << __FILE__ << "\n";
+    TRACKTABLE_LOG(warning) 
+      << "Can't access Mach task info to get peak memory use in "
+      << __FILE__;
     return static_cast<std::size_t>(0);
     }
   else
@@ -108,8 +110,9 @@ std::size_t current_memory_use()
 
   if (task_info_status != KERN_SUCCESS)
     {
-    std::cerr << "WARNING: Can't access Mach task info to get current memory use in "
-              << __FILE__ << "\n";
+    TRACKTABLE_LOG(warning) 
+      << "WARNING: Can't access Mach task info to get current memory use in "
+      << __FILE__;
     return static_cast<std::size_t>(0);
     }
   else
@@ -123,8 +126,9 @@ std::size_t current_memory_use()
   fp = fopen("/proc/self/statm", "r");
   if (fp == NULL)
     {
-    std::cerr << "WARNING: Can't open /proc/self/statm to get current memory use in "
-              << __FILE__ << "\n";
+    TRACKTABLE_LOG(warning) 
+              << "Can't open /proc/self/statm to get current memory use in "
+              << __FILE__;
     return static_cast<std::size_t>(0);
     }
   else
@@ -133,8 +137,9 @@ std::size_t current_memory_use()
     int lookup_result = fscanf(fp, "%*s%ld", &rss);
     if (lookup_result != 1)
       {
-      std::cerr << "WARNING: Can't read from /proc/self/statm to get current memory use in "
-                << __FILE__ << "\n";
+      TRACKTABLE_LOG(warning) 
+        << "Can't read from /proc/self/statm to get current memory use in "
+        << __FILE__;
       return static_cast<std::size_t>(0);
       }
     else

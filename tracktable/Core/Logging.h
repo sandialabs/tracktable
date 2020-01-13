@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2019 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -28,48 +28,28 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef __tracktable_core_implementations_ConvexHullAreaTerrestrial_h
-#define __tracktable_core_implementations_ConvexHullAreaTerrestrial_h
+/** Logging: configurable log messages in C++
+ *
+ * We're going to fall through to Boost's logging library here.
+ * 
+ * I would love to have a solution that works for both C++
+ * and Python but I don't currently know how to do that.
+ */
 
-#include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/Core/Conversions.h>
+#ifndef __tracktable_Logging_h
+#define __tracktable_Logging_h
 
-#include <tracktable/Core/detail/algorithm_signatures/ConvexHull.h>
-#include <tracktable/Core/detail/implementations/ConvexHullTerrestrial.h>
-#include <tracktable/Core/detail/implementations/SphericalPolygons.h>
+#include <boost/log/trivial.hpp>
 
-#include <boost/geometry/algorithms/area.hpp>
-#include <boost/geometry/core/cs.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-
-#include <iostream>
-
-namespace tracktable { namespace algorithms {
-
-namespace bg = boost::geometry;
-
-template<>
-struct compute_convex_hull_area<
-  bg::cs::spherical_equatorial<bg::degree>, 2
-  >
-{
-  template<typename iterator>
-  static inline double apply(iterator point_begin, iterator point_end)
-    {
-      typedef typename iterator::value_type point_type;
-      typedef bg::model::polygon<point_type> polygon_type;
-
-      polygon_type hull;
-
-      implementations::compute_convex_hull_terrestrial
-        (point_begin, point_end, hull);
-
-      return tracktable::conversions::steradians_to_km2(
-        boost::geometry::area(hull)
-        );
-    }
-};
-
-} } // close tracktable::algorithms
+#define TRACKTABLE_LOG BOOST_LOG_TRIVIAL
+#if 0
+namespace logging = boost::log;
+namespace sinks = boost::log::sinks;
+namespace src = boost::log::sources;
+namespace expr = boost::log::expressions;
+namespace attrs = boost::log::attributes;
+namespace keywords = boost::log::keywords;
+#endif
 
 #endif
+

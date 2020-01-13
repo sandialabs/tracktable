@@ -145,7 +145,6 @@ def draw_cities(map_axes,
             )
             artists.append(text_artist)
 
-    print("DEBUG: draw_cities returning {}".format(artists))
     return artists
 
 # ----------------------------------------------------------------------
@@ -357,9 +356,10 @@ def draw_scale(mymap,
                linewidth=1,
                zorder=20):
 
-    print("ERROR: draw_scale has not been ported to Cartopy")
-    return
-
+    raise NotImplementedError(
+      ("tracktable.render.geographic_decoration.draw_scale has not "
+       "been ported to Cartopy"))
+    
     artists = []
 
     artists.append(
@@ -500,8 +500,9 @@ def _draw_map_scale_label(mymap,
 # ----------------------------------------------------------------------
 
 def fill_background(mymap, border_color='#000000', bgcolor='#000000', linewidth=1):
-    print("ERROR: fill_background has not been ported to Cartopy")
-    return
-
+    raise NotImplementedError(
+      ("tracktable.render.geographic_decoration: fill_background has not "
+       "been ported to Cartopy"))
+    
     result = mymap.drawmapboundary(color=border_color, fill_color=bgcolor, linewidth=linewidth)
     return result
