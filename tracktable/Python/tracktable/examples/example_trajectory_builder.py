@@ -35,11 +35,14 @@
 # Imports
 from tracktable.domain.terrestrial import TrajectoryPointReader        # Read points from file
 from tracktable.source.trajectory import AssembleTrajectoryFromPoints  # Turn points into trajectories
+from tracktable.core import data_directory
+
+import os.path
 
 # Requirements: In order to use the trajectory builder, we need a source that gives 
 # us data points in time sequential order. As with before, we can use the Point Reader.
 
-inFile = open('data/SampleFlightsUS.csv')
+inFile = open(os.path.join(data_directoyr(), 'SampleFlightsUS.csv'), 'r')
 reader = TrajectoryPointReader()
 reader.input = inFile
 reader.comment_character = '#'

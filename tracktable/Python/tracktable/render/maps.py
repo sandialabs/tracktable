@@ -46,6 +46,7 @@ import cartopy
 import cartopy.crs
 
 from tracktable.core import geomath
+from tracktable.core import logging
 
 from matplotlib import pyplot as plt
 airports = None
@@ -239,8 +240,9 @@ def instantiate_map(min_corner,
              max_corner[1]]
         )
 
-    print("DEBUG: map successfully instantiated")
-    print("DEBUG: axes are {}".format(axes))
+    logger = logging.getLogger(__name__)
+    logger.debug(("instantiate_map: Map successfully instantiated.  "
+                  "Axes: {}").format(axes))
     axes.tracktable_projection = projection
     return axes
 
@@ -298,9 +300,9 @@ def predefined_map(mapname,
         return region_map(region_name, projection=projection)
 
     else:
-        print("ERROR: Unknown name for predefined map: {}".format(mapname))
-        print("       Valid argments are 'region:XXX', 'city:XXX' or")
-        print("       'airport:XXX'.")
+        raise KeyError(("Unknown name for predefined map: {}"
+                        " Valid argments are 'region:XXX', 'city:XXX' or"
+                        " 'airport:XXX'.").format(mapname))
         
 # ----------------------------------------------------------------------
 
@@ -337,8 +339,8 @@ def region_map(region_name,
     if projection is None:
         projection = cartopy.crs.Miller
 
-
-    print("DEBUG: region_map: projection is {}".format(projection))
+    logger = logging.getLogger(__name__)
+    logger.debug("region_map: projection is {}".format(projection))
 
     map_axes = instantiate_map(
         min_corner=params['min_corner'],
@@ -346,5 +348,5 @@ def region_map(region_name,
         projection=projection
         )
 
-    print("DEBUG: region_map: map_axes are {}".format(map_axes))
+    logger.debug("region_map: map_axes are {}".format(map_axes))
     return map_axes
