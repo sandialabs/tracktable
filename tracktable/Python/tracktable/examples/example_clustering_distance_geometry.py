@@ -161,7 +161,7 @@ for(cid, cluster) in clusters.items():
 # Cluster Visualization    
 # You can use pyplot to see your clusters that were created
 
-from tracktable.examples.example_trajectory_rendering import render_trajectories
+from tracktable.render import paths
 from tracktable.domain import terrestrial
 from tracktable.render import mapmaker
 from matplotlib import pyplot
@@ -172,7 +172,7 @@ for cluster_id in sorted_ids:
     figure = pyplot.figure(figsize=[20, 15])
     axes = figure.add_subplot(1, 1, 1)
     (mymap, map_actors) = mapmaker.mapmaker(domain = 'terrestrial', map_name='region:conus')
-    render_trajectories(mymap, clusters[cluster_id], trajectory_linewidth=1)
+    paths.draw_traffic(traffic_map = mymap, trajectory_iterable = clusters[cluster_id])
     figure.suptitle('{}: {} members'.format(cluster_name(cluster_id),
                                            len(clusters[cluster_id])))
     pyplot.show()
