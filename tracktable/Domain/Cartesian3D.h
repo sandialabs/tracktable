@@ -304,6 +304,8 @@ TRACKTABLE_DELEGATE_TRAJECTORY_POINT_TRAITS(tracktable::domain::cartesian3d::Car
 TRACKTABLE_DELEGATE_DOMAIN_TRAIT(tracktable::domain::cartesian3d,
                                  tracktable::traits::domains::cartesian3d)
 
+TRACKTABLE_DELEGATE_POINT_DOMAIN_NAME_TRAIT(tracktable::domain::cartesian3d, "cartesian3d")
+
 // ----------------------------------------------------------------------
 //
 // ALGORITHM DELEGATION

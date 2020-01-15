@@ -722,7 +722,10 @@ struct has_properties< Trajectory<point_type> > : boost::mpl::bool_<true> {};
 
 template<typename point_type>
 struct domain<Trajectory<point_type> > : domain<point_type> {};
-    
+
+template<typename point_type>
+struct point_domain_name< Trajectory<point_type> > : point_domain_name<point_type> {};
+
 } } // end namespace tracktable::traits
 
 // We get our implementations for trajectory_subset and point_at_time

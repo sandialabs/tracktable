@@ -292,10 +292,12 @@ struct point_domain_name<tracktable::domain::cartesian2d::CartesianPoint2D>
   static inline string_type apply() { return "cartesian2d"; }
 };
 
-} }
+} } // close namespace tracktable:traits
 
 TRACKTABLE_DELEGATE_DOMAIN_TRAIT(tracktable::domain::cartesian2d,
                                  tracktable::traits::domains::cartesian2d)
+
+TRACKTABLE_DELEGATE_POINT_DOMAIN_NAME_TRAIT(tracktable::domain::cartesian2d, "cartesian2d")
 
 TRACKTABLE_DELEGATE_BOOST_POINT_TRAITS(tracktable::domain::cartesian2d::CartesianPoint2D,
                                        tracktable::PointCartesian<2>)
