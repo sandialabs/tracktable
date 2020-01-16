@@ -297,7 +297,7 @@ struct point_domain_name<tracktable::domain::cartesian2d::CartesianPoint2D>
 TRACKTABLE_DELEGATE_DOMAIN_TRAIT(tracktable::domain::cartesian2d,
                                  tracktable::traits::domains::cartesian2d)
 
-TRACKTABLE_DELEGATE_POINT_DOMAIN_NAME_TRAIT(tracktable::domain::cartesian2d, "cartesian2d")
+TRACKTABLE_DELEGATE_POINT_DOMAIN_NAME_TRAIT(tracktable::domain::cartesian2d)
 
 TRACKTABLE_DELEGATE_BOOST_POINT_TRAITS(tracktable::domain::cartesian2d::CartesianPoint2D,
                                        tracktable::PointCartesian<2>)
