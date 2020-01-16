@@ -35,6 +35,8 @@
 include(PythonTest)
 set(DOMAIN "tracktable.domain.tests")
 
+add_python_test(P_TestDomainNames ${DOMAIN}.test_domain_names)
+
 add_python_test(P_GeometricMedian ${DOMAIN}.test_geometric_median)
 
 add_python_test(P_Terrestrial_BasePointReader
