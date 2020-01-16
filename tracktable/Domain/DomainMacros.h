@@ -107,9 +107,9 @@ struct access< NEW_POINT, dim > : access< DELEGATE_POINT, dim > { };
       template<> struct domain<DOMAIN_NS::linestring_type> : domain<DOMAIN_NS::base_point_type> {}; \
   } }
 
-#define TRACKTABLE_DELEGATE_POINT_DOMAIN_NAME_TRAIT(DOMAIN_NS, DOMAIN_NAME) \
+#define TRACKTABLE_DELEGATE_POINT_DOMAIN_NAME_TRAIT(DOMAIN_NS) \
   namespace tracktable { namespace traits {                                 \
-    template<> struct point_domain_name<DOMAIN_NS::linestring_type> : point_domain_name<DOMAIN_NS::base_point_type> {};       \
+    template<> struct point_domain_name<DOMAIN_NS::box_type> : point_domain_name<DOMAIN_NS::base_point_type> {};       \
   } } 
 
   
