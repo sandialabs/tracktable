@@ -36,10 +36,8 @@ points on the globe'.
 from __future__ import division, absolute_import
 
 from six.moves import range
+import copy
 import math
-
-from tracktable.core import logging
-LOGGER = logging.getLogger(__name__)
 
 from tracktable.lib._domain_algorithm_overloads import distance as _distance
 from tracktable.lib._domain_algorithm_overloads import bearing as _bearing
@@ -64,6 +62,10 @@ from tracktable.lib._domain_algorithm_overloads import convex_hull_area as _conv
 from tracktable.lib._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
 from tracktable.lib._domain_algorithm_overloads import convex_hull_centroid as _convex_hull_centroid
 from tracktable.lib._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
+
+from tracktable.core import logging
+LOGGER = logging.getLogger(__name__)
+DOMAIN_MODULE = None
 
 
 
@@ -676,6 +678,15 @@ def compute_bounding_box(point_sequence, buffer=()):
       Each domain returns a separate bounding box type.
     """
 
+    # We need some machinery from tracktable.domain in order to find
+    # the correct class for the bounding box.  In order to avoid a
+    # load-time circular import dependency, we grab it on demand
+    # here.
+    global DOMAIN_MODULE
+    if DOMAIN_MODULE is None:
+        import importlib
+        DOMAIN_MODULE = importlib.import_module('tracktable.domain')
+
     min_corner = None
     max_corner = None
     bbox_type = None
@@ -685,14 +696,12 @@ def compute_bounding_box(point_sequence, buffer=()):
     for point in point_sequence:
         num_points += 1
         if bbox_type is None:
-            bbox_type = point.domain_classes['BoundingBox']
-
+            bbox_type = DOMAIN_MODULE.domain_class_for_object(
+               point, 'BoundingBox'
+            )
         if min_corner is None:
-            min_corner = point.domain_classes['BasePoint']()
-            max_corner = point.domain_classes['BasePoint']()
-            for i in range(len(point)):
-                min_corner[i] = point[i]
-                max_corner[i] = point[i]
+            min_corner = copy.deepcopy(point)
+            max_corner = copy.deepcopy(point)
         else:
             for i in range(len(point)):
                 min_corner[i] = min(min_corner[i], point[i])
