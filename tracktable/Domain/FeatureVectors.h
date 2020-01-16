@@ -144,6 +144,7 @@ template<std::size_t Dimension, std::size_t dim>
 struct access< tracktable::domain::feature_vectors::FeatureVector<Dimension>, dim > :
     access< tracktable::PointCartesian<Dimension>, dim > {};
 
+
 } } } // exit boost::geometry::traits
 
 namespace tracktable { namespace traits {
@@ -153,6 +154,9 @@ struct tag< tracktable::domain::feature_vectors::FeatureVector<dim> > : tag< tra
 
 template<std::size_t dim>
 struct dimension< tracktable::domain::feature_vectors::FeatureVector<dim> > : dimension< tracktable::PointCartesian<dim> > {};
+
+template<std::size_t dim>
+struct point_domain_name< tracktable::domain::feature_vectors::FeatureVector<dim> > : point_domain_name< tracktable::PointCartesian<dim> > {};
 
 } } // exit tracktable::traits
 
