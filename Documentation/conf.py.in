@@ -37,6 +37,7 @@ autodoc_mock_imports = [
     'numpy',
     'shapefile',
     'shapely',
+    'tracktable.core.core_types',
     'tracktable.lib._cartesian2d',
     'tracktable.lib._cartesian3d',
     'tracktable.lib._core_types',
