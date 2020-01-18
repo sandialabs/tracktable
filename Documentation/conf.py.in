@@ -313,7 +313,7 @@ texinfo_documents = [
 epub_title = u'Tracktable'
 epub_author = u'Andy Wilson and Danny Rintoul and Chris Valicka and Ben Newton and Phil Baxley'
 epub_publisher = u'Sandia National Laboratories'
-epub_copyright = u'2014-2019, National Technology and Engineering Solutions of Sandia, Inc.'
+epub_copyright = u'2014-2020, National Technology and Engineering Solutions of Sandia, Inc.'
 
 # The basename for the epub file. It defaults to the project name.
 #epub_basename = u'Tracktable'
