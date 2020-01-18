@@ -14,6 +14,7 @@ We are no longer building Python wheels for Python 2.7.  Python 2.7 is [no longe
 
 ### NOTABLE FIXES
 
+* Trajectory assembler now correctly prints its separation duration.
 * The Cartopy map example no longer relies on outdated/removed example code.
 * There was a bug that caused `tracktable.core.geomath.compute_bounding_box` to fail on trajectories that had been loaded from pickle files instead of assembled from points.  Fixed.
 
@@ -25,6 +26,7 @@ We are no longer building Python wheels for Python 2.7.  Python 2.7 is [no longe
 
 * Building for Python 3.8 is error-prone because of changes to CMake's infrastructure for finding Boost, Python, and Boost's Python library.  
 * There may be trouble building against Boost versions 1.71 and newer because of changes to the way Boost and CMake interact.
+* If you build from source on Linux you will probably need to add `-lpthread` to CMAKE_EXE_LINKER_FLAGS.
 
 VERSION 1.2.2, 2 January 2019
 -----------------------------
