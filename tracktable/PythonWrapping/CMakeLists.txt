@@ -52,7 +52,7 @@
 
 set(Boost_PYTHON_LIBRARY_SUFFIX "")
 
-find_package(Boost 1.57 COMPONENTS date_time regex REQUIRED)
+find_package(Boost 1.61 COMPONENTS date_time regex REQUIRED)
 find_package(PythonInterp)
 if (PYTHONINTERP_FOUND)
   find_package(PythonLibs)
@@ -73,7 +73,7 @@ if (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
 
   # Force CMake to go back and find Boost again instead of relying on cached values.
   unset(Boost_FOUND)
-  find_package(Boost 1.57 COMPONENTS date_time regex python${Boost_PYTHON_LIBRARY_SUFFIX})
+  find_package(Boost 1.61 COMPONENTS date_time regex python${Boost_PYTHON_LIBRARY_SUFFIX})
 else (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
   message(WARNING "Boost.Python library version cannot be determined until both Boost and Python have been found.")
 endif (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
