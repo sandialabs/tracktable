@@ -29,7 +29,7 @@
 
 # This is tracktable/Examples/Assemble/CMakeLists.txt
 
-find_package(Boost REQUIRED COMPONENTS date_time program_options regex)
+find_package(Boost 1.61 REQUIRED COMPONENTS date_time program_options regex)
 
 include_directories(
   ${Tracktable_SOURCE_DIR}

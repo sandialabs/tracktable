@@ -30,7 +30,7 @@
 
 # This is tracktable/C++/IO/CMakeLists.txt
 
-find_package(Boost 1.57.0 REQUIRED regex)
+find_package(Boost 1.61 REQUIRED regex)
 
 include_directories(
   ${Tracktable_SOURCE_DIR}
