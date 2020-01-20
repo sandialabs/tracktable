@@ -1,5 +1,33 @@
 ## Tracktable Release Notes
 
+VERSION 1.2.3, 18 January 2019
+------------------------------
+
+This is a bugfix release.  There are no new features.
+
+We are no longer building Python wheels for Python 2.7.  Python 2.7 is [no longer supported at all](https://www.python.org/doc/sunset-python-2/) by the Python Software Foundation as of January 1, 2020.  We expect to remove CMake support for Python 2 in Release 1.3, due out in mid-to-late February.
+
+
+### UPDATES SINCE 1.2.2
+
+* Configuration files now insist upon Boost 1.61 or newer and CMake 3.12 or newer.  There were a few old instances that would only require 1.57 and 2.8, respectively.
+
+### NOTABLE FIXES
+
+* Trajectory assembler now correctly prints its separation duration.
+* The Cartopy map example no longer relies on outdated/removed example code.
+* There was a bug that caused `tracktable.core.geomath.compute_bounding_box` to fail on trajectories that had been loaded from pickle files instead of assembled from points.  Fixed.
+
+### HOTFIXES SINCE 1.2.2
+
+* No hotfixes have been deployed since 1.2.2.
+
+### KNOWN ISSUES
+
+* Building for Python 3.8 is error-prone because of changes to CMake's infrastructure for finding Boost, Python, and Boost's Python library.  
+* There may be trouble building against Boost versions 1.71 and newer because of changes to the way Boost and CMake interact.
+* If you build from source on Linux you will probably need to add `-lpthread` to CMAKE_EXE_LINKER_FLAGS.
+
 VERSION 1.2.2, 2 January 2019
 -----------------------------
 
@@ -9,6 +37,7 @@ This is a quality-of-life release.
 
 * The C++ function `tracktable::point_at_fraction` and the Python function `tracktable.core.geomath.point_at_fraction` have both been renamed to `point_at_length_fraction` to remove confusion about what they do.  The previous name was ambiguous: was the interpolation fraction being computed with respect to trajectory duration or with respect to travel distance?  In Python, `point_at_fraction` will print a deprecation warning.  In C++, `point_at_fraction` is simply gone.  The deprecated Python binding will be removed in release 1.3.
 * Tracktable should be much quieter.  All debug/info/warning/error messages are now directed to a logger instead of writing directly to standard output or standard error.  Right now the C++ and Python messages go to different destinations.  Log messages in C++ go to `boost::log`.  Log messages in Python go to the standard `logging` module.  We will unify these in a future release.  
+
 ### HOTFIXES SINCE 1.2.1
 
 No hotfixes have been deployed since the last release.

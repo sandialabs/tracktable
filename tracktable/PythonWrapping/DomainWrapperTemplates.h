@@ -188,6 +188,12 @@ int point_dimension(point_type const& /*pt*/)
   return boost::geometry::dimension<point_type>::value;
 }
 
+template<class domain_object_type>
+std::string point_domain_name(domain_object_type const& /*thing*/)
+{
+  return tracktable::traits::point_domain_name<domain_object_type>::apply();
+}
+
 // Basic wrappers for point types - user-defined constructors will
 // be added by the user
 
@@ -224,6 +230,7 @@ class basic_point_methods : public boost::python::def_visitor<basic_point_method
         .def("__idiv__", divide_scalar_in_place<wrapped_type, double>)
         .def("zero", zero<wrapped_type>)
         .def_pickle(GenericSerializablePickleSuite<wrapped_type>())
+        .add_property("domain", point_domain_name<wrapped_type>)
         .staticmethod("zero")
         .def(self == self)
         .def(self != self)
@@ -412,6 +419,7 @@ class bounding_box_methods : public boost::python::def_visitor<bounding_box_meth
     .def(bbox_to_string_methods())
     .add_property("min_corner", make_function(min_corner, return_internal_reference<>()))
     .add_property("max_corner", make_function(max_corner, return_internal_reference<>()))
+    .add_property("domain", point_domain_name<wrapped_type>)
     ;
   }
 };
@@ -452,6 +460,7 @@ class trajectory_methods : public boost::python::def_visitor<trajectory_methods>
 
 		c
                   .add_property("duration", &wrapped_type::duration)
+                  .add_property("domain", point_domain_name<wrapped_type>)
                   .def(self == self)
                   .def(self != self)
                   .def_pickle(GenericSerializablePickleSuite<wrapped_type>())

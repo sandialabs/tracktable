@@ -31,7 +31,7 @@
 
 # This is trajectory/C++/Core/CMakeLists.txt
 
-find_package(Boost 1.57.0 REQUIRED COMPONENTS date_time log serialization)
+find_package(Boost 1.61 REQUIRED COMPONENTS date_time log serialization)
 include(GenerateExportHeader)
 
 include_directories(
