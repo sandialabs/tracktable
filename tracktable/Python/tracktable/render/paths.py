@@ -115,7 +115,8 @@ def points_to_segments(point_list, maximum_distance=None):
             (point2[1]-point1[1])*(point2[1]-point1[1])
         )
 
-    # Now that we know the thresholds, we can go through and build the actual segments.
+    # Now that we know the thresholds, we can go through and build the 
+    # actual segments.
     segments = []
     logger = None
 
@@ -150,7 +151,7 @@ def draw_traffic(traffic_map,
                  color_scale=matplotlib.colors.Normalize(),
                  trajectory_scalar_generator=None,
                  trajectory_linewidth_generator=None,
-                 linewidth=0.1,
+                 linewidth=1,
                  dot_size=2,
                  dot_color='white',
                  label_objects=False,
@@ -375,7 +376,8 @@ def draw_traffic(traffic_map,
             current_batch_scalars.append(local_scalars[0:-1])
 
             # The lead point is the last point in the trajectory
-            lead_point_labels.append(label_generator(trajectory[-1]))
+            if label_generator is not None:
+                lead_point_labels.append(label_generator(trajectory[-1]))
             lead_point_x.append(local_x[-1])
             lead_point_y.append(local_y[-1])
             lead_point_scalars.append(local_scalars[-1])
