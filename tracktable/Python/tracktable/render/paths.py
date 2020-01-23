@@ -277,6 +277,7 @@ def draw_traffic(traffic_map,
     make this value large.  It has no range limit.
     """
 
+    logger = logging.getLogger(__name__)
     all_artists = []
 
     lead_point_scalars = []
@@ -297,8 +298,10 @@ def draw_traffic(traffic_map,
 
     if label_generator is None:
         if label_objects:
-            log_function('WARNING: Object labels requested but no label formatter is present.  Labels will be weird.\n')
-        label_generator = lambda thing: thing
+            logger.warning(("Object labels requested in draw_traffic but no "
+                            "label formatter is present.  Labels will look "
+                            "weird."))
+            label_generator = lambda thing: thing
 
     if axes is None:
         axes = matplotlib.pyplot.gca()
