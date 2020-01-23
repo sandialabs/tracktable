@@ -275,13 +275,6 @@ def draw_traffic(traffic_map,
     Height level where the trajectories will be drawn.  If you want
     them to be on top of the map and anything else you draw on it then
     make this value large.  It has no range limit.
-
-    ``log_function``: function(string) (default sys.stderr.write)
-
-    The draw_paths function generates occasional status messages.  It
-    will pass them to this function.  You can use this to display them
-    to the user, write them to a file or ignore them entirely.
-
     """
 
     all_artists = []
