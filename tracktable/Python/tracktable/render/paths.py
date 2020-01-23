@@ -156,9 +156,7 @@ def draw_traffic(traffic_map,
                  label_generator=None,
                  label_kwargs=dict(),
                  axes=None,
-                 zorder=8,
-                 log_function=sys.stderr.write
-             ):
+                 zorder=8):
     """Draw a set of (possibly decorated trajectories.
 
     Args:
@@ -175,7 +173,6 @@ def draw_traffic(traffic_map,
        label_kwargs: Dictionary of arguments to be passed to labeler (FIXME)
        axes: Matplotlib axes object into which trajectories will be rendered
        zorder: Layer into which trajectories will be drawn (default 8).
-       log_function: Function to print, save or discard informational messages
 
     Returns:
        List of Matplotlib artists
