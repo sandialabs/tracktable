@@ -132,12 +132,12 @@ def points_to_segments(point_list, maximum_distance=None):
             logger.debug(
                 ("WARNING: Discarding outlier line segment with length {}, {} "
                  "times the maximum length of {}.").format(
-                     distance,
-                     distance/maximum_distance, 
+                     segment_length,
+                     segment_length/maximum_distance, 
                      maximum_distance))
-            segments.append(( point1, point1 ))
+            segments.append((point1, point1))
         else:
-            segments.append( (point1, point2) )
+            segments.append((point1, point2))
 
     return segments
 
