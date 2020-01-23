@@ -1,5 +1,27 @@
 ## Tracktable Release Notes
 
+VERSION 1.2.4, 23 January 2019
+------------------------------
+
+This is a bugfix release.  There are no new features.
+
+### UPDATES SINCE 1.2.3
+
+No features have been updated or added.
+
+### NOTABLE FIXES
+
+* Remnants of some old logging code were causing `tracktable.render.paths.draw_traffic()` to raise exceptions.
+* There was an uncommon case in `tracktable.render.paths.draw_traffic()` that would cause an error if no label generator was set (which is the default).
+
+### HOTFIXES SINCE 1.2.3
+
+No hotfixes have been deployed since 1.2.3.
+
+### KNOWN ISSUES
+
+If you configure a point reader with a coordinate that does not exist for the point type (e.g. `reader.coordinates[2] = 4` for a domain like `terrestrial` that only has coordinates 0 and 1), Tracktable will fail an assertion and exit when the reader loads its data.
+
 VERSION 1.2.3, 18 January 2019
 ------------------------------
 
