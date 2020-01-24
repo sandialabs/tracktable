@@ -78,7 +78,9 @@ def remove_duplicate_points(trajectory):
     new_points = []
     last_point = None
     for point in trajectory:
-        if (not last_point) or (point[1] != last_point[1]) or (point[0] != last_point[0]):
+        if ((not last_point) 
+                or (point[1] != last_point[1]) 
+                or (point[0] != last_point[0])):
             new_points.append(point)
             last_point = point
 
@@ -86,9 +88,8 @@ def remove_duplicate_points(trajectory):
         new_points.append(trajectory[-1])
 
     logger = logging.getLogger(__name__)
-    logging.debug(logger,
-                  ("remove_duplicate_points: old trajectory has length {}, "
-                   "new trajectory has length {}").format(
+    logger.debug(("remove_duplicate_points: old trajectory has length {}, "
+                  "new trajectory has length {}").format(
                         len(trajectory), len(new_points)))
 
     return type(trajectory).from_position_list(new_points)
@@ -114,9 +115,10 @@ def points_to_segments(point_list, maximum_distance=None):
             (point2[1]-point1[1])*(point2[1]-point1[1])
         )
 
-    # Now that we know the thresholds, we can go through and build the actual segments.
+    # Now that we know the thresholds, we can go through and build the 
+    # actual segments.
     segments = []
-    segment_lengths = []
+    logger = None
 
     # Python 3: An object of type zip does not have a len() so we need
     # to turn this into an actual list
@@ -126,17 +128,17 @@ def points_to_segments(point_list, maximum_distance=None):
         point2 = point_list[i+1]
         segment_length = cart2_distance(point_list[i], point_list[i+1])
         if maximum_distance and segment_length > maximum_distance:
-            logger = logging.getLogger(__name__)
-            logging.debug(
-                logger, 
+            if logger is None:
+                logger = logging.getLogger(__name__)
+            logger.debug(
                 ("WARNING: Discarding outlier line segment with length {}, {} "
-                 "times the median length of {}.").format(
-                     distance, 
-                     distance/median_distance, 
-                     median_distance))
-            segments.append(( point1, point1 ))
+                 "times the maximum length of {}.").format(
+                     segment_length,
+                     segment_length/maximum_distance, 
+                     maximum_distance))
+            segments.append((point1, point1))
         else:
-            segments.append( (point1, point2) )
+            segments.append((point1, point2))
 
     return segments
 
@@ -149,16 +151,14 @@ def draw_traffic(traffic_map,
                  color_scale=matplotlib.colors.Normalize(),
                  trajectory_scalar_generator=None,
                  trajectory_linewidth_generator=None,
-                 linewidth=0.1,
+                 linewidth=1,
                  dot_size=2,
                  dot_color='white',
                  label_objects=False,
                  label_generator=None,
                  label_kwargs=dict(),
                  axes=None,
-                 zorder=8,
-                 log_function=sys.stderr.write
-             ):
+                 zorder=8):
     """Draw a set of (possibly decorated trajectories.
 
     Args:
@@ -175,7 +175,6 @@ def draw_traffic(traffic_map,
        label_kwargs: Dictionary of arguments to be passed to labeler (FIXME)
        axes: Matplotlib axes object into which trajectories will be rendered
        zorder: Layer into which trajectories will be drawn (default 8).
-       log_function: Function to print, save or discard informational messages
 
     Returns:
        List of Matplotlib artists
@@ -278,15 +277,9 @@ def draw_traffic(traffic_map,
     Height level where the trajectories will be drawn.  If you want
     them to be on top of the map and anything else you draw on it then
     make this value large.  It has no range limit.
-
-    ``log_function``: function(string) (default sys.stderr.write)
-
-    The draw_paths function generates occasional status messages.  It
-    will pass them to this function.  You can use this to display them
-    to the user, write them to a file or ignore them entirely.
-
     """
 
+    logger = logging.getLogger(__name__)
     all_artists = []
 
     lead_point_scalars = []
@@ -307,8 +300,10 @@ def draw_traffic(traffic_map,
 
     if label_generator is None:
         if label_objects:
-            log_function('WARNING: Object labels requested but no label formatter is present.  Labels will be weird.\n')
-        label_generator = lambda thing: thing
+            logger.warning(("Object labels requested in draw_traffic but no "
+                            "label formatter is present.  Labels will look "
+                            "weird."))
+            label_generator = lambda thing: thing
 
     if axes is None:
         axes = matplotlib.pyplot.gca()
@@ -321,7 +316,9 @@ def draw_traffic(traffic_map,
     current_batch_scalars = []
     current_batch_linewidths = []
 
-    # We want to ignore segments that span most of the way across the map.
+    # We want to ignore individual segments that span most of the way across 
+    # the map.  These are almost always errors in the data, especially where
+    # segments cross the limb of the map.
     if hasattr(traffic_map, 'get_extent'):
         map_extent = traffic_map.get_extent()
         x_span = map_extent[2] - map_extent[0]
@@ -364,19 +361,23 @@ def draw_traffic(traffic_map,
         # segments.  We shouldn't have any degenerate segments because
         # of the call to remove_duplicate_points() earlier.
 
-        local_segments = points_to_segments(zip(local_x, local_y), maximum_distance=max_segment_length)
+        local_segments = points_to_segments(
+            zip(local_x, local_y), 
+            maximum_distance=max_segment_length)
 
         if len(local_segments) > 0:
             # Save the line segments, linewidths, scalars for the
             # whole path -- we'll render a bunch of them together in a
             # batch
             local_scalars = trajectory_scalar_generator(trajectory)
-            current_batch_linewidths.append(trajectory_linewidth_generator(trajectory)[0:-1])
+            current_batch_linewidths.append(
+                trajectory_linewidth_generator(trajectory)[0:-1])
             current_batch_paths.append(local_segments)
             current_batch_scalars.append(local_scalars[0:-1])
 
             # The lead point is the last point in the trajectory
-            lead_point_labels.append(label_generator(trajectory[-1]))
+            if label_generator is not None:
+                lead_point_labels.append(label_generator(trajectory[-1]))
             lead_point_x.append(local_x[-1])
             lead_point_y.append(local_y[-1])
             lead_point_scalars.append(local_scalars[-1])
@@ -385,10 +386,12 @@ def draw_traffic(traffic_map,
             # Now we've processed some traffic and made it into line
             # segments.  Time to create the line segment collection that we
             # can plot.
-            segment_collection = LineCollection(numpy.vstack(current_batch_paths),
+            segment_collection = LineCollection(numpy.vstack(
+                                                    current_batch_paths),
                                                 norm=color_scale,
                                                 cmap=color_map,
-                                                linewidth=numpy.hstack(current_batch_linewidths),
+                                                linewidth=numpy.hstack(
+                                                    current_batch_linewidths),
                                                 zorder=zorder)
 
             stacked_scalars = numpy.hstack(current_batch_scalars)
@@ -406,7 +409,8 @@ def draw_traffic(traffic_map,
         segment_collection = LineCollection(numpy.vstack(current_batch_paths),
                                             norm=color_scale,
                                             cmap=color_map,
-                                            linewidth=numpy.hstack(current_batch_linewidths),
+                                            linewidth=numpy.hstack(
+                                                current_batch_linewidths),
                                             zorder=zorder)
 
         stacked_scalars = numpy.hstack(current_batch_scalars)
@@ -425,13 +429,13 @@ def draw_traffic(traffic_map,
             if zorder:
                 dot_zorder = zorder+1
             else:
-                dot_zorder=None
+                dot_zorder = None
 
             if dot_color == 'body':
-                dot_color_kwargs = { 'cmap': color_map,
-                                     'c': lead_point_scalars }
+                dot_color_kwargs = {'cmap': color_map,
+                                    'c': lead_point_scalars}
             else:
-                dot_color_kwargs = { 'c': dot_color }
+                dot_color_kwargs = {'c': dot_color}
 
             dot_collection = traffic_map.scatter(lead_point_x, lead_point_y,
                                                  s=dot_size,
@@ -442,7 +446,8 @@ def draw_traffic(traffic_map,
             all_artists.append(dot_collection)
 
         if label_objects:
-            for (x, y, label) in zip(lead_point_x_world, lead_point_y_world, lead_point_labels):
+            for (x, y, label) in zip(
+                    lead_point_x, lead_point_y, lead_point_labels):
                 all_artists.append(axes.text(x, y, label, **label_kwargs))
 
     return all_artists
