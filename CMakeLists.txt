@@ -35,10 +35,47 @@ if (POLICY CMP0042)
   set(CMAKE_MACOSX_RPATH ${Tracktable_BINARY_DIR}/lib)
 endif ()
 
+include(GNUInstallDirs)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # set(Boost_DEBUG ON)
 
-project(Tracktable)
+##########################################################################
+# Release variables
+##########################################################################
+
+set(TRACKTABLE_VERSION 1.2.2)
+set(RPM_RELEASE 4)
+
+# UNIX library ABI versioning
+# CURRENT : REVISION : AGE
+# +1 :  ? : +1 == new interface that does not break old one
+# +1 :  ? :  0 == new interface that breaks old one
+#  ? :  ? :  0 == no new interfaces, but breaks apps
+#  ? : +1 :  ? == just some internal changes, nothing breaks but might work better
+set(UNIX_SO_VERSION_CURRENT  0)
+set(UNIX_SO_VERSION_REVISION 0)
+set(UNIX_SO_VERSION_AGE      0)
+
+##########################################################################
+# End release variables
+##########################################################################
+
+if (UNIX)
+  set(UNIX_SO_VERSION ${UNIX_SO_VERSION_CURRENT}.${UNIX_SO_VERSION_REVISION}.${UNIX_SO_VERSION_AGE})
+  set(SO_VERSION ${UNIX_SO_VERSION})
+else()
+  set(SO_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
+endif()
+
+project(Tracktable VERSION ${TRACKTABLE_VERSION})
+
 include(CTest)
+
+set(TRACKTABLE_INCLUDEDIR tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}/tracktable)
 
 # We include CMake modules to find NumPy and a good set of Python
 # libraries.  Add them to the search path.
@@ -68,16 +105,16 @@ SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 
 # add the automatically determined parts of the RPATH which point to
 # directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_LIBDIR}" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 set(MACOSX_RPATH ON)
@@ -90,6 +127,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 option(BUILD_SHARED_LIBS "Build shared libraries.  Required for Python wrapping." ON)
 option(BUILD_PYTHON_WRAPPING "Wrap trajectory classes for use in Python." ON)
+option(BUILD_EXAMPLES "Build tracktable example programs" ON)
 option(BUILD_DOCUMENTATION "Build documentation for Tracktable." OFF)
 option(USE_ANACONDA_LINK_FLAGS "Use Anaconda-specific link flags." OFF)
 
@@ -99,7 +137,7 @@ if (BUILD_SHARED_LIBS)
   message(STATUS "Building shared libraries.")
   add_definitions(-DBUILDING_SHARED_LIBS)
   add_definitions(-DBOOST_ALL_DYN_LINK)
-  set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+  #set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_LIBDIR})
   set(Boost_USE_STATIC_LIBS OFF)
 else (BUILD_SHARED_LIBS)
   if (BUILD_PYTHON_WRAPPING)
@@ -174,11 +212,13 @@ endif (BUILD_DOCUMENTATION)
 
 # ----------------------------------------------------------------------
 
-install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/Python/tracktable)
-install(FILES README.md DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(FILES README.md DESTINATION ${CMAKE_INSTALL_PREFIX}/Python/tracktable)
+install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR})
+install(FILES README.md DESTINATION ${CMAKE_INSTALL_DOCDIR})
 
+if (BUILD_PYTHON_WRAPPING)
+  install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/Python/tracktable)
+  install(FILES README.md DESTINATION ${CMAKE_INSTALL_DOCDIR}/Python/tracktable)
+endif ()
 # ----------------------------------------------------------------------
 
 if (BUILD_PYTHON_WRAPPING)
@@ -201,3 +241,60 @@ endif (BUILD_TESTING)
 add_subdirectory(tracktable)
 
 message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")
+
+##########################################################################
+# pkgconfig variables
+##########################################################################
+if (UNIX)
+
+  set(PKGCONFIG_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
+  set(PKGCONFIG_FILE tracktable-${PKGCONFIG_VERSION}.pc)
+
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/tracktable.pc.in
+    ${PROJECT_BINARY_DIR}/${PKGCONFIG_FILE}
+    @ONLY IMMEDIATE
+  )
+
+  install(FILES ${PKGCONFIG_FILE} DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+  set(CPACK_GENERATOR TBZ2)
+  set(CPACK_PACKAGE_FILE_NAME tracktable)
+  set(CPACK_ARCHIVE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}-${TRACKTABLE_VERSION})
+  set(CPACK_SOURCE_GENERATOR TBZ2)
+  set(CPACK_SOURCE_IGNORE_FILES
+    "/build/;"
+    "/.git/;"
+    "/.ipynb_checkpoints/"
+  )
+  include(CPack)
+
+endif ()
+
+# Effectively, if LINUX
+if (UNIX AND NOT APPLE)
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/packaging/rpm/rhel7/tracktable.spec.in" "${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/tracktable.spec" @ONLY IMMEDIATE)
+
+  add_custom_target(srpm_rhel7
+      COMMAND "${CMAKE_COMMAND}" --build . --target package_source
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+      COMMAND mock --buildsrpm --spec ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/tracktable.spec --sources Tracktable-${TRACKTABLE_VERSION}-Source.tar.bz2 --resultdir=packaging/rhel7/srpms/
+      COMMENT Building source rpms with mock
+  )
+
+  add_custom_target(srpm
+      DEPENDS srpm_rhel7
+  )
+
+  add_custom_target(rpm_rhel7
+      COMMAND mock --no-clean rebuild packaging/rhel7/srpms/tracktable-${TRACKTABLE_VERSION}-${RPM_RELEASE}*.src.rpm --resultdir=packaging/rhel7/rpms
+      DEPENDS srpm
+      COMMENT Building rpms with mock
+  )
+  
+  add_custom_target(rpm
+      DEPENDS rpm_rhel7
+  )
+  
+endif ()
+
