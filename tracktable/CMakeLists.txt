@@ -35,8 +35,6 @@
 
 cmake_minimum_required(VERSION 3.12)
 
-set(Tracktable_VERSION 1.2.4)
-
 add_subdirectory(Core)
 add_subdirectory(Domain)
 add_subdirectory(IO)
