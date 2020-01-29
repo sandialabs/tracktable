@@ -256,6 +256,11 @@ install(
   DESTINATION include/tracktable/Core/WarningGuards
 )
 
+if (APPLE)
+    set(CMAKE_INSTALL_BINDIR bin)
+    set(CMAKE_INSTALL_LIBDIR lib)
+endif ()
+
 install(
   TARGETS TracktableCore
   RUNTIME DESTINATION bin
