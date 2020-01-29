@@ -82,6 +82,10 @@ generate_export_header( TracktableDomain
    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/tracktable/Domain/TracktableDomainWindowsHeader.h
    )
 
+if (APPLE)
+    set(CMAKE_INSTALL_BINDIR bin)
+    set(CMAKE_INSTALL_LIBDIR lib)
+endif ()
 
 install(
   TARGETS TracktableDomain
