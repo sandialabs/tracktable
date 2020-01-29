@@ -119,7 +119,7 @@ class AssembleTrajectoryFromPoints(object):
         self.points_processed_count = 0
 
         logger.info(("New trajectories will be declared after a separation "
-                     "of {} distance units or {} seconds.").format(
+                     "of {} distance units or {}.").format(
                                   self.separation_distance,
                                   self.separation_time))
         logger.info(("Trajectories with fewer than {} points will "
