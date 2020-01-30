@@ -65,12 +65,10 @@ def cartesian_map(map_bbox=None,
     draw axes/grid lines on the figure.
     """
 
-    from tracktable.domain.cartesian2d import BoundingBox, BasePoint
-
     if axes is None:
         axes = pyplot.gca()
 
-    logging.getLogger(__path__).trace(
+    logging.getLogger(__name__).debug(
         "cartesian_map: map_bbox is {}".format(map_bbox))
 
     (proj, artists) = make_projection_cartesian2d()
@@ -130,10 +128,11 @@ def terrestrial_map(map_name,
 
     """Create and decorate a map
 
-    Call the Basemap toolkit to create a map of some predefined area,
+    Call the Cartopy toolkit to create a map of some predefined area,
     up to and including the entire world.  The map will be decorated
     with some subset of coastlines, country borders, state/province
-    borders and cities.
+    borders and cities according to the keyword arguments you supply
+    to mapmaker() or terrestrial_map().
 
     Args:
       map_name:            Region name ('region:XXX' or 'airport:XXX' or 'city:XXX' or 'custom').  Available regions are in tracktable.render.maps.available_maps().
@@ -285,6 +284,7 @@ def terrestrial_map(map_name,
 
     return (map_axes, artists)
 
+
 def _make_bounding_box(bbox_args, domain):
     """Make a sensible bounding box out of whatever the user gave us."""
 
@@ -304,5 +304,6 @@ def _make_bounding_box(bbox_args, domain):
             raise ValueError('Custom bounding box for domain {} is not defined.'.format(domain))
     # Case 2: is it a bbox already?
     else:
-        return bbox_args # hope for the best
+        # just hope for the best
+        return bbox_args
 
