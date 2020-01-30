@@ -2,7 +2,7 @@
 #
 # This is tracktable/Python/tracktable/CMakeLists.txt
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -33,11 +33,12 @@
 if (BUILD_TESTING)
   add_subdirectory(analysis/tests)
   add_subdirectory(core/tests)
-  add_subdirectory(source/tests)
-  add_subdirectory(render/tests)
   add_subdirectory(domain/tests)
+  add_subdirectory(examples)
   add_subdirectory(io/tests)
-endif (BUILD_TESTING)
+  add_subdirectory(render/tests)
+  add_subdirectory(source/tests)
+ endif (BUILD_TESTING)
 
 
 set( PYTHON_INSTALL_PREFIX "Python/tracktable" )
