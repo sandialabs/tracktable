@@ -219,8 +219,8 @@ def extract_field_assignments_from_arguments(arguments,
 
 
 def trajectories_from_points(point_source,
-                             separation_distance=None,
-                             separation_time=None,
+                             separation_distance=1000,
+                             separation_time=datetime.timedelta(hours=24),
                              minimum_length=2):
     """Assemble a sequence of points into trajectories
 
@@ -246,12 +246,11 @@ def trajectories_from_points(point_source,
         separation_distance {float} -- Points with the same object ID
             that are at least this far apart will be used as the end
             of one trajectory and the beginning of the next.  Defaults
-            to None (corresponds to unlimited separation distance).
+            to 1000 (km in terrestrial domain, units in cartesian2d).
         separation_time {datetime.timedelta} -- Points with the same
             object ID that have timestamps at least this far apart will
             be used as the end of one trajectory and the beginning of
-            the next.  Defaults to None (corresponds to unlimited
-            separation time).
+            the next.  Defaults to 24 hours.
         minimum_length {integer} -- Trajectories with fewer than this
             many points will be discarded.  (default: 2)
     """
