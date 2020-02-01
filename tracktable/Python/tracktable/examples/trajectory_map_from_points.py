@@ -450,31 +450,31 @@ def main():
                 args.map_bbox[2] = data_bbox.min_corner[1]
                 args.map_bbox[3] = data_bbox.max_corner[1]
 
-    # We're done loading trajectories so we can exit the with: block that
-    # holds open the input file.
+        #
+        # Step 3: Set up the map.
+        #
+        # There are a lot of keyword arguments for the map -- see
+        # tracktable.script_helpers.argument_groups.mapmaker --
+        # so rather than pull them out individually like we did for
+        # the point reader we extract the whole dict using
+        # tracktable.script_helpers.argument_groups.extract_arguments().
+        logger.info('Initializing map canvas.')
+        mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
+        (mymap, artists) = mapmaker.mapmaker(**mapmaker_kwargs)
 
-    #
-    # Step 3: Set up the map.
-    #
-    # There are a lot of keyword arguments for the map -- see
-    # tracktable.script_helpers.argument_groups.mapmaker --
-    # so rather than pull them out individually like we did for
-    # the point reader we extract the whole dict using
-    # tracktable.script_helpers.argument_groups.extract_arguments().
-    logger.info('Initializing map canvas.')
-    mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
-    (mymap, artists) = mapmaker.mapmaker(**mapmaker_kwargs)
+        paths.draw_traffic(
+          traffic_map=mymap,
+          trajectory_iterable=trajectory_source,
+          color_map=args.trajectory_colormap,
+          linewidth=args.trajectory_linewidth
+          )
 
-    paths.draw_traffic(
-      traffic_map=mymap,
-      trajectory_iterable=trajectory_source,
-      color_map=args.trajectory_colormap,
-      linewidth=args.trajectory_linewidth
-      )
+        render_trajectories(mymap,
+                            trajectory_source,
+                            args)
 
-    render_trajectories(mymap,
-                        trajectory_source,
-                        args)
+    # We're done operating on the trajectory data so we can finally exit the
+    # with: block that opened the data file.
 
     print("STATUS: Saving figure to file")
     pyplot.savefig(args.image_file[0],
