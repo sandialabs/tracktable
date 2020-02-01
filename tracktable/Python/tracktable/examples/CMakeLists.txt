@@ -63,44 +63,44 @@ add_python_test(
     ${Tracktable_BINARY_DIR}/TestOutput/test_output_heatmap_cartesian.png
 )
 
-# add_python_test(
-#   P_TerrestrialTrajectoryMapExample
-#   ${EXAMPLE_MODULE}.trajectory_map_from_points
-#   --domain terrestrial
-#   --object-id-column 0
-#   --timestamp-column 1
-#   --longitude-column 2
-#   --latitude-column 3
-#   ${EXAMPLES}/data/SampleTrajectories.csv
-#   ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_terrestrial.png
-# )
+add_python_test(
+  P_TerrestrialTrajectoryMapExample
+  ${EXAMPLE_MODULE}.trajectory_map_from_points
+  --domain terrestrial
+  --object-id-column 0
+  --timestamp-column 1
+  --longitude-column 2
+  --latitude-column 3
+  ${EXAMPLES}/data/SampleTrajectories.csv
+  ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_terrestrial.png
+)
 
 
-# add_python_test(
-#   P_CartesianTrajectoryMapExample
-#   ${EXAMPLE_MODULE}.trajectory_map_from_points
-#   --domain cartesian2d
-#   --object-id-column 0
-#   --timestamp-column 1
-#   --x-column 2
-#   --y-column 3
-#   --map-bbox -100 -100 100 100
-#   ${EXAMPLES}/data/SamplePointsCartesian.csv
-#   ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_cartesian.png
-# )
+add_python_test(
+  P_CartesianTrajectoryMapExample
+  ${EXAMPLE_MODULE}.trajectory_map_from_points
+  --domain cartesian2d
+  --object-id-column 0
+  --timestamp-column 1
+  --x-column 2
+  --y-column 3
+  --map-bbox -100 -100 100 100
+  ${EXAMPLES}/data/SamplePointsCartesian.csv
+  ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_cartesian.png
+)
 
 
-# add_python_test(
-#   P_CartesianTrajectoryMapAutoBbox
-#   ${EXAMPLE_MODULE}.trajectory_map_from_points
-#   --domain cartesian2d
-#   --object-id-column 0
-#   --timestamp-column 1
-#   --x-column 2
-#   --y-column 3
-#   ${EXAMPLES}/data/SamplePointsCartesian.csv
-#   ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_cartesian_auto_bbox.png
-# )
+add_python_test(
+  P_CartesianTrajectoryMapAutoBbox
+  ${EXAMPLE_MODULE}.trajectory_map_from_points
+  --domain cartesian2d
+  --object-id-column 0
+  --timestamp-column 1
+  --x-column 2
+  --y-column 3
+  ${EXAMPLES}/data/SamplePointsCartesian.csv
+  ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_cartesian_auto_bbox.png
+)
 
 
 
