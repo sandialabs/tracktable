@@ -168,7 +168,8 @@ def parse_args():
     return args
 
 # --------------------------------------------------------------------
-#
+
+
 def extract_field_assignments_from_arguments(arguments,
                                              field_type):
     """Extract named field definitions from a dict of arguments
@@ -186,7 +187,7 @@ def extract_field_assignments_from_arguments(arguments,
     that can be passed to trajectory_points_from_file().
 
     Arguments:
-        arguments {dict or argparse.Namespace}: Parsed command-line arguments
+        arguments {dict}: Dictionary of parsed command-line arguments
         field_type {string}: What type of property to extract.  Must be
             'string', 'real' or 'time'.
 
@@ -409,14 +410,17 @@ def main():
     # Step 2: Set up the input pipeline to load points and build trajectories.
     #
     point_filename = args.point_data_file[0]
-    string_fields = extract_field_assignments_from_arguments(args, 'string')
-    real_fields = extract_field_assignments_from_arguments(args, 'real')
-    time_fields = extract_field_assignments_from_arguments(args, 'time')
+    args_as_dict = vars(args)
+    string_fields = extract_field_assignments_from_arguments(args_as_dict, 'string')
+    real_fields = extract_field_assignments_from_arguments(args_as_dict, 'real')
+    time_fields = extract_field_assignments_from_arguments(args_as_dict, 'time')
 
     with open(point_filename, 'r') as infile:
         logger.info('Initializing point source.')
         point_source = trajectory_points_from_file(
                           infile,
+                          args.object_id_column,
+                          args.timestamp_column,
                           args.coordinate0,
                           args.coordinate1,
                           string_fields=string_fields,
