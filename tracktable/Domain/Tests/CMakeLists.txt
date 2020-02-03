@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-find_package(Boost 1.57.0 REQUIRED)
+find_package(Boost 1.61 REQUIRED)
 
 include_directories(
   ${Tracktable_SOURCE_DIR}

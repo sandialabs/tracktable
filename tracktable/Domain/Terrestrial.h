@@ -269,6 +269,20 @@ TRACKTABLE_DOMAIN_EXPORT std::ostream& operator<<(std::ostream& out, trajectory_
 // ----------------------------------------------------------------------
 
 
+namespace tracktable { namespace traits {
+
+namespace domains {
+  struct terrestrial { };
+}
+    
+template<>
+struct point_domain_name<tracktable::domain::terrestrial::TerrestrialPoint>
+{
+  static inline string_type apply() { return "terrestrial"; }
+};
+
+} }
+
 // ----------------------------------------------------------------------
 // BOOST GEOMETRY REGISTRATION
 // ----------------------------------------------------------------------
@@ -294,20 +308,6 @@ TRACKTABLE_DELEGATE_TRAJECTORY_POINT_TRAITS(
   tracktable::domain::terrestrial::TerrestrialTrajectoryPoint,
   tracktable::TrajectoryPoint<tracktable::domain::terrestrial::TerrestrialPoint>
   )
-
-namespace tracktable { namespace traits {
-
-namespace domains {
-  struct terrestrial { };
-}
-    
-template<>
-struct point_domain_name<tracktable::domain::terrestrial::TerrestrialPoint>
-{
-  static inline string_type apply() { return "terrestrial"; }
-};
-    
-} }
 
 // ----------------------------------------------------------------------
 // TRACKTABLE POINT ALGORITHMS FOR BASE POINT
@@ -409,6 +409,7 @@ struct length<tracktable::domain::terrestrial::trajectory_type>
 
 } } // exit namespace tracktable::algorithms
 
+TRACKTABLE_DELEGATE_POINT_DOMAIN_NAME_TRAIT(tracktable::domain::terrestrial)
 TRACKTABLE_DELEGATE_DOMAIN_TRAIT(tracktable::domain::terrestrial, tracktable::traits::domains::terrestrial)
     
 #undef TT_DOMAIN

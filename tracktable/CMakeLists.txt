@@ -33,9 +33,9 @@
 # This is tracktable/C++/CMakeLists.txt.
 #
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.12)
 
-set(Tracktable_VERSION 1.2.0)
+set(Tracktable_VERSION 1.2.4)
 
 add_subdirectory(Core)
 add_subdirectory(Domain)

@@ -72,9 +72,10 @@ struct generic_subset_during_interval
 
       if (start_time > end_time)
         {
-        std::cerr << "WARNING: Trajectory::subset_in_window: start_time ("
-                  << start_time << ") is after end_time (" << end_time
-                  << ").  We'll pretend you meant it the other way around.\n";
+        TRACKTABLE_LOG(warning) 
+          << "Trajectory::subset_in_window: start_time ("
+          << start_time << ") is after end_time (" << end_time
+          << ").  We'll pretend you meant it the other way around.";
         start_time = _end_time;
         end_time = _start_time;
         }

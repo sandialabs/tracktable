@@ -33,7 +33,8 @@ tracktable.source.trajectory - Sources that turn a sequence of points into a seq
 
 import datetime
 from tracktable.core.geomath import distance
-import sys
+from tracktable.core import logging
+
 
 class AssembleTrajectoryFromPoints(object):
     """Turn a sequence of points into a set of trajectories
@@ -109,6 +110,7 @@ class AssembleTrajectoryFromPoints(object):
           Trajectories built from input points
         """
 
+        logger = logging.getLogger(__name__ + "AssembleTrajectoryFromPoints")
         trajectory_class = None
         trajectories_in_progress = {}
 
@@ -116,11 +118,12 @@ class AssembleTrajectoryFromPoints(object):
         self.invalid_trajectory_count = 0
         self.points_processed_count = 0
 
-        print("INFO: Trajectory assembly: New trajectories will be " +
-              "declared after a separation of {} units or {} seconds.".format(
-                  self.separation_distance,
-                  self.separation_time))
-        print("INFO: Trajectories with fewer than {} points will be rejected.".format(self.minimum_length))
+        logger.info(("New trajectories will be declared after a separation "
+                     "of {} distance units or {}.").format(
+                                  self.separation_distance,
+                                  self.separation_time))
+        logger.info(("Trajectories with fewer than {} points will "
+                     "be discarded.").format(self.minimum_length))
 
         for point in self.input:
             self.points_processed_count += 1
@@ -149,11 +152,23 @@ class AssembleTrajectoryFromPoints(object):
                         yield(new_trajectory)
                         self.valid_trajectory_count += 1
                         if self.valid_trajectory_count > 0 and self.valid_trajectory_count % 100 == 0:
-                            print("(1) STATUS: {} trajectories announced and {} discarded for having fewer than {} points".format(self.valid_trajectory_count, self.invalid_trajectory_count, self.minimum_length))
+                            logger.debug(
+                                ("(1) {} trajectories announced and {} "
+                                 "discarded for having fewer than {} "
+                                 "points").format(
+                                     self.valid_trajectory_count, 
+                                     self.invalid_trajectory_count, 
+                                     self.minimum_length))
                     else:
                         self.invalid_trajectory_count += 1
                         if self.invalid_trajectory_count > 0 and self.invalid_trajectory_count % 100 == 0:
-                            print("(2) STATUS: {} trajectories announced and {} discarded for having fewer than {} points".format(self.valid_trajectory_count, self.invalid_trajectory_count, self.minimum_length))
+                            logger.debug(
+                                ("(2) STATUS: {} trajectories announced and {} "
+                                 "discarded for having fewer than {} "
+                                 "points").format(
+                                     self.valid_trajectory_count, 
+                                     self.invalid_trajectory_count, 
+                                     self.minimum_length))
                     trajectories_in_progress[object_id] = [ point ]
 
                 else:
@@ -181,11 +196,23 @@ class AssembleTrajectoryFromPoints(object):
                                 yield(new_trajectory)
                                 self.valid_trajectory_count += 1
                                 if self.valid_trajectory_count > 0 and self.valid_trajectory_count % 100 == 0:
-                                    print("(3) STATUS: {} trajectories announced and {} discarded for having fewer than {} points".format(self.valid_trajectory_count, self.invalid_trajectory_count, self.minimum_length))
+                                    logger.debug(
+                                        ("(3) {} trajectories "
+                                         "announced and {} discarded for "
+                                         "having fewer than {} points").format(
+                                            self.valid_trajectory_count, 
+                                            self.invalid_trajectory_count, 
+                                            self.minimum_length))
                             else:
                                 self.invalid_trajectory_count += 1
                                 if self.invalid_trajectory_count > 0 and self.invalid_trajectory_count % 100 == 0:
-                                    print("(4) STATUS: {} trajectories announced and {} discarded for having fewer than {} points".format(self.valid_trajectory_count, self.invalid_trajectory_count, self.minimum_length))
+                                    logger.debug(
+                                        ("(4) {} trajectories" 
+                                         "announced and {} discarded for "
+                                         "having fewer than {} points").format(
+                                             self.valid_trajectory_count, 
+                                             self.invalid_trajectory_count, 
+                                             self.minimum_length))
 
                         else:
                             trajectories_in_progress[object_id] = update_list
@@ -199,16 +226,34 @@ class AssembleTrajectoryFromPoints(object):
                 yield(new_trajectory)
                 self.valid_trajectory_count += 1
                 if self.valid_trajectory_count > 0 and self.valid_trajectory_count % 100 == 0:
-                    print("STATUS: {} trajectories announced and {} discarded for having fewer than {} points".format(self.valid_trajectory_count, self.invalid_trajectory_count, self.minimum_length))
+                    logger.debug(
+                        ("{} trajectories announced and {} discarded for "
+                         "having fewer than {} points").format(
+                            self.valid_trajectory_count, 
+                            self.invalid_trajectory_count, 
+                            self.minimum_length))
             else:
                 self.invalid_trajectory_count += 1
                 if self.invalid_trajectory_count > 0 and self.invalid_trajectory_count % 100 == 0:
-                    print("STATUS: {} trajectories announced and {} discarded for having fewer than {} points".format(self.valid_trajectory_count, self.invalid_trajectory_count, self.minimum_length))
+                    logger.debug(
+                        ("{} trajectories announced and {} discarded for "
+                         "having fewer than {} points").format(
+                             self.valid_trajectory_count, 
+                             self.invalid_trajectory_count, 
+                             self.minimum_length))
 
 
-        print("INFO: Done assembling trajectories.")
+        logger.info(
+            ("Done assembling trajectories.  {} trajectories produced and "
+             "{} discarded for having fewer than {} points.").format(
+                 self.valid_trajectory_count,
+                 self.invalid_trajectory_count,
+                 self.minimum_length))
+
         if self.valid_trajectory_count == 0:
-            print("INFO: No trajectories produced.  Are you sure your delimiters and your column assignments are correct?")
+            logger.warning(
+                ("No trajectories produced.  Are you sure your delimiters and "
+                 "your column assignments are correct?"))
         return
 
 
