@@ -174,7 +174,8 @@ inline double compute_polygon_area(iterator point_begin,
     {
     double area = compute_spherical_triangle_area(*here, *(here+1), *(here+2));
 #if 0
-    std::cout << "Area of spherical triangle for points "
+    TRACKTABLE_LOG(debug) 
+              << "Area of spherical triangle for points "
               << here->to_string()
               << ", "
               << (here+1)->to_string()

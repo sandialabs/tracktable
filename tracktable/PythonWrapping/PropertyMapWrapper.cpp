@@ -150,7 +150,7 @@ struct object_to_property_value
             }
           else
             {
-            std::cout << "ERROR: Couldn't encode Python string as UTF-8 or ASCII\n";
+            TRACKTABLE_LOG(error) << "Couldn't encode Python string as UTF-8 or ASCII\n";
             c_value = tracktable::PropertyValueT();
             }
           }

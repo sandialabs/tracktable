@@ -34,13 +34,18 @@
 # Imports
 from tracktable.domain.terrestrial import TrajectoryPointReader
 from tracktable.render import mapmaker
-from tracktable.examples import heatmap_from_points as heatmap
+from tracktable.render.histogram2d import render_histogram
+from tracktable.render import maps
+from tracktable.core import data_directory
+from matplotlib import pyplot
+import os.path
 
 
 # First we set up our point source by reading points from a file. Then we dump the points to a list.    
 # We do not care about extra data in this example, so we leave all the column fields as default.
 points = []
-with open('data/SampleHeatmapPoints.csv', 'r') as inFile:
+data_filename = os.path.join(data_directory(), 'SampleHeatmapPoints.csv')
+with open(data_filename, 'r') as inFile:
     reader = TrajectoryPointReader()
     reader.input = inFile
     reader.comment_character = '#'
@@ -51,13 +56,25 @@ with open('data/SampleHeatmapPoints.csv', 'r') as inFile:
 
 # Now we generate a map and create a heatmap from the points we generated.
 # Set up the canvas and map projection
-(mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
-                                        map_name='region:world')
 
-heatmap.render_histogram(mymap, 
-                         domain = 'terrestrial',
+# Set up a bounding box based off of a default
+def get_bbox(area, domain):
+    coords = []
+    location = maps.CONVENIENCE_MAPS[area]
+    coords.append(location['min_corner'][0])
+    coords.append(location['min_corner'][1])
+    coords.append(location['max_corner'][0])
+    coords.append(location['max_corner'][1])
+    return mapmaker._make_bounding_box(coords, domain)
+
+# 100 DPI * (8,6) gives an 800X600 pixel image
+figure = pyplot.figure(dpi=100, figsize=(8,6))
+(mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
+                                        map_name='region:conus')
+
+bbox = get_bbox('conus', 'terrestrial')
+heatmap.render_histogram(mymap,
                          point_source=points,       # Our list of points we created above
-                         bounding_box = None,       # Bounding box is generated from mymap
+                         bounding_box = bbox,       # Bounding box is generated from mymap
                          bin_size=0.25, 
                          color_map='gist_heat')
-

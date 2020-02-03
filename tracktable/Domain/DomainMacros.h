@@ -96,6 +96,7 @@ struct access< NEW_POINT, dim > : access< DELEGATE_POINT, dim > { };
   TRACKTABLE_DELEGATE( NEW_POINT, DELEGATE_POINT, object_id )           \
   TRACKTABLE_DELEGATE( NEW_POINT, DELEGATE_POINT, timestamp )           \
   TRACKTABLE_DELEGATE( NEW_POINT, DELEGATE_POINT, undecorated_point )   \
+  TRACKTABLE_DELEGATE( NEW_POINT, DELEGATE_POINT, point_domain_name )   \
   } }
 
 #define TRACKTABLE_DELEGATE_DOMAIN_TRAIT(DOMAIN_NS, DOMAIN_TAG)        \
@@ -105,6 +106,11 @@ struct access< NEW_POINT, dim > : access< DELEGATE_POINT, dim > { };
       template<> struct domain<DOMAIN_NS::trajectory_type> : domain<DOMAIN_NS::trajectory_point_type> {}; \
       template<> struct domain<DOMAIN_NS::linestring_type> : domain<DOMAIN_NS::base_point_type> {}; \
   } }
+
+#define TRACKTABLE_DELEGATE_POINT_DOMAIN_NAME_TRAIT(DOMAIN_NS) \
+  namespace tracktable { namespace traits {                                 \
+    template<> struct point_domain_name<DOMAIN_NS::box_type> : point_domain_name<DOMAIN_NS::base_point_type> {};       \
+  } } 
 
   
 

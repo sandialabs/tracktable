@@ -61,8 +61,9 @@ void RotatePointsToNorthPole(iterator point_begin, iterator point_end,
                              PointLonLat const& centroid)
 {
   // Rotate so that the center is at longitude 0.0.  No trig required.
-  std::cout << "RotatePointsToNorthPole: Removing latitude excess "
-            << centroid[1] << "\n";
+  TRACKTABLE_LOG(debug) 
+    << "RotatePointsToNorthPole: Removing latitude excess "
+    << centroid[1];
   
   for (iterator here = point_begin; here != point_end; ++here)
     {

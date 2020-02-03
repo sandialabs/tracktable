@@ -33,12 +33,11 @@ related to geography such as 'find the distance between these two
 points on the globe'.
 """
 
-from __future__ import division, print_function, absolute_import
+from __future__ import division, absolute_import
+
 from six.moves import range
-
-
+import copy
 import math
-import sys
 
 from tracktable.lib._domain_algorithm_overloads import distance as _distance
 from tracktable.lib._domain_algorithm_overloads import bearing as _bearing
@@ -63,6 +62,14 @@ from tracktable.lib._domain_algorithm_overloads import convex_hull_area as _conv
 from tracktable.lib._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
 from tracktable.lib._domain_algorithm_overloads import convex_hull_centroid as _convex_hull_centroid
 from tracktable.lib._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
+
+from tracktable.core import logging
+LOGGER = logging.getLogger(__name__)
+DOMAIN_MODULE = None
+
+
+
+
 
 def xcoord(thing):
     """Return what we think is the X-coordinate for an object.
@@ -438,7 +445,11 @@ def point_at_fraction(trajectory, time_fraction):
 
     """
 
-    print("WARNING: point_at_fraction is deprecated and will be removed in a future release.  Use tracktable.core.geomath.point_at_time_fraction instead.")
+    logging.warn_deprecated(("tracktable.core.geomath.point_at_fraction is "
+                             "deprecated and will be removed in a future "
+                             "release.  Use tracktable.core.geomath."
+                             "point_at_time_fraction or tracktable.core."
+                             "geomath.point_at_length_fraction instead."))
 
     return _point_at_time_fraction(trajectory, time_fraction)
 
@@ -667,6 +678,15 @@ def compute_bounding_box(point_sequence, buffer=()):
       Each domain returns a separate bounding box type.
     """
 
+    # We need some machinery from tracktable.domain in order to find
+    # the correct class for the bounding box.  In order to avoid a
+    # load-time circular import dependency, we grab it on demand
+    # here.
+    global DOMAIN_MODULE
+    if DOMAIN_MODULE is None:
+        import importlib
+        DOMAIN_MODULE = importlib.import_module('tracktable.domain')
+
     min_corner = None
     max_corner = None
     bbox_type = None
@@ -676,14 +696,12 @@ def compute_bounding_box(point_sequence, buffer=()):
     for point in point_sequence:
         num_points += 1
         if bbox_type is None:
-            bbox_type = point.domain_classes['BoundingBox']
-
+            bbox_type = DOMAIN_MODULE.domain_class_for_object(
+               point, 'BoundingBox'
+            )
         if min_corner is None:
-            min_corner = point.domain_classes['BasePoint']()
-            max_corner = point.domain_classes['BasePoint']()
-            for i in range(len(point)):
-                min_corner[i] = point[i]
-                max_corner[i] = point[i]
+            min_corner = copy.deepcopy(point)
+            max_corner = copy.deepcopy(point)
         else:
             for i in range(len(point)):
                 min_corner[i] = min(min_corner[i], point[i])
@@ -697,16 +715,16 @@ def compute_bounding_box(point_sequence, buffer=()):
         max_corner[0] = max_corner[0] + horiz_buff
         max_corner[1] = max_corner[1] + vert_buff
     elif len(buffer) != 0:
-        print("ERROR: buffer requires exactly 0 or 2 values")
-        return None
-
+        raise ValueError("Buffer must contain exactly 0 or 2 values.")
     if num_points == 0:
-        print("ERROR: Cannot compute bounding box.  No points provided.")
-        return None
+        raise ValueError("Cannot compute bounding box.  No points provided.")
     else:
-        print("Bounding box points: {}, {}".format(min_corner, max_corner))
+        global LOGGER
+        LOGGER.debug("Bounding box points: {}, {}".format(
+            min_corner, 
+            max_corner))
         result = bbox_type(min_corner, max_corner)
-        print("Final bounding box: {}".format(result))
+        LOGGER.debug("Final bounding box: {}".format(result))
         return result
 
 

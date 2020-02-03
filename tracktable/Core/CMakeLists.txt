@@ -29,9 +29,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-# This is trajectory/C++/Core/CMakeLists.txt
+find_package(Boost 1.61 REQUIRED COMPONENTS date_time log serialization)
 
-find_package(Boost 1.57.0 REQUIRED COMPONENTS date_time serialization)
+# Prefer pthreads on systems where it's installed.  If the compiler will
+# accept the '-pthread' flag as a compile argument, use that too.
+set(THREADS_PREFER_PTHREAD_FLAG 1)
+# Find the system's threads library.  We need it for boost::log.
+find_package(Threads)
+
 include(GenerateExportHeader)
 
 include_directories(
@@ -60,6 +65,7 @@ set( Core_HEADERS
   GeometricMedian.h
   Geometry.h
   GuardedBoostGeometryHeaders.h
+  Logging.h
   MemoryUse.h
   PlatformDetect.h
   PointArithmetic.h
@@ -207,7 +213,7 @@ generate_export_header( TracktableCore
    EXPORT_FILE_NAME TracktableCoreWindowsHeader.h
    )
 
-target_link_libraries( TracktableCore ${Boost_LIBRARIES} )
+target_link_libraries(TracktableCore ${Boost_LIBRARIES} Threads::Threads)
 
 if (BUILD_TESTING)
   add_subdirectory(Tests)

@@ -106,7 +106,8 @@ public:
   {
     if (this->Writer == boost::python::object())
       {
-      std::cerr << "ERROR: PythonWriteSink: Supplied object has no write() attribute.\n";
+      TRACKTABLE_LOG(error) << "ERROR: PythonWriteSink: Supplied object "
+                            << "has no write() attribute.";
       }
   }
 

@@ -33,7 +33,9 @@
 
 # Imports
 from tracktable.domain.terrestrial import TrajectoryPointReader
+from tracktable.core import data_directory
 
+import os.path
 
 # To create a point, we create a generic TrajectoryPointReader object and give it the following:    
 #   input file - File stream connected to a data file    
@@ -42,7 +44,7 @@ from tracktable.domain.terrestrial import TrajectoryPointReader
 
 #   Note: The domain will default to terrestrial, which is what we typically use for real data.
 
-inFile = open('data/SampleASDI.csv', 'r')
+inFile = open(os.path.join(data_directory(), 'SampleASDI.csv'), 'r')
 reader = TrajectoryPointReader()
 reader.input = inFile
 reader.comment_character = '#'

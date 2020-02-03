@@ -105,16 +105,18 @@ string_type PropertyConverter::property_to_string(PropertyValueT const& prop)
     case TYPE_NULL:
       return this->NullValue;
     case TYPE_UNKNOWN:
-      std::cout << "ERROR: PropertyConverter::property_to_string: Don't know what to make of property " << prop << "\n";
+      TRACKTABLE_LOG(error) << "ERROR: PropertyConverter::property_to_string: "
+                            << "Don't know what to make of property " << prop;
       return this->NullValue;
     }
   return this->NullValue;
 }
 
-  PropertyValueT PropertyConverter::property_from_string(string_type const& prop_value,
+PropertyValueT PropertyConverter::property_from_string(
+               string_type const& prop_value,
 							 PropertyUnderlyingType desired_type)
   {
-    // std::cout << "property_from_string: raw_value is '" << prop_value << "', type is " << desired_type << "\n";
+    // TRACKTABLE_LOG(debug) << "property_from_string: raw_value is '" << prop_value << "', type is " << desired_type << "\n";
     PropertyValueT result;
 
     if (prop_value == this->NullValue)
@@ -125,36 +127,38 @@ string_type PropertyConverter::property_to_string(PropertyValueT const& prop)
     switch (desired_type)
       {
       case TYPE_STRING:
-	{
-	  result = PropertyValueT(prop_value);
-	}; break;
+	      {
+	      result = PropertyValueT(prop_value);
+	      }; break;
       case TYPE_REAL:
-	{
-	  // Why doesn't the following code work?
-	  // this->InputBuf.str(prop_value);
-	  // double actual_value = 0;
-	  // this->InputBuf >> actual_value;
-	  double actual_value = boost::lexical_cast<double>(prop_value);
-	  result = PropertyValueT(actual_value);
-	}; break;
+	      {
+	      // Why doesn't the following code work?
+	      // this->InputBuf.str(prop_value);
+	      // double actual_value = 0;
+	      // this->InputBuf >> actual_value;
+	      double actual_value = boost::lexical_cast<double>(prop_value);
+	      result = PropertyValueT(actual_value);
+	      }; break;
 #if defined(PROPERTY_VALUE_INCLUDES_INTEGER)
       case TYPE_INTEGER:
-	{
-	  int64_t actual_value = boost::lexical_cast<int64_t>(prop_value);
-	  result = PropertyValueT(actual_value);
-	}; break;
+	      {
+	      int64_t actual_value = boost::lexical_cast<int64_t>(prop_value);
+	      result = PropertyValueT(actual_value);
+	      }; break;
 #endif
       case TYPE_TIMESTAMP:
-	{
-	  result = PropertyValueT(this->TimestampReadWrite.timestamp_from_string(prop_value));
-	}; break;
+	      {
+	      result = PropertyValueT(this->TimestampReadWrite.timestamp_from_string(prop_value));
+	      }; break;
       case TYPE_UNKNOWN:
       case TYPE_NULL:
-	std::cout << "ERROR: property_from_string: Don't know what to do with value '"
-		  << prop_value << " and desired type " << desired_type << "\n";
-	return PropertyValueT();
+        {
+        TRACKTABLE_LOG(error) 
+	         << "ERROR: property_from_string: Don't know what to do with value '"
+	         << prop_value << " and desired type " << desired_type << ".";
+	      return PropertyValueT();
+        }
       }
-    // std::cout << "property_from_string: Result is " << result << "\n";
     return result;
   }
 

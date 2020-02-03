@@ -30,6 +30,7 @@
 """tracktable.filter.trajectory - Filters that take trajectories as input
 """
 
+from tracktable.core import geomath, logging
 from tracktable.core.geomath import subset_during_interval
 
 class ClipToTimeWindow(object):
@@ -74,20 +75,10 @@ class ClipToTimeWindow(object):
         if self.start_time is None or self.end_time is None:
             raise ValueError("ClipToTimeWindow: Incomplete time window!  You must set both 'start_time' and 'end_time'.  The current time window is ({}, {}).".format(self.start_time, self.end_time))
 
-# XXX DEBUG
-#        print("ClipToTimeWindow: Time window is {} - {}".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"),
-#                                                                self.end_time.strftime("%Y-%m-%d %H:%M:%S")))
-
         for trajectory in self.input:
-            subset = subset_during_interval(trajectory, self.start_time, self.end_time)
-# XXX DEBUG
-#            print("ClipToTimeWindow: Trajectory for object {} spans time window {} - {}.  Original contains {} points.  Subset contains {} points.".format(
-#                trajectory[0].object_id,
-#                trajectory[0].timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-#                trajectory[-1].timestamp.strftime("%Y-%m-%d %H:%M:%S"),
-#                len(trajectory),
-#                len(subset)))
-
+            subset = geomath.subset_during_interval(trajectory, 
+                self.start_time, 
+                self.end_time)
             if len(subset) > 0:
                 yield(subset)
 
@@ -122,7 +113,8 @@ class FilterByBoundingBox(object):
         """
 
         if self.box is None:
-            print("WARNING: FilterByBoundingBox: Box is not set!")
+            logging.getLogger(__name__).warning(
+                "FilterByBoundingBox: Box is not set.")
 
         for trajectory in self.input:
             if self.box is None:

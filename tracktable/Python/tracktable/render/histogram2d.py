@@ -37,13 +37,11 @@ from tracktable.domain.cartesian2d import identity_projection
 
 # from ..core.geomath import latitude, longitude
 
-import math
+
 import matplotlib.colors
 import matplotlib.pyplot
 import numpy
 from numpy import ma as masked_array
-import string
-import pdb
 from six.moves import range
 
 def render_histogram(map_projection,
@@ -65,8 +63,6 @@ def render_histogram(map_projection,
                                              bounding_box[3]))
         bbox_span = bounding_box.max_corner - bounding_box.min_corner
 
-#    print("DEBUG: bbox_span: {}".format(bbox_span))
-
     x_bin_boundaries = []
     y_bin_boundaries = []
 
@@ -82,11 +78,6 @@ def render_histogram(map_projection,
         y_bin_boundaries.append(next_boundary)
         next_boundary += bin_size
     y_bin_boundaries.append(bounding_box.max_corner[1])
-
-    # print("DEBUG: histogram2d: Bucket count is ({}, {}) -> {}".format(len(longitude_bin_boundaries), len(latitude_bin_boundaries), len(longitude_bin_boundaries) * len(latitude_bin_boundaries)))
-    # print("DEBUG: histogram2d: Bucket boundaries are ({}, {}) - ({}, {})".format(
-    #     longitude_bin_boundaries[0], latitude_bin_boundaries[0],
-    #     longitude_bin_boundaries[-1], latitude_bin_boundaries[-1]))
 
     # This looks backwards, I know, but it's correct -- the first
     # dimension is rows, which corresponds to Y, which means latitude.
@@ -114,16 +105,6 @@ def render_histogram(map_projection,
     x_bins_2d, y_bins_2d = numpy.meshgrid(x_bin_boundaries,
                                           y_bin_boundaries)
 
-#    print("RH: x_bin_boundaries {}".format(x_bin_boundaries[0:10]))
-#    print("RH: y_bin_boundaries {}".format(y_bin_boundaries[0:10]))
-
-    xcoords = x_bins_2d
-    ycoords = y_bins_2d
-
-#    xcoords, ycoords = map_projection(x_bins_2d, y_bins_2d)
-#    print("RH: map_xcoords: {}".format(xcoords))
-#    print("RH: map_ycoords: {}".format(ycoords))
-
     masked_density = masked_array.masked_less_equal(density, 0)
 
     # And finally render it onto the map.
@@ -133,13 +114,6 @@ def render_histogram(map_projection,
                               colormap=colormap,
                               colorscale=colorscale,
                               zorder=zorder)
-
-    # return matplotlib.pyplot.pcolormesh(xcoords,
-    #                                     ycoords,
-    #                                     masked_density,
-    #                                     cmap=colormap,
-    #                                     norm=colorscale,
-    #                                     zorder=zorder)
 
 
 def cartesian(point_source,
@@ -208,17 +182,6 @@ def cartesian(point_source,
                               colormap=colormap,
                               colorscale=colorscale,
                               zorder=zorder)
-
-
-    # x_bins_2d, y_bins_2d = numpy.meshgrid(x_bins, y_bins)
-
-    # # And finally render it onto the map.
-    # return matplotlib.pyplot.pcolormesh(x_bins_2d,
-    #                                     y_bins_2d,
-    #                                     density,
-    #                                     cmap=colormap,
-    #                                     norm=colorscale,
-    #                                     zorder=zorder)
 
 
 # ----------------------------------------------------------------------
@@ -302,11 +265,6 @@ def geographic(map_projection,
         next_boundary += bin_size
     y_bin_boundaries.append(bbox_upperright[1])
 
-    # print("DEBUG: histogram2d: Bucket count is ({}, {}) -> {}".format(len(longitude_bin_boundaries), len(latitude_bin_boundaries), len(longitude_bin_boundaries) * len(latitude_bin_boundaries)))
-    # print("DEBUG: histogram2d: Bucket boundaries are ({}, {}) - ({}, {})".format(
-    #     longitude_bin_boundaries[0], latitude_bin_boundaries[0],
-    #     longitude_bin_boundaries[-1], latitude_bin_boundaries[-1]))
-
     # This looks backwards, I know, but it's correct -- the first
     # dimension is rows, which corresponds to Y, which means latitude.
     density = numpy.zeros( shape = (len(y_bin_boundaries) - 1, len(x_bin_boundaries) - 1) )
@@ -350,14 +308,7 @@ def geographic(map_projection,
                               colorscale=colorscale,
                               zorder=zorder)
 
-    # # And finally render it onto the map.
-    # return matplotlib.pyplot.pcolormesh(xcoords,
-    #                                     ycoords,
-    #                                     masked_density,
-    #                                     cmap=colormap,
-    #                                     norm=colorscale,
-    #                                     zorder=zorder)
-
+   
 # ----------------------------------------------------------------------
 
 def save_density_array(density, outfile):
@@ -414,14 +365,7 @@ def draw_density_array(density,
                             bounding_box.max_corner[1],
                             density.shape[0] + 1)
 
-#    print("DDA: x_bins: {}".format(x_bins[0:10]))
-#    print("DDA: y_bins: {}".format(y_bins[0:10]))
-
     x_bins_mesh, y_bins_mesh = numpy.meshgrid(x_bins, y_bins)
-
-#    xcoords_map, ycoords_map = map_projection(x_bins_mesh, y_bins_mesh)
-#    print("DDA: map_xcoords: {}".format(xcoords_map))
-#    print("DEBUG: draw_density_array: array min, max are {}, {}".format(density.min(), density.max()))
 
     # And finally render it onto the map.
     return [ matplotlib.pyplot.pcolormesh(x_bins_mesh,
