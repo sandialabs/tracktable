@@ -29,7 +29,7 @@ domains.  While we cannot prevent you entirely from mixing up (for
 example) kilometers and miles when computing distances, we can at
 least try to make it difficult.
 
-Tracktable 0.9 includes the following domains:
+Tracktable 1.2.4 includes the following domains:
 
 .. csv-table:: Available Point Domains
    :header: "C++ Namespace", "Python Module", "Description"
@@ -123,13 +123,15 @@ at position 1.
 Access a point's coordinates as if the point were an array using
 ``[]``.  In Python::
 
-   my_point = tracktable.domain.terrestrial.TrajectoryPoint()
+   from tracktable.domain.terrestrial import TrajectoryPoint
+   from tracktable.core import Timestamp
+   my_point = TrajectoryPoint()
    longitude = 50
    latitude = 40
    my_point[0] = longitude
    my_point[1] = latitude
    my_point.object_id = 'FlightId'
-   my_point.timestamp = tracktable.core.Timestamp.from_any('2014-04-05 13:25:00')
+   my_point.timestamp = Timestamp.from_any('2014-04-05 13:25:00')
 
 In C++::
 
@@ -231,7 +233,9 @@ C++::
 Python::
 
   # Populate a trajectory from scratch
-  traj = tracktable.domain.terrestrial.Trajectory()
+  from tracktable.domain.terrestrial import Trajectory
+
+  traj = Trajectory()
   for point in mypoints:
       traj.append(mypoint)
 
@@ -275,7 +279,7 @@ Input
 =====
 
 There are three ways to get point data into Tracktable in version
-0.9.9.  We can instantiate and populate TrajectoryPoint objects by
+1.2.4.  We can instantiate and populate TrajectoryPoint objects by
 hand, load points from a delimited text file, or create them
 algorithmically.
 
@@ -426,7 +430,7 @@ Rendering
 
 Now we come to the fun part: making images and movies from data.
 
-Tracktable 0.9.0 supports three kinds of visualization: a heatmap (2D
+Tracktable 1.2.4 supports three kinds of visualization: a heatmap (2D
 histogram), a trajectory map (lines/curves drawn on the map) and a
 trajectory movie.  We render heatmaps directly from points.
 Trajectory maps and movies require assembled trajectories.
@@ -436,7 +440,7 @@ user's guide we will discuss rendering onto a map projection.  The
 procedure for rendering points in Cartesian space is very similar and
 will be documented Real Soon Now.
 
-We use the `Basemap <http://matplotlib.org/basemap>`_ toolkit for the
+We use the `Cartopy <http://scitools.org.uk/cartopy>`_ toolkit for the
 map projection and `Matplotlib <http://matplotlib.org>`_ for the
 actual rendering.
 
