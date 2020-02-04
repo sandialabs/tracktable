@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -44,6 +44,7 @@ import datetime
 import itertools
 import numpy
 import shlex
+import six
 import sys
 
 import matplotlib
@@ -547,6 +548,55 @@ def render_trajectory_movie(movie_writer,
             for artist in trajectory_artists:
                 artist.remove()
 
+# --------------------------------------------------------------------
+
+
+def extract_field_assignments_from_arguments(arguments,
+                                             field_type):
+    """Helper function for configuring point reader
+
+    When running this script, the user specifies named fields that
+    the reader should process with arguments like
+    '--real-field-column altitude 12'.  This will cause the reader
+    to take column 12 in the data file, convert its contents to a
+    floating-point number, and store the result in a property
+    named "altitude" on each point.
+
+    This function is a convenience: it extracts those declarations
+    for a given field type (string, real, timestamp) from a dictionary
+    or namespace of arguments, then returns the result as a dictionary
+    that can be passed to trajectory_points_from_file().
+
+    Arguments:
+        arguments {dict}: Dictionary of parsed command-line arguments
+        field_type {string}: What type of property to extract.  Must be
+            'string', 'real' or 'time'.
+
+    Returns:
+        Dictionary containing { field_name: column_number } for the
+        specified field type.  Dictionary will be empty if there are
+        no assignments of that type.
+
+    Raises:
+        ValueError: invalid field type
+    """
+
+    if field_type not in ['string', 'real', 'time']:
+        raise ValueError(('Field type ({}) must be one of "string", '
+                          '"real", or "time".  Case matters').format(
+                                field_type))
+
+    arg_name = '{}_field_column'.format(field_type)
+    arg_dict = dict(arguments)
+    field_assignments = dict()
+    definition_list = arg_dict.get(arg_name, None)
+    if definition_list is not None:
+        if len(definition_list) > 0:
+            for (field_name, column) in n_at_a_time(definition_list, 2):
+                field_assignments[field_name] = int(column)
+
+    return field_assignments
+
 # ----------------------------------------------------------------------
 
 
@@ -719,7 +769,6 @@ def trajectories_from_point_file(infile,
             minimum_length=minimum_length)
 
     return trajectory_source
-
 
 # ---------------------------------------------------------------------
 
@@ -923,6 +972,7 @@ def _make_tapered_linewidth_generator(initial_linewidth,
 
 # ----------------------------------------------------------------------
 
+
 def _make_constant_linewidth_generator(linewidth):
 
     """Create a function that will make a constant line width for a trajectory
@@ -1071,7 +1121,6 @@ def main():
     movie_kwargs = argument_groups.extract_arguments("movie_rendering", args)
     movie_writer = setup_encoder(**movie_kwargs)
 
-
     # This set of arguments will be passed to the savefig() call that
     # grabs the latest movie frame.  This is the place to put things
     # like background color, tight layout and friends.
@@ -1106,6 +1155,7 @@ def main():
     return 0
 
 # ----------------------------------------------------------------------
+
 
 if __name__ == '__main__':
     sys.exit(main())
