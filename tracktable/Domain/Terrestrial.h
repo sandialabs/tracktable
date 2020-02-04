@@ -215,6 +215,25 @@ public:
     this->set_latitude(_latitude);
     }
 
+  // Returns ECEF values for lon/lat points.  Uses a km convention.  
+  // Note that this expects an altitude in km (not ft or m).  This is easy
+  // to change but the whole convention of feet seems unconventional
+  PointCartesian<3> ECEF() const
+    {
+      coord_type lon = conversions::radians(this->get<0>());
+      coord_type lat = conversions::radians(this->get<1>());
+      double alt = this->real_property("altitude");
+      coord_type pt[3];
+      double a = 6378.137;
+      double e2 = 8.1819190842622e-2*8.1819190842622e-2;
+      double n = a/sqrt((1.0 - e2*pow(sin(lat),2.0)));
+      pt[0] = (n+alt)*cos(lat)*cos(lon);
+      pt[1] = (n+alt)*cos(lat)*sin(lon);
+      pt[2] = (n*(1.0-e2)+alt)*sin(lat);
+
+      return PointCartesian<3>(pt);
+    }
+
 private:
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
