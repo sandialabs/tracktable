@@ -470,6 +470,7 @@ def main():
         mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
         (mymap, artists) = mapmaker.mapmaker(**mapmaker_kwargs)
 
+
         render_trajectories(trajectory_source,
                             mymap,
                             linewidth=args.trajectory_linewidth,
