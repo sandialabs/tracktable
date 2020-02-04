@@ -302,6 +302,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='Render a movie of traffic found in a delimited text file',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
     argument_groups.use_argument_group("delimited_text_point_reader", parser)
     argument_groups.use_argument_group("trajectory_assembly", parser)
     argument_groups.use_argument_group("trajectory_rendering", parser)
@@ -1070,6 +1071,7 @@ def main():
     movie_kwargs = argument_groups.extract_arguments("movie_rendering", args)
     movie_writer = setup_encoder(**movie_kwargs)
 
+
     # This set of arguments will be passed to the savefig() call that
     # grabs the latest movie frame.  This is the place to put things
     # like background color, tight layout and friends.
@@ -1085,6 +1087,7 @@ def main():
         movie_writer,
         map_projection=mymap,
         trajectories=trajectories,
+
         dpi=args.dpi,
         figure=figure,
         filename=args.movie_file[0],
