@@ -465,16 +465,12 @@ def main():
         mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
         (mymap, artists) = mapmaker.mapmaker(**mapmaker_kwargs)
 
-        paths.draw_traffic(
-          traffic_map=mymap,
-          trajectory_iterable=trajectory_source,
+        render_trajectories(
+          map_canvas=mymap,
+          trajectories=trajectory_source,
           color_map=args.trajectory_colormap,
           linewidth=args.trajectory_linewidth
           )
-
-        render_trajectories(mymap,
-                            trajectory_source,
-                            args)
 
     # We're done operating on the trajectory data so we can finally exit the
     # with: block that opened the data file.
