@@ -215,6 +215,9 @@ public:
     this->set_latitude(_latitude);
     }
 
+  // Returns ECEF values for lon/lat points.  Uses a km convention.  
+  // Note that this expects an altitude in km (not ft or m).  This is easy
+  // to change but the whole convention of feet seems unconventional
   PointCartesian<3> ECEF() const
     {
       coord_type lon = conversions::radians(this->get<0>());
