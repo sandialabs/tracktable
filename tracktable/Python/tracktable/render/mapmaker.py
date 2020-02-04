@@ -36,7 +36,6 @@ from matplotlib import pyplot
 
 from tracktable.core import logging
 from tracktable.render import maps
-from tracktable.render.projection import make_projection_cartesian2d
 from tracktable.render import geographic_decoration as decoration
 
 
