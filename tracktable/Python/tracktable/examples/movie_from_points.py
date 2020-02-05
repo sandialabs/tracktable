@@ -936,6 +936,7 @@ def trajectory_time_bounds(trajectories):
     else:
         return (start_time, end_time)
 
+
 # ---------------------------------------------------------------------
 
 
@@ -1050,8 +1051,6 @@ def _extract_typed_field_assignments(arguments,
     return field_assignments
 
 # --------------------------------------------------------------------
-
-
 def main():
     logger = logging.getLogger(__name__)
 
