@@ -350,8 +350,6 @@ def maybe_split_string(maybe_string):
     else:
         return maybe_string
 
-# ----------------------------------------------------------------------
-
 
 # ----------------------------------------------------------------------
 
@@ -373,23 +371,15 @@ def render_trajectory_movie(axes,
 
   # XXX YOU ARE HERE
   # 
-    local_savefig_kwargs = dict(savefig_kwargs)
-    local_trajectory_rendering_args = dict(trajectory_rendering_args)
+    
 
-    # Cull out trajectories that do not overlap the map.  We do not
-    # clip them (at least not now) since that would affect measures
-    # like progress along the path.
-    try:
-        map_bbox = map_projection.bbox
-        trajectories_on_map = [ traj for traj in trajectories if geomath.intersects(traj, map_bbox) ]
-    except AttributeError:
-        print("INFO: Map does not contain a bbox attribute.  Trajectory culling will be skipped.")
-        trajectories_on_map = list(trajectories)
+    # TODO: Cull trajectories that do not overlap the map.  To do this,
+    # we need to figure out how to get the bounding box of the map in
+    # longitude/latitude coordinates.  We should probably compare
+    # trajectory bounding boxes against axes.outline_patch().
+    
 
-    if len(trajectories_on_map) == 0:
-        print("ERROR: No trajectories intersect the map bounding box ({}).  Is the bounding box set correctly?")
-        return
-
+    # TODO: Move trajectory annotation out of this function.
     global ANNOTATED_TRAJECTORIES
     if not ANNOTATED_TRAJECTORIES:
         print("Annotating trajectories (should only happen once)")
@@ -404,6 +394,7 @@ def render_trajectory_movie(axes,
 
     if local_trajectory_rendering_args['trajectory_color_type'] == 'static':
         local_trajectory_rendering_args['trajectory_colormap'] = example_trajectory_rendering.make_constant_colormap(local_trajectory_rendering_args['trajectory_color'])
+
 
     (data_start_time, data_end_time) = compute_trajectory_time_bounds(trajectories_on_map)
     if end_time is None:
@@ -446,31 +437,6 @@ def render_trajectory_movie(axes,
     def frame_time(which_frame):
         return first_frame_time + which_frame * frame_duration
 
-
-    def my_format_time(timestamp):
-        minutes = timestamp.time().minute
-        minutes = 15 * int(minutes / 15)
-        local_timezone = SimpleTimeZone(hours=utc_offset)
-        newtime = timestamp.replace(minute=minutes).astimezone(local_timezone)
-
-        timestring = Timestamp.to_string(newtime, format_string='%Y-%m-%d\n%H:%M {}'.format(
-            timezone_label), include_tz=False)
-
-        return timestring
-
-
-
-    ## TODO Add arguments to control this
-    clock_artist = clock.digital_clock(frame_time(0),
-                                       my_format_time,
-                                       (0.95, 0.85),
-                                       ha='right',
-                                       va='baseline',
-                                       color='white',
-                                       size=18,
-                                       backgroundcolor='black',
-                                       zorder=20)[0]
-
     if figure is None:
         figure = pyplot.gcf()
 
@@ -508,8 +474,6 @@ def render_trajectory_movie(axes,
                 frame_number=i
                 )
 
-            clock_artist.set_text(my_format_time(current_time))
-
             next_filename = 'test_frame_{}.png'.format(i)
             movie_writer.grab_frame(**local_savefig_kwargs)
             cleanup_frame(frame_data)
@@ -517,7 +481,278 @@ def render_trajectory_movie(axes,
             current_time += frame_duration
             trail_start_time += frame_duration
 
+# ----------------------------------------------------------------------
+
+
+def render_trajectories_for_frame(frame_time,
+                                  trail_start_time,
+                                  trajectories,
+                                  basemap,
+                                  axes=None,
+                                  render_args=dict(),
+                                  frame_number=None):
+
+    clipped_trajectories = ( geomath.subset_during_interval(
+        trajectory, trail_start_time, frame_time
+        ) for trajectory in trajectories )
+
+    # TODO: Do I actually need a list or can I pass the generator in directly?
+    clip_result = list(clipped_trajectories)
+#    print("Lengths of trajectories for frame {}: {}".format(frame_time, [ len(traj) for traj in clip_result ]))
+#    print("Geographic lengths: {}".format([ geomath.length(traj) for traj in clip_result ]))
+    #    print("render_trajectories_for_frame: Frame {} contains {} clipped trajectories".format(frame_number, len(clip_result)))
+
+    return example_trajectory_rendering.render_annotated_trajectories(
+        basemap=basemap,
+#        trajectory_source=clipped_trajectories.trajectories(),
+        trajectory_source=clip_result,
+        axes=axes,
+        **render_args)
+
+
+def render_trajectories(basemap,
+                        trajectory_source,
+                        trajectory_color_type="scalar",
+                        trajectory_color="progress",
+                        trajectory_colormap="gist_heat",
+                        trajectory_zorder=10,
+                        decorate_trajectory_head=False,
+                        trajectory_head_dot_size=2,
+                        trajectory_head_color="white",
+                        trajectory_linewidth=0.5,
+                        trajectory_initial_linewidth=0.5,
+                        trajectory_final_linewidth=0.01,
+                        scalar_min=0,
+                        scalar_max=1,
+                        axes=None):
+    """Render decorated trajectories onto a map instance.
+
+    Given a map instance (usually axes from Cartopy) and an iterable 
+    containing trajectories, draw the trajectories onto the map with 
+    the specified appearance parameters.  You can control the trajectory 
+    color, linewidth, z-order and whether or not a dot is drawn at the
+    head of each path.
+
+    Args:
+       basemap:                  Basemap instance to draw into
+       trajectory_source:        Iterable of Trajectory objects
+       trajectory_color_type:    String, either 'scalar' or 'constant'
+       trajectory_color:         Name of an annotation function if trajectory_color_type
+                                 is 'scalar'; name/hex string of a color if it's 'constant'
+       trajectory_colormap:      Colormap to map between scalars and colors if
+                                 trajectory_color_type is 'scalar'
+       trajectory_zorder:        Image layer for trajectory geometry -- higher layers
+                                 occlude lower ones
+       decorate_trajectory_head: Whether or not to draw a dot at the head of each trajectory
+       trajectory_head_dot_size: Size (in points) for the dot at the head of each trajectory
+       trajectory_head_color:    Name/hex string for color of trajectory dots
+       trajectory_linewidth:     Trajectory linewidth in points
+       trajectory_initial_linewidth: If trajectory_linewidth is 'taper', lines will be this
+                                 wide at the head of the trajectory
+       trajectory_final_linewidth: If trajectory_linewidth is 'taper', lines will be this
+                                 wide at the tail of the trajectory
+       axes:                     Artists will be added to this Axes instance instead of the default
+
+    Raises:
+       KeyError: trajectory_color_type is 'scalar' and the specified
+                 trajectory scalar generator was not found in
+                 tracktable.features.available_annotations()
+
+    Returns:
+       A list of the artists added to the basemap
+
+
+    NOTE: This function is an adapter between the trajectory_rendering
+    argument group and the draw_traffic() function in the
+    tracktable.render.paths module.
+    """
+
+    trajectories_to_render = None
+
+    if trajectory_color_type == 'scalar':
+        annotator = annotations.retrieve_feature_function(trajectory_color)
+        
+        def annotation_generator(traj_source):
+            for trajectory in traj_source:
+                yield(annotator(trajectory))
+
+        trajectories_to_render = annotation_generator(trajectory_source)
+        scalar_generator = annotations.retrieve_feature_accessor(trajectory_color)
+        colormap = trajectory_colormap
+
+    else:
+        def dummy_scalar_retrieval(trajectory):
+            scalar = numpy.zeros(len(trajectory))
+            return scalar
+
+        def dummy_generator(things):
+            for thing in things:
+                yield(thing)
+
+        trajectories_to_render = dummy_generator(trajectory_source)
+        scalar_generator = dummy_scalar_retrieval
+        colormap = make_constant_colormap(trajectory_color)
+
+    return render_annotated_trajectories(basemap,
+                                         trajectories_to_render,
+                                         trajectory_scalar_accessor=scalar_generator,
+                                         trajectory_colormap=colormap,
+                                         trajectory_zorder=trajectory_zorder,
+                                         decorate_trajectory_head=decorate_trajectory_head,
+                                         trajectory_head_dot_size=trajectory_head_dot_size,
+                                         trajectory_head_color=trajectory_head_color,
+                                         trajectory_linewidth=trajectory_linewidth,
+                                         trajectory_initial_linewidth=trajectory_initial_linewidth,
+                                         trajectory_final_linewidth=trajectory_final_linewidth,
+                                         scalar_min=scalar_min,
+                                         scalar_max=scalar_max,
+                                         axes=axes)
+
+# ----------------------------------------------------------------------
+
+def _dummy_accessor(trajectory):
+    return numpy.zeros(len(trajectory))
+
+def render_annotated_trajectories(basemap,
+                                  trajectory_source,
+                                  trajectory_scalar_accessor=_dummy_accessor,
+                                  trajectory_colormap="gist_heat",
+                                  trajectory_zorder=10,
+                                  decorate_trajectory_head=False,
+                                  trajectory_head_dot_size=2,
+                                  trajectory_head_color="white",
+                                  trajectory_linewidth=0.5,
+                                  trajectory_initial_linewidth=0.5,
+                                  trajectory_final_linewidth=0.01,
+                                  scalar_min=0,
+                                  scalar_max=1,
+                                  axes=None):
+
+    """Render decorated trajectories (with scalars) onto a map instance.
+
+    Given a map instance and an iterable containing trajectories,
+    draw the trajectories onto the map with the specified appearance
+    parameters.  You can control the trajectory color, linewidth,
+    z-order and whether or not a dot is drawn at the head of each
+    path.
+
+    Args:
+       basemap:                  Map instance to draw into
+       trajectory_source:        Iterable of Trajectory objects
+       trajectory_scalar_accessor: Return a list of scalars for a trajectory
+       trajectory_colormap:      Colormap to map between scalars and colors
+       trajectory_zorder:        Image layer for trajectory geometry -- higher layers
+                                 occlude lower ones
+       decorate_trajectory_head: Whether or not to draw a dot at the head of each trajectory
+       trajectory_head_dot_size: Size (in points) for the dot at the head of each trajectory
+       trajectory_head_color:    Name/hex string for color of trajectory dots
+       trajectory_linewidth:     Trajectory linewidth in points
+       trajectory_initial_linewidth: If trajectory_linewidth is 'taper', lines will be this
+                                 wide at the head of the trajectory
+       trajectory_final_linewidth: If trajectory_linewidth is 'taper', lines will be this
+                                 wide at the tail of the trajectory
+       axes:                     Artists will be added to this Axes instance instead of the default
+       scalar_min (float):       Scalar value to map to bottom of color map
+       scalar_max (float):       Scalar value to map to top of color map
+
+    Returns:
+       A list of the artists added to the basemap
+
+
+    NOTE: This function is an adapter between the trajectory_rendering
+    argument group and the draw_traffic() function in the
+    tracktable.render.paths module.
+
+    """
+
+    if trajectory_linewidth == 'taper':
+        linewidth_generator = _make_tapered_linewidth_generator(trajectory_initial_linewidth,
+                                                                trajectory_final_linewidth)
+    else:
+        linewidth_generator = _make_constant_linewidth_generator(trajectory_linewidth)
+
+    if decorate_trajectory_head:
+        dot_size = trajectory_head_dot_size
+        dot_color = trajectory_head_color
+    else:
+        dot_size = 0
+        dot_color = 'white'
+
+    return paths.draw_traffic(basemap,
+                              trajectory_source,
+                              color_map=trajectory_colormap,
+                              trajectory_scalar_generator=trajectory_scalar_accessor,
+                              trajectory_linewidth_generator=linewidth_generator,
+                              zorder=trajectory_zorder,
+                              color_scale=matplotlib.colors.Normalize(vmin=scalar_min, vmax=scalar_max),
+                              dot_size=dot_size,
+                              dot_color=dot_color,
+                              axes=axes)
+
+
+# ----------------------------------------------------------------------
+
+
+def _make_tapered_linewidth_generator(initial_linewidth,
+                                      final_linewidth):
+
+    """Create a function that will make a tapered line width for a trajectory
+
+    In order to render tapered trajectories whose lines get thinner as
+    they get older, we need to generate a scalar array with as many
+    components as the trajectory has segments.  The first entry in
+    this array (corresponding to the OLDEST point) should have the
+    value 'final_linewidth'.  The last entry (corresponding to the
+    NEWEST point) should have the value 'initial_linewidth'.
+
+    Args:
+       initial_linewidth:  Width (in points) at the head of the trajectory
+       final_linewidth:    Width (in points) at the tail of the trajectory
+
+    Returns:
+       A function that takes in a trajectory as an argument and
+       returns an array of linewidths
+
+    NOTE: There might be an off-by-one error in here: we generate
+    len(trajectory) scalars but the geometry has len(trajectory)-1
+    segments.  Check to see if draw_traffic in paths.py corrects for
+    this.
+    """
+
+    def linewidth_generator(trajectory):
+        return numpy.linspace(final_linewidth, initial_linewidth, len(trajectory))
+
+    return linewidth_generator
+
+# ----------------------------------------------------------------------
+
+def _make_constant_linewidth_generator(linewidth):
+
+    """Create a function that will make a constant line width for a trajectory
+
+    Args:
+       linewidth:  Width (in points) along the trajectory
+
+    Returns:
+       A function that takes in a trajectory as an argument and
+       returns an array of linewidths
+
+    NOTE: There might be an off-by-one error in here: we generate
+    len(trajectory) scalars but the geometry has len(trajectory)-1
+    segments.  Check to see if draw_traffic in paths.py corrects for
+    this.
+    """
+
+    def linewidth_generator(trajectory):
+        scalars = numpy.zeros(len(trajectory))
+        scalars += float(linewidth)
+        return scalars
+
+    return linewidth_generator
+    
 # -----------------------------------------------------------------------
+
+
 def main():
     logger = logging.getLogger(__name__)
     args = parse_args()
