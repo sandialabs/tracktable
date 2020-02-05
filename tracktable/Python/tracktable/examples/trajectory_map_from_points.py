@@ -410,9 +410,12 @@ def main():
     #
     point_filename = args.point_data_file[0]
     args_as_dict = vars(args)
-    string_fields = extract_field_assignments_from_arguments(args_as_dict, 'string')
-    real_fields = extract_field_assignments_from_arguments(args_as_dict, 'real')
-    time_fields = extract_field_assignments_from_arguments(args_as_dict, 'time')
+    string_fields = extract_field_assignments_from_arguments(args_as_dict,
+                                                             'string')
+    real_fields = extract_field_assignments_from_arguments(args_as_dict,
+                                                           'real')
+    time_fields = extract_field_assignments_from_arguments(args_as_dict,
+                                                           'time')
 
     with open(point_filename, 'r') as infile:
         logger.info('Initializing point source.')
