@@ -1,5 +1,5 @@
 Summary:          Tracktable C++ trajectory analysis and rendering library
-Name:             tracktable
+Name:             tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@
 Version:          @TRACKTABLE_VERSION@
 Release:          @RPM_RELEASE@%{?dist}
 License:          Other
@@ -8,9 +8,16 @@ Group:            System Environment/Libraries
 Source:           Tracktable-@TRACKTABLE_VERSION@-Source.tar.bz2
 Vendor:           National Technology and Engineering Solutions of Sandia, LLC
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+#BuildRequires:    python2-sphinx
+#BuildRequires:    python2-breathe
+#BuildRequires:    python2-sphinx_rtd_theme
+#BuildRequires:    python-sphinxcontrib-napoleon
+BuildRequires:    doxygen
+BuildRequires:    graphviz
 BuildRequires:    boost169-devel >= 1.69
 BuildRequires:    cmake3 >= 3.12
 BuildRequires:    pkgconfig
+Obsoletes:        tracktable
 
 %description
 Tracktable is a C++ trajectory and analysis library.
@@ -18,9 +25,10 @@ Tracktable is a C++ trajectory and analysis library.
 %package          devel
 Summary:          C++ Headers for developing programs that will use the tracktable library
 Group:            Development/Libraries
-Requires:         tracktable = %{version}-%{release}
+Requires:         tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@ = %{version}-%{release}
 Requires:         boost169-devel >= 1.69
 Requires:         pkgconfig
+Obsoletes:        tracktable-devel
 
 %description    devel
 C++ libraries and header files needed for developing applications that
@@ -29,9 +37,8 @@ will use the tracktable library.
 %package          doc
 Summary:          Developer's documentation for the tracktable library
 Group:            Documentation
-Requires:         gtk-doc
-Requires:         devhelp
 BuildArch:        noarch
+Obsoletes:        tracktable-doc
 
 %description      doc
 This package contains developer's documentation for the tracktable library.
@@ -47,12 +54,26 @@ This package contains developer's documentation for the tracktable library.
     -DBUILD_PYTHON_WRAPPING=OFF \
     -DBUILD_TESTING=OFF \
     -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} \
+    -DBUILD_DOCUMENTATION=ON \
+    -DPYTHON_EXECUTABLE=python3.6 \
     .
+#    -DSphinx_PYTHON_EXECUTABLE=python2.7 \
+#    .
     
 %make_build %{?_smp_mflags}
+%make_build doxygen_doc
+#%make_build doc
 
 %install
 %make_install
+
+for file in $(find Documentation/doxygen/html -type f); do
+  install -p --mode=0664 -D ${file} %{buildroot}%{_datadir}/doc/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/cpp_reference/${file#"Documentation/doxygen/html/"}
+done
+
+#for file in $(find Documentation/html -type f); do
+#  install -p --mode=0664 -D ${file} %{buildroot}%{_datadir}/doc/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/html${file#Documentation/html/}
+#done
 
 %check
 ctest3 -V %{?_smp_mflags}
@@ -67,22 +88,24 @@ ctest3 -V %{?_smp_mflags}
 %files
 %defattr(-,root,root,-)
 %{_libdir}/libTracktable*.so.*
-%{_docdir}/LICENSE.txt
-%{_docdir}/README.md
+%{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/LICENSE.txt
+%{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/README.md
 
 %files devel
 %defattr(-,root,root,-)
 %{_libdir}/libTracktable*.so
 %{_libdir}/pkgconfig/@PKGCONFIG_FILE@
 %{_includedir}/@TRACKTABLE_INCLUDEDIR@
-%{_docdir}/LICENSE.txt
-%{_docdir}/README.md
+%{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/LICENSE.txt
+%{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/README.md
 
 %files doc
 %defattr(-,root,root,-)
-%{_docdir}/LICENSE.txt
-%{_docdir}/README.md
-#%doc %{_datadir}/doc/html/tracktable/
+%dir %{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@
+%{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/LICENSE.txt
+%{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/README.md
+%doc %{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/cpp_reference/
+#%doc %{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/html/
 
 %changelog
 
