@@ -97,10 +97,11 @@ int test_trajectory()
     ++error_count;
     }
   std::ostringstream sbuf;
+  tracktable::imbue_stream_with_timestamp_output_format(sbuf, "%Y%m%d%H%M%S");
   sbuf << albuquerque.object_id()
-       << "//"
+       << "_"
        << albuquerque.timestamp()
-       << "//"
+       << "_"
        << roswell.timestamp();
   std::string expected_trajectory_id = sbuf.str();
   if (path.trajectory_id() != expected_trajectory_id)
