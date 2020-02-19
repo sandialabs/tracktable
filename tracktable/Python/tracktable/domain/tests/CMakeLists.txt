@@ -211,3 +211,8 @@ add_python_test(
   P_CurrentLengthAvailable
   ${DOMAIN}.test_current_length
   )
+
+add_python_test(
+  P_TrajectoryId
+  ${DOMAIN}.test_trajectory_id
+  )
