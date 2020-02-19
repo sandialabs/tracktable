@@ -205,12 +205,13 @@ public:
       else
         {
         std::ostringstream outbuf;
-        outbuf << this->object_id() << "//"
-               << this->start_time() << "//"
+        imbue_stream_with_timestamp_output_format(outbuf, "%Y%m%d%H%M%S");
+        outbuf << this->object_id() << "_"
+               << this->start_time() << "_"
                << this->end_time();
         return outbuf.str();
-        }
     }
+        }
 
   /// Set a named property with a variant value (let the caller handle the type)
   void set_property(std::string const& name, PropertyValueT const& value)
