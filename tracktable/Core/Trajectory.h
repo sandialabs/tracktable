@@ -190,11 +190,15 @@ public:
         }
     }
 
-  /** Return a unique ID for the trajectory.
+  /** Return a human-readable ID for the trajectory.
    *
-   * Return a unique ID for the trajectory incorporating its object
+   * Return a mostly-unique ID for the trajectory incorporating its object
    * ID, start time and end time.  If the trajectory is empty then we
-   * will return the string "(empty)".
+   * return the string "(empty)".  
+   *
+   * Note that if you have multiple trajectories with the same object ID,
+   * start time and end time, this identifier will not be unique.
+   * 
    */
   std::string trajectory_id() const
     {
