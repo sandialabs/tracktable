@@ -42,7 +42,7 @@ import os.path
 # Requirements: In order to use the trajectory builder, we need a source that gives 
 # us data points in time sequential order. As with before, we can use the Point Reader.
 
-inFile = open(os.path.join(data_directoyr(), 'SampleFlightsUS.csv'), 'r')
+inFile = open(os.path.join(data_directory(), 'SampleFlightsUS.csv'), 'r')
 reader = TrajectoryPointReader()
 reader.input = inFile
 reader.comment_character = '#'
