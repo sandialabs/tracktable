@@ -64,7 +64,7 @@ def main():
     point2 = terrestrial.TrajectoryPoint(50, 0)
     point1.timestamp = start_time
     point2.timestamp = end_time
-    error_count += test_speed_between(point1, point2, 5565.9745)
+    error_count += test_speed_between(point1, point2, 5559.7463)
 
     point1 = cartesian2d.TrajectoryPoint(0, 0)
     point2 = cartesian2d.TrajectoryPoint(50, 0)
