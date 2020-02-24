@@ -36,6 +36,7 @@
 #include <tracktable/Core/TracktableCoreWindowsHeader.h>
 
 #include <tracktable/Core/PointBase.h>
+#include <tracktable/Core/PointCartesian.h>
 
 #include <tracktable/Core/detail/algorithm_signatures/Distance.h>
 #include <tracktable/Core/detail/algorithm_signatures/Interpolate.h>

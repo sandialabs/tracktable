@@ -29,14 +29,14 @@
 
 from __future__ import print_function, division, absolute_import
 
+import logging
 import os.path
 import pytz
+import shapefile
 
 from shapely.geometry.polygon import Polygon
 from shapely.geometry import Point, MultiPolygon
 from six.moves import range
-
-from tracktable.core import logging
 
 
 TIMEZONE_BOUNDARIES = None
@@ -47,7 +47,7 @@ def load_timezone_shapefile():
     global TIMEZONE_BOUNDARIES
     logger = logging.getLogger(__name__)
     full_path = os.path.join(os.path.dirname(__file__), 'data', 'tz_world')
-    logging.trace(logger, "Loading timezone shapefile")
+    logger.debug('Loading timezone shapefile from {}'.format(full_path))
     reader = shapefile.Reader(full_path)
     timezone_names = [ record[0] for record in reader.records() ]
     shapes = reader.shapes()
@@ -55,15 +55,15 @@ def load_timezone_shapefile():
     split_names = [ tz.split('/') for tz in timezone_names ]
     names_and_zones = zip(shapes, split_names)
 
-    america_timezones = [ thing for thing in names_and_zones if thing[1][0] == 'America' ]
+    america_timezones = [thing for thing in names_and_zones if thing[1][0] == 'America']
     canada_timezones = [ thing for thing in names_and_zones if thing[1][0] == 'Canada' ]
     all_other_timezones = [ thing for thing in names_and_zones if (thing[1][0] != 'Canada' and thing[1][0] != 'America') ]
 
     sorted_timezones = america_timezones + canada_timezones + all_other_timezones
 
     boundaries = []
-    logging.trace(logger, "Converting shapefile to polygons")
-    
+    logger.debug("Converting shapefile to polygons")
+
     TIMEZONE_BOUNDARIES = []
     for named_shape in sorted_timezones:
         shape = named_shape[0]

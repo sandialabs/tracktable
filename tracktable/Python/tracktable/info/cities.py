@@ -145,11 +145,11 @@ def cities_in_bbox(bbox_min=(-180, -90),
     result = []
 
     logger = logging.getLogger(__name__)
-    logging.trace(logger, ("cities_in_bbox: bbox_min is {}, "
+    logging.debug(logger, ("cities_in_bbox: bbox_min is {}, "
                            "bbox_max is {}".format(bbox_min, bbox_max)))
-  
-    logging.trace(
-      logger, 
+
+    logging.debug(
+      logger,
       ("DEBUG: min_longitude is {}, min_latitude is {}, "
        "max_longitude is {}, max_latitude is {}").format(
             longitude(bbox_min),
@@ -161,7 +161,7 @@ def cities_in_bbox(bbox_min=(-180, -90),
     max_longitude = longitude(bbox_max)
     min_latitude = latitude(bbox_min)
     max_latitude = latitude(bbox_max)
-    
+
     for row in CITY_TABLE:
         lat = row[3]
         lon = row[4]
@@ -203,8 +203,8 @@ def largest_cities_in_bbox(bbox_min=(-180, -90),
     """
 
     all_cities = cities_in_bbox(bbox_min, bbox_max)
-    sorted_cities = sorted(all_cities, 
-                           key=lambda city: city.population, 
+    sorted_cities = sorted(all_cities,
+                           key=lambda city: city.population,
                            reverse=True)
     return sorted_cities[0:count]
 

@@ -34,7 +34,7 @@ from __future__ import print_function
 
 from matplotlib import pyplot
 
-from tracktable.core import logging
+import logging
 from tracktable.render import maps
 from tracktable.render.projection import make_projection_cartesian2d
 from tracktable.render import geographic_decoration as decoration
@@ -70,7 +70,7 @@ def cartesian_map(map_bbox=None,
     if axes is None:
         axes = pyplot.gca()
 
-    logging.getLogger(__path__).trace(
+    logging.getLogger(__name__).debug(
         "cartesian_map: map_bbox is {}".format(map_bbox))
 
     (proj, artists) = make_projection_cartesian2d()
