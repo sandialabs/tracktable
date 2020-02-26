@@ -55,6 +55,7 @@ set( Core_SRCS
   PropertyValue.cpp
   Timestamp.cpp
   TimestampConverter.cpp
+  UUID.cpp
   )
 
 set( Core_HEADERS
@@ -82,6 +83,7 @@ set( Core_HEADERS
   Trajectory.h
   TrajectoryPoint.h
   UnfortunateWorkarounds.h
+  UUID.h
   )
 
 set( Core_Detail_Points_HEADERS
