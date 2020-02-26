@@ -44,6 +44,7 @@
 #ifndef __tracktable_algorithm_signatures_SimplifyLinestring_h
 #define __tracktable_algorithm_signatures_SimplifyLinestring_h
 
+#include <set>
 #include <boost/geometry/algorithms/simplify.hpp>
 #include <tracktable/Core/detail/trait_signatures/HasProperties.h>
 #include <tracktable/Core/detail/algorithm_signatures/TransferProperties.h>
