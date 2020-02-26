@@ -114,7 +114,7 @@ string_type PropertyConverter::property_to_string(PropertyValueT const& prop)
 
 PropertyValueT PropertyConverter::property_from_string(
                string_type const& prop_value,
-							 PropertyUnderlyingType desired_type)
+               PropertyUnderlyingType desired_type)
   {
     // TRACKTABLE_LOG(debug) << "property_from_string: raw_value is '" << prop_value << "', type is " << desired_type << "\n";
     PropertyValueT result;
