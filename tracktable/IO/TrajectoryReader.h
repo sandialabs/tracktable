@@ -347,9 +347,10 @@ private:
         trajectory_shared_ptr_type trajectory(new trajectory_type);
 
 //        io::detail::TrajectoryHeader header(this->PropertyReadWrite);
-//	this->ParseTrajectoryHeader.set_timestamp_input_format(this->TimestampFormat);
+        this->ParseTrajectoryHeader.set_timestamp_input_format(this->TimestampFormat);
 
-        this->ParseTrajectoryHeader.read_from_tokens(tokens.begin(), tokens.end());
+        std::size_t tokens_consumed_by_header = this->ParseTrajectoryHeader.read_from_tokens(tokens.begin(), tokens.end());
+        trajectory->set_uuid(this->ParseTrajectoryHeader.UUID);
         trajectory->__set_properties(this->ParseTrajectoryHeader.Properties);
 #if 0
         TRACKTABLE_LOG(debug) 
@@ -363,8 +364,7 @@ private:
         string_vector_type::const_iterator points_end = tokens.end();
 
         // Advance past all the things in the header
-        std::advance(points_begin,
-                     4 + 3 * this->ParseTrajectoryHeader.Properties.size());
+        std::advance(points_begin, tokens_consumed_by_header+1);
 
         this->populate_trajectory_points(points_begin, points_end,
                                          this->ParseTrajectoryHeader.NumPoints,
