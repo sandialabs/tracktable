@@ -152,33 +152,35 @@ struct dispatch_extrapolate
 
 // ----------------------------------------------------------------------
 
-class RetrieveUnderlyingType : public boost::static_visitor<>
+class RetrieveUnderlyingType : public boost::static_visitor<tracktable::PropertyUnderlyingType>
 {
 public:
-  tracktable::PropertyUnderlyingType value;
-
-  RetrieveUnderlyingType()
-    { this->value = tracktable::TYPE_UNKNOWN; }
-
-  void operator()(double /*value*/)
+  tracktable::PropertyUnderlyingType operator()(double /*value*/) const
     {
-      this->value = tracktable::TYPE_REAL;
+      return tracktable::TYPE_REAL;
     }
 
-  void operator()(tracktable::string_type const& /*value*/)
+  tracktable::PropertyUnderlyingType operator()(tracktable::string_type const& /*value*/) const
     {
-      this->value = tracktable::TYPE_STRING;
+      return tracktable::TYPE_STRING;
     }
 
-  void operator()(tracktable::Timestamp const& /*ts*/)
+  tracktable::PropertyUnderlyingType operator()(tracktable::Timestamp const& /*ts*/) const
     {
-      this->value = tracktable::TYPE_TIMESTAMP;
+      return tracktable::TYPE_TIMESTAMP;
     }
 
-  void operator()(tracktable::NullValue const& /*value*/)
+  tracktable::PropertyUnderlyingType operator()(const tracktable::NullValue& /*value*/) const
     {
-      this->value = tracktable::TYPE_NULL;
+      return tracktable::TYPE_NULL;
     }
+
+  template<typename T>
+  tracktable::PropertyUnderlyingType operator()(const T& /*value*/) const
+    {
+      return tracktable::TYPE_UNKNOWN;
+    }
+
 };
 
 
@@ -226,12 +228,8 @@ bool is_property_null(PropertyValueT const& value)
 
 PropertyUnderlyingType property_underlying_type(PropertyValueT const& pv)
 {
-  ::RetrieveUnderlyingType visitor;
-  boost::apply_visitor(visitor, pv);
-
-  return visitor.value;
+  return boost::apply_visitor(::RetrieveUnderlyingType(), pv);
 }
-
 
 std::ostream& operator<<(std::ostream& out, NullValue const& value)
 {
@@ -257,6 +255,77 @@ std::ostream& operator<<(std::ostream& out, NullValue const& value)
   outbuf << ")";
   out << outbuf.str();
   return out;
+}
+
+/** Implements a static binary visitor for comparing two property values
+ *
+ * This class imposes a total ordering on all property comparisons.
+ *
+ * Logical comparisons are only performed between variants of the same type, although
+ * it would be possible to extend this class with comparisons between Timestamps and
+ * strings by supplying the appropriate overloaded operator().
+ *
+ * For each of the logical comparisons an overload of the binary operator() is
+ * supplied. For all other forms without a specific overload the template
+ * form will be selected that will use enums of the underlying types.
+ *
+ * Some local storage is necessary to allow for customization of the
+ * epsilon closeness or actual distance between two doubles.
+ */
+class PropertyComparator : public boost::static_visitor<int>
+{
+public:
+    double difference;
+    bool is_epsilon_difference;
+
+    PropertyComparator(double difference=1.0, bool is_epsilon_difference=true) {
+        this->difference = difference;
+        this->is_epsilon_difference = is_epsilon_difference;
+    }
+
+    // Compares two doubles using either epsilon or actual differences
+    int operator()(double v1, double v2) const {
+      if (this->is_epsilon_difference && boost::math::epsilon_difference(v1, v2) <= this->difference)
+        return 0;
+      if (!this->is_epsilon_difference && boost::math::relative_difference(v1, v2) <= this->difference)
+        return 0;
+      if (v1 < v2) return -1;
+      return 1;
+    }
+
+    // Compares two timestamps using the gt and lt operators
+    int operator()(const Timestamp& v1, const Timestamp& v2) const {
+        if (v1 < v2) return -1;
+        if (v1 > v2) return 1;
+        return 0;
+    }
+
+    // Compares two strings using lexicographical comparison
+    int operator()(const std::string& v1, const std::string& v2) const {
+        return v1.compare(v2);
+    }
+
+    // All null values are equal
+    int operator()(const NullValue& v1, const NullValue& v2) const {
+        return 0;
+    }
+
+    // ^^^^^^^ WHEN EXTENDING PropertyValueT WITH NEW TYPES ADD SPECIFIC FORMS ABOVE HERE
+
+    // This template will catch all other forms that do not have explicit forms above.
+    // This also means the template will return 1 if new types are added to PropertyValueT and
+    // a specific form of operator() is not supplied above.
+    template<typename T1, typename T2>
+    int operator()(const T1& v1, const T2& v2) const {
+      return (property_underlying_type(v1) < property_underlying_type(v2)) ? -1 : 1;
+    }
+
+};
+
+TRACKTABLE_CORE_EXPORT int compare(const PropertyValueT& value1, const PropertyValueT& value2, double difference, bool is_epsilon_difference) {
+  // To access the underlying values an instance of a static visitor is used
+  int result = boost::apply_visitor(PropertyComparator(difference, is_epsilon_difference), value1, value2);
+  return result;
 }
 
 
