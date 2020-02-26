@@ -99,12 +99,14 @@ the reference documentation.  We use the following ones most frequently.
 
 .. _userguide-python-base-point:
 
-
 -----------
 Base Points
 -----------
 
-Within a domain, Tracktable uses the ``BasePoint`` class to store a bare set of coordinates.  These behave like vectors or sequences in that we use square brackets to set and get coordinates::
+Within a domain, Tracktable uses the ``BasePoint`` class to store a bare set of coordinates.  
+These behave like vectors or sequences in that we use square brackets to set and get coordinates. 
+Access a point's coordinates as if the point were an array using 
+``[]``.  In Python::
 
     from tracktable.domain.terrestrial import BasePoint
 
@@ -120,48 +122,41 @@ We choose this ordering for consistency with the 2D Cartesian domain
 where the X coordinate is always at position 0 and the Y coordinate is
 at position 1.
 
-Access a point's coordinates as if the point were an array using
-``[]``.  In Python::
-
-   from tracktable.domain.terrestrial import TrajectoryPoint
-   from tracktable.core import Timestamp
-   my_point = TrajectoryPoint()
-   longitude = 50
-   latitude = 40
-   my_point[0] = longitude
-   my_point[1] = latitude
-   my_point.object_id = 'FlightId'
-   my_point.timestamp = Timestamp.from_any('2014-04-05 13:25:00')
-
-In C++::
-
-   my_point = tracktable::domain::terrestrial::trajectory_point
-   float longitude = 50, latitude = 40;
-   my_point[0] = longitude;
-   my_point[1] = latitude;
-   my_point.set_object_id("FlightId");
-   my_point.set_timestamp(tracktable::time_from_string("2014-04-05 13:25:00");
-
 .. _userguide-python-trajectory-point:
 
 -----------------
 Trajectory Points
 -----------------
 
-The things that make a point part of a trajectory are (1) its
+The things that make a point part of a trajectory are: (1) its
 coordinates, already covered by BasePoint; (2) an identifier for the
-moving object, and (3) a timestamp recording when the object was
-observed.  These are the main differences between BasePoint and TrajectoryPoint. ::
+moving object; (3) a timestamp recording when the object was
+observed. These are the main differences between BasePoint and TrajectoryPoint.
 
-    from tracktable.domain.terrestrial import TrajectoryPoint
-    from tracktable.core import Timestamp
+In Python::
 
-    my_point = TrajectoryPoint()
-    my_point.coordinates[0] = my_longitude
-    my_point.coordinates[1] = my_latitude
+   from tracktable.domain.terrestrial import TrajectoryPoint
+   from tracktable.core import Timestamp
 
-    my_point.object_id = 'FlyingThing01'
-    my_point.timestamp = Timestamp.from_any('2015-02-01 12:23:56')
+   my_point = TrajectoryPoint()
+   longitude = 50
+   latitude = 40
+   my_point[0] = longitude
+   my_point[1] = latitude
+
+   my_point.object_id = 'FlightId'
+   my_point.timestamp = Timestamp.from_any('2014-04-05 13:25:00')
+
+In C++::
+
+   my_point = tracktable::domain::terrestrial::trajectory_point
+
+   float longitude = 50, latitude = 40;
+   my_point[0] = longitude;
+   my_point[1] = latitude;
+
+   my_point.set_object_id("FlightId");
+   my_point.set_timestamp(tracktable::time_from_string("2014-04-05 13:25:00");
 
 You may want to associate other data with a point as well.  For example::
 
@@ -306,7 +301,6 @@ Python Example
 ::
 
    from tracktable.domain.terrestrial import TrajectoryPointReader
-
 
         with open('point_data.csv', 'rb') as infile:
             reader = TrajectoryPointReader()

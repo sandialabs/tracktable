@@ -40,18 +40,28 @@ Module contents
    (depending on your data source) and heading will usually be in
    degrees clockwise from due north.
 
+   The (longitude, latitude) coordinates of a TrajectoryPoint
+   object are accessed as if the object were a Python array,
+   using the ``[]`` operator::
+
+     from tracktable.domain.terrestrial import TrajectoryPoint
+
+     my_point = TrajectoryPoint()
+     longitude = 30
+     latitude = 40
+     my_point[0] = longitude
+     my_point[1] = latitude
+
+   Longitude is always coordinate 0 and latitude is always coordinate 1.
+   We choose this ordering for consistency with the 2D Cartesian domain
+   where the X coordinate is always at position 0 and the Y coordinate is
+   at position 1. Longitude is between -180 and 180 and 
+   latitude is between -90 and 90. 
+
    .. note:: TrajectoryPoint is implemented in C++ and exposed to
              Python via the Boost.Python module.  I will include a
              link to the C++ class definition as soon as I figure out
              how to do so within Sphinx, Breathe and Napoleon.
-
-   .. attribute:: coordinates
-
-		  *array of floats*
-
-                  (longitude, latitude), where longitude is
-                  between -180 and 180 and latitude is between -90 and
-                  90
 
    .. attribute:: object_id
 
