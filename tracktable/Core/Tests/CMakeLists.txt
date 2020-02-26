@@ -139,6 +139,11 @@ add_executable(test_trajectory_subset
 )
 set_property(TARGET test_trajectory_subset              PROPERTY FOLDER "Tests")
 
+add_executable(test_trajectory_uuid
+ test_trajectory_uuid.cpp
+)
+set_property(TARGET test_trajectory_uuid        PROPERTY FOLDER "Tests")
+
 add_executable(test_timestamp_format
   test_timestamp_format.cpp
 )
@@ -262,6 +267,11 @@ target_link_libraries(test_trajectory_serialization
   )
 
 target_link_libraries(test_trajectory_subset
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
+target_link_libraries(test_trajectory_uuid
   TracktableCore
   ${Boost_LIBRARIES}
 )
