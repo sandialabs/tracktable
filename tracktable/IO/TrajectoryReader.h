@@ -342,6 +342,8 @@ private:
   trajectory_shared_ptr_type
   parse_trajectory(string_vector_type const& tokens)
     {
+      bool auto_uuid_generation_state = ::tracktable::is_automatic_uuid_generation_enabled();
+      ::tracktable::enable_automatic_uuid_generation(false);
       try
         {
         trajectory_shared_ptr_type trajectory(new trajectory_type);
@@ -374,13 +376,15 @@ private:
           {
           return trajectory_shared_ptr_type();
           }
+        ::tracktable::enable_automatic_uuid_generation(auto_uuid_generation_state);
         return trajectory;
         }
       catch (std::exception& e)
         {
-        TRACKTABLE_LOG(warning)
+          TRACKTABLE_LOG(warning)
            << "Error parsing trajectory: " << e.what();
-        return trajectory_shared_ptr_type();
+           ::tracktable::enable_automatic_uuid_generation(auto_uuid_generation_state);
+           return trajectory_shared_ptr_type();
         }
     }
 
