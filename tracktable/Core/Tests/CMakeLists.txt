@@ -114,6 +114,11 @@ add_executable(test_trajectory_lonlat
 )
 set_property(TARGET test_trajectory_lonlat              PROPERTY FOLDER "Tests")
 
+add_executable(test_trajectory_id
+  test_trajectory_id.cpp
+)
+set_property(TARGET test_trajectory_id PROPERTY FOLDER "Tests")
+
 add_executable(test_trajectory_point_serialization
   test_trajectory_point_serialization.cpp
   )
@@ -237,6 +242,11 @@ target_link_libraries(test_serialize_variant
   )
 
 target_link_libraries(test_simplify_linestring
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
+target_link_libraries(test_trajectory_id
   TracktableCore
   ${Boost_LIBRARIES}
 )
@@ -366,6 +376,11 @@ add_test(
 add_test(
   NAME C_SimplifyLinestring
   COMMAND test_simplify_linestring
+)
+
+add_test(
+  NAME C_TrajectoryId
+  COMMAND test_trajectory_id
 )
 
 add_test(
