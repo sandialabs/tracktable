@@ -35,6 +35,7 @@
 #include <tracktable/Core/TracktableCommon.h>
 #include <tracktable/Core/PropertyMap.h>
 #include <tracktable/Core/Timestamp.h>
+#include <tracktable/Core/UUID.h>
 
 #include <tracktable/Core/detail/algorithm_signatures/EndToEndDistance.h>
 #include <tracktable/Core/detail/algorithm_signatures/Length.h>
@@ -99,19 +100,62 @@ public:
   typedef typename point_vector_type::reference reference;
   typedef typename point_vector_type::const_reference const_reference;
 
-  /// Instantiate an empty trajectory
-  Trajectory() { }
+  /** Instantiate an empty trajectory
+   */
+
+  Trajectory(bool generate_uuid=true): UUID() {
+    if (generate_uuid)
+      this->set_uuid();
+  }
+
   ~Trajectory() { }
 
   /// Create a trajectory a copy of another
   Trajectory(const Trajectory& other) :
+    UUID(other.UUID),
     Points(other.Points),
     Properties(other.Properties)
-      { }
+    {
+    }
+
+  /** Create a new trajectory with pre-specified length
+   *
+   * Create a new trajectory with n elements.  You may also supply a
+   * point that will be copied into each element.
+   *
+   * @param[in] n             Length of the trajectory
+   * @param[in] initial_value Point to be used to fill the new vector
+   */
+
+  Trajectory(size_type n, point_type initial_value=point_type(), bool generate_uuid=true)
+    : Points(n, initial_value),
+      UUID()
+    {
+      if (generate_uuid)
+        this->set_uuid();
+    }
+
+  /** Create a new trajectory from a range of points
+   *
+   * Create a new trajectory by copying points from [first, last).
+   *
+   * @param[in] first   Iterator pointing to the first point for the new trajectory
+   * @param[in] last    Iterator pointing past the last point for the new trajectory
+   */
+  template<class InputIterator>
+  Trajectory(InputIterator first, InputIterator last, bool generate_uuid=true)
+    : Points(first, last),
+      UUID()
+    {
+      if (generate_uuid)
+        this->set_uuid();
+      this->compute_current_length(0);
+    }
 
   /// Make this trajectory a copy of another
   Trajectory& operator=(const Trajectory& other)
     {
+      this->UUID = other.UUID;
       this->Points = other.Points;
       this->Properties = other.Properties;
       return *this;
@@ -173,6 +217,26 @@ public:
 	  }
   }
 
+  /** Return the UUID (RFC 4122 or variant) of the trajectory.
+   */
+  const uuid_type& uuid() const {
+    return this->UUID;
+  }
+
+  /** Set the UUID of the trajectory.
+   */
+  void set_uuid(const uuid_type& new_uuid) {
+    this->UUID = new_uuid;
+  }
+
+  /** Set the UUID of the trajectory to a random UUID using the systemwide generator
+   */
+  void set_uuid() {
+      if (automatic_uuid_generator()) {
+        this->UUID = automatic_uuid_generator()->generate_uuid();
+      }
+  }
+
   /** Return the ID of the moving object.
    *
    * If there are any points in the trajectory, return the object ID
@@ -216,6 +280,14 @@ public:
         return outbuf.str();
     }
         }
+
+  // ************************************************************
+  // *** BEGIN doxygen group for property related methods
+  // ************************************************************
+  /**
+   * @name Methods related to properties
+   */
+  //@{
 
   /// Set a named property with a variant value (let the caller handle the type)
   void set_property(std::string const& name, PropertyValueT const& value)
@@ -285,49 +357,38 @@ public:
       return ::tracktable::has_property(this->Properties, name);
     }
 
-  /// INTERNAL METHOD
-  //
-  // This method is for use by the Python wrappers that can provide
-  // their own access to the property map.
+  /** @internal
+   *
+   * This method is for use by the Python wrappers that can provide
+   * their own access to the property map.
+   */
   PropertyMap const& __properties() const { return this->Properties; }
   PropertyMap& __non_const_properties() { return this->Properties; }
 
-  /// INTERNAL METHOD
-  //
-  // This method is for use by the Python wrappers that can provide
-  // their own access to the property map.
+  /** @internal
+   *
+   * This method is for use by the Python wrappers that can provide
+   * their own access to the property map.
+   */
   void __set_properties(PropertyMap const& props) { this->Properties = props; }
 
-  // Below here are all the methods that make this container usable
-  // just like a std::vector.  There's no magic here -- all we do is
-  // forward to the Points vector.
+  //@}
+  // ************************************************************
+  // *** END doxygen group for property related methods
+  // ************************************************************
 
-  /** Create a new trajectory with pre-specified length
+
+  // ************************************************************
+  // *** BEGIN doxygen group for std::vector related methods
+  // ************************************************************
+  /**
+   * @name Methods that allow a Trajectory to be used like std::vector
    *
-   * Create a new trajectory with n elements.  You may also supply a
-   * point that will be copied into each element.
-   *
-   * @param[in] n             Length of the trajectory
-   * @param[in] initial_value Point to be used to fill the new vector
+   * Here are all the methods that make this container usable
+   * just like a std::vector.  There's no magic here -- all we do is
+   * forward to the Points vector.
    */
-
-  Trajectory(size_type n, point_type initial_value=point_type())
-    : Points(n, initial_value)
-    { }
-
-  /** Create a new trajectory from a range of points
-   *
-   * Create a new trajectory by copying points from [first, last).
-   *
-   * @param[in] first   Iterator pointing to the first point for the new trajectory
-   * @param[in] last    Iterator pointing past the last point for the new trajectory
-   */
-  template<class InputIterator>
-  Trajectory(InputIterator first, InputIterator last)
-    : Points(first, last)
-    {
-      this->compute_current_length(0);
-    }
+  //@{
 
   /** Return the length of the trajectory in points.
    */
@@ -391,6 +452,9 @@ public:
   /** Check whether one trajectory is equal to another by comparing all the points.
    *
    * Two trajectories are equal if all of their points are equal.
+   *
+   * This method does not check whether the UUID's of the trajectories are equal.
+   * It only checks the points of the trajectories.
    *
    * \param other Trajectory for comparison
    */
@@ -676,10 +740,20 @@ public:
         }
     }
 
+  //@}
+  // ************************************************************
+  // *** END doxygen group for std::vector related methods
+  // ************************************************************
+
 protected:
+  /// Internal storage for the trajectory UUID
+  uuid_type UUID;
+
   /// Internal storage for the points in the trajectory
   point_vector_type Points;
+
   PropertyMap Properties;
+
 
 private:
   template<class Archive>
@@ -688,7 +762,7 @@ private:
     ar & BOOST_SERIALIZATION_NVP(Points);
     ar & BOOST_SERIALIZATION_NVP(Properties);
   }
-  
+
 public:
 
   /** Return an iterator pointing to the beginning of the trajectory
