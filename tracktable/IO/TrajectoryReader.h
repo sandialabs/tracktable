@@ -342,11 +342,10 @@ private:
   trajectory_shared_ptr_type
   parse_trajectory(string_vector_type const& tokens)
     {
-      bool auto_uuid_generation_state = ::tracktable::is_automatic_uuid_generation_enabled();
-      ::tracktable::enable_automatic_uuid_generation(false);
       try
         {
-        trajectory_shared_ptr_type trajectory(new trajectory_type);
+        // Create a new trajectory object, but we won't spend time generating a uuid
+        trajectory_shared_ptr_type trajectory(new trajectory_type(false));
 
 //        io::detail::TrajectoryHeader header(this->PropertyReadWrite);
         this->ParseTrajectoryHeader.set_timestamp_input_format(this->TimestampFormat);
@@ -376,14 +375,12 @@ private:
           {
           return trajectory_shared_ptr_type();
           }
-        ::tracktable::enable_automatic_uuid_generation(auto_uuid_generation_state);
         return trajectory;
         }
       catch (std::exception& e)
         {
           TRACKTABLE_LOG(warning)
            << "Error parsing trajectory: " << e.what();
-           ::tracktable::enable_automatic_uuid_generation(auto_uuid_generation_state);
            return trajectory_shared_ptr_type();
         }
     }
