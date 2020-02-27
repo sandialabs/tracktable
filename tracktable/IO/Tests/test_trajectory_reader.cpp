@@ -173,6 +173,8 @@ void test_trajectory_reader()
   std::cout << "Trajectory has "
             << my_trajectory.__properties().size() << " properties set\n";
 
+  std::cout << "Trajectory has " << my_trajectory.size() << " points" << std::endl;
+
   tracktable::ostringstream_type outbuf;
   tracktable::TrajectoryWriter writer(outbuf);
   writer.write(my_trajectory);
@@ -184,6 +186,16 @@ void test_trajectory_reader()
   tracktable::istringstream_type inbuf(outbuf.str());
   tracktable::TrajectoryReader<trajectory_type> reader(inbuf);
   trajectory_vector_type restored_trajectories(reader.begin(), reader.end());
+
+  bool equality = (my_trajectory == restored_trajectories[0]);
+  std::cout << "Trajectories equal = " << equality << std::endl;
+
+  writer.write(restored_trajectories[0]);
+
+  std::cout << "Restored and original trajectory writer output:\n";
+  std::cout << outbuf.str();
+  std::cout << "(end)\n";
+
 }
 
 int

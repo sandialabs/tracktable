@@ -55,6 +55,7 @@
 
 #include <boost/variant.hpp>
 #include <boost/serialization/variant.hpp>
+#include <boost/math/special_functions/relative_difference.hpp>
 
 namespace tracktable {
 
@@ -144,6 +145,32 @@ inline PropertyValueT make_null(PropertyUnderlyingType null_type)
   return PropertyValueT(my_value);
 }
 
+/** Provides a total order comparison of all PropertyValueT instances allowing for floating point epsilon differences
+ * @param value1 The first property value instance to compare
+ * @param value2 The second property value instance to compare
+ * @param difference The allowed difference between doubles to still maintain equality. The meaning of this parameter is controlled by is_epsilon_difference
+ * @param is_epsilon_difference If true, difference will be treated as the machine specific epsilon difference and if false as a relative difference
+ * @return -1 if value1 < value2, 0 if value1 == value2, 1 if value1 > value2
+ *
+ * Compares two property values to provide a total ordering.
+ *
+ * When the property values are of different types the relationship between their
+ * underlying value types will be returned based on the ordering of the parameters.
+ *
+ * When the property values are of the same type a logical comparison of the values is performed.
+ *
+ * When the parameters contain double values the parameters difference and is_epsilon_difference
+ * will control tests of equality. Machine epsilon is an upper bound on the rounding error that
+ * can occur in floating point arithmetic for a specific type.
+ *
+ * Also see:
+ *
+ * https://en.wikipedia.org/wiki/Floating-point_arithmetic#Accuracy_problems
+ * https://en.wikipedia.org/wiki/Machine_epsilon
+ * https://www.boost.org/doc/libs/1_72_0/libs/math/doc/html/math_toolkit/float_comparison.html
+ * Knuth D.E. The art of computer programming, vol II, section 4.2, Floating-Point Comparison 4.2.2, pages 198-220
+ */
+TRACKTABLE_CORE_EXPORT int compare(const PropertyValueT& value1, const PropertyValueT& value2, double difference=1.0, bool is_epsilon_difference=true);
 
 /*! \brief Check to see whether a property value is null.
  *
