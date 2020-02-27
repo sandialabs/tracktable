@@ -34,6 +34,8 @@
 
 #include <memory>
 
+#include <tracktable/Core/TracktableCoreWindowsHeader.h>
+
 #define BOOST_ALLOW_DEPRECATED_HEADERS
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/uuid/uuid.hpp>
@@ -59,7 +61,7 @@ typedef boost::uuids::uuid uuid_type;
  * have any common hierarchy. This class provides a common hierarchy around
  * the generate() method.
  */
-class UUIDGenerator
+class TRACKTABLE_CORE_EXPORT UUIDGenerator
 {
 public:
 
@@ -87,7 +89,7 @@ public:
  * This class supplies threadsafe uuid generation.
  */
 template <typename UniformRandomNumberGenerator=boost::random::mt19937>
-class BoostRandomUUIDGenerator : public UUIDGenerator
+class TRACKTABLE_CORE_EXPORT BoostRandomUUIDGenerator : public UUIDGenerator
 {
 public:
 
