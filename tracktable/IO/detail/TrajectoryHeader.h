@@ -177,13 +177,8 @@ public:
           current_token++;
           consumed++;
       } catch(boost::bad_lexical_cast &) {
-          // If automatic uuid generation is enabled set the token, otherwise set a null UUID
-          if (is_automatic_uuid_generation_enabled()) {
-              this->UUID = ::tracktable::automatic_uuid_generator()->generate_uuid();
-          }
-          else {
-              this->UUID = uuid_type();
-          }
+          // If this is an older file without UUIDs, let's generate a new one moving forward
+          this->UUID = ::tracktable::automatic_uuid_generator()->generate_uuid();
       }
       ++stage;
       this->Domain      = (*current_token++);
