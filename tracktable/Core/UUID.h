@@ -128,7 +128,7 @@ private:
  * This could be used to generate uuids using the same mechanisms as the current
  * global generator.
  */
-UUIDGenerator::pointer automatic_uuid_generator();
+TRACKTABLE_CORE_EXPORT UUIDGenerator::pointer automatic_uuid_generator();
 
 /** Set the global automatic uuid generator
  *
@@ -141,7 +141,7 @@ UUIDGenerator::pointer automatic_uuid_generator();
  * The BoostRandomUUIDGenerator template can be used to quickly create
  * generators employing other random number generation approaches.
  */
-void set_automatic_uuid_generator ( UUIDGenerator::pointer new_random_generator );
+TRACKTABLE_CORE_EXPORT void set_automatic_uuid_generator ( UUIDGenerator::pointer new_random_generator );
 
 } // namespace tracktable
 
