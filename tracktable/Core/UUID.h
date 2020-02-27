@@ -35,6 +35,7 @@
 #include <memory>
 
 #include <tracktable/Core/TracktableCoreWindowsHeader.h>
+#include <tracktable/Core/PlatformDetect.h>
 
 #define BOOST_ALLOW_DEPRECATED_HEADERS
 #include <boost/enable_shared_from_this.hpp>
@@ -42,7 +43,13 @@
 #include <boost/uuid/uuid_io.hpp>
 #include <boost/uuid/random_generator.hpp>
 #include <boost/random/mersenne_twister.hpp>
-#include <boost/thread.hpp>
+
+#ifdef TT_WINDOWS
+  #include <boost/thread.hpp>
+#else
+  #include <pthread.h>
+#endif
+
 #undef BOOST_ALLOW_DEPRECATED_HEADERS
 
 namespace tracktable
@@ -92,9 +99,13 @@ template <typename UniformRandomNumberGenerator=boost::random::mt19937>
 class TRACKTABLE_CORE_EXPORT BoostRandomUUIDGenerator : public UUIDGenerator
 {
 public:
-
     BoostRandomUUIDGenerator() : generator()
     {
+      #ifndef TT_WINDOWS
+      this->mutex_initialized = false;
+      if (pthread_mutex_init(&(this->mutex), NULL) == 0)
+        this->mutex_initialized = true;
+      #endif
     }
 
     explicit BoostRandomUUIDGenerator ( UniformRandomNumberGenerator& gen ) : generator ( gen )
@@ -109,15 +120,35 @@ public:
 
     uuid_type generate_uuid()
     {
-        mutex.lock();
-        uuid_type new_uuid = generator();
-        mutex.unlock();
+      #ifdef TT_WINDOWS
+        this->mutex.lock();
+      #else
+        if (this->mutex_initialized)
+          pthread_mutex_lock(&(this->mutex));
+      #endif
+
+      uuid_type new_uuid = generator();
+
+      #ifdef TT_WINDOWS
+        this->mutex.unlock();
+      #else
+        if (this->mutex_initialized)
+          pthread_mutex_unlock(&(this->mutex));
+      #endif
+
         return new_uuid;
     }
 
 private:
     boost::uuids::basic_random_generator<UniformRandomNumberGenerator> generator;
-    boost::mutex mutex;
+
+    #ifdef TT_WINDOWS
+      boost::mutex mutex;
+    #else
+      pthread_mutex_t mutex;
+      bool mutex_initialized;
+    #endif
+
 };
 
 /** Get the current global automatic uuid generator.
