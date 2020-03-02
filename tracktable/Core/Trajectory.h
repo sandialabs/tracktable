@@ -144,8 +144,8 @@ public:
    */
   template<class InputIterator>
   Trajectory(InputIterator first, InputIterator last, bool generate_uuid=true)
-    : Points(first, last),
-      UUID()
+    : UUID(),
+      Points(first, last)
     {
       if (generate_uuid)
         this->set_uuid();
