@@ -41,7 +41,6 @@ typedef Trajectory<TrajectoryPointLonLat> TrajectoryLonLat;
 
 int test_trajectory_uuid()
 {
-  typedef tracktable::TrajectoryPointLonLat point_type;
   typedef tracktable::TrajectoryLonLat trajectory_type;
   int error_count = 0;
 
