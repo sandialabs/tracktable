@@ -118,6 +118,7 @@ public:
 
     virtual ~BoostRandomUUIDGenerator() { }
 
+    inline
     uuid_type generate_uuid()
     {
       #ifdef TT_WINDOWS
@@ -143,7 +144,7 @@ private:
     boost::uuids::basic_random_generator<UniformRandomNumberGenerator> generator;
 
     #ifdef TT_WINDOWS
-      boost::mutex mutex;
+    TRACKTABLE_CORE_EXPORT boost::mutex mutex;
     #else
       pthread_mutex_t mutex;
       bool mutex_initialized;
