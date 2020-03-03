@@ -99,56 +99,79 @@ template <typename UniformRandomNumberGenerator=boost::random::mt19937>
 class TRACKTABLE_CORE_EXPORT BoostRandomUUIDGenerator : public UUIDGenerator
 {
 public:
-    BoostRandomUUIDGenerator() : generator()
-    {
-      #ifndef TT_WINDOWS
-      this->mutex_initialized = false;
-      if (pthread_mutex_init(&(this->mutex), NULL) == 0)
-        this->mutex_initialized = true;
-      #endif
-    }
+  BoostRandomUUIDGenerator() :
+    generator()
+  {
+    // Call the inline private method to initialize the mutex
+    this->init_mutex();
+  }
 
-    explicit BoostRandomUUIDGenerator ( UniformRandomNumberGenerator& gen ) : generator ( gen )
-    {
-    }
+  explicit BoostRandomUUIDGenerator ( UniformRandomNumberGenerator& gen ) :
+    generator ( gen )
+  {
+    this->init_mutex();
+  }
 
-    explicit BoostRandomUUIDGenerator ( UniformRandomNumberGenerator* pGen ) : generator ( pGen )
-    {
-    }
+  explicit BoostRandomUUIDGenerator ( UniformRandomNumberGenerator* pGen ) :
+    generator ( pGen )
+  {
+    this->init_mutex();
+  }
 
-    virtual ~BoostRandomUUIDGenerator() { }
+  virtual ~BoostRandomUUIDGenerator() {
+    #ifdef TT_WINDOWS
+      delete this->mutex;
+    #endif // ifdef TT_WINDOWS
+  }
 
-    inline
-    uuid_type generate_uuid()
-    {
-      #ifdef TT_WINDOWS
-        this->mutex.lock();
-      #else
-        if (this->mutex_initialized)
-          pthread_mutex_lock(&(this->mutex));
-      #endif
+  inline
+  uuid_type generate_uuid()
+  {
+    #ifdef TT_WINDOWS
+      this->mutex->lock();
+    #else // not defined TT_WINDOWS
+      if (this->mutex_initialized)
+        pthread_mutex_lock(&(this->mutex));
+    #endif // ifdef TT_WINDOWS
 
-      uuid_type new_uuid = generator();
-
-      #ifdef TT_WINDOWS
-        this->mutex.unlock();
-      #else
-        if (this->mutex_initialized)
-          pthread_mutex_unlock(&(this->mutex));
-      #endif
-
-        return new_uuid;
-    }
-
-private:
-    boost::uuids::basic_random_generator<UniformRandomNumberGenerator> generator;
+    uuid_type new_uuid = generator();
 
     #ifdef TT_WINDOWS
-    boost::mutex mutex;
-    #else
-      pthread_mutex_t mutex;
-      bool mutex_initialized;
-    #endif
+      this->mutex->unlock();
+    #else // not defined TT_WINDOWS
+      if (this->mutex_initialized)
+        pthread_mutex_unlock(&(this->mutex));
+    #endif // ifdef TT_WINDOWS
+
+      return new_uuid;
+  }
+
+private:
+
+  /** Internal method to initialize the mutex
+   *
+   * Boost mutex is broken on MacOS boost < 1.71, so pthread mutexes are used directly.
+   */
+  inline
+  void init_mutex() {
+    #ifdef TT_WINDOWS
+    this->mutex = new boost::mutex();
+    #else // not defined TT_WINDOWS
+    this->mutex_initialized = false;
+    if (pthread_mutex_init(&(this->mutex), NULL) == 0)
+      this->mutex_initialized = true;
+    #endif // ifdef TT_WINDOWS
+  }
+
+  boost::uuids::basic_random_generator<UniformRandomNumberGenerator> generator;
+
+  /** Mutexes used to ensure generate_uuid() is threadsafe */
+  #ifdef TT_WINDOWS
+    boost::mutex* mutex;
+  #else // not defined TT_WINDOWS
+    pthread_mutex_t mutex;
+    bool mutex_initialized;
+  #endif // ifdef TT_WINDOWS
 
 };
 
