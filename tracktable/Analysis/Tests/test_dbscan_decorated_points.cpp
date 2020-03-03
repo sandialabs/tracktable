@@ -33,10 +33,10 @@
 #include <tracktable/Analysis/ComputeDBSCANClustering.h>
 #include <tracktable/Domain/FeatureVectors.h>
 
-
+#define BOOST_ALLOW_DEPRECATED_HEADERS
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
-
+#undef BOOST_ALLOW_DEPRECATED_HEADERS
 
 #ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES

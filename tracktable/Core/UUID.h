@@ -67,19 +67,62 @@ typedef boost::uuids::uuid uuid_type;
  * This class is necessary because the boost random uuid generators do not
  * have any common hierarchy. This class provides a common hierarchy around
  * the generate() method.
+ *
+ * This base class also provides a basic mutex to allow threadsafe generation.
  */
 class TRACKTABLE_CORE_EXPORT UUIDGenerator
 {
 public:
+  /** A convenience typedef for a smart pointer to a generator */
+  typedef boost::shared_ptr<UUIDGenerator> pointer;
 
-    virtual ~UUIDGenerator() { }
+  UUIDGenerator() {
+    #ifdef TT_WINDOWS
+      this->mutex = new boost::mutex();
+    #else // not defined TT_WINDOWS
+      this->mutex_initialized = false;
+      if (pthread_mutex_init(&(this->mutex), NULL) == 0)
+        this->mutex_initialized = true;
+    #endif // ifdef TT_WINDOWS
+  }
 
-    /** A convenience typedef for a smart pointer to a generator */
-    typedef boost::shared_ptr<UUIDGenerator> pointer;
+  virtual ~UUIDGenerator() {
+    #ifdef TT_WINDOWS
+      delete this->mutex;
+    #endif // ifdef TT_WINDOWS
+  }
 
-    /** This pure virtual method provides a common method for generating uuids */
-    virtual uuid_type generate_uuid() = 0;
+  /** This pure virtual method provides a common method for generating uuids */
+  virtual uuid_type generate_uuid() = 0;
 
+protected:
+
+  inline void lock_mutex() {
+    #ifdef TT_WINDOWS
+    this->mutex->lock();
+    #else // not defined TT_WINDOWS
+    if (this->mutex_initialized)
+      pthread_mutex_lock(&(this->mutex));
+    #endif // ifdef TT_WINDOWS
+  }
+
+  inline void unlock_mutex() {
+    #ifdef TT_WINDOWS
+    this->mutex->unlock();
+    #else // not defined TT_WINDOWS
+    if (this->mutex_initialized)
+      pthread_mutex_unlock(&(this->mutex));
+    #endif // ifdef TT_WINDOWS
+  }
+
+private:
+  /** Mutexes used to ensure generate_uuid() is threadsafe */
+  #ifdef TT_WINDOWS
+    boost::mutex* mutex;
+  #else // not defined TT_WINDOWS
+    pthread_mutex_t mutex;
+    bool mutex_initialized;
+  #endif // ifdef TT_WINDOWS
 };
 
 /** Wraps a boost uuid random generator to act as a RandomUUIDGenerator
@@ -91,63 +134,117 @@ public:
  * However, any random number generator suitable for the boost classes can
  * be used with this thin wrapper template.
  *
- * The constructors mimic the available boost random generator constructors.
- *
- * This class supplies threadsafe uuid generation.
+ * To create an instance of this class, use the various static create() methods
+ * that mimic the available boost random generator constructors.
  */
 template <typename UniformRandomNumberGenerator=boost::random::mt19937>
 class TRACKTABLE_CORE_EXPORT BoostRandomUUIDGenerator : public UUIDGenerator
 {
+private:
+  /** Use BoostRandomUUIDGenerator<URNG type>::create() */
+  BoostRandomUUIDGenerator()
+  {
+    this->_generator = new random_generator_type();
+  }
+
+  /** Use BoostRandomUUIDGenerator<URNG type>::create(URNG type &) */
+  BoostRandomUUIDGenerator ( UniformRandomNumberGenerator& gen )
+  {
+    this->_generator = new random_generator_type(gen);
+  }
+
+  /** Use BoostRandomUUIDGenerator<URNG type>::create(URNG type *) */
+  BoostRandomUUIDGenerator ( UniformRandomNumberGenerator* pGen )
+  {
+    this->_generator = new random_generator_type(pGen);
+  }
+
 public:
-    BoostRandomUUIDGenerator() : generator()
-    {
-      #ifndef TT_WINDOWS
-      this->mutex_initialized = false;
-      if (pthread_mutex_init(&(this->mutex), NULL) == 0)
-        this->mutex_initialized = true;
-      #endif
-    }
+  typedef boost::uuids::basic_random_generator<UniformRandomNumberGenerator> random_generator_type;
 
-    explicit BoostRandomUUIDGenerator ( UniformRandomNumberGenerator& gen ) : generator ( gen )
-    {
-    }
+  virtual ~BoostRandomUUIDGenerator() {
+    delete _generator;
+  }
 
-    explicit BoostRandomUUIDGenerator ( UniformRandomNumberGenerator* pGen ) : generator ( pGen )
-    {
-    }
+  /** Static method to create an instance using the default uniform random number generator type
+   *
+   * Example setting a new default uuid generator with mt19937:
+   * @code
+   * ::tracktable::set_automatic_uuid_generator(::tracktable::BoostRandomUUIDGenerator<boost::random::mt19937>::create());
+   * @endcode
+   *
+   */
+  static UUIDGenerator::pointer create() {
+    return UUIDGenerator::pointer(new BoostRandomUUIDGenerator());
+  }
 
-    virtual ~BoostRandomUUIDGenerator() { }
+  /** Static method to create an instance using a supplied uniform random number generator type */
+  static UUIDGenerator::pointer create( UniformRandomNumberGenerator& gen ) {
+    return UUIDGenerator::pointer(new BoostRandomUUIDGenerator(gen));
+  }
 
-    uuid_type generate_uuid()
-    {
-      #ifdef TT_WINDOWS
-        this->mutex.lock();
-      #else
-        if (this->mutex_initialized)
-          pthread_mutex_lock(&(this->mutex));
-      #endif
+  /** Static method to create an instance using a supplied uniform random number generator type */
+  static UUIDGenerator::pointer create( UniformRandomNumberGenerator* pGen ) {
+    return UUIDGenerator::pointer(new BoostRandomUUIDGenerator(pGen));
+  }
 
-      uuid_type new_uuid = generator();
-
-      #ifdef TT_WINDOWS
-        this->mutex.unlock();
-      #else
-        if (this->mutex_initialized)
-          pthread_mutex_unlock(&(this->mutex));
-      #endif
-
-        return new_uuid;
-    }
+  inline
+  uuid_type generate_uuid()
+  {
+    this->lock_mutex();
+    uuid_type new_uuid = this->_generator->operator()();
+    this->unlock_mutex();
+    return new_uuid;
+  }
 
 private:
-    boost::uuids::basic_random_generator<UniformRandomNumberGenerator> generator;
+  random_generator_type* _generator;
 
-    #ifdef TT_WINDOWS
-      boost::mutex mutex;
-    #else
-      pthread_mutex_t mutex;
-      bool mutex_initialized;
-    #endif
+};
+
+/** Wraps a boost uuid pure generator to act as a RandomUUIDGenerator
+ *
+ * The boost uuid pure generator is a lighter weight generator with less
+ * entropy, but as stated in the boost documentation it "will satisfy the
+ * majority of use cases."
+ */
+class TRACKTABLE_CORE_EXPORT BoostRandomUUIDGeneratorPure : public UUIDGenerator
+{
+private:
+  BoostRandomUUIDGeneratorPure() {
+    _generator = new random_generator_type();
+  }
+
+public:
+  typedef boost::uuids::random_generator_pure random_generator_type;
+
+  /** Static method to create an instance using the default uniform random number generator type
+   *
+   * Example setting a new default uuid generator:
+   * @code
+   * ::tracktable::set_automatic_uuid_generator(::tracktable::BoostRandomUUIDGeneratorPure::create());
+   * @endcode
+   *
+   */
+  static UUIDGenerator::pointer create() {
+    return UUIDGenerator::pointer(new BoostRandomUUIDGeneratorPure());
+  }
+
+  virtual ~BoostRandomUUIDGeneratorPure() {
+    delete _generator;
+  }
+
+  inline
+  uuid_type generate_uuid()
+  {
+    this->lock_mutex();
+    uuid_type new_uuid = this->_generator->operator()();
+    this->unlock_mutex();
+    return new_uuid;
+  }
+
+private:
+  random_generator_type* _generator;
 
 };
 

@@ -138,7 +138,7 @@ int run_test()
 
     std::cout << "Testing Cartesian 2D Distance" << std::endl;
     
-    double expected, actual;
+    //double expected, actual;
     TrajectoryCartesian2dPoint point00 = create_cartesian2d_point(0,0);
     TrajectoryCartesian2dPoint point01 = create_cartesian2d_point(0,1);
     TrajectoryCartesian2dPoint point11 = create_cartesian2d_point(1,1);
