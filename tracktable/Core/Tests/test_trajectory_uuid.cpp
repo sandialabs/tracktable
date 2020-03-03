@@ -41,12 +41,12 @@ typedef Trajectory<TrajectoryPointLonLat> TrajectoryLonLat;
 
 int test_trajectory_uuid()
 {
-  typedef tracktable::TrajectoryLonLat trajectory_type;
+  typedef ::tracktable::TrajectoryLonLat trajectory_type;
   int error_count = 0;
 
   trajectory_type path1;
   
-  tracktable::uuid_type null_uuid = tracktable::uuid_type();
+  ::tracktable::uuid_type null_uuid = tracktable::uuid_type();
   
   if (path1.uuid() == null_uuid) {
     std::cerr << "ERROR: Expected non-null trajectory UUID\n";
@@ -75,7 +75,7 @@ int test_trajectory_uuid()
     ++error_count;
   }
 
-  tracktable::uuid_type new_random_uuid = tracktable::automatic_uuid_generator()->generate_uuid();
+  ::tracktable::uuid_type new_random_uuid = tracktable::automatic_uuid_generator()->generate_uuid();
   path3.set_uuid(new_random_uuid);
 
   if (path1.uuid() == path3.uuid()) {
@@ -96,6 +96,22 @@ int test_trajectory_uuid()
     std::cerr << "ERROR: Expected non-null trajectory UUID with automatic generation re-enabled\n";
     ++error_count;
   }
+
+  ::tracktable::set_automatic_uuid_generator(::tracktable::BoostRandomUUIDGeneratorPure::create());
+  ::tracktable::uuid_type new_random_uuid2 = tracktable::automatic_uuid_generator()->generate_uuid();
+
+  if (path5.uuid() == new_random_uuid2) {
+    std::cerr << "ERROR: Expected different uuids with the new generator\n";
+    ++error_count;
+  }
+
+  ::tracktable::uuid_type new_random_uuid3 = tracktable::automatic_uuid_generator()->generate_uuid();
+
+  if (new_random_uuid3 == new_random_uuid2) {
+    std::cerr << "ERROR: Expected different uuids with the new generator\n";
+    ++error_count;
+  }
+
 
   return error_count;
 }
