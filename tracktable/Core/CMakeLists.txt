@@ -29,7 +29,10 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
+# This is trajectory/C++/Core/CMakeLists.txt
+
 find_package(Boost 1.61 REQUIRED COMPONENTS date_time log serialization)
+
 
 # Prefer pthreads on systems where it's installed.  If the compiler will
 # accept the '-pthread' flag as a compile argument, use that too.
@@ -177,12 +180,12 @@ add_library( TracktableCore
 
 set_property(
   TARGET TracktableCore
-  PROPERTY SOVERSION ${Tracktable_VERSION}
+  PROPERTY SOVERSION ${SO_VERSION}
   )
 
 set_property(
   TARGET TracktableCore
-  PROPERTY VERSION ${Tracktable_VERSION}
+  PROPERTY VERSION ${TRACKTABLE_VERSION}
   )
 
 
@@ -223,37 +226,37 @@ endif (BUILD_TESTING)
 
 install(
   FILES ${Core_HEADERS}
-  DESTINATION include/tracktable/Core
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Core
 )
 
 install(
   FILES ${CMAKE_BINARY_DIR}/tracktable/Core/TracktableCoreWindowsHeader.h
-  DESTINATION include/tracktable/Core
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Core
   )
 
 install(
   FILES ${Core_Detail_AlgorithmSignatures_HEADERS}
-  DESTINATION include/tracktable/Core/detail/algorithm_signatures
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Core/detail/algorithm_signatures
 )
 
 install(
   FILES ${Core_Detail_Points_HEADERS}
-  DESTINATION include/tracktable/Core/detail/points
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Core/detail/points
 )
 
 install(
   FILES ${Core_Detail_Implementations_HEADERS}
-  DESTINATION include/tracktable/Core/detail/implementations
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Core/detail/implementations
 )
 
 install(
   FILES ${Core_Detail_TraitSignatures_HEADERS}
-  DESTINATION include/tracktable/Core/detail/trait_signatures
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Core/detail/trait_signatures
 )
 
 install(
   FILES ${Core_WarningGuards_HEADERS}
-  DESTINATION include/tracktable/Core/WarningGuards
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Core/WarningGuards
 )
 
 if (APPLE)
@@ -263,7 +266,7 @@ endif ()
 
 install(
   TARGETS TracktableCore
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
