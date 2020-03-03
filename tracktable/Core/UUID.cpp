@@ -33,14 +33,14 @@
 namespace tracktable
 {
 
-  TRACKTABLE_CORE_EXPORT UUIDGenerator::pointer AutomaticUUIDGenerator ( new BoostRandomUUIDGenerator<boost::random::mt19937>() );
+  TRACKTABLE_CORE_EXPORT UUIDGenerator::pointer AutomaticUUIDGenerator ( BoostRandomUUIDGenerator<boost::random::mt19937>::create() );
 
   UUIDGenerator::pointer automatic_uuid_generator()
   {
       return AutomaticUUIDGenerator;
   }
 
-  void set_random_uuid_generator ( UUIDGenerator::pointer new_automatic_generator )
+  void set_automatic_uuid_generator ( UUIDGenerator::pointer new_automatic_generator )
   {
       AutomaticUUIDGenerator = new_automatic_generator;
   }

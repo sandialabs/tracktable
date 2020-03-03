@@ -14,7 +14,9 @@
 
 #include <tracktable/Core/WarningGuards/PushWarningState.h>
 #include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
+#define BOOST_ALLOW_DEPRECATED_HEADERS
 #include <boost/random.hpp>
+#undef BOOST_ALLOW_DEPRECATED_HEADERS
 #include <tracktable/Core/WarningGuards/PopWarningState.h>
 
 #include <functional>

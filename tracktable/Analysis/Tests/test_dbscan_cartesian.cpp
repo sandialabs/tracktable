@@ -42,8 +42,10 @@
 #include <tracktable/Core/PointCartesian.h>
 #include <tracktable/Core/PointArithmetic.h>
 
+#define BOOST_ALLOW_DEPRECATED_HEADERS
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
+#undef BOOST_ALLOW_DEPRECATED_HEADERS
 
 
 #ifndef _USE_MATH_DEFINES

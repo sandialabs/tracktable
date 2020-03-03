@@ -49,8 +49,8 @@ namespace tracktable { namespace io { namespace detail {
 class TrajectoryHeader
 {
 public:
-  uuid_type UUID;
   string_type MagicString;
+  uuid_type UUID;
   string_type Domain;
   std::size_t NumPoints;
   PropertyMap Properties;

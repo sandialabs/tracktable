@@ -128,8 +128,8 @@ public:
    */
 
   Trajectory(size_type n, point_type initial_value=point_type(), bool generate_uuid=true)
-    : Points(n, initial_value),
-      UUID()
+    : UUID(),
+      Points(n, initial_value)
     {
       if (generate_uuid)
         this->set_uuid();
@@ -144,8 +144,8 @@ public:
    */
   template<class InputIterator>
   Trajectory(InputIterator first, InputIterator last, bool generate_uuid=true)
-    : Points(first, last),
-      UUID()
+    : UUID(),
+      Points(first, last)
     {
       if (generate_uuid)
         this->set_uuid();
