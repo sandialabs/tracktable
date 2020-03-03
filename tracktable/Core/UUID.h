@@ -99,26 +99,29 @@ template <typename UniformRandomNumberGenerator=boost::random::mt19937>
 class TRACKTABLE_CORE_EXPORT BoostRandomUUIDGenerator : public UUIDGenerator
 {
 public:
-  BoostRandomUUIDGenerator() :
-    generator()
+  typedef boost::uuids::basic_random_generator<UniformRandomNumberGenerator> random_generator_type;
+
+  BoostRandomUUIDGenerator()
   {
-    // Call the inline private method to initialize the mutex
+    this->_generator = new random_generator_type();
     this->init_mutex();
   }
 
-  explicit BoostRandomUUIDGenerator ( UniformRandomNumberGenerator& gen ) :
-    generator ( gen )
+  explicit BoostRandomUUIDGenerator ( UniformRandomNumberGenerator& gen )
   {
+    this->_generator = new random_generator_type(gen);
     this->init_mutex();
   }
 
-  explicit BoostRandomUUIDGenerator ( UniformRandomNumberGenerator* pGen ) :
-    generator ( pGen )
+  explicit BoostRandomUUIDGenerator ( UniformRandomNumberGenerator* pGen )
   {
+    this->_generator = new random_generator_type(pGen);
     this->init_mutex();
   }
 
   virtual ~BoostRandomUUIDGenerator() {
+    delete _generator;
+
     #ifdef TT_WINDOWS
       delete this->mutex;
     #endif // ifdef TT_WINDOWS
@@ -134,7 +137,7 @@ public:
         pthread_mutex_lock(&(this->mutex));
     #endif // ifdef TT_WINDOWS
 
-    uuid_type new_uuid = generator();
+    uuid_type new_uuid = this->_generator->operator()();
 
     #ifdef TT_WINDOWS
       this->mutex->unlock();
@@ -163,7 +166,7 @@ private:
     #endif // ifdef TT_WINDOWS
   }
 
-  boost::uuids::basic_random_generator<UniformRandomNumberGenerator> generator;
+  random_generator_type* _generator;
 
   /** Mutexes used to ensure generate_uuid() is threadsafe */
   #ifdef TT_WINDOWS
