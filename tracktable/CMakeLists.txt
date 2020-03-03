@@ -41,7 +41,10 @@ add_subdirectory(Core)
 add_subdirectory(Domain)
 add_subdirectory(IO)
 add_subdirectory(Analysis)
+
+if (BUILD_EXAMPLES)
 add_subdirectory(Examples)
+endif (BUILD_EXAMPLES)
 
 if (BUILD_PYTHON_WRAPPING)
   add_subdirectory(Python)
