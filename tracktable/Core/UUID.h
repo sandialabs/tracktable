@@ -211,7 +211,9 @@ private:
 class TRACKTABLE_CORE_EXPORT BoostRandomUUIDGeneratorPure : public UUIDGenerator
 {
 private:
-  BoostRandomUUIDGeneratorPure(): _generator() { }
+  BoostRandomUUIDGeneratorPure() {
+    _generator = new random_generator_type();
+  }
 
 public:
   typedef boost::uuids::random_generator_pure random_generator_type;
@@ -228,19 +230,21 @@ public:
     return UUIDGenerator::pointer(new BoostRandomUUIDGeneratorPure());
   }
 
-  virtual ~BoostRandomUUIDGeneratorPure() { }
+  virtual ~BoostRandomUUIDGeneratorPure() {
+    delete _generator;
+  }
 
   inline
   uuid_type generate_uuid()
   {
     this->lock_mutex();
-    uuid_type new_uuid = _generator();
+    uuid_type new_uuid = this->_generator->operator()();
     this->unlock_mutex();
     return new_uuid;
   }
 
 private:
-  random_generator_type _generator;
+  random_generator_type* _generator;
 
 };
 
