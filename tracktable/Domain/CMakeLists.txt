@@ -67,12 +67,12 @@ target_link_libraries( TracktableDomain
 
 set_property(
   TARGET TracktableDomain
-  PROPERTY SOVERSION ${Tracktable_VERSION}
+  PROPERTY SOVERSION ${SO_VERSION}
   )
 
 set_property(
   TARGET TracktableDomain
-  PROPERTY VERSION ${Tracktable_VERSION}
+  PROPERTY VERSION ${TRACKTABLE_VERSION}
   )
 
 generate_export_header( TracktableDomain
@@ -82,20 +82,24 @@ generate_export_header( TracktableDomain
    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/tracktable/Domain/TracktableDomainWindowsHeader.h
    )
 
+if (APPLE)
+    set(CMAKE_INSTALL_BINDIR bin)
+    set(CMAKE_INSTALL_LIBDIR lib)
+endif ()
 
 install(
   TARGETS TracktableDomain
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 install(
   FILES ${Domain_HEADERS}
-  DESTINATION include/tracktable/Domain
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Domain
 )
 
 install(
   FILES ${PROJECT_BINARY_DIR}/tracktable/Domain/TracktableDomainWindowsHeader.h
-  DESTINATION include/tracktable/Domain
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Domain
   )

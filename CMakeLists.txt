@@ -35,10 +35,47 @@ if (POLICY CMP0042)
   set(CMAKE_MACOSX_RPATH ${Tracktable_BINARY_DIR}/lib)
 endif ()
 
+include(GNUInstallDirs)
+
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
+
 # set(Boost_DEBUG ON)
 
-project(Tracktable)
+##########################################################################
+# Release variables
+##########################################################################
+
+set(TRACKTABLE_VERSION 1.2.4)
+set(RPM_RELEASE 6)
+
+# UNIX library ABI versioning
+# CURRENT : REVISION : AGE
+# +1 :  ? : +1 == new interface that does not break old one
+# +1 :  ? :  0 == new interface that breaks old one
+#  ? :  ? :  0 == no new interfaces, but breaks apps
+#  ? : +1 :  ? == just some internal changes, nothing breaks but might work better
+set(UNIX_SO_VERSION_CURRENT  0)
+set(UNIX_SO_VERSION_REVISION 0)
+set(UNIX_SO_VERSION_AGE      0)
+
+##########################################################################
+# End release variables
+##########################################################################
+
+if (UNIX)
+  set(UNIX_SO_VERSION ${UNIX_SO_VERSION_CURRENT}.${UNIX_SO_VERSION_REVISION}.${UNIX_SO_VERSION_AGE})
+  set(SO_VERSION ${UNIX_SO_VERSION})
+else()
+  set(SO_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
+endif()
+
+project(Tracktable VERSION ${TRACKTABLE_VERSION})
+
 include(CTest)
+
+set(TRACKTABLE_INCLUDEDIR tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}/tracktable)
 
 # We include CMake modules to find NumPy and a good set of Python
 # libraries.  Add them to the search path.
@@ -68,16 +105,16 @@ SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 
 # add the automatically determined parts of the RPATH which point to
 # directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 # the RPATH to be used when installing, but only if it's not a system directory
-LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_PREFIX}/lib" isSystemDir)
+LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_LIBDIR}" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 set(MACOSX_RPATH ON)
@@ -90,6 +127,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 option(BUILD_SHARED_LIBS "Build shared libraries.  Required for Python wrapping." ON)
 option(BUILD_PYTHON_WRAPPING "Wrap trajectory classes for use in Python." ON)
+option(BUILD_EXAMPLES "Build tracktable example programs" ON)
 option(BUILD_DOCUMENTATION "Build documentation for Tracktable." OFF)
 option(USE_ANACONDA_LINK_FLAGS "Use Anaconda-specific link flags." OFF)
 
@@ -99,7 +137,7 @@ if (BUILD_SHARED_LIBS)
   message(STATUS "Building shared libraries.")
   add_definitions(-DBUILDING_SHARED_LIBS)
   add_definitions(-DBOOST_ALL_DYN_LINK)
-  set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_PREFIX}/lib)
+  #set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_LIBDIR})
   set(Boost_USE_STATIC_LIBS OFF)
 else (BUILD_SHARED_LIBS)
   if (BUILD_PYTHON_WRAPPING)
@@ -116,69 +154,76 @@ endif (BUILD_SHARED_LIBS)
 if (BUILD_DOCUMENTATION)
   find_package(Doxygen REQUIRED)
 
-#  message("Before FindSphinx, Python exe is ${Sphinx_PYTHON_EXECUTABLE}")
-  find_package(Sphinx REQUIRED)
-#  message("After FindSphinx, Python exe is ${Sphinx_PYTHON_EXECUTABLE}")
+  message("Before FindSphinx, Python exe is ${Sphinx_PYTHON_EXECUTABLE}")
+  find_package(Sphinx)
+  message("After FindSphinx, Python exe is ${Sphinx_PYTHON_EXECUTABLE}")
 
   set( DOC_SOURCE_DIR ${Tracktable_SOURCE_DIR}/Documentation )
   set( DOC_BINARY_DIR ${Tracktable_BINARY_DIR}/Documentation )
 
-  if(DOXYGEN_FOUND AND Sphinx_FOUND)
+  if(DOXYGEN_FOUND)
     configure_file(
       ${DOC_SOURCE_DIR}/Doxyfile.in
       ${DOC_BINARY_DIR}/Doxyfile
       @ONLY
       )
 
-    # Yes, I'm writing a file into the source tree.  Sphinx requires
-    # that its configuration file (conf.py) exist in the source tree
-    # even though it can put all of its generated files elsewhere.
-    configure_file(
-      ${DOC_SOURCE_DIR}/conf.py.in
-      ${DOC_SOURCE_DIR}/conf.py
-      @ONLY
+    add_custom_target( doxygen_doc
+      ${DOXYGEN_EXECUTABLE} ${DOC_BINARY_DIR}/Doxyfile
+      WORKING_DIRECTORY ${DOC_BINARY_DIR}
+      COMMENT "Generating Doxygen documentation" VERBATIM
       )
 
+    if(Sphinx_FOUND)
 
-  add_custom_target( DoxygenXML
-    ${DOXYGEN_EXECUTABLE} ${DOC_BINARY_DIR}/Doxyfile
-    WORKING_DIRECTORY ${DOC_BINARY_DIR}
-    COMMENT "Generating XML documentation with Doxygen" VERBATIM
-    )
+      # Yes, I'm writing a file into the source tree.  Sphinx requires
+      # that its configuration file (conf.py) exist in the source tree
+      # even though it can put all of its generated files elsewhere.
+      configure_file(
+        ${DOC_SOURCE_DIR}/conf.py.in
+        ${DOC_SOURCE_DIR}/conf.py
+        @ONLY
+        )
 
-  set(Sphinx_BUILD_DIR "${DOC_BINARY_DIR}/_build")
+      set(Sphinx_BUILD_DIR "${DOC_BINARY_DIR}/_build")
 
 
-  # NOTE: This approach to setting PYTHONPATH will only work on
-  # Unix-like systems.  In CMake 3.1 we will get the '-E env'
-  # capability which is what we really need here.  Since requiring the
-  # bleeding-edge version of CMake isn't a terribly friendly thing to
-  # do, I will probably end up faking it with batch files.
+      # NOTE: This approach to setting PYTHONPATH will only work on
+      # Unix-like systems.  In CMake 3.1 we will get the '-E env'
+      # capability which is what we really need here.  Since requiring the
+      # bleeding-edge version of CMake isn't a terribly friendly thing to
+      # do, I will probably end up faking it with batch files.
 
-  add_custom_target( doc
-      ${PYTHON_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
-      -b html
-      -d "${Sphinx_BUILD_DIR}/doctrees"
-      ${DOC_SOURCE_DIR}
-      ${DOC_BINARY_DIR}/html
+      add_custom_target( doc
+          ${PYTHON_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
+          -b html
+          -d "${Sphinx_BUILD_DIR}/doctrees"
+          ${DOC_SOURCE_DIR}
+          ${DOC_BINARY_DIR}/html
 
-    DEPENDS DoxygenXML
-    WORKING_DIRECTORY ${DOC_SOURCE_DIR}
-    )
+        DEPENDS doxygen_doc
+        WORKING_DIRECTORY ${DOC_SOURCE_DIR}
+        )
 
-  else(DOXYGEN_FOUND AND Sphinx_FOUND)
+    else(Sphinx_FOUND)
+      message("WARNING: Sphinx executables not found. Only Doxygen html will be built.")
+    endif(Sphinx_FOUND)
+
+  else(DOXYGEN_FOUND)
     message("ERROR: Please provide paths to the Sphinx and Doxygen executables.")
-  endif(DOXYGEN_FOUND AND Sphinx_FOUND)
+  endif(DOXYGEN_FOUND)
 endif (BUILD_DOCUMENTATION)
 
 
 # ----------------------------------------------------------------------
 
-install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_PREFIX}/Python/tracktable)
-install(FILES README.md DESTINATION ${CMAKE_INSTALL_PREFIX})
-install(FILES README.md DESTINATION ${CMAKE_INSTALL_PREFIX}/Python/tracktable)
+install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
+install(FILES README.md DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 
+if (BUILD_PYTHON_WRAPPING)
+  install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}/Python/tracktable)
+  install(FILES README.md DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}/Python/tracktable)
+endif ()
 # ----------------------------------------------------------------------
 
 if (BUILD_PYTHON_WRAPPING)
@@ -201,3 +246,78 @@ endif (BUILD_TESTING)
 add_subdirectory(tracktable)
 
 message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")
+
+##########################################################################
+# pkgconfig variables
+##########################################################################
+if (UNIX)
+
+  set(PKGCONFIG_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
+  set(PKGCONFIG_FILE tracktable-${PKGCONFIG_VERSION}.pc)
+
+  configure_file(
+    ${PROJECT_SOURCE_DIR}/tracktable.pc.in
+    ${PROJECT_BINARY_DIR}/${PKGCONFIG_FILE}
+    @ONLY IMMEDIATE
+  )
+
+  install(FILES ${PKGCONFIG_FILE} DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+  set(CPACK_GENERATOR TBZ2)
+  set(CPACK_PACKAGE_FILE_NAME tracktable)
+  set(CPACK_ARCHIVE_FILE_NAME ${CPACK_PACKAGE_FILE_NAME}-${TRACKTABLE_VERSION})
+  set(CPACK_SOURCE_GENERATOR TBZ2)
+  set(CPACK_SOURCE_IGNORE_FILES
+    "/build/;"
+    "/.git/;"
+    "/.ipynb_checkpoints/"
+  )
+  include(CPack)
+
+  add_custom_target(source_tar_bz2
+    COMMAND "${CMAKE_COMMAND}" --build . --target package_source
+    WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+    COMMENT "Building package source .tar.bz2"
+    VERBATIM
+  )
+
+endif ()
+
+# Effectively, if LINUX
+if (UNIX AND NOT APPLE)
+
+  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/packaging/rpm/rhel7/tracktable.spec.in" "${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.spec" @ONLY IMMEDIATE)
+
+  add_custom_target(srpm_rhel7
+      DEPENDS source_tar_bz2
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+      COMMAND mock -r epel-7-x86_64 --buildsrpm --spec ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.spec --sources Tracktable-${TRACKTABLE_VERSION}-Source.tar.bz2 --resultdir=packaging/rhel7/srpms/
+      COMMENT Building RHEL/CentOS 7 source rpms with mock
+      BYPRODUCTS
+        ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/srpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.src.rpm
+      VERBATIM
+  )
+
+  add_custom_target(srpm
+      DEPENDS srpm_rhel7
+  )
+
+  add_custom_target(rpm_rhel7_x86_64
+      DEPENDS srpm_rhel7
+      WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+      COMMAND mock -r epel-7-x86_64 rebuild packaging/rhel7/srpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.src.rpm --resultdir=packaging/rhel7/rpms
+      COMMENT Building RHEL/CentOS 7 rpms with mock
+      BYPRODUCTS
+        ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/rpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.x86_64.rpm
+        ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/rpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-debuginfo-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.x86_64.rpm
+        ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/rpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-devel-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.x86_64.rpm
+        ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/rpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-doc-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.noarch.rpm
+      VERBATIM
+  )
+  
+  add_custom_target(rpm
+      DEPENDS rpm_rhel7_x86_64
+  )
+  
+endif ()
+
