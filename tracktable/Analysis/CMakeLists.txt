@@ -76,10 +76,10 @@ endif (BUILD_TESTING)
 
 install(
   FILES ${Analysis_HEADERS}
-  DESTINATION include/tracktable/Analysis
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Analysis
 )
 
 install(
   FILES ${Detail_HEADERS}
-  DESTINATION include/tracktable/Analysis/detail
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Analysis/detail
 )

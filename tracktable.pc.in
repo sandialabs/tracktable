@@ -1,0 +1,12 @@
+prefix="@CMAKE_INSTALL_PREFIX@"
+exec_prefix="${prefix}"
+libdir="@CMAKE_INSTALL_LIBDIR@"
+includedir="${prefix}/include"
+
+Name: tracktable
+Description: Trajectory analysis and rendering library
+Requires: @PKGCONFIG_REQUIRES_PUBLIC@
+Requires.private: @PKGCONFIG_REQUIRES_PRIVATE@
+Version: @PROJECT_VERSION@
+Libs: -L${libdir} -lm -lTracktableCore -lTracktableDomain
+Cflags: -I${includedir}/boost169/ -I${includedir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@
