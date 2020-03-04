@@ -67,12 +67,12 @@ target_link_libraries( TracktableDomain
 
 set_property(
   TARGET TracktableDomain
-  PROPERTY SOVERSION ${Tracktable_VERSION}
+  PROPERTY SOVERSION ${SO_VERSION}
   )
 
 set_property(
   TARGET TracktableDomain
-  PROPERTY VERSION ${Tracktable_VERSION}
+  PROPERTY VERSION ${TRACKTABLE_VERSION}
   )
 
 generate_export_header( TracktableDomain
