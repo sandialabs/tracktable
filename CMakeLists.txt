@@ -48,7 +48,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 ##########################################################################
 
 set(TRACKTABLE_VERSION 1.2.4)
-set(RPM_RELEASE 5)
+set(RPM_RELEASE 6)
 
 # UNIX library ABI versioning
 # CURRENT : REVISION : AGE
