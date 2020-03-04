@@ -8,10 +8,6 @@ Group:            System Environment/Libraries
 Source:           Tracktable-@TRACKTABLE_VERSION@-Source.tar.bz2
 Vendor:           National Technology and Engineering Solutions of Sandia, LLC
 BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-#BuildRequires:    python2-sphinx
-#BuildRequires:    python2-breathe
-#BuildRequires:    python2-sphinx_rtd_theme
-#BuildRequires:    python-sphinxcontrib-napoleon
 BuildRequires:    doxygen
 BuildRequires:    graphviz
 BuildRequires:    boost169-devel >= 1.69
@@ -57,12 +53,9 @@ This package contains developer's documentation for the tracktable library.
     -DBUILD_DOCUMENTATION=ON \
     -DPYTHON_EXECUTABLE=python3.6 \
     .
-#    -DSphinx_PYTHON_EXECUTABLE=python2.7 \
-#    .
     
 %make_build %{?_smp_mflags}
 %make_build doxygen_doc
-#%make_build doc
 
 %install
 %make_install
@@ -70,10 +63,6 @@ This package contains developer's documentation for the tracktable library.
 for file in $(find Documentation/doxygen/html -type f); do
   install -p --mode=0664 -D ${file} %{buildroot}%{_datadir}/doc/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/cpp_reference/${file#"Documentation/doxygen/html/"}
 done
-
-#for file in $(find Documentation/html -type f); do
-#  install -p --mode=0664 -D ${file} %{buildroot}%{_datadir}/doc/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/html${file#Documentation/html/}
-#done
 
 %check
 ctest3 -V %{?_smp_mflags}
@@ -109,6 +98,7 @@ ctest3 -V %{?_smp_mflags}
 
 %changelog
 
+* Mon Jan 20 2020 Rick L Vinyard Jr <rlvinya@sandia.gov> - 1.2.2-1
 * Mon Jan 20 2020 Rick L Vinyard Jr <rlvinya@sandia.gov> - 1.2.2-1
 - Initial version
 
