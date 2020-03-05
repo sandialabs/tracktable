@@ -40,7 +40,7 @@ expected_string_representation(
   )
 {
   std::ostringstream outbuf;
-  outbuf << "FeatureVector<" << dim << ">(";
+  outbuf << "(";
   for (std::size_t i = 0; i < dim; ++i)
   {
     if (i > 0)
