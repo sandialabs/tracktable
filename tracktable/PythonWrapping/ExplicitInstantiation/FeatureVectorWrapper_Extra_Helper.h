@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -32,6 +32,6 @@
 # error "Do not include this file yourself.  See the CMake parameter FEATURE_VECTOR_MAX_SIZE."
 #else
 
-WRAP_FEATURE_VECTOR_POINT( BOOST_PP_ITERATION() );
+tracktable::python_wrapping::wrap_feature_vector_point<BOOST_PP_ITERATION()>();
 
 #endif
