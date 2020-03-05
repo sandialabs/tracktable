@@ -193,6 +193,11 @@ add_python_test(
 )
 
 add_python_test(
+  P_FeatureVector_ToString
+  ${DOMAIN}.test_feature_vector_to_string
+)
+
+add_python_test(
   P_ImportDomainClasses
   ${DOMAIN}.import_everything
   )

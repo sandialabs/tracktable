@@ -123,7 +123,7 @@ public:
  *
  * Output:
  *
- * "FeatureVector<3>(1, 2, 3)"
+ * "(1, 2, 3)"
  *
  * Parameters:
  *   out:  Stream to write to
@@ -133,8 +133,7 @@ public:
 template<std::size_t dim>
 std::ostream& operator<<(std::ostream& out, FeatureVector<dim> const& pt)
 {
-  out << "FeatureVector" 
-      << "<" << dim << ">(";
+  out << "(";
   for (std::size_t i = 0; i < dim; ++i)
   {
     if (i > 0)
