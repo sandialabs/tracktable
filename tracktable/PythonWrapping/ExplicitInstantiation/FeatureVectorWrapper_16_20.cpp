@@ -32,9 +32,9 @@
 
 void install_feature_vector_wrappers_16_20()
 {
-  WRAP_FEATURE_VECTOR_POINT(16);
-  WRAP_FEATURE_VECTOR_POINT(17);
-  WRAP_FEATURE_VECTOR_POINT(18);
-  WRAP_FEATURE_VECTOR_POINT(19);
-  WRAP_FEATURE_VECTOR_POINT(20);
+  tracktable::python_wrapping::wrap_feature_vector_point<16>();
+  tracktable::python_wrapping::wrap_feature_vector_point<17>();
+  tracktable::python_wrapping::wrap_feature_vector_point<18>();
+  tracktable::python_wrapping::wrap_feature_vector_point<19>();
+  tracktable::python_wrapping::wrap_feature_vector_point<20>();
 }
