@@ -80,10 +80,12 @@ public:
     {
       detail::assign_coordinates<dim>::apply(*this, other);
     }
-  FeatureVector(const double * coords)
+  
+  FeatureVector(const double* coords)
     {
       tracktable::detail::assign_coordinates_from_array<dim>(*this, coords);
     }
+
   FeatureVector& operator=(FeatureVector const& other)
     {
       tracktable::detail::assign_coordinates<dim>::apply(*this, other);
@@ -92,18 +94,36 @@ public:
 
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
-  {
+    {
     // ar & boost::serialization::base_object< PointCartesian<dim> >(*this);
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
-  }
+    }
 
+  string_type to_string() const
+    {
+    std::ostringstream outbuf;
+    outbuf << *this;
+    return outbuf.str();
+    }
 };
 
 
 /** Write a feature vector to a stream as a string
  *
- * This supports the idiom "stream << my_point".  Under the hood it
- * calls FeatureVector::to_string.
+ * This supports the idiom "stream << my_point".  This function
+ * is also the implementatino for FeatureVector<dim>::to_string().
+ *
+ * Example:
+ *
+ * FeatureVector<3> my_vector;
+ * my_vector[0] = 1;
+ * my_vector[1] = 2;
+ * my_vector[2] = 3;
+ * std::cout << my_vector << std::endl;
+ *
+ * Output:
+ *
+ * "FeatureVector<3>(1, 2, 3)"
  *
  * Parameters:
  *   out:  Stream to write to
@@ -113,7 +133,17 @@ public:
 template<std::size_t dim>
 std::ostream& operator<<(std::ostream& out, FeatureVector<dim> const& pt)
 {
-  out << pt.to_string();
+  out << "FeatureVector" 
+      << "<" << dim << ">(";
+  for (std::size_t i = 0; i < dim; ++i)
+  {
+    if (i > 0)
+    {
+      out << ", ";
+    }
+    out << pt[i];
+  }
+  out << ")";
   return out;
 }
 
