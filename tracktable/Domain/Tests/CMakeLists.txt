@@ -46,6 +46,11 @@ add_executable(test_base_point_terrestrial
 )
 set_property(TARGET test_base_point_terrestrial         PROPERTY FOLDER "Tests")
 
+add_executable(test_feature_vector_to_string
+  test_feature_vector_to_string.cpp
+)
+set_property(TARGET test_feature_vector_to_string PROPERTY FOLDER "Tests")
+
 add_executable(test_trajectory_point_terrestrial
   test_trajectory_point_terrestrial.cpp
 )
@@ -74,6 +79,12 @@ target_link_libraries(test_base_point_terrestrial
   ${Boost_LIBRARIES}
 )
 
+target_link_libraries(test_feature_vector_to_string
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+  )
+
 target_link_libraries(test_trajectory_point_terrestrial
   TracktableCore
   TracktableDomain
@@ -100,6 +111,11 @@ add_test(
 add_test(
   NAME C_BasePointTerrestrial
   COMMAND test_base_point_terrestrial
+)
+
+add_test(
+  NAME C_FeatureVectorToString
+  COMMAND test_feature_vector_to_string
 )
 
 add_test(
