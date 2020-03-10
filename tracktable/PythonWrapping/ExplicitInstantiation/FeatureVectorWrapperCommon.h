@@ -35,17 +35,37 @@
 #include <tracktable/Domain/FeatureVectors.h>
 
 #include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
+#include <tracktable/PythonWrapping/BasePointToString.h>
 #include <tracktable/PythonWrapping/DomainWrapperTemplates.h>
 #include <tracktable/PythonWrapping/PythonAwarePointReader.h>
 
-using tracktable::domain::feature_vectors::FeatureVector;
+#include <sstream>
 
-#define WRAP_FEATURE_VECTOR_POINT(dim)                                  \
-  boost::python::class_< FeatureVector<dim> >("FeatureVector" # dim)    \
-  .def(tracktable::python_wrapping::basic_point_methods())              \
-  .def(tracktable::python_wrapping::point_to_string_methods())          \
-  ;
 
+namespace tracktable { namespace python_wrapping { 
+
+template<std::size_t dim>
+void wrap_feature_vector_point()
+{
+	std::ostringstream short_name_buf;
+	string_type short_name;
+
+	short_name_buf << "FeatureVector" << dim;
+	short_name = short_name_buf.str();
+
+	std::ostringstream full_name_buf;
+	string_type full_name;
+	full_name_buf << "tracktable.domain.feature_vectors." << short_name;
+    full_name = full_name_buf.str();
+
+	using tracktable::domain::feature_vectors::FeatureVector;
+	boost::python::class_< FeatureVector<dim> >(short_name.c_str())
+	   .def(tracktable::python_wrapping::basic_point_methods())
+	   .def(tracktable::python_wrapping::base_point_to_string_methods(full_name))
+	   ;
+}
+
+} } // close namespace tracktable::python_wrapping
 
 void install_feature_vector_wrappers_1_5();
 void install_feature_vector_wrappers_6_10();

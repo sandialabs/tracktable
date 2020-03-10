@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -28,13 +28,61 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <tracktable/PythonWrapping/ExplicitInstantiation/FeatureVectorWrapperCommon.h>
+#include <tracktable/Domain/FeatureVectors.h>
+#include <iostream>
 
-void install_feature_vector_wrappers_6_10()
+
+// This function should match what's in operator<<(ostream, FeatureVector).
+template<std::size_t dim>
+std::string 
+expected_string_representation(
+  tracktable::domain::feature_vectors::FeatureVector<dim> const& my_feature_vector
+  )
 {
-  tracktable::python_wrapping::wrap_feature_vector_point<6>();
-  tracktable::python_wrapping::wrap_feature_vector_point<7>();
-  tracktable::python_wrapping::wrap_feature_vector_point<8>();
-  tracktable::python_wrapping::wrap_feature_vector_point<9>();
-  tracktable::python_wrapping::wrap_feature_vector_point<10>();
+  std::ostringstream outbuf;
+  outbuf << "(";
+  for (std::size_t i = 0; i < dim; ++i)
+  {
+    if (i > 0)
+    {
+      outbuf << ", ";
+    }
+    outbuf << my_feature_vector[i];
+  }
+  outbuf << ")";
+  return outbuf.str();
+}
+
+
+template<std::size_t num_components>
+int test_feature_vector_to_string()
+{
+  tracktable::domain::feature_vectors::FeatureVector<num_components> my_feature_vector;
+  for (std::size_t i = 0; i < num_components; ++i)
+  {
+    my_feature_vector[i] = i + 0.5;
+  }
+
+  std::ostringstream outbuf;
+  outbuf << my_feature_vector;
+  if (outbuf.str() != expected_string_representation(my_feature_vector)) 
+  {
+    std::cerr << "ERROR: Expected FeatureVector operator<< to return '"
+              << expected_string_representation(my_feature_vector)
+              << "' but instead got '"
+              << outbuf.str() << "'\n";
+    return 1;
+  }
+  return 0;
+}
+
+
+int 
+main(int argc, char* argv[])
+{
+  int error_count = 0;
+  error_count += test_feature_vector_to_string<1>();
+  error_count += test_feature_vector_to_string<2>();
+  error_count += test_feature_vector_to_string<10>();
+  return error_count;
 }
