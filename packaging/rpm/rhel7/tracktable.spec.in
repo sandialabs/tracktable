@@ -55,14 +55,9 @@ This package contains developer's documentation for the tracktable library.
     .
     
 %make_build %{?_smp_mflags}
-%make_build doxygen_doc
 
 %install
 %make_install
-
-for file in $(find Documentation/doxygen/html -type f); do
-  install -p --mode=0664 -D ${file} %{buildroot}%{_datadir}/doc/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/cpp_reference/${file#"Documentation/doxygen/html/"}
-done
 
 %check
 ctest3 -V %{?_smp_mflags}
