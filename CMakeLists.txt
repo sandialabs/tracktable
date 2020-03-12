@@ -35,6 +35,10 @@ if (POLICY CMP0042)
   set(CMAKE_MACOSX_RPATH ${Tracktable_BINARY_DIR}/lib)
 endif ()
 
+if (UNIX AND NOT APPLE)
+  set(LINUX TRUE)
+endif ()
+
 include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 11)
@@ -44,8 +48,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # set(Boost_DEBUG ON)
 
 ##########################################################################
-# Release variables
-##########################################################################
+# Begin RELEASE VARIABLES
+#-------------------------------------------------------------------------
 
 set(TRACKTABLE_VERSION 1.2.4)
 set(RPM_RELEASE 6)
@@ -60,9 +64,11 @@ set(UNIX_SO_VERSION_CURRENT  0)
 set(UNIX_SO_VERSION_REVISION 0)
 set(UNIX_SO_VERSION_AGE      0)
 
+#-------------------------------------------------------------------------
+# End RELEASE VARIABLES
 ##########################################################################
-# End release variables
-##########################################################################
+
+project(Tracktable LANGUAGES CXX VERSION ${TRACKTABLE_VERSION})
 
 if (UNIX)
   set(UNIX_SO_VERSION ${UNIX_SO_VERSION_CURRENT}.${UNIX_SO_VERSION_REVISION}.${UNIX_SO_VERSION_AGE})
@@ -70,8 +76,6 @@ if (UNIX)
 else()
   set(SO_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 endif()
-
-project(Tracktable VERSION ${TRACKTABLE_VERSION})
 
 include(CTest)
 
@@ -87,6 +91,8 @@ set(CMAKE_MODULE_PATH
 set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib )
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib )
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${Tracktable_BINARY_DIR}/bin )
+
+# ----------------------------------------------------------------------
 
 # Build-type-specific output paths for things like MSVC, XCode
 foreach( OUTPUTCONFIG ${CMAKE_CONFIGURATION_TYPES} )
@@ -148,15 +154,14 @@ else (BUILD_SHARED_LIBS)
   endif (BUILD_PYTHON_WRAPPING)
 endif (BUILD_SHARED_LIBS)
 
-# ----------------------------------------------------------------------
+#=========================================================================
+# Begin DOCUMENTATION
+#-------------------------------------------------------------------------
 
 # Add a target to generate combined documentation with Doxygen and Sphinx
 if (BUILD_DOCUMENTATION)
   find_package(Doxygen REQUIRED)
-
-  message("Before FindSphinx, Python exe is ${Sphinx_PYTHON_EXECUTABLE}")
   find_package(Sphinx)
-  message("After FindSphinx, Python exe is ${Sphinx_PYTHON_EXECUTABLE}")
 
   set( DOC_SOURCE_DIR ${Tracktable_SOURCE_DIR}/Documentation )
   set( DOC_BINARY_DIR ${Tracktable_BINARY_DIR}/Documentation )
@@ -168,11 +173,16 @@ if (BUILD_DOCUMENTATION)
       @ONLY
       )
 
-    add_custom_target( doxygen_doc
+    add_custom_target( doxygen_doc ALL
       ${DOXYGEN_EXECUTABLE} ${DOC_BINARY_DIR}/Doxyfile
       WORKING_DIRECTORY ${DOC_BINARY_DIR}
       COMMENT "Generating Doxygen documentation" VERBATIM
       )
+
+    install(
+      DIRECTORY ${DOC_BINARY_DIR}/doxygen/html/
+      DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}/cpp_reference
+    )
 
     if(Sphinx_FOUND)
 
@@ -194,7 +204,7 @@ if (BUILD_DOCUMENTATION)
       # bleeding-edge version of CMake isn't a terribly friendly thing to
       # do, I will probably end up faking it with batch files.
 
-      add_custom_target( doc
+      add_custom_target( doc ALL
           ${PYTHON_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
           -b html
           -d "${Sphinx_BUILD_DIR}/doctrees"
@@ -205,6 +215,11 @@ if (BUILD_DOCUMENTATION)
         WORKING_DIRECTORY ${DOC_SOURCE_DIR}
         )
 
+      install(
+        DIRECTORY ${DOC_BINARY_DIR}/html
+        DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+      )
+
     else(Sphinx_FOUND)
       message("WARNING: Sphinx executables not found. Only Doxygen html will be built.")
     endif(Sphinx_FOUND)
@@ -214,6 +229,9 @@ if (BUILD_DOCUMENTATION)
   endif(DOXYGEN_FOUND)
 endif (BUILD_DOCUMENTATION)
 
+#-------------------------------------------------------------------------
+# End DOCUMENTATION
+#=========================================================================
 
 # ----------------------------------------------------------------------
 
@@ -247,9 +265,38 @@ add_subdirectory(tracktable)
 
 message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")
 
-##########################################################################
-# pkgconfig variables
-##########################################################################
+#=========================================================================
+# Begin FIND PACKAGE
+#-------------------------------------------------------------------------
+
+set(BOOST_MINIMUM_VERSION_REQUIRED 1.61)
+
+# Core: date_time log serialization
+# IO: regex
+set(BOOST_CORE_COMPONENTS_NEEDED date_time log regex serialization)
+
+unset(Boost_FOUND)
+find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED COMPONENTS ${BOOST_CORE_COMPONENTS_NEEDED} )
+set(BOOST_CORE_LIBRARIES "")
+foreach(_component ${BOOST_CORE_COMPONENTS_NEEDED})
+  set(BOOST_CORE_LIBRARIES "${BOOST_CORE_LIBRARIES} -lboost_${_component}")
+endforeach()
+
+
+# Prefer pthreads on systems where it's installed.  If the compiler will
+# accept the '-pthread' flag as a compile argument, use that too.
+set(THREADS_PREFER_PTHREAD_FLAG 1)
+# Find the system's threads library.  We need it for boost::log.
+find_package(Threads)
+
+#-------------------------------------------------------------------------
+# End FIND PACKAGE
+#=========================================================================
+
+#=========================================================================
+# Begin PKGCONFIG
+#-------------------------------------------------------------------------
+
 if (UNIX)
 
   set(PKGCONFIG_VERSION ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
@@ -261,7 +308,7 @@ if (UNIX)
     @ONLY IMMEDIATE
   )
 
-  install(FILES ${PKGCONFIG_FILE} DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+  install(FILES ${PROJECT_BINARY_DIR}/${PKGCONFIG_FILE} DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
   set(CPACK_GENERATOR TBZ2)
   set(CPACK_PACKAGE_FILE_NAME tracktable)
@@ -283,10 +330,21 @@ if (UNIX)
 
 endif ()
 
-# Effectively, if LINUX
-if (UNIX AND NOT APPLE)
+#-------------------------------------------------------------------------
+# End PKGCONFIG
+#=========================================================================
 
-  configure_file("${CMAKE_CURRENT_SOURCE_DIR}/packaging/rpm/rhel7/tracktable.spec.in" "${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.spec" @ONLY IMMEDIATE)
+#=========================================================================
+# Begin RPM
+#-------------------------------------------------------------------------
+if (LINUX)
+
+  configure_file(
+    "${CMAKE_CURRENT_SOURCE_DIR}/packaging/rpm/rhel7/tracktable.spec.in" 
+    "${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.spec" 
+    @ONLY
+    IMMEDIATE
+    )
 
   add_custom_target(srpm_rhel7
       DEPENDS source_tar_bz2
@@ -320,4 +378,8 @@ if (UNIX AND NOT APPLE)
   )
   
 endif ()
+
+#-------------------------------------------------------------------------
+# End RPM
+#=========================================================================
 
