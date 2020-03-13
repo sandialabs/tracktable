@@ -147,12 +147,10 @@ endfunction(extract_interpreter)
 
 find_sphinx_components()
 if (Sphinx_BUILD_EXECUTABLE)
-#   message("Sphinx_BUILD_EXECUTABLE is ${Sphinx_BUILD_EXECUTABLE}")
-   if (NOT ${Sphinx_PYTHON_EXECUTABLE})
+   #message("Sphinx_BUILD_EXECUTABLE is ${Sphinx_BUILD_EXECUTABLE}")
+   #message("Sphinx_PYTHON_EXECUTABLE is '${Sphinx_PYTHON_EXECUTABLE}'")
+   if (NOT Sphinx_PYTHON_EXECUTABLE)
      extract_interpreter(FILE ${Sphinx_BUILD_EXECUTABLE} DESTINATION Sphinx_EXECUTABLE_TMP)
-   endif()
-
-   if (NOT "${Sphinx_PYTHON_EXECUTABLE}")
      set( Sphinx_PYTHON_EXECUTABLE ${Sphinx_EXECUTABLE_TMP}
        CACHE FILEPATH "Python interpreter to use to run Sphinx"
        )
