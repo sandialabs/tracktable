@@ -167,6 +167,15 @@ if (BUILD_DOCUMENTATION)
   set( DOC_BINARY_DIR ${Tracktable_BINARY_DIR}/Documentation )
 
   if(DOXYGEN_FOUND)
+
+    #Now, let's look for dot and see if it's installed
+    find_program(DOT_FOUND dot)
+    if (DOT_FOUND)
+      set(HAVE_DOT YES)
+    else(DOT_FOUND)
+      set(HAVE_DOT NO)
+    endif(DOT_FOUND)
+
     configure_file(
       ${DOC_SOURCE_DIR}/Doxyfile.in
       ${DOC_BINARY_DIR}/Doxyfile
@@ -184,7 +193,25 @@ if (BUILD_DOCUMENTATION)
       DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}/cpp_reference
     )
 
+    # We have found Sphinx, but that isn't the end of it. We need to make sure the sphinx_rtd_theme is accessible
     if(Sphinx_FOUND)
+      #message("Sphinx_EXECUTABLE_TMP ${Sphinx_EXECUTABLE_TMP}")
+      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c" 
+			"import re; import sphinx_rtd_theme; print(re.compile('/__init__.py.*').sub('',sphinx_rtd_theme.__file__))"
+			RESULT_VARIABLE SPHINX_RTD_THEME_STATUS 
+			OUTPUT_VARIABLE SPHINX_RTD_THEME_LOCATION
+			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+      #message("SPHINX_RTD_THEME_STATUS ${SPHINX_RTD_THEME_STATUS}")
+      #message("SPHINX_RTD_THEME_LOCATION ${SPHINX_RTD_THEME_LOCATION}")
+      if(NOT SPHINX_RTD_THEME_STATUS)
+			set(PY_SPHINX_RTD_THEME ${SPHINX_RTD_THEME_LOCATION} CACHE STRING 
+				"Location of Python module sphinx_rtd_theme")
+      endif(NOT SPHINX_RTD_THEME_STATUS)
+      find_package_handle_standard_args(PY_sphinx_rtd_theme DEFAULT_MSG PY_SPHINX_RTD_THEME)
+      #message("PY_SPHINX_RTD_THEME ${PY_SPHINX_RTD_THEME}")
+    endif(Sphinx_FOUND)
+
+    if(Sphinx_FOUND AND PY_SPHINX_RTD_THEME)
 
       # Yes, I'm writing a file into the source tree.  Sphinx requires
       # that its configuration file (conf.py) exist in the source tree
@@ -220,9 +247,9 @@ if (BUILD_DOCUMENTATION)
         DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
       )
 
-    else(Sphinx_FOUND)
+    else(Sphinx_FOUND AND PY_SPHINX_RTD_THEME)
       message("WARNING: Sphinx executables not found. Only Doxygen html will be built.")
-    endif(Sphinx_FOUND)
+    endif(Sphinx_FOUND AND PY_SPHINX_RTD_THEME)
 
   else(DOXYGEN_FOUND)
     message("ERROR: Please provide paths to the Sphinx and Doxygen executables.")
