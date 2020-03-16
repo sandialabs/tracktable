@@ -286,9 +286,9 @@ def render_trajectories(trajectories,
     along the length of the trajectory.
 
     Arguments:
+        trajectories {iterable} -- Trajectories to render.
         map_canvas {Matplotlib axes} -- Map to draw into.  This will usually
             come from ``tracktable.render.mapmaker``.
-        trajectories {iterable} -- Trajectories to render.
 
     Keyword Arguments:
         color_map {string or matplotlib.colors.Colormap} -- Colors for
