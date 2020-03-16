@@ -43,6 +43,7 @@ import warnings
 import logging
 from logging import getLogger
 
+from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 def warn_deprecated(message):
     """Warn the caller that a function is deprecated
