@@ -81,7 +81,7 @@ def cartesian_map(map_bbox=None,
                       top=map_bbox.max_corner[1])
         proj.bbox = map_bbox
 
-    return (proj, artists)
+    return (axes, artists)
 
 # ----------------------------------------------------------------------
 
