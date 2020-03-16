@@ -437,12 +437,15 @@ def draw_traffic(traffic_map,
             else:
                 dot_color_kwargs = {'c': dot_color}
 
-            dot_collection = traffic_map.scatter(lead_point_x, lead_point_y,
-                                                 s=dot_size,
-                                                 linewidth=0,
-                                                 marker='o',
-                                                 zorder=dot_zorder,
-                                                 **dot_color_kwargs)
+            if axes is None:
+                axes = matplotlib.pyplot.gca()
+
+            dot_collection = axes.scatter(lead_point_x, lead_point_y,
+                                          s=dot_size,
+                                          linewidth=0,
+                                          marker='o',
+                                          zorder=dot_zorder,
+                                          **dot_color_kwargs)
             all_artists.append(dot_collection)
 
         if label_objects:
