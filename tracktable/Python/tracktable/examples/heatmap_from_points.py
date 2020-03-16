@@ -188,9 +188,8 @@ def render_histogram(mymap,
 
     if domain not in ['terrestrial', 'cartesian2d']:
         raise AttributeError(('Domain {} is either misspelled (case matters) '
-                              'or does not yet have histogram '
+                              'or does not have histogram '
                               'support.').format(domain))
-
 
     if domain == 'terrestrial' and bounding_box is None:
         # Deduce bounding box from map.  Whatever the user requested
@@ -210,6 +209,7 @@ def render_histogram(mymap,
 
 # ----------------------------------------------------------------------
 
+
 def points_from_file(
     infile,
     coordinate0_column,
@@ -228,21 +228,22 @@ def points_from_file(
 
     >>> all_points = list(points_from_file(infile, 2, 3))
 
-    Arguments: 
+    Arguments:
         infile {file-like object}: Data source for points
         coordinate0_column {int}: Column in file for x/longitude
         coordinate1_column {int}: Column in file for y/latitude
-      
+
     Keyword Arguments:
-        comment_character {single-character string}: Ignore lines in the input 
+        comment_character {single-character string}: Ignore lines in the input
             that have this as the first non-whitespace character.  Defaults to
             '#'.
         field_delimiter {single-character string}: This character is the field
-            separator in the input and must be escaped inside strings.  
+            separator in the input and must be escaped inside strings.
             Defaults to ','.
         domain {(}string naming point domain}: Must be either 'terrestrial' or
-            'cartesian2d' depending on whether your points are longitude/latitude
-            or arbitrary Cartesian coordinates.  Defaults to 'terrestrial'.
+            'cartesian2d' depending on whether your points are
+            longitude/latitude or arbitrary Cartesian coordinates.  Defaults
+            to 'terrestrial'.
 
     Returns:
         Iterable of tracktable.domain.<domain>.BasePoints.
