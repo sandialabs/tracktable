@@ -449,11 +449,13 @@ def main():
                 # forcing assembly
                 trajectory_source = list(trajectory_source)
                 data_bbox = geomath.compute_bounding_box(
-                    itertools.chain(trajectory_source)
+                    itertools.chain(*trajectory_source)
                     )
+                if args.map_bbox is None:
+                    args.map_bbox = [0] * 4
                 args.map_bbox[0] = data_bbox.min_corner[0]
-                args.map_bbox[1] = data_bbox.max_corner[0]
-                args.map_bbox[2] = data_bbox.min_corner[1]
+                args.map_bbox[1] = data_bbox.min_corner[1]
+                args.map_bbox[2] = data_bbox.max_corner[0]
                 args.map_bbox[3] = data_bbox.max_corner[1]
 
         #
@@ -467,13 +469,6 @@ def main():
         logger.info('Initializing map canvas.')
         mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
         (mymap, artists) = mapmaker.mapmaker(**mapmaker_kwargs)
-
-        #paths.draw_traffic(
-        #  traffic_map=mymap,
-        #  trajectory_iterable=trajectory_source,
-        #  color_map=args.trajectory_colormap,
-        #  linewidth=args.trajectory_linewidth
-        #  )
 
         render_trajectories(trajectory_source,
                             mymap,
