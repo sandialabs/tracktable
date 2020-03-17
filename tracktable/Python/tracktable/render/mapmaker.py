@@ -292,13 +292,13 @@ def _make_bounding_box(bbox_args, domain):
     if type(bbox_args) is list and len(bbox_args) == 4:
         if domain == 'terrestrial':
             from tracktable.domain.terrestrial import BoundingBox as TerrestrialBoundingBox
-            min_corner = (bbox_args[0], bbox_args[2])
-            max_corner = (bbox_args[1], bbox_args[3])
+            min_corner = (bbox_args[0], bbox_args[1])
+            max_corner = (bbox_args[2], bbox_args[3])
             return TerrestrialBoundingBox(min_corner, max_corner)
         elif domain == 'cartesian2d':
             from tracktable.domain.cartesian2d import BoundingBox as Cartesian2DBoundingBox
-            min_corner = (bbox_args[0], bbox_args[2])
-            max_corner = (bbox_args[1], bbox_args[3])
+            min_corner = (bbox_args[0], bbox_args[1])
+            max_corner = (bbox_args[2], bbox_args[3])
             return Cartesian2DBoundingBox(min_corner, max_corner)
         else:
             raise ValueError('Custom bounding box for domain {} is not defined.'.format(domain))
