@@ -87,17 +87,12 @@ You can control the following aspects of the rendering:
 
 from __future__ import print_function
 
-# Tell Matplotlib to use the non-interactive backend so that we can
-# run this script without a window system.  We do this before anything
-# else so that we can be sure that no other package can initialize
-# Matplotlib to default to a window system.
-
+import logging
 import sys
 
 from tracktable.core import geomath
-import logging
 from tracktable.script_helpers import argparse, argument_groups
-from tracktable.render import histogram2d, mapmaker 
+from tracktable.render import histogram2d, mapmaker
 from tracktable.domain import domain_module_from_name
 from tracktable.domain import terrestrial, cartesian2d
 
@@ -113,10 +108,6 @@ from matplotlib import pyplot # noqa
 
 # ----------------------------------------------------------------------
 
-# Note: There is more work to do here to expose options for the
-# linewidths, line colors, Z-order and background color for the map.
-# That work will happen once we get this script up and running in the
-# first place.
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -276,8 +267,8 @@ def main():
     ]
 
     logger.info("Initializing image canvas.")
-    figure = pyplot.figure(figsize=figure_dimensions, 
-                           facecolor='black', 
+    figure = pyplot.figure(figsize=figure_dimensions,
+                           facecolor='black',
                            edgecolor='black')
     axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor='black')
     axes.set_frame_on(False)
@@ -345,7 +336,7 @@ def main():
                          color_map=args.colormap,
                          scale_type=args.scale)
 
-    # We're done with the points so we exit the with: block where we held 
+    # We're done with the points so we exit the with: block where we held
     # the input file open.
     if args.title is not None:
         logger.info("Setting title: {}".format(args.title))
