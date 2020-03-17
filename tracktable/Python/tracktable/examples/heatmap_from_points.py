@@ -195,6 +195,7 @@ def render_histogram(mymap,
         # Deduce bounding box from map.  Whatever the user requested
         # has already been figured out there.
         extent = mymap.get_extent()
+        # Matplotlib axes supply their extent as (x_min, xmax, y_min, y_max)
         bounding_box = terrestrial.BoundingBox(
             terrestrial.BasePoint(extent[0], extent[2]),
             terrestrial.BasePoint(extent[1], extent[3]))
@@ -304,28 +305,27 @@ def main():
         # For the moment I elect to read the points and keep them in memory.
         if args.domain == 'cartesian2d':
             if args.map_bbox is None:
-                logger.info("Collecting points to compute Cartesian bounding box.")
+                logger.info(('Collecting points to compute Cartesian '
+                             'bounding box.'))
                 point_source = list(point_source)
                 data_bbox = geomath.compute_bounding_box(point_source)
             else:
-                data_bbox = cartesian2d.BoundingBox()
-                # The bounding box on the command line is 
-                # [x_min, x_max, y_min, y_max]
-                data_bbox.min_corner[0] = args.map_bbox[0]
-                data_bbox.min_corner[1] = args.map_bbox[2]
-                data_bbox.max_corner[0] = args.map_bbox[1]
-                data_bbox.max_corner[1] = args.map_bbox[3]
+                # The bounding box on the command line is
+                # [x_min, y_min, x_max, y_max]
+                data_bbox = cartesian2d.BoundingBox(
+                    (args.map_bbox[0], args.map_bbox[1]),
+                    (args.map_bbox[2], args.map_bbox[3])
+                    )
         else:
             # Default to taking the histogram bounds from the map extent.
             data_bbox = None
             if args.map_bbox is not None:
-                data_bbox = terrestrial.BoundingBox()
-                # The bounding box on the command line is 
-                # [x_min, x_max, y_min, y_max]
-                data_bbox.min_corner[0] = args.map_bbox[0]
-                data_bbox.min_corner[1] = args.map_bbox[2]
-                data_bbox.max_corner[0] = args.map_bbox[1]
-                data_bbox.max_corner[1] = args.map_bbox[3]
+                # The bounding box on the command line is
+                # [x_min, y_min, x_max, y_max]
+                data_bbox = terrestrial.BoundingBox(
+                    (args.map_bbox[0], args.map_bbox[1]),
+                    (args.map_bbox[2], args.map_bbox[3])
+                    )
 
         logger.info("Creating map projection.")
         # There are a lot of keyword arguments for the map -- see
