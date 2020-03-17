@@ -721,7 +721,7 @@ def compute_bounding_box(point_sequence, buffer=()):
     else:
         global LOGGER
         LOGGER.debug("Bounding box points: {}, {}".format(
-            min_corner, 
+            min_corner,
             max_corner))
         result = bbox_type(min_corner, max_corner)
         LOGGER.debug("Final bounding box: {}".format(result))
@@ -921,12 +921,12 @@ def radius_of_gyration(trajectory):
 
 def convex_hull_centroid(trajectory):
     """Compute the centroid of the convex hull of a trajectory
- 
+
     Centroid will be returned in the native units of
     the domain.  This is: latitude, longitude (altitude) for the
     terrestrial domain; and x, y (z) for Cartesian.
     """
-    
+
     return _convex_hull_centroid(trajectory)
 
 # ----------------------------------------------------------------------
@@ -964,9 +964,9 @@ def longitude_degree_size(latitude):
 def kms_to_lon(kms, latitude):
     """
     kms_to_lon(kms: float, latitude: float between -90 and 90) -> float (in longitude)
-    
+
     Compute the degrees-longitude conversion for a distance in km, at a given latitude.
-    This is because as you move towards the poles, the km/longitude ratio decreases 
+    This is because as you move towards the poles, the km/longitude ratio decreases
     """
 
     return kms / longitude_degree_size(latitude)
@@ -976,7 +976,7 @@ def kms_to_lon(kms, latitude):
 def kms_to_lat(kms, latitude):
     """
     kms_to_lat(kms: float, latitude: float between -90 and 90) -> float (in latitude)
-    
+
     Compute the degrees-latitude conversion for a distance in km, at a given latitude.
     """
 
