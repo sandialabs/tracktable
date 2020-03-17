@@ -32,11 +32,12 @@
 import sys
 import os.path
 import matplotlib
-matplotlib.use('Agg')
-
 from matplotlib import pyplot
+
 from tracktable.render.mapmaker import mapmaker
 from tracktable.core import test_utilities
+
+matplotlib.use('Agg')
 
 # ----------------------------------------------------------------------
 
@@ -46,7 +47,7 @@ def test_florida_map(ground_truth_dir,
 
     pyplot.figure(figsize=(8, 8))
     # This is approximately Florida
-    bounding_box = [-88, -79.5, 24, 31]
+    bounding_box = [-88, 24, -79.5, 31]
     (mymap, artists) = mapmaker(domain='terrestrial',
                                 map_name='custom',
                                 map_bbox=bounding_box,
