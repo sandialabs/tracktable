@@ -135,7 +135,6 @@ option(BUILD_SHARED_LIBS "Build shared libraries.  Required for Python wrapping.
 option(BUILD_PYTHON_WRAPPING "Wrap trajectory classes for use in Python." ON)
 option(BUILD_EXAMPLES "Build tracktable example programs" ON)
 option(BUILD_DOCUMENTATION "Build documentation for Tracktable." OFF)
-option(USE_ANACONDA_LINK_FLAGS "Use Anaconda-specific link flags." OFF)
 
 # ----------------------------------------------------------------------
 
@@ -196,22 +195,34 @@ if (BUILD_DOCUMENTATION)
     # We have found Sphinx, but that isn't the end of it. We need to make sure the sphinx_rtd_theme is accessible
     if(Sphinx_FOUND)
       #message("Sphinx_EXECUTABLE_TMP ${Sphinx_EXECUTABLE_TMP}")
-      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c" 
+      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
 			"import re; import sphinx_rtd_theme; print(re.compile('/__init__.py.*').sub('',sphinx_rtd_theme.__file__))"
-			RESULT_VARIABLE SPHINX_RTD_THEME_STATUS 
+			RESULT_VARIABLE SPHINX_RTD_THEME_STATUS
 			OUTPUT_VARIABLE SPHINX_RTD_THEME_LOCATION
 			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
       #message("SPHINX_RTD_THEME_STATUS ${SPHINX_RTD_THEME_STATUS}")
       #message("SPHINX_RTD_THEME_LOCATION ${SPHINX_RTD_THEME_LOCATION}")
       if(NOT SPHINX_RTD_THEME_STATUS)
-			set(PY_SPHINX_RTD_THEME ${SPHINX_RTD_THEME_LOCATION} CACHE STRING 
+			set(PY_SPHINX_RTD_THEME ${SPHINX_RTD_THEME_LOCATION} CACHE STRING
 				"Location of Python module sphinx_rtd_theme")
       endif(NOT SPHINX_RTD_THEME_STATUS)
       find_package_handle_standard_args(PY_sphinx_rtd_theme DEFAULT_MSG PY_SPHINX_RTD_THEME)
       #message("PY_SPHINX_RTD_THEME ${PY_SPHINX_RTD_THEME}")
+
+      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
+			"import re; import breathe; print(re.compile('/__init__.py.*').sub('',breathe.__file__))"
+			RESULT_VARIABLE BREATHE_STATUS
+			OUTPUT_VARIABLE BREATHE_LOCATION
+			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+      if(NOT BREATHE_STATUS)
+			set(PY_BREATHE ${BREATHE_LOCATION} CACHE STRING
+				"Location of Python module breathe")
+      endif(NOT BREATHE_STATUS)
+      find_package_handle_standard_args(PY_breathe DEFAULT_MSG PY_BREATHE)
+
     endif(Sphinx_FOUND)
 
-    if(Sphinx_FOUND AND PY_SPHINX_RTD_THEME)
+    if(Sphinx_FOUND AND PY_SPHINX_RTD_THEME AND PY_BREATHE)
 
       # Yes, I'm writing a file into the source tree.  Sphinx requires
       # that its configuration file (conf.py) exist in the source tree
@@ -247,9 +258,9 @@ if (BUILD_DOCUMENTATION)
         DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
       )
 
-    else(Sphinx_FOUND AND PY_SPHINX_RTD_THEME)
+    else(Sphinx_FOUND AND PY_SPHINX_RTD_THEME AND PY_BREATHE)
       message("WARNING: Sphinx executables not found. Only Doxygen html will be built.")
-    endif(Sphinx_FOUND AND PY_SPHINX_RTD_THEME)
+    endif(Sphinx_FOUND AND PY_SPHINX_RTD_THEME AND PY_BREATHE)
 
   else(DOXYGEN_FOUND)
     message("ERROR: Please provide paths to the Sphinx and Doxygen executables.")
@@ -271,13 +282,8 @@ if (BUILD_PYTHON_WRAPPING)
 endif ()
 # ----------------------------------------------------------------------
 
-if (BUILD_PYTHON_WRAPPING)
-  if (NOT BUILD_SHARED_LIBS)
-    message("Python wrapping requires shared libraries.  Please turn on BUILD_SHARED_LIBS.")
-  endif ()
-  if (USE_ANACONDA_LINK_FLAGS)
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-  endif (USE_ANACONDA_LINK_FLAGS)
+if (BUILD_PYTHON_WRAPPING AND NOT BUILD_SHARED_LIBS)
+  message("Python wrapping requires shared libraries.  Please turn on BUILD_SHARED_LIBS.")
 endif ()
 
 
@@ -367,8 +373,8 @@ endif ()
 if (LINUX)
 
   configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/packaging/rpm/rhel7/tracktable.spec.in" 
-    "${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.spec" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/packaging/rpm/rhel7/tracktable.spec.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.spec"
     @ONLY
     IMMEDIATE
     )
@@ -399,11 +405,11 @@ if (LINUX)
         ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/rpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-doc-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.noarch.rpm
       VERBATIM
   )
-  
+
   add_custom_target(rpm
       DEPENDS rpm_rhel7_x86_64
   )
-  
+
 endif ()
 
 #-------------------------------------------------------------------------
