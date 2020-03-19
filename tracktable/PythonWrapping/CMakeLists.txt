@@ -53,12 +53,14 @@
 set(Boost_PYTHON_LIBRARY_SUFFIX "")
 
 find_package(Boost 1.61 COMPONENTS date_time regex REQUIRED)
-find_package(PythonInterp)
-if (PYTHONINTERP_FOUND)
-  find_package(PythonLibs)
-endif (PYTHONINTERP_FOUND)
+find_package(Python3 COMPONENTS Interpreter Development NumPy)
 
-if (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
+#message("Python3_INCLUDE_DIRS ${Python_INCLUDE_DIRS}")
+#message("Python3_LIBRARIES ${Python_LIBRARIES}")
+#message("Python3_LIBRARY_DIRS ${Python_LIBRARY_DIRS}")
+
+if (Boost_FOUND AND EXISTS ${Python_EXECUTABLE})
+  message("Boost_VERSION ${Boost_VERSION}")
   if (Boost_VERSION VERSION_LESS 106700)
     # This version of Boost generates libboost_python[3].so.
     if (PYTHON_VERSION_MAJOR EQUAL 2)
@@ -67,16 +69,19 @@ if (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
       set(Boost_PYTHON_LIBRARY_SUFFIX "3")
     endif()
   else (Boost_VERSION VERSION_LESS 106700)
+    #message("Python3_VERSION_MAJOR ${Python3_VERSION_MAJOR}")
+    #message("Python3_VERSION_MINOR ${Python3_VERSION_MINOR}")
     # This version of Boost needs a versioned library.
-    set(Boost_PYTHON_LIBRARY_SUFFIX "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
+    set(Boost_PYTHON_LIBRARY_SUFFIX "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}")
   endif (Boost_VERSION VERSION_LESS 106700)
 
   # Force CMake to go back and find Boost again instead of relying on cached values.
   unset(Boost_FOUND)
+  #message("Boost_PYTHON_LIBRARY_SUFFIX ${Boost_PYTHON_LIBRARY_SUFFIX}")
   find_package(Boost 1.61 COMPONENTS date_time regex python${Boost_PYTHON_LIBRARY_SUFFIX})
-else (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
+else (Boost_FOUND AND EXISTS ${Python_EXECUTABLE})
   message(WARNING "Boost.Python library version cannot be determined until both Boost and Python have been found.")
-endif (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
+endif (Boost_FOUND AND EXISTS ${Python_EXECUTABLE})
 
 # ----------------------------------------------------------------------
 #
@@ -97,8 +102,8 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-else ()  
+  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${Python3_LIBRARIES})
+else ()
   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
 endif()
 
@@ -112,11 +117,11 @@ configure_file(
   )
 
 include_directories(
+  ${Python3_INCLUDE_DIRS}
+  ${Python3_NumPy_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIR}
   ${Tracktable_SOURCE_DIR}
   ${Tracktable_BINARY_DIR}
-  ${Boost_INCLUDE_DIR}
-  ${PYTHON_INCLUDE_DIRS}
-  ${NUMPY_INCLUDE_DIRS}
   )
 
 link_directories(
@@ -142,6 +147,7 @@ add_library(_tracktable_hello MODULE
 # puts the target into a folder in Visual studio
 set_property(TARGET _tracktable_hello           PROPERTY FOLDER "Python")
 
+#message("PYTHON_EXTENSION_LIBRARIES ${PYTHON_EXTENSION_LIBRARIES}")
 target_link_libraries(_tracktable_hello
   ${PYTHON_EXTENSION_LIBRARIES}
   )
@@ -292,12 +298,12 @@ install_python_extension(_rtree lib ${Tracktable_PYTHON_DIR})
 
 get_filename_component(
   PYTHON_EXECUTABLE_DIRECTORY
-  ${PYTHON_EXECUTABLE}
+  ${Python_EXECUTABLE}
   DIRECTORY
   )
 
 message(STATUS "Adding wheel target.")
-message(STATUS "INFO: Python executable is ${PYTHON_EXECUTABLE}")
+message(STATUS "INFO: Python executable is ${Python_EXECUTABLE}")
 message(STATUS "INFO: Install prefix is ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "INFO: Wheel should go in ${CMAKE_BINARY_DIR}/wheel")
 
@@ -325,7 +331,7 @@ endif (UNIX AND NOT APPLE)
 add_custom_target( wheel
   COMMAND
   ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
-  ${PYTHON_EXECUTABLE}
+  ${Python_EXECUTABLE}
   ${CMAKE_BINARY_DIR}
   ${CMAKE_INSTALL_PREFIX}
   ${CMAKE_BINARY_DIR}/wheel
