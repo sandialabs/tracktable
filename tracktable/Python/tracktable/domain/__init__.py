@@ -37,13 +37,13 @@ types for each different point domain.
 
 import importlib
 
-all_domains = ['terrestrial', 'cartesian2d', 'cartesian3d']
+all_domains = ['terrestrial', 'cartesian2d', 'cartesian3d', 'feature_vectors']
 
 
 def domain_module_from_name(_domain):
     """domain_module_from_name(name: string) -> domain module
 
-    Given the name of one of Tracktable's point domains 
+    Given the name of one of Tracktable's point domains
     (terrestrial, cartesian2d, cartesian3d), return the
     module object for that domain.
 
@@ -63,9 +63,10 @@ def domain_module_from_name(_domain):
     global all_domains
     domain = _domain.lower()
     if domain not in all_domains:
-        raise KeyError(('Requested domain {} is not in list of '
-                        'available domains: {}').format(_domain,
-                                                        all_domains))
+        raise AttributeError(
+            ('Requested domain {} is not in list of '
+             'available domains: {}').format(_domain,
+                                             all_domains))
     domain_to_import = 'tracktable.domain.{}'.format(domain)
     domain_module = importlib.import_module(domain_to_import)
     return domain_module
@@ -102,6 +103,7 @@ def domain_module_for_object(thing):
             "point, trajectory, or bounding box?"
             ).format(type(thing))) from e
 
+
 def domain_class_for_object(thing, desired_class):
     """domain_class_for_object(thing: object, class_name: string) -> class object
 
@@ -136,3 +138,40 @@ def domain_class_for_object(thing, desired_class):
             ).format(desired_class))
     else:
         return getattr(domain, desired_class)
+
+
+def domain_class(domain_name, class_name):
+    """Fetch the class object for a named class in a named domain
+
+    Given the name of a Tracktable domain (terrestrial, cartesian2d,
+    cartesian3d, feature_vectores) and the name of a class (BasePoint,
+    TrajectoryPoint, Trajectory, BoundingBox), return the class object
+    so that you can instantiate it.
+
+    Arguments:
+        domain_name {string}: Name of point domain.  Must be one of
+            "terrestrial", "cartesian2d", "cartesian3d", or "feature_vectors".
+        class_name {string}: Name of class.  Must be one of "BasePoint",
+            "TrajectoryPoint", "Trajectory", or "BoundingBox".
+
+    Returns:
+        Class object for the specified class.
+
+    Raises:
+        AttributeError: you specified a domain or a class that doesn't
+            exist
+    """
+
+   domain_module = domain_module_from_name(domain_name)
+   if class_name not in [
+                "BasePoint", "TrajectoryPoint", "Trajectory", "BoundingBox"
+            ]:
+        raise AttributeError(
+            ("You requested a class ({}) that does not exist "
+             "in Tracktable.").format(class_name))
+    try:
+        return getattr(domain_module, class_name)
+    except AttributeError:
+        raise AttributeError(("The requested class ({}) does not exist in the "
+                              "{} domain.").format(class_name, domain_name))
+
