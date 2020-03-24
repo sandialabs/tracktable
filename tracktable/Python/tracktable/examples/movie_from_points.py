@@ -37,8 +37,10 @@ from tracktable.filter.trajectory import (
     ClipToTimeWindow as ClipTrajectoryToTimeWindow,
     FilterByBoundingBox as FilterTrajectoriesByBoundingBox
     )
+
+import tracktable.domain
+
 from tracktable.core import geomath, logging, Timestamp
-from tracktable.domain import domain_module_from_name, domain_class
 from tracktable.render import colormaps, mapmaker, paths
 from tracktable.script_helpers import argument_groups, argparse, n_at_a_time
 from tracktable.source.trajectory import AssembleTrajectoryFromPoints
@@ -57,123 +59,11 @@ matplotlib.use('Agg')
 
 # ----------------------------------------------------------------------
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description='Render a movie of traffic found in a delimited text file',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    argument_groups.use_argument_group("delimited_text_point_reader", parser)
-    argument_groups.use_argument_group("trajectory_assembly", parser)
-    argument_groups.use_argument_group("trajectory_rendering", parser)
-    argument_groups.use_argument_group("mapmaker", parser)
-    argument_groups.use_argument_group("movie_rendering", parser)
 
-    parser.add_argument('--trail-duration',
-                        help='How long should each object\'s trail last? (seconds)',
-                        type=int,
-                        default=300)
-
-    parser.add_argument('point_data_file',
-                        nargs=1,
-                        help='Delimited text file containing point data')
-
-    parser.add_argument('movie_file',
-                        nargs=1,
-                        help='Filename for trajectory movie')
-
-    args = parser.parse_args()
-    if args.resolution is None:
-        args.resolution = [800, 600]
-    if args.delimiter == 'tab':
-        args.delimiter = '\t'
-
-    return args
-
-
-# ---------------------------------------------------------------------
-
-
-def trajectory_points_from_file(
-      infile,
-      object_id_column,
-      timestamp_column,
-      coordinate0_column,
-      coordinate1_column,
-      string_fields=None,
-      real_fields=None,
-      time_fields=None,
-      comment_character='#',
-      field_delimiter=',',
-      domain='terrestrial'
-      ):
-    """points_from_file: Load a list of points from a delimited text file
-
-    Use tracktable.domain.<domain>.BasePointReader to read points from a file.
-    Results are returned as an iterable.
-
-    Note: You can only iterate over the resulting point sequence once.  If you
-    need to do more than that, save the points in a list:
-
-    >>> all_points = list(points_from_file(infile, 2, 3))
-
-    Note: The function 'extract_field_assignments_from_arguments' will help
-        you pull out rela_fields, string_fields, and time_fields from a
-        set of parsed arguments.
-
-    Arguments:
-        infile {file-like object}: Data source for points
-        object_id_column {int}: Column in file containing object ID
-        timestamp_column {int}: Column in file containing timestamps for points
-        coordinate0_column {int}: Column in file for x/longitude
-        coordinate1_column {int}: Column in file for y/latitude
-
-    Keyword Arguments:
-        string_fields {dict, string->int}: Columns in the input file that we
-            want to add to points as string properties.  The keys in this
-            dict should be the name of the field and the values should be the
-            integer column IDs (first column is 0).
-        real_fields {dict, string->int}: Columns in the input file that we
-            want to add to points as real-valued properties.  The keys in this
-            dict should be the name of the field and the values should be the
-            integer column IDs (first column is 0).
-        time_fields {dict, string->int}: Columns in the input file that we
-            want to add to points as timestamp-valued properties.  The keys in
-            this dict should be the name of the field and the values should be
-            the integer column IDs (first column is 0).
-        comment_character {single-character string}: Ignore lines in the input
-            that have this as the first non-whitespace character.  Defaults to
-            '#'.
-        field_delimiter {single-character string}: This character is the field
-            separator in the input and must be escaped inside strings.
-            Defaults to ','.
-        domain {(}string naming point domain}: Must be either 'terrestrial' or
-            'cartesian2d' depending on whether your points are
-            longitude/latitude or arbitrary Cartesian coordinates.  Defaults
-            to 'terrestrial'.
-
-    Returns:
-        Iterable of tracktable.domain.<domain>.TrajectoryPoints.
-    """
-    domain_module = domain_module_from_name(domain)
-    reader_type = getattr(domain_module, 'TrajectoryPointReader')
-    reader = reader_type()
-    reader.input = infile
-    reader.object_id_column = object_id_column
-    reader.timestamp_column = timestamp_column
-    reader.coordinates[0] = coordinate0_column
-    reader.coordinates[1] = coordinate1_column
-    reader.comment_character = comment_character
-    reader.field_delimiter = field_delimiter
-
-    return reader
-
-
-# ----------------------------------------------------------------------
-
-
-def trajectories_from_points(point_source,
-                             separation_distance=1000,
-                             separation_time=datetime.timedelta(hours=24),
-                             minimum_length=2):
+def assemble_trajectories(point_source,
+                          separation_distance=1000,
+                          separation_time=datetime.timedelta(hours=24),
+                          minimum_length=2):
     """Assemble a sequence of points into trajectories
 
     This function will instantiate and configure a `tracktable.source.
@@ -215,46 +105,35 @@ def trajectories_from_points(point_source,
 
     return assembler
 
-
 # ----------------------------------------------------------------------
 
 
-def initialize_canvas(resolution,
-                      dpi=72,
-                      facecolor='black'):
-    """Set up Matplotlib canvas for rendering
+def cleanup_frame(artists_to_remove):
+    """Restore the figure to just the background decorations
 
-    This function sets up a Matplotlib figure with specified resolution,
-    DPI, and background/edge color.
-
-    Since font sizes are specified in points, the combination of DPI and
-    resolution determines how large a font will appear when text is
-    rendered into the image.  One inch is 72 points, so a 12-point font
-    will produce text where each line is (dpi / 6) pixels tall.
-
-    Arguments:
-        resolution {2 ints}: how large the images should be in pixels
-
-    Keyword arguments:
-        dpi {integer}: how many pixels per inch (pertains to text rendering).
-            Defaults to 72.
-        facecolor {string}: Default color for image background.  Can be
-            specified as the name of a color ('black'), a float value for
-            grays (0.75 == #B0B0B0), an RGBA tuple ((1, 0, 0, 1) is red),
-            or an #RRGGBB string.  Defaults to 'black'.
-
-    Returns:
-        (figure, axes), where 'figure' is a Matplotlib figure and 'axes'
-        are the default axes to render into.
+    At the beginning of each frame we have just the geometry
+    related to the background map and any decorations thereupon.
+    After we render trajectories and save the image to the video
+    encoder, we use this function to restore the frame to its beginning state.
     """
 
-    figure_dimensions = compute_figure_dimensions(resolution, dpi)
-    figure = pyplot.figure(figsize=figure_dimensions,
-                           facecolor=facecolor)
-    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor=facecolor)
-    axes.set_frame_on(False)
+    for artist in artists_to_remove:
+        artist.remove()
 
-    return (figure, axes)
+# ---------------------------------------------------------------------
+
+
+def clip_trajectories_to_interval(trajectories, start, end):
+    trajectories_this_frame = [
+        t for t in trajectories if trajectory_overlaps_interval(start, end)
+    ]
+
+    clipped_trajectories = (
+        geomath.subset_during_interval(t, start, end)
+        for t in trajectories_this_frame
+        )
+
+    return clipped_trajectories
 
 # ----------------------------------------------------------------------
 
@@ -274,260 +153,6 @@ def compute_figure_dimensions(resolution, dpi):
     """
 
     return (float(resolution[0])/dpi, float(resolution[1])/dpi)
-
-
-# ----------------------------------------------------------------------
-
-
-def setup_encoder(encoder='ffmpeg',
-                  codec=None,
-                  encoder_args=None,
-                  movie_title='Tracktable Movie',
-                  movie_artist='Tracktable Trajectory Toolkit',
-                  movie_comment='',
-                  fps=30,
-                  **kwargs):
-    """Instantiate and configure a video encoder
-
-    Matplotlib supports video encoding with a writer interface that
-    takes several arguments including which program to use to do
-    the encoding and what parameters the encoder needs.  This
-    function is a convenience interface to that.
-
-    Keyword Arguments:
-        encoder {string}: Name of encoder.  This must be one of the
-            values in :code:`matplotlib.animation.writers.list`.
-            Default: 'ffmpeg' (requires that you have FFmpeg installed
-            on your system)
-        codec {string}: Name of specific encoding algorithm to use.
-            This is specific to the encoder you choose.  Default:
-            None (whatever the encoder prefers)
-        encoder_args {list of strings}: Any arguments you wish to
-            provide to the encoder.  These are passed through
-            to the underlying Matplotlib implementation as
-            :code:`extra_args`.  TODO: get a reference to a
-            documentation page in Matplotlib that explains what
-            these do
-        movie_title {string}: Title string to be embedded in the
-            movie's metadata.  This is not rendered on screen.
-            Default: "Tracktable Movie"
-        movie_artist {string}: Movie creator to be embedded in the
-            movie's metadata.  This is not rendered on screen.
-            Default: "Tracktable Trajectory Toolkit"
-        movie_comment {string}: Any other comments you want to
-            embed in metadata.  Default: empty string
-        fps {int}: Desired frames per second for the result.
-            Default: 30
-
-    Returns:
-        Matplotlib animation object configured with supplied parameters
-
-    Raises:
-        KeyError: You have requested an encoder that is not available
-            on this system
-    """
-
-    if encoder_args is None:
-        encoder_args = list()
-
-    if encoder not in matplotlib.animation.writers.list():
-        raise KeyError((
-            'Movie encoder {} is not available.  This system '
-            'has the following encoders available: {}').format(
-                encoder, matplotlib.animation.writers.list()))
-
-    movie_metadata = {'title': movie_title,
-                      'artist': movie_artist,
-                      'comment': movie_comment}
-
-    # The encoder args are passed to FFmpeg as if they were command-line
-    # parameters.
-    #
-    # TODO: what do other encoders expect as encoder_args?
-    if type(encoder_args) is str:
-        encoder_args = shlex.split(encoder_args)
-
-    writer = matplotlib.animation.writers[encoder]( fps=fps,
-                                                    codec=codec,
-                                                    metadata=movie_metadata,
-                                                    extra_args=encoder_args)
-
-    return writer
-
-# ----------------------------------------------------------------------
-
-
-def extract_typed_field_assignments(arguments,
-                                    field_type):
-    """Extract named field definitions from a dict of arguments
-
-    When running this script, the user specifies named fields that
-    the reader should process with arguments like
-    '--real-field-column altitude 12'.  This will cause the reader
-    to take column 12 in the data file, convert its contents to a
-    floating-point number, and store the result in a property
-    named "altitude" on each point.
-
-    This function is a convenience: it extracts those declarations
-    for a given field type (string, real, timestamp) from a dictionary
-    or namespace of arguments, then returns the result as a dictionary
-    that can be passed to trajectory_points_from_file().
-
-    Arguments:
-        arguments {dict}: Dictionary of parsed command-line arguments
-        field_type {string}: What type of property to extract.  Must be
-            'string', 'real' or 'time'.
-
-    Returns:
-        Dictionary containing { field_name: column_number } for the
-        specified field type.  Dictionary will be empty if there are
-        no assignments of that type.
-
-    Raises:
-        ValueError: invalid field type
-    """
-
-    if field_type not in ['string', 'real', 'time']:
-        raise ValueError(('Field type ({}) must be one of "string", '
-                          '"real", or "time".  Case matters').format(
-                                field_type))
-
-    arg_name = '{}_field_column'.format(field_type)
-    field_assignments = dict()
-    definition_list = arguments.get(arg_name, None)
-    if definition_list is not None:
-        if len(definition_list) > 0:
-            for (field_name, column) in n_at_a_time(definition_list, 2):
-                field_assignments[field_name] = int(column)
-
-    return field_assignments
-
-# ---------------------------------------------------------------------
-
-
-def trajectories_inside_box(trajectories, bounding_box):
-    """Filter trajectories to include only those inside a bounding box
-
-    We can speed up rendering quite a bit if we discard trajectories
-    that do not intersect the image being rendered.  This function
-    compares each trajectory against a user-supplied bounding box
-    (presumably the bounds for the map) and returns only those trajectories
-    that fall within the box.
-
-    Arguments:
-        trajectories {iterable of Tracktable trajectories}: Data
-            to test against bounding box
-        bounding_box {Tracktable bounding box}: box to test
-
-    Returns:
-        Iterable of trajectories that intersect the bounding box
-
-    Raises:
-        ValueError: bounding box must not be None
-    """
-
-    if bounding_box is None:
-        raise ValueError(('trajectories_inside_box: Bounding box must '
-                          'not be None.'))
-    return (t for t in trajectories if geomath.intersects(t, bounding_box))
-
-
-# ----------------------------------------------------------------------
-
-
-def map_extent_as_bounding_box(axes, domain='terrestrial'):
-    """Return a Tracktable bounding box for axes' drawable extent
-
-    This is a convenience function to grab the bounding box for
-    a set of Matplotlib axes and transform it to a Tracktable bounding
-    box that can be used for intersection calculations.
-
-    Note that this returns the extent of the drawable area itself without
-    including the part of the canvas (if any) that containins decorations
-    such as axis lines, ticks, and tick labels.
-
-    Arguments:
-        axes {Matplotlib axes}: Map for which you want the bounding box
-
-    Keyword arguments:
-        domain {string}: Coordinate domain for bounding box (default:
-            'terrestrial')
-
-    Returns:
-        Tracktable bounding box from appropriate point domain
-
-    Raises:
-        KeyError: 'domain' must be one of 'cartesian2d' or 'terrestrial'
-    """
-
-    if domain not in ['terrestrial', 'cartesian2d']:
-        raise KeyError(('map_extent_as_bounding_box: Domain must be '
-                        'either "cartesian2d" or "terrestrial".  You '
-                        'supplied "{}".').format(domain))
-
-    bounds = axes.get_window_extent()
-    x_min = bounds[0]
-    y_min = bounds[1]
-    x_max = bounds[2]
-    y_max = bounds[3]
-    bbox_type = domain_class(domain, 'BoundingBox')
-    return bbox_type(min_corner=(x_min, y_min),
-                     max_corner=(x_max, y_max))
-
-
-# ----------------------------------------------------------------------
-
-
-def cleanup_frame(artists_to_remove):
-    """Restore the figure to just the background decorations
-
-    At the beginning of each frame we have just the geometry
-    related to the background map and any decorations thereupon.
-    After we render trajectories and save the image to the video
-    encoder, we use this function to restore the frame to its beginning state.
-    """
-
-    for artist in artists_to_remove:
-        artist.remove()
-
-# ----------------------------------------------------------------------
-
-
-def trajectory_time_bounds(trajectories):
-    """Compute the collective start and end time of a set of trajectories
-
-    Arguments:
-        trajectories {iterable of Tracktable trajectories}: trajectories
-            whose bounds you want
-
-    Returns:
-        Pair of Python datetimes.  The first element is the earliest
-            timestamp in any of the trajectories.  The second element is
-            the latest timestamp.
-
-    Raises:
-        ValueError: input sequence is empty
-    """
-
-    start_time = None
-    end_time = None
-    for t in trajectories:
-        this_start_time = t[0].timestamp
-        this_end_time = t[-1].timestamp
-        if start_time is None:
-            start_time = this_start_time
-        else:
-            start_time = min(this_start_time, start_time)
-        if end_time is None:
-            end_time = this_end_time
-        else:
-            this_end_time = min(this_end_time, end_time)
-
-    if start_time is None:
-        raise ValueError('trajectory_time_bounds: Input sequence is empty')
-    else:
-        return (start_time, end_time)
-
 
 # ---------------------------------------------------------------------
 
@@ -574,99 +199,155 @@ def compute_movie_time_bounds(trajectories, user_start_time, user_end_time):
 
     return (start_time, end_time)
 
-
-# ---------------------------------------------------------------------
-
-
-def render_trajectory_movie(movie_writer,
-                            map_axes,
-                            trajectories,
-                            num_frames,
-                            trail_duration,
-                            figure=None,
-                            dpi=100,
-                            filename='movie.mp4',
-                            start_time=None,
-                            end_time=None,
-                            savefig_kwargs=dict(),
-                            trajectory_rendering_args=dict(),
-                            utc_offset=0,
-                            timezone_label=None):
-
-    # Steps:
-    # 1.  Cull trajectories that are entirely outside the map
-    # 2.  Annotate trajectories with scalars needed for color
-    # 3.  Compute frame duration
-    # 4.  Add clock to map
-    # 5.  Loop through frames
-    #
-    # I still need arguments to control whether the clock is included and,
-    # if so, where and how it's rendered.
-    logger = logging.getLogger(__name__)
-
-    (movie_start_time, movie_end_time) = compute_movie_time_bounds(
-        trajectories, start_time, end_time)
-
-    map_bbox = map_extent_as_bounding_box(map_axes)
-
-    # Cull out trajectories that do not overlap the map.  We do not
-    # clip them (at least not now) since that would affect measures
-    # like progress along the path.
-    trajectories_on_map = trajectories_inside_box(trajectories, map_bbox)
-
-    if len(trajectories_on_map) == 0:
-        raise ValueError(
-            ('No trajectories intersect the map bounding box ({:s}).  Is the '
-             'bounding box correct?').format(map_bbox))
-
-    # TODO: replace this with properly annotated trajectories when we add that
-    # feature back in for both the static map and movie renderer
-    annotated_trajectories = list(trajectories_on_map)
-
-    logger.info('Movie covers time span from {} to {}'.format(
-        movie_start_time.strftime("%Y-%m-%d %H:%M:%S"),
-        movie_end_time.strftime("%Y-%m-%d %H:%M:%S")))
+# --------------------------------------------------------------------
 
 
-    frame_duration = (datetime.timedelta(movie_end_time - movie_start_time) /
-                      num_frames)
-    first_frame_time = start_time + trail_duration
-    scalar_accessor = None
+def extract_field_assignments(arg_dict):
+    """Extract column->field assignments from arguments
 
-    def frame_time(which_frame):
-        return first_frame_time + which_frame * frame_duration
+    Field assignments are specified on the command line as arguments
+    like '--real-field speed 12', meaning "take the contents
+    of column 12 and add it to each point as a numeric field called
+    speed".  This function iterates over the arguments and extracts
+    all of those.
 
-    if figure is None:
-        figure = pyplot.gcf()
+    Arguments:
+        arg_dict {:obj:`dict`}: Command-line arguments to parse,
+        specified as a :obj:`dict`.  To get a dictionary from the
+        :obj:`Namespace` object returned by :code:`argparse.parse_args()`,
+        call :code:`vars()` on the args object.
 
-    with movie_writer.saving(figure, filename, dpi):
-        for i in range(0, num_frames):
-            current_time = frame_time(i)
-            trail_start_time = frame_time(i) - trail_duration
+    Returns:
+        Dictionary with three entries:
+            'real': Dictionary mapping column names (strings) to
+                    integer column IDs for real-valued fields
+            'string': Dictionary mapping column names (strings) to
+                    integer column IDs for string-valued fields
+            'time': Dictionary mapping column names (strings) to
+                    integer column IDs for timestamp-valued fields
+    """
 
-            logger.info(
-                ('Rendering frame {}: current_time {}, '
-                 'trail_start_time {}').format(
-                    i,
-                    current_time.strftime("%Y-%m-%d %H:%M:%S"),
-                    trail_start_time.strftime("%Y-%m-%d %H:%M:%S")))
+    return {
+        'real': _extract_typed_field_assignments(arg_dict, 'real'),
+        'string': _extract_typed_field_assignments(arg_dict, 'string'),
+        'time': _extract_typed_field_assignments(arg_dict, 'time')
+    }
 
-            frame_trajectories = clip_trajectories_to_interval(
-                annotated_trajectories,
-                start_time=trail_start_time,
-                end_time=current_time
-                )
+# ----------------------------------------------------------------------
 
-            trajectory_artists = render_annotated_trajectories(
-                frame_trajectories,
-                axes=map_axes,
-                extra_args=trajectory_rendering_args
-                )
 
-            # TODO: here we could also render the clock
-            #
-            movie_writer.grab_frame(savefig_kwargs)
-            cleanup_frame(trajectory_artists)
+def initialize_canvas(resolution,
+                      dpi=72,
+                      facecolor='black'):
+    """Set up Matplotlib canvas for rendering
+
+    This function sets up a Matplotlib figure with specified resolution,
+    DPI, and background/edge color.
+
+    Since font sizes are specified in points, the combination of DPI and
+    resolution determines how large a font will appear when text is
+    rendered into the image.  One inch is 72 points, so a 12-point font
+    will produce text where each line is (dpi / 6) pixels tall.
+
+    Arguments:
+        resolution {2 ints}: how large the images should be in pixels
+
+    Keyword arguments:
+        dpi {integer}: how many pixels per inch (pertains to text rendering).
+            Defaults to 72.
+        facecolor {string}: Default color for image background.  Can be
+            specified as the name of a color ('black'), a float value for
+            grays (0.75 == #B0B0B0), an RGBA tuple ((1, 0, 0, 1) is red),
+            or an #RRGGBB string.  Defaults to 'black'.
+
+    Returns:
+        (figure, axes), where 'figure' is a Matplotlib figure and 'axes'
+        are the default axes to render into.
+    """
+
+    figure_dimensions = compute_figure_dimensions(resolution, dpi)
+    figure = pyplot.figure(figsize=figure_dimensions,
+                           facecolor=facecolor)
+    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor=facecolor)
+    axes.set_frame_on(False)
+
+    return (figure, axes)
+
+# ----------------------------------------------------------------------
+
+
+def map_extent_as_bounding_box(axes, domain='terrestrial'):
+    """Return a Tracktable bounding box for axes' drawable extent
+
+    This is a convenience function to grab the bounding box for
+    a set of Matplotlib axes and transform it to a Tracktable bounding
+    box that can be used for intersection calculations.
+
+    Note that this returns the extent of the drawable area itself without
+    including the part of the canvas (if any) that containins decorations
+    such as axis lines, ticks, and tick labels.
+
+    Arguments:
+        axes {Matplotlib axes}: Map for which you want the bounding box
+
+    Keyword arguments:
+        domain {string}: Coordinate domain for bounding box (default:
+            'terrestrial')
+
+    Returns:
+        Tracktable bounding box from appropriate point domain
+
+    Raises:
+        KeyError: 'domain' must be one of 'cartesian2d' or 'terrestrial'
+    """
+
+    if domain not in ['terrestrial', 'cartesian2d']:
+        raise KeyError(('map_extent_as_bounding_box: Domain must be '
+                        'either "cartesian2d" or "terrestrial".  You '
+                        'supplied "{}".').format(domain))
+
+    bounds = axes.get_window_extent()
+    x_min = bounds[0]
+    y_min = bounds[1]
+    x_max = bounds[2]
+    y_max = bounds[3]
+    bbox_type = tracktable.domain.domain_class(domain, 'BoundingBox')
+    return bbox_type(min_corner=(x_min, y_min),
+                     max_corner=(x_max, y_max))
+
+# ----------------------------------------------------------------------
+
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Render a movie of traffic found in a delimited text file',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    argument_groups.use_argument_group("delimited_text_point_reader", parser)
+    argument_groups.use_argument_group("trajectory_assembly", parser)
+    argument_groups.use_argument_group("trajectory_rendering", parser)
+    argument_groups.use_argument_group("mapmaker", parser)
+    argument_groups.use_argument_group("movie_rendering", parser)
+
+    parser.add_argument('--trail-duration',
+                        help='How long should each object\'s trail last? (seconds)',
+                        type=int,
+                        default=300)
+
+    parser.add_argument('point_data_file',
+                        nargs=1,
+                        help='Delimited text file containing point data')
+
+    parser.add_argument('movie_file',
+                        nargs=1,
+                        help='Filename for trajectory movie')
+
+    args = parser.parse_args()
+    if args.resolution is None:
+        args.resolution = [800, 600]
+    if args.delimiter == 'tab':
+        args.delimiter = '\t'
+
+    return args
 
 # --------------------------------------------------------------------
 
@@ -789,125 +470,176 @@ def render_annotated_trajectories(map_axes,
                               dot_color=head_color,
                               axes=map_axes)
 
-# --------------------------------------------------------------------
-
-
-def trajectory_overlaps_interval(trajectory, start_time, end_time):
-    return not (trajectory[0].timestamp > end_time or
-                trajectory[-1].timestamp < start_time)
-
-
-def clip_to_time_interval(trajectory, start_time, end_time):
-    return geomath.subset_during_interval(trajectory, start_time, end_time)
-
-
 # ---------------------------------------------------------------------
 
 
-def clip_trajectories_to_interval(trajectories, start, end):
-    trajectories_this_frame = [
-        t for t in trajectories if trajectory_overlaps_interval(start, end)
-    ]
+def render_trajectory_movie(movie_writer,
+                            map_axes,
+                            trajectories,
+                            num_frames,
+                            trail_duration,
+                            figure=None,
+                            dpi=100,
+                            filename='movie.mp4',
+                            start_time=None,
+                            end_time=None,
+                            savefig_kwargs=dict(),
+                            trajectory_rendering_args=dict(),
+                            utc_offset=0,
+                            timezone_label=None):
 
-    clipped_trajectories = (
-        clip_to_time_interval(t, start, end)
-        for t in trajectories_this_frame
-        )
+    # Steps:
+    # 1.  Cull trajectories that are entirely outside the map
+    # 2.  Annotate trajectories with scalars needed for color
+    # 3.  Compute frame duration
+    # 4.  Add clock to map
+    # 5.  Loop through frames
+    #
+    # I still need arguments to control whether the clock is included and,
+    # if so, where and how it's rendered.
+    logger = logging.getLogger(__name__)
 
-    return clipped_trajectories
+    (movie_start_time, movie_end_time) = compute_movie_time_bounds(
+        trajectories, start_time, end_time)
 
+    map_bbox = map_extent_as_bounding_box(map_axes)
 
-# --------------------------------------------------------------------
+    # Cull out trajectories that do not overlap the map.  We do not
+    # clip them (at least not now) since that would affect measures
+    # like progress along the path.
+    trajectories_on_map = trajectories_inside_box(trajectories, map_bbox)
 
+    if len(trajectories_on_map) == 0:
+        raise ValueError(
+            ('No trajectories intersect the map bounding box ({:s}).  Is the '
+             'bounding box correct?').format(map_bbox))
 
-def extract_field_assignments(arg_dict):
-    """Extract column->field assignments from arguments
+    # TODO: replace this with properly annotated trajectories when we add that
+    # feature back in for both the static map and movie renderer
+    annotated_trajectories = list(trajectories_on_map)
 
-    Field assignments are specified on the command line as arguments
-    like '--real-field speed 12', meaning "take the contents
-    of column 12 and add it to each point as a numeric field called
-    speed".  This function iterates over the arguments and extracts
-    all of those.
-
-    Arguments:
-        arg_dict {:obj:`dict`}: Command-line arguments to parse,
-        specified as a :obj:`dict`.  To get a dictionary from the
-        :obj:`Namespace` object returned by :code:`argparse.parse_args()`,
-        call :code:`vars()` on the args object.
-
-    Returns:
-        Dictionary with three entries:
-            'real': Dictionary mapping column names (strings) to
-                    integer column IDs for real-valued fields
-            'string': Dictionary mapping column names (strings) to
-                    integer column IDs for string-valued fields
-            'time': Dictionary mapping column names (strings) to
-                    integer column IDs for timestamp-valued fields
-    """
-
-    return {
-        'real': extract_typed_field_assignments(arg_dict, 'real'),
-        'string': extract_typed_field_assignments(arg_dict, 'string'),
-        'time': extract_typed_field_assignments(arg_dict, 'time')
-    }
+    logger.info('Movie covers time span from {} to {}'.format(
+        movie_start_time.strftime("%Y-%m-%d %H:%M:%S"),
+        movie_end_time.strftime("%Y-%m-%d %H:%M:%S")))
 
 
-def _make_tapered_linewidth_generator(initial_linewidth,
-                                      final_linewidth):
+    frame_duration = (datetime.timedelta(movie_end_time - movie_start_time) /
+                      num_frames)
+    first_frame_time = start_time + trail_duration
+    scalar_accessor = None
 
-    """Create a function that will make a tapered line width for a trajectory
+    def frame_time(which_frame):
+        return first_frame_time + which_frame * frame_duration
 
-    In order to render tapered trajectories whose lines get thinner as
-    they get older, we need to generate a scalar array with as many
-    components as the trajectory has segments.  The first entry in
-    this array (corresponding to the OLDEST point) should have the
-    value 'final_linewidth'.  The last entry (corresponding to the
-    NEWEST point) should have the value 'initial_linewidth'.
+    if figure is None:
+        figure = pyplot.gcf()
 
-    Args:
-       initial_linewidth:  Width (in points) at the head of the trajectory
-       final_linewidth:    Width (in points) at the tail of the trajectory
+    with movie_writer.saving(figure, filename, dpi):
+        for i in range(0, num_frames):
+            current_time = frame_time(i)
+            trail_start_time = frame_time(i) - trail_duration
 
-    Returns:
-       A function that takes in a trajectory as an argument and
-       returns an array of linewidths
+            logger.info(
+                ('Rendering frame {}: current_time {}, '
+                 'trail_start_time {}').format(
+                    i,
+                    current_time.strftime("%Y-%m-%d %H:%M:%S"),
+                    trail_start_time.strftime("%Y-%m-%d %H:%M:%S")))
 
-    TODO: There might be an off-by-one error in here: we generate
-    len(trajectory) scalars but the geometry has len(trajectory)-1
-    segments.  Check to see if draw_traffic in paths.py corrects for
-    this.
-    """
+            frame_trajectories = clip_trajectories_to_interval(
+                annotated_trajectories,
+                start_time=trail_start_time,
+                end_time=current_time
+                )
 
-    def linewidth_generator(trajectory):
-        return numpy.linspace(final_linewidth, initial_linewidth, len(trajectory))
+            trajectory_artists = render_annotated_trajectories(
+                frame_trajectories,
+                axes=map_axes,
+                extra_args=trajectory_rendering_args
+                )
 
-    return linewidth_generator
+            # TODO: here we could also render the clock
+            #
+            movie_writer.grab_frame(savefig_kwargs)
+            cleanup_frame(trajectory_artists)
 
 # ----------------------------------------------------------------------
 
-def _make_constant_linewidth_generator(linewidth):
 
-    """Create a function that will make a constant line width for a trajectory
+def setup_encoder(encoder='ffmpeg',
+                  codec=None,
+                  encoder_args=None,
+                  movie_title='Tracktable Movie',
+                  movie_artist='Tracktable Trajectory Toolkit',
+                  movie_comment='',
+                  fps=30,
+                  **kwargs):
+    """Instantiate and configure a video encoder
 
-    Args:
-       linewidth:  Width (in points) along the trajectory
+    Matplotlib supports video encoding with a writer interface that
+    takes several arguments including which program to use to do
+    the encoding and what parameters the encoder needs.  This
+    function is a convenience interface to that.
+
+    Keyword Arguments:
+        encoder {string}: Name of encoder.  This must be one of the
+            values in :code:`matplotlib.animation.writers.list`.
+            Default: 'ffmpeg' (requires that you have FFmpeg installed
+            on your system)
+        codec {string}: Name of specific encoding algorithm to use.
+            This is specific to the encoder you choose.  Default:
+            None (whatever the encoder prefers)
+        encoder_args {list of strings}: Any arguments you wish to
+            provide to the encoder.  These are passed through
+            to the underlying Matplotlib implementation as
+            :code:`extra_args`.  TODO: get a reference to a
+            documentation page in Matplotlib that explains what
+            these do
+        movie_title {string}: Title string to be embedded in the
+            movie's metadata.  This is not rendered on screen.
+            Default: "Tracktable Movie"
+        movie_artist {string}: Movie creator to be embedded in the
+            movie's metadata.  This is not rendered on screen.
+            Default: "Tracktable Trajectory Toolkit"
+        movie_comment {string}: Any other comments you want to
+            embed in metadata.  Default: empty string
+        fps {int}: Desired frames per second for the result.
+            Default: 30
 
     Returns:
-       A function that takes in a trajectory as an argument and
-       returns an array of linewidths
+        Matplotlib animation object configured with supplied parameters
 
-    TODO: There might be an off-by-one error in here: we generate
-    len(trajectory) scalars but the geometry has len(trajectory)-1
-    segments.  Check to see if draw_traffic in paths.py corrects for
-    this.
+    Raises:
+        KeyError: You have requested an encoder that is not available
+            on this system
     """
 
-    def linewidth_generator(trajectory):
-        scalars = numpy.zeros(len(trajectory))
-        scalars += float(linewidth)
-        return scalars
+    if encoder_args is None:
+        encoder_args = list()
 
-    return linewidth_generator
+    if encoder not in matplotlib.animation.writers.list():
+        raise KeyError((
+            'Movie encoder {} is not available.  This system '
+            'has the following encoders available: {}').format(
+                encoder, matplotlib.animation.writers.list()))
+
+    movie_metadata = {'title': movie_title,
+                      'artist': movie_artist,
+                      'comment': movie_comment}
+
+    # The encoder args are passed to FFmpeg as if they were command-line
+    # parameters.
+    #
+    # TODO: what do other encoders expect as encoder_args?
+    if type(encoder_args) is str:
+        encoder_args = shlex.split(encoder_args)
+
+    writer = matplotlib.animation.writers[encoder]( fps=fps,
+                                                    codec=codec,
+                                                    metadata=movie_metadata,
+                                                    extra_args=encoder_args)
+
+    return writer
 
 # --------------------------------------------------------------------
 
@@ -996,13 +728,292 @@ def trajectories_from_point_file(infile,
                           field_delimiter=field_delimiter,
                           domain=domain)
 
-    trajectory_source = trajectories_from_points(
+    trajectory_source = assemble_trajectories(
             point_source,
             separation_distance=separation_distance,
             separation_time=separation_time,
             minimum_length=minimum_length)
 
     return trajectory_source
+
+
+# ---------------------------------------------------------------------
+
+
+def trajectories_inside_box(trajectories, bounding_box):
+    """Filter trajectories to include only those inside a bounding box
+
+    We can speed up rendering quite a bit if we discard trajectories
+    that do not intersect the image being rendered.  This function
+    compares each trajectory against a user-supplied bounding box
+    (presumably the bounds for the map) and returns only those trajectories
+    that fall within the box.
+
+    Arguments:
+        trajectories {iterable of Tracktable trajectories}: Data
+            to test against bounding box
+        bounding_box {Tracktable bounding box}: box to test
+
+    Returns:
+        Iterable of trajectories that intersect the bounding box
+
+    Raises:
+        ValueError: bounding box must not be None
+    """
+
+    if bounding_box is None:
+        raise ValueError(('trajectories_inside_box: Bounding box must '
+                          'not be None.'))
+    return (t for t in trajectories if geomath.intersects(t, bounding_box))
+
+
+# --------------------------------------------------------------------
+
+
+def trajectory_overlaps_interval(trajectory, start_time, end_time):
+    """Does a trajectory overlap a time interval?
+
+    For a trajectory to overlap a time interval, it cannot be the case
+    that it begins after the interval ends or ends before the interval
+    begins.
+
+    Arguments:
+        trajectory {Tracktable trajectory}: trajectory to test
+        start_time {datetime.datetime}: Beginning of interval
+        end_time {datetime.datetime}: End of interval
+
+    Returns:
+        Boolean: true if overlap, false if disjoint
+    """
+    return not (trajectory[0].timestamp > end_time or
+                trajectory[-1].timestamp < start_time)
+
+# ---------------------------------------------------------------------
+
+
+def trajectory_points_from_file(
+      infile,
+      object_id_column,
+      timestamp_column,
+      coordinate0_column,
+      coordinate1_column,
+      string_fields=None,
+      real_fields=None,
+      time_fields=None,
+      comment_character='#',
+      field_delimiter=',',
+      domain='terrestrial'
+      ):
+    """points_from_file: Load a list of points from a delimited text file
+
+    Use tracktable.domain.<domain>.BasePointReader to read points from a file.
+    Results are returned as an iterable.
+
+    Note: You can only iterate over the resulting point sequence once.  If you
+    need to do more than that, save the points in a list:
+
+    >>> all_points = list(points_from_file(infile, 2, 3))
+
+    Note: The function 'extract_field_assignments_from_arguments' will help
+        you pull out rela_fields, string_fields, and time_fields from a
+        set of parsed arguments.
+
+    Arguments:
+        infile {file-like object}: Data source for points
+        object_id_column {int}: Column in file containing object ID
+        timestamp_column {int}: Column in file containing timestamps for points
+        coordinate0_column {int}: Column in file for x/longitude
+        coordinate1_column {int}: Column in file for y/latitude
+
+    Keyword Arguments:
+        string_fields {dict, string->int}: Columns in the input file that we
+            want to add to points as string properties.  The keys in this
+            dict should be the name of the field and the values should be the
+            integer column IDs (first column is 0).
+        real_fields {dict, string->int}: Columns in the input file that we
+            want to add to points as real-valued properties.  The keys in this
+            dict should be the name of the field and the values should be the
+            integer column IDs (first column is 0).
+        time_fields {dict, string->int}: Columns in the input file that we
+            want to add to points as timestamp-valued properties.  The keys in
+            this dict should be the name of the field and the values should be
+            the integer column IDs (first column is 0).
+        comment_character {single-character string}: Ignore lines in the input
+            that have this as the first non-whitespace character.  Defaults to
+            '#'.
+        field_delimiter {single-character string}: This character is the field
+            separator in the input and must be escaped inside strings.
+            Defaults to ','.
+        domain {(}string naming point domain}: Must be either 'terrestrial' or
+            'cartesian2d' depending on whether your points are
+            longitude/latitude or arbitrary Cartesian coordinates.  Defaults
+            to 'terrestrial'.
+
+    Returns:
+        Iterable of tracktable.domain.<domain>.TrajectoryPoints.
+    """
+    domain_module = domain_module_from_name(domain)
+    reader_type = getattr(domain_module, 'TrajectoryPointReader')
+    reader = reader_type()
+    reader.input = infile
+    reader.object_id_column = object_id_column
+    reader.timestamp_column = timestamp_column
+    reader.coordinates[0] = coordinate0_column
+    reader.coordinates[1] = coordinate1_column
+    reader.comment_character = comment_character
+    reader.field_delimiter = field_delimiter
+
+    return reader
+
+# ----------------------------------------------------------------------
+
+
+def trajectory_time_bounds(trajectories):
+    """Compute the collective start and end time of a set of trajectories
+
+    Arguments:
+        trajectories {iterable of Tracktable trajectories}: trajectories
+            whose bounds you want
+
+    Returns:
+        Pair of Python datetimes.  The first element is the earliest
+            timestamp in any of the trajectories.  The second element is
+            the latest timestamp.
+
+    Raises:
+        ValueError: input sequence is empty
+    """
+
+    start_time = None
+    end_time = None
+    for t in trajectories:
+        this_start_time = t[0].timestamp
+        this_end_time = t[-1].timestamp
+        if start_time is None:
+            start_time = this_start_time
+        else:
+            start_time = min(this_start_time, start_time)
+        if end_time is None:
+            end_time = this_end_time
+        else:
+            this_end_time = min(this_end_time, end_time)
+
+    if start_time is None:
+        raise ValueError('trajectory_time_bounds: Input sequence is empty')
+    else:
+        return (start_time, end_time)
+
+# ---------------------------------------------------------------------
+
+
+def _make_tapered_linewidth_generator(initial_linewidth,
+                                      final_linewidth):
+
+    """Create a function that will make a tapered line width for a trajectory
+
+    In order to render tapered trajectories whose lines get thinner as
+    they get older, we need to generate a scalar array with as many
+    components as the trajectory has segments.  The first entry in
+    this array (corresponding to the OLDEST point) should have the
+    value 'final_linewidth'.  The last entry (corresponding to the
+    NEWEST point) should have the value 'initial_linewidth'.
+
+    Args:
+       initial_linewidth:  Width (in points) at the head of the trajectory
+       final_linewidth:    Width (in points) at the tail of the trajectory
+
+    Returns:
+       A function that takes in a trajectory as an argument and
+       returns an array of linewidths
+
+    TODO: There might be an off-by-one error in here: we generate
+    len(trajectory) scalars but the geometry has len(trajectory)-1
+    segments.  Check to see if draw_traffic in paths.py corrects for
+    this.
+    """
+
+    def linewidth_generator(trajectory):
+        return numpy.linspace(final_linewidth, initial_linewidth, len(trajectory))
+
+    return linewidth_generator
+
+# ----------------------------------------------------------------------
+
+def _make_constant_linewidth_generator(linewidth):
+
+    """Create a function that will make a constant line width for a trajectory
+
+    Args:
+       linewidth:  Width (in points) along the trajectory
+
+    Returns:
+       A function that takes in a trajectory as an argument and
+       returns an array of linewidths
+
+    TODO: There might be an off-by-one error in here: we generate
+    len(trajectory) scalars but the geometry has len(trajectory)-1
+    segments.  Check to see if draw_traffic in paths.py corrects for
+    this.
+    """
+
+    def linewidth_generator(trajectory):
+        scalars = numpy.zeros(len(trajectory))
+        scalars += float(linewidth)
+        return scalars
+
+    return linewidth_generator
+
+# ----------------------------------------------------------------------
+
+
+def _extract_typed_field_assignments(arguments,
+                                     field_type):
+    """Extract named field definitions from a dict of arguments
+
+    When running this script, the user specifies named fields that
+    the reader should process with arguments like
+    '--real-field-column altitude 12'.  This will cause the reader
+    to take column 12 in the data file, convert its contents to a
+    floating-point number, and store the result in a property
+    named "altitude" on each point.
+
+    This function is a convenience: it extracts those declarations
+    for a given field type (string, real, timestamp) from a dictionary
+    or namespace of arguments, then returns the result as a dictionary
+    that can be passed to trajectory_points_from_file().
+
+    Arguments:
+        arguments {dict}: Dictionary of parsed command-line arguments
+        field_type {string}: What type of property to extract.  Must be
+            'string', 'real' or 'time'.
+
+    Returns:
+        Dictionary containing { field_name: column_number } for the
+        specified field type.  Dictionary will be empty if there are
+        no assignments of that type.
+
+    Raises:
+        ValueError: invalid field type
+
+    NOTE: Don't call this function directly unless you need the field
+        assignments for one specific data type.  Instead, call
+        `extract_field_assignments`.
+    """
+
+    if field_type not in ['string', 'real', 'time']:
+        raise ValueError(('Field type ({}) must be one of "string", '
+                          '"real", or "time".  Case matters').format(
+                                field_type))
+
+    arg_name = '{}_field_column'.format(field_type)
+    field_assignments = dict()
+    definition_list = arguments.get(arg_name, None)
+    if definition_list is not None:
+        if len(definition_list) > 0:
+            for (field_name, column) in n_at_a_time(definition_list, 2):
+                field_assignments[field_name] = int(column)
+
+    return field_assignments
 
 # --------------------------------------------------------------------
 
