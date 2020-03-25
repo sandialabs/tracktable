@@ -43,6 +43,7 @@ from tracktable.source.trajectory import AssembleTrajectoryFromPoints
 import datetime
 import itertools
 import numpy
+import pprint
 import shlex
 import six
 import sys
@@ -104,13 +105,14 @@ def assemble_trajectories(point_source,
 # ---------------------------------------------------------------------
 
 
-def clip_trajectories_to_interval(trajectories, start, end):
+def clip_trajectories_to_interval(trajectories, start_time, end_time):
     trajectories_this_frame = [
-        t for t in trajectories if trajectory_overlaps_interval(start, end)
+        t for t in trajectories if trajectory_overlaps_interval(
+            t, start_time, end_time)
     ]
 
     clipped_trajectories = (
-        geomath.subset_during_interval(t, start, end)
+        geomath.subset_during_interval(t, start_time, end_time)
         for t in trajectories_this_frame
         )
 
@@ -288,13 +290,13 @@ def map_extent_as_bounding_box(axes, domain='terrestrial'):
                         'supplied "{}".').format(domain))
 
     bounds = axes.get_window_extent()
-    x_min = bounds[0]
-    y_min = bounds[1]
-    x_max = bounds[2]
-    y_max = bounds[3]
+    x_min = min(bounds.x0, bounds.x1)
+    y_min = min(bounds.y0, bounds.y1)
+    x_max = max(bounds.x0, bounds.x1)
+    y_max = max(bounds.y0, bounds.y1)
     bbox_type = tracktable.domain.domain_class(domain, 'BoundingBox')
-    return bbox_type(min_corner=(x_min, y_min),
-                     max_corner=(x_max, y_max))
+
+    return bbox_type((x_min, y_min), (x_max, y_max))
 
 # ----------------------------------------------------------------------
 
@@ -334,8 +336,8 @@ def parse_args():
 # --------------------------------------------------------------------
 
 
-def render_annotated_trajectories(map_axes,
-                                  trajectories,
+def render_annotated_trajectories(trajectories,
+                                  axes,
                                   color_map='plasma',
                                   decorate_head=False,
                                   head_size=2,
@@ -343,7 +345,7 @@ def render_annotated_trajectories(map_axes,
                                   linewidth_style='taper',
                                   linewidth=0.5,
                                   final_linewidth=0.01,
-                                  scalar_name='progress',
+                                  scalar='progress',
                                   scalar_min=0,
                                   scalar_max=1,
                                   zorder=10):
@@ -365,7 +367,7 @@ def render_annotated_trajectories(map_axes,
     so that traverse the entire colormap from start to finish.
 
     Arguments:
-        map_axes {matplotlib Axes}: Axes to render into
+        axes {matplotlib Axes}: Axes to render into
         trajectories {iterable of Tracktable trajectories}: trajectories
             to render
 
@@ -393,7 +395,7 @@ def render_annotated_trajectories(map_axes,
             `linewidth_style`. (default: 0.5)
         final_linewidth {float}: Width of oldest end of trajectory trail.
             Only used when `linewidth_style` is 'taper'.
-        scalar_name {string}: Real-valued property to be used to determine
+        scalar {string}: Real-valued property to be used to determine
             trajectory color.  You must make sure that this property is present
             at all points in the trajectory data.  The default 'progress'
             scalar is added automatically. (default: 'progress')
@@ -425,38 +427,44 @@ def render_annotated_trajectories(map_axes,
                           '"taper".  You supplied "{}".').format(
                           linewidth_style))
     if linewidth_style == 'taper':
-        linewidth_generator = _make_tapered_linewidth_generator(
+        linewidths_for_trajectory = _make_tapered_linewidth_generator(
                                 linewidth, final_linewidth)
     else:
-        linewidth_generator = _make_constant_linewidth_generator(linewidth)
+        linewidths_for_trajectory = _make_constant_linewidth_generator(linewidth)
 
     if not decorate_head:
         head_size = 0
         head_color = 'white'
 
-    def scalar_accessor(point):
-        value = point.properties[scalar]
-        if value is None:
-            return 0
-        else:
-            return value
+    logger = logging.getLogger(__name__)
+    def scalars_for_trajectory(trajectory):
+        result = [0] * len(trajectory)
+        try:
+            for (i, point) in enumerate(trajectory):
+                value = point.properties[scalar]
+                if value is not None:
+                    result[i] = value
+        except KeyError:
+            logger.error(('One or more points in trajectory do not have '
+                          'the scalar field "{}".').format(scalar))
 
-    return paths.draw_traffic(map_axes,
+        return result
+
+    return paths.draw_traffic(axes,
                               trajectories,
                               color_map=color_map,
-                              trajectory_scalar_generator=scalar_accessor,
-                              trajectory_linewidth_generator=linewidth_generator,
+                              trajectory_scalar_generator=scalars_for_trajectory,
+                              trajectory_linewidth_generator=linewidths_for_trajectory,
                               zorder=zorder,
                               color_scale=matplotlib.colors.Normalize(vmin=scalar_min, vmax=scalar_max),
                               dot_size=head_size,
-                              dot_color=head_color,
-                              axes=map_axes)
+                              dot_color=head_color)
 
 # ---------------------------------------------------------------------
 
 
 def render_trajectory_movie(movie_writer,
-                            map_axes,
+                            axes,
                             trajectories,
                             num_frames,
                             trail_duration,
@@ -466,9 +474,10 @@ def render_trajectory_movie(movie_writer,
                             start_time=None,
                             end_time=None,
                             savefig_kwargs=None,
-                            trajectory_rendering_args=None,
+                            trajectory_rendering_kwargs=None,
                             utc_offset=0,
-                            timezone_label=None):
+                            timezone_label=None,
+                            domain='terrestrial'):
 
     # Steps:
     # 1.  Cull trajectories that are entirely outside the map
@@ -483,17 +492,17 @@ def render_trajectory_movie(movie_writer,
 
     if savefig_kwargs is None:
         savefig_kwargs = dict()
-    if trajectory_rendering_args is None:
-        trajectory_rendering_args = dict()
+    if trajectory_rendering_kwargs is None:
+        trajectory_rendering_kwargs = dict()
     (movie_start_time, movie_end_time) = compute_movie_time_bounds(
         trajectories, start_time, end_time)
 
-    map_bbox = map_extent_as_bounding_box(map_axes)
+    map_bbox = map_extent_as_bounding_box(axes, domain=domain)
 
     # Cull out trajectories that do not overlap the map.  We do not
     # clip them (at least not now) since that would affect measures
     # like progress along the path.
-    trajectories_on_map = trajectories_inside_box(trajectories, map_bbox)
+    trajectories_on_map = list(trajectories_inside_box(trajectories, map_bbox))
 
     if len(trajectories_on_map) == 0:
         raise ValueError(
@@ -504,10 +513,9 @@ def render_trajectory_movie(movie_writer,
         movie_start_time.strftime("%Y-%m-%d %H:%M:%S"),
         movie_end_time.strftime("%Y-%m-%d %H:%M:%S")))
 
-    frame_duration = (datetime.timedelta(movie_end_time - movie_start_time) /
+    frame_duration = ((movie_end_time - movie_start_time) /
                       num_frames)
-    first_frame_time = start_time + trail_duration
-    scalar_accessor = None
+    first_frame_time = movie_start_time + trail_duration
 
     def frame_time(which_frame):
         return first_frame_time + which_frame * frame_duration
@@ -536,13 +544,13 @@ def render_trajectory_movie(movie_writer,
             # TODO: Add in scalar accessor
             trajectory_artists = render_annotated_trajectories(
                 frame_trajectories,
-                axes=map_axes,
-                extra_args=trajectory_rendering_args
+                axes,
+                **trajectory_rendering_kwargs
                 )
 
             # TODO: here we could also render the clock
             #
-            movie_writer.grab_frame(savefig_kwargs)
+            movie_writer.grab_frame(**savefig_kwargs)
 
             # Clean up the figure for the next time around
             for artist in trajectory_artists:
@@ -885,7 +893,7 @@ def trajectory_points_from_file(
     Returns:
         Iterable of tracktable.domain.<domain>.TrajectoryPoints.
     """
-    domain_module = domain_module_from_name(domain)
+    domain_module = tracktable.domain.domain_module_from_name(domain)
     reader_type = getattr(domain_module, 'TrajectoryPointReader')
     reader = reader_type()
     reader.input = infile
@@ -1059,8 +1067,10 @@ def main():
     args = parse_args()
     mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
     movie_kwargs = argument_groups.extract_arguments("movie_rendering", args)
-    trajectory_rendering_kwargs = argument_groups.extract_arguments(
-                                    "trajectory_rendering", args)
+#   We still need to restore support for some of these so we will assemble
+#   the list by hand for now.
+#    trajectory_rendering_kwargs = argument_groups.extract_arguments(
+#                                    "trajectory_rendering", args)
 
     # Step 1: Load all the trajectories into memory.
     point_filename = args.point_data_file[0]
@@ -1073,8 +1083,8 @@ def main():
                 infile,
                 object_id_column=args.object_id_column,
                 timestamp_column=args.timestamp_column,
-                longitude_column=args.coordinate0,
-                latitude_column=args.coordinate1,
+                coordinate0_column=args.coordinate0,
+                coordinate1_column=args.coordinate1,
                 string_fields=field_assignments['string'],
                 real_fields=field_assignments['real'],
                 time_fields=field_assignments['time'],
@@ -1128,12 +1138,42 @@ def main():
                                                            args.dpi),
                       'frameon': False}
 
+
+    #print("Command-line arguments:")
+    #pprint.pprint(vars(args))
     #
     # Lights! Camera! Action!
     #
+    if args.trajectory_linewidth == 'taper':
+        linewidth_style = 'taper'
+        linewidth = args.trajectory_initial_linewidth
+        final_linewidth = args.trajectory_final_linewidth
+    else:
+        linewidth_style = 'constant'
+        linewidth = args.trajectory_linewidth
+        final_linewidth = linewidth
+
+    # Eventually we will be able to use argument_groups.extract_arguments() for
+    # this, but right now it's broken.  Not all of the parameters in the
+    # trajectory rendering argument group are supported and some of the names
+    # have changed.
+    #
+    trajectory_rendering_kwargs = {
+        'decorate_head': args.decorate_trajectory_head,
+        'head_color': args.trajectory_head_color,
+        'head_size': args.trajectory_head_dot_size,
+        'color_map': args.trajectory_colormap,
+        'scalar': args.trajectory_color,
+        'scalar_min': args.scalar_min,
+        'scalar_max': args.scalar_max,
+        'linewidth_style': linewidth_style,
+        'linewidth': linewidth,
+        'final_linewidth': final_linewidth
+    }
+
     render_trajectory_movie(
         movie_writer,
-        map_projection=mymap,
+        axes=mymap,
         trajectories=trajectories,
 
         dpi=args.dpi,
@@ -1144,7 +1184,8 @@ def main():
         end_time=movie_kwargs['end_time'],
         trail_duration=datetime.timedelta(seconds=args.trail_duration),
         savefig_kwargs=savefig_kwargs,
-        trajectory_rendering_args=trajectory_rendering_kwargs
+        trajectory_rendering_kwargs=trajectory_rendering_kwargs,
+        domain=args.domain
     )
 
     pyplot.close()
