@@ -384,7 +384,6 @@ def trajectory_points_from_file(
 
     return reader
 
-
 # ----------------------------------------------------------------------
 
 
@@ -447,16 +446,18 @@ def main():
             if args.map_bbox is None or len(args.map_bbox) == 0:
                 # Pull all the trajectories into memory by
                 # forcing assembly
+                print("DEBUG: Computing bounding box for Cartesian data")
                 trajectory_source = list(trajectory_source)
                 data_bbox = geomath.compute_bounding_box(
                     itertools.chain(*trajectory_source)
                     )
-                if args.map_bbox is None:
-                    args.map_bbox = [0] * 4
-                args.map_bbox[0] = data_bbox.min_corner[0]
-                args.map_bbox[1] = data_bbox.min_corner[1]
-                args.map_bbox[2] = data_bbox.max_corner[0]
-                args.map_bbox[3] = data_bbox.max_corner[1]
+
+                args.map_bbox = [
+                    data_bbox.min_corner[0],
+                    data_bbox.max_corner[0],
+                    data_bbox.min_corner[1],
+                    data_bbox.max_corner[1]
+                    ]
 
         #
         # Step 3: Set up the map.

@@ -36,7 +36,6 @@ from matplotlib import pyplot
 
 from tracktable.core import logging
 from tracktable.render import maps
-from tracktable.render.projection import make_projection_cartesian2d
 from tracktable.render import geographic_decoration as decoration
 
 
@@ -71,17 +70,14 @@ def cartesian_map(map_bbox=None,
     logging.getLogger(__name__).debug(
         "cartesian_map: map_bbox is {}".format(map_bbox))
 
-    (proj, artists) = make_projection_cartesian2d()
-
     axes.set_aspect(kwargs.get('aspect', 'equal'))
     if map_bbox is not None:
         axes.set_xlim(left=map_bbox.min_corner[0],
                       right=map_bbox.max_corner[0])
         axes.set_ylim(bottom=map_bbox.min_corner[1],
                       top=map_bbox.max_corner[1])
-        proj.bbox = map_bbox
 
-    return (axes, artists)
+    return (axes, list())
 
 # ----------------------------------------------------------------------
 

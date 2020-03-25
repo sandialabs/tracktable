@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -295,6 +295,7 @@ def map_extent_as_bounding_box(axes, domain='terrestrial'):
     return bbox_type(min_corner=(x_min, y_min),
                      max_corner=(x_max, y_max))
 
+
 # ----------------------------------------------------------------------
 
 
@@ -302,6 +303,7 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description='Render a movie of traffic found in a delimited text file',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
     argument_groups.use_argument_group("delimited_text_point_reader", parser)
     argument_groups.use_argument_group("trajectory_assembly", parser)
     argument_groups.use_argument_group("trajectory_rendering", parser)
@@ -309,7 +311,8 @@ def parse_args():
     argument_groups.use_argument_group("movie_rendering", parser)
 
     parser.add_argument('--trail-duration',
-                        help='How long should each object\'s trail last? (seconds)',
+                        help=('How long should each object\'s trail last? '
+                              '(seconds)'),
                         type=int,
                         default=300)
 
@@ -848,6 +851,7 @@ def trajectory_points_from_file(
 
     return reader
 
+
 # ----------------------------------------------------------------------
 
 
@@ -1058,6 +1062,7 @@ def main():
     # so rather than pull them out individually like we did for
     # the point reader we extract the whole dict using
     # tracktable.script_helpers.argument_groups.extract_arguments().
+
     logger.info('Initializing map canvas for rendering.')
     (figure, axes) = initialize_canvas(args.resolution,
                                        args.dpi)
@@ -1069,6 +1074,7 @@ def main():
     #
     movie_kwargs = argument_groups.extract_arguments("movie_rendering", args)
     movie_writer = setup_encoder(**movie_kwargs)
+
 
     # This set of arguments will be passed to the savefig() call that
     # grabs the latest movie frame.  This is the place to put things
