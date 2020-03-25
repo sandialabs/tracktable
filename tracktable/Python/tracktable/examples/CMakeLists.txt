@@ -120,24 +120,25 @@ if (TEST_MOVIES)
     ${EXAMPLES}/data/SamplePointsCartesian.csv
     ${Tracktable_BINARY_DIR}/TestOutput/test_cartesian_trajectory_movie.m4v
     )
+
+  add_python_test(
+    P_TerrestrialTrajectoryMovieExample_Points
+    ${EXAMPLE_MODULE}.movie_from_points
+    --domain terrestrial
+    --object-id-column 0
+    --timestamp-column 1
+    --longitude-column 2
+    --latitude-column 3
+    --map region:conus
+    --trajectory-linewidth taper
+    --trajectory-initial-linewidth 2
+    --trajectory-final-linewidth 0.5
+    --trail-duration 1800
+    ${EXAMPLES}/data/SampleTrajectories.csv
+    ${Tracktable_BINARY_DIR}/TestOutput/test_terrestrial_trajectory_movie_points.m4v
+    )
 endif (TEST_MOVIES)
 
-#   add_python_test(
-#     P_TerrestrialTrajectoryMovieExample_Points
-#     ${EXAMPLE_MODULE}.movie_from_points
-#     --domain terrestrial
-#     --object-id-column 0
-#     --timestamp-column 1
-#     --longitude-column 2
-#     --latitude-column 3
-#     --map conus
-#     --trajectory-linewidth taper
-#     --trajectory-initial-linewidth 2
-#     --trajectory-final-linewidth 0.5
-#     --trail-duration 1800
-#     ${EXAMPLES}/data/SampleTrajectories.csv
-#     ${Tracktable_BINARY_DIR}/TestOutput/test_terrestrial_trajectory_movie_points.m4v
-#     )
 
 #   add_python_test(
 #     P_TerrestrialTrajectoryMovieExample_Trajectories
