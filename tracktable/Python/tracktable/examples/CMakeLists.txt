@@ -104,7 +104,24 @@ add_python_test(
 
 
 
-# if (TEST_MOVIES)
+if (TEST_MOVIES)
+  add_python_test(
+    P_Cartesian2DTrajectoryMovieExample
+    ${EXAMPLE_MODULE}.movie_from_points
+    --domain cartesian2d
+    --object-id-column 0
+    --timestamp-column 1
+    --x-column 2
+    --y-column 3
+    --map-bbox -100 -100 100 100
+    --trajectory-linewidth taper
+    --trajectory-initial-linewidth 4
+    --trajectory-final-linewidth 1
+    ${EXAMPLES}/data/SamplePointsCartesian.csv
+    ${Tracktable_BINARY_DIR}/TestOutput/test_cartesian_trajectory_movie.m4v
+    )
+endif (TEST_MOVIES)
+
 #   add_python_test(
 #     P_TerrestrialTrajectoryMovieExample_Points
 #     ${EXAMPLE_MODULE}.movie_from_points
@@ -135,20 +152,3 @@ add_python_test(
 #     ${Tracktable_BINARY_DIR}/TestOutput/test_terrestrial_trajectory_movie_trajectories.m4v
 #     )
 
-#   add_python_test(
-#     P_Cartesian2DTrajectoryMovieExample
-#     ${EXAMPLE_MODULE}.movie_from_points
-#     --domain cartesian2d
-#     --object-id-column 0
-#     --timestamp-column 1
-#     --x-column 2
-#     --y-column 3
-#     --map-bbox -100 -100 100 100
-#     --trajectory-linewidth taper
-#     --trajectory-initial-linewidth 4
-#     --trajectory-final-linewidth 1
-#     ${EXAMPLES}/data/SamplePointsCartesian.csv
-#     ${Tracktable_BINARY_DIR}/TestOutput/test_cartesian_trajectory_movie.m4v
-#     )
-
-# endif (TEST_MOVIES)
