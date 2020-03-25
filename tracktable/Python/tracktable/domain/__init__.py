@@ -162,8 +162,8 @@ def domain_class(domain_name, class_name):
             exist
     """
 
-   domain_module = domain_module_from_name(domain_name)
-   if class_name not in [
+    domain_module = domain_module_from_name(domain_name)
+    if class_name not in [
                 "BasePoint", "TrajectoryPoint", "Trajectory", "BoundingBox"
             ]:
         raise AttributeError(
