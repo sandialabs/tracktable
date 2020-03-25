@@ -174,4 +174,3 @@ def domain_class(domain_name, class_name):
     except AttributeError:
         raise AttributeError(("The requested class ({}) does not exist in the "
                               "{} domain.").format(class_name, domain_name))
-
