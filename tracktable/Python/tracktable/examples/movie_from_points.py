@@ -32,16 +32,11 @@ trajectories built from points in a CSV file
 
 """
 
-from tracktable.feature import annotations
-from tracktable.filter.trajectory import (
-    ClipToTimeWindow as ClipTrajectoryToTimeWindow,
-    FilterByBoundingBox as FilterTrajectoriesByBoundingBox
-    )
-
 import tracktable.domain
+from tracktable.feature import annotations
 
-from tracktable.core import geomath, logging, Timestamp
-from tracktable.render import colormaps, mapmaker, paths
+from tracktable.core import geomath, logging
+from tracktable.render import mapmaker, paths
 from tracktable.script_helpers import argument_groups, argparse, n_at_a_time
 from tracktable.source.trajectory import AssembleTrajectoryFromPoints
 
@@ -104,21 +99,6 @@ def assemble_trajectories(point_source,
     assembler.minimum_length = minimum_length
 
     return assembler
-
-# ----------------------------------------------------------------------
-
-
-def cleanup_frame(artists_to_remove):
-    """Restore the figure to just the background decorations
-
-    At the beginning of each frame we have just the geometry
-    related to the background map and any decorations thereupon.
-    After we render trajectories and save the image to the video
-    encoder, we use this function to restore the frame to its beginning state.
-    """
-
-    for artist in artists_to_remove:
-        artist.remove()
 
 # ---------------------------------------------------------------------
 
@@ -483,8 +463,8 @@ def render_trajectory_movie(movie_writer,
                             filename='movie.mp4',
                             start_time=None,
                             end_time=None,
-                            savefig_kwargs=dict(),
-                            trajectory_rendering_args=dict(),
+                            savefig_kwargs=None,
+                            trajectory_rendering_args=None,
                             utc_offset=0,
                             timezone_label=None):
 
@@ -499,6 +479,10 @@ def render_trajectory_movie(movie_writer,
     # if so, where and how it's rendered.
     logger = logging.getLogger(__name__)
 
+    if savefig_kwargs is None:
+        savefig_kwargs = dict()
+    if trajectory_rendering_args is None:
+        trajectory_rendering_args = dict()
     (movie_start_time, movie_end_time) = compute_movie_time_bounds(
         trajectories, start_time, end_time)
 
@@ -514,14 +498,9 @@ def render_trajectory_movie(movie_writer,
             ('No trajectories intersect the map bounding box ({:s}).  Is the '
              'bounding box correct?').format(map_bbox))
 
-    # TODO: replace this with properly annotated trajectories when we add that
-    # feature back in for both the static map and movie renderer
-    annotated_trajectories = list(trajectories_on_map)
-
     logger.info('Movie covers time span from {} to {}'.format(
         movie_start_time.strftime("%Y-%m-%d %H:%M:%S"),
         movie_end_time.strftime("%Y-%m-%d %H:%M:%S")))
-
 
     frame_duration = (datetime.timedelta(movie_end_time - movie_start_time) /
                       num_frames)
@@ -547,11 +526,12 @@ def render_trajectory_movie(movie_writer,
                     trail_start_time.strftime("%Y-%m-%d %H:%M:%S")))
 
             frame_trajectories = clip_trajectories_to_interval(
-                annotated_trajectories,
+                trajectories_on_map,
                 start_time=trail_start_time,
                 end_time=current_time
                 )
 
+            # TODO: Add in scalar accessor
             trajectory_artists = render_annotated_trajectories(
                 frame_trajectories,
                 axes=map_axes,
@@ -561,7 +541,10 @@ def render_trajectory_movie(movie_writer,
             # TODO: here we could also render the clock
             #
             movie_writer.grab_frame(savefig_kwargs)
-            cleanup_frame(trajectory_artists)
+
+            # Clean up the figure for the next time around
+            for artist in trajectory_artists:
+                artist.remove()
 
 # ----------------------------------------------------------------------
 
@@ -1019,15 +1002,20 @@ def _extract_typed_field_assignments(arguments,
 
 
 def main():
-    args = parse_args()
     logger = logging.getLogger(__name__)
 
-    #
-    # Step 2: Set up the input pipeline to load points and build trajectories.
-    #
+    # Step 0: Parse the command line arguments and grab sets we will need
+    # later.
+    args = parse_args()
+    mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
+    movie_kwargs = argument_groups.extract_arguments("movie_rendering", args)
+    trajectory_rendering_kwargs = argument_groups.extract_arguments(
+                                    "trajectory_rendering", args)
 
+    # Step 1: Load all the trajectories into memory.
     point_filename = args.point_data_file[0]
     field_assignments = extract_field_assignments(vars(args))
+
     with open(point_filename, 'r') as infile:
         logger.info('Loading points and building trajectories.')
         trajectories = list(
@@ -1054,9 +1042,10 @@ def main():
     # We can compute the bounding box for Cartesian data automatically.
     # We don't need to do so for terrestrial data because the map will
     # default to the whole world.
-    if args.domain == 'cartesian2d' and (
-                args.map_bbox is None or len(args.map_bbox) == 0
-                ):
+    if (args.domain == 'cartesian2d' and
+            (args.map_bbox is None or
+             len(args.map_bbox) == 0)):
+
         args.map_bbox = geomath.compute_bounding_box(
             itertools.chain(*trajectories)
             )
@@ -1072,10 +1061,12 @@ def main():
     logger.info('Initializing map canvas for rendering.')
     (figure, axes) = initialize_canvas(args.resolution,
                                        args.dpi)
-
-    mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
     (mymap, map_artists) = mapmaker.mapmaker(**mapmaker_kwargs)
 
+    #
+    # Step 4: Set up the video encoder.
+    #
+    #
     movie_kwargs = argument_groups.extract_arguments("movie_rendering", args)
     movie_writer = setup_encoder(**movie_kwargs)
 
@@ -1087,8 +1078,9 @@ def main():
                                                            args.dpi),
                       'frameon': False}
 
-    trajectory_kwargs = argument_groups.extract_arguments("trajectory_rendering", args)
-
+    #
+    # Lights! Camera! Action!
+    #
     render_trajectory_movie(
         movie_writer,
         map_projection=mymap,
@@ -1101,12 +1093,12 @@ def main():
         end_time=movie_kwargs['end_time'],
         trail_duration=datetime.timedelta(seconds=args.trail_duration),
         savefig_kwargs=savefig_kwargs,
-        trajectory_rendering_args=trajectory_kwargs
+        trajectory_rendering_args=trajectory_rendering_kwargs
     )
 
     pyplot.close()
 
-    print("Movie render complete. File saved to {}".format(args.movie_file[0]))
+    logger.info("Movie render complete. File saved to {}".format(args.movie_file[0]))
 
     return 0
 
