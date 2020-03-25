@@ -506,7 +506,7 @@ def render_trajectory_movie(movie_writer,
 
     if len(trajectories_on_map) == 0:
         raise ValueError(
-            ('No trajectories intersect the map bounding box ({:s}).  Is the '
+            ('No trajectories intersect the map bounding box ({!r}).  Is the '
              'bounding box correct?').format(map_bbox))
 
     logger.info('Movie covers time span from {} to {}'.format(
