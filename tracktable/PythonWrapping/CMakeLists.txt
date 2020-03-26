@@ -53,7 +53,12 @@
 set(Boost_PYTHON_LIBRARY_SUFFIX "")
 
 find_package(Boost 1.61 COMPONENTS date_time regex REQUIRED)
-find_package(Python3 COMPONENTS Interpreter Development NumPy)
+
+if (UNIX AND APPLE)
+  find_package(Python3 COMPONENTS Interpreter Development)
+else ()
+  find_package(Python3 COMPONENTS Interpreter Development NumPy)
+endif()
 
 #message("Python3_INCLUDE_DIRS ${Python_INCLUDE_DIRS}")
 #message("Python3_LIBRARIES ${Python_LIBRARIES}")

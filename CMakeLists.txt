@@ -135,6 +135,7 @@ option(BUILD_SHARED_LIBS "Build shared libraries.  Required for Python wrapping.
 option(BUILD_PYTHON_WRAPPING "Wrap trajectory classes for use in Python." ON)
 option(BUILD_EXAMPLES "Build tracktable example programs" ON)
 option(BUILD_DOCUMENTATION "Build documentation for Tracktable." OFF)
+set(PYTHON_INSTALL_PREFIX "Python/tracktable" )
 
 # ----------------------------------------------------------------------
 
@@ -275,8 +276,6 @@ endif (BUILD_DOCUMENTATION)
 
 install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 install(FILES README.md DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
-
-set( PYTHON_INSTALL_PREFIX "Python/tracktable" )
 
 if (BUILD_PYTHON_WRAPPING)
   install(FILES LICENSE.txt DESTINATION ${PYTHON_INSTALL_PREFIX})
