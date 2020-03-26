@@ -289,11 +289,16 @@ def map_extent_as_bounding_box(axes, domain='terrestrial'):
                         'either "cartesian2d" or "terrestrial".  You '
                         'supplied "{}".').format(domain))
 
-    bounds = axes.get_window_extent()
-    x_min = min(bounds.x0, bounds.x1)
-    y_min = min(bounds.y0, bounds.y1)
-    x_max = max(bounds.x0, bounds.x1)
-    y_max = max(bounds.y0, bounds.y1)
+    # We use get_xlim() and get_ylim() instead of get_extent()
+    # in order to get coordinates in data space instead of projected space.
+    x_limits = axes.get_xlim()
+    x_min = min(x_limits)
+    x_max = max(x_limits)
+
+    y_limits = axes.get_ylim()
+    y_min = min(y_limits)
+    y_max = max(y_limits)
+
     bbox_type = tracktable.domain.domain_class(domain, 'BoundingBox')
 
     return bbox_type((x_min, y_min), (x_max, y_max))
@@ -504,11 +509,13 @@ def render_trajectory_movie(movie_writer,
     # clip them (at least not now) since that would affect measures
     # like progress along the path.
     trajectories_on_map = list(trajectories_inside_box(trajectories, map_bbox))
-
     if len(trajectories_on_map) == 0:
         raise ValueError(
-            ('No trajectories intersect the map bounding box ({!r}).  Is the '
-             'bounding box correct?').format(map_bbox))
+            ('No trajectories intersect the map bounding box (({} {}) - ({} {})).  Is the '
+             'bounding box correct?').format(map_bbox.min_corner[0],
+                                             map_bbox.min_corner[1],
+                                             map_bbox.max_corner[0],
+                                             map_bbox.max_corner[1]))
 
     logger.info('Movie covers time span from {} to {}'.format(
         movie_start_time.strftime("%Y-%m-%d %H:%M:%S"),
