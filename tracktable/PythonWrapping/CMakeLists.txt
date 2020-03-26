@@ -64,7 +64,7 @@ endif()
 #message("Python3_LIBRARIES ${Python_LIBRARIES}")
 #message("Python3_LIBRARY_DIRS ${Python_LIBRARY_DIRS}")
 
-if (Boost_FOUND AND EXISTS ${Python_EXECUTABLE})
+if (Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
   #message("Boost_VERSION ${Boost_VERSION}")
   if (Boost_VERSION VERSION_LESS 106700)
     # This version of Boost generates libboost_python[3].so.
@@ -80,9 +80,9 @@ if (Boost_FOUND AND EXISTS ${Python_EXECUTABLE})
   unset(Boost_FOUND)
   #message("Boost_PYTHON_LIBRARY_SUFFIX ${Boost_PYTHON_LIBRARY_SUFFIX}")
   find_package(Boost 1.61 COMPONENTS date_time regex python${Boost_PYTHON_LIBRARY_SUFFIX})
-else (Boost_FOUND AND EXISTS ${Python_EXECUTABLE})
+else (Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
   message(WARNING "Boost.Python library version cannot be determined until both Boost and Python have been found.")
-endif (Boost_FOUND AND EXISTS ${Python_EXECUTABLE})
+endif (Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
 
 # ----------------------------------------------------------------------
 #
