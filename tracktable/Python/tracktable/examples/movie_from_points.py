@@ -313,7 +313,8 @@ def parse_args():
     argument_groups.use_argument_group("movie_rendering", parser)
 
     parser.add_argument('--trail-duration',
-                        help='How long should each object\'s trail last? (seconds)',
+                        help=('How long should each object\'s trail last? '
+                              '(seconds)'),
                         type=int,
                         default=300)
 
@@ -556,54 +557,6 @@ def render_trajectory_movie(movie_writer,
             for artist in trajectory_artists:
                 artist.remove()
 
-# --------------------------------------------------------------------
-
-
-def extract_field_assignments_from_arguments(arguments,
-                                             field_type):
-    """Helper function for configuring point reader
-
-    When running this script, the user specifies named fields that
-    the reader should process with arguments like
-    '--real-field-column altitude 12'.  This will cause the reader
-    to take column 12 in the data file, convert its contents to a
-    floating-point number, and store the result in a property
-    named "altitude" on each point.
-
-    This function is a convenience: it extracts those declarations
-    for a given field type (string, real, timestamp) from a dictionary
-    or namespace of arguments, then returns the result as a dictionary
-    that can be passed to trajectory_points_from_file().
-
-    Arguments:
-        arguments {dict}: Dictionary of parsed command-line arguments
-        field_type {string}: What type of property to extract.  Must be
-            'string', 'real' or 'time'.
-
-    Returns:
-        Dictionary containing { field_name: column_number } for the
-        specified field type.  Dictionary will be empty if there are
-        no assignments of that type.
-
-    Raises:
-        ValueError: invalid field type
-    """
-
-    if field_type not in ['string', 'real', 'time']:
-        raise ValueError(('Field type ({}) must be one of "string", '
-                          '"real", or "time".  Case matters').format(
-                                field_type))
-
-    arg_name = '{}_field_column'.format(field_type)
-    arg_dict = dict(arguments)
-    field_assignments = dict()
-    definition_list = arg_dict.get(arg_name, None)
-    if definition_list is not None:
-        if len(definition_list) > 0:
-            for (field_name, column) in n_at_a_time(definition_list, 2):
-                field_assignments[field_name] = int(column)
-
-    return field_assignments
 
 # ----------------------------------------------------------------------
 
@@ -778,6 +731,7 @@ def trajectories_from_point_file(infile,
 
     return trajectory_source
 
+
 # ---------------------------------------------------------------------
 
 
@@ -944,7 +898,6 @@ def trajectory_time_bounds(trajectories):
     else:
         return (start_time, end_time)
 
-
 # ---------------------------------------------------------------------
 
 
@@ -1059,6 +1012,8 @@ def _extract_typed_field_assignments(arguments,
     return field_assignments
 
 # --------------------------------------------------------------------
+
+
 def main():
     logger = logging.getLogger(__name__)
 
@@ -1118,6 +1073,7 @@ def main():
     # so rather than pull them out individually like we did for
     # the point reader we extract the whole dict using
     # tracktable.script_helpers.argument_groups.extract_arguments().
+
     logger.info('Initializing map canvas for rendering.')
     (figure, axes) = initialize_canvas(args.resolution,
                                        args.dpi)
@@ -1175,7 +1131,6 @@ def main():
         movie_writer,
         axes=mymap,
         trajectories=trajectories,
-
         dpi=args.dpi,
         figure=figure,
         filename=args.movie_file[0],
