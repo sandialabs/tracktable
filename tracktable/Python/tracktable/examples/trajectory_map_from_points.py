@@ -452,6 +452,7 @@ def main():
                     itertools.chain(*trajectory_source)
                     )
 
+
                 if args.map_bbox is None:
                     args.map_bbox = [
                         data_bbox.min_corner[0],
@@ -471,7 +472,6 @@ def main():
         logger.info('Initializing map canvas.')
         mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
         (mymap, artists) = mapmaker.mapmaker(**mapmaker_kwargs)
-
 
         render_trajectories(trajectory_source,
                             mymap,

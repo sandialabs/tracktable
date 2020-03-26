@@ -139,7 +139,6 @@ if (TEST_MOVIES)
     )
 endif (TEST_MOVIES)
 
-
 #   add_python_test(
 #     P_TerrestrialTrajectoryMovieExample_Trajectories
 #     ${EXAMPLE_MODULE}.movie_from_trajectories
