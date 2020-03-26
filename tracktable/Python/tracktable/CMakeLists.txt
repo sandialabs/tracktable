@@ -39,9 +39,6 @@ if (BUILD_TESTING)
   add_subdirectory(io/tests)
 endif (BUILD_TESTING)
 
-
-set( PYTHON_INSTALL_PREFIX "Python/tracktable" )
-
 install(
   FILES __init__.py
   DESTINATION ${PYTHON_INSTALL_PREFIX}
