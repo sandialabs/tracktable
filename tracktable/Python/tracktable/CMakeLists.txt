@@ -30,6 +30,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+if (UNIX AND APPLE)
+  set(PYTHON_INSTALL_PREFIX "Python/tracktable" )
+endif (UNIX AND APPLE)
+
 if (BUILD_TESTING)
   add_subdirectory(analysis/tests)
   add_subdirectory(core/tests)
