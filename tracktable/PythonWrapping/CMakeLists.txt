@@ -56,29 +56,27 @@ find_package(Boost 1.61 COMPONENTS date_time regex REQUIRED)
 
 if (UNIX AND APPLE)
   find_package(Python3 COMPONENTS Interpreter Development)
-else ()
-  find_package(Python3 COMPONENTS Interpreter Development NumPy)
-endif()
+endif(UNIX AND APPLE)
 
-#message("Python3_INCLUDE_DIRS ${Python_INCLUDE_DIRS}")
-#message("Python3_LIBRARIES ${Python_LIBRARIES}")
-#message("Python3_LIBRARY_DIRS ${Python_LIBRARY_DIRS}")
+#message(STATUS "Python3_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
+#message(STATUS "Python3_LIBRARIES ${Python3_LIBRARIES}")
+#message(STATUS "Python3_LIBRARY_DIRS ${Python3_LIBRARY_DIRS}")
 
 if (Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
-  #message("Boost_VERSION ${Boost_VERSION}")
+  #message(STATUS "Boost_VERSION ${Boost_VERSION}")
   if (Boost_VERSION VERSION_LESS 106700)
     # This version of Boost generates libboost_python[3].so.
     set(Boost_PYTHON_LIBRARY_SUFFIX "3")
   else (Boost_VERSION VERSION_LESS 106700)
-    #message("Python3_VERSION_MAJOR ${Python3_VERSION_MAJOR}")
-    #message("Python3_VERSION_MINOR ${Python3_VERSION_MINOR}")
+    #message(STATUS "Python3_VERSION_MAJOR ${Python3_VERSION_MAJOR}")
+    #message(STATUS "Python3_VERSION_MINOR ${Python3_VERSION_MINOR}")
     # This version of Boost needs a versioned library.
     set(Boost_PYTHON_LIBRARY_SUFFIX "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}")
   endif (Boost_VERSION VERSION_LESS 106700)
 
   # Force CMake to go back and find Boost again instead of relying on cached values.
   unset(Boost_FOUND)
-  #message("Boost_PYTHON_LIBRARY_SUFFIX ${Boost_PYTHON_LIBRARY_SUFFIX}")
+  #message(STATUS "Boost_PYTHON_LIBRARY_SUFFIX ${Boost_PYTHON_LIBRARY_SUFFIX}")
   find_package(Boost 1.61 COMPONENTS date_time regex python${Boost_PYTHON_LIBRARY_SUFFIX})
 else (Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
   message(WARNING "Boost.Python library version cannot be determined until both Boost and Python have been found.")
@@ -107,6 +105,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 else ()
   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
 endif()
+
+#message(STATUS "Boost_LIBRARIES ${Boost_LIBRARIES}")
+#message(STATUS "PYTHON_EXTENSION_LIBRARIES ${PYTHON_EXTENSION_LIBRARIES}")
 
 include(PythonExtension)
 
@@ -164,7 +165,7 @@ add_library(_core_types MODULE
   )
 set_property(TARGET _core_types PROPERTY FOLDER "Python")
 
-target_link_libraries(_core_types
+target_link_libraries(_core_types PUBLIC
   TracktableCore
   ${PYTHON_EXTENSION_LIBRARIES}
   )
@@ -176,7 +177,7 @@ add_library(_domain_algorithm_overloads MODULE
   )
 set_property(TARGET _domain_algorithm_overloads PROPERTY FOLDER "Python")
 
-target_link_libraries(_domain_algorithm_overloads
+target_link_libraries(_domain_algorithm_overloads PUBLIC
   TracktableCore
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
@@ -189,7 +190,7 @@ add_library(_terrestrial MODULE
 )
 set_property(TARGET _terrestrial PROPERTY FOLDER "Python")
 
-target_link_libraries(_terrestrial
+target_link_libraries(_terrestrial PUBLIC
   TracktableCore
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
@@ -202,7 +203,7 @@ add_library(_cartesian2d MODULE
 )
 set_property(TARGET _cartesian2d PROPERTY FOLDER "Python")
 
-target_link_libraries(_cartesian2d
+target_link_libraries(_cartesian2d PUBLIC
   TracktableCore
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
@@ -215,7 +216,7 @@ add_library(_cartesian3d MODULE
 )
 set_property(TARGET _cartesian3d                PROPERTY FOLDER "Python")
 
-target_link_libraries(_cartesian3d
+target_link_libraries(_cartesian3d PUBLIC
   TracktableCore
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
@@ -263,7 +264,7 @@ add_library(_dbscan_clustering MODULE
   )
 set_property(TARGET _dbscan_clustering PROPERTY FOLDER "Python")
 
-target_link_libraries(_dbscan_clustering
+target_link_libraries(_dbscan_clustering PUBLIC
   TracktableCore
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
@@ -289,7 +290,7 @@ add_library(_rtree MODULE
   )
 set_property(TARGET _rtree PROPERTY FOLDER "Python")
 
-target_link_libraries(_rtree
+target_link_libraries(_rtree PUBLIC
   TracktableCore
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
