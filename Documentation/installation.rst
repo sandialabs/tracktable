@@ -18,7 +18,7 @@ complaint about a GEOS version or a request for Proj 4.9.0.
 The solution is to install Cartopy yourself before you try to install
 Tracktable.  If you are using `Anaconda
 <https://www.anaconda.com/distribution/>`_, the command ``conda install
-cartopy`` should do it.  
+cartopy`` should do it.
 
 After you have installed Cartopy, retry ``pip install tracktable``.
 
@@ -31,7 +31,7 @@ example:
 
 - You might need access to features on the development branch.
 - You might be running a version of Python for which we do not build wheels (binary packages).
-- You might be on an unsupported platform. 
+- You might be on an unsupported platform.
 - You might not have permission to use binary packages on your system.
 
 In that case, this section is for you.
@@ -56,7 +56,7 @@ Tracktable has the following required dependencies:
 Python
 ^^^^^^
 
-* Python 3.5, 3.6, or 3.7 - http://python.org 
+* Python 3.5, 3.6, or 3.7 - http://python.org
     * NOTE: Tracktable 1.1 was the last version to officially support Python 2.7.
 * NumPy 1.7+ - http://numpy.org
 * Matplotlib 2.0+ - http://matplotlib.org
@@ -70,7 +70,7 @@ Python
 C++
 ^^^
 
-* Compiler - GCC 4.4.7 or newer (http://gcc.gnu.org), clang 3.5 or newer (http://clang.llvm.org), 
+* Compiler - GCC 4.4.7 or newer (http://gcc.gnu.org), clang 3.5 or newer (http://clang.llvm.org),
   Visual Studio 14 2015 or newer (https://visualstudio.microsoft.com)
 * Boost 1.67 or newer - http://www.boost.org
 * GEOS library - http://geos.osgeo.org
@@ -92,7 +92,7 @@ C++
     maintain compatibility with a few environments that are still
     stranded in the age of C++03.  We look forward to their arrival in
     the modern age.
-    
+
 
 Other
 ^^^^^
@@ -108,15 +108,15 @@ If you want to build documentation you will also need the following packages:
 * Sphinx Read the Docs theme - https://sphinx-rtd-theme.readthedocs.io/en/latest
 * Doxygen - http://www.doxygen.nl/index.html
 * Graphviz (for dot executable)- https://www.graphviz.org/
-  
+
 If you want to render movies you will need FFMPEG:
 
 * FFMPEG - https://www.ffmpeg.org
   - If you build from source please be sure to include the MPEG4 and
   FFV1 codecs.  Both of these are included with the standard FFMPEG
   download.  Tracktable can use other codecs but does not require
-  them. 
-  - Windows users can obtain the ffmpeg executable by installing 
+  them.
+  - Windows users can obtain the ffmpeg executable by installing
   Image Magick (https://www.imagemagick.org)
 
 Build Notes for Dependencies
@@ -219,7 +219,7 @@ need to check:
     If you change either of these directories in CMake, press 'c' or
     click 'Configure' to make your changes take effect.
 
-2.  ``PYTHON_EXECUTABLE``, ``PYTHON_LIBRARY``, ``PYTHON_INCLUDE_DIR``
+2.  ``Python3_EXECUTABLE``, ``Python3_LIBRARIES``, ``Python3_INCLUDE_DIRS``
 
     Make sure that all three of these point to the same installation.
     On Mac OSX with MacPorts in particular, CMake has a habit of using
@@ -288,13 +288,13 @@ to ``TRACKTABLE_HOME/tracktable/CMakeLists.txt`` and then rerun CMake as describ
 Step 3: Build and Test
 ----------------------
 
-On Unix-like systems, type ``make``.  For Visual Studio, run ``nmake``, run ``msbuild`` on 
+On Unix-like systems, type ``make``.  For Visual Studio, run ``nmake``, run ``msbuild`` on
 a project file, or open up the project files in your IDE (as appropriate).
 
 Once the build process has finished go to your build directory and run
 ``ctest`` (part of CMake) to run all the tests.  Optionally, Windows users can run the
 test project but this is just a fancy wrapper for ctest in this case. They should all
-succeed.  Some of the later Python tests such as P_Mapmaker may take a minute or two. 
+succeed.  Some of the later Python tests such as P_Mapmaker may take a minute or two.
 
 If you have multiple cores or processors and your build system
 supports it, by all means build in parallel.  GNU Make will do this
@@ -319,25 +319,25 @@ Common Problems
 
     This usually arises when CMake detects a different Python
     installation than the one you actually use.  Take a look at the
-    ``PYTHON_EXECUTABLE`` field in CMake.  If it says something like
+    ``Python3_EXECUTABLE`` field in CMake.  If it says something like
     ``/usr/bin/python`` and you use a Python distribution like
     Anaconda or Enthought's Canopy, that's the problem.
 
-    To fix, change ``PYTHON_EXECUTABLE`` to point to the Python
+    To fix, change ``Python3_EXECUTABLE`` to point to the Python
     interpreter in your environment.  For Anaconda under Linux and OS
     X, this is usually either ``~/anaconda3/bin/python`` or
     ``~/anaconda3/envs/<environment name>/bin/python``.  Remember to
-    also change ``PYTHON_LIBRARY`` and ``PYTHON_INCLUDE_DIR`` to the
+    also change ``Python3_LIBRARIES`` and ``Python3_INCLUDE_DIRS`` to the
     files inside your Anaconda (or Enthought) directory.
-    
+
 2.  Python tests crashing
 
     If the tests whose names begin with ``P_`` crash, you probably
-    have a mismatch between ``PYTHON_EXECUTABLE`` and
-    ``PYTHON_LIBRARY``.  Check their values in ``ccmake`` / CMake GUI.
+    have a mismatch between ``Python3_EXECUTABLE`` and
+    ``Python3_LIBRARIES``.  Check their values in ``ccmake`` / CMake GUI.
     If your Python executable is in (for example)
     ``/usr/local/python/bin/python`` then its corresponding library
-    will usually be in ``/usr/local/python/lib/libpython2.7.so``
+    will usually be in ``/usr/local/python/lib/libpython3.6.so``
     instead of halfway across the system.
 
 3.  Python tests running but failing
@@ -356,7 +356,7 @@ Common Problems
     * Cause #3: The wrong Python interpreter is being invoked.
 
       This really shouldn't happen: we use the same Python interpreter
-      that you specify in ``PYTHON_EXECUTABLE`` and set ``PYTHONPATH``
+      that you specify in ``Python3_EXECUTABLE`` and set ``PYTHONPATH``
       ourselves while running tests.
 
 4.  Nearby stars go nova
