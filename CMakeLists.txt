@@ -134,7 +134,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 option(BUILD_SHARED_LIBS "Build shared libraries.  Required for Python wrapping." ON)
 option(BUILD_PYTHON_WRAPPING "Wrap trajectory classes for use in Python." ON)
 option(BUILD_EXAMPLES "Build tracktable example programs" ON)
-option(BUILD_DOCUMENTATION "Build documentation for Tracktable." OFF)
+option(BUILD_DOCUMENTATION "Build Python and C++ documentation for Tracktable." OFF)
+option(BUILD_DOCUMENTATION_CXX_ONLY "Build only C++ documentation for Tracktable." OFF)
 set(PYTHON_INSTALL_PREFIX "Python/tracktable" )
 
 # ----------------------------------------------------------------------
@@ -169,16 +170,17 @@ endif (BUILD_SHARED_LIBS)
 #-------------------------------------------------------------------------
 
 # Add a target to generate combined documentation with Doxygen and Sphinx
-if (BUILD_DOCUMENTATION)
+if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
+  # Whichever is being build, we need Doxygen
   find_package(Doxygen REQUIRED)
-  find_package(Sphinx)
 
   set( DOC_SOURCE_DIR ${Tracktable_SOURCE_DIR}/Documentation )
   set( DOC_BINARY_DIR ${Tracktable_BINARY_DIR}/Documentation )
 
   if(DOXYGEN_FOUND)
 
-    #Now, let's look for dot and see if it's installed
+    # Now, let's look for dot and see if it's installed
+    # We can still build the docs even if we don't find dot, but they won't be as nice
     find_program(DOT_FOUND dot)
     if (DOT_FOUND)
       set(HAVE_DOT YES)
@@ -192,10 +194,10 @@ if (BUILD_DOCUMENTATION)
       @ONLY
       )
 
-    add_custom_target( doxygen_doc ALL
+    add_custom_target( doc_cxx ALL
       ${DOXYGEN_EXECUTABLE} ${DOC_BINARY_DIR}/Doxyfile
       WORKING_DIRECTORY ${DOC_BINARY_DIR}
-      COMMENT "Generating Doxygen documentation" VERBATIM
+      COMMENT "Generating C++ Doxygen documentation" VERBATIM
       )
 
     install(
@@ -204,50 +206,50 @@ if (BUILD_DOCUMENTATION)
     )
 
     # We have found Sphinx, but that isn't the end of it. We need to make sure the sphinx_rtd_theme is accessible
-    if(Sphinx_FOUND)
-      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
-			"import re; import sphinx; print(re.compile('/__init__.py.*').sub('',sphinx.__file__))"
-			RESULT_VARIABLE SPHINX_MODULE_STATUS
-			OUTPUT_VARIABLE SPHINX_MODULE_LOCATION
-			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-      message("SPHINX_MODULE_STATUS ${SPHINX_MODULE_STATUS}")
-      message("SPHINX_MODULE_LOCATION ${SPHINX_MODULE_LOCATION}")
-      if(NOT SPHINX_MODULE_STATUS)
-			set(PY_SPHINX_MODULE ${SPHINX_MODULE_LOCATION} CACHE STRING
-				"Location of Python module sphinx")
-      endif(NOT SPHINX_MODULE_STATUS)
-      find_package_handle_standard_args(PY_sphinx_module DEFAULT_MSG PY_SPHINX_MODULE)
-      message("PY_SPHINX_MODULE ${PY_SPHINX_MODULE}")
+    if(NOT BUILD_DOCUMENTATION_CXX_ONLY)
+      unset(Sphinx_FOUND)
+      find_package(Sphinx)
 
-      #message("Sphinx_EXECUTABLE_TMP ${Sphinx_EXECUTABLE_TMP}")
+      if (NOT Sphinx_FOUND)
+        message(ERROR ": Please provide the path to the Sphinx executable.")
+      endif (NOT Sphinx_FOUND)
+
       execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
-			"import re; import sphinx_rtd_theme; print(re.compile('/__init__.py.*').sub('',sphinx_rtd_theme.__file__))"
-			RESULT_VARIABLE SPHINX_RTD_THEME_STATUS
-			OUTPUT_VARIABLE SPHINX_RTD_THEME_LOCATION
-			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+        "import re; import sphinx; print(re.compile('/__init__.py.*').sub('',sphinx.__file__))"
+        RESULT_VARIABLE SPHINX_MODULE_STATUS
+        OUTPUT_VARIABLE SPHINX_MODULE_LOCATION
+        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+      #message("SPHINX_MODULE_STATUS ${SPHINX_MODULE_STATUS}")
+      #message("SPHINX_MODULE_LOCATION ${SPHINX_MODULE_LOCATION}")
+      # The status is empty if everything went ok, but if it has anything in it there was an error
+      if(SPHINX_MODULE_STATUS)
+        message(ERROR ": Python module 'sphinx' is required to build Python documentation. Install the sphinx module or enable BUILD_DOCUMENTATION_CXX_ONLY.")
+      endif(SPHINX_MODULE_STATUS)
+
+      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
+        "import re; import sphinx_rtd_theme; print(re.compile('/__init__.py.*').sub('',sphinx_rtd_theme.__file__))"
+        RESULT_VARIABLE SPHINX_RTD_THEME_STATUS
+        OUTPUT_VARIABLE SPHINX_RTD_THEME_LOCATION
+        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
       #message("SPHINX_RTD_THEME_STATUS ${SPHINX_RTD_THEME_STATUS}")
       #message("SPHINX_RTD_THEME_LOCATION ${SPHINX_RTD_THEME_LOCATION}")
-      if(NOT SPHINX_RTD_THEME_STATUS)
-			set(PY_SPHINX_RTD_THEME ${SPHINX_RTD_THEME_LOCATION} CACHE STRING
-				"Location of Python module sphinx_rtd_theme")
-      endif(NOT SPHINX_RTD_THEME_STATUS)
-      find_package_handle_standard_args(PY_sphinx_rtd_theme DEFAULT_MSG PY_SPHINX_RTD_THEME)
-      #message("PY_SPHINX_RTD_THEME ${PY_SPHINX_RTD_THEME}")
+      # The status is empty if everything went ok, but if it has anything in it there was an error
+      if(SPHINX_RTD_THEME_STATUS)
+        message(ERROR ": Python module 'sphinx_rtd_theme' is required to build Python documentation. Install the sphinx_rtd_theme module or enable BUILD_DOCUMENTATION_CXX_ONLY.")
+      endif(SPHINX_RTD_THEME_STATUS)
 
       execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
-			"import re; import breathe; print(re.compile('/__init__.py.*').sub('',breathe.__file__))"
-			RESULT_VARIABLE BREATHE_STATUS
-			OUTPUT_VARIABLE BREATHE_LOCATION
-			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-      if(NOT BREATHE_STATUS)
-			set(PY_BREATHE ${BREATHE_LOCATION} CACHE STRING
-				"Location of Python module breathe")
-      endif(NOT BREATHE_STATUS)
-      find_package_handle_standard_args(PY_breathe DEFAULT_MSG PY_BREATHE)
-
-    endif(Sphinx_FOUND)
-
-    if(Sphinx_FOUND AND PY_SPHINX_MODULE AND PY_SPHINX_RTD_THEME AND PY_BREATHE)
+        "import re; import breathe; print(re.compile('/__init__.py.*').sub('',breathe.__file__))"
+        RESULT_VARIABLE BREATHE_STATUS
+        OUTPUT_VARIABLE BREATHE_LOCATION
+        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+      # The status is empty if everything went ok, but if it has anything in it there was an error
+      if(BREATHE_STATUS)
+        message(ERROR ": Python module 'breathe' is required to build Python documentation. Install the breathe module or enable BUILD_DOCUMENTATION_CXX_ONLY.")
+      endif(BREATHE_STATUS)
 
       # Yes, I'm writing a file into the source tree.  Sphinx requires
       # that its configuration file (conf.py) exist in the source tree
@@ -267,14 +269,14 @@ if (BUILD_DOCUMENTATION)
       # bleeding-edge version of CMake isn't a terribly friendly thing to
       # do, I will probably end up faking it with batch files.
 
-      add_custom_target( doc ALL
+      add_custom_target( doc_python ALL
           ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
           -b html
           -d "${Sphinx_BUILD_DIR}/doctrees"
           ${DOC_SOURCE_DIR}
           ${DOC_BINARY_DIR}/html
-
-        DEPENDS doxygen_doc
+        COMMENT "Generating Python documentation"
+        DEPENDS doc_cxx
         WORKING_DIRECTORY ${DOC_SOURCE_DIR}
         )
 
@@ -283,14 +285,22 @@ if (BUILD_DOCUMENTATION)
         DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
       )
 
-    else(Sphinx_FOUND AND PY_SPHINX_MODULE AND PY_SPHINX_RTD_THEME AND PY_BREATHE)
-      message("WARNING: Sphinx executables or modules not found. Only Doxygen html will be built.")
-    endif(Sphinx_FOUND AND PY_SPHINX_MODULE AND PY_SPHINX_RTD_THEME AND PY_BREATHE)
+    endif(NOT BUILD_DOCUMENTATION_CXX_ONLY)
+
+    if (BUILD_DOCUMENTATION_CXX_ONLY)
+      set(DOC_DEPENDS doc_cxx)
+    else (BUILD_DOCUMENTATION_CXX_ONLY)
+      set(DOC_DEPENDS doc_python)
+    endif (BUILD_DOCUMENTATION_CXX_ONLY)
+
+    add_custom_target( doc ALL
+      DEPENDS ${DOC_DEPENDS}
+      )
 
   else(DOXYGEN_FOUND)
-    message("ERROR: Please provide paths to the Sphinx and Doxygen executables.")
+    message(ERROR "Please provide the path to the Doxygen executable in DOXYGEN_EXECUTABLE and set DOXYGEN_FOUND to 1.")
   endif(DOXYGEN_FOUND)
-endif (BUILD_DOCUMENTATION)
+endif (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
 
 #-------------------------------------------------------------------------
 # End DOCUMENTATION
@@ -408,7 +418,7 @@ if (LINUX)
       DEPENDS source_tar_bz2
       WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
       COMMAND mock -r epel-7-x86_64 --buildsrpm --spec ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.spec --sources Tracktable-${TRACKTABLE_VERSION}-Source.tar.bz2 --resultdir=packaging/rhel7/srpms/
-      COMMENT Building RHEL/CentOS 7 source rpms with mock
+      COMMENT "Building RHEL/CentOS 7 source rpms with mock"
       BYPRODUCTS
         ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/srpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.src.rpm
       VERBATIM
@@ -422,7 +432,7 @@ if (LINUX)
       DEPENDS srpm_rhel7
       WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
       COMMAND mock -r epel-7-x86_64 rebuild packaging/rhel7/srpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.src.rpm --resultdir=packaging/rhel7/rpms
-      COMMENT Building RHEL/CentOS 7 rpms with mock
+      COMMENT "Building RHEL/CentOS 7 rpms with mock"
       BYPRODUCTS
         ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/rpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.x86_64.rpm
         ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/rpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-debuginfo-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.x86_64.rpm
