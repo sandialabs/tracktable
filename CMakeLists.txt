@@ -139,6 +139,16 @@ set(PYTHON_INSTALL_PREFIX "Python/tracktable" )
 
 # ----------------------------------------------------------------------
 
+# Look for python early if we're going to build the wrappers
+# These symbols are also used to look for Sphinx
+if (BUILD_PYTHON_WRAPPING)
+  if (UNIX AND APPLE)
+    find_package(Python3 COMPONENTS Interpreter Development)
+  else (UNIX AND APPLE)
+    find_package(Python3 COMPONENTS Interpreter Development NumPy)
+  endif(UNIX AND APPLE)
+endif (BUILD_PYTHON_WRAPPING)
+
 if (BUILD_SHARED_LIBS)
   message(STATUS "Building shared libraries.")
   add_definitions(-DBUILDING_SHARED_LIBS)
@@ -195,6 +205,20 @@ if (BUILD_DOCUMENTATION)
 
     # We have found Sphinx, but that isn't the end of it. We need to make sure the sphinx_rtd_theme is accessible
     if(Sphinx_FOUND)
+      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
+			"import re; import sphinx; print(re.compile('/__init__.py.*').sub('',sphinx.__file__))"
+			RESULT_VARIABLE SPHINX_MODULE_STATUS
+			OUTPUT_VARIABLE SPHINX_MODULE_LOCATION
+			ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+      message("SPHINX_MODULE_STATUS ${SPHINX_MODULE_STATUS}")
+      message("SPHINX_MODULE_LOCATION ${SPHINX_MODULE_LOCATION}")
+      if(NOT SPHINX_MODULE_STATUS)
+			set(PY_SPHINX_MODULE ${SPHINX_MODULE_LOCATION} CACHE STRING
+				"Location of Python module sphinx")
+      endif(NOT SPHINX_MODULE_STATUS)
+      find_package_handle_standard_args(PY_sphinx_module DEFAULT_MSG PY_SPHINX_MODULE)
+      message("PY_SPHINX_MODULE ${PY_SPHINX_MODULE}")
+
       #message("Sphinx_EXECUTABLE_TMP ${Sphinx_EXECUTABLE_TMP}")
       execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
 			"import re; import sphinx_rtd_theme; print(re.compile('/__init__.py.*').sub('',sphinx_rtd_theme.__file__))"
@@ -223,7 +247,7 @@ if (BUILD_DOCUMENTATION)
 
     endif(Sphinx_FOUND)
 
-    if(Sphinx_FOUND AND PY_SPHINX_RTD_THEME AND PY_BREATHE)
+    if(Sphinx_FOUND AND PY_SPHINX_MODULE AND PY_SPHINX_RTD_THEME AND PY_BREATHE)
 
       # Yes, I'm writing a file into the source tree.  Sphinx requires
       # that its configuration file (conf.py) exist in the source tree
@@ -244,7 +268,7 @@ if (BUILD_DOCUMENTATION)
       # do, I will probably end up faking it with batch files.
 
       add_custom_target( doc ALL
-          ${PYTHON_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
+          ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
           -b html
           -d "${Sphinx_BUILD_DIR}/doctrees"
           ${DOC_SOURCE_DIR}
@@ -259,9 +283,9 @@ if (BUILD_DOCUMENTATION)
         DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
       )
 
-    else(Sphinx_FOUND AND PY_SPHINX_RTD_THEME AND PY_BREATHE)
-      message("WARNING: Sphinx executables not found. Only Doxygen html will be built.")
-    endif(Sphinx_FOUND AND PY_SPHINX_RTD_THEME AND PY_BREATHE)
+    else(Sphinx_FOUND AND PY_SPHINX_MODULE AND PY_SPHINX_RTD_THEME AND PY_BREATHE)
+      message("WARNING: Sphinx executables or modules not found. Only Doxygen html will be built.")
+    endif(Sphinx_FOUND AND PY_SPHINX_MODULE AND PY_SPHINX_RTD_THEME AND PY_BREATHE)
 
   else(DOXYGEN_FOUND)
     message("ERROR: Please provide paths to the Sphinx and Doxygen executables.")
