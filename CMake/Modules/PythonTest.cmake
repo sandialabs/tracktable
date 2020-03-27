@@ -2,7 +2,7 @@
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
- 
+
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -34,7 +34,7 @@ function(add_python_test test_name module_to_run)
 
 add_test(
   NAME ${test_name}
-  COMMAND ${PYTHON_EXECUTABLE} -m ${module_to_run} ${ARGN}
+  COMMAND ${Python3_EXECUTABLE} -m ${module_to_run} ${ARGN}
   )
 
 if (MINGW OR MSVC)
@@ -54,7 +54,7 @@ else (MINGW OR MSVC)
     ${test_name}
     PROPERTIES
     ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python:$ENV{PYTHONPATH}"
+	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python:${Tracktable_BINARY_DIR}/lib:$ENV{PYTHONPATH}"
 	)
 endif (MINGW OR MSVC)
 
