@@ -26,55 +26,9 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-add_test(
-  NAME P_TrajToFromDictionary
-  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_read_write_dictionary.py
-  )
+include(PythonTest)
 
-add_test(
-  NAME P_TrajToFromJson
-  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_read_write_json.py
-)
+set(IO "tracktable.io.tests")
 
-
-if (MINGW OR MSVC)
-  string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )
-  string( REPLACE ";" "\\;" ESCAPED_PYTHONPATH "$ENV{PYTHONPATH}" )
-
-  set_tests_properties(
-    P_TrajToFromDictionary
-    PROPERTIES
-    ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python\\;${ESCAPED_PYTHONPATH};PATH=${Tracktable_BINARY_DIR}/bin\\;${ESCAPED_SYSTEM_PATH}"
-	)
-else (MINGW OR MSVC)
-  # Trust the compiler to set RPATH so that the libraries in bin/ are
-  # accessible.
-  set_tests_properties(
-    P_TrajToFromDictionary
-    PROPERTIES
-    ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python:${CTEST_PYTHONPATH_ADDITIONS}:$ENV{PYTHONPATH}"
-	)
-endif (MINGW OR MSVC)
-
-if (MINGW OR MSVC)
-  string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )
-  string( REPLACE ";" "\\;" ESCAPED_PYTHONPATH "$ENV{PYTHONPATH}" )
-
-  set_tests_properties(
-    P_TrajToFromJson
-    PROPERTIES
-    ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python\\;${ESCAPED_PYTHONPATH};PATH=${Tracktable_BINARY_DIR}/bin\\;${ESCAPED_SYSTEM_PATH}"
-	)
-else (MINGW OR MSVC)
-  # Trust the compiler to set RPATH so that the libraries in bin/ are
-  # accessible.
-  set_tests_properties(
-    P_TrajToFromJson
-    PROPERTIES
-    ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python:${CTEST_PYTHONPATH_ADDITIONS}:$ENV{PYTHONPATH}"
-	)
-endif (MINGW OR MSVC)
+add_python_test(P_TrajToFromDictionary ${IO}.test_read_write_dictionary)
+add_python_test(P_TrajToFromJson ${IO}.test_read_write_json)
