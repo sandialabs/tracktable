@@ -61,7 +61,7 @@ This package contains developer's documentation for the tracktable library.
     -DBUILD_PYTHON_WRAPPING=OFF \
     -DBUILD_TESTING=ON \
     -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} \
-    -DBUILD_DOCUMENTATION=ON \
+    -DBUILD_DOCUMENTATION_CXX_ONLY=ON \
     -DPython3_EXECUTABLE=python3.6 \
     .
 
