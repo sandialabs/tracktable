@@ -13,6 +13,17 @@ BuildRequires:    graphviz
 BuildRequires:    boost169-devel >= 1.69
 BuildRequires:    cmake3 >= 3.12
 BuildRequires:    pkgconfig
+#BuildRequires:    python36-python-devel
+#BuildRequires:    python36-pillow
+#BuildRequires:    python36-Cython
+#BuildRequires:    proj-devel
+#BuildRequires:    proj-epsg
+#BuildRequires:    proj-nad
+#BuildRequires:    python36-scipy
+#BuildRequires:    python36-pytz
+#BuildRequires:    python3-pip
+#pip install matplotlib
+#pip install cartopy fails because RHEL 7 proj is 4.8.0 and cartopy requires 4.9.0
 Obsoletes:        tracktable
 
 %description
@@ -51,9 +62,9 @@ This package contains developer's documentation for the tracktable library.
     -DBUILD_TESTING=ON \
     -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} \
     -DBUILD_DOCUMENTATION=ON \
-    -DPYTHON_EXECUTABLE=python3.6 \
+    -DPython3_EXECUTABLE=python3.6 \
     .
-    
+
 %make_build %{?_smp_mflags}
 
 %install
