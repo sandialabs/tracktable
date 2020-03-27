@@ -43,14 +43,14 @@ execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
       RESULT_VARIABLE CARTOPY_MODULE_STATUS
       OUTPUT_VARIABLE CARTOPY_MODULE_LOCATION
       ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-message("CARTOPY_MODULE_STATUS ${CARTOPY_MODULE_STATUS}")
-message("CARTOPY_MODULE_LOCATION ${CARTOPY_MODULE_LOCATION}")
+#message("CARTOPY_MODULE_STATUS ${CARTOPY_MODULE_STATUS}")
+#message("CARTOPY_MODULE_LOCATION ${CARTOPY_MODULE_LOCATION}")
 if(NOT CARTOPY_MODULE_STATUS)
       set(PY_CARTOPY_MODULE ${CARTOPY_MODULE_LOCATION} CACHE STRING
           "Location of Python module cartopy")
 endif(NOT CARTOPY_MODULE_STATUS)
 find_package_handle_standard_args(PY_cartopy_module DEFAULT_MSG PY_CARTOPY_MODULE)
-message("PY_CARTOPY_MODULE ${PY_CARTOPY_MODULE}")
+#message("PY_CARTOPY_MODULE ${PY_CARTOPY_MODULE}")
 
 if (PY_CARTOPY_MODULE)
   #add_python_test(P_Mapmaker_Airport
@@ -77,6 +77,6 @@ if (PY_CARTOPY_MODULE)
     tracktable.render.tests.test_mapmaker_europe "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
   )
 else (PY_CARTOPY_MODULE)
-  message(WARNING "Cartopy module not found. Rendering tests will not be executed and rendering module will not execute with current python implementation.")
-  message(WARNING "Rendering modules will be installed, but you must add cartopy to your current environment or change to a python environment with cartopy for rendering to work.")
+  message(STATUS "Cartopy module not found. Rendering tests will not be executed and rendering module will not execute with current python implementation.")
+  message(STATUS "Rendering modules will be installed, but you must add cartopy to your current environment or change to a python environment with cartopy for rendering to work.")
 endif(PY_CARTOPY_MODULE)
