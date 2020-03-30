@@ -43,9 +43,7 @@ from tracktable.source.trajectory import AssembleTrajectoryFromPoints
 import datetime
 import itertools
 import numpy
-import pprint
 import shlex
-import six
 import sys
 
 import matplotlib
