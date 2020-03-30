@@ -119,8 +119,6 @@ matplotlib.use('Agg')
 # flake8, the Python style checker, that we really did mean to do this.
 from matplotlib import pyplot # noqa
 
-
-
 # ----------------------------------------------------------------------
 
 
@@ -361,7 +359,7 @@ def parse_args():
 
     return args
 
-  # --------------------------------------------------------------------
+# --------------------------------------------------------------------
 
 
 def render_annotated_trajectories(trajectories,
@@ -456,15 +454,17 @@ def render_annotated_trajectories(trajectories,
                           linewidth_style))
     if linewidth_style == 'taper':
         linewidths_for_trajectory = _make_tapered_linewidth_generator(
-                                linewidth, final_linewidth)
+                                        linewidth, final_linewidth)
     else:
-        linewidths_for_trajectory = _make_constant_linewidth_generator(linewidth)
+        linewidths_for_trajectory = _make_constant_linewidth_generator(
+                                        linewidth)
 
     if not decorate_head:
         head_size = 0
         head_color = 'white'
 
     logger = logging.getLogger(__name__)
+
     def scalars_for_trajectory(trajectory):
         result = [0] * len(trajectory)
         try:
@@ -478,15 +478,17 @@ def render_annotated_trajectories(trajectories,
 
         return result
 
-    return paths.draw_traffic(axes,
-                              trajectories,
-                              color_map=color_map,
-                              trajectory_scalar_generator=scalars_for_trajectory,
-                              trajectory_linewidth_generator=linewidths_for_trajectory,
-                              zorder=zorder,
-                              color_scale=matplotlib.colors.Normalize(vmin=scalar_min, vmax=scalar_max),
-                              dot_size=head_size,
-                              dot_color=head_color)
+    return paths.draw_traffic(
+              axes,
+              trajectories,
+              color_map=color_map,
+              trajectory_scalar_generator=scalars_for_trajectory,
+              trajectory_linewidth_generator=linewidths_for_trajectory,
+              zorder=zorder,
+              color_scale=matplotlib.colors.Normalize(vmin=scalar_min,
+                                                      vmax=scalar_max),
+              dot_size=head_size,
+              dot_color=head_color)
 
 
 # --------------------------------------------------------------------
@@ -692,7 +694,9 @@ def _make_tapered_linewidth_generator(initial_linewidth,
     """
 
     def linewidth_generator(trajectory):
-        return numpy.linspace(final_linewidth, initial_linewidth, len(trajectory))
+        return numpy.linspace(final_linewidth,
+                              initial_linewidth,
+                              len(trajectory))
 
     return linewidth_generator
 
@@ -784,6 +788,11 @@ def main():
     args = parse_args()
 
     mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
+    # Some of the argument names for trajectory rendering are out of
+    # sync with their command-line parameter names.  We extract those
+    # arguments manually at the render_annotated_trajectories
+    # call instead of using extract_arguments("trajectory_rendering")
+    # here.
 
     # Step 1: Load all the trajectories into memory.
     point_filename = args.point_data_file[0]
@@ -873,7 +882,8 @@ def main():
     print("STATUS: Saving figure to file")
     pyplot.savefig(args.image_file[0],
                    facecolor=figure.get_facecolor(),
-                   figsize=compute_figure_dimensions(args.resolution, args.dpi),
+                   figsize=compute_figure_dimensions(
+                       args.resolution, args.dpi),
                    dpi=args.dpi)
 
     pyplot.close()
