@@ -441,6 +441,7 @@ def render_annotated_trajectories(trajectories,
         head_color = 'white'
 
     logger = logging.getLogger(__name__)
+
     def scalars_for_trajectory(trajectory):
         result = [0] * len(trajectory)
         try:
@@ -509,7 +510,8 @@ def render_trajectory_movie(movie_writer,
     trajectories_on_map = list(trajectories_inside_box(trajectories, map_bbox))
     if len(trajectories_on_map) == 0:
         raise ValueError(
-            ('No trajectories intersect the map bounding box (({} {}) - ({} {})).  Is the '
+            ('No trajectories intersect the map bounding box '
+             '(({} {}) - ({} {})).  Is the '
              'bounding box correct?').format(map_bbox.min_corner[0],
                                              map_bbox.min_corner[1],
                                              map_bbox.max_corner[0],
@@ -634,10 +636,10 @@ def setup_encoder(encoder='ffmpeg',
     if type(encoder_args) is str:
         encoder_args = shlex.split(encoder_args)
 
-    writer = matplotlib.animation.writers[encoder]( fps=fps,
-                                                    codec=codec,
-                                                    metadata=movie_metadata,
-                                                    extra_args=encoder_args)
+    writer = matplotlib.animation.writers[encoder](fps=fps,
+                                                   codec=codec,
+                                                   metadata=movie_metadata,
+                                                   extra_args=encoder_args)
 
     return writer
 
@@ -1027,8 +1029,8 @@ def main():
     args = parse_args()
     mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
     movie_kwargs = argument_groups.extract_arguments("movie_rendering", args)
-#   We still need to restore support for some of these so we will assemble
-#   the list by hand for now.
+#   Some of the keyword arguments for trajectory rendering have been renamed.
+#   For now, we'll extract them by hand farther down in this function.
 #    trajectory_rendering_kwargs = argument_groups.extract_arguments(
 #                                    "trajectory_rendering", args)
 
@@ -1099,9 +1101,6 @@ def main():
                                                            args.dpi),
                       'frameon': False}
 
-
-    #print("Command-line arguments:")
-    #pprint.pprint(vars(args))
     #
     # Lights! Camera! Action!
     #
