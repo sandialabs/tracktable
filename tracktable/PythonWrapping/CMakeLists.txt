@@ -53,30 +53,34 @@
 set(Boost_PYTHON_LIBRARY_SUFFIX "")
 
 find_package(Boost 1.61 COMPONENTS date_time regex REQUIRED)
-find_package(PythonInterp)
-if (PYTHONINTERP_FOUND)
-  find_package(PythonLibs)
-endif (PYTHONINTERP_FOUND)
 
-if (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
+if (UNIX AND APPLE)
+  find_package(Python3 COMPONENTS Interpreter Development)
+endif(UNIX AND APPLE)
+
+#message(STATUS "Python3_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
+#message(STATUS "Python3_LIBRARIES ${Python3_LIBRARIES}")
+#message(STATUS "Python3_LIBRARY_DIRS ${Python3_LIBRARY_DIRS}")
+
+if (Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
+  #message(STATUS "Boost_VERSION ${Boost_VERSION}")
   if (Boost_VERSION VERSION_LESS 106700)
     # This version of Boost generates libboost_python[3].so.
-    if (PYTHON_VERSION_MAJOR EQUAL 2)
-      set(Boost_PYTHON_LIBRARY_SUFFIX "")
-    else ()
-      set(Boost_PYTHON_LIBRARY_SUFFIX "3")
-    endif()
+    set(Boost_PYTHON_LIBRARY_SUFFIX "3")
   else (Boost_VERSION VERSION_LESS 106700)
+    #message(STATUS "Python3_VERSION_MAJOR ${Python3_VERSION_MAJOR}")
+    #message(STATUS "Python3_VERSION_MINOR ${Python3_VERSION_MINOR}")
     # This version of Boost needs a versioned library.
-    set(Boost_PYTHON_LIBRARY_SUFFIX "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
+    set(Boost_PYTHON_LIBRARY_SUFFIX "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}")
   endif (Boost_VERSION VERSION_LESS 106700)
 
   # Force CMake to go back and find Boost again instead of relying on cached values.
   unset(Boost_FOUND)
+  #message(STATUS "Boost_PYTHON_LIBRARY_SUFFIX ${Boost_PYTHON_LIBRARY_SUFFIX}")
   find_package(Boost 1.61 COMPONENTS date_time regex python${Boost_PYTHON_LIBRARY_SUFFIX})
-else (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
+else (Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
   message(WARNING "Boost.Python library version cannot be determined until both Boost and Python have been found.")
-endif (Boost_FOUND AND EXISTS ${PYTHON_EXECUTABLE})
+endif (Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
 
 # ----------------------------------------------------------------------
 #
@@ -97,10 +101,13 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 endif()
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${PYTHON_LIBRARIES})
-else ()  
+  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${Python3_LIBRARIES})
+else ()
   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
 endif()
+
+#message(STATUS "Boost_LIBRARIES ${Boost_LIBRARIES}")
+#message(STATUS "PYTHON_EXTENSION_LIBRARIES ${PYTHON_EXTENSION_LIBRARIES}")
 
 include(PythonExtension)
 
@@ -112,11 +119,11 @@ configure_file(
   )
 
 include_directories(
+  ${Python3_INCLUDE_DIRS}
+  ${Python3_NumPy_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIR}
   ${Tracktable_SOURCE_DIR}
   ${Tracktable_BINARY_DIR}
-  ${Boost_INCLUDE_DIR}
-  ${PYTHON_INCLUDE_DIRS}
-  ${NUMPY_INCLUDE_DIRS}
   )
 
 link_directories(
@@ -142,6 +149,7 @@ add_library(_tracktable_hello MODULE
 # puts the target into a folder in Visual studio
 set_property(TARGET _tracktable_hello           PROPERTY FOLDER "Python")
 
+#message("PYTHON_EXTENSION_LIBRARIES ${PYTHON_EXTENSION_LIBRARIES}")
 target_link_libraries(_tracktable_hello
   ${PYTHON_EXTENSION_LIBRARIES}
   )
@@ -157,7 +165,7 @@ add_library(_core_types MODULE
   )
 set_property(TARGET _core_types PROPERTY FOLDER "Python")
 
-target_link_libraries(_core_types
+target_link_libraries(_core_types PUBLIC
   TracktableCore
   ${PYTHON_EXTENSION_LIBRARIES}
   )
@@ -169,7 +177,7 @@ add_library(_domain_algorithm_overloads MODULE
   )
 set_property(TARGET _domain_algorithm_overloads PROPERTY FOLDER "Python")
 
-target_link_libraries(_domain_algorithm_overloads
+target_link_libraries(_domain_algorithm_overloads PUBLIC
   TracktableCore
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
@@ -182,7 +190,7 @@ add_library(_terrestrial MODULE
 )
 set_property(TARGET _terrestrial PROPERTY FOLDER "Python")
 
-target_link_libraries(_terrestrial
+target_link_libraries(_terrestrial PUBLIC
   TracktableCore
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
@@ -195,7 +203,7 @@ add_library(_cartesian2d MODULE
 )
 set_property(TARGET _cartesian2d PROPERTY FOLDER "Python")
 
-target_link_libraries(_cartesian2d
+target_link_libraries(_cartesian2d PUBLIC
   TracktableCore
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
@@ -208,7 +216,7 @@ add_library(_cartesian3d MODULE
 )
 set_property(TARGET _cartesian3d                PROPERTY FOLDER "Python")
 
-target_link_libraries(_cartesian3d
+target_link_libraries(_cartesian3d PUBLIC
   TracktableCore
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
@@ -256,7 +264,7 @@ add_library(_dbscan_clustering MODULE
   )
 set_property(TARGET _dbscan_clustering PROPERTY FOLDER "Python")
 
-target_link_libraries(_dbscan_clustering
+target_link_libraries(_dbscan_clustering PUBLIC
   TracktableCore
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
@@ -282,7 +290,7 @@ add_library(_rtree MODULE
   )
 set_property(TARGET _rtree PROPERTY FOLDER "Python")
 
-target_link_libraries(_rtree
+target_link_libraries(_rtree PUBLIC
   TracktableCore
   TracktableDomain
   ${PYTHON_EXTENSION_LIBRARIES}
@@ -291,13 +299,13 @@ target_link_libraries(_rtree
 install_python_extension(_rtree lib ${Tracktable_PYTHON_DIR})
 
 get_filename_component(
-  PYTHON_EXECUTABLE_DIRECTORY
-  ${PYTHON_EXECUTABLE}
+  Python3_EXECUTABLE_DIRECTORY
+  ${Python3_EXECUTABLE}
   DIRECTORY
   )
 
 message(STATUS "Adding wheel target.")
-message(STATUS "INFO: Python executable is ${PYTHON_EXECUTABLE}")
+message(STATUS "INFO: Python executable is ${Python3_EXECUTABLE}")
 message(STATUS "INFO: Install prefix is ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "INFO: Wheel should go in ${CMAKE_BINARY_DIR}/wheel")
 
@@ -306,7 +314,7 @@ if (APPLE)
     FIX_WHEEL_EXECUTABLE
     delocate-wheel
     HINTS
-    ${PYTHON_EXECUTABLE_DIRECTORY}
+    ${Python3_EXECUTABLE_DIRECTORY}
     DOC
     "delocate-wheel executable: OS X utility to add libraries to Python wheels"
     )
@@ -325,7 +333,7 @@ endif (UNIX AND NOT APPLE)
 add_custom_target( wheel
   COMMAND
   ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
-  ${PYTHON_EXECUTABLE}
+  ${Python3_EXECUTABLE}
   ${CMAKE_BINARY_DIR}
   ${CMAKE_INSTALL_PREFIX}
   ${CMAKE_BINARY_DIR}/wheel

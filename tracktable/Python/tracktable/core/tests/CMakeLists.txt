@@ -32,21 +32,6 @@
 # Here we list the Python tests that we need to run to make sure that
 # our core classes and functions are working.
 
-#add_test(
-#  NAME P_TravelFromPoint
-#  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_travel_from_point.py
-#)
-
-#add_test(
-#  NAME P_WrappedPointTypes
-#  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_point_types.py
-#)
-
-#add_test(
-#  NAME P_WrappedTrajectoryTypes
-#  COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_trajectory_types.py
-#)
-
 include(PythonTest)
 
 add_python_test(P_TestConvexHullArea tracktable.core.tests.test_convex_hull_area)
