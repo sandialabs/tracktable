@@ -134,10 +134,21 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 option(BUILD_SHARED_LIBS "Build shared libraries.  Required for Python wrapping." ON)
 option(BUILD_PYTHON_WRAPPING "Wrap trajectory classes for use in Python." ON)
 option(BUILD_EXAMPLES "Build tracktable example programs" ON)
-option(BUILD_DOCUMENTATION "Build documentation for Tracktable." OFF)
-option(USE_ANACONDA_LINK_FLAGS "Use Anaconda-specific link flags." OFF)
+option(BUILD_DOCUMENTATION "Build Python and C++ documentation for Tracktable." OFF)
+option(BUILD_DOCUMENTATION_CXX_ONLY "Build only C++ documentation for Tracktable." OFF)
+set(PYTHON_INSTALL_PREFIX "Python/tracktable" )
 
 # ----------------------------------------------------------------------
+
+# Look for python early if we're going to build the wrappers
+# These symbols are also used to look for Sphinx
+if (BUILD_PYTHON_WRAPPING)
+  if (UNIX AND APPLE)
+    find_package(Python3 COMPONENTS Interpreter Development)
+  else (UNIX AND APPLE)
+    find_package(Python3 COMPONENTS Interpreter Development NumPy)
+  endif(UNIX AND APPLE)
+endif (BUILD_PYTHON_WRAPPING)
 
 if (BUILD_SHARED_LIBS)
   message(STATUS "Building shared libraries.")
@@ -159,24 +170,34 @@ endif (BUILD_SHARED_LIBS)
 #-------------------------------------------------------------------------
 
 # Add a target to generate combined documentation with Doxygen and Sphinx
-if (BUILD_DOCUMENTATION)
+if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
+  # Whichever is being build, we need Doxygen
   find_package(Doxygen REQUIRED)
-  find_package(Sphinx)
 
   set( DOC_SOURCE_DIR ${Tracktable_SOURCE_DIR}/Documentation )
   set( DOC_BINARY_DIR ${Tracktable_BINARY_DIR}/Documentation )
 
   if(DOXYGEN_FOUND)
+
+    # Now, let's look for dot and see if it's installed
+    # We can still build the docs even if we don't find dot, but they won't be as nice
+    find_program(DOT_FOUND dot)
+    if (DOT_FOUND)
+      set(HAVE_DOT YES)
+    else(DOT_FOUND)
+      set(HAVE_DOT NO)
+    endif(DOT_FOUND)
+
     configure_file(
       ${DOC_SOURCE_DIR}/Doxyfile.in
       ${DOC_BINARY_DIR}/Doxyfile
       @ONLY
       )
 
-    add_custom_target( doxygen_doc ALL
+    add_custom_target( doc_cxx ALL
       ${DOXYGEN_EXECUTABLE} ${DOC_BINARY_DIR}/Doxyfile
       WORKING_DIRECTORY ${DOC_BINARY_DIR}
-      COMMENT "Generating Doxygen documentation" VERBATIM
+      COMMENT "Generating C++ Doxygen documentation" VERBATIM
       )
 
     install(
@@ -184,7 +205,51 @@ if (BUILD_DOCUMENTATION)
       DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}/cpp_reference
     )
 
-    if(Sphinx_FOUND)
+    # We have found Sphinx, but that isn't the end of it. We need to make sure the sphinx_rtd_theme is accessible
+    if(NOT BUILD_DOCUMENTATION_CXX_ONLY)
+      unset(Sphinx_FOUND)
+      find_package(Sphinx)
+
+      if (NOT Sphinx_FOUND)
+        message(ERROR ": Please provide the path to the Sphinx executable.")
+      endif (NOT Sphinx_FOUND)
+
+      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
+        "import re; import sphinx; print(re.compile('/__init__.py.*').sub('',sphinx.__file__))"
+        RESULT_VARIABLE SPHINX_MODULE_STATUS
+        OUTPUT_VARIABLE SPHINX_MODULE_LOCATION
+        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+      #message("SPHINX_MODULE_STATUS ${SPHINX_MODULE_STATUS}")
+      #message("SPHINX_MODULE_LOCATION ${SPHINX_MODULE_LOCATION}")
+      # The status is empty if everything went ok, but if it has anything in it there was an error
+      if(SPHINX_MODULE_STATUS)
+        message(ERROR ": Python module 'sphinx' is required to build Python documentation. Install the sphinx module or enable BUILD_DOCUMENTATION_CXX_ONLY.")
+      endif(SPHINX_MODULE_STATUS)
+
+      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
+        "import re; import sphinx_rtd_theme; print(re.compile('/__init__.py.*').sub('',sphinx_rtd_theme.__file__))"
+        RESULT_VARIABLE SPHINX_RTD_THEME_STATUS
+        OUTPUT_VARIABLE SPHINX_RTD_THEME_LOCATION
+        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+      #message("SPHINX_RTD_THEME_STATUS ${SPHINX_RTD_THEME_STATUS}")
+      #message("SPHINX_RTD_THEME_LOCATION ${SPHINX_RTD_THEME_LOCATION}")
+      # The status is empty if everything went ok, but if it has anything in it there was an error
+      if(SPHINX_RTD_THEME_STATUS)
+        message(ERROR ": Python module 'sphinx_rtd_theme' is required to build Python documentation. Install the sphinx_rtd_theme module or enable BUILD_DOCUMENTATION_CXX_ONLY.")
+      endif(SPHINX_RTD_THEME_STATUS)
+
+      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
+        "import re; import breathe; print(re.compile('/__init__.py.*').sub('',breathe.__file__))"
+        RESULT_VARIABLE BREATHE_STATUS
+        OUTPUT_VARIABLE BREATHE_LOCATION
+        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+      # The status is empty if everything went ok, but if it has anything in it there was an error
+      if(BREATHE_STATUS)
+        message(ERROR ": Python module 'breathe' is required to build Python documentation. Install the breathe module or enable BUILD_DOCUMENTATION_CXX_ONLY.")
+      endif(BREATHE_STATUS)
 
       # Yes, I'm writing a file into the source tree.  Sphinx requires
       # that its configuration file (conf.py) exist in the source tree
@@ -204,14 +269,14 @@ if (BUILD_DOCUMENTATION)
       # bleeding-edge version of CMake isn't a terribly friendly thing to
       # do, I will probably end up faking it with batch files.
 
-      add_custom_target( doc ALL
-          ${PYTHON_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
+      add_custom_target( doc_python ALL
+          ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
           -b html
           -d "${Sphinx_BUILD_DIR}/doctrees"
           ${DOC_SOURCE_DIR}
           ${DOC_BINARY_DIR}/html
-
-        DEPENDS doxygen_doc
+        COMMENT "Generating Python documentation"
+        DEPENDS doc_cxx
         WORKING_DIRECTORY ${DOC_SOURCE_DIR}
         )
 
@@ -220,14 +285,22 @@ if (BUILD_DOCUMENTATION)
         DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
       )
 
-    else(Sphinx_FOUND)
-      message("WARNING: Sphinx executables not found. Only Doxygen html will be built.")
-    endif(Sphinx_FOUND)
+    endif(NOT BUILD_DOCUMENTATION_CXX_ONLY)
+
+    if (BUILD_DOCUMENTATION_CXX_ONLY)
+      set(DOC_DEPENDS doc_cxx)
+    else (BUILD_DOCUMENTATION_CXX_ONLY)
+      set(DOC_DEPENDS doc_python)
+    endif (BUILD_DOCUMENTATION_CXX_ONLY)
+
+    add_custom_target( doc ALL
+      DEPENDS ${DOC_DEPENDS}
+      )
 
   else(DOXYGEN_FOUND)
-    message("ERROR: Please provide paths to the Sphinx and Doxygen executables.")
+    message(ERROR "Please provide the path to the Doxygen executable in DOXYGEN_EXECUTABLE and set DOXYGEN_FOUND to 1.")
   endif(DOXYGEN_FOUND)
-endif (BUILD_DOCUMENTATION)
+endif (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
 
 #-------------------------------------------------------------------------
 # End DOCUMENTATION
@@ -239,18 +312,13 @@ install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJE
 install(FILES README.md DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 
 if (BUILD_PYTHON_WRAPPING)
-  install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}/Python/tracktable)
-  install(FILES README.md DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}/Python/tracktable)
+  install(FILES LICENSE.txt DESTINATION ${PYTHON_INSTALL_PREFIX})
+  install(FILES README.md DESTINATION ${PYTHON_INSTALL_PREFIX})
 endif ()
 # ----------------------------------------------------------------------
 
-if (BUILD_PYTHON_WRAPPING)
-  if (NOT BUILD_SHARED_LIBS)
-    message("Python wrapping requires shared libraries.  Please turn on BUILD_SHARED_LIBS.")
-  endif ()
-  if (USE_ANACONDA_LINK_FLAGS)
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
-  endif (USE_ANACONDA_LINK_FLAGS)
+if (BUILD_PYTHON_WRAPPING AND NOT BUILD_SHARED_LIBS)
+  message("Python wrapping requires shared libraries.  Please turn on BUILD_SHARED_LIBS.")
 endif ()
 
 
@@ -340,8 +408,8 @@ endif ()
 if (LINUX)
 
   configure_file(
-    "${CMAKE_CURRENT_SOURCE_DIR}/packaging/rpm/rhel7/tracktable.spec.in" 
-    "${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.spec" 
+    "${CMAKE_CURRENT_SOURCE_DIR}/packaging/rpm/rhel7/tracktable.spec.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.spec"
     @ONLY
     IMMEDIATE
     )
@@ -350,7 +418,7 @@ if (LINUX)
       DEPENDS source_tar_bz2
       WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
       COMMAND mock -r epel-7-x86_64 --buildsrpm --spec ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}.spec --sources Tracktable-${TRACKTABLE_VERSION}-Source.tar.bz2 --resultdir=packaging/rhel7/srpms/
-      COMMENT Building RHEL/CentOS 7 source rpms with mock
+      COMMENT "Building RHEL/CentOS 7 source rpms with mock"
       BYPRODUCTS
         ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/srpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.src.rpm
       VERBATIM
@@ -364,7 +432,7 @@ if (LINUX)
       DEPENDS srpm_rhel7
       WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
       COMMAND mock -r epel-7-x86_64 rebuild packaging/rhel7/srpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.src.rpm --resultdir=packaging/rhel7/rpms
-      COMMENT Building RHEL/CentOS 7 rpms with mock
+      COMMENT "Building RHEL/CentOS 7 rpms with mock"
       BYPRODUCTS
         ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/rpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.x86_64.rpm
         ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/rpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-debuginfo-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.x86_64.rpm
@@ -372,11 +440,11 @@ if (LINUX)
         ${CMAKE_CURRENT_BINARY_DIR}/packaging/rhel7/rpms/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}-doc-${TRACKTABLE_VERSION}-${RPM_RELEASE}.el7.noarch.rpm
       VERBATIM
   )
-  
+
   add_custom_target(rpm
       DEPENDS rpm_rhel7_x86_64
   )
-  
+
 endif ()
 
 #-------------------------------------------------------------------------
