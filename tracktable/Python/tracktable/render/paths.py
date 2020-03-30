@@ -78,8 +78,8 @@ def remove_duplicate_points(trajectory):
     new_points = []
     last_point = None
     for point in trajectory:
-        if ((not last_point) 
-                or (point[1] != last_point[1]) 
+        if ((not last_point)
+                or (point[1] != last_point[1])
                 or (point[0] != last_point[0])):
             new_points.append(point)
             last_point = point
@@ -115,7 +115,7 @@ def points_to_segments(point_list, maximum_distance=None):
             (point2[1]-point1[1])*(point2[1]-point1[1])
         )
 
-    # Now that we know the thresholds, we can go through and build the 
+    # Now that we know the thresholds, we can go through and build the
     # actual segments.
     segments = []
     logger = None
@@ -134,7 +134,7 @@ def points_to_segments(point_list, maximum_distance=None):
                 ("WARNING: Discarding outlier line segment with length {}, {} "
                  "times the maximum length of {}.").format(
                      segment_length,
-                     segment_length/maximum_distance, 
+                     segment_length/maximum_distance,
                      maximum_distance))
             segments.append((point1, point1))
         else:
@@ -316,7 +316,7 @@ def draw_traffic(traffic_map,
     current_batch_scalars = []
     current_batch_linewidths = []
 
-    # We want to ignore individual segments that span most of the way across 
+    # We want to ignore individual segments that span most of the way across
     # the map.  These are almost always errors in the data, especially where
     # segments cross the limb of the map.
     if hasattr(traffic_map, 'get_extent'):
@@ -362,7 +362,7 @@ def draw_traffic(traffic_map,
         # of the call to remove_duplicate_points() earlier.
 
         local_segments = points_to_segments(
-            zip(local_x, local_y), 
+            zip(local_x, local_y),
             maximum_distance=max_segment_length)
 
         if len(local_segments) > 0:
@@ -437,12 +437,15 @@ def draw_traffic(traffic_map,
             else:
                 dot_color_kwargs = {'c': dot_color}
 
-            dot_collection = traffic_map.scatter(lead_point_x, lead_point_y,
-                                                 s=dot_size,
-                                                 linewidth=0,
-                                                 marker='o',
-                                                 zorder=dot_zorder,
-                                                 **dot_color_kwargs)
+            if axes is None:
+                axes = matplotlib.pyplot.gca()
+
+            dot_collection = axes.scatter(lead_point_x, lead_point_y,
+                                          s=dot_size,
+                                          linewidth=0,
+                                          marker='o',
+                                          zorder=dot_zorder,
+                                          **dot_color_kwargs)
             all_artists.append(dot_collection)
 
         if label_objects:
@@ -456,22 +459,22 @@ def draw_traffic(traffic_map,
 def unwrap_path(locs):
     """
     Function:
-        Inspects a list of [lat, lon] coordinates. If the trajectory crosses 
+        Inspects a list of [lat, lon] coordinates. If the trajectory crosses
 	the antimeridian (180 deg. Long), 'unwrap' the trajectory by projecting
 	longitudinal values onto >+180 or <-180. This will prevent horizontal
 	lines from streaking across a mercator projection, when plotting the
 	trajectory in mapping packages like Folium. Operates by comparing pairs
 	of elements (coord. point tuples) for the entire list.
-    
+
     Input:
         locs: a list of (lat,lon) tuples
 
-    Output: 
+    Output:
         None
         modifies the locs[] list in-place.
     """
 
-    # 't' is an arbitrary threshold for comparing suqsequent points. If they are 'far enough' apart, 
+    # 't' is an arbitrary threshold for comparing suqsequent points. If they are 'far enough' apart,
     #   then we assume they must be on opposite sides of the antimeridian.
     t = 320
     for i in range(1,len(locs)):
@@ -482,6 +485,6 @@ def unwrap_path(locs):
             else:
                 # i-1 point in Eastern Hemisphere
                 locs[i] = (locs[i][0],locs[i][1]+360)
-    
+
     return
 
