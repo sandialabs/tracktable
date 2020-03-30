@@ -242,7 +242,7 @@ and `--map-bbox x y X Y` as follows::
          --x-column 2
          --y-column 3
          --delimiter ,
-         --map-bbox -100 -100 100 100
+         --map-bbox -100 100 -100 100
          --domain cartesian2d
          TRACKTABLE/examples/data/SamplePointsCartesian.csv
 	 trajectory_map_cartesian.png
@@ -313,7 +313,7 @@ As with geographic data, we can also make movies from data in flat Cartesian spa
       --x-column 2
       --y-column 3
       --delimiter ,
-      --map-bbox -100 -100 100 100
+      --map-bbox -100 100 -100 100
       --trajectory-linewidth taper
       --trajectory-initial-linewidth 4
       --trajectory-final-linewidth 1
