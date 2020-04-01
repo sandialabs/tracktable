@@ -37,6 +37,21 @@ if (POLICY CMP0042)
   set(CMAKE_MACOSX_RPATH ${Tracktable_BINARY_DIR}/lib)
 endif ()
 
+# This policy is supposed to set Python3_FIND_STRATEGY=LOCATION.
+# However, at least on CMake 3.16.5 on MacOS, setting it appears
+# to have no effect: we observe the same behavior we had previously
+# with Python3_FIND_STRATEGY=VERSION.  
+#
+# We're going to manually set Python3_FIND_STRATEGY for now.
+if (POLICY CMP0094)
+  cmake_policy(SET CMP0094 NEW)
+endif ()
+
+# TODO: Once we can verify that CMake policy CMP0094 produces the 
+# behavior the documentation claims it should, we will remove this
+# line and let the policy mechanism handle it.
+set(Python3_FIND_STRATEGY LOCATION)
+
 if (UNIX AND NOT APPLE)
   set(LINUX TRUE)
 endif ()
