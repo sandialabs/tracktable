@@ -148,6 +148,7 @@ if (BUILD_PYTHON_WRAPPING)
   else (UNIX AND APPLE)
     find_package(Python3 COMPONENTS Interpreter Development NumPy)
   endif(UNIX AND APPLE)
+  message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
 endif (BUILD_PYTHON_WRAPPING)
 
 if (BUILD_SHARED_LIBS)
