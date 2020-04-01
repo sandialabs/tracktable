@@ -32,7 +32,6 @@
 
 message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
 
-
 if (UNIX AND APPLE)
   set(PYTHON_INSTALL_PREFIX "Python/tracktable" )
 endif (UNIX AND APPLE)
