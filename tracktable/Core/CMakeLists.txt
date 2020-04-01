@@ -31,15 +31,6 @@
 
 # This is trajectory/C++/Core/CMakeLists.txt
 
-find_package(Boost 1.61 REQUIRED COMPONENTS date_time log serialization)
-
-
-# Prefer pthreads on systems where it's installed.  If the compiler will
-# accept the '-pthread' flag as a compile argument, use that too.
-set(THREADS_PREFER_PTHREAD_FLAG 1)
-# Find the system's threads library.  We need it for boost::log.
-find_package(Threads)
-
 include(GenerateExportHeader)
 
 include_directories(

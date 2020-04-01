@@ -19,7 +19,6 @@ compile-macos:
   tags: 
     - macos
   script:
-    - cp ~/Library/TrackTableBuildFiles/CMakeLists.txt .
     - cmake .
     - make -j8
     - cmake .

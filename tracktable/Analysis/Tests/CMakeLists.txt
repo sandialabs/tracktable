@@ -27,9 +27,6 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-find_package(Boost 1.61 REQUIRED COMPONENTS system timer chrono)
-
-
 # We need this because heavily templated classes like DBSCAN create
 # object files too big for the Visual C++ linker to handle normally.
 

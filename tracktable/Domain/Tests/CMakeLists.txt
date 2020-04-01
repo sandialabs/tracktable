@@ -27,9 +27,6 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-
-find_package(Boost 1.61 REQUIRED)
-
 include_directories(
   ${Tracktable_SOURCE_DIR}
   ${Boost_INCLUDE_DIR}

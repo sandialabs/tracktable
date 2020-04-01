@@ -34,8 +34,6 @@
 # So far this is a header-only implementation.  The lack of libraries
 # being built is not an error.
 
-find_package(Boost 1.61 REQUIRED)
-
 include_directories(
   ${Tracktable_SOURCE_DIR}
   ${Boost_INCLUDE_DIR}
