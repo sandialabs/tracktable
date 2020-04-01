@@ -30,6 +30,8 @@
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 cmake_minimum_required(VERSION 3.12)
+message(STATUS "Building with CMake version ${CMAKE_VERSION}")
+
 if (POLICY CMP0042)
   cmake_policy(SET CMP0042 NEW)
   set(CMAKE_MACOSX_RPATH ${Tracktable_BINARY_DIR}/lib)
@@ -131,8 +133,12 @@ set(CMAKE_MACOSX_RPATH ON)
 ### Organize programs into folders in Visual Studio, Windows
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+include(CMakeDependentOption)
+
 option(BUILD_SHARED_LIBS "Build shared libraries.  Required for Python wrapping." ON)
-option(TRACKTABLE_PYTHON "Build and install tracktable's python bindings." ON)
+CMAKE_DEPENDENT_OPTION(
+  TRACKTABLE_PYTHON "Build and install tracktable's python bindings." ON
+  "BUILD_SHARED_LIBS" OFF)
 option(BUILD_EXAMPLES "Build tracktable example programs" ON)
 option(BUILD_DOCUMENTATION "Build Python and C++ documentation for Tracktable." OFF)
 option(BUILD_DOCUMENTATION_CXX_ONLY "Build only C++ documentation for Tracktable." OFF)
@@ -157,18 +163,18 @@ else(TRACKTABLE_PYTHON)
 endif (TRACKTABLE_PYTHON)
 
 if (BUILD_SHARED_LIBS)
-  message(STATUS "Building shared libraries.")
+  message(STATUS "Building SHARED libraries.")
   add_definitions(-DBUILDING_SHARED_LIBS)
   add_definitions(-DBOOST_ALL_DYN_LINK)
   #set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_LIBDIR})
   set(Boost_USE_STATIC_LIBS OFF)
 else (BUILD_SHARED_LIBS)
-  if (TRACKTABLE_PYTHON)
-    message(ERROR "You must turn on BUILD_SHARED_LIBS if you want to use Tracktable's Python interface.")
-  else (TRACKTABLE_PYTHON)
-    message(STATUS "Building static libraries.")
+#  if (TRACKTABLE_PYTHON)
+#    message(ERROR "You must turn on BUILD_SHARED_LIBS if you want to use Tracktable's Python interface.")
+#  else (TRACKTABLE_PYTHON)
+    message(STATUS "Building STATIC libraries.")
     set(Boost_USE_STATIC_LIBS ON)
-  endif (TRACKTABLE_PYTHON)
+#  endif (TRACKTABLE_PYTHON)
 endif (BUILD_SHARED_LIBS)
 
 #=========================================================================
