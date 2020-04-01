@@ -30,6 +30,8 @@
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
 cmake_minimum_required(VERSION 3.12)
+message(STATUS "Building with CMake version ${CMAKE_VERSION}")
+
 if (POLICY CMP0042)
   cmake_policy(SET CMP0042 NEW)
   set(CMAKE_MACOSX_RPATH ${Tracktable_BINARY_DIR}/lib)
@@ -131,38 +133,48 @@ set(CMAKE_MACOSX_RPATH ON)
 ### Organize programs into folders in Visual Studio, Windows
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+include(CMakeDependentOption)
+
 option(BUILD_SHARED_LIBS "Build shared libraries.  Required for Python wrapping." ON)
-option(BUILD_PYTHON_WRAPPING "Wrap trajectory classes for use in Python." ON)
+CMAKE_DEPENDENT_OPTION(
+  TRACKTABLE_PYTHON "Build and install tracktable's python bindings." ON
+  "BUILD_SHARED_LIBS" OFF)
 option(BUILD_EXAMPLES "Build tracktable example programs" ON)
 option(BUILD_DOCUMENTATION "Build Python and C++ documentation for Tracktable." OFF)
 option(BUILD_DOCUMENTATION_CXX_ONLY "Build only C++ documentation for Tracktable." OFF)
-set(PYTHON_INSTALL_PREFIX "Python/tracktable" )
+set(PYTHON_INSTALL_PREFIX "Python/tracktable" CACHE PATH "Install directory for python modules" )
+set(Python3_EXECUTABLE "" CACHE FILEPATH "Python executable for running tests and compiling modules")
+set(Python3_ROOT_DIR "" CACHE PATH "Location of python installation for running tests and compiling modules")
 
 # ----------------------------------------------------------------------
 
 # Look for python early if we're going to build the wrappers
 # These symbols are also used to look for Sphinx
-if (BUILD_PYTHON_WRAPPING)
+if (TRACKTABLE_PYTHON)
+  message(STATUS "Building and installing python bindings")
   if (UNIX AND APPLE)
     find_package(Python3 COMPONENTS Interpreter Development)
   else (UNIX AND APPLE)
     find_package(Python3 COMPONENTS Interpreter Development NumPy)
   endif(UNIX AND APPLE)
-endif (BUILD_PYTHON_WRAPPING)
+  message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
+else(TRACKTABLE_PYTHON)
+  message(STATUS "Python bindings will NOT be built or installed")
+endif (TRACKTABLE_PYTHON)
 
 if (BUILD_SHARED_LIBS)
-  message(STATUS "Building shared libraries.")
+  message(STATUS "Building SHARED libraries.")
   add_definitions(-DBUILDING_SHARED_LIBS)
   add_definitions(-DBOOST_ALL_DYN_LINK)
   #set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_LIBDIR})
   set(Boost_USE_STATIC_LIBS OFF)
 else (BUILD_SHARED_LIBS)
-  if (BUILD_PYTHON_WRAPPING)
-    message(ERROR "You must turn on BUILD_SHARED_LIBS if you want to use Tracktable's Python interface.")
-  else (BUILD_PYTHON_WRAPPING)
-    message(STATUS "Building static libraries.")
+#  if (TRACKTABLE_PYTHON)
+#    message(ERROR "You must turn on BUILD_SHARED_LIBS if you want to use Tracktable's Python interface.")
+#  else (TRACKTABLE_PYTHON)
+    message(STATUS "Building STATIC libraries.")
     set(Boost_USE_STATIC_LIBS ON)
-  endif (BUILD_PYTHON_WRAPPING)
+#  endif (TRACKTABLE_PYTHON)
 endif (BUILD_SHARED_LIBS)
 
 #=========================================================================
@@ -311,13 +323,13 @@ endif (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
 install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 install(FILES README.md DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 
-if (BUILD_PYTHON_WRAPPING)
+if (TRACKTABLE_PYTHON)
   install(FILES LICENSE.txt DESTINATION ${PYTHON_INSTALL_PREFIX})
   install(FILES README.md DESTINATION ${PYTHON_INSTALL_PREFIX})
 endif ()
 # ----------------------------------------------------------------------
 
-if (BUILD_PYTHON_WRAPPING AND NOT BUILD_SHARED_LIBS)
+if (TRACKTABLE_PYTHON AND NOT BUILD_SHARED_LIBS)
   message("Python wrapping requires shared libraries.  Please turn on BUILD_SHARED_LIBS.")
 endif ()
 
@@ -328,8 +340,6 @@ if (BUILD_TESTING)
   endif()
   option(TEST_MOVIES "Include tests of movie-making.  These take a few minutes each." OFF)
 endif (BUILD_TESTING)
-
-add_subdirectory(tracktable)
 
 message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")
 
@@ -343,6 +353,19 @@ set(BOOST_MINIMUM_VERSION_REQUIRED 1.61)
 # IO: regex
 set(BOOST_CORE_COMPONENTS_NEEDED date_time log regex serialization)
 
+# These are the components, in addition to core components that are needed to
+# build examples.
+if (BUILD_EXAMPLES)
+  set(BOOST_EXAMPLE_COMPONENTS program_options)
+endif (BUILD_EXAMPLES)
+
+# These are the components, in addition to core components that are needed to
+# build tests.
+if (BUILD_TESTING)
+  set(BOOST_TEST_COMPONENTS system timer chrono)
+endif (BUILD_TESTING)
+
+# This first check gets the core component libraries needed for the pkgconfig file
 unset(Boost_FOUND)
 find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED COMPONENTS ${BOOST_CORE_COMPONENTS_NEEDED} )
 set(BOOST_CORE_LIBRARIES "")
@@ -350,12 +373,51 @@ foreach(_component ${BOOST_CORE_COMPONENTS_NEEDED})
   set(BOOST_CORE_LIBRARIES "${BOOST_CORE_LIBRARIES} -lboost_${_component}")
 endforeach()
 
+set(Boost_PYTHON_LIBRARY_SUFFIX "")
+
+#message(STATUS "Python3_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
+#message(STATUS "Python3_LIBRARIES ${Python3_LIBRARIES}")
+#message(STATUS "Python3_LIBRARY_DIRS ${Python3_LIBRARY_DIRS}")
+
+#
+# So, what's the Boost.Python library called?
+#
+# Versions of Boost from 1.57 through 1.66 generate
+# libboost_python3.so for Python 3.  From 1.67 onward we get
+# libboost_pythonXY.so for Python X.Y.  In order to figure out the
+# proper library name we need to know BOTH the Python version and the
+# Boost version.
+if (TRACKTABLE_PYTHON AND Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
+  #message(STATUS "Boost_VERSION ${Boost_VERSION}")
+  if (Boost_VERSION VERSION_LESS 106700)
+    # This version of Boost generates libboost_python[3].so.
+    set(Boost_PYTHON_LIBRARY_SUFFIX "3")
+  else (Boost_VERSION VERSION_LESS 106700)
+    #message(STATUS "Python3_VERSION_MAJOR ${Python3_VERSION_MAJOR}")
+    #message(STATUS "Python3_VERSION_MINOR ${Python3_VERSION_MINOR}")
+    # This version of Boost needs a versioned library.
+    set(Boost_PYTHON_LIBRARY_SUFFIX "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}")
+  endif (Boost_VERSION VERSION_LESS 106700)
+
+  #message(STATUS "Boost_PYTHON_LIBRARY_SUFFIX ${Boost_PYTHON_LIBRARY_SUFFIX}")
+  set(BOOST_PYTHON_COMPONENTS python${Boost_PYTHON_LIBRARY_SUFFIX})
+else (TRACKTABLE_PYTHON AND Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
+  message(ERROR "Boost.Python library version cannot be determined until both Boost and Python have been found.")
+endif (TRACKTABLE_PYTHON AND Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
+
+# This second check undoes the previous find and looks for all necessary components
+unset(Boost_FOUND)
+set(ALL_BOOST_COMPONENTS ${BOOST_CORE_COMPONENTS_NEEDED} ${BOOST_PYTHON_COMPONENTS} ${BOOST_EXAMPLE_COMPONENTS} ${BOOST_TEST_COMPONENTS})
+message(STATUS "Looking for Boost minimum version ${BOOST_MINIMUM_VERSION_REQUIRED} components ${ALL_BOOST_COMPONENTS}")
+find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED COMPONENTS ${ALL_BOOST_COMPONENTS} )
 
 # Prefer pthreads on systems where it's installed.  If the compiler will
 # accept the '-pthread' flag as a compile argument, use that too.
 set(THREADS_PREFER_PTHREAD_FLAG 1)
 # Find the system's threads library.  We need it for boost::log.
 find_package(Threads)
+
+add_subdirectory(tracktable)
 
 #-------------------------------------------------------------------------
 # End FIND PACKAGE

@@ -34,74 +34,94 @@
 #
 # This does not yet test the Jupyter notebooks.
 
+message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
+
 include(PythonTest)
 
 set(EXAMPLE_MODULE tracktable.examples)
 set(EXAMPLES ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable/examples)
 
-add_python_test(
-  P_TerrestrialHeatmapExample
-  ${EXAMPLE_MODULE}.heatmap_from_points
-  --domain terrestrial
-  --longitude-column 2
-  --latitude-column 3
-  --object-id-column 0
-  --timestamp-column 1
-  ${EXAMPLES}/data/SampleHeatmapPoints.csv
-  ${Tracktable_BINARY_DIR}/TestOutput/test_output_heatmap_terrestrial.png
-)
+execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
+      "import re; import cartopy; print(re.compile('/__init__.py.*').sub('',cartopy.__file__))"
+      RESULT_VARIABLE CARTOPY_MODULE_STATUS
+      OUTPUT_VARIABLE CARTOPY_MODULE_LOCATION
+      ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+#message("CARTOPY_MODULE_STATUS ${CARTOPY_MODULE_STATUS}")
+#message("CARTOPY_MODULE_LOCATION ${CARTOPY_MODULE_LOCATION}")
+if(NOT CARTOPY_MODULE_STATUS)
+      set(PY_CARTOPY_MODULE ${CARTOPY_MODULE_LOCATION} CACHE STRING
+          "Location of Python module cartopy")
+endif(NOT CARTOPY_MODULE_STATUS)
+find_package_handle_standard_args(PY_cartopy_module DEFAULT_MSG PY_CARTOPY_MODULE)
+#message("PY_CARTOPY_MODULE ${PY_CARTOPY_MODULE}")
 
-add_python_test(
-  P_CartesianHeatmapExample
-  ${EXAMPLE_MODULE}.heatmap_from_points
+if (PY_CARTOPY_MODULE)
+  add_python_test(
+    P_TerrestrialHeatmapExample
+    ${EXAMPLE_MODULE}.heatmap_from_points
+    --domain terrestrial
+    --longitude-column 2
+    --latitude-column 3
+    --object-id-column 0
+    --timestamp-column 1
+    ${EXAMPLES}/data/SampleHeatmapPoints.csv
+    ${Tracktable_BINARY_DIR}/TestOutput/test_output_heatmap_terrestrial.png
+  )
+
+  add_python_test(
+    P_CartesianHeatmapExample
+    ${EXAMPLE_MODULE}.heatmap_from_points
+      --domain cartesian2d
+      --object-id-column 0
+      --timestamp-column 1
+      --x-column 2
+      --y-column 3
+      ${EXAMPLES}/data/SamplePointsCartesian.csv
+      ${Tracktable_BINARY_DIR}/TestOutput/test_output_heatmap_cartesian.png
+  )
+
+  add_python_test(
+    P_TerrestrialTrajectoryMapExample
+    ${EXAMPLE_MODULE}.trajectory_map_from_points
+    --domain terrestrial
+    --object-id-column 0
+    --timestamp-column 1
+    --longitude-column 2
+    --latitude-column 3
+    ${EXAMPLES}/data/SampleTrajectories.csv
+    ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_terrestrial.png
+  )
+
+
+  add_python_test(
+    P_CartesianTrajectoryMapExample
+    ${EXAMPLE_MODULE}.trajectory_map_from_points
+    --domain cartesian2d
+    --object-id-column 0
+    --timestamp-column 1
+    --x-column 2
+    --y-column 3
+    --map-bbox -100 100 -100 100
+    ${EXAMPLES}/data/SamplePointsCartesian.csv
+    ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_cartesian.png
+  )
+
+
+  add_python_test(
+    P_CartesianTrajectoryMapAutoBbox
+    ${EXAMPLE_MODULE}.trajectory_map_from_points
     --domain cartesian2d
     --object-id-column 0
     --timestamp-column 1
     --x-column 2
     --y-column 3
     ${EXAMPLES}/data/SamplePointsCartesian.csv
-    ${Tracktable_BINARY_DIR}/TestOutput/test_output_heatmap_cartesian.png
-)
-
-add_python_test(
-  P_TerrestrialTrajectoryMapExample
-  ${EXAMPLE_MODULE}.trajectory_map_from_points
-  --domain terrestrial
-  --object-id-column 0
-  --timestamp-column 1
-  --longitude-column 2
-  --latitude-column 3
-  ${EXAMPLES}/data/SampleTrajectories.csv
-  ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_terrestrial.png
-)
-
-
-add_python_test(
-  P_CartesianTrajectoryMapExample
-  ${EXAMPLE_MODULE}.trajectory_map_from_points
-  --domain cartesian2d
-  --object-id-column 0
-  --timestamp-column 1
-  --x-column 2
-  --y-column 3
-  --map-bbox -100 100 -100 100
-  ${EXAMPLES}/data/SamplePointsCartesian.csv
-  ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_cartesian.png
-)
-
-
-add_python_test(
-  P_CartesianTrajectoryMapAutoBbox
-  ${EXAMPLE_MODULE}.trajectory_map_from_points
-  --domain cartesian2d
-  --object-id-column 0
-  --timestamp-column 1
-  --x-column 2
-  --y-column 3
-  ${EXAMPLES}/data/SamplePointsCartesian.csv
-  ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_cartesian_auto_bbox.png
-)
-
+    ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_cartesian_auto_bbox.png
+  )
+else (PY_CARTOPY_MODULE)
+  message(STATUS "Cartopy module not found. Rendering tests will not be executed and rendering module will not execute with current python implementation.")
+  message(STATUS "Rendering modules will be installed, but you must add cartopy to your current environment or change to a python environment with cartopy for rendering to work.")
+endif(PY_CARTOPY_MODULE)
 
 
 if (TEST_MOVIES)
