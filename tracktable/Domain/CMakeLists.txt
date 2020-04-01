@@ -30,7 +30,6 @@
 
 # This is tracktable/Domain/CMakeLists.txt
 
-find_package(Boost 1.61 REQUIRED)
 include(GenerateExportHeader)
 
 include_directories(
