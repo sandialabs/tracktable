@@ -132,7 +132,7 @@ set(CMAKE_MACOSX_RPATH ON)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 option(BUILD_SHARED_LIBS "Build shared libraries.  Required for Python wrapping." ON)
-option(BUILD_PYTHON_WRAPPING "Wrap trajectory classes for use in Python." ON)
+option(TRACKTABLE_PYTHON "Build and install tracktable's python bindings." ON)
 option(BUILD_EXAMPLES "Build tracktable example programs" ON)
 option(BUILD_DOCUMENTATION "Build Python and C++ documentation for Tracktable." OFF)
 option(BUILD_DOCUMENTATION_CXX_ONLY "Build only C++ documentation for Tracktable." OFF)
@@ -144,14 +144,17 @@ set(Python3_ROOT_DIR "" CACHE PATH "Location of python installation for running 
 
 # Look for python early if we're going to build the wrappers
 # These symbols are also used to look for Sphinx
-if (BUILD_PYTHON_WRAPPING)
+if (TRACKTABLE_PYTHON)
+  message(STATUS "Building and installing python bindings")
   if (UNIX AND APPLE)
     find_package(Python3 COMPONENTS Interpreter Development)
   else (UNIX AND APPLE)
     find_package(Python3 COMPONENTS Interpreter Development NumPy)
   endif(UNIX AND APPLE)
   message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
-endif (BUILD_PYTHON_WRAPPING)
+else(TRACKTABLE_PYTHON)
+  message(STATUS "Python bindings will NOT be built or installed")
+endif (TRACKTABLE_PYTHON)
 
 if (BUILD_SHARED_LIBS)
   message(STATUS "Building shared libraries.")
@@ -160,12 +163,12 @@ if (BUILD_SHARED_LIBS)
   #set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_LIBDIR})
   set(Boost_USE_STATIC_LIBS OFF)
 else (BUILD_SHARED_LIBS)
-  if (BUILD_PYTHON_WRAPPING)
+  if (TRACKTABLE_PYTHON)
     message(ERROR "You must turn on BUILD_SHARED_LIBS if you want to use Tracktable's Python interface.")
-  else (BUILD_PYTHON_WRAPPING)
+  else (TRACKTABLE_PYTHON)
     message(STATUS "Building static libraries.")
     set(Boost_USE_STATIC_LIBS ON)
-  endif (BUILD_PYTHON_WRAPPING)
+  endif (TRACKTABLE_PYTHON)
 endif (BUILD_SHARED_LIBS)
 
 #=========================================================================
@@ -314,13 +317,13 @@ endif (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
 install(FILES LICENSE.txt DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 install(FILES README.md DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR})
 
-if (BUILD_PYTHON_WRAPPING)
+if (TRACKTABLE_PYTHON)
   install(FILES LICENSE.txt DESTINATION ${PYTHON_INSTALL_PREFIX})
   install(FILES README.md DESTINATION ${PYTHON_INSTALL_PREFIX})
 endif ()
 # ----------------------------------------------------------------------
 
-if (BUILD_PYTHON_WRAPPING AND NOT BUILD_SHARED_LIBS)
+if (TRACKTABLE_PYTHON AND NOT BUILD_SHARED_LIBS)
   message("Python wrapping requires shared libraries.  Please turn on BUILD_SHARED_LIBS.")
 endif ()
 
