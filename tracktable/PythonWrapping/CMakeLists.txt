@@ -50,13 +50,14 @@
 # sure that a new version of CMake will be available in some of the
 # more constrained environments where we build Tracktable.
 
+message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
 set(Boost_PYTHON_LIBRARY_SUFFIX "")
 
 find_package(Boost 1.61 COMPONENTS date_time regex REQUIRED)
 
-if (UNIX AND APPLE)
-  find_package(Python3 COMPONENTS Interpreter Development)
-endif(UNIX AND APPLE)
+#if (UNIX AND APPLE)
+#  find_package(Python3 COMPONENTS Interpreter Development)
+#endif(UNIX AND APPLE)
 
 #message(STATUS "Python3_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
 #message(STATUS "Python3_LIBRARIES ${Python3_LIBRARIES}")

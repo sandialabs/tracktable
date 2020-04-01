@@ -2,7 +2,7 @@
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
- 
+
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,7 +33,7 @@
 # This is tracktable/C++/CMakeLists.txt.
 #
 
-cmake_minimum_required(VERSION 3.12)
+message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
 
 add_subdirectory(Core)
 add_subdirectory(Domain)
