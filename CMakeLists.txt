@@ -136,7 +136,9 @@ option(BUILD_PYTHON_WRAPPING "Wrap trajectory classes for use in Python." ON)
 option(BUILD_EXAMPLES "Build tracktable example programs" ON)
 option(BUILD_DOCUMENTATION "Build Python and C++ documentation for Tracktable." OFF)
 option(BUILD_DOCUMENTATION_CXX_ONLY "Build only C++ documentation for Tracktable." OFF)
-set(PYTHON_INSTALL_PREFIX "Python/tracktable" )
+set(PYTHON_INSTALL_PREFIX "Python/tracktable" CACHE PATH "Install directory for python modules" )
+set(Python3_EXECUTABLE "" CACHE FILEPATH "Python executable for running tests and compiling modules")
+set(Python3_ROOT_DIR "" CACHE PATH "Location of python installation for running tests and compiling modules")
 
 # ----------------------------------------------------------------------
 
