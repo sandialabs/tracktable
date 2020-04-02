@@ -1,7 +1,7 @@
 # Copyright (c) 2014-2017 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
-# the U.S. Government retains certain rights in this software. 
+# the U.S. Government retains certain rights in this software.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,6 +33,17 @@
 if (MSVC)
   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj" )
 endif (MSVC)
+
+unset(Boost_FOUND)
+get_filename_component(_TEST_NAME_TMP ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+get_filename_component(_TEST_NAME_2 ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+get_filename_component(_TEST_NAME_1 ${_TEST_NAME_TMP} NAME)
+message(STATUS "Looking for Boost components needed for C++ tests in ${_TEST_NAME_1}/${_TEST_NAME_2}")
+find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
+  COMPONENTS
+    ${BOOST_CORE_COMPONENTS_NEEDED}
+    ${BOOST_TEST_COMPONENTS}
+  )
 
 include_directories(
   ${Tracktable_SOURCE_DIR}
@@ -72,7 +83,7 @@ set_property(
   PROPERTY FOLDER "Tests"
   )
 
-  
+
 add_executable(test_dg
   test_dg.cpp
   )

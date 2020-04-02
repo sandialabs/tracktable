@@ -31,6 +31,17 @@
 #
 # This is tracktable/Examples/CMakeLists.txt.
 #
+# This second check undoes the previous find and looks for all necessary components
+unset(Boost_FOUND)
+message(STATUS "Looking for Boost components needed for C++ examples")
+find_package(Boost
+  ${BOOST_MINIMUM_VERSION_REQUIRED}
+  REQUIRED
+  COMPONENTS
+    ${BOOST_CORE_COMPONENTS_NEEDED}
+    ${BOOST_EXAMPLE_COMPONENTS}
+  )
+
 
 add_subdirectory(Assemble)
 add_subdirectory(Classify)

@@ -40,14 +40,14 @@ endif ()
 # This policy is supposed to set Python3_FIND_STRATEGY=LOCATION.
 # However, at least on CMake 3.16.5 on MacOS, setting it appears
 # to have no effect: we observe the same behavior we had previously
-# with Python3_FIND_STRATEGY=VERSION.  
+# with Python3_FIND_STRATEGY=VERSION.
 #
 # We're going to manually set Python3_FIND_STRATEGY for now.
 if (POLICY CMP0094)
   cmake_policy(SET CMP0094 NEW)
 endif ()
 
-# TODO: Once we can verify that CMake policy CMP0094 produces the 
+# TODO: Once we can verify that CMake policy CMP0094 produces the
 # behavior the documentation claims it should, we will remove this
 # line and let the policy mechanism handle it.
 set(Python3_FIND_STRATEGY LOCATION)
@@ -148,8 +148,10 @@ set(CMAKE_MACOSX_RPATH ON)
 ### Organize programs into folders in Visual Studio, Windows
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+#=========================================================================
+# Begin options and cache variables
+#-------------------------------------------------------------------------
 include(CMakeDependentOption)
-
 option(BUILD_SHARED_LIBS "Build shared libraries.  Required for Python wrapping." ON)
 CMAKE_DEPENDENT_OPTION(
   TRACKTABLE_PYTHON "Build and install tracktable's python bindings." ON
@@ -160,9 +162,13 @@ option(BUILD_DOCUMENTATION_CXX_ONLY "Build only C++ documentation for Tracktable
 set(PYTHON_INSTALL_PREFIX "Python/tracktable" CACHE PATH "Install directory for python modules" )
 set(Python3_EXECUTABLE "" CACHE FILEPATH "Python executable for running tests and compiling modules")
 set(Python3_ROOT_DIR "" CACHE PATH "Location of python installation for running tests and compiling modules")
+#-------------------------------------------------------------------------
+# End options and cache variables
+#=========================================================================
 
-# ----------------------------------------------------------------------
-
+#=========================================================================
+# Begin FindPython3
+#-------------------------------------------------------------------------
 # Look for python early if we're going to build the wrappers
 # These symbols are also used to look for Sphinx
 if (TRACKTABLE_PYTHON)
@@ -176,6 +182,10 @@ if (TRACKTABLE_PYTHON)
 else(TRACKTABLE_PYTHON)
   message(STATUS "Python bindings will NOT be built or installed")
 endif (TRACKTABLE_PYTHON)
+#-------------------------------------------------------------------------
+# End FindPython3
+#=========================================================================
+
 
 if (BUILD_SHARED_LIBS)
   message(STATUS "Building SHARED libraries.")
@@ -359,9 +369,8 @@ endif (BUILD_TESTING)
 message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")
 
 #=========================================================================
-# Begin FIND PACKAGE
+# Begin FindBoost
 #-------------------------------------------------------------------------
-
 set(BOOST_MINIMUM_VERSION_REQUIRED 1.61)
 
 # Core: date_time log serialization
@@ -370,62 +379,31 @@ set(BOOST_CORE_COMPONENTS_NEEDED date_time log regex serialization)
 
 # These are the components, in addition to core components that are needed to
 # build examples.
-if (BUILD_EXAMPLES)
-  set(BOOST_EXAMPLE_COMPONENTS program_options)
-endif (BUILD_EXAMPLES)
+set(BOOST_EXAMPLE_COMPONENTS program_options)
 
 # These are the components, in addition to core components that are needed to
 # build tests.
-if (BUILD_TESTING)
-  set(BOOST_TEST_COMPONENTS system timer chrono)
-endif (BUILD_TESTING)
+set(BOOST_TEST_COMPONENTS system timer chrono)
 
 # This first check gets the core component libraries needed for the pkgconfig file
 unset(Boost_FOUND)
-find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED COMPONENTS ${BOOST_CORE_COMPONENTS_NEEDED} )
+find_package(Boost
+  ${BOOST_MINIMUM_VERSION_REQUIRED}
+  REQUIRED
+  COMPONENTS
+    ${BOOST_CORE_COMPONENTS_NEEDED}
+  )
 set(BOOST_CORE_LIBRARIES "")
 foreach(_component ${BOOST_CORE_COMPONENTS_NEEDED})
   set(BOOST_CORE_LIBRARIES "${BOOST_CORE_LIBRARIES} -lboost_${_component}")
 endforeach()
+#-------------------------------------------------------------------------
+# End FindBoost
+#=========================================================================
 
-set(Boost_PYTHON_LIBRARY_SUFFIX "")
-
-#message(STATUS "Python3_INCLUDE_DIRS ${Python3_INCLUDE_DIRS}")
-#message(STATUS "Python3_LIBRARIES ${Python3_LIBRARIES}")
-#message(STATUS "Python3_LIBRARY_DIRS ${Python3_LIBRARY_DIRS}")
-
-#
-# So, what's the Boost.Python library called?
-#
-# Versions of Boost from 1.57 through 1.66 generate
-# libboost_python3.so for Python 3.  From 1.67 onward we get
-# libboost_pythonXY.so for Python X.Y.  In order to figure out the
-# proper library name we need to know BOTH the Python version and the
-# Boost version.
-if (TRACKTABLE_PYTHON AND Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
-  #message(STATUS "Boost_VERSION ${Boost_VERSION}")
-  if (Boost_VERSION VERSION_LESS 106700)
-    # This version of Boost generates libboost_python[3].so.
-    set(Boost_PYTHON_LIBRARY_SUFFIX "3")
-  else (Boost_VERSION VERSION_LESS 106700)
-    #message(STATUS "Python3_VERSION_MAJOR ${Python3_VERSION_MAJOR}")
-    #message(STATUS "Python3_VERSION_MINOR ${Python3_VERSION_MINOR}")
-    # This version of Boost needs a versioned library.
-    set(Boost_PYTHON_LIBRARY_SUFFIX "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}")
-  endif (Boost_VERSION VERSION_LESS 106700)
-
-  #message(STATUS "Boost_PYTHON_LIBRARY_SUFFIX ${Boost_PYTHON_LIBRARY_SUFFIX}")
-  set(BOOST_PYTHON_COMPONENTS python${Boost_PYTHON_LIBRARY_SUFFIX})
-else (TRACKTABLE_PYTHON AND Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
-  message(ERROR "Boost.Python library version cannot be determined until both Boost and Python have been found.")
-endif (TRACKTABLE_PYTHON AND Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
-
-# This second check undoes the previous find and looks for all necessary components
-unset(Boost_FOUND)
-set(ALL_BOOST_COMPONENTS ${BOOST_CORE_COMPONENTS_NEEDED} ${BOOST_PYTHON_COMPONENTS} ${BOOST_EXAMPLE_COMPONENTS} ${BOOST_TEST_COMPONENTS})
-message(STATUS "Looking for Boost minimum version ${BOOST_MINIMUM_VERSION_REQUIRED} components ${ALL_BOOST_COMPONENTS}")
-find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED COMPONENTS ${ALL_BOOST_COMPONENTS} )
-
+#=========================================================================
+# Begin FindThreads
+#-------------------------------------------------------------------------
 # Prefer pthreads on systems where it's installed.  If the compiler will
 # accept the '-pthread' flag as a compile argument, use that too.
 set(THREADS_PREFER_PTHREAD_FLAG 1)
@@ -433,9 +411,8 @@ set(THREADS_PREFER_PTHREAD_FLAG 1)
 find_package(Threads)
 
 add_subdirectory(tracktable)
-
 #-------------------------------------------------------------------------
-# End FIND PACKAGE
+# End FindThreads
 #=========================================================================
 
 #=========================================================================
