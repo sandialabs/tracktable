@@ -54,12 +54,6 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
-if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
-  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${Python3_LIBRARIES})
-else ()
-  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
-endif()
-
 #message(STATUS "Boost_LIBRARIES ${Boost_LIBRARIES}")
 #message(STATUS "PYTHON_EXTENSION_LIBRARIES ${PYTHON_EXTENSION_LIBRARIES}")
 
@@ -86,6 +80,78 @@ link_directories(
 )
 
 set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable)
+
+
+
+# ---------------------------------------------------------------------
+# Begin find_package(Boost)
+# ---------------------------------------------------------------------
+#
+# We did most of the work of finding Boost up in the top-level CMakeLists.
+# However, the Python wrapping needs one component that introduces a
+# tricky dependency: the Boost.Python library.  This is because 
+# libboost_python uses symbols from libpython.  This introduces two 
+# problems:
+#
+# 1. The rest of Tracktable has no reason at all to link against
+#    libpython.
+#
+# 2. Depending on exactly which Python distribution you use, linking
+#    against libpython might cause your code to segfault.
+#
+# On top of that, the very filename of the Boost.Python shared library
+# changes based on which Python version it was built for.  
+#
+# The cleanest thing to do is to bite the bullet and repeat some of the
+# process of finding Boost here in this subdirectory.  
+#
+#
+# So, what's the Boost.Python library called?
+#
+# Versions of Boost from 1.57 through 1.66 generate
+# libboost_python3.so for Python 3.  From 1.67 onward we get
+# libboost_pythonXY.so for Python X.Y.  In order to figure out the
+# proper library name we need to know BOTH the Python version and the
+# Boost version.
+
+set(Boost_PYTHON_LIBRARY_SUFFIX "")
+
+if (TRACKTABLE_PYTHON AND Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
+  #message(STATUS "Boost_VERSION ${Boost_VERSION}")
+  if (Boost_VERSION VERSION_LESS 106700)
+    # This version of Boost generates libboost_python[3].so.
+    set(Boost_PYTHON_LIBRARY_SUFFIX "3")
+  else (Boost_VERSION VERSION_LESS 106700)
+    #message(STATUS "Python3_VERSION_MAJOR ${Python3_VERSION_MAJOR}")
+    #message(STATUS "Python3_VERSION_MINOR ${Python3_VERSION_MINOR}")
+    # This version of Boost needs a versioned library.
+    set(Boost_PYTHON_LIBRARY_SUFFIX "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}")
+  endif (Boost_VERSION VERSION_LESS 106700)
+
+  #message(STATUS "Boost_PYTHON_LIBRARY_SUFFIX ${Boost_PYTHON_LIBRARY_SUFFIX}")
+  set(BOOST_PYTHON_COMPONENTS python${Boost_PYTHON_LIBRARY_SUFFIX})
+else (TRACKTABLE_PYTHON AND Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
+  message(ERROR "Boost.Python library version cannot be determined until both Boost and Python have been found.")
+endif (TRACKTABLE_PYTHON AND Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
+
+# This second check undoes the previous find and looks for all necessary components
+unset(Boost_FOUND)
+set(ALL_BOOST_COMPONENTS ${ALL_BOOST_COMPONENTS} ${BOOST_PYTHON_COMPONENTS})
+message(STATUS "(PythonWrapping) Looking for Boost minimum version ${BOOST_MINIMUM_VERSION_REQUIRED} components ${ALL_BOOST_COMPONENTS}")
+find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED COMPONENTS ${ALL_BOOST_COMPONENTS} )
+
+if (Boost_FOUND)
+  message(STATUS "(PythonWrapping) DEBUG: Boost found; libraries are ${Boost_LIBRARIES}")
+else ()
+  message(WARNING "(PythonWrapping) DEBUG: Boost not found!")
+endif ()
+
+
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES} ${Python3_LIBRARIES})
+else ()
+  set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
+endif()
 
 # We use Python-like naming for these files for two reasons.  First,
 # we're going to be importing these from Python, so it's consistent.
