@@ -5,13 +5,17 @@
 # This file is a "template" file used by various FindPython modules.
 #
 
-#cmake_policy (GET CMP0094 _${_PYTHON_PREFIX}_LOOKUP_POLICY)
+if (POLICY CMP0094)
+  cmake_policy (GET CMP0094 _${_PYTHON_PREFIX}_LOOKUP_POLICY)
 
-#cmake_policy (VERSION 3.7)
+  cmake_policy (VERSION 3.7)
 
-if (_${_PYTHON_PREFIX}_LOOKUP_POLICY)
-    set(_${_PYTHON_PREFIX}_LOOKUP_POLICY LOCATION)
-#  cmake_policy (SET CMP0094 ${_${_PYTHON_PREFIX}_LOOKUP_POLICY})
+  if (_${_PYTHON_PREFIX}_LOOKUP_POLICY)
+    cmake_policy (SET CMP0094 ${_${_PYTHON_PREFIX}_LOOKUP_POLICY})
+  endif()
+else()
+  message(STATUS "Policy CMP0094 does not exist in this version of CMake. Defaulting to NEW LOCATION python finding strategy.")
+  set(_${_PYTHON_PREFIX}_LOOKUP_POLICY NEW)
 endif()
 
 
