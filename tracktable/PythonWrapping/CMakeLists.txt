@@ -54,33 +54,6 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
-#message(STATUS "Boost_LIBRARIES ${Boost_LIBRARIES}")
-#message(STATUS "PYTHON_EXTENSION_LIBRARIES ${PYTHON_EXTENSION_LIBRARIES}")
-
-include(PythonExtension)
-
-set( FEATURE_VECTOR_MAX_DIMENSION 30 CACHE STRING "Maximum dimension of feature vectors for Python wrapping." )
-
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/PythonWrappingParameters.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/PythonWrappingParameters.h
-  )
-
-include_directories(
-  ${Python3_INCLUDE_DIRS}
-  ${Python3_NumPy_INCLUDE_DIRS}
-  ${Boost_INCLUDE_DIR}
-  ${Tracktable_SOURCE_DIR}
-  ${Tracktable_BINARY_DIR}
-  )
-
-link_directories(
-  ${Boost_LIBRARY_DIRS}
-  ${Tracktable_BINARY_DIR}/lib
-)
-
-set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable)
-
 
 
 # ---------------------------------------------------------------------
@@ -89,8 +62,8 @@ set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable)
 #
 # We did most of the work of finding Boost up in the top-level CMakeLists.
 # However, the Python wrapping needs one component that introduces a
-# tricky dependency: the Boost.Python library.  This is because 
-# libboost_python uses symbols from libpython.  This introduces two 
+# tricky dependency: the Boost.Python library.  This is because
+# libboost_python uses symbols from libpython.  This introduces two
 # problems:
 #
 # 1. The rest of Tracktable has no reason at all to link against
@@ -100,10 +73,10 @@ set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable)
 #    against libpython might cause your code to segfault.
 #
 # On top of that, the very filename of the Boost.Python shared library
-# changes based on which Python version it was built for.  
+# changes based on which Python version it was built for.
 #
 # The cleanest thing to do is to bite the bullet and repeat some of the
-# process of finding Boost here in this subdirectory.  
+# process of finding Boost here in this subdirectory.
 #
 #
 # So, what's the Boost.Python library called?
@@ -152,6 +125,33 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 else ()
   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
 endif()
+
+#message(STATUS "Boost_LIBRARIES ${Boost_LIBRARIES}")
+#message(STATUS "PYTHON_EXTENSION_LIBRARIES ${PYTHON_EXTENSION_LIBRARIES}")
+
+include(PythonExtension)
+
+set( FEATURE_VECTOR_MAX_DIMENSION 30 CACHE STRING "Maximum dimension of feature vectors for Python wrapping." )
+
+configure_file(
+  ${CMAKE_CURRENT_SOURCE_DIR}/PythonWrappingParameters.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/PythonWrappingParameters.h
+  )
+
+include_directories(
+  ${Python3_INCLUDE_DIRS}
+  ${Python3_NumPy_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIR}
+  ${Tracktable_SOURCE_DIR}
+  ${Tracktable_BINARY_DIR}
+  )
+
+link_directories(
+  ${Boost_LIBRARY_DIRS}
+  ${Tracktable_BINARY_DIR}/lib
+)
+
+set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable)
 
 # We use Python-like naming for these files for two reasons.  First,
 # we're going to be importing these from Python, so it's consistent.
