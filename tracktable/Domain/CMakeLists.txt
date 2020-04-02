@@ -30,6 +30,17 @@
 
 # This is tracktable/Domain/CMakeLists.txt
 
+unset(Boost_FOUND)
+get_filename_component(_TEST_NAME_TMP ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+get_filename_component(_TEST_NAME_2 ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+get_filename_component(_TEST_NAME_1 ${_TEST_NAME_TMP} NAME)
+message(STATUS "Looking for Boost components needed for C++ tests in ${_TEST_NAME_1}/${_TEST_NAME_2}")
+find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
+  COMPONENTS
+    ${BOOST_CORE_COMPONENTS_NEEDED}
+    ${BOOST_TEST_COMPONENTS}
+  )
+
 include(GenerateExportHeader)
 
 include_directories(
