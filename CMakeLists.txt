@@ -150,8 +150,6 @@ SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
-
 # add the automatically determined parts of the RPATH which point to
 # directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -159,7 +157,13 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # the RPATH to be used when installing, but only if it's not a system directory
 LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_LIBDIR}" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
+   # This RPATH is absolute.  This is what you want when you're installing
+   # into something like your home directory.
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+ELSE("${isSystemDir}" STREQUAL "-1")
+  # This RPATH is relative.  It does not contain any sort of prefix.  That makes
+  # it suitable for use in system directories like /usr and /usr/local.
+  SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 set(MACOSX_RPATH ON)
