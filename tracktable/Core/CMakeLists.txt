@@ -159,8 +159,6 @@ set( Core_WarningGuards_HEADERS
   WarningGuards/UnusedTypedef.h
 )
 
-message(STATUS "DEBUG: Testing a hypothesis: Core_SRCS are ${Core_SRCS}")
-
 add_library( TracktableCore
   ${Core_SRCS}
   ${Core_HEADERS}
