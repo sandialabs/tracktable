@@ -68,17 +68,39 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Begin RELEASE VARIABLES
 #-------------------------------------------------------------------------
 
-set(TRACKTABLE_VERSION 1.2.4)
+set(TRACKTABLE_VERSION 1.2.5)
 set(RPM_RELEASE 6)
 
-# UNIX library ABI versioning
+# UNIX library ABI versioning according to libtool:
+#
+# A libtool version number C.R.A has three components:
+#
+# C - current library interface ID (abbreviated CURRENT), an integer.  
+# Any release that makes user-visible changes to the interface must
+# increment CURRENT.
+#
+# R - interface revision number (abbreviated REVISION).  Any release
+# that changes things under the hood but does not add new features or
+# break existing code should increment REVISION.  Reset REVISION
+# to zero whenever CURRENT changes.
+#
+# A - "age" of this release (abbreviated AGE).  (CURRENT - AGE) is the 
+# oldest interface version supported by a release.  If a new release breaks
+# existing code, AGE must be reset to 0.  If a new release adds new features 
+# and does not break existing code, AGE should be incremented by 1.  
+#
+# NOTE: This version information is often referred to as the 
+# "compatibility version".  It is not the same as the version number 
+# that is often attached to the software release as a whole.
+#                                      
+# Quick reference:
 # CURRENT : REVISION : AGE
 # +1 :  ? : +1 == new interface that does not break old one
 # +1 :  ? :  0 == new interface that breaks old one
 #  ? :  ? :  0 == no new interfaces, but breaks apps
 #  ? : +1 :  ? == just some internal changes, nothing breaks but might work better
-set(UNIX_SO_VERSION_CURRENT  0)
-set(UNIX_SO_VERSION_REVISION 0)
+set(UNIX_SO_VERSION_CURRENT  1)
+set(UNIX_SO_VERSION_REVISION 1)
 set(UNIX_SO_VERSION_AGE      0)
 
 #-------------------------------------------------------------------------
@@ -128,8 +150,6 @@ SET(CMAKE_SKIP_BUILD_RPATH FALSE)
 # (but later on when installing)
 SET(CMAKE_BUILD_WITH_INSTALL_RPATH FALSE)
 
-SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
-
 # add the automatically determined parts of the RPATH which point to
 # directories outside the build tree to the install RPATH
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
@@ -137,7 +157,13 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 # the RPATH to be used when installing, but only if it's not a system directory
 LIST(FIND CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES "${CMAKE_INSTALL_LIBDIR}" isSystemDir)
 IF("${isSystemDir}" STREQUAL "-1")
-   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
+   # This RPATH is absolute.  This is what you want when you're installing
+   # into something like your home directory.
+   SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+ELSE("${isSystemDir}" STREQUAL "-1")
+  # This RPATH is relative.  It does not contain any sort of prefix.  That makes
+  # it suitable for use in system directories like /usr and /usr/local.
+  SET(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 ENDIF("${isSystemDir}" STREQUAL "-1")
 
 set(MACOSX_RPATH ON)
