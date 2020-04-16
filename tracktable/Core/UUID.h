@@ -216,7 +216,7 @@ private:
   }
 
 public:
-  typedef boost::uuids::random_generator_pure random_generator_type;
+  typedef boost::uuids::random_generator random_generator_type;
 
   /** Static method to create an instance using the default uniform random number generator type
    *
