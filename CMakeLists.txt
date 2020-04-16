@@ -108,6 +108,8 @@ set(UNIX_SO_VERSION_AGE      0)
 ##########################################################################
 
 project(Tracktable LANGUAGES CXX VERSION ${TRACKTABLE_VERSION})
+message(STATUS "project: ${PROJECT_NAME}")
+message(STATUS "version: ${PROJECT_VERSION}")
 
 if (UNIX)
   set(UNIX_SO_VERSION ${UNIX_SO_VERSION_CURRENT}.${UNIX_SO_VERSION_REVISION}.${UNIX_SO_VERSION_AGE})
