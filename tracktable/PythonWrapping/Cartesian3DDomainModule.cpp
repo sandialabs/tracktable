@@ -142,7 +142,7 @@ void install_cartesian3d_base_point_wrappers()
 
   class_< base_point_type >("BasePointCartesian3D")
     .def(tracktable::python_wrapping::basic_point_methods())
-    .def(tracktable::python_wrapping::base_point_to_string_methods("tracktable.domain.cartesian2d.BasePoint"))
+    .def(tracktable::python_wrapping::base_point_to_string_methods("tracktable.domain.cartesian3d.BasePoint"))
     .def("__init__", make_constructor(make_point_3d<base_point_type>))
     ;
 }
