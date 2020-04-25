@@ -61,7 +61,7 @@ def verify_result(expected, actual, test):
     if (abs(actual - expected) > .00001):
         sys.stderr.write('ERROR: {} does not match. Expected aspect_ratio {}, but returned {}.\n'.format(test,expected,actual))
         return 1
-  
+
     return 0
 
 
@@ -70,7 +70,7 @@ def test_convex_hull_aspect_ratio():
     print("Testing Convex Hull Aspect_Ratio")
 
     error_count = 0;
-    
+
     albuquerque = create_point(35.0844, -106.6504, "short_flight")
     denver = create_point(39.7392, -104.9903, "short_flight")
     el_paso = create_point(31.7619, -106.4850, "short_flight")
@@ -83,9 +83,9 @@ def test_convex_hull_aspect_ratio():
     point4 = create_cart2_point(0,1, "2d cartesian trajectory")
 
     short_trajectory = TerrestrialTrajectory.from_position_list([el_paso, albuquerque, denver])
-    
+
     #Short trajectorty should have small aspect_ratio
-    expected_short_aspect_ratio = 0.04729
+    expected_short_aspect_ratio = 21.14811
 
     short_flight_aspect_ratio = geomath.convex_hull_aspect_ratio(short_trajectory)
     error_count += verify_result(expected_short_aspect_ratio, short_flight_aspect_ratio, "Short flight")
@@ -93,7 +93,7 @@ def test_convex_hull_aspect_ratio():
     long_trajectory = TerrestrialTrajectory.from_position_list([san_francisco, new_york, london])
 
     #/Longer flight should have larger aspect_ratio
-    expected_long_aspect_ratio = 0.18974
+    expected_long_aspect_ratio = 5.27049
 
     long_flight_aspect_ratio = geomath.convex_hull_aspect_ratio(long_trajectory)
     error_count += verify_result(expected_long_aspect_ratio, long_flight_aspect_ratio, "Long flight")
@@ -101,7 +101,7 @@ def test_convex_hull_aspect_ratio():
     combined_trajectory = TerrestrialTrajectory.from_position_list([el_paso, albuquerque, denver, san_francisco, new_york, london])
 
     #Combined flight should have about the same aspect_ratio even though there are more points relatively further away
-    expected_combined_aspect_ratio = 0.18874
+    expected_combined_aspect_ratio = 5.29825
 
     combined_aspect_ratio = geomath.convex_hull_aspect_ratio(combined_trajectory)
     error_count += verify_result(expected_combined_aspect_ratio, combined_aspect_ratio, "Combined flight")
@@ -117,15 +117,15 @@ def test_convex_hull_aspect_ratio():
     expected_one_point_aspect_ratio = 0.0
 
     one_point = TerrestrialTrajectory.from_position_list([el_paso])
-    
+
     one_point_aspect_ratio = geomath.convex_hull_aspect_ratio(one_point)
     error_count += verify_result(expected_one_point_aspect_ratio, one_point_aspect_ratio, "One point flight")
 
     #Test Cartesian for good measure
-    expected_cartesian2d_aspect_ratio = 0.707107
+    expected_cartesian2d_aspect_ratio = 1.41421
 
     cart_trajectory = Cartesian2dTrajectory.from_position_list([point1, point2, point3, point4])
-    
+
     cart2d_aspect_ratio = geomath.convex_hull_aspect_ratio(cart_trajectory)
     error_count += verify_result(expected_cartesian2d_aspect_ratio, cart2d_aspect_ratio, "Four points cartesian")
 
