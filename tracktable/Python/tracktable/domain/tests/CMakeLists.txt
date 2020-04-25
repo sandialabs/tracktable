@@ -37,6 +37,8 @@ message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is â€
 include(PythonTest)
 set(DOMAIN "tracktable.domain.tests")
 
+add_python_test(P_BasePointToString ${DOMAIN}.test_base_point_to_string)
+
 add_python_test(P_TestDomainNames ${DOMAIN}.test_domain_names)
 
 add_python_test(P_GeometricMedian ${DOMAIN}.test_geometric_median)
