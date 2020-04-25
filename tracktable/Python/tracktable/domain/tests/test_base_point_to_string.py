@@ -38,6 +38,10 @@ from tracktable.domain.terrestrial import BasePoint as TerrestrialBasePoint
 from tracktable.domain.cartesian2d import BasePoint as Cartesian2DBasePoint
 from tracktable.domain.cartesian3d import BasePoint as Cartesian3DBasePoint
 
+import tracktable.domain.terrestrial
+import tracktable.domain.cartesian2d
+import tracktable.domain.cartesian3d
+
 
 def matches_expected(expected_value, actual_value, test_name='unnamed test'):
     if expected_value != actual_value:
@@ -96,9 +100,34 @@ def test_repr_output():
     return error_count
 
 
+def test_repr_equality():
+    error_count = 0
+
+    point1 = TerrestrialBasePoint(1, 2)
+    reconstituted_point1 = eval(repr(point1))
+    if not matches_expected(point1, reconstituted_point1,
+                            test_name='eval(repr(TerrestrialBasePoint))'):
+        error_count += 1
+
+    point2 = Cartesian2DBasePoint(1, 2)
+    reconstituted_point2 = eval(repr(point2))
+    if not matches_expected(point2, reconstituted_point2,
+                            test_name='eval(repr(Cartesian2DBasePoint))'):
+        error_count += 1
+
+    point3 = Cartesian3DBasePoint(1, 2, 3)
+    reconstituted_point3 = eval(repr(point3))
+    if not matches_expected(point3, reconstituted_point3,
+                            test_name='eval(repr(Cartesian3DBasePoint))'):
+        error_count += 1
+
+    return error_count
+
+
 def main():
     total_error_count = test_str_output()
     total_error_count += test_repr_output()
+    total_error_count += test_repr_equality()
 
     return total_error_count
 
