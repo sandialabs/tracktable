@@ -102,13 +102,19 @@ struct compute_convex_hull_aspect_ratio<
               << long_axis;
 #endif
 
-    if (std::abs(long_axis) < 1e-5)
+    if (std::abs(short_axis) < 1e-5)
       {
-      return 0;
+        return 0;
       }
     else
       {
-      return short_axis / long_axis;
+        double result = long_axis / short_axis;
+        if (std::isnan(result)) 
+        {
+          return 0;
+        } else {
+          return result;
+        }
       }
     }
 };
