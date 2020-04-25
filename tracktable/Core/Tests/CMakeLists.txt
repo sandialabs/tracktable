@@ -69,6 +69,11 @@ add_executable(test_convex_hull_perimeter
   )
 set_property(TARGET test_convex_hull_perimeter          PROPERTY FOLDER "Tests")
 
+add_executable(test_degenerate_convex_hull
+  test_degenerate_convex_hull.cpp
+  )
+set_property(TARGET test_degenerate_convex_hull         PROPERTY FOLDER "Tests")
+
 add_executable(test_point_at_fraction
   test_point_at_fraction.cpp
   )
@@ -206,6 +211,11 @@ target_link_libraries(test_current_length
   ${Boost_LIBRARIES}
 )
 
+target_link_libraries(test_degenerate_convex_hull
+  TracktableCore
+  ${Boost_LIBRARIES}
+  )
+
 target_link_libraries(test_point_at_fraction
   TracktableCore
   ${Boost_LIBRARIES}
@@ -331,6 +341,11 @@ add_test(
 add_test(
  NAME C_ConvexHullPerimeter
  COMMAND test_convex_hull_perimeter
+)
+
+add_test(
+  NAME C_DegenerateConvexHull
+  COMMAND test_degenerate_convex_hull
 )
 
 add_test(
