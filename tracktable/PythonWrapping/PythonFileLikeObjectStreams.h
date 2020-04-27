@@ -101,8 +101,9 @@ public:
 
   explicit
   PythonWriteSink(boost::python::object object)
-    : Writer(getattr(object, "write", boost::python::object()))
+    : Destination(object)
     , Flusher(getattr(object, "flush", boost::python::object()))
+    , Writer(getattr(object, "write", boost::python::object()))
   {
     if (this->Writer == boost::python::object())
       {
@@ -112,14 +113,16 @@ public:
   }
 
   PythonWriteSink(PythonWriteSink const& other)
-    : Writer(other.Writer)
-    , Flusher(other.Flusher)
+    : Destination(other.Destination)
+      , Flusher(other.Flusher)
+      , Writer(other.Writer)
     { }
 
   PythonWriteSink& operator=(PythonWriteSink const& other)
     {
-      this->Writer = other.Writer;
+      this->Destination = other.Destination;
       this->Flusher = other.Flusher;
+      this->Writer = other.Writer;
       return *this;
     }
 
@@ -147,9 +150,14 @@ public:
     return (bytes_written.check() ? bytes_written() : n);
   }
 
-  // Flushable concept
+  // Flushable concept.  Refuse to flush if the stream is already closed.
   bool flush()
     {
+      if (this->stream_is_closed())
+      {
+        return true;
+      }
+   
       if (this->Flusher != boost::python::object())
         {
         if (!this->Flusher.is_none())
@@ -161,9 +169,50 @@ public:
     }
 
 private:
-  boost::python::object Writer;
+  boost::python::object Destination;
   boost::python::object Flusher;
+  boost::python::object Writer;
 
+  // Check 'stream.closed is True'
+  // 
+  // Every Python object derived from io.IOBase has an attribute 'closed'.
+  // This function checks its value while being appropriately careful 
+  // about whether the attribute exists.
+  // 
+  // If for any reason we cannot determine the value of the attribute, 
+  // we return false -- that is, as far as we can tell the stream is
+  // still open.
+  bool stream_is_closed()
+  {
+    using boost::python::object;
+    using boost::python::extract;
+
+    if (this->Destination != object())
+    {
+      object closed_attr(getattr(this->Destination, "closed", object()));
+      if (closed_attr != object()) 
+      {
+        extract<bool> get_closed(closed_attr);
+        if (get_closed.check())
+        {
+          return get_closed();
+        }
+        else
+        {
+          TRACKTABLE_LOG(debug) << "Couldn't convert 'stream.closed' to boolean.";
+        }
+      }
+      else
+      {
+        TRACKTABLE_LOG(debug) << "Couldn't get 'closed' attribute from stream.";
+      }
+    }
+    else
+    {
+      TRACKTABLE_LOG(debug) << "Destination object in write sink is not set.";
+    }
+    return false;
+  }
 };
 
 } // close namespace tracktable

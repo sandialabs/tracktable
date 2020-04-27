@@ -43,6 +43,8 @@ add_python_test(P_TestDomainNames ${DOMAIN}.test_domain_names)
 
 add_python_test(P_GeometricMedian ${DOMAIN}.test_geometric_median)
 
+add_python_test(P_NoFlushClosedStream ${DOMAIN}.test_no_flush_closed_stream)
+
 add_python_test(P_Terrestrial_BasePointReader
   ${DOMAIN}.test_terrestrial_base_point_reader ${Tracktable_SOURCE_DIR}/TestData/Points/PointsWithComments.csv 14
   )
