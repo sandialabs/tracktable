@@ -84,11 +84,11 @@ set_property(
   )
 
 
-add_executable(test_dg
-  test_dg.cpp
+add_executable(test_distance_geometry
+  test_distance_geometry.cpp
   )
 set_property(
-  TARGET test_dg
+  TARGET test_distance_geometry
   PROPERTY FOLDER "Tests"
   )
 
@@ -122,7 +122,7 @@ target_link_libraries(test_dbscan_decorated_points
   ${Boost_LIBRARIES}
   )
 
-target_link_libraries(test_dg
+target_link_libraries(test_distance_geometry
   TracktableCore
   TracktableDomain
   ${Boost_LIBRARIES}
@@ -148,8 +148,8 @@ add_test(
   )
 
 add_test(
-  NAME C_DG
-  COMMAND test_dg
+  NAME C_DistanceGeometry
+  COMMAND test_distance_geometry
   )
 
 add_test(

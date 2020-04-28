@@ -46,7 +46,7 @@
 #include <tracktable/Domain/Cartesian2D.h>
 #include <tracktable/Domain/Terrestrial.h>
 
-#include <tracktable/Analysis/DG.h>
+#include <tracktable/Analysis/DistanceGeometry.h>
 
 typedef tracktable::domain::cartesian2d::CartesianPoint2D Cartesian2dPoint;
 typedef tracktable::domain::cartesian2d::CartesianTrajectoryPoint2D TrajectoryCartesian2dPoint;
