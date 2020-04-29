@@ -362,6 +362,7 @@ struct speed_between<tracktable::domain::terrestrial::TerrestrialTrajectoryPoint
     {
       double distance_traveled = tracktable::distance(from, to);
       double seconds_elapsed = (to.timestamp() - from.timestamp()).total_seconds();
+      // Returns 0 if division by 0 could be a problem
       if (tracktable::almost_zero(seconds_elapsed))
         {
         return 0;
