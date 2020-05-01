@@ -28,66 +28,201 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _DG_h
-#define _DG_h
+#ifndef __tracktable_analysis_distance_geometry_h
+#define __tracktable_analysis_distance_geometry_h
 
+#include <iostream>
 #include <vector>
-#include <utility> // for std::pair
 #include <tracktable/Core/Trajectory.h>
 
+namespace tracktable {
 
-template<typename TrajectoryT>
-double ControlPointDistance(TrajectoryT trajectory,
- std::pair<double,double> control_point) {
-  return tracktable::distance(
-    tracktable::point_at_length_fraction(trajectory,control_point.first),
-    tracktable::point_at_length_fraction(trajectory,control_point.second));
-}
 
-// This routine returns a vector of distance geometries of length 
-// depth * (depth+1)/2 for each trajectory.  The are all normalized to be 
-// between 0 and 1.
-template<typename TrajectoryT>
-void GetDistanceGeometries(std::vector<TrajectoryT> &trajectories, 
- std::vector<std::vector<double> > &dgs, unsigned int depth)
+// Create distance geometry signature with samples by distance
+// 
+// This function computes the multilevel distance geometry
+// for a given trajectory.  Each level *d* approximates the 
+// input trajectory with *d* equal-length line segments.
+// The distance geometry values for that level are the lengths
+// of all *d* line segments, normalized to lie between 0 and 1.
+// 
+// The D-level distance geometry for a curve will result in 
+// (D * (D+1)) / 2  separate values.
+// 
+// This implementation creates the endpoints of the line segments 
+// by sampling the trajectory at fractions of total distance 
+// traveled.  To sample by total duration, use 
+// distance_geometry_by_time().
+//    
+// Arguments:
+//     trajectory {Tracktable trajectory}: Input curve to analyze
+//     depth {unsigned int}: How many levels to compute.  Must
+//         be greater than zero.
+//         
+// Returns:
+//     std::vector<double> containing the distance geometry values
+//         laid out consecutively by increasing depth.
+
+template<typename trajectory_type>
+std::vector<double>
+distance_geometry_by_distance(
+  trajectory_type const& trajectory,
+  unsigned int depth
+  )
 {
-
-  if (depth < 1)
-    return;
-
-  // This builds the different fractional intervals
-  std::vector<std::pair<double,double> > control_points;
-  for (unsigned int i = 1; i <= depth; ++i)
-    for (unsigned int j = 0; j < i; ++j) {
-      double start = static_cast<double>(j)/static_cast<double>(i);
-      double stop = static_cast<double>(j+1)/static_cast<double>(i);
-      control_points.push_back(std::make_pair(start,stop));
-    }
-
-  for (unsigned int i = 0; i < trajectories.size(); ++i) {
-    std::vector<double> dists;
-    double length = tracktable::length(trajectories[i]);
-
-    // Build the distances for all of the control points
-    for (unsigned int j = 0; j < control_points.size(); ++j)
-      dists.push_back(ControlPointDistance(trajectories[i],control_points[j]));
-
-    // Normalize them all with respect to fraction of total length
-    // If it is a zero length trajectory, in theory we could just ignore it
-    // but this could cause some misalignment with the trajectory vector that
-    // the user may want.  So, so just give it a default value.  Really, the
-    // user should be filtering for zero length trajectories
-    unsigned int cur = 0;
-    for (unsigned int j = 1; j <= depth; ++j)
-      for (unsigned int k = 0; k < j; ++k)
-        if (length == 0.0)
-          dists[cur++] = 1.0;  // Need a default behavior, either this or 0.0
-        else
-          dists[cur++] /= length/static_cast<double>(j);
-
-    dgs.push_back(dists);
-  }
-  
-  return;
+  return _distance_geometry(trajectory, depth, true);
 }
-#endif
+
+
+// Create distance geometry signature with samples by time
+// 
+// This function computes the multilevel distance geometry
+// for a given trajectory.  Each level *d* approximates the 
+// input trajectory with *d* equal-length line segments.
+// The distance geometry values for that level are the lengths
+// of all *d* line segments, normalized to lie between 0 and 1.
+// 
+// The D-level distance geometry for a curve will result in 
+// (D * (D+1)) / 2  separate values.
+// 
+// This implementation creates the endpoints of the line segments 
+// by sampling the trajectory at fractions of total duration 
+// traveled.  To sample by total travel distance, use 
+// distance_geometry_by_distance().
+//    
+// Arguments:
+//     trajectory {Tracktable trajectory}: Input curve to analyze
+//     depth {unsigned int}: How many levels to compute.  Must
+//         be greater than zero.
+//         
+// Returns:
+//     std::vector<double> containing the distance geometry values
+//         laid out consecutively by increasing depth.
+
+template<typename trajectory_type>
+std::vector<double>
+distance_geometry_by_time(
+  trajectory_type const& trajectory,
+  unsigned int depth
+  )
+{
+  return _distance_geometry(trajectory, depth, false);
+}
+
+
+// Internal method: do the actual computation for distance geometry
+// 
+// See distance_geometry_by_distance and distance_geometry_by_time
+// for documentation on what this is for.
+//    
+// Arguments:
+//     trajectory {Tracktable trajectory}: Input curve to analyze
+//     depth {unsigned int}: How many levels to compute.  Must
+//         be greater than zero.
+//     sample_by_distance {boolean, optional}: Whether to place the
+//         control points that define the line segments according to
+//         fraction of distance traveled versus fraction of time
+//         elapsed.  Defaults to 'true', meaning sample by distance.
+//         
+// Returns:
+//     std::vector<double> containing the distance geometry values
+//         laid out consecutively by increasing depth.
+
+template<typename trajectory_type>
+std::vector<double>
+_distance_geometry(
+  trajectory_type const& trajectory, 
+  unsigned int depth, 
+  bool sample_by_distance=true
+  )
+{
+  if (depth < 1 || trajectory.size() == 0)
+  {
+    return std::vector<double>();
+  }
+
+  double travel_distance = tracktable::length(trajectory);
+  const std::size_t result_size = (depth * (depth+1)) / 2;
+
+  // If a trajectory has overall length zero, all of the distance geometry
+  // distances will be zero.  Given the choice between returning a vector
+  // of all zeros or a vector of all ones, we opt to return all ones for
+  // cleanliness -- you won't get division-by-zero errors that way.
+  // 
+  // As for the decision of whether or not the length is zero: since it is 
+  // perfectly reasonable for Cartesian trajectories to have very small but 
+  // non-zero lengths, we compare against exactly zero instead of almost zero.
+  // 
+  // If we're sampling by time, we also need to consider whether or not the
+  // duration is zero.
+  
+  if (travel_distance == 0)
+  {
+    return std::vector<double>(result_size, 1.0);
+  }
+
+  if (!sample_by_distance)
+  {
+    tracktable::Duration duration = 
+      trajectory.back().timestamp() - trajectory.front().timestamp();
+    if (duration.total_seconds() == 0)
+    {
+      return std::vector<double>(result_size, 1.0);
+    }
+  }
+
+  // Since we know in advance how many values we'll generate, we can avoid
+  // memory reallocations later.  
+  std::vector<double> distance_geometry_distances;
+  distance_geometry_distances.reserve(result_size);
+  std::vector<typename trajectory_type::point_type> control_points(depth + 1);
+
+  for (unsigned int d = 1; d <= depth; ++d) 
+  {
+    control_points.clear();
+    _create_control_points(d, trajectory, sample_by_distance, control_points);
+    for (unsigned int i = 0; i < d; ++i) 
+    {
+      double control_point_distance = tracktable::distance(
+        control_points[i], control_points[i+1]
+        );
+      distance_geometry_distances.push_back(control_point_distance / travel_distance);
+    }
+  }
+  return distance_geometry_distances;
+}
+
+
+// Internal function.  
+// 
+// Sample the input trajectory at (depth+1) locations evenly spaced 
+// along the trajectory by distance traveled or by time elapsed.
+// 
+// Results are returned via the 'output' parameter.
+// 
+template<typename trajectory_type, typename point_type>
+void _create_control_points(unsigned int depth, 
+                           trajectory_type const& trajectory,
+                           bool sample_by_distance,
+                           std::vector<point_type>& output)
+{
+  double step_fraction = 1.0 / depth;
+  for (std::size_t i = 0; i < depth+1; ++i) 
+  {
+    double here = i * step_fraction;
+    if (sample_by_distance)
+    {
+      output.push_back(tracktable::point_at_length_fraction(trajectory, here));
+    } 
+    else
+    {
+      output.push_back(tracktable::point_at_time_fraction(trajectory, here));
+    }
+  } 
+}
+
+
+
+} // close namespace tracktable
+
+#endif // __tracktable_analysis_distance_geometry_h
