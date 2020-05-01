@@ -179,6 +179,7 @@ install_python_extension(_tracktable_hello lib ${Tracktable_PYTHON_DIR})
 add_library(_core_types MODULE
   CorePythonModule.cpp
   DateTimeWrapper.cpp
+  FloatVectorWrapper.cpp
   PairToTupleWrapper.cpp
   PropertyMapWrapper.cpp
   CommonMapWrappers.cpp
@@ -204,6 +205,21 @@ target_link_libraries(_domain_algorithm_overloads PUBLIC
   )
 
 install_python_extension(_domain_algorithm_overloads lib ${Tracktable_PYTHON_DIR})
+
+add_library(_distance_geometry MODULE
+  DistanceGeometryModule.cpp
+  )
+
+set_property(TARGET _distance_geometry PROPERTY FOLDER "Python")
+
+target_link_libraries(_distance_geometry
+  TracktableCore
+  TracktableDomain
+  ${PYTHON_EXTENSION_LIBRARIES}
+  )
+
+install_python_extension(_distance_geometry lib ${Tracktable_PYTHON_DIR})
+
 
 add_library(_terrestrial MODULE
   TerrestrialDomainModule.cpp

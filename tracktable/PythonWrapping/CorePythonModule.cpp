@@ -35,10 +35,11 @@
 
 #include <tracktable/Core/MemoryUse.h>
 
-#include <tracktable/PythonWrapping/PropertyMapWrapper.h>
-#include <tracktable/PythonWrapping/DateTimeWrapper.h>
 #include <tracktable/PythonWrapping/CommonMapWrappers.h>
+#include <tracktable/PythonWrapping/DateTimeWrapper.h>
+#include <tracktable/PythonWrapping/FloatVectorWrapper.h>
 #include <tracktable/PythonWrapping/PairToTupleWrapper.h>
+#include <tracktable/PythonWrapping/PropertyMapWrapper.h>
 #include <tracktable/PythonWrapping/TrivialFileReader.h>
 
 #include <boost/python.hpp>
@@ -53,6 +54,7 @@ void trigger_args_exception(int foo)
 
 BOOST_PYTHON_MODULE(_core_types) {
   install_common_map_wrappers();
+  install_float_vector_wrappers();
   install_property_map_wrapper();
   install_datetime_converters();
   install_pair_wrappers();
