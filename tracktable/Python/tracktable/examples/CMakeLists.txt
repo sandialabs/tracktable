@@ -34,8 +34,6 @@
 #
 # This does not yet test the Jupyter notebooks.
 
-message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
-
 include(PythonTest)
 
 set(EXAMPLE_MODULE tracktable.examples)
