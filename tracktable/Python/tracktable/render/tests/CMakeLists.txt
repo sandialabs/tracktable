@@ -35,9 +35,6 @@
 # our rendering code is working.  These are basically "smoke tests" --
 # we don't yet have the ability to verify the content of an image.
 
-
-message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
-
 include(PythonTest)
 
 execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"

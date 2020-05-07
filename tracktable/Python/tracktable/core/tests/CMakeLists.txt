@@ -32,8 +32,6 @@
 # Here we list the Python tests that we need to run to make sure that
 # our core classes and functions are working.
 
-message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
-
 include(PythonTest)
 
 add_python_test(P_TestConvexHullArea tracktable.core.tests.test_convex_hull_area)

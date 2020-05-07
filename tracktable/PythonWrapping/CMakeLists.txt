@@ -34,8 +34,6 @@
 # a single symbol -- its entry point -- and Boost.Python already
 # handles the dllexport/dllimport annotation for that.
 
-message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
-
 # ----------------------------------------------------------------------
 #
 # (Not) Linking against libpython
@@ -113,9 +111,7 @@ set(ALL_BOOST_COMPONENTS ${ALL_BOOST_COMPONENTS} ${BOOST_PYTHON_COMPONENTS})
 message(STATUS "(PythonWrapping) Looking for Boost minimum version ${BOOST_MINIMUM_VERSION_REQUIRED} components ${ALL_BOOST_COMPONENTS}")
 find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED COMPONENTS ${ALL_BOOST_COMPONENTS} )
 
-if (Boost_FOUND)
-  message(STATUS "(PythonWrapping) DEBUG: Boost found; libraries are ${Boost_LIBRARIES}")
-else ()
+if (NOT Boost_FOUND)
   message(WARNING "(PythonWrapping) DEBUG: Boost not found!")
 endif ()
 
