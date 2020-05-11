@@ -31,8 +31,6 @@
 # Here we list the Python tests that we need to run to make sure that
 # our Python point sources are working.
 
-message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
-
 include(PythonTest)
 
 set(ANALYSIS "tracktable.analysis.tests")
