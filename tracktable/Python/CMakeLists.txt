@@ -30,6 +30,4 @@
 #
 # This file has the sole purpose of forwarding CMake to Python/tracktable.
 
-message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
-
 add_subdirectory(tracktable)
