@@ -37,7 +37,6 @@
 #ifndef __tracktable_floating_point_comparison_h
 #define __tracktable_floating_point_comparison_h
 
-#include <boost/test/floating_point_comparison.hpp>
 #include <cmath>
 #include <limits>
 
