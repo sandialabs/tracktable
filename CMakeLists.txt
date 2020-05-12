@@ -400,6 +400,9 @@ message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")
 #-------------------------------------------------------------------------
 set(BOOST_MINIMUM_VERSION_REQUIRED 1.61)
 
+# Do not use Boost's CMake modules yet.
+set(Boost_NO_BOOST_CMAKE ON)
+
 # Core: date_time log serialization
 # IO: regex
 set(BOOST_CORE_COMPONENTS_NEEDED date_time log regex serialization)
