@@ -417,6 +417,8 @@ protected:
           this->get_tokens_from_input(_tokens);
 
 #if defined(COPIOUS_DEBUG_OUTPUT)
+          // Since this precomputes its output, I'm guarding it with an #ifdef
+          // AND putting it behind log level TRACE.
           std::ostringstream outbuf;
           outbuf << "Token list has " << _tokens.size() << " entries: ";
           for (string_vector_type::iterator iter = _tokens.begin();
@@ -425,8 +427,9 @@ protected:
             {
             outbuf << "'" << *iter << "' ";
             }
-          TRACKTABLE_LOG(debug) << outbuf.str();
+          TRACKTABLE_LOG(log::trace) << outbuf.str();
 #endif
+
           if (_tokens.size() == 0)
             {
             // Skip empty lines.  Should this even be possible?
@@ -436,7 +439,7 @@ protected:
 
           if (_tokens[0] == io::detail::PointFileMagicString && this->IgnoreHeader)
             {
-            TRACKTABLE_LOG(debug) << "Found point header but IgnoreHeader is enabled.\n";
+            TRACKTABLE_LOG(log::debug) << "Found point header but IgnoreHeader is enabled.\n";
             }
 
           if (_tokens[0] == io::detail::PointFileMagicString
@@ -460,8 +463,8 @@ protected:
               }
             else
               {
-              TRACKTABLE_LOG(warning) 
-                << "WARNING: Not enough tokens to assemble point.  Expected " 
+              TRACKTABLE_LOG(log::debug) 
+                << "DEBUG WARNING: Not enough tokens to assemble point.  Expected " 
                 << required_num_tokens << ", found " << _tokens.size() 
                 << ".  Point will be skipped.";
               ++(this->SourceBegin);
@@ -471,18 +474,18 @@ protected:
         catch (ParseError const& e)
           {
           // We might need to back this off to a debug message instead of a warning.
-          TRACKTABLE_LOG(warning) << e.what() << "\n";
+          TRACKTABLE_LOG(log::debug) << e.what() << "\n";
           NextPoint = point_shared_ptr_type();
           ++(this->SourceBegin);
           }
         catch (boost::bad_lexical_cast& e)
           {
-          TRACKTABLE_LOG(warning) << "Cast error while parsing point: " << e.what();
+          TRACKTABLE_LOG(log::debug) << "Cast error while parsing point: " << e.what();
           ++(this->SourceBegin);
           }
         catch (std::exception& e)
           {
-          TRACKTABLE_LOG(warning) << "Exception while parsing point: " << e.what();
+          TRACKTABLE_LOG(log::warning) << "Exception while parsing point: " << e.what();
           ++(this->SourceBegin);
           }
         }
@@ -500,7 +503,7 @@ protected:
         header.Dimension != std::size_t(traits::dimension<point_type>::value)
         )
         {
-        TRACKTABLE_LOG(warning) 
+        TRACKTABLE_LOG(log::warning) 
                   << "PointFromTokensIterator: Header indicates points with dimension "
                   << header.Dimension << " but reader's point type has dimension "
                   << traits::dimension<point_type>::value << ".";

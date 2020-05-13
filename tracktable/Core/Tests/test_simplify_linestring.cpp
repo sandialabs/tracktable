@@ -39,6 +39,9 @@
 #include <sstream>
 #include <typeinfo>
 
+// Import constants for log level
+using namespace tracktable::log;
+
 template<typename iter_type>
 std::string linestring_to_string(iter_type _begin, iter_type _end)
 {
