@@ -160,7 +160,7 @@ _distance_geometry(
   if (travel_distance == 0)
   {
     TRACKTABLE_LOG(warning) 
-      << "distance_geometry: Total distance for trjaectory is zero. "
+      << "distance_geometry: Total distance for trajectory is zero. "
       << "Distance geometry results may not be what you expect.";
     return std::vector<double>(result_size, 1.0);
   }
