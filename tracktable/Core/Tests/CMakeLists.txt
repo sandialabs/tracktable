@@ -74,6 +74,11 @@ add_executable(test_degenerate_convex_hull
   )
 set_property(TARGET test_degenerate_convex_hull         PROPERTY FOLDER "Tests")
 
+add_executable(test_log_level
+  test_log_level.cpp
+  )
+set_property(TARGET test_log_level PROPERTY FOLDER "Tests")
+
 add_executable(test_point_at_fraction
   test_point_at_fraction.cpp
   )
@@ -216,6 +221,11 @@ target_link_libraries(test_degenerate_convex_hull
   ${Boost_LIBRARIES}
   )
 
+target_link_libraries(test_log_level
+  TracktableCore
+  ${Boost_LIBRARIES}
+  )
+
 target_link_libraries(test_point_at_fraction
   TracktableCore
   ${Boost_LIBRARIES}
@@ -347,6 +357,11 @@ add_test(
   NAME C_DegenerateConvexHull
   COMMAND test_degenerate_convex_hull
 )
+
+add_test(
+  NAME C_LogLevel
+  COMMAND test_log_level
+  )
 
 add_test(
   NAME C_MemoryUse

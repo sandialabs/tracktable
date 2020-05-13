@@ -195,7 +195,7 @@ struct interpolate<PropertyMap>
             }
           catch (boost::bad_get& /*e*/)
             {
-            TRACKTABLE_LOG(warning) 
+            TRACKTABLE_LOG(log::warning) 
                       << "WARNING: interpolate<PropertyMap>: "
                       << "Couldn't retrieve property '"
                       << key << "' (type "
@@ -245,7 +245,7 @@ struct extrapolate<PropertyMap>
                 }
                 catch (boost::bad_get& /*e*/)
                 {
-                    TRACKTABLE_LOG(warning) 
+                    TRACKTABLE_LOG(log::warning) 
                         << "WARNING: extrapolate<PropertyMap>: "
                         << "Couldn't retrieve property '"
                         << key << "' (type "
