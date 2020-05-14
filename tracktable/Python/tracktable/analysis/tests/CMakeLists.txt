@@ -31,8 +31,6 @@
 # Here we list the Python tests that we need to run to make sure that
 # our Python point sources are working.
 
-message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
-
 include(PythonTest)
 
 set(ANALYSIS "tracktable.analysis.tests")
@@ -40,3 +38,5 @@ set(ANALYSIS "tracktable.analysis.tests")
 add_python_test(P_DBSCAN ${ANALYSIS}.test_dbscan_clustering)
 add_python_test(P_RTree_Nearest_Neighbors ${ANALYSIS}.test_rtree_nearest_neighbors)
 add_python_test(P_RTree_Points_In_Box ${ANALYSIS}.test_rtree_points_in_box)
+add_python_test(P_DistanceGeometry_Distance ${ANALYSIS}.test_distance_geometry_by_distance)
+add_python_test(P_DistanceGeometry_Time ${ANALYSIS}.test_distance_geometry_by_time)

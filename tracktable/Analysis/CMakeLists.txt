@@ -42,6 +42,7 @@ include_directories(
 set( Analysis_HEADERS
   AssembleTrajectories.h
   ComputeDBSCANClustering.h
+  DistanceGeometry.h
   RTree.h
   GuardedBoostGeometryRTreeHeader.h
 )

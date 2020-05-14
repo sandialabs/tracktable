@@ -206,7 +206,6 @@ if (TRACKTABLE_PYTHON)
   else (UNIX AND APPLE)
     find_package(Python3 COMPONENTS Interpreter Development NumPy)
   endif(UNIX AND APPLE)
-  message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
 else(TRACKTABLE_PYTHON)
   message(STATUS "Python bindings will NOT be built or installed")
 endif (TRACKTABLE_PYTHON)
@@ -279,7 +278,7 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
         message(ERROR ": Please provide the path to the Sphinx executable.")
       endif (NOT Sphinx_FOUND)
 
-      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
+      execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
         "import re; import sphinx; print(re.compile('/__init__.py.*').sub('',sphinx.__file__))"
         RESULT_VARIABLE SPHINX_MODULE_STATUS
         OUTPUT_VARIABLE SPHINX_MODULE_LOCATION
@@ -289,10 +288,10 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
       #message("SPHINX_MODULE_LOCATION ${SPHINX_MODULE_LOCATION}")
       # The status is empty if everything went ok, but if it has anything in it there was an error
       if(SPHINX_MODULE_STATUS)
-        message(ERROR ": Python module 'sphinx' is required to build Python documentation. Install the sphinx module or enable BUILD_DOCUMENTATION_CXX_ONLY.")
+        message(ERROR ": Python module 'sphinx' is required to build Python documentation. Install the sphinx module or enable BUILD_DOCUMENTATION_CXX_ONLY.  If you are certain that Sphinx is already installed, make sure Python3_EXECUTABLE is correct.")
       endif(SPHINX_MODULE_STATUS)
 
-      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
+      execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
         "import re; import sphinx_rtd_theme; print(re.compile('/__init__.py.*').sub('',sphinx_rtd_theme.__file__))"
         RESULT_VARIABLE SPHINX_RTD_THEME_STATUS
         OUTPUT_VARIABLE SPHINX_RTD_THEME_LOCATION
@@ -302,10 +301,10 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
       #message("SPHINX_RTD_THEME_LOCATION ${SPHINX_RTD_THEME_LOCATION}")
       # The status is empty if everything went ok, but if it has anything in it there was an error
       if(SPHINX_RTD_THEME_STATUS)
-        message(ERROR ": Python module 'sphinx_rtd_theme' is required to build Python documentation. Install the sphinx_rtd_theme module or enable BUILD_DOCUMENTATION_CXX_ONLY.")
+        message(ERROR ": Python module 'sphinx_rtd_theme' is required to build Python documentation. Install the sphinx_rtd_theme module or enable BUILD_DOCUMENTATION_CXX_ONLY.  If you are certain that sphinx_rtd_theme is already installed, make sure Python3_EXECUTABLE is correct.")
       endif(SPHINX_RTD_THEME_STATUS)
 
-      execute_process(COMMAND "${Sphinx_EXECUTABLE_TMP}" "-c"
+      execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
         "import re; import breathe; print(re.compile('/__init__.py.*').sub('',breathe.__file__))"
         RESULT_VARIABLE BREATHE_STATUS
         OUTPUT_VARIABLE BREATHE_LOCATION
@@ -313,9 +312,9 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
         )
       # The status is empty if everything went ok, but if it has anything in it there was an error
       if(BREATHE_STATUS)
-        message(ERROR ": Python module 'breathe' is required to build Python documentation. Install the breathe module or enable BUILD_DOCUMENTATION_CXX_ONLY.")
+        message(ERROR ": Python module 'breathe' is required to build Python documentation. Install the breathe module or enable BUILD_DOCUMENTATION_CXX_ONLY.  If you are certain that breathe is already installed, make sure Python3_EXECUTABLE is correct.")
       endif(BREATHE_STATUS)
-
+      
       # Yes, I'm writing a file into the source tree.  Sphinx requires
       # that its configuration file (conf.py) exist in the source tree
       # even though it can put all of its generated files elsewhere.
