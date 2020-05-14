@@ -358,10 +358,13 @@ add_test(
   COMMAND test_degenerate_convex_hull
 )
 
-add_test(
-  NAME C_LogLevel
-  COMMAND test_log_level
-  )
+# This test is not yet enabled because it depends on capability
+# (adding a separate back-end log sink) that we don't yet have.
+#
+#add_test(
+#  NAME C_LogLevel
+#  COMMAND test_log_level
+#  )
 
 add_test(
   NAME C_MemoryUse
