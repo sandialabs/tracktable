@@ -33,8 +33,6 @@
 # This is tracktable/C++/CMakeLists.txt.
 #
 
-message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
-
 add_subdirectory(Core)
 add_subdirectory(Domain)
 add_subdirectory(IO)

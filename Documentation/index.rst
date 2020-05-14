@@ -38,11 +38,11 @@ Documentation
 =============
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    installation.rst
    user_guide.rst
-   examples.rst
+   examples/index.rst
    reference.rst
    conventions.rst
    contacts.rst

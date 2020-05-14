@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -28,52 +28,37 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+
 // Tracktable Trajectory Library
 //
-// CorePythonModule - Expose core types (PropertyMap and Timestamp) to
-// Python
+// Boost.Python code to expose std::vector<float> and std::vector<double>
+// with interfaces that look like Python lists
+// 
+// Based on Boost.Python documentation and code at the following web page:
+// 
+// https://riptutorial.com/boost/example/25280/wrapping-std--vector-in-boost-python
 
-#include <tracktable/Core/MemoryUse.h>
+#include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
-#include <tracktable/PythonWrapping/CommonMapWrappers.h>
-#include <tracktable/PythonWrapping/DateTimeWrapper.h>
-#include <tracktable/PythonWrapping/FloatVectorWrapper.h>
-#include <tracktable/PythonWrapping/PairToTupleWrapper.h>
-#include <tracktable/PythonWrapping/PropertyMapWrapper.h>
-#include <tracktable/PythonWrapping/TrivialFileReader.h>
+#include <tracktable/Core/WarningGuards/PushWarningState.h>
+#include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
+#include <vector>
+#include <tracktable/Core/WarningGuards/PopWarningState.h>
 
-#include <boost/python.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/module.hpp>
-#include <Python.h>
-
-void trigger_args_exception(int foo)
+void install_float_vector_wrappers()
 {
-  return;
-}
+  using boost::python::class_;
+  using boost::python::vector_indexing_suite;
 
-BOOST_PYTHON_MODULE(_core_types) {
-  install_common_map_wrappers();
-  install_float_vector_wrappers();
-  install_property_map_wrapper();
-  install_datetime_converters();
-  install_pair_wrappers();
-  install_timestamp_functions();
+  typedef std::vector<float> float_vector_type;
+  typedef std::vector<double> double_vector_type;
 
-  using namespace boost::python;
-  class_<tracktable::TrivialFileReader>("TrivialFileReader")
-    .def(init<>())
-    .def("read_from_file", &tracktable::TrivialFileReader::read_from_file)
+  class_<float_vector_type>("FloatVector")
+    .def(vector_indexing_suite<float_vector_type>())
     ;
 
-  // This function is there so that we can deliberately provoke a
-  // Boost.Python.ArgumentError exception.  This lets us get a pointer
-  // to it.  I don't know any other way to do that except to make one
-  // happen.
-  def("trigger_args_exception", trigger_args_exception);
+  class_<double_vector_type>("DoubleVector")
+    .def(vector_indexing_suite<double_vector_type>())
+    ;
 
-  def("current_memory_use", tracktable::current_memory_use);
-  def("peak_memory_use", tracktable::peak_memory_use);
-  
 }
-

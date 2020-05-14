@@ -34,8 +34,6 @@
 # a single symbol -- its entry point -- and Boost.Python already
 # handles the dllexport/dllimport annotation for that.
 
-message(STATUS "*** DEBUG: ${CMAKE_CURRENT_SOURCE_DIR}: Python3_EXECUTABLE is ‘${Python3_EXECUTABLE}’")
-
 # ----------------------------------------------------------------------
 #
 # (Not) Linking against libpython
@@ -113,9 +111,7 @@ set(ALL_BOOST_COMPONENTS ${ALL_BOOST_COMPONENTS} ${BOOST_PYTHON_COMPONENTS})
 message(STATUS "(PythonWrapping) Looking for Boost minimum version ${BOOST_MINIMUM_VERSION_REQUIRED} components ${ALL_BOOST_COMPONENTS}")
 find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED COMPONENTS ${ALL_BOOST_COMPONENTS} )
 
-if (Boost_FOUND)
-  message(STATUS "(PythonWrapping) DEBUG: Boost found; libraries are ${Boost_LIBRARIES}")
-else ()
+if (NOT Boost_FOUND)
   message(WARNING "(PythonWrapping) DEBUG: Boost not found!")
 endif ()
 
@@ -179,6 +175,7 @@ install_python_extension(_tracktable_hello lib ${Tracktable_PYTHON_DIR})
 add_library(_core_types MODULE
   CorePythonModule.cpp
   DateTimeWrapper.cpp
+  FloatVectorWrapper.cpp
   PairToTupleWrapper.cpp
   PropertyMapWrapper.cpp
   CommonMapWrappers.cpp
@@ -204,6 +201,21 @@ target_link_libraries(_domain_algorithm_overloads PUBLIC
   )
 
 install_python_extension(_domain_algorithm_overloads lib ${Tracktable_PYTHON_DIR})
+
+add_library(_distance_geometry MODULE
+  DistanceGeometryModule.cpp
+  )
+
+set_property(TARGET _distance_geometry PROPERTY FOLDER "Python")
+
+target_link_libraries(_distance_geometry
+  TracktableCore
+  TracktableDomain
+  ${PYTHON_EXTENSION_LIBRARIES}
+  )
+
+install_python_extension(_distance_geometry lib ${Tracktable_PYTHON_DIR})
+
 
 add_library(_terrestrial MODULE
   TerrestrialDomainModule.cpp

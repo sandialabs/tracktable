@@ -83,12 +83,35 @@ set_property(
   PROPERTY FOLDER "Tests"
   )
 
-
-add_executable(test_dg
-  test_dg.cpp
+add_executable(test_terrestrial_distance_geometry_by_distance
+  test_terrestrial_distance_geometry_by_distance.cpp
   )
 set_property(
-  TARGET test_dg
+  TARGET test_terrestrial_distance_geometry_by_distance
+  PROPERTY FOLDER "Tests"
+  )
+
+add_executable(test_cartesian2d_distance_geometry_by_distance
+  test_cartesian2d_distance_geometry_by_distance.cpp
+  )
+set_property(
+  TARGET test_cartesian2d_distance_geometry_by_distance
+  PROPERTY FOLDER "Tests"
+  )
+
+add_executable(test_terrestrial_distance_geometry_by_time
+  test_terrestrial_distance_geometry_by_time.cpp
+  )
+set_property(
+  TARGET test_terrestrial_distance_geometry_by_time
+  PROPERTY FOLDER "Tests"
+  )
+
+add_executable(test_cartesian2d_distance_geometry_by_time
+  test_cartesian2d_distance_geometry_by_time.cpp
+  )
+set_property(
+  TARGET test_cartesian2d_distance_geometry_by_time
   PROPERTY FOLDER "Tests"
   )
 
@@ -122,11 +145,30 @@ target_link_libraries(test_dbscan_decorated_points
   ${Boost_LIBRARIES}
   )
 
-target_link_libraries(test_dg
+target_link_libraries(test_terrestrial_distance_geometry_by_distance
   TracktableCore
   TracktableDomain
   ${Boost_LIBRARIES}
   )
+
+target_link_libraries(test_cartesian2d_distance_geometry_by_distance
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+  )
+
+target_link_libraries(test_terrestrial_distance_geometry_by_time
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+  )
+
+target_link_libraries(test_cartesian2d_distance_geometry_by_time
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+  )
+
 add_test(
   NAME C_DBSCAN_Cartesian
   COMMAND test_dbscan_cartesian
@@ -148,8 +190,23 @@ add_test(
   )
 
 add_test(
-  NAME C_DG
-  COMMAND test_dg
+  NAME C_Terrestrial_DistanceGeometry_Distance
+  COMMAND test_terrestrial_distance_geometry_by_distance
+  )
+
+add_test(
+  NAME C_Cartesian2D_DistanceGeometry_Distance
+  COMMAND test_cartesian2d_distance_geometry_by_distance
+  )
+
+add_test(
+  NAME C_Terrestrial_DistanceGeometry_Time
+  COMMAND test_terrestrial_distance_geometry_by_time
+  )
+
+add_test(
+  NAME C_Cartesian2D_DistanceGeometry_Time
+  COMMAND test_cartesian2d_distance_geometry_by_time
   )
 
 add_test(
