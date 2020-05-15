@@ -230,6 +230,20 @@ target_link_libraries(_terrestrial PUBLIC
 
 install_python_extension(_terrestrial lib ${Tracktable_PYTHON_DIR})
 
+
+add_library(_logging MODULE
+  LoggingModule.cpp
+  )
+set_property(TARGET _logging PROPERTY FOLDER "Python")
+
+target_link_libraries(_logging PUBLIC
+  TracktableCore
+  ${PYTHON_EXTENSION_LIBRARIES}
+  )
+
+install_python_extension(_logging lib ${Tracktable_PYTHON_DIR})
+install_python_extension(_terrestrial lib ${Tracktable_PYTHON_DIR})
+
 add_library(_cartesian2d MODULE
   Cartesian2DDomainModule.cpp
 )
