@@ -137,6 +137,9 @@ void TRACKTABLE_CORE_EXPORT set_log_level(::tracktable::log::severity_level new_
  * Returns:
  *     Current log level (as tracktable::log::severity_level)
  */
+
+log::severity_level TRACKTABLE_CORE_EXPORT log_level();
+
 } // close namespace tracktable
 
 
