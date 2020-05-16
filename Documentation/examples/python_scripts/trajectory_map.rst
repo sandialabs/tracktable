@@ -9,7 +9,7 @@ As soon as we add timestamps to our (longitude, latitude) points we
 can sensibly assemble sequences of points into trajectories.
 Trajectories lend themselves to being plotted as lines on a map.
 We have provided a sample data set of fictitious trajectories between
- many of the world's busiest airports for you to use. ::
+many of the world's busiest airports for you to use. ::
 
    $ python -m "tracktable.examples.trajectory_map_from_points"
        TRACKTABLE/examples/data/SampleTrajectories.csv
