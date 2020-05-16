@@ -41,14 +41,13 @@ pointed in the right direction.
 
 from __future__ import print_function, absolute_import, division
 
-from tracktable.core import logging
-
+import logging
 import math
-import sys
+
 import matplotlib
 import matplotlib.collections
 import matplotlib.colors
-from io import StringIO
+
 from matplotlib.collections import LineCollection
 from six.moves import range
 import numpy

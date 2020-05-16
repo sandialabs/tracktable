@@ -39,6 +39,8 @@ from six.moves import range
 import copy
 import math
 
+import tracktable.core.log
+
 from tracktable.lib._domain_algorithm_overloads import distance as _distance
 from tracktable.lib._domain_algorithm_overloads import bearing as _bearing
 from tracktable.lib._domain_algorithm_overloads import interpolate as _interpolate
@@ -63,7 +65,7 @@ from tracktable.lib._domain_algorithm_overloads import convex_hull_aspect_ratio 
 from tracktable.lib._domain_algorithm_overloads import convex_hull_centroid as _convex_hull_centroid
 from tracktable.lib._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
 
-from tracktable.core import logging
+import logging
 LOGGER = logging.getLogger(__name__)
 DOMAIN_MODULE = None
 
@@ -445,11 +447,12 @@ def point_at_fraction(trajectory, time_fraction):
 
     """
 
-    logging.warn_deprecated(("tracktable.core.geomath.point_at_fraction is "
-                             "deprecated and will be removed in a future "
-                             "release.  Use tracktable.core.geomath."
-                             "point_at_time_fraction or tracktable.core."
-                             "geomath.point_at_length_fraction instead."))
+    tracktable.core.log.warn_deprecated((
+      "tracktable.core.geomath.point_at_fraction is "
+      "deprecated and will be removed in a future "
+      "release.  Use tracktable.core.geomath."
+      "point_at_time_fraction or tracktable.core."
+      "geomath.point_at_length_fraction instead."))
 
     return _point_at_time_fraction(trajectory, time_fraction)
 

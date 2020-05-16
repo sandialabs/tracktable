@@ -29,16 +29,17 @@
 
 # This test ensures that compute_bounding_box() still works after pickling
 # and unpickling trajectories.
-# 
+#
 
 import datetime
 import io
+import logging
 import math
 import pickle
 import sys
 
 import tracktable.domain
-from tracktable.core import geomath, logging
+from tracktable.core import geomath
 from tracktable.source.path_point_source import TrajectoryPointSource
 from tracktable.domain.terrestrial import Trajectory as TerrestrialTrajectory
 from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
@@ -88,11 +89,11 @@ def test_compute_bounding_box_after_pickle():
         bbox_after_pickling.max_corner[0],
         bbox_after_pickling.max_corner[1]))
 
-    bbox_min_delta = (bbox_after_pickling.min_corner[0] - 
+    bbox_min_delta = (bbox_after_pickling.min_corner[0] -
                       bbox_before_pickling.min_corner[0],
                       bbox_after_pickling.min_corner[1] -
                       bbox_before_pickling.min_corner[1])
-    bbox_max_delta = (bbox_after_pickling.max_corner[0] - 
+    bbox_max_delta = (bbox_after_pickling.max_corner[0] -
                       bbox_before_pickling.max_corner[0],
                       bbox_after_pickling.max_corner[1] -
                       bbox_before_pickling.max_corner[1])
@@ -114,7 +115,7 @@ def test_compute_bounding_box_after_pickle():
 
 def main():
     return test_compute_bounding_box_after_pickle()
-    
+
 # ----------------------------------------------------------------------
 
 
