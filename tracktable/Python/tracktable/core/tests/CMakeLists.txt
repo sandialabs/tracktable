@@ -65,3 +65,5 @@ add_python_test(P_TestComputeBoundingBoxAfterPickle tracktable.core.tests.test_c
 add_python_test(P_TestDistance tracktable.core.tests.test_distance)
 
 add_python_test(P_TestKM2LonLat tracktable.core.tests.test_kms_to_lon_lat)
+
+add_python_test(P_LogLevel tracktable.core.tests.test_log_level)
