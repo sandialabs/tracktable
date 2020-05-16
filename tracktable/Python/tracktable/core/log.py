@@ -31,7 +31,9 @@
 from __future__ import print_function, division, absolute_import
 
 from tracktable.lib import _logging as cpp_logging
+
 import logging
+import warnings
 
 # The logging module doesn't have loglevel TRACE by default.  I think
 # it should.
@@ -78,3 +80,25 @@ def log_level():
         Current log level as an integer.
     """
     return logging.getLogger().getEffectiveLevel()
+
+
+def warn_deprecated(message):
+    """Warn the caller that a function is deprecated
+
+    This function prints a message and possibly raises an exception when
+    a deprecated function is called.  It must be used in the body of the
+    function itself.
+
+    Example:
+
+    def undesirable_function():
+        warn_deprecated(("Please use good_function instead of "
+                         "undesirable_function."))
+        return do_thing_anyway()
+
+
+    Args:
+        message: {string} What to print on the console
+    """
+    warnings.warn(message, DeprecationWarning, stacklevel=2)
+

@@ -30,7 +30,9 @@
 """tracktable.filter.trajectory - Filters that take trajectories as input
 """
 
-from tracktable.core import geomath, logging
+import logging
+
+from tracktable.core import geomath
 from tracktable.core.geomath import subset_during_interval
 
 class ClipToTimeWindow(object):
@@ -76,8 +78,8 @@ class ClipToTimeWindow(object):
             raise ValueError("ClipToTimeWindow: Incomplete time window!  You must set both 'start_time' and 'end_time'.  The current time window is ({}, {}).".format(self.start_time, self.end_time))
 
         for trajectory in self.input:
-            subset = geomath.subset_during_interval(trajectory, 
-                self.start_time, 
+            subset = geomath.subset_during_interval(trajectory,
+                self.start_time,
                 self.end_time)
             if len(subset) > 0:
                 yield(subset)
