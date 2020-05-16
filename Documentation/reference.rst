@@ -21,6 +21,7 @@ based on speed, memory usage and algorithmic needs.
    python/tracktable.rst
    python/tracktable.core.rst
    python/tracktable.core.geomath.rst
+   python/tracktable.core.log.rst
    python/tracktable.core.simple_timezone.rst
    python/tracktable.core.timestamp.rst
    python/tracktable.feature.rst
