@@ -35,13 +35,14 @@ trajectories built from points in a CSV file
 import tracktable.domain
 from tracktable.feature import annotations
 
-from tracktable.core import geomath, logging
+from tracktable.core import geomath
 from tracktable.render import mapmaker, paths
 from tracktable.script_helpers import argument_groups, argparse, n_at_a_time
 from tracktable.source.trajectory import AssembleTrajectoryFromPoints
 
 import datetime
 import itertools
+import logging
 import numpy
 import shlex
 import sys

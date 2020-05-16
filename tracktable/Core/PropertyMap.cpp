@@ -69,7 +69,7 @@ T typed_property_with_default(
       }
     catch (boost::bad_get e)
       {
-      TRACKTABLE_LOG(warning) 
+      TRACKTABLE_LOG(tracktable::log::warning) 
         << "PropertyMap: Property '"
         << name 
         << "' is present but is not of the requested type";
@@ -235,7 +235,7 @@ double real_property(PropertyMap const& properties, string_type const& name, boo
       }
     catch (boost::bad_get e)
       {
-      TRACKTABLE_LOG(warning) 
+      TRACKTABLE_LOG(log::warning) 
         << "PropertyMap: Property '"
         << name << "' is present but is not real-valued\n";
       if (is_present) *is_present = false;
@@ -290,7 +290,7 @@ int64_t integer_property(PropertyMap const& properties, string_type const& name,
       }
     catch (boost::bad_get e)
       {
-      TRACKTABLE_LOG(warning) 
+      TRACKTABLE_LOG(log::warning) 
         << "PropertyMap: Property '"
         << name << "' is present but is not integer-valued";
       if (is_present) *is_present = false;
@@ -345,7 +345,7 @@ string_type string_property(PropertyMap const& properties, string_type const& na
       }
     catch (boost::bad_get e)
       {
-      TRACKTABLE_LOG(warning) 
+      TRACKTABLE_LOG(log::warning) 
         << "PropertyMap: Property '"
         << name << "' is present but is not a string";
       if (is_present) *is_present = false;
@@ -398,7 +398,7 @@ Timestamp timestamp_property(PropertyMap const& properties, string_type const& n
       }
     catch (boost::bad_get e)
       {
-      TRACKTABLE_LOG(warning) 
+      TRACKTABLE_LOG(log::warning) 
         << "PropertyMap: Property '"
         << name << "' is present but is not a timestamp";
       if (is_present) *is_present = false;

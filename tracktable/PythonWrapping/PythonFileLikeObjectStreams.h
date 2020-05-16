@@ -107,8 +107,8 @@ public:
   {
     if (this->Writer == boost::python::object())
       {
-      TRACKTABLE_LOG(error) << "ERROR: PythonWriteSink: Supplied object "
-                            << "has no write() attribute.";
+      TRACKTABLE_LOG(log::error) << "ERROR: PythonWriteSink: Supplied object "
+                                 << "has no write() attribute.";
       }
   }
 
@@ -199,17 +199,17 @@ private:
         }
         else
         {
-          TRACKTABLE_LOG(debug) << "Couldn't convert 'stream.closed' to boolean.";
+          TRACKTABLE_LOG(log::debug) << "Couldn't convert 'stream.closed' to boolean.";
         }
       }
       else
       {
-        TRACKTABLE_LOG(debug) << "Couldn't get 'closed' attribute from stream.";
+        TRACKTABLE_LOG(log::debug) << "Couldn't get 'closed' attribute from stream.";
       }
     }
     else
     {
-      TRACKTABLE_LOG(debug) << "Destination object in write sink is not set.";
+      TRACKTABLE_LOG(log::debug) << "Destination object in write sink is not set.";
     }
     return false;
   }
