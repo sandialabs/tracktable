@@ -89,19 +89,12 @@ def warn_deprecated(message):
     a deprecated function is called.  It must be used in the body of the
     function itself.
 
-    Example:
-
-    def undesirable_function():
-        warn_deprecated(("Please use good_function instead of "
-                         "undesirable_function."))
-        return do_thing_anyway()
-
-
-    Args:
+    Arguments:
         message: {string} What to print on the console
 
     Returns:
         No return value.
+
     """
     warnings.warn(message, DeprecationWarning, stacklevel=2)
 
