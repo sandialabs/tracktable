@@ -99,6 +99,9 @@ def warn_deprecated(message):
 
     Args:
         message: {string} What to print on the console
+
+    Returns:
+        No return value.
     """
     warnings.warn(message, DeprecationWarning, stacklevel=2)
 
