@@ -34,7 +34,7 @@ from __future__ import division, absolute_import, print_function
 from tracktable.lib import _dbscan_clustering
 
 from tracktable.domain.feature_vectors import convert_to_feature_vector
-from tracktable.core import logging
+import logging
 
 def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_size):
     """Use DBSCAN to compute clusters for a set of points.

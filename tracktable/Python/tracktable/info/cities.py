@@ -89,10 +89,9 @@ cities.py - Locations and population values for many cities of the world
 
 from __future__ import print_function, absolute_import, division
 
-import operator
+import logging
 
 from tracktable.core.geomath import latitude, longitude
-from tracktable.core import logging
 
 CITY_TABLE = None
 CITY_HEADERS = None

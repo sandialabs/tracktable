@@ -44,9 +44,9 @@ from __future__ import print_function, division, absolute_import
 
 import cartopy
 import cartopy.crs
+import logging
 
 from tracktable.core import geomath
-from tracktable.core import logging
 
 from matplotlib import pyplot as plt
 airports = None
@@ -285,7 +285,7 @@ def predefined_map(mapname,
 
     if region_size is None:
         region_size = (200, 200)
-        
+
     mapname_upper = mapname.upper()
     if mapname_upper.startswith('AIRPORT:'):
         airport_id = mapname.split(':')[1].upper()
@@ -303,7 +303,7 @@ def predefined_map(mapname,
         raise KeyError(("Unknown name for predefined map: {}"
                         " Valid argments are 'region:XXX', 'city:XXX' or"
                         " 'airport:XXX'.").format(mapname))
-        
+
 # ----------------------------------------------------------------------
 
 

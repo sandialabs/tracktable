@@ -56,7 +56,7 @@ struct set_properties
     {
       if (field_map.size() > 0)
         {
-        TRACKTABLE_LOG(warning) 
+        TRACKTABLE_LOG(log::warning) 
           << "You are attempting to set "
           << "properties on a point of type "
           << typeid(point).name()
@@ -97,7 +97,7 @@ struct set_properties<PointT, true>
           }
         catch (std::exception& e)
           {
-          TRACKTABLE_LOG(warning) 
+          TRACKTABLE_LOG(log::debug) 
             << "WARNING: Parse error while trying to set field '"
             << field_name << "' from string '"
             << raw_value << "': "
@@ -122,7 +122,7 @@ struct set_object_id
     {
       if (ObjectIdColumn != -1)
         {
-        TRACKTABLE_LOG(warning) 
+        TRACKTABLE_LOG(log::warning) 
                   << "WARNING: You are attempting to set "
                   << "an object ID on a point of type "
                   << typeid(point).name()
@@ -164,7 +164,7 @@ struct set_timestamp
     {
       if (TimestampColumn != -1)
         {
-        TRACKTABLE_LOG(warning) 
+        TRACKTABLE_LOG(log::warning) 
                   << "WARNING: You are attempting to set "
                   << "a timestamp on a point of type "
                   << typeid(point).name()
@@ -195,7 +195,7 @@ struct set_timestamp<PointT, true>
         }
       catch (std::exception& e)
         {
-        TRACKTABLE_LOG(warning) 
+        TRACKTABLE_LOG(log::warning) 
                   << "Error while setting timestamp: "
                   << e.what() << "\n"
                   << "Timestamp string was '"

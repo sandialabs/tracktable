@@ -35,7 +35,7 @@ import tracktable.domain.cartesian2d
 import tracktable.domain.cartesian3d
 import tracktable.domain.terrestrial
 
-from tracktable.core.logging import getLogger
+from logging import getLogger
 
 def retrieve_classes_for_domain(domain_name):
     """retrieve_classes_for_domain(domain_name: string) -> list of classes
@@ -48,7 +48,7 @@ def retrieve_classes_for_domain(domain_name):
         domain_name [string]: one of "terrestrial", "cartesian2d",
             "cartesian3d"
 
-    Returns: 
+    Returns:
         List of classes for that domain: BasePoint, TrajectoryPoint,
             LineString, Trajectory, BoundingBox
     """
@@ -60,7 +60,7 @@ def retrieve_classes_for_domain(domain_name):
           "BasePoint", "TrajectoryPoint", "Trajectory", "BoundingBox"
           ]:
         classes.append(getattr(domain, class_name))
-  
+
     return classes
 
 

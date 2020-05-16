@@ -42,6 +42,7 @@ include_directories(
 # Most of the files in Core are header-only implementations and don't
 # show up here.
 set( Core_SRCS
+  Logging.cpp
   MemoryUse.cpp
   PointLonLat.cpp
   PropertyConverter.cpp
