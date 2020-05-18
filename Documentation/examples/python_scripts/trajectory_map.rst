@@ -1,4 +1,4 @@
-.. _Trajectory_Map_Example
+.. _Trajectory_Map_Example:
 
 ===========================================
 Rendering Trajectories from Points on a Map 
