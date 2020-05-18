@@ -43,6 +43,7 @@ autodoc_mock_imports = [
     'tracktable.lib._core_types',
     'tracktable.lib._dbscan_clustering',
     'tracktable.lib._domain_algorithm_overloads',
+    'tracktable.lib._logging',
     'tracktable.lib._rtree',
     'tracktable.lib._terrestrial'
 ]
