@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -27,7 +27,43 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""tracktable.examples - Example scripts and convenience modules"""
+"""tracktable.examples - Example scripts and Jupyter notebooks"""
 
-pass
+import glob
+import os.path
+import shutil
+
+def copy_example_notebooks(destdir):
+    """Copy Jupyter notebooks to a specified directory
+
+    We bundle several example Jupyter notebooks with Tracktable.
+    However, they're installed in a fairly well-hidden directory.
+    This function will copy them to someplace more convenient.
+
+    For example:
+    >>> example_path = os.path.expanduser('~/tt_examples')
+    >>> os.mkdir(example_path)
+    >>> tracktable.examples.copy_example_notebooks(example_path)
+
+    Arguments:
+        destdir {string}: Destination directory for notebooks
+
+    Returns:
+        No return value.
+
+    Raises:
+        OSError: the copy operation failed (probably because the
+        destination directory doesn't exist)
+
+    Note:
+        This function relies on the __file__ special variable.
+        It will probably fail if Tracktable is installed as a zip
+        file.
+    """
+
+    here = os.path.dirname(__file__)
+    notebook_dir = os.path.join(here, 'notebook_examples')
+    all_notebooks = glob.glob('{}/*.ipynb'.format(notebook_dir))
+    for notebook in all_notebooks:
+        shutil.copy(notebook, destdir)
 
