@@ -120,7 +120,8 @@ class AssembleTrajectoryFromPoints(object):
         self.points_processed_count = 0
 
         logger.info(("New trajectories will be declared after a separation "
-                     "of {} distance units or {}.").format(
+                     "of {} distance units between two points or a time lapse "
+                     "of at least {} (hours, minutes, seconds).").format(
                                   self.separation_distance,
                                   self.separation_time))
         logger.info(("Trajectories with fewer than {} points will "
@@ -255,8 +256,8 @@ class AssembleTrajectoryFromPoints(object):
 
         if self.valid_trajectory_count == 0:
             logger.warning(
-                ("Perplexity: No trajectories produced.  Are you sure your delimiters and "
-                 "your column assignments are correct?"))
+                ("Perplexity: No trajectories produced.  Are you sure your "
+                 "delimiters and your column assignments are correct?"))
         return
 
 
