@@ -36,5 +36,16 @@ Jupyter Notebooks
 
 This section will be filled out in patch releases for 1.3 and 1.4.
 
+Between now and then, there are two things you need to know.  The first is that we include several Jupyter_ notebooks as examples of how to do various common tasks with Tracktable.  The second is how to get them.  There are two ways:
+
+ 1.  Download from `<https://tracktable.sandia.gov/downloads.html>` (starting with 1.3).
+ 2.  The function `tracktable.examples.copy_example_notebooks`:
+ 
+ ::
+
+     import tracktable.examples
+     tracktable.examples.copy_example_notebooks('/my/home/directory/notebooks')
+
+
 .. _Jupyter: https://jupyter.org
 
