@@ -42,6 +42,8 @@ add_python_test(P_TestConvexHullCentroid tracktable.core.tests.test_convex_hull_
 
 add_python_test(P_TestConvexHullPerimeter tracktable.core.tests.test_convex_hull_perimeter)
 
+add_python_test(P_CopyExampleNotebooks tracktable.core.tests.test_copy_example_notebooks "${Tracktable_BINARY_DIR}/TestOutput/")
+
 add_python_test(P_DataDirectory tracktable.core.tests.test_data_directory)
 
 add_python_test(P_EchoArgs tracktable.core.tests.echo_args foo bar baz)

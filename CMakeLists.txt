@@ -56,6 +56,10 @@ if (UNIX AND NOT APPLE)
   set(LINUX TRUE)
 endif ()
 
+# This has to be set before GNUInstallDirs is included.  It only applies
+# for compiled languages -- that's why we don't list Python as well.
+enable_language(CXX)
+
 include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 11)
