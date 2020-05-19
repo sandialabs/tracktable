@@ -1,5 +1,51 @@
 ## Tracktable Release Notes
 
+VERSION 1.3.0, 19 May 2020
+
+This is a feature release.  
+
+### NEW FEATURES SINCE 1.2
+
+* Distance geometry code has been added to C++ and Python.  Distance geometry is a family of algorithms that operate on curves represented as a (partial)
+matrix of distances between points sampled from the curve.  In C++, check out the functions :cpp:`tracktable::distance_geometry_by_distance()` and 
+:cpp:`tracktable:distance_geometry_by_time()`.  In Python, check out the module
+:python:`tracktable.analysis.distance_geometry`. 
+
+* We now include several Jupyter notebooks as examples of how to use Tracktable.  These are in addition to the scripts in :python:`tracktable.examples`.  You can download the scripts from the Tracktable web site (<https://tracktable.sandia.gov>) or copy them from the installed library with the following commands: 
+```python
+import tracktable.examples
+tracktable.examples.copy_example_notebooks('/path/to/my/notebooks')
+```
+
+* Log messages have been cleaned up.  Log output from C++ now uses Boost's logging facilities.  Log output from C++ now uses Python's `logging` module.  The function `tracktable.core.log.set_log_level()` will set the minimum severity for both.  Particularly noisy modules such as the point reader and trajectory assembler are now much quieter.
+
+* We now use the [Libtool library versioning scheme](https://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html) for the Tracktable shared libraries.  
+
+* We now support Python 3.8.  
+
+* We include support for building RPMs containing Tracktable's shared libraries.  These RPMs do not yet include the Python interface.
+
+* Along with RPM support, we generate a [pkg-config](https://people.freedesktop.org/~dbn/pkg-config-guide.html) configuration file.
+
+* Python example scripts for rendering heatmaps, trajectory maps, and making movies are back.
+
+* Terrestrial points have an `ECEF()` method that will return the earth-centered earth-facing (ECEF) coordinates for the point.
+
+* We now require a compiler capable of C++11.  
+
+* It is now possible to generate just the C++ documentation instead of C++ and Python.  The CMake variable `BUILD_DOCUMENTATION_CXX_ONLY` controls this.
+
+### NOTABLE FIXES 
+
+* Boost versions 1.71 and newer were failing to compile due to a CMake issue.
+* TrajectoryWriter was failing and sometimes crashing because the destination file would sometimes be closed before its final flush.
+* The function `tracktable.core.geomath.convex_hull_aspect_ratio()` would return NaN for degenerate trajectories (those whose convex hull was a single point or line segment).  While this is mathematically correct, we've changed it to return 0 for convenience.  The value 0 should not appear except in degenerate situations.
+* `tracktable.core.geomath.speed_between()` was always returning 0.  
+* We now use CMake's FindThreads module to find and link against thread libraries.  Some Boost components now require this.
+
+
+
+
 VERSION 1.2.4, 23 January 2019
 ------------------------------
 
