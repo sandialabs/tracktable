@@ -30,7 +30,7 @@ Obsoletes:        tracktable
 Tracktable is a C++ trajectory and analysis library.
 
 %package          devel
-Summary:          C++ Headers for developing programs that will use the tracktable library
+Summary:          C++ Headers for developing programs that will use the Tracktable library
 Group:            Development/Libraries
 Requires:         tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@ = %{version}-%{release}
 Requires:         boost169-devel >= 1.69
@@ -104,6 +104,8 @@ ctest3 -V %{?_smp_mflags}
 
 %changelog
 
+* Tue May 19 2020 Andrew T Wilson <atwilso@sandia.gov> - 1.3.0-1
+- Update for Tracktable 1.3.0
 * Wed Mar 04 2020 Rick L Vinyard Jr <rlvinya@sandia.gov> - 1.2.4-7
 - Enabled example and testing builds to force rpmbuild failure on example or test failure
 * Wed Mar 04 2020 Rick L Vinyard Jr <rlvinya@sandia.gov> - 1.2.4-6

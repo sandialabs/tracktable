@@ -29,7 +29,7 @@ domains.  While we cannot prevent you entirely from mixing up (for
 example) kilometers and miles when computing distances, we can at
 least try to make it difficult.
 
-Tracktable 1.2.4 includes the following domains:
+Tracktable 1.3 includes the following domains:
 
 .. csv-table:: Available Point Domains
    :header: "C++ Namespace", "Python Module", "Description"
