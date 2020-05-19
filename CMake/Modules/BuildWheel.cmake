@@ -94,7 +94,7 @@ function(_get_python_platform_tag _python_interpreter _output_var)
     COMMAND
       ${_python_interpreter}
       "-c"
-      "from __future__ import print_function; from wheel import pep425tags; print(pep425tags.get_platform())"
+      "from __future__ import print_function; import distutils.util; print(distutils.util.get_platform())"
     RESULT_VARIABLE _interpreter_result
     OUTPUT_VARIABLE _platform_tag
     )
@@ -102,6 +102,7 @@ function(_get_python_platform_tag _python_interpreter _output_var)
     message(ERROR "Error while invoking Python interpreter to retrieve platform tag: ${_interpreter_result}")
   else ()
     string(STRIP ${_platform_tag} _platform_tag)
+    string(REPLACE ${_platform_tag} "." "_" _platform_tag)
     message(STATUS "Python platform tag: ${_platform_tag}")
     set(${_output_var} ${_platform_tag} PARENT_SCOPE)
   endif()
