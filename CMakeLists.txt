@@ -56,11 +56,6 @@ if (UNIX AND NOT APPLE)
   set(LINUX TRUE)
 endif ()
 
-# This has to be set before GNUInstallDirs is included.  It only applies
-# for compiled languages -- that's why we don't list Python as well.
-enable_language(CXX)
-
-include(GNUInstallDirs)
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -72,8 +67,12 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Begin RELEASE VARIABLES
 #-------------------------------------------------------------------------
 
-set(TRACKTABLE_VERSION 1.2.5)
+set(TRACKTABLE_VERSION 1.3.0)
 set(RPM_RELEASE 6)
+
+project(Tracktable LANGUAGES CXX VERSION ${TRACKTABLE_VERSION})
+
+include(GNUInstallDirs)
 
 # UNIX library ABI versioning according to libtool:
 #
@@ -103,17 +102,13 @@ set(RPM_RELEASE 6)
 # +1 :  ? :  0 == new interface that breaks old one
 #  ? :  ? :  0 == no new interfaces, but breaks apps
 #  ? : +1 :  ? == just some internal changes, nothing breaks but might work better
-set(UNIX_SO_VERSION_CURRENT  1)
-set(UNIX_SO_VERSION_REVISION 1)
-set(UNIX_SO_VERSION_AGE      0)
+set(UNIX_SO_VERSION_CURRENT  2)
+set(UNIX_SO_VERSION_REVISION 0)
+set(UNIX_SO_VERSION_AGE      1)
 
 #-------------------------------------------------------------------------
 # End RELEASE VARIABLES
 ##########################################################################
-
-project(Tracktable LANGUAGES CXX VERSION ${TRACKTABLE_VERSION})
-message(STATUS "project: ${PROJECT_NAME}")
-message(STATUS "version: ${PROJECT_VERSION}")
 
 if (UNIX)
   set(UNIX_SO_VERSION ${UNIX_SO_VERSION_CURRENT}.${UNIX_SO_VERSION_REVISION}.${UNIX_SO_VERSION_AGE})
