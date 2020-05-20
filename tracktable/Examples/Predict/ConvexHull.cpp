@@ -42,6 +42,10 @@
 #include <boost/geometry/geometries/linestring.hpp>
 #include <boost/geometry/algorithms/convex_hull.hpp>
 
+namespace {
+  static const double PI = 3.141592653589793238462643383;
+}
+
 BOOST_GEOMETRY_REGISTER_LINESTRING(TrackLonLat)
 
 void GetConvexHull(trajectory_type &trajectory, TrackLonLat &hull)
@@ -138,8 +142,8 @@ point_ll GetLatLonCentroid(TrackLonLat &data)
   double x = 0.0, y = 0.0, z = 0.0;
 
   for (TrackLonLat::iterator itr = data.begin(); itr != data.end(); ++itr) {
-    double lat_rad = itr->get<1>()*M_PI/180.0;
-    double lon_rad = itr->get<0>()*M_PI/180.0;
+    double lat_rad = itr->get<1>()*PI/180.0;
+    double lon_rad = itr->get<0>()*PI/180.0;
     x += cos(lat_rad)*cos(lon_rad);
     y += cos(lat_rad)*sin(lon_rad);
     z += sin(lat_rad);
@@ -148,8 +152,8 @@ point_ll GetLatLonCentroid(TrackLonLat &data)
   x /= static_cast<double>(data.size());
   y /= static_cast<double>(data.size());
   z /= static_cast<double>(data.size());
-  double center_lon = atan2(y,x)*180.0/M_PI;
-  double center_lat = atan2(z,sqrt(x*x + y*y))*180.0/M_PI;
+  double center_lon = atan2(y,x)*180.0/PI;
+  double center_lat = atan2(z,sqrt(x*x + y*y))*180.0/PI;
   return point_ll(center_lon,center_lat);
 }
 
@@ -165,8 +169,8 @@ point_ll GetWeightedLatLonCentroid(std::vector<std::pair<point_ll,double> >&data
   double total_weight = 0.0;
   std::vector<std::pair<point_ll,double> >::iterator itr;
   for (itr = data.begin(); itr != data.end(); ++itr) {
-    double lat_rad = itr->first.get<1>()*M_PI/180.0;
-    double lon_rad = itr->first.get<0>()*M_PI/180.0;
+    double lat_rad = itr->first.get<1>()*PI/180.0;
+    double lon_rad = itr->first.get<0>()*PI/180.0;
     x += itr->second * cos(lat_rad)*cos(lon_rad);
     y += itr->second * cos(lat_rad)*sin(lon_rad);
     z += itr->second * sin(lat_rad);
@@ -176,8 +180,8 @@ point_ll GetWeightedLatLonCentroid(std::vector<std::pair<point_ll,double> >&data
   x /= total_weight;
   y /= total_weight;
   z /= total_weight;
-  double center_lon = atan2(y,x)*180.0/M_PI;
-  double center_lat = atan2(z,sqrt(x*x + y*y))*180.0/M_PI;
+  double center_lon = atan2(y,x)*180.0/PI;
+  double center_lat = atan2(z,sqrt(x*x + y*y))*180.0/PI;
   return point_ll(center_lon,center_lat);
 }
 
@@ -191,8 +195,8 @@ point_ll GetWeightedLatLonSlerp(std::vector<std::pair<point_ll,double> >&data)
   double total_weight = 0.0;
   std::vector<std::pair<point_ll,double> >::iterator itr;
   for (itr = data.begin(); itr != data.end(); ++itr) {
-    double lat_rad = itr->first.get<1>()*M_PI/180.0;
-    double lon_rad = itr->first.get<0>()*M_PI/180.0;
+    double lat_rad = itr->first.get<1>()*PI/180.0;
+    double lon_rad = itr->first.get<0>()*PI/180.0;
     double t = itr->second / (total_weight + itr->second);
     double x_new = cos(lat_rad)*cos(lon_rad);
     double y_new = cos(lat_rad)*sin(lon_rad);
@@ -213,8 +217,8 @@ point_ll GetWeightedLatLonSlerp(std::vector<std::pair<point_ll,double> >&data)
     total_weight += itr->second;
   }
 
-  double center_lon = atan2(y,x)*180.0/M_PI;
-  double center_lat = atan2(z,sqrt(x*x + y*y))*180.0/M_PI;
+  double center_lon = atan2(y,x)*180.0/PI;
+  double center_lat = atan2(z,sqrt(x*x + y*y))*180.0/PI;
   return point_ll(center_lon,center_lat);
 }
 
@@ -248,15 +252,15 @@ void RotatePoints(TrackLonLat &data, point_ll center)
   // discussion.
 
   for (TrackLonLat::iterator itr = data.begin(); itr != data.end(); ++itr) {
-    double old_lon = itr->get<0>()*M_PI/180.0;
-    double old_lat = itr->get<1>()*M_PI/180.0;
-    double theta = center.get<1>()*M_PI/180.0;
+    double old_lon = itr->get<0>()*PI/180.0;
+    double old_lat = itr->get<1>()*PI/180.0;
+    double theta = center.get<1>()*PI/180.0;
     double new_lon = atan2(sin(old_lon)*cos(old_lat),
      cos(old_lon)*cos(old_lat)*sin(theta) - sin(old_lat)*cos(theta));
     double new_lat = asin(sin(old_lat)*sin(theta) +
      cos(old_lon)*cos(old_lat)*cos(theta));
-    itr->set<0>(180.0*new_lon/M_PI);
-    itr->set<1>(180.0*new_lat/M_PI);
+    itr->set<0>(180.0*new_lon/PI);
+    itr->set<1>(180.0*new_lat/PI);
   }
 
   return;
@@ -274,10 +278,10 @@ void NorthPoleHull(TrackLonLat &data, TrackLonLat &hull)
   // First fill project the points down to a plane through the equator
 
   for (TrackLonLat::iterator itr = data.begin(); itr != data.end(); ++itr) {
-    double r = cos(itr->get<1>()*M_PI/180.0);
+    double r = cos(itr->get<1>()*PI/180.0);
     point_xy temp;
-    temp.set<0>(r*cos(itr->get<0>()*M_PI/180.0));
-    temp.set<1>(r*sin(itr->get<0>()*M_PI/180.0));
+    temp.set<0>(r*cos(itr->get<0>()*PI/180.0));
+    temp.set<1>(r*sin(itr->get<0>()*PI/180.0));
     boost::geometry::append(projection,temp);
   }
 
@@ -291,11 +295,11 @@ void NorthPoleHull(TrackLonLat &data, TrackLonLat &hull)
     double x = itr->get<0>();
     double y = itr->get<1>();
     point_ll temp;
-    temp.set<0>(atan2(y,x)*180.0/M_PI);
-    temp.set<1>(acos(sqrt(x*x + y*y))*180.0/M_PI);
+    temp.set<0>(atan2(y,x)*180.0/PI);
+    temp.set<1>(acos(sqrt(x*x + y*y))*180.0/PI);
     hull.push_back(temp);
 //    boost::geometry::append(hull,temp);
-//     point_ll(atan2(y,x)*180.0/M_PI,acos(sqrt(x*x + y*y))*180.0/M_PI));
+//     point_ll(atan2(y,x)*180.0/PI,acos(sqrt(x*x + y*y))*180.0/PI));
   }
 
   // Note we don't return the points from the North Pole centered system.
@@ -309,15 +313,15 @@ void ReturnPoints(TrackLonLat &data, point_ll center)
   // Just invert the previous rotation.
 
   for (TrackLonLat::iterator itr = data.begin(); itr != data.end(); ++itr) {
-    double old_lon = itr->get<0>()*M_PI/180.0;
-    double old_lat = itr->get<1>()*M_PI/180.0;
-    double theta = center.get<1>()*M_PI/180.0;
+    double old_lon = itr->get<0>()*PI/180.0;
+    double old_lat = itr->get<1>()*PI/180.0;
+    double theta = center.get<1>()*PI/180.0;
     double new_lon = atan2(sin(old_lon)*cos(old_lat),
      cos(old_lon)*cos(old_lat)*sin(theta) + sin(old_lat)*cos(theta));
     double new_lat = asin(sin(old_lat)*sin(theta) -
      cos(old_lon)*cos(old_lat)*cos(theta));
-    itr->set<0>(180.0*new_lon/M_PI);
-    itr->set<1>(180.0*new_lat/M_PI);
+    itr->set<0>(180.0*new_lon/PI);
+    itr->set<1>(180.0*new_lat/PI);
   }
 
   for (TrackLonLat::iterator itr = data.begin(); itr != data.end(); ++itr) {
