@@ -51,4 +51,11 @@ __maintainer__ = "Andy Wilson"
 __license__ = "BSD"
 __copyright__ = "Copyright (c) 2014-2020 National Technology and Engineering Solutions of Sandia, LLC."
 
+
 from .core import register_core_types
+
+# We always start out with the log level set to INFO.  
+# You can set it lower in your own code if you want.
+import logging
+import tracktable.core.log
+tracktable.core.log.set_log_level(logging.INFO)
