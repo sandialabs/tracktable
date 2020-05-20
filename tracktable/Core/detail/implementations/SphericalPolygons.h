@@ -48,6 +48,10 @@ using tracktable::algorithms::spherical_math::to_cartesian;
 
 typedef tracktable::PointCartesian<3> Point3D;
 
+namespace {
+  static const double PI = 3.141592653589793238462643383;
+}
+
 // ----------------------------------------------------------------------
 
 inline double angle_between(Point3D const& point1, Point3D const& point2)
@@ -97,7 +101,7 @@ inline double compute_spherical_triangle_area(double a, double b, double c)
   B = acos((cos_b - cos_c * cos_a) / (sin_c * sin_a));
   C = acos((cos_c - cos_a * cos_b) / (sin_a * sin_b));
 
-  return (A + B + C - M_PI);
+  return (A + B + C - PI);
 }
 
 
