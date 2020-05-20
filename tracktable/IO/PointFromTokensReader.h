@@ -410,16 +410,6 @@ protected:
           }
         }
 
-      if (this->TimestampColumn == -1)
-        {
-        -- required_num_tokens;
-        }
-
-      if (this->ObjectIdColumn == -1)
-        {
-        -- required_num_tokens;
-        }
-
       while (this->SourceBegin != this->SourceEnd)
         {
         try
@@ -434,13 +424,15 @@ protected:
                iter != _tokens.end();
                ++iter)
             {
-            outbuf << "'" << *iter << "' ";
+            outbuf << "'" << *iter << "' ("
+                   << iter->size() << ") ";
             }
           TRACKTABLE_LOG(log::trace) << outbuf.str();
 #endif
           if (_tokens.size() == 0)
             {
             // Skip empty lines.  Should this even be possible?
+            TRACKTABLE_LOG(log::debug) << "Skipping empty line.";
             ++(this->SourceBegin);
             continue;
             }
@@ -453,6 +445,7 @@ protected:
           if (_tokens[0] == io::detail::PointFileMagicString
               && !this->IgnoreHeader)
             {
+            TRACKTABLE_LOG(log::debug) << "Configuring point reader from header.";
             this->configure_reader_from_header(_tokens);
             ++(this->SourceBegin);
             continue;
@@ -463,11 +456,16 @@ protected:
             // parse it as a point.
             if (_tokens.size() >= required_num_tokens)
               {
+              TRACKTABLE_LOG(log::trace) << "Parsing list of " 
+                  << _tokens.size() << " tokens ("
+                  << required_num_tokens << " required) "
+                  << "as point.";
               NextPoint = point_shared_ptr_type(new point_type);
               this->populate_coordinates_from_tokens(_tokens, NextPoint);
               this->populate_properties_from_tokens(_tokens, NextPoint);
               ++(this->SourceBegin);
               ++(this->NumPoints);
+
               return NextPoint;
               }
             else
@@ -498,6 +496,7 @@ protected:
           {
           TRACKTABLE_LOG(log::warning) << "Exception while parsing point: " << e.what();
           ++(this->SourceBegin);
+          ++(this->NumParseErrors);
           }
         }
       if (!NextPoint)
