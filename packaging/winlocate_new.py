@@ -53,7 +53,7 @@ import wheel
 
 import pdb
 
-# NOTE TO SELF: we should also remove DLLs found in SYSTEM32
+# NOTE TO SELF: we should also remove DLLs found in C:\Windows
 
 # Libraries in these lists should not be bundled into the wheel,
 # either because they are part of Windows itself or have other
@@ -61,19 +61,24 @@ import pdb
 EXCLUDED_FILENAMES = {
     'windows': [
         r'kernel32\.dll',
-        r'api-ms-win-crt.*\.dll'
+        r'api-ms-win-.*\.dll'
         r'bcrypt.dll'
         ],
     'msvc_runtime': [
-        r'msvcp[0-9]{3}\.dll',
-        r'vcruntime.*\.dll'
-    ]    
+        r'msvcp\d{3}\.dll',
+        r'vcruntime.*\.dll',
+        r'concrt\d{3}\.dll'
+        ],
+    'libpython': [
+        r'python\d{2}\.dll'
+    ]
 }
 
 EXCLUDE_REGEXES = {}
 
 EXCLUDED_DIRECTORIES = [
-    'system32'
+    'c:\\windows',
+    'microsoft visual studio'
 ]
 
 
@@ -125,6 +130,7 @@ def find_dll_dependencies(filename):
     #
     # The lines we want are those that start with four spaces and
     # end with the string '.dll' or '.DLL'.
+    print('DEBUG: Checking dependencies for {}'.format(filename))
     dumpbin_result = subprocess.run(
         ['dumpbin.exe', '/dependents', filename],
         capture_output=True
@@ -137,7 +143,7 @@ def find_dll_dependencies(filename):
     dll_names = [m.group(1) for m in matches if m is not None]
     # Convert to strings so that we can do case-insensitive 
     # processing
-    return [name.decode('utf-8') for name in dll_names]
+    return [name.decode('utf-8').lower() for name in dll_names]
 
 # ---------------------------------------------------------------
 
@@ -145,10 +151,12 @@ def remove_excluded_files(dll_list, exclusions):
     logger = logging.getLogger(__name__)
 
     def is_excluded(dll_name):
+        #basename = os.path.basename(dll_name)
         for (category, regex_list) in exclusions.items():
+            print('Checking file {} against category {}'.format(dll_name, category))
             for regex in regex_list:
-                if regex.match(dll_name):
-                    logger.debug('Excluding {}: it belongs to category "{}"'.format(
+                if regex.search(dll_name):
+                    logger.warning('Excluding {}: it belongs to category "{}"'.format(
                         dll_name, category
                         ))
                     return True
@@ -206,6 +214,9 @@ def files_in_directory(dirname):
         List of filenames with paths.  If dirname is of type str,
         the filenames will be strings.  If it is of type
         bytes, the filenames will be bytes.
+    
+    Raises:
+        PermissionError: Couldn't open the directory
     """
 
     return [direntry.path for direntry in os.scandir(dirname)
@@ -236,6 +247,12 @@ def split_path(path_env):
 def file_has_desired_extension(filename, extensions):
     return any([filename.endswith(ext) for ext in extensions])
 
+def file_in_excluded_directory(filename, exclusions):
+    for exclusion in exclusions:
+        if exclusion in filename:
+            return True
+    return False
+
 # ---------------------------------------------------------------
 
 def file_db_for_directories(search_directories, extensions=None):
@@ -250,7 +267,9 @@ def file_db_for_directories(search_directories, extensions=None):
             files_this_dir = files_in_directory(dirname)
             all_files.extend(files_this_dir)
         except FileNotFoundError as e:
-            logger.warning('Couldn\'t open directory {}.  Skipping.'.format(dirname))
+            logger.debug('Couldn\'t open directory {}.  Skipping.'.format(dirname))
+        except PermissionError as e:
+            logger.debug('Permission denied while trying to open directory {}.  Skipping.'.format(dirname))
 
     if extensions is not None:
         lc_extensions = [ext.lower() for ext in extensions]
@@ -303,7 +322,7 @@ def find_file_on_path(filename, file_dict):
 
 # ---------------------------------------------------------------
 
-def filter_excluded_directories(filenames, excluded_directories):
+def remove_excluded_directories(filenames, excluded_directories):
     """Remove files whose paths contain excluded directories
 
     We want to avoid bundling DLLs from places like 
@@ -364,8 +383,51 @@ def resolve_dependencies_transitive(filename, search_paths=None):
     """
 
     if search_paths is None:
-        search_paths = split_path(os.getenv('PATH', ''))
+        search_paths = (
+            split_path(os.getenv('PATH', '')) +
+            directories_in_subtree('C:\\Windows')
+            )
+    file_db = file_db_for_directories(search_paths, extensions=['.dll'])
 
+    lc_excluded_directories = [dirname.lower() for dirname in EXCLUDED_DIRECTORIES]
+
+    dependency_queue = find_dll_dependencies(filename)
+    resolved = set()
+    while len(dependency_queue) != 0:
+        dll_name = dependency_queue.pop(0)
+        if dll_name in resolved:
+            continue
+        else:
+            if dll_name not in file_db:
+                raise FileNotFoundError('Couldn\'t find DLL {}.'.format(dll_name))
+            else:
+                resolved.add(dll_name)
+                if not file_in_excluded_directory(file_db[dll_name], lc_excluded_directories):
+                    new_dependencies = find_dll_dependencies(file_db[dll_name])
+                    dependency_queue.extend(new_dependencies)
+
+    print('DEBUG: Found {} total dependencies'.format(len(resolved)))
+    return [
+        file_db[dll_name] for dll_name in resolved
+    ]
+
+# -------------------------------------------------------------
+
+def directories_in_subtree(basedir):
+    """List all the directories under a base path
+
+    Arguments:
+        basedir {str}: Base directory to search
+
+    Returns:
+        All directories under base, including base, as full paths
+    """
+
+    result = [basedir]
+    for (dirpath, dirnames, filenames) in os.walk(basedir):
+        for dirname in dirnames:
+            result.append(os.path.join(dirpath, dirname))
+    return result
 
 # --------------------------------------------------------------
 
@@ -384,20 +446,10 @@ def main():
     exclusions = compile_exclusion_regexes(EXCLUDED_FILENAMES)
 
     # YOU ARE HERE
-    # Write find_dll_dependencies_transitive().
+    # 
+    # When you find files, keep the lowercased AND the regular-cased version.
     #
-    # Start with the list of DLLs.  
-    # Remove DLLs on the exclusion list.
-    # Find all of them on the path.  
-    # Remove those that are in SYSTEM32.
-    # Put everything that remains into a set.
-    # Loop over the items in that set.
-    # Find *their* dependencies.
-    # Create a new set containing the original set plus the dependencies.
-    # If the sets are equal, we're done.
-    #
-    # Maintain two parallel sets: DLLs by filename alone and those by
-    # filename + complete path.
+
     try:
         direct_dependencies = find_dll_dependencies(filename_to_inspect)
         user_dll_names = remove_excluded_files(direct_dependencies, exclusions)
@@ -412,9 +464,21 @@ def main():
             else:
                 print('\tNOT FOUND')
 
-        non_system_dlls = filter_excluded_directories(dependencies_with_paths, EXCLUDED_DIRECTORIES)
-        print('Non-system DLLs with paths:')
-        pprint.pprint(non_system_dlls)
+        non_system_dlls = remove_excluded_directories(dependencies_with_paths, EXCLUDED_DIRECTORIES)
+        #print('Non-system DLLs with paths:')
+        #pprint.pprint(non_system_dlls)
+
+        transitive_dependencies = resolve_dependencies_transitive(filename_to_inspect)
+        #print('Full dependency list with paths:')
+        #pprint.pprint(transitive_dependencies)
+
+        print('Dependency list after removing Windows DLLs:')
+        trimmed_deps = remove_excluded_directories(transitive_dependencies,
+                                [d.lower() for d in EXCLUDED_DIRECTORIES]
+                                )
+      
+        trimmed_deps = remove_excluded_files(trimmed_deps, exclusions)
+        pprint.pprint(trimmed_deps)
         return 0
     except subprocess.CalledProcessError:
         print('ERROR: The file {} is not a DLL or EXE.'.format(filename_to_inspect))
