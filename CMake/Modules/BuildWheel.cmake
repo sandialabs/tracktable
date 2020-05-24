@@ -230,18 +230,6 @@ function(build_wheel _base_directory _output_directory _setup_py _python_interpr
     endforeach ()
   endif ()
     
-  #  syntax of foreach:
-  #
-  #  foreach(<loop_var> <items>)
-  #    <commands>
-  #  endforeach()
-  # execute_process(
-  #   COMMAND
-  #   ${_fixwheel} ${_wheel_filename}
-  #   RESULT_VARIABLE _fixwheel_result
-  #   WORKING_DIRECTORY ${_base_directory}
-  #   )
-
   # if (NOT ${_fixwheel_result} EQUAL 0)
   #   message(ERROR "Error while adding libraries to wheel: ${_fixwheel_result}")
   # endif ()
