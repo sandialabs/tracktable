@@ -333,7 +333,7 @@ def build_file_db(search_directories, extensions=None):
         if base_filename not in file_dict:
             file_dict[base_filename] = filename
 
-    print('DEBUG: Found {} files in {} search directories with extension filter {}'.format(
+    logger.debug('Found {} files in {} search directories with extension filter {}'.format(
         len(file_dict), len(unique_directories), extensions))
 
     return file_dict
@@ -589,7 +589,7 @@ def add_dependencies_to_wheel(dependency_results,
                     dependency_basename, original_file_path, os.path.basename(original_file)))                
                 shutil.copy(
                     dependency,
-                    os.path.join(original_file_path, dependency_basename)
+                    os.path.join(original_file_path, os.path.basename(dependency))
                     )
                 files_added_by_directory[original_file_path].add(dependency_basename.lower())
                 num_files_copied += 1
@@ -748,7 +748,7 @@ def main():
     args = parse_args()
     exclusions = compile_exclusion_regexes(EXCLUSIONS)
 
-    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     logger = logging.getLogger(__name__)
 
     with tempfile.TemporaryDirectory(prefix='winlocate') as tempdir:
