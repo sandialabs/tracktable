@@ -387,20 +387,38 @@ if (UNIX)
       )
   endif (APPLE)
 else (UNIX)
-  # Windows doesn't have delocate/auditwheel.
-  set(FIX_WHEEL_EXECUTABLE "no_fixwheel_on_windows")
+  # Windows doesn't have delocate/auditwheel yet.  We wrote a replacement.
+  set(FIX_WHEEL_EXECUTABLE "${Tracktable_SOURCE_DIR}/packaging/winlocate_new.py")
 endif (UNIX)
 
 
-add_custom_target( wheel
-  COMMAND
-  ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
-  ${Python3_EXECUTABLE}
-  ${CMAKE_BINARY_DIR}
-  ${CMAKE_INSTALL_PREFIX}
-  ${CMAKE_BINARY_DIR}/wheel
-  ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
-  ${FIX_WHEEL_EXECUTABLE}
-  WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+if (UNIX)
+  add_custom_target( wheel
+    COMMAND
+    ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
+    ${Python3_EXECUTABLE}
+    ${CMAKE_BINARY_DIR}
+    ${CMAKE_INSTALL_PREFIX}
+    ${CMAKE_BINARY_DIR}/wheel
+    ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
+    ${FIX_WHEEL_EXECUTABLE}
+    NO_EXTRA_SEARCH_PATHS
+    WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
 #  DEPENDS install
-  )
+    )
+else (UNIX)
+  message(STATUS "DEBUG: Boost_LIBRARY_DIRS is ${Boost_LIBRARY_DIRS}")
+  add_custom_target( wheel
+    COMMAND
+    ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
+    ${Python3_EXECUTABLE}
+    ${CMAKE_BINARY_DIR}
+    ${CMAKE_INSTALL_PREFIX}
+    ${CMAKE_BINARY_DIR}/wheel
+    ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
+    ${FIX_WHEEL_EXECUTABLE}
+    # These will be picked up as extra search paths
+    ${Boost_LIBRARY_DIRS}
+    WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+    )
+endif (UNIX)
