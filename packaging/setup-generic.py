@@ -41,7 +41,6 @@ import sys
 
 from setuptools import setup, find_packages
 from setuptools.dist import Distribution
-import winlocate
 
 class BinaryDistribution(Distribution):
     def is_pure(self):
@@ -145,7 +144,6 @@ def main():
         )
 
     support_libraries = []
-    # On Windows we will also want to pick up support DLLs.
     if shared_library_suffix is not None:
         support_libraries.extend(
             glob.glob(
@@ -153,32 +151,6 @@ def main():
                              '*.{}'.format(shared_library_suffix))
                 )
         )
-
-    # TODO: update to do more than second level dependencies. This will be more future proof
-    if system == 'Windows':
-        dlls = winlocate.locate_dir(
-            os.path.join(tracktable_home, 'lib'),
-            extension_suffix
-            )
-        for file in dlls:
-            for dir in os.environ['Path'].split(';'):
-                found_depends = glob.glob(os.path.join(dir, file))
-                if len(found_depends) > 0:
-                    support_libraries.extend(found_depends)
-                    break
-        second_support_libraries = []
-        for support_library in support_libraries:
-            second_lvl_dlls = winlocate.locate_file(support_library)
-            for file in second_lvl_dlls:
-                for dir in os.environ['Path'].split(';'):
-                    found_depends = glob.glob(os.path.join(dir, file))
-                    if len(found_depends) > 0:
-                        second_support_libraries.extend(found_depends)
-                        break
-        support_libraries.extend(second_support_libraries)
-        support_libraries_set = set(support_libraries)
-        support_libraries = list(support_libraries_set)
-        print(support_libraries)
 
     # Include any auxiliary data files such as the stuff in
     # tracktable.info
@@ -254,8 +226,6 @@ def main():
                         license_files +
                         aux_data_files +
                         example_data_files) },
-        # TODO: Make sure using datafiles doesnt eff up osx and linux builds
-        data_files=[("", support_libraries)],
         # Assembly information and system parameters
         distclass=BinaryDistribution,
         zip_safe=False,
