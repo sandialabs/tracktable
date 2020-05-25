@@ -47,6 +47,7 @@ import logging
 import os
 import pprint
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -59,7 +60,7 @@ import tempfile
 EXCLUSIONS = {
     'windows': [
         r'kernel32\.dll',
-        r'api-ms-win-.*\.dll'
+        r'api-ms-win-.*\.dll',
         r'bcrypt.dll'
         ],
     'msvc_runtime': [
@@ -179,6 +180,8 @@ def is_excluded(filename, exclusions):
         for regex in regex_list:
             if regex.search(filename):
                 return True
+    assert('api-ms-win' not in filename)
+    assert('vcruntime' not in filename)
     return False
 
 
@@ -556,9 +559,42 @@ def add_dependencies_to_wheel(dependency_results,
         Make sure to get the right one.
     """
 
-    logging.getLogger(__name__).debug('add_dependencies: Got {} dependency lists'.format(len(dependency_results)))
-    for (dll_file, dependencies) in dependency_results.items():
-        print('DEBUG: file {} has {} dependencies: {}'.format(dll_file, len(dependencies), dependencies))
+    logger = logging.getLogger(__name__)
+    num_files_copied = 0
+
+    files_added_by_directory = dict()
+    for (original_file, dependencies) in dependency_results.items():
+        logger.debug('Copying dependencies for {}'.format(original_file))
+        original_file_path = os.path.dirname(original_file).lower()
+        if original_file_path not in files_added_by_directory:
+            files_added_by_directory[original_file_path] = set()
+        logger.debug('Files already in directory: {}'.format(pprint.pformat(files_added_by_directory[original_file_path])))
+       
+        
+        for dependency in dependencies:
+            dependency_basename = os.path.basename(dependency).lower()
+            dependency_path = os.path.dirname(dependency).lower()
+            # We don't need to add files that are already in that 
+            # directory -- the current directory is always on the
+            # DLL search path.
+            if dependency_path == original_file_path:
+                continue
+            # Don't add files that we've already added
+            if dependency_basename in files_added_by_directory[original_file_path]:
+                logger.debug('File {} is already in directory {}'.format(dependency_basename, original_file_path))
+                continue
+            else:
+                # OK, add this one!
+                logger.debug('Adding file {} to {} for {}'.format(
+                    dependency_basename, original_file_path, os.path.basename(original_file)))                
+                shutil.copy(
+                    dependency,
+                    os.path.join(original_file_path, dependency_basename)
+                    )
+                files_added_by_directory[original_file_path].add(dependency_basename.lower())
+                num_files_copied += 1
+
+    logger.info('Copied {} files to resolve dependencies for wheel.'.format(num_files_copied))
 
 # --------------------------------------------------------------
 
