@@ -41,6 +41,7 @@
 # will have dumpbin available.
 #
 
+import argparse
 import csv
 import logging
 import os
@@ -49,9 +50,6 @@ import re
 import subprocess
 import sys
 import tempfile
-import wheel
-
-import pdb
 
 # NOTE TO SELF: we should also remove DLLs found in C:\Windows
 
@@ -265,7 +263,7 @@ def split_path(path_env):
 
 # ---------------------------------------------------------------
 
-def file_db_for_directories(search_directories, extensions=None):
+def build_file_db(search_directories, extensions=None):
     """Compile a database of all files in a set of directories
 
     Since searching a filesystem is an expensive operation, we
@@ -364,10 +362,30 @@ def find_file_on_path(filename, file_dict):
     filename_lc = filename.lower()
     return file_dict.get(filename_lc, None)
 
+# -----------------------------------------------------------
+
+def files_in_subtree(root_dir, extensions=None):
+    """Find files in a directory tree with desired extensions
+
+    Arguments:
+        root_dir {path-like}: Root of directory tree to search
+
+    Keyword arguments:
+        extensions {list of str}: Extensions to use as filters.
+            Defaults to None, meaning 'include all files'.
+
+    Returns:
+        List of files with full paths
+    """
+
+    dirlist = directories_in_subtree(root_dir)
+    db = build_file_db(dirlist, extensions=extensions)
+    return list(db.values())
+
+# ------------------------------------------------------------
 
 def resolve_dependencies_transitive(filename, 
-                                    search_paths=None,
-                                    include_file_location=True,
+                                    file_db,
                                     exclusions=None):
     """Find all dependent DLLs for the specified file
 
@@ -377,19 +395,14 @@ def resolve_dependencies_transitive(filename,
     process terminates we will have a full list of all the DLLs
     needed to load the given file.
 
-    This function does not make any attempt to filter
-    out DLLs that are found in system directories.
+    The files to be returned will also be filtered to remove DLLs
+    on the exclusion list / in system directories.
 
     Arguments:
         filename {str}: Filename whose dependencies you want
+        file_db {dict}: Database of files to search for dependencies
 
     Keyword Arguments:
-        search_paths {list of str}: Directories to search for
-            dependent DLLs.  Defaults to PATH environment variable.
-        include_file_location {boolean}: If true, the search paths
-            will be extended to include the directory that the file
-            is in.  This reflects the fact that the DLL search 
-            process starts in the file's current directory.
         exclusions {dict}: Dict of regular expressions to check
             to see if file should be excluded from further processing.
             This makes sure we don't try to chase down dependencies
@@ -398,35 +411,31 @@ def resolve_dependencies_transitive(filename,
         List of filenames for all dependencies with full paths.
     """
 
-    if search_paths is None:
-        search_paths = (
-            split_path(os.getenv('PATH', '')) +
-            directories_in_subtree('C:\\Windows')
-            )
-    if include_file_location:
-        search_paths.append(os.path.dirname(filename))
-
-    file_db = file_db_for_directories(search_paths, extensions=['\.dll'])
-
+    logger = logging.getLogger(__name__)
     dependency_queue = find_dll_dependencies(filename)
     resolved = set()
     while len(dependency_queue) != 0:
         dll_name = dependency_queue.pop(0)
+        logger.debug('** Resolving dependencies for {}'.format(dll_name))
         if dll_name in resolved:
             continue
         else:
             if dll_name not in file_db:
-                raise FileNotFoundError('Couldn\'t find DLL {}.'.format(dll_name))
+                raise FileNotFoundError((
+                    'Couldn\'t find DLL {} while resolving '
+                    'dependencies of {}.').format(dll_name, filename))
             else:
                 resolved.add(dll_name)
                 full_name = file_db[dll_name]
                 if not is_excluded(full_name, exclusions):
                     new_dependencies = find_dll_dependencies(full_name)
+                    logging.debug('** Adding {} new dependencies for file {}.'.format(len(new_dependencies), dll_name))
                     dependency_queue.extend(new_dependencies)
 
-    return [
+    return remove_excluded_files([
         file_db[dll_name] for dll_name in resolved
-    ]
+        ], 
+        exclusions)
 
 # -------------------------------------------------------------
 
@@ -448,30 +457,286 @@ def directories_in_subtree(basedir):
 
 # --------------------------------------------------------------
 
+def resolve_dependencies_for_wheel(wheel_path, 
+                                   search_paths=None,
+                                   exclusions=None,
+                                   extensions=None):
+    """Find all the DLLs that need to be added to a wheel
+
+    Arguments:
+        wheel_path {str}: Full path to where the wheel has been
+            unpacked
+
+    Keyword arguments:
+        search_paths {list of str}: Directories to search
+            for dependencies.  Defaults to directories
+            on the PATH environment variable plus 
+            C:\Windows.
+        exclusions {dict of regexes}: Regular expressions
+            indicating files and directories to be excluded
+            from dependency lists
+        extensions {list of str}: Extensions of binary files
+            (defaults to '.dll', '.pyd')
+
+    Returns: dict of {wheel_file: dependency_files}
+
+    Note: Before you copy files into the wheel, make sure to
+        remove anything that's already in the current directory
+        of the file being examined.
+
+    Note: Windows also searches the registry key
+        HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\
+        SessionManager\KnownDLLs.  We do not yet include those.
+
+    """
+
+    if extensions is None:
+        extensions = [r'\.dll', r'\.pyd']
+
+    if search_paths is None:
+        search_paths = (
+            split_path(os.getenv('PATH', '')) +
+            directories_in_subtree('C:\\Windows')
+        )
+
+    if exclusions is None:
+        exclusions = dict()
+
+    logger = logging.getLogger(__name__)
+    logger.info('resolve_dependencies_for_wheel has {} exclusion categories.'.format(len(exclusions)))
+    logger.info('Building file DB.  This may take some time.')
+    main_file_db = build_file_db(search_paths, extensions)
+    logger.info('Locating binary artifacts in wheel.  Root directory is {}.'.format(wheel_path))
+    files_to_check = files_in_subtree(wheel_path, extensions)
+
+    all_dependencies = {}
+
+    for filename in files_to_check:
+        logger.info('Resolving dependencies for {}.'.format(filename))
+        file_db_this_directory = build_file_db([os.path.dirname(filename)], extensions)
+        full_file_db = dict(main_file_db)
+        full_file_db.update(file_db_this_directory)
+
+        try:
+            all_dependencies[filename] = resolve_dependencies_transitive(filename,
+                                                                         file_db=full_file_db,
+                                                                         exclusions=exclusions)
+        except subprocess.CalledProcessError:
+            logger.warning('File {} is not a DLL.  Maybe the extension filter is wrong.'.format(filename))
+    return all_dependencies
+
+
+# --------------------------------------------------------------
+
+def add_dependencies_to_wheel(dependency_results,
+                              wheel_path):
+    """Add dependency results to an unpacked wheel
+
+    Given the dict that comes from 
+    resolve_dependencies_for_wheel, copy any missing
+    files into appropriate locations in the unpacked
+    wheel.  
+
+    This function will add dependencies alongside the
+    library that loads them so that they will be found 
+    first in the DLL search process.  It will not
+    overwrite files that are already there.
+
+    Arguments:
+        dependency_results {dict}: Result of calling
+            resolve_dependencies_for_wheel()
+        wheel_path {path or str}: Root directory of
+            files for unpacked wheel
+
+    Returns:
+        List of files added
+
+    Note:
+        There are multiple subdirectories in a wheel.
+        Make sure to get the right one.
+    """
+
+    logging.getLogger(__name__).debug('add_dependencies: Got {} dependency lists'.format(len(dependency_results)))
+    for (dll_file, dependencies) in dependency_results.items():
+        print('DEBUG: file {} has {} dependencies: {}'.format(dll_file, len(dependencies), dependencies))
+
+# --------------------------------------------------------------
+
+def unpack_wheel(wheel_filename, root_dir):
+    """Unpack wheel into desired directory
+
+    Arguments:
+        wheel_filename {str or bytes}: Filename of wheel to 
+            unpack with any necessary path
+        root_dir {str, bytes, or Path}: Directory into which
+            wheel should be unpacked
+
+    Returns:
+        Path to code directory in wheel.  This directory does
+        not end with '.data' or '.dist-info'.
+
+    Raises:
+        FileNotFoundError: 'wheel' is not on your path
+        subprocess.CalledProcessError: Something went wrong with
+            the unpacking
+
+    NOTE: The Python wheel module does not expose any documented
+          module interface.  We would much rather call it within
+          Python than as a subprocess, but that's not currently
+          a viable option.
+    """
+
+    result = subprocess.run([
+            'wheel', 'unpack',
+            '-d', root_dir,
+            wheel_filename],
+            capture_output=True)
+    result.check_returncode()
+    
+    # There should be only one item in the root directory -- the
+    # directory containing the wheel.
+    directories = []
+    for direntry in os.scandir(root_dir):
+        if direntry.is_dir():
+            directories.append(direntry.path)
+    if len(directories) != 1:
+        logging.getLogger(__name__).warning(
+            ('WARNING: After unpacking wheel, directory has '
+             '{} entries.  We were expecting only one.').format(len(directories)))
+
+    return directories[0]
+
+
+
+# --------------------------------------------------------------
+
+def code_dir_inside_wheel(wheel_root):
+    """Find the directory that probably contains code
+
+    A wheel can contain several directories:
+
+    foo
+    foo.data
+    foo.dist-info
+
+    We want to return the one that is not .data and not
+    .dist-info.
+
+    Arguments:
+        wheel_root {str or path}: Directory of wheel contents
+
+    Returns:
+        Path of code directory (we hope)
+    """
+
+    # Now we have to find the code directory in there.  Hopefully
+    # this is correct...
+    for direntry in os.scandir(wheel_root):
+        if direntry.is_dir():
+            if not (direntry.path.endswith('.data') or
+                    direntry.path.endswith('.dist-info')):
+                return direntry.path
+
+# --------------------------------------------------------------
+
+def repack_wheel(root_dir, destination_dir):
+    """Re-pack wheel from specified directory into specified destination
+
+    Arguments:
+        root_dir {str or path}: Top-level directory of wheel.  
+            This is the directory for the wheel itself (e.g. 
+            mypackage-1.2), not the directory into which the 
+            wheel was unpacked.
+        destination_dir {str or path}: Directory into which 
+            the new wheel should be placed
+
+    Returns:
+        No return value.
+
+    Raises:
+        FileNotFoundError: 'wheel' is not on your path
+        subprocess.CalledProcessError: Something went wrong with repacking
+        OSError: Destination directory exists but is not writable
+    """
+
+    if os.access(destination_dir, os.F_OK):
+        if not os.access(destination_dir, os.W_OK):
+            raise OSError('Destination directory {} is not writable.'.format(destination_dir))
+    else:
+        os.mkdir(destination_dir)
+
+    result = subprocess.run([
+        'wheel', 'pack',
+        '-d', destination_dir,
+        root_dir
+        ], capture_output=True)
+    result.check_returncode()
+
+# --------------------------------------------------------------
+
+def dumpbin_available():
+    try:
+        result = subprocess.run(['dumpbin.exe'], capture_output=True)
+        return True
+    except FileNotFoundError:
+        return False
+
+# --------------------------------------------------------------
+
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Add binary dependencies to a wheel.'
+        )
+    parser.add_argument(
+        '--destination-dir', '-d',
+        help='Output directory for modified wheel',
+        default='new_wheel'
+        )
+    parser.add_argument(
+        'wheel_file',
+        nargs=1,
+        help='Wheel to process'
+        )
+    return parser.parse_args()
+
+# --------------------------------------------------------------
+
 def main():
-    if len(sys.argv) != 2:
-        print('usage: {} filename.dll'.format(sys.argv[0]))
+    if not dumpbin_available():
+        print(('ERROR: dumpbin.exe must be on the PATH. The easiest '
+               'way to accomplish this is to run this program from '
+               'a command prompt started with the Visual Studio '
+               'Developer Prompt shortcut.'), file=sys.stderr)
         return 1
 
-    filename_to_inspect = sys.argv[1]
-
+    args = parse_args()
     exclusions = compile_exclusion_regexes(EXCLUSIONS)
 
-    try:
-        
-        transitive_dependencies = resolve_dependencies_transitive(filename_to_inspect, exclusions=exclusions)
-        #print('Full dependency list with paths:')
-        #pprint.pprint(transitive_dependencies)
+    logging.basicConfig(stream=sys.stdout, level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
 
-        trimmed_deps = remove_excluded_files(transitive_dependencies, exclusions)
-        trimmed_deps = transitive_dependencies    
-        print('Dependency list after removing excluded DLLs:')
-        pprint.pprint(trimmed_deps)
-        return 0
-    except subprocess.CalledProcessError:
+    with tempfile.TemporaryDirectory(prefix='winlocate') as tempdir:
+        logger.debug('Unpacking wheel into {}'.format(tempdir))
+        wheel_root = unpack_wheel(args.wheel_file, tempdir)
+        wheel_code_dir = code_dir_inside_wheel(wheel_root)
+        logger.debug('Resolving dependencies')
+        dependencies = resolve_dependencies_for_wheel(wheel_code_dir, exclusions=exclusions)
+        logger.debug('Adding dependencies to unpacked wheel')
+        add_dependencies_to_wheel(dependencies, wheel_root)
+        logger.debug('Repacking wheel')
+        repack_wheel(wheel_root, args.destination_dir)
 
-        print('ERROR: The file {} is not a DLL or EXE.'.format(filename_to_inspect))
-        return 1
+    return 0
+
+# YOU ARE HERE:
+#
+#
+# Write a function that takes a DLL, calls resolve_dependencies_transitive, and then
+# removes any files that are in the DLL's directory already.
+#
+# Write a function that copies the remaining DLLs into the directory of the file that
+# was being examined.
+#
 
 if __name__ == '__main__':
     sys.exit(main())
