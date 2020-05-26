@@ -17,8 +17,7 @@ from __future__ import print_function
 import sys
 import os
 
-tracktable_src = '/Users/atwilso/projects/tracktable/releases/1.3.0/tracktable'
-tracktable_build = '/Users/atwilso/projects/tracktable/releases/1.3.0/build/py37'
+tracktable_src = '../'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
