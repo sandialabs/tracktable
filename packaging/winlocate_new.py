@@ -77,6 +77,55 @@ EXCLUSIONS = {
         ]
 }
 
+def _my_run(arg_list, timeout=None, **kwargs):
+    """Internal function: Simulate subprocess.run()
+
+    When we call subprocess.run(), we want to use 
+    `capture_output=True` for debugging.  Python 3.5 appears to 
+    lack this option.  This function fakes it.
+
+    All keyword arguments will be passed unmodified to 
+    `subprocess.Popen()`.
+
+    Arguments:
+        arg_list {list of str}: Command to run and arguments
+        
+    Returns:
+        Dict with 'returncode' set to the process's return code (-1
+            if it was killed), 'stdout' set to the process's standard
+            output and 'stderr' set to its standard error
+
+    Note:
+        Do not supply the `stdout` or `stderr` keyword arguments
+        with this function.  We use those ourselves.
+
+    Note:
+        If you supply a timeout keyword argument, the process
+            will be killed if it doesn't exit before then.
+    """
+
+    if 'stdout' in kwargs or 'stderr' in kwargs:
+        raise KeyError('stdout and stderr are used internally by _my_run; do not override')
+
+    process = subprocess.Popen(
+        arg_list, 
+        stdout=subprocess.PIPE, 
+        stderr=subprocess.PIPE, 
+        **kwargs
+        )
+    try:
+        (stdout, stderr) = process.communicate(timeout=timeout)
+        return { 'returncode': process.returncode,
+                 'stdout': stdout,
+                 'stderr': stderr }
+    except subprocess.TimeoutExpired:
+        process.kill()
+        (stdout, stderr) = process.communicate()
+        return { 'returncode': -1,
+                 'stdout': stdout,
+                 'stderr': stderr }
+
+
 
 def find_dll_dependencies(filename):
     """Use dumpbin.exe to find DLL dependencies for a file
@@ -126,13 +175,13 @@ def find_dll_dependencies(filename):
     #
     # The lines we want are those that start with four spaces and
     # end with the string '.dll' or '.DLL'.
-    dumpbin_result = subprocess.run(
-        ['dumpbin.exe', '/dependents', filename],
-        capture_output=True
-        )
+    dumpbin_result = _my_run(['dumpbin.exe', '/dependents', filename])
+
     # This will raise CalledProcessError if the return code is non-zero.
-    dumpbin_result.check_returncode()
-    lines = dumpbin_result.stdout.split(b'\r\n')
+    if dumpbin_result['returncode'] != 0:
+        raise subprocess.CalledProcessError((
+            'Result code from dumpbin was {}.').format(dumpbin_result['returncode']))
+    lines = dumpbin_result['stdout'].split(b'\r\n')
     dll_line_regex = re.compile(b'^    (\S+\.(dll|DLL))$')
     matches = [dll_line_regex.match(line) for line in lines]
     dll_names = [m.group(1) for m in matches if m is not None]
@@ -622,13 +671,14 @@ def unpack_wheel(wheel_filename, root_dir):
           a viable option.
     """
 
-    result = subprocess.run([
+    result = _my_run([
             'wheel', 'unpack',
             '-d', root_dir,
-            wheel_filename],
-            capture_output=True)
-    result.check_returncode()
-    
+            wheel_filename])
+
+    if result['returncode'] != 0:
+        raise subprocess.CalledProcessError((
+            'Return code from "wheel unpack" was {}.').format(result['returncode']))
     # There should be only one item in the root directory -- the
     # directory containing the wheel.
     directories = []
@@ -701,18 +751,20 @@ def repack_wheel(root_dir, destination_dir):
     else:
         os.mkdir(destination_dir)
 
-    result = subprocess.run([
+    result = _my_run([
         'wheel', 'pack',
         '-d', destination_dir,
         root_dir
-        ], capture_output=True)
-    result.check_returncode()
-
+        ])
+    if result['returncode'] != 0:
+        raise subprocess.CalledProcessError((
+            'Return code from "wheel pack" was {}.').format(result['returncode']))
+    
 # --------------------------------------------------------------
 
 def dumpbin_available():
     try:
-        result = subprocess.run(['dumpbin.exe'], capture_output=True)
+        result = subprocess.run(['dumpbin.exe'])
         return True
     except FileNotFoundError:
         return False
