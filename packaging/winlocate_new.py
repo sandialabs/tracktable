@@ -751,9 +751,10 @@ def main():
     logging.basicConfig(stream=sys.stdout, level=logging.INFO)
     logger = logging.getLogger(__name__)
 
+    wheel_filename = args.wheel_file[0]
     with tempfile.TemporaryDirectory(prefix='winlocate') as tempdir:
         logger.debug('Unpacking wheel into {}'.format(tempdir))
-        wheel_root = unpack_wheel(args.wheel_file, tempdir)
+        wheel_root = unpack_wheel(wheel_filename, tempdir)
         wheel_code_dir = code_dir_inside_wheel(wheel_root)
         logger.debug('Resolving dependencies')
         dependencies = resolve_dependencies_for_wheel(wheel_code_dir, exclusions=exclusions)
