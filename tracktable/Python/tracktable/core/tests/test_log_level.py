@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -28,33 +28,30 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Projector classes for Tracktable
+from __future__ import print_function, division, absolute_import
 
-Here we define projections from 2D and 3D back down to 2D.  We will
-import these into domains as appropriate.
-"""
+import sys
 
-def make_projection_cartesian2d():
-    return ( Projection2DCartesian(), list() )
+import logging
+import tracktable.core.log
 
-class Projection2DCartesian(object):
-    """Project from 2D space to 2D space.
+# At present this is a smoke test rather than a function test.  We'll
+# add a function test once we build a bridge from Boost logging
+# to Python logging.
 
-    The initial implementation of this class will be trivial.  We'll
-    allow matplotlib's Axes class to take care of moving things about.
-    We can add more complexity as it's needed.
-    """
 
-    def __init__(self):
-        pass
+def test_log_level():
+    tracktable.core.log.set_log_level(logging.INFO)
+    logging.getLogger(__name__).debug("This message should not print.")
+    logging.getLogger(__name__).info("This message should print.")
+    logging.getLogger(__name__).error("This isn't an error, just a test of the logger.")
+    return 0
 
-    def __call__(self, x_list, y_list):
-        """Map points from world space into projected space.
 
-        In order to project points down into 2D, call this object like
-        a function.  Pass it two lists, one of X coordinates and one
-        of Y coordinates.  You will get back two lists of projected
-        coordinates.
-        """
+def main():
+    num_errors = test_log_level()
+    return num_errors
 
-        return (x_list, y_list)
+
+if __name__ == '__main__':
+    sys.exit(main())

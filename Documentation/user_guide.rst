@@ -29,7 +29,7 @@ domains.  While we cannot prevent you entirely from mixing up (for
 example) kilometers and miles when computing distances, we can at
 least try to make it difficult.
 
-Tracktable 1.2.4 includes the following domains:
+Tracktable 1.3 includes the following domains:
 
 .. csv-table:: Available Point Domains
    :header: "C++ Namespace", "Python Module", "Description"
@@ -180,7 +180,7 @@ operations we want to perform on two or more points.  Here are a few
 common ones.  These work with both BasePoint and TrajectoryPoint
 unless otherwise noted.
 
-* ``distance_between(A, B)``: Compute distance between A and B
+* ``distance(A, B)``: Compute distance between A and B
 * ``bearing(origin, destination)``: Compute the bearing from the origin to the destination
 * ``speed_between(here, there)``: Compute speed between two TrajectoryPoints
 * ``signed_turn_angle(A, B, C)``: Angle between vectors AB and BC
@@ -233,6 +233,10 @@ Python::
   traj = Trajectory()
   for point in mypoints:
       traj.append(mypoint)
+
+  # Alternate approach in case you already have points in a list:
+  traj = Trajectory.from_position_list(my_point_list)
+
 
 Tracktable expects that all points in a given trajectory will have the
 same object ID.  Timestamps must not decrease from one point to the
@@ -383,7 +387,7 @@ Example
 ^^^^^^^
 ::
 
-        trajectory_builder = AssembleTrajectoryFromPoints()
+  trajectory_builder = AssembleTrajectoryFromPoints()
 	trajectory_builder.input = point_reader
 
 	trajectory_builder.separation_time = datetime.timedelta(minutes=30)
@@ -595,9 +599,8 @@ color map and where on the map the heatmap is rendered.
 
 We include a start-to-finish example of how to load points and render
 a heat map in the ``heatmap_from_csv.py`` script in the
-``tracktable/examples/`` subdirectory of our Python code.  This
-example has :ref:`its own page <heatmap-example>` in the
-documentation.
+``tracktable/examples/`` subdirectory of our Python code.  You can find
+this example on the :doc:`/examples/python_scripts/heatmap` page.
 
 .. note:: The :py:class:`histogram2d.geographic()
           <tracktable.render.histogram2d.geographic>` heat map
@@ -640,8 +643,8 @@ All of this is packaged into the function :py:func:`draw_traffic
 
 Like :ref:`heat maps <userguide-heat-maps>`, trajectory maps have
 their own example script ``trajectory_map_from_csv.py`` in the
-``tracktable/examples`` directory.  This script has :ref:`its own page
-<trajectory-map-example>` in the documentation.
+``tracktable/examples`` directory.  You can find this example on the
+:doc:`/examples/python_scripts/trajectory_map` page.
 
 
 -------------

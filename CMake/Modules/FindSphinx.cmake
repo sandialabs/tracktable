@@ -94,12 +94,13 @@ function(find_sphinx_components)
    foreach(_component ${_sphinx_all_components})
 
      set(_component_name "sphinx-${_component}")
+     set(_component_name_3 "sphinx-${_component}-3")
 #     message("Searching for Sphinx component ${_component} with full name ${_component_name}")
      string(TOUPPER ${_component} _uc_executable_name)
      set(_varname "Sphinx_${_uc_executable_name}_EXECUTABLE")
 
      find_program( ${_varname}
-       ${_component_name}
+       ${_component_name} ${_component_name_3}
        PATHS ${_sphinx_search_paths}
        DOC "Path to sphinx-${_component} executable"
        )
@@ -110,6 +111,7 @@ function(find_sphinx_components)
      endif (${_varname})
 
      unset( _component_name )
+     unset( _component_name_3 )
 
    endforeach()
 endfunction(find_sphinx_components)
@@ -145,12 +147,10 @@ endfunction(extract_interpreter)
 
 find_sphinx_components()
 if (Sphinx_BUILD_EXECUTABLE)
-#   message("Sphinx_BUILD_EXECUTABLE is ${Sphinx_BUILD_EXECUTABLE}")
-   if (NOT ${Sphinx_PYTHON_EXECUTABLE})
+   #message("Sphinx_BUILD_EXECUTABLE is ${Sphinx_BUILD_EXECUTABLE}")
+   #message("Sphinx_PYTHON_EXECUTABLE is '${Sphinx_PYTHON_EXECUTABLE}'")
+   if (NOT Sphinx_PYTHON_EXECUTABLE)
      extract_interpreter(FILE ${Sphinx_BUILD_EXECUTABLE} DESTINATION Sphinx_EXECUTABLE_TMP)
-   endif()
-
-   if (NOT "${Sphinx_PYTHON_EXECUTABLE}")
      set( Sphinx_PYTHON_EXECUTABLE ${Sphinx_EXECUTABLE_TMP}
        CACHE FILEPATH "Python interpreter to use to run Sphinx"
        )

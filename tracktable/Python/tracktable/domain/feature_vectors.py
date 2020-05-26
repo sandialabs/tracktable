@@ -68,13 +68,30 @@ POINT_TYPES = [ None,
 ]
 
 def convert_to_feature_vector(coords):
-    """Turn a list of coordinates into a feature vector
+    """Package up a list of numbers as a feature vector
 
-    Args:
-       coords: List, tuple or Tracktable point
+    Conceptually, a feature vector is just a list of numbers.  However,
+    in Tracktable, the functions that work with feature vectors (DBSCAN
+    and the R-tree) expect specific data structures in order to go back
+    and forth between Python and C++.  Specifically, this data structure
+    is a tracktable.domain.feature_vectors.POINT_TYPES[NN], where NN is
+    the number of values.  Right now NN can be no greater than 30.
+
+    The function convert_to_feature_vector() takes a list or tuple of
+    numeric values and packages them up in that data structure.  It does
+    not change or reorder the values in any way.
+
+    Arguments:
+        coords {list or tuple of numbers}: Sequence of feature values
 
     Returns:
-       Appropriately sized tracktable.domain.feature_vector point with the same coordinates
+        Input values bundled up in a FeatureVectorNN data structure as
+            described above
+
+    Note:
+        In the future, it would be great if the user never had to care
+        about this function -- feature vectors would get automatically
+        instantiated when the R-tree is built or DBSCAN is invoked.
     """
 
     if len(coords) == 0 or len(coords) >= len(POINT_TYPES):

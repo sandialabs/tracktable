@@ -72,7 +72,7 @@ struct generic_subset_during_interval
 
       if (start_time > end_time)
         {
-        TRACKTABLE_LOG(warning) 
+        TRACKTABLE_LOG(log::warning) 
           << "Trajectory::subset_in_window: start_time ("
           << start_time << ") is after end_time (" << end_time
           << ").  We'll pretend you meant it the other way around.";

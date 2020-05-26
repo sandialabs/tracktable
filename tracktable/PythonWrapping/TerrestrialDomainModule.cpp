@@ -45,6 +45,7 @@
 #include <tracktable/IO/TrajectoryWriter.h>
 
 #include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
+#include <tracktable/PythonWrapping/BasePointToString.h>
 #include <tracktable/PythonWrapping/PythonFileLikeObjectStreams.h>
 #include <tracktable/PythonWrapping/DomainWrapperTemplates.h>
 #include <tracktable/PythonWrapping/PythonAwarePointReader.h>
@@ -125,10 +126,11 @@ void install_terrestrial_base_point_wrappers()
 {
   using namespace boost::python;
   using tracktable::python_wrapping::make_point_2d;
+  using tracktable::python_wrapping::base_point_to_string_methods;
 
   class_<base_point_type>("BasePointTerrestrial")
     .def(tracktable::python_wrapping::basic_point_methods())
-    .def(tracktable::python_wrapping::point_to_string_methods())
+    .def(tracktable::python_wrapping::base_point_to_string_methods("tracktable.domain.terrestrial.BasePoint"))
     .def("__init__", make_constructor(make_point_2d<base_point_type>))
     ;
 }

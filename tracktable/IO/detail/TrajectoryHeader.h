@@ -34,6 +34,7 @@
 #include <tracktable/Core/TracktableCommon.h>
 #include <tracktable/Core/PointTraits.h>
 #include <tracktable/Core/PropertyConverter.h>
+#include <tracktable/Core/UUID.h>
 
 #include <tracktable/IO/detail/HeaderStrings.h>
 #include <tracktable/IO/detail/PropertyMapReadWrite.h>
@@ -49,21 +50,24 @@ class TrajectoryHeader
 {
 public:
   string_type MagicString;
+  uuid_type UUID;
   string_type Domain;
   std::size_t NumPoints;
   PropertyMap Properties;
   PropertyConverter PropertyReadWrite;
 
   TrajectoryHeader()
-    : MagicString(TrajectoryFileMagicString)
-    , Domain("unknown")
+    : MagicString(TrajectoryFileMagicString),
+      UUID(),
+      Domain("unknown")
     { }
 
   TrajectoryHeader(TrajectoryHeader const& other)
-    : MagicString(other.MagicString)
-    , Domain(other.Domain)
-    , Properties(other.Properties)
-    , PropertyReadWrite(other.PropertyReadWrite)
+    : MagicString(other.MagicString),
+      UUID(),
+      Domain(other.Domain),
+      Properties(other.Properties),
+      PropertyReadWrite(other.PropertyReadWrite)
     { }
 
   virtual ~TrajectoryHeader() { }
@@ -71,6 +75,7 @@ public:
   TrajectoryHeader& operator=(TrajectoryHeader const& other)
     {
       this->MagicString    = other.MagicString;
+      this->UUID           = other.UUID;
       this->Domain         = other.Domain;
       this->NumPoints      = other.NumPoints;
       this->Properties     = other.Properties;
@@ -81,7 +86,8 @@ public:
   bool operator==(TrajectoryHeader const& other) const
     {
       return (
-        this->MagicString       == other.MagicString
+           this->MagicString    == other.MagicString
+        && this->UUID           == other.UUID
         && this->Domain         == other.Domain
         && this->NumPoints      == other.NumPoints
         && this->Properties     == other.Properties
@@ -122,6 +128,7 @@ public:
   template<typename trajectory_type>
   void populate_from_trajectory(trajectory_type const& trajectory)
     {
+      this->UUID = trajectory.uuid();
       this->Domain = traits::point_domain_name<typename trajectory_type::point_type>::apply();
       this->NumPoints = trajectory.size();
       this->Properties = trajectory.__properties();
@@ -131,6 +138,7 @@ public:
   void write_as_tokens(out_iter_type destination)
     {
       (*destination++) = this->MagicString;
+      (*destination++) = boost::lexical_cast<string_type>(this->UUID);
       (*destination++) = this->Domain;
       (*destination++) = boost::lexical_cast<string_type>(this->NumPoints);
       (*destination++) = boost::lexical_cast<string_type>(this->Properties.size());
@@ -145,18 +153,39 @@ public:
 		}
     }
 
+  /**
+   * Reads the header from a stream of tokens
+   *
+   * @return The number of tokens consumed
+   */
   template<typename in_iter_type>
-  void read_from_tokens(in_iter_type current_token, in_iter_type /*last_token*/)
+  std::size_t read_from_tokens(in_iter_type current_token, in_iter_type /*last_token*/)
     {
       std::size_t stage = 0;
+      std::size_t consumed = 0;
       std::size_t expected_num_properties = 0;
 
       ++stage;
       this->MagicString = (*current_token++);
+      consumed++;
+      ++stage;
+      try {
+          // If the token can't be parsed as a UUID that means this is an older file without UUIDs
+          // In that case we will handle the default UUID in the exception clause, but we won't
+          // consume the token unless we successfully parse.
+          this->UUID = boost::lexical_cast<uuid_type>(*current_token);
+          current_token++;
+          consumed++;
+      } catch(boost::bad_lexical_cast &) {
+          // If this is an older file without UUIDs, let's generate a new one moving forward
+          this->UUID = ::tracktable::automatic_uuid_generator()->generate_uuid();
+      }
       ++stage;
       this->Domain      = (*current_token++);
+      consumed++;
       ++stage;
       this->NumPoints   = boost::lexical_cast<std::size_t>(*current_token++);
+      consumed++;
       ++stage;
       expected_num_properties = boost::lexical_cast<std::size_t>(*current_token++);
 
@@ -166,7 +195,10 @@ public:
         string_type prop_name(*current_token++);
         PropertyUnderlyingType prop_type = string_to_property_type(*current_token++);
         this->Properties[prop_name] = this->PropertyReadWrite.property_from_string(*current_token++, prop_type);
+        consumed += 3;
         }
+
+      return consumed;
     }
 };
 

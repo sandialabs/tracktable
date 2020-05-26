@@ -85,6 +85,8 @@ public:
     , TimestampColumn(-1)
     , IgnoreHeader(false)
     , WarningsEnabled(true)
+    , NumPoints(0)
+    , NumParseErrors(0)
     {
     }
 
@@ -95,8 +97,10 @@ public:
     , FieldMap(other.FieldMap)
     , ObjectIdColumn(other.ObjectIdColumn)
     , TimestampColumn(other.TimestampColumn)
-    , IgnoreHeader(false)
+    , IgnoreHeader(other.IgnoreHeader)
     , WarningsEnabled(true)
+    , NumPoints(other.NumPoints)
+    , NumParseErrors(other.NumParseErrors)
     { }
 
 
@@ -107,6 +111,8 @@ public:
     , TimestampColumn(-1)
     , IgnoreHeader(false)
     , WarningsEnabled(true)
+    , NumPoints(0)
+    , NumParseErrors(0)
     { }
 
   virtual ~PointFromTokensReader()
@@ -124,6 +130,8 @@ public:
       this->IgnoreHeader    = other.IgnoreHeader;
       this->WarningsEnabled = other.WarningsEnabled;
       this->PropertyReadWrite = other.PropertyReadWrite;
+      this->NumPoints       = other.NumPoints;
+      this->NumParseErrors = other.NumParseErrors;
       return *this;
     }
 
@@ -138,7 +146,7 @@ public:
         && this->TimestampColumn == other.TimestampColumn
         && this->IgnoreHeader    == other.IgnoreHeader
         && this->WarningsEnabled == other.WarningsEnabled
-	&& this->PropertyReadWrite == other.PropertyReadWrite
+	      && this->PropertyReadWrite == other.PropertyReadWrite
         );
     }
 
@@ -378,6 +386,9 @@ protected:
 
   PropertyConverter     PropertyReadWrite;
 
+  int                   NumPoints;
+  int                   NumParseErrors;
+
   point_shared_ptr_type next_item()
     {
       point_shared_ptr_type NextPoint;
@@ -399,16 +410,6 @@ protected:
           }
         }
 
-      if (this->TimestampColumn == -1)
-        {
-        -- required_num_tokens;
-        }
-
-      if (this->ObjectIdColumn == -1)
-        {
-        -- required_num_tokens;
-        }
-
       while (this->SourceBegin != this->SourceEnd)
         {
         try
@@ -423,25 +424,28 @@ protected:
                iter != _tokens.end();
                ++iter)
             {
-            outbuf << "'" << *iter << "' ";
+            outbuf << "'" << *iter << "' ("
+                   << iter->size() << ") ";
             }
-          TRACKTABLE_LOG(debug) << outbuf.str();
+          TRACKTABLE_LOG(log::trace) << outbuf.str();
 #endif
           if (_tokens.size() == 0)
             {
             // Skip empty lines.  Should this even be possible?
+            TRACKTABLE_LOG(log::debug) << "Skipping empty line.";
             ++(this->SourceBegin);
             continue;
             }
 
           if (_tokens[0] == io::detail::PointFileMagicString && this->IgnoreHeader)
             {
-            TRACKTABLE_LOG(debug) << "Found point header but IgnoreHeader is enabled.\n";
+            TRACKTABLE_LOG(log::trace) << "Found point header but IgnoreHeader is enabled.\n";
             }
 
           if (_tokens[0] == io::detail::PointFileMagicString
               && !this->IgnoreHeader)
             {
+            TRACKTABLE_LOG(log::debug) << "Configuring point reader from header.";
             this->configure_reader_from_header(_tokens);
             ++(this->SourceBegin);
             continue;
@@ -452,39 +456,54 @@ protected:
             // parse it as a point.
             if (_tokens.size() >= required_num_tokens)
               {
+              TRACKTABLE_LOG(log::trace) << "Parsing list of " 
+                  << _tokens.size() << " tokens ("
+                  << required_num_tokens << " required) "
+                  << "as point.";
               NextPoint = point_shared_ptr_type(new point_type);
               this->populate_coordinates_from_tokens(_tokens, NextPoint);
               this->populate_properties_from_tokens(_tokens, NextPoint);
               ++(this->SourceBegin);
+              ++(this->NumPoints);
+
               return NextPoint;
               }
             else
               {
-              TRACKTABLE_LOG(warning) 
+              TRACKTABLE_LOG(log::debug) 
                 << "WARNING: Not enough tokens to assemble point.  Expected " 
                 << required_num_tokens << ", found " << _tokens.size() 
                 << ".  Point will be skipped.";
               ++(this->SourceBegin);
+              ++(this->NumParseErrors);
               }
             }
           }
         catch (ParseError const& e)
           {
-          // We might need to back this off to a debug message instead of a warning.
-          TRACKTABLE_LOG(warning) << e.what() << "\n";
+          TRACKTABLE_LOG(log::debug) << e.what() << "\n";
           NextPoint = point_shared_ptr_type();
           ++(this->SourceBegin);
+          ++(this->NumParseErrors);
           }
         catch (boost::bad_lexical_cast& e)
           {
-          TRACKTABLE_LOG(warning) << "Cast error while parsing point: " << e.what();
+          TRACKTABLE_LOG(log::debug) << "Cast error while parsing point: " << e.what();
           ++(this->SourceBegin);
+          ++(this->NumParseErrors);
           }
         catch (std::exception& e)
           {
-          TRACKTABLE_LOG(warning) << "Exception while parsing point: " << e.what();
+          TRACKTABLE_LOG(log::warning) << "Exception while parsing point: " << e.what();
           ++(this->SourceBegin);
+          ++(this->NumParseErrors);
           }
+        }
+      if (!NextPoint)
+        {
+          TRACKTABLE_LOG(log::info) << "Done reading points.  "
+                                    << "Generated " << this->NumPoints << " points correctly and "
+                                    << "discarded " << this->NumParseErrors << " due to parse errors.\n";
         }
       return NextPoint;
     }
@@ -500,7 +519,7 @@ protected:
         header.Dimension != std::size_t(traits::dimension<point_type>::value)
         )
         {
-        TRACKTABLE_LOG(warning) 
+        TRACKTABLE_LOG(log::warning) 
                   << "PointFromTokensIterator: Header indicates points with dimension "
                   << header.Dimension << " but reader's point type has dimension "
                   << traits::dimension<point_type>::value << ".";

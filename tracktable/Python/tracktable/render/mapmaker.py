@@ -36,7 +36,6 @@ from matplotlib import pyplot
 
 import logging
 from tracktable.render import maps
-from tracktable.render.projection import make_projection_cartesian2d
 from tracktable.render import geographic_decoration as decoration
 
 
@@ -65,15 +64,11 @@ def cartesian_map(map_bbox=None,
     draw axes/grid lines on the figure.
     """
 
-    from tracktable.domain.cartesian2d import BoundingBox, BasePoint
-
     if axes is None:
         axes = pyplot.gca()
 
     logging.getLogger(__name__).debug(
         "cartesian_map: map_bbox is {}".format(map_bbox))
-
-    (proj, artists) = make_projection_cartesian2d()
 
     axes.set_aspect(kwargs.get('aspect', 'equal'))
     if map_bbox is not None:
@@ -81,9 +76,8 @@ def cartesian_map(map_bbox=None,
                       right=map_bbox.max_corner[0])
         axes.set_ylim(bottom=map_bbox.min_corner[1],
                       top=map_bbox.max_corner[1])
-        proj.bbox = map_bbox
 
-    return (proj, artists)
+    return (axes, list())
 
 # ----------------------------------------------------------------------
 
@@ -130,10 +124,11 @@ def terrestrial_map(map_name,
 
     """Create and decorate a map
 
-    Call the Basemap toolkit to create a map of some predefined area,
+    Call the Cartopy toolkit to create a map of some predefined area,
     up to and including the entire world.  The map will be decorated
     with some subset of coastlines, country borders, state/province
-    borders and cities.
+    borders and cities according to the keyword arguments you supply
+    to mapmaker() or terrestrial_map().
 
     Args:
       map_name:            Region name ('region:XXX' or 'airport:XXX' or 'city:XXX' or 'custom').  Available regions are in tracktable.render.maps.available_maps().
@@ -285,6 +280,7 @@ def terrestrial_map(map_name,
 
     return (map_axes, artists)
 
+
 def _make_bounding_box(bbox_args, domain):
     """Make a sensible bounding box out of whatever the user gave us."""
 
@@ -292,17 +288,18 @@ def _make_bounding_box(bbox_args, domain):
     if type(bbox_args) is list and len(bbox_args) == 4:
         if domain == 'terrestrial':
             from tracktable.domain.terrestrial import BoundingBox as TerrestrialBoundingBox
-            min_corner = (bbox_args[0], bbox_args[2])
-            max_corner = (bbox_args[1], bbox_args[3])
+            min_corner = (bbox_args[0], bbox_args[1])
+            max_corner = (bbox_args[2], bbox_args[3])
             return TerrestrialBoundingBox(min_corner, max_corner)
         elif domain == 'cartesian2d':
             from tracktable.domain.cartesian2d import BoundingBox as Cartesian2DBoundingBox
-            min_corner = (bbox_args[0], bbox_args[2])
-            max_corner = (bbox_args[1], bbox_args[3])
+            min_corner = (bbox_args[0], bbox_args[1])
+            max_corner = (bbox_args[2], bbox_args[3])
             return Cartesian2DBoundingBox(min_corner, max_corner)
         else:
             raise ValueError('Custom bounding box for domain {} is not defined.'.format(domain))
     # Case 2: is it a bbox already?
     else:
-        return bbox_args # hope for the best
+        # just hope for the best
+        return bbox_args
 

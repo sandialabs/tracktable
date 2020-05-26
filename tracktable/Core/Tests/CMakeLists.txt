@@ -27,6 +27,16 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+unset(Boost_FOUND)
+get_filename_component(_TEST_NAME_TMP ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+get_filename_component(_TEST_NAME_2 ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+get_filename_component(_TEST_NAME_1 ${_TEST_NAME_TMP} NAME)
+message(STATUS "Looking for Boost components needed for C++ tests in ${_TEST_NAME_1}/${_TEST_NAME_2}")
+find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
+  COMPONENTS
+    ${BOOST_CORE_COMPONENTS_NEEDED}
+    ${BOOST_TEST_COMPONENTS}
+  )
 
 include_directories(
   ${Tracktable_SOURCE_DIR}
@@ -58,6 +68,16 @@ add_executable(test_convex_hull_perimeter
   test_convex_hull_perimeter.cpp
   )
 set_property(TARGET test_convex_hull_perimeter          PROPERTY FOLDER "Tests")
+
+add_executable(test_degenerate_convex_hull
+  test_degenerate_convex_hull.cpp
+  )
+set_property(TARGET test_degenerate_convex_hull         PROPERTY FOLDER "Tests")
+
+add_executable(test_log_level
+  test_log_level.cpp
+  )
+set_property(TARGET test_log_level PROPERTY FOLDER "Tests")
 
 add_executable(test_point_at_fraction
   test_point_at_fraction.cpp
@@ -114,6 +134,11 @@ add_executable(test_trajectory_lonlat
 )
 set_property(TARGET test_trajectory_lonlat              PROPERTY FOLDER "Tests")
 
+add_executable(test_trajectory_id
+  test_trajectory_id.cpp
+)
+set_property(TARGET test_trajectory_id PROPERTY FOLDER "Tests")
+
 add_executable(test_trajectory_point_serialization
   test_trajectory_point_serialization.cpp
   )
@@ -138,6 +163,11 @@ add_executable(test_trajectory_subset
  test_trajectory_subset.cpp
 )
 set_property(TARGET test_trajectory_subset              PROPERTY FOLDER "Tests")
+
+add_executable(test_trajectory_uuid
+ test_trajectory_uuid.cpp
+)
+set_property(TARGET test_trajectory_uuid        PROPERTY FOLDER "Tests")
 
 add_executable(test_timestamp_format
   test_timestamp_format.cpp
@@ -185,6 +215,16 @@ target_link_libraries(test_current_length
   TracktableCore
   ${Boost_LIBRARIES}
 )
+
+target_link_libraries(test_degenerate_convex_hull
+  TracktableCore
+  ${Boost_LIBRARIES}
+  )
+
+target_link_libraries(test_log_level
+  TracktableCore
+  ${Boost_LIBRARIES}
+  )
 
 target_link_libraries(test_point_at_fraction
   TracktableCore
@@ -236,6 +276,11 @@ target_link_libraries(test_simplify_linestring
   ${Boost_LIBRARIES}
 )
 
+target_link_libraries(test_trajectory_id
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
 target_link_libraries(test_trajectory_lonlat
   TracktableCore
   ${Boost_LIBRARIES}
@@ -262,6 +307,11 @@ target_link_libraries(test_trajectory_serialization
   )
 
 target_link_libraries(test_trajectory_subset
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
+target_link_libraries(test_trajectory_uuid
   TracktableCore
   ${Boost_LIBRARIES}
 )
@@ -302,6 +352,19 @@ add_test(
  NAME C_ConvexHullPerimeter
  COMMAND test_convex_hull_perimeter
 )
+
+add_test(
+  NAME C_DegenerateConvexHull
+  COMMAND test_degenerate_convex_hull
+)
+
+# This test is not yet enabled because it depends on capability
+# (adding a separate back-end log sink) that we don't yet have.
+#
+#add_test(
+#  NAME C_LogLevel
+#  COMMAND test_log_level
+#  )
 
 add_test(
   NAME C_MemoryUse
@@ -356,6 +419,11 @@ add_test(
 add_test(
   NAME C_SimplifyLinestring
   COMMAND test_simplify_linestring
+)
+
+add_test(
+  NAME C_TrajectoryId
+  COMMAND test_trajectory_id
 )
 
 add_test(

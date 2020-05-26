@@ -105,8 +105,8 @@ string_type PropertyConverter::property_to_string(PropertyValueT const& prop)
     case TYPE_NULL:
       return this->NullValue;
     case TYPE_UNKNOWN:
-      TRACKTABLE_LOG(error) << "ERROR: PropertyConverter::property_to_string: "
-                            << "Don't know what to make of property " << prop;
+      TRACKTABLE_LOG(log::error) << "ERROR: PropertyConverter::property_to_string: "
+                                 << "Don't know what to make of property " << prop;
       return this->NullValue;
     }
   return this->NullValue;
@@ -114,7 +114,7 @@ string_type PropertyConverter::property_to_string(PropertyValueT const& prop)
 
 PropertyValueT PropertyConverter::property_from_string(
                string_type const& prop_value,
-							 PropertyUnderlyingType desired_type)
+               PropertyUnderlyingType desired_type)
   {
     // TRACKTABLE_LOG(debug) << "property_from_string: raw_value is '" << prop_value << "', type is " << desired_type << "\n";
     PropertyValueT result;
@@ -153,7 +153,7 @@ PropertyValueT PropertyConverter::property_from_string(
       case TYPE_UNKNOWN:
       case TYPE_NULL:
         {
-        TRACKTABLE_LOG(error) 
+        TRACKTABLE_LOG(log::error) 
 	         << "ERROR: property_from_string: Don't know what to do with value '"
 	         << prop_value << " and desired type " << desired_type << ".";
 	      return PropertyValueT();

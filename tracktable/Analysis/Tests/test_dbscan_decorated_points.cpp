@@ -33,10 +33,10 @@
 #include <tracktable/Analysis/ComputeDBSCANClustering.h>
 #include <tracktable/Domain/FeatureVectors.h>
 
-
+#define BOOST_ALLOW_DEPRECATED_HEADERS
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
-
+#undef BOOST_ALLOW_DEPRECATED_HEADERS
 
 #ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
@@ -45,6 +45,10 @@
 #include <cstdlib>
 #include <iostream>
 #include <limits>
+
+namespace {
+  static const double PI = 3.141592653589793238462643383;
+}
 
 // ----------------------------------------------------------------------
 
@@ -63,7 +67,7 @@ double random_gaussian(double mean=0, double stddev=1)
   double u1 = random_float();
   double u2 = random_float();
 
-  return mean + stddev*(sqrt(-2 * log(u1)) * sin(2*M_PI*u2));
+  return mean + stddev*(sqrt(-2 * log(u1)) * sin(2*PI*u2));
 }
 
 // ----------------------------------------------------------------------

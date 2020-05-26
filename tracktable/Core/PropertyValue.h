@@ -55,6 +55,7 @@
 
 #include <boost/variant.hpp>
 #include <boost/serialization/variant.hpp>
+#include <boost/math/special_functions/relative_difference.hpp>
 
 namespace tracktable {
 
@@ -135,22 +136,48 @@ TRACKTABLE_CORE_EXPORT std::ostream& operator<<(std::ostream& out, NullValue con
    string_type,
    Timestamp
    >
-   PropertyValueT;
-typedef PropertyValueT PropertyValue;
+   PropertyValue;
+typedef PropertyValue PropertyValueT;
 
-inline PropertyValueT make_null(PropertyUnderlyingType null_type)
+inline PropertyValue make_null(PropertyUnderlyingType null_type)
 {
   NullValue my_value(null_type);
-  return PropertyValueT(my_value);
+  return PropertyValue(my_value);
 }
 
+/** Provides a total order comparison of all PropertyValue instances allowing for floating point epsilon differences
+ * @param value1 The first property value instance to compare
+ * @param value2 The second property value instance to compare
+ * @param difference The allowed difference between doubles to still maintain equality. The meaning of this parameter is controlled by is_epsilon_difference
+ * @param is_epsilon_difference If true, difference will be treated as the machine specific epsilon difference and if false as a relative difference
+ * @return -1 if value1 < value2, 0 if value1 == value2, 1 if value1 > value2
+ *
+ * Compares two property values to provide a total ordering.
+ *
+ * When the property values are of different types the relationship between their
+ * underlying value types will be returned based on the ordering of the parameters.
+ *
+ * When the property values are of the same type a logical comparison of the values is performed.
+ *
+ * When the parameters contain double values the parameters difference and is_epsilon_difference
+ * will control tests of equality. Machine epsilon is an upper bound on the rounding error that
+ * can occur in floating point arithmetic for a specific type.
+ *
+ * Also see:
+ *
+ * https://en.wikipedia.org/wiki/Floating-point_arithmetic#Accuracy_problems
+ * https://en.wikipedia.org/wiki/Machine_epsilon
+ * https://www.boost.org/doc/libs/1_72_0/libs/math/doc/html/math_toolkit/float_comparison.html
+ * Knuth D.E. The art of computer programming, vol II, section 4.2, Floating-Point Comparison 4.2.2, pages 198-220
+ */
+TRACKTABLE_CORE_EXPORT int compare(const PropertyValue& value1, const PropertyValue& value2, double difference=1.0, bool is_epsilon_difference=true);
 
 /*! \brief Check to see whether a property value is null.
  *
  * @return True/false depending on whether or not the supplied value is null
  */
 
-TRACKTABLE_CORE_EXPORT bool is_property_null(PropertyValueT const& value);
+TRACKTABLE_CORE_EXPORT bool is_property_null(PropertyValue const& value);
 
 
 /*! \brief Get a property's underlying type.
@@ -159,7 +186,7 @@ TRACKTABLE_CORE_EXPORT bool is_property_null(PropertyValueT const& value);
  * property.  This function is meant to help with serialization.
  */
 
-TRACKTABLE_CORE_EXPORT PropertyUnderlyingType property_underlying_type(PropertyValueT const& value);
+TRACKTABLE_CORE_EXPORT PropertyUnderlyingType property_underlying_type(PropertyValue const& value);
 
 
 /*! \brief Utility method: convert a string to a PropertyUnderlyingType.
@@ -176,28 +203,28 @@ PropertyUnderlyingType string_to_property_type(text_type const& input)
 /*! \brief Return a property's data type as a string
  */
 
-TRACKTABLE_CORE_EXPORT tracktable::string_type property_type_as_string(tracktable::PropertyValueT const& p);
+TRACKTABLE_CORE_EXPORT tracktable::string_type property_type_as_string(tracktable::PropertyValue const& p);
 
-/*! \brief Utility method: convert a source type (usually a string) to a PropertyValueT.
+/*! \brief Utility method: convert a source type (usually a string) to a PropertyValue.
  *
  */
 
 template<typename source_type>
-PropertyValueT to_property_variant(source_type const& source, PropertyUnderlyingType thing_type)
+PropertyValue to_property_variant(source_type const& source, PropertyUnderlyingType thing_type)
 {
   try
     {
     switch (thing_type)
       {
       case TYPE_STRING:
-        return PropertyValueT(boost::lexical_cast<string_type>(source));
+        return PropertyValue(boost::lexical_cast<string_type>(source));
       case TYPE_REAL:
-        return PropertyValueT(boost::lexical_cast<double>(source));
+        return PropertyValue(boost::lexical_cast<double>(source));
       case TYPE_TIMESTAMP:
-        return PropertyValueT(time_from_string(boost::lexical_cast<string_type>(source)));
+        return PropertyValue(time_from_string(boost::lexical_cast<string_type>(source)));
       case TYPE_NULL:
       case TYPE_UNKNOWN:
-        return PropertyValueT();
+        return PropertyValue();
       }
     }
   catch (boost::bad_lexical_cast&)
@@ -210,11 +237,11 @@ PropertyValueT to_property_variant(source_type const& source, PropertyUnderlying
 
 namespace tracktable { namespace algorithms {
     
-TRACKTABLE_CORE_EXPORT PropertyValueT interpolate_property(PropertyValueT const& left,
-                                                           PropertyValueT const& right,
+TRACKTABLE_CORE_EXPORT PropertyValue interpolate_property(PropertyValue const& left,
+                                                           PropertyValue const& right,
                                                            double t);
-TRACKTABLE_CORE_EXPORT PropertyValueT extrapolate_property(PropertyValueT const& left,
-                                                           PropertyValueT const& right,
+TRACKTABLE_CORE_EXPORT PropertyValue extrapolate_property(PropertyValue const& left,
+                                                           PropertyValue const& right,
                                                            double t);
 } } // namespace tracktable::algorithms
 

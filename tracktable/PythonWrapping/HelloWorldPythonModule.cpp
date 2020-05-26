@@ -39,7 +39,7 @@
 
 char const* greet()
 {
-	return "Hello world!";
+	return "Hello world from Tracktable!";
 }
 
 class SimpleTestClass
@@ -47,10 +47,10 @@ class SimpleTestClass
 public:
    SimpleTestClass() { this->Value = 0; }
    ~SimpleTestClass() { };
-   
+
    void setValue(int value) { this->Value = value; }
    int getValue() const { return this->Value; }
-   
+
    int Value;
 };
 
@@ -66,5 +66,5 @@ BOOST_PYTHON_MODULE(_tracktable_hello)
 //        .def_readwrite("value", &SimpleTestClass::Value)
         .add_property("value", &SimpleTestClass::getValue)
         ;
-        
+
 }

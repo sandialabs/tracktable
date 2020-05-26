@@ -28,6 +28,10 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+from tracktable.script_helpers.argument_groups import create_argument_group
+from tracktable.script_helpers.argument_groups import add_argument
+from tracktable.render import maps
+
 """Command-line options for creating and decorating maps.
 
 The Mapmaker argument group contains (almost) everything we think you
@@ -110,7 +114,7 @@ Arguments:
 | ``--city-label-color COLOR``
 |   Color (name or hex string) for city labels on map.
 |
-| ``--map-bbox X_MIN X_MAX Y_MIN Y_MAX``
+| ``--map-bbox X_MIN Y_MIN X_MAX Y_MAX``
 |   Axis-aligned bounding box for map.
 |
 | ``--map-projection STRING``
@@ -122,11 +126,8 @@ Arguments:
 """example_movie_rendering - Parameters for movie encoding
 """
 
-from tracktable.script_helpers.argument_groups import create_argument_group, add_argument
-from tracktable.render import maps
-
-
 GROUP_INSTALLED = False
+
 
 def install_group():
     """Register the Mapmaker argument group.

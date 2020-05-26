@@ -38,45 +38,5 @@ set(ANALYSIS "tracktable.analysis.tests")
 add_python_test(P_DBSCAN ${ANALYSIS}.test_dbscan_clustering)
 add_python_test(P_RTree_Nearest_Neighbors ${ANALYSIS}.test_rtree_nearest_neighbors)
 add_python_test(P_RTree_Points_In_Box ${ANALYSIS}.test_rtree_points_in_box)
-
-
-# add_test(
-#   NAME P_DBSCAN
-#   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_dbscan_clustering.py
-# )
-
-# add_test(
-#   NAME P_RTree_Nearest_Neighbors
-#   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_rtree_nearest_neighbors.py
-# )
-
-# add_test(
-#   NAME P_RTree_Points_In_Box
-#   COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/test_rtree_points_in_box.py
-# )
-
-# if (MINGW OR MSVC)
-#   string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )
-#   string( REPLACE ";" "\\;" ESCAPED_PYTHONPATH "$ENV{PYTHONPATH}" )
-
-#   set_tests_properties(
-#     P_DBSCAN
-#     P_RTree_Nearest_Neighbors
-#     P_RTree_Points_In_Box
-#     PROPERTIES
-#     ENVIRONMENT
-# 	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python\\;${ESCAPED_PYTHONPATH};PATH=${Tracktable_BINARY_DIR}/bin\\;${ESCAPED_SYSTEM_PATH}"
-# 	)
-# else (MINGW OR MSVC)
-#   # Trust the compiler to set RPATH so that the libraries in bin/ are
-#   # accessible.
-#   set_tests_properties(
-#     P_DBSCAN
-#     P_RTree_Nearest_Neighbors
-#     P_RTree_Points_In_Box
-#     PROPERTIES
-#     ENVIRONMENT
-# 	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python:${CTEST_PYTHONPATH_ADDITIONS}:$ENV{PYTHONPATH}"
-# 	)
-# endif (MINGW OR MSVC)
-
+add_python_test(P_DistanceGeometry_Distance ${ANALYSIS}.test_distance_geometry_by_distance)
+add_python_test(P_DistanceGeometry_Time ${ANALYSIS}.test_distance_geometry_by_time)

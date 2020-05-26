@@ -147,7 +147,12 @@ TRACKTABLE_CORE_EXPORT Timestamp timestamp_property_with_default(PropertyMap con
 
 TRACKTABLE_CORE_EXPORT string_type property_map_to_string(PropertyMap const& properties);
 
-
+/** Provides an overloaded equality operator that that accounts for floating point epsilon differences
+ *
+ * Except for the call to compare(const PropertyValueT&, const PropertyValueT&, double, bool)
+ * this function is identical to the default std::map comparator.
+ */
+TRACKTABLE_CORE_EXPORT bool operator==(const PropertyMap& pm1, const PropertyMap& pm2);
 
 } // exit namespace tracktable
 
@@ -190,7 +195,7 @@ struct interpolate<PropertyMap>
             }
           catch (boost::bad_get& /*e*/)
             {
-            TRACKTABLE_LOG(warning) 
+            TRACKTABLE_LOG(log::warning) 
                       << "WARNING: interpolate<PropertyMap>: "
                       << "Couldn't retrieve property '"
                       << key << "' (type "
@@ -240,7 +245,7 @@ struct extrapolate<PropertyMap>
                 }
                 catch (boost::bad_get& /*e*/)
                 {
-                    TRACKTABLE_LOG(warning) 
+                    TRACKTABLE_LOG(log::warning) 
                         << "WARNING: extrapolate<PropertyMap>: "
                         << "Couldn't retrieve property '"
                         << key << "' (type "
