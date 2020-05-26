@@ -203,7 +203,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 if read_the_docs_build or debugging:
     html_static_path = ['css']
 else:
-    html_static_path = os.path.join(tracktable_src, 'Documentation', 'css')
+    html_static_path = [os.path.join(tracktable_src, 'Documentation', 'css')]
 html_style = "tracktable.css"
 
 # Add any extra paths that contain custom files (such as robots.txt or
