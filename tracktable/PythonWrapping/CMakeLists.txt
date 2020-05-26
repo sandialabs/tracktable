@@ -388,7 +388,7 @@ if (UNIX)
   endif (APPLE)
 else (UNIX)
   # Windows doesn't have delocate/auditwheel yet.  We wrote a replacement.
-  set(FIX_WHEEL_EXECUTABLE "${Tracktable_SOURCE_DIR}/packaging/winlocate_new.py")
+  set(FIX_WHEEL_EXECUTABLE "${Tracktable_SOURCE_DIR}/packaging/winlocate.py")
 endif (UNIX)
 
 
