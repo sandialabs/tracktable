@@ -14,11 +14,28 @@
 
 from __future__ import print_function
 
+import subprocess
 import sys
 import os
 
-tracktable_src = '@Tracktable_SOURCE_DIR@'
-tracktable_build = '@Tracktable_BINARY_DIR@'
+tracktable_src = '../'
+tracktable_build = None
+
+debugging = False
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+
+if read_the_docs_build or debugging:
+    # We have to run these manually on readthedocs since we aren't
+    # driving the build with CMake.
+    subprocess.call(['doxygen', 'readthedocs/Doxyfile-readthedocs'])
+else:
+    # If we're building all of Tracktable, we're operating in
+    # the build directory instead of the source directory.  These
+    # variables will be filled in by CMake.
+    #
+    tracktable_src = '@Tracktable_SOURCE_DIR@'
+    tracktable_build = '@Tracktable_BINARY_DIR@'
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -31,18 +48,20 @@ sys.path.insert(0, os.path.abspath(os.path.join(tracktable_src, 'tracktable', 'P
 # pretend to have imported already.
 
 autodoc_mock_imports = [
+    'cartopy',
     'matplotlib',
     'mpl_toolkits',
-    'cartopy',
     'numpy',
     'shapefile',
     'shapely',
-    'tracktable.core.core_types',
+    'tracktable.core.core_types', # for BoostPythonArgumentError
     'tracktable.lib._cartesian2d',
     'tracktable.lib._cartesian3d',
     'tracktable.lib._core_types',
     'tracktable.lib._dbscan_clustering',
+    'tracktable.lib._distance_geometry',
     'tracktable.lib._domain_algorithm_overloads',
+    'tracktable.lib._feature_vector_points',
     'tracktable.lib._logging',
     'tracktable.lib._rtree',
     'tracktable.lib._terrestrial'
@@ -108,7 +127,7 @@ release = '1.3.0'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build', '*/data/*']
+exclude_patterns = ['_build', '*/data/*', 'readthedocs']
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
@@ -136,7 +155,12 @@ pygments_style = 'sphinx'
 
 # -- Options for Breathe Doxygen <-> Sphinx bridge
 
-breathe_projects = { "tracktable_cpp": os.path.join(tracktable_build, "Documentation", "doxyxml") }
+if read_the_docs_build or debugging:
+    breathe_projects = {'tracktable_cpp': 'readthedocs/doxygen/doxyxml'}
+else:
+    breathe_projects = {
+        'tracktable_cpp': os.path.join(tracktable_build, 'Documentation', 'doxyxml')
+    }
 breathe_default_project = "tracktable_cpp"
 
 # -- Options for HTML output ----------------------------------------------
@@ -176,7 +200,10 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = [ os.path.join(tracktable_src, 'Documentation', 'css') ]
+if read_the_docs_build or debugging:
+    html_static_path = ['css']
+else:
+    html_static_path = os.path.join(tracktable_src, 'Documentation', 'css')
 html_style = "tracktable.css"
 
 # Add any extra paths that contain custom files (such as robots.txt or
@@ -245,9 +272,10 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
+
+AUTHORS = u'Andy Wilson and Danny Rintoul and Chris Valicka and Ben Newton and Phil Baxley and Kat Ward and Rick Vinyard'
 latex_documents = [
-  ('index', 'Tracktable.tex', u'Tracktable Documentation',
-   u'Andy Wilson and Danny Rintoul and Chris Valicka and Ben Newton and Phil Baxley and Kat Ward and Rick Vinyard', 'manual'),
+  ('index', 'Tracktable.tex', u'Tracktable Documentation', AUTHORS, 'manual')
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -277,7 +305,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'tracktable', u'Tracktable 1.3.0 Documentation',
-     [u'Andy Wilson and Danny Rintoul and Chris Valicka and Ben Newton and Phil Baxley and Kat Ward and Rick Vinyard'], 1)
+     [AUTHORS], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -290,8 +318,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'Tracktable', u'Tracktable 1.3.0 Documentation',
-   u'Andy Wilson and Danny Rintoul and Chris Valicka and Ben Newton and Phil Baxley and Kat Ward and Rick Vinyard', 'Tracktable', 'Trajectory analysis and rendering.',
+  ('index', 'Tracktable', u'Tracktable 1.2.4 Documentation',
+   AUTHORS, 'Tracktable', 'Trajectory analysis and rendering.',
    'Miscellaneous'),
 ]
 
@@ -312,7 +340,7 @@ texinfo_documents = [
 
 # Bibliographic Dublin Core info.
 epub_title = u'Tracktable'
-epub_author = u'Andy Wilson and Danny Rintoul and Chris Valicka and Ben Newton and Phil Baxley and Kat Ward and Rick Vinyard'
+epub_author = AUTHORS
 epub_publisher = u'Sandia National Laboratories'
 epub_copyright = u'2014-2020, National Technology and Engineering Solutions of Sandia, Inc.'
 
