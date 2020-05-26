@@ -355,36 +355,70 @@ message(STATUS "INFO: Python executable is ${Python3_EXECUTABLE}")
 message(STATUS "INFO: Install prefix is ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "INFO: Wheel should go in ${CMAKE_BINARY_DIR}/wheel")
 
-if (APPLE)
-  find_program(
-    FIX_WHEEL_EXECUTABLE
-    delocate-wheel
-    HINTS
-    ${Python3_EXECUTABLE_DIRECTORY}
-    DOC
-    "delocate-wheel executable: OS X utility to add libraries to Python wheels"
+# Wheel fixup:
+#
+# On Linux and MacOS, we have programs (auditwheel and delocate)
+# that will inspect the contents of the wheel and track down any
+# missing binary dependencies such as Boost shared libraries (and
+# incidentally Tracktable's shared libraries!), then copy them into
+# the wheel.
+#
+# Windows doesn't have anything comparable.  We have a utility called
+# 'winlocate' that tracks down the dependencies and adds them to the
+# list of files to be packaged in the wheel.
+if (UNIX)
+  if (APPLE)
+    find_program(
+      FIX_WHEEL_EXECUTABLE
+      delocate-wheel
+      HINTS
+      ${Python3_EXECUTABLE_DIRECTORY}
+      DOC
+      "delocate-wheel executable: OS X utility to add libraries to Python wheels"
     )
-endif (APPLE)
+  else (APPLE)
+    find_program(
+      FIX_WHEEL_EXECUTABLE
+      auditwheel
+      HINTS
+      ${Python3_EXECUTABLE_DIRECTORY}
+      DOC
+      "auditwheel: add libraries to a wheel"
+      )
+  endif (APPLE)
+else (UNIX)
+  # Windows doesn't have delocate/auditwheel yet.  We wrote a replacement.
+  set(FIX_WHEEL_EXECUTABLE "${Tracktable_SOURCE_DIR}/packaging/winlocate.py")
+endif (UNIX)
 
-if (UNIX AND NOT APPLE)
-  find_program(
-    FIX_WHEEL_EXECUTABLE
-    auditwheel
-    DOC
-    "auditwheel: add libraries to a wheel"
-    )
-endif (UNIX AND NOT APPLE)
 
-
-add_custom_target( wheel
-  COMMAND
-  ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
-  ${Python3_EXECUTABLE}
-  ${CMAKE_BINARY_DIR}
-  ${CMAKE_INSTALL_PREFIX}
-  ${CMAKE_BINARY_DIR}/wheel
-  ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
-  ${FIX_WHEEL_EXECUTABLE}
-  WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+if (UNIX)
+  add_custom_target( wheel
+    COMMAND
+    ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
+    ${Python3_EXECUTABLE}
+    ${CMAKE_BINARY_DIR}
+    ${CMAKE_INSTALL_PREFIX}
+    ${CMAKE_BINARY_DIR}/wheel
+    ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
+    ${FIX_WHEEL_EXECUTABLE}
+    NO_EXTRA_SEARCH_PATHS
+    WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
 #  DEPENDS install
-  )
+    )
+else (UNIX)
+  message(STATUS "DEBUG: Boost_LIBRARY_DIRS is ${Boost_LIBRARY_DIRS}")
+  add_custom_target( wheel
+    COMMAND
+    ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake
+    ${Python3_EXECUTABLE}
+    ${CMAKE_BINARY_DIR}
+    ${CMAKE_INSTALL_PREFIX}
+    ${CMAKE_BINARY_DIR}/wheel
+    ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
+    ${FIX_WHEEL_EXECUTABLE}
+    # These will be picked up as extra search paths
+    ${Boost_LIBRARY_DIRS}
+    WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
+    )
+endif (UNIX)
