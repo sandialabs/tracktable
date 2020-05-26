@@ -27,8 +27,16 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-
-find_package(Boost 1.61 REQUIRED)
+unset(Boost_FOUND)
+get_filename_component(_TEST_NAME_TMP ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+get_filename_component(_TEST_NAME_2 ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+get_filename_component(_TEST_NAME_1 ${_TEST_NAME_TMP} NAME)
+message(STATUS "Looking for Boost components needed for C++ tests in ${_TEST_NAME_1}/${_TEST_NAME_2}")
+find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
+  COMPONENTS
+    ${BOOST_CORE_COMPONENTS_NEEDED}
+    ${BOOST_TEST_COMPONENTS}
+  )
 
 include_directories(
   ${Tracktable_SOURCE_DIR}
@@ -45,6 +53,11 @@ add_executable(test_base_point_terrestrial
   test_base_point_terrestrial.cpp
 )
 set_property(TARGET test_base_point_terrestrial         PROPERTY FOLDER "Tests")
+
+add_executable(test_feature_vector_to_string
+  test_feature_vector_to_string.cpp
+)
+set_property(TARGET test_feature_vector_to_string PROPERTY FOLDER "Tests")
 
 add_executable(test_trajectory_point_terrestrial
   test_trajectory_point_terrestrial.cpp
@@ -74,6 +87,12 @@ target_link_libraries(test_base_point_terrestrial
   ${Boost_LIBRARIES}
 )
 
+target_link_libraries(test_feature_vector_to_string
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+  )
+
 target_link_libraries(test_trajectory_point_terrestrial
   TracktableCore
   TracktableDomain
@@ -100,6 +119,11 @@ add_test(
 add_test(
   NAME C_BasePointTerrestrial
   COMMAND test_base_point_terrestrial
+)
+
+add_test(
+  NAME C_FeatureVectorToString
+  COMMAND test_feature_vector_to_string
 )
 
 add_test(

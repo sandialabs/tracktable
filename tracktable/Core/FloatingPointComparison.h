@@ -37,7 +37,6 @@
 #ifndef __tracktable_floating_point_comparison_h
 #define __tracktable_floating_point_comparison_h
 
-#include <boost/test/floating_point_comparison.hpp>
 #include <cmath>
 #include <limits>
 
@@ -75,7 +74,7 @@ bool almost_equal(
     {
     // Either they're both close to zero or one of them actually is
     // zero.  Relative error is less meaningful here.
-    return (diff < tolerance * std::numeric_limits<T>::min());
+    return (diff < tolerance);
     }
   else
     {
@@ -92,7 +91,7 @@ bool almost_equal(
 template<typename T>
 bool almost_zero(
   T z,
-  T epsilon=settings::EQUALITY_RELATIVE_TOLERANCE
+  T epsilon=settings::ZERO_ABSOLUTE_TOLERANCE
   )
 {
   return almost_equal<T>(z, static_cast<T>(0), epsilon);

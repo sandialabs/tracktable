@@ -29,8 +29,6 @@
 
 # This is tracktable/Examples/Assemble/CMakeLists.txt
 
-find_package(Boost 1.61 REQUIRED COMPONENTS program_options regex)
-
 include_directories(
   ${Tracktable_SOURCE_DIR}
   ${Tracktable_BINARY_DIR}

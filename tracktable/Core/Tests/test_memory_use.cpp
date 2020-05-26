@@ -34,6 +34,9 @@
 #include <boost/cstdint.hpp>
 #include <iostream>
 
+// Import constants for log level
+using namespace tracktable::log;
+
 int test_memory_use()
 {
   int error_count = 0;

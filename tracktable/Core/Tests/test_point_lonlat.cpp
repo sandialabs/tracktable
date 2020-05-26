@@ -141,6 +141,7 @@ int test_point_lonlat()
   dummy = tracktable::longitude_as_degrees(access_test);
   dummy = tracktable::latitude_as_radians(access_test);
   dummy = tracktable::longitude_as_radians(access_test);
+  if (dummy > 0.0) { } // This line is here to avoid unused variable warning
 
   santa_fe.set_latitude(35.6672);
   santa_fe.set_longitude(-105.9644);

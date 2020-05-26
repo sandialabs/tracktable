@@ -69,7 +69,7 @@ T typed_property_with_default(
       }
     catch (boost::bad_get e)
       {
-      TRACKTABLE_LOG(warning) 
+      TRACKTABLE_LOG(tracktable::log::warning) 
         << "PropertyMap: Property '"
         << name 
         << "' is present but is not of the requested type";
@@ -235,7 +235,7 @@ double real_property(PropertyMap const& properties, string_type const& name, boo
       }
     catch (boost::bad_get e)
       {
-      TRACKTABLE_LOG(warning) 
+      TRACKTABLE_LOG(log::warning) 
         << "PropertyMap: Property '"
         << name << "' is present but is not real-valued\n";
       if (is_present) *is_present = false;
@@ -290,7 +290,7 @@ int64_t integer_property(PropertyMap const& properties, string_type const& name,
       }
     catch (boost::bad_get e)
       {
-      TRACKTABLE_LOG(warning) 
+      TRACKTABLE_LOG(log::warning) 
         << "PropertyMap: Property '"
         << name << "' is present but is not integer-valued";
       if (is_present) *is_present = false;
@@ -345,7 +345,7 @@ string_type string_property(PropertyMap const& properties, string_type const& na
       }
     catch (boost::bad_get e)
       {
-      TRACKTABLE_LOG(warning) 
+      TRACKTABLE_LOG(log::warning) 
         << "PropertyMap: Property '"
         << name << "' is present but is not a string";
       if (is_present) *is_present = false;
@@ -398,7 +398,7 @@ Timestamp timestamp_property(PropertyMap const& properties, string_type const& n
       }
     catch (boost::bad_get e)
       {
-      TRACKTABLE_LOG(warning) 
+      TRACKTABLE_LOG(log::warning) 
         << "PropertyMap: Property '"
         << name << "' is present but is not a timestamp";
       if (is_present) *is_present = false;
@@ -584,5 +584,41 @@ string_type property_map_to_string(
   outbuf << ")";
   return outbuf.str();
 }
+
+// Except for the call to compare() this function is identical to the std::map operator==
+TRACKTABLE_CORE_EXPORT bool operator==(const PropertyMap& pm1, const PropertyMap& pm2) {
+  // First compare the sizes
+  if (pm1.size() != pm2.size())
+      return false;
+
+  // Because the property map iterators are sorted on key we can use the iterators
+  // to provide an O(n) comparison
+  PropertyMap::const_iterator iter1 = pm1.begin();
+  PropertyMap::const_iterator iter2 = pm2.begin();
+
+  while (iter1 != pm1.end()) {
+
+    // Compare property names first
+    // If any name is different the property maps are different
+    if (iter1->first != iter2->first)
+        return false;
+
+    // Now we'll use the compare method of the property values
+    if (compare(iter1->second, iter2->second) != 0)
+        return false;
+
+    iter1++;
+    iter2++;
+  }
+
+  // So far all the items are equal, and we're done checking pm1 against
+  // pm2. But, if pm2 has any more items the two maps aren't equal.
+  if (iter2 != pm2.end())
+    return false;
+
+  // And, of course, if we haven't found any differences by now, the maps are equal
+  return true;
+}
+
 
 } // exit namespace tracktable

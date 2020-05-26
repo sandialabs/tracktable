@@ -34,8 +34,6 @@
 # So far this is a header-only implementation.  The lack of libraries
 # being built is not an error.
 
-find_package(Boost 1.61 REQUIRED)
-
 include_directories(
   ${Tracktable_SOURCE_DIR}
   ${Boost_INCLUDE_DIR}
@@ -44,6 +42,7 @@ include_directories(
 set( Analysis_HEADERS
   AssembleTrajectories.h
   ComputeDBSCANClustering.h
+  DistanceGeometry.h
   RTree.h
   GuardedBoostGeometryRTreeHeader.h
 )
@@ -76,10 +75,10 @@ endif (BUILD_TESTING)
 
 install(
   FILES ${Analysis_HEADERS}
-  DESTINATION include/tracktable/Analysis
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Analysis
 )
 
 install(
   FILES ${Detail_HEADERS}
-  DESTINATION include/tracktable/Analysis/detail
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Analysis/detail
 )

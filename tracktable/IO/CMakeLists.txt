@@ -30,8 +30,6 @@
 
 # This is tracktable/C++/IO/CMakeLists.txt
 
-find_package(Boost 1.61 REQUIRED regex)
-
 include_directories(
   ${Tracktable_SOURCE_DIR}
   ${Boost_INCLUDE_DIR}
@@ -94,12 +92,12 @@ endif (BUILD_TESTING)
 
 install(
   FILES ${IO_Headers}
-  DESTINATION include/tracktable/IO
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/IO
 )
 
 install(
   FILES ${IO_Detail_HEADERS}
-  DESTINATION include/tracktable/IO/detail
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/IO/detail
 )
 
 # install(

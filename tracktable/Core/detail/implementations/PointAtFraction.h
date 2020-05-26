@@ -152,7 +152,7 @@ struct generic_point_at_length_fraction
             }
             else
             {
-                TRACKTABLE_LOG(warning)
+                TRACKTABLE_LOG(log::warning)
                   << "WARNING: Trajectory::point_at_time: This shouldn't ever happen.  "
                   << "before: " << *before << " " 
                   << "after: " << *after << " "

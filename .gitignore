@@ -9,3 +9,4 @@ Documentation/Makefile
 __pycache__
 *.project
 *.pydevproject
+/build/

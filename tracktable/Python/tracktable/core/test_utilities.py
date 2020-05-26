@@ -36,6 +36,7 @@ ground truth files, including computing differences where appropriate.
 
 from __future__ import print_function, division
 
+import logging
 import numpy as np
 
 try:
@@ -43,8 +44,8 @@ try:
     from PIL import Image
     PIL_AVAILABLE=True
 except ImportError:
-    get_logger(__name__).log(LogLevel.WARNING, 
-        ("Python image library (PIL or Pillow) not available. "
+    logging.getLogger(__name__).warning((
+         "Python image library (PIL or Pillow) not available. "
          "Image tests will automatically fail."))
     PIL_AVAILABLE=False
 
@@ -76,7 +77,7 @@ def image_mse(imageA, imageB):
 
     err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
     err /= float(imageA.shape[0] * imageA.shape[1])
-    
+
     # return the MSE, the lower the error, the more "similar"
     # the two images are
     return err
@@ -112,7 +113,7 @@ def compare_images(expected, actual, tolerance=1):
         computed_mse = image_mse(expected_image, actual_image)
         if computed_mse >= tolerance:
             print(("Image comparison failed: tolerance = {}, "
-                  "computed mean squared error = {}").format(tolerance, 
+                  "computed mean squared error = {}").format(tolerance,
                                                              computed_mse))
         return computed_mse < tolerance
 

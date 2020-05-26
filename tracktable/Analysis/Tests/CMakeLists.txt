@@ -1,7 +1,7 @@
 # Copyright (c) 2014-2017 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
-# the U.S. Government retains certain rights in this software. 
+# the U.S. Government retains certain rights in this software.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -27,15 +27,23 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-find_package(Boost 1.61 REQUIRED COMPONENTS system timer chrono)
-
-
 # We need this because heavily templated classes like DBSCAN create
 # object files too big for the Visual C++ linker to handle normally.
 
 if (MSVC)
   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj" )
 endif (MSVC)
+
+unset(Boost_FOUND)
+get_filename_component(_TEST_NAME_TMP ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+get_filename_component(_TEST_NAME_2 ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+get_filename_component(_TEST_NAME_1 ${_TEST_NAME_TMP} NAME)
+message(STATUS "Looking for Boost components needed for C++ tests in ${_TEST_NAME_1}/${_TEST_NAME_2}")
+find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
+  COMPONENTS
+    ${BOOST_CORE_COMPONENTS_NEEDED}
+    ${BOOST_TEST_COMPONENTS}
+  )
 
 include_directories(
   ${Tracktable_SOURCE_DIR}
@@ -75,12 +83,35 @@ set_property(
   PROPERTY FOLDER "Tests"
   )
 
-  
-add_executable(test_dg
-  test_dg.cpp
+add_executable(test_terrestrial_distance_geometry_by_distance
+  test_terrestrial_distance_geometry_by_distance.cpp
   )
 set_property(
-  TARGET test_dg
+  TARGET test_terrestrial_distance_geometry_by_distance
+  PROPERTY FOLDER "Tests"
+  )
+
+add_executable(test_cartesian2d_distance_geometry_by_distance
+  test_cartesian2d_distance_geometry_by_distance.cpp
+  )
+set_property(
+  TARGET test_cartesian2d_distance_geometry_by_distance
+  PROPERTY FOLDER "Tests"
+  )
+
+add_executable(test_terrestrial_distance_geometry_by_time
+  test_terrestrial_distance_geometry_by_time.cpp
+  )
+set_property(
+  TARGET test_terrestrial_distance_geometry_by_time
+  PROPERTY FOLDER "Tests"
+  )
+
+add_executable(test_cartesian2d_distance_geometry_by_time
+  test_cartesian2d_distance_geometry_by_time.cpp
+  )
+set_property(
+  TARGET test_cartesian2d_distance_geometry_by_time
   PROPERTY FOLDER "Tests"
   )
 
@@ -114,11 +145,30 @@ target_link_libraries(test_dbscan_decorated_points
   ${Boost_LIBRARIES}
   )
 
-target_link_libraries(test_dg
+target_link_libraries(test_terrestrial_distance_geometry_by_distance
   TracktableCore
   TracktableDomain
   ${Boost_LIBRARIES}
   )
+
+target_link_libraries(test_cartesian2d_distance_geometry_by_distance
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+  )
+
+target_link_libraries(test_terrestrial_distance_geometry_by_time
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+  )
+
+target_link_libraries(test_cartesian2d_distance_geometry_by_time
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+  )
+
 add_test(
   NAME C_DBSCAN_Cartesian
   COMMAND test_dbscan_cartesian
@@ -140,8 +190,23 @@ add_test(
   )
 
 add_test(
-  NAME C_DG
-  COMMAND test_dg
+  NAME C_Terrestrial_DistanceGeometry_Distance
+  COMMAND test_terrestrial_distance_geometry_by_distance
+  )
+
+add_test(
+  NAME C_Cartesian2D_DistanceGeometry_Distance
+  COMMAND test_cartesian2d_distance_geometry_by_distance
+  )
+
+add_test(
+  NAME C_Terrestrial_DistanceGeometry_Time
+  COMMAND test_terrestrial_distance_geometry_by_time
+  )
+
+add_test(
+  NAME C_Cartesian2D_DistanceGeometry_Time
+  COMMAND test_cartesian2d_distance_geometry_by_time
   )
 
 add_test(

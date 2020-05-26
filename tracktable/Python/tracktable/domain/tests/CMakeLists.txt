@@ -35,9 +35,13 @@
 include(PythonTest)
 set(DOMAIN "tracktable.domain.tests")
 
+add_python_test(P_BasePointToString ${DOMAIN}.test_base_point_to_string)
+
 add_python_test(P_TestDomainNames ${DOMAIN}.test_domain_names)
 
 add_python_test(P_GeometricMedian ${DOMAIN}.test_geometric_median)
+
+add_python_test(P_NoFlushClosedStream ${DOMAIN}.test_no_flush_closed_stream)
 
 add_python_test(P_Terrestrial_BasePointReader
   ${DOMAIN}.test_terrestrial_base_point_reader ${Tracktable_SOURCE_DIR}/TestData/Points/PointsWithComments.csv 14
@@ -193,6 +197,11 @@ add_python_test(
 )
 
 add_python_test(
+  P_FeatureVector_ToString
+  ${DOMAIN}.test_feature_vector_to_string
+)
+
+add_python_test(
   P_ImportDomainClasses
   ${DOMAIN}.import_everything
   )
@@ -210,4 +219,9 @@ add_python_test(
 add_python_test(
   P_CurrentLengthAvailable
   ${DOMAIN}.test_current_length
+  )
+
+add_python_test(
+  P_TrajectoryId
+  ${DOMAIN}.test_trajectory_id
   )

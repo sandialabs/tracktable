@@ -42,8 +42,10 @@
 #include <tracktable/Core/PointCartesian.h>
 #include <tracktable/Core/PointArithmetic.h>
 
+#define BOOST_ALLOW_DEPRECATED_HEADERS
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_real_distribution.hpp>
+#undef BOOST_ALLOW_DEPRECATED_HEADERS
 
 
 #ifndef _USE_MATH_DEFINES
@@ -53,6 +55,10 @@
 #include <cstdlib>
 #include <iostream>
 #include <limits>
+
+namespace {
+  static const double PI = 3.141592653589793238462643383;
+}
 
 // ----------------------------------------------------------------------
 
@@ -80,7 +86,7 @@ double random_gaussian(double mean=0, double stddev=1)
   //
   // y1 and y2 will be independent and normally distributed.
   
-  return mean + stddev * (sqrt(-2 * log(u)) * sin(2*M_PI*v));
+  return mean + stddev * (sqrt(-2 * log(u)) * sin(2*PI*v));
 }
 
 // ----------------------------------------------------------------------

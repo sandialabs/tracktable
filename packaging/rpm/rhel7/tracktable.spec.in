@@ -1,0 +1,115 @@
+Summary:          Tracktable C++ trajectory analysis and rendering library
+Name:             tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@
+Version:          @TRACKTABLE_VERSION@
+Release:          @RPM_RELEASE@%{?dist}
+License:          Other
+URL:              https://tracktable.sandia.gov/
+Group:            System Environment/Libraries
+Source:           Tracktable-@TRACKTABLE_VERSION@-Source.tar.bz2
+Vendor:           National Technology and Engineering Solutions of Sandia, LLC
+BuildRoot:        %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires:    doxygen
+BuildRequires:    graphviz
+BuildRequires:    boost169-devel >= 1.69
+BuildRequires:    cmake3 >= 3.12
+BuildRequires:    pkgconfig
+#BuildRequires:    python36-python-devel
+#BuildRequires:    python36-pillow
+#BuildRequires:    python36-Cython
+#BuildRequires:    proj-devel
+#BuildRequires:    proj-epsg
+#BuildRequires:    proj-nad
+#BuildRequires:    python36-scipy
+#BuildRequires:    python36-pytz
+#BuildRequires:    python3-pip
+#pip install matplotlib
+#pip install cartopy fails because RHEL 7 proj is 4.8.0 and cartopy requires 4.9.0
+Obsoletes:        tracktable
+
+%description
+Tracktable is a C++ trajectory and analysis library.
+
+%package          devel
+Summary:          C++ Headers for developing programs that will use the Tracktable library
+Group:            Development/Libraries
+Requires:         tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@ = %{version}-%{release}
+Requires:         boost169-devel >= 1.69
+Requires:         pkgconfig
+Obsoletes:        tracktable-devel
+
+%description    devel
+C++ libraries and header files needed for developing applications that
+will use the tracktable library.
+
+%package          doc
+Summary:          Developer's documentation for the tracktable library
+Group:            Documentation
+BuildArch:        noarch
+Obsoletes:        tracktable-doc
+
+%description      doc
+This package contains developer's documentation for the tracktable library.
+
+%prep
+%setup -q -n Tracktable-@TRACKTABLE_VERSION@-Source
+
+%build
+%cmake3 \
+    -DBOOST_INCLUDEDIR=/usr/include/boost169/ \
+    -DBOOST_LIBRARYDIR=/usr/lib64/boost169 \
+    -DBUILD_EXAMPLES=ON \
+    -DTRACKTABLE_PYTHON=OFF \
+    -DBUILD_TESTING=ON \
+    -DCMAKE_INSTALL_LIBDIR:PATH=%{_libdir} \
+    -DBUILD_DOCUMENTATION_CXX_ONLY=ON \
+    -DPython3_EXECUTABLE=python3.6 \
+    .
+
+%make_build %{?_smp_mflags}
+
+%install
+%make_install
+
+%check
+ctest3 -V %{?_smp_mflags}
+
+%clean
+%{__rm} -rf %{buildroot}
+
+%post -p /sbin/ldconfig
+
+%postun -p /sbin/ldconfig
+
+%files
+%defattr(-,root,root,-)
+%{_libdir}/libTracktable*.so.*
+%{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/LICENSE.txt
+%{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/README.md
+
+%files devel
+%defattr(-,root,root,-)
+%{_libdir}/libTracktable*.so
+%{_libdir}/pkgconfig/@PKGCONFIG_FILE@
+%{_includedir}/@TRACKTABLE_INCLUDEDIR@
+%{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/LICENSE.txt
+%{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/README.md
+
+%files doc
+%defattr(-,root,root,-)
+%dir %{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@
+%{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/LICENSE.txt
+%{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/README.md
+%doc %{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/cpp_reference/
+#%doc %{_docdir}/tracktable-@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@/html/
+
+%changelog
+
+* Tue May 19 2020 Andrew T Wilson <atwilso@sandia.gov> - 1.3.0-1
+- Update for Tracktable 1.3.0
+* Wed Mar 04 2020 Rick L Vinyard Jr <rlvinya@sandia.gov> - 1.2.4-7
+- Enabled example and testing builds to force rpmbuild failure on example or test failure
+* Wed Mar 04 2020 Rick L Vinyard Jr <rlvinya@sandia.gov> - 1.2.4-6
+- Added documentation subpackage
+* Mon Jan 20 2020 Rick L Vinyard Jr <rlvinya@sandia.gov> - 1.2.2-1
+- Initial version
+

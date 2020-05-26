@@ -14,6 +14,8 @@ Albuquerque, New Mexico:
 * Danny Rintoul
 * Ben Newton
 * Phil Baxley
+* Kat Ward
+
 
 We gratefully acknowledge contributions from our collaborators:
 

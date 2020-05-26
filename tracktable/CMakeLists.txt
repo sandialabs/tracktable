@@ -2,7 +2,7 @@
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
- 
+
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,17 +33,16 @@
 # This is tracktable/C++/CMakeLists.txt.
 #
 
-cmake_minimum_required(VERSION 3.12)
-
-set(Tracktable_VERSION 1.2.4)
-
 add_subdirectory(Core)
 add_subdirectory(Domain)
 add_subdirectory(IO)
 add_subdirectory(Analysis)
-add_subdirectory(Examples)
 
-if (BUILD_PYTHON_WRAPPING)
+if (BUILD_EXAMPLES)
+add_subdirectory(Examples)
+endif (BUILD_EXAMPLES)
+
+if (TRACKTABLE_PYTHON)
   add_subdirectory(Python)
   add_subdirectory(PythonWrapping)
-endif (BUILD_PYTHON_WRAPPING)
+endif (TRACKTABLE_PYTHON)
