@@ -73,10 +73,10 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/examples
 )
 
-file(GLOB example_notebooks "examples/notebooks/*.py")
+file(GLOB example_notebooks "examples/notebook_examples/*.ipynb")
 install(
-  FILES ${example_noteboos}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/notebooks
+  FILES ${example_notebooks}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/notebook_examples
   )
 
 file(GLOB example_data_files "examples/data/*.*")
