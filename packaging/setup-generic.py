@@ -165,6 +165,9 @@ def main():
         files_from_components(example_data_directory, '*.traj')
         )
 
+    notebook_example_directory = os.path.join(tracktable_home, 'examples', 'notebook_examples')
+    notebook_example_files = files_from_components(notebook_example_directory, '*.ipynb')
+
     license_files = [ os.path.join(tracktable_home, 'LICENSE.txt') ]
 
     # --------------------
@@ -220,12 +223,15 @@ def main():
         # Computed properties
         package_dir=package_directory,
         packages=tracktable_contents,
-        package_data={ 'tracktable':
-                       (binary_extensions +
-                        support_libraries +
-                        license_files +
-                        aux_data_files +
-                        example_data_files) },
+        package_data={
+            'tracktable':
+                (binary_extensions +
+                 support_libraries +
+                 license_files +
+                 aux_data_files +
+                 example_data_files +
+                 notebook_example_files)
+                },
         # Assembly information and system parameters
         distclass=BinaryDistribution,
         zip_safe=False,
