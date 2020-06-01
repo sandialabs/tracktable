@@ -88,9 +88,8 @@ cities.py - Locations and population values for many cities of the world
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import print_function, absolute_import, division
-import pandas as pd
-import numpy as np
 import logging
+from math import inf
 
 from tracktable.core.geomath import latitude, longitude, distance
 from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
@@ -237,44 +236,55 @@ def get_city(name, country=None, latlong=None):
     if not CITY_TABLE:
         from tracktable.info.data.city_table import city_table as cities
         CITY_TABLE = cities
-
-    # Using pandas for lookup convenience features. 
-    df = pd.DataFrame(CITY_TABLE)
-    df.columns = HEADINGS   
+ 
+    city_list = CITY_TABLE
     
-    COUNTRY = HEADINGS[0]
-    CITY = HEADINGS[1]
-    POP = HEADINGS[2]
-    LAT = HEADINGS[3]
-    LONG = HEADINGS[4]
+    COUNTRY = 0
+    CITY = 1
+    POP = 2
+    LAT = 3
+    LONG = 4
     
     city_info = CityInfo()
     
     if country == None:
         # Get cities with this name
-        city_df = df[df[CITY] == name]
+        city_list = [city for city in city_list if (city[CITY] == name)]
     else:
         # Get cities with this name AND this country code
-        city_df = df[(df[CITY] == name) & (df[COUNTRY] == country)]
+        city_list = [city for city in city_list if ((city[CITY] == name) & (city[COUNTRY] == country))]
     
-    if len(city_df.index) == 0:
+    if len(city_list) == 0:
         return None
-    
+
     if latlong != None:
         # Find the distance of each town form the target lat/long
-        city_df['DISTANCE'] = city_df.apply(lambda x: distance(TerrestrialTrajectoryPoint(x[LAT], x[LONG]), TerrestrialTrajectoryPoint(latlong)), axis=1)
-        # Get the closest city to the lat/long
-        city_df = city_df[city_df['DISTANCE'] == city_df['DISTANCE'].min()]   
-
+        closest_city_distance = inf
+        closest_city = None
+        for city in city_list:
+            city_distance = distance(TerrestrialTrajectoryPoint(city[LAT], city[LONG]), TerrestrialTrajectoryPoint(latlong))
+            if city_distance < closest_city_distance:
+                closest_city = city
+                closest_city_distance = city_distance
+        city_info.country_code =  closest_city[COUNTRY]
+        city_info.name = closest_city[CITY]
+        city_info.population = closest_city[POP]
+        city_info.latitude = closest_city[LAT]
+        city_info.longitude = closest_city[LONG]
+        return city_info
+    
     # Get the biggest city 
-    # Don't need to do this if only one result but its doesn't hurt to just do it anyway.
-    city_df = city_df[city_df[POP] == city_df[POP].max()]
-  
-    city_info.country_code =  city_df[COUNTRY].values[0]
-    city_info.name = city_df[CITY].values[0]
-    city_info.population = city_df[POP].values[0]
-    city_info.latitude = city_df[LAT].values[0]
-    city_info.longitude = city_df[LONG].values[0]
+    biggest_city_population = -inf
+    biggest_city = None
+    for city in city_list:
+        if city[POP] > biggest_city_population:
+            biggest_city = city
+            biggest_city_population = city[POP]
+    city_info.country_code =  biggest_city[COUNTRY]
+    city_info.name = biggest_city[CITY]
+    city_info.population = biggest_city[POP]
+    city_info.latitude = biggest_city[LAT]
+    city_info.longitude = biggest_city[LONG]
     return city_info
 
 HEADINGS = [ u"Country",u"AccentCity",'Population','Latitude','Longitude' ]
