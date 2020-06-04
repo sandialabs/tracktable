@@ -36,6 +36,7 @@ from tracktable.lib import _dbscan_clustering
 from tracktable.domain.feature_vectors import convert_to_feature_vector
 import logging
 
+
 def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_size):
     """Use DBSCAN to compute clusters for a set of points.
 
@@ -105,3 +106,14 @@ def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_si
         final_labels.append((vertex_ids[vertex_index], cluster_id))
 
     return final_labels
+
+   
+def cluster_labels_to_dict(cluster_labels):
+    """Creates a dictionary from cluster label pairs."""
+    dict = {}
+    for (vertex_id, cluster_id) in cluster_labels:
+        if str(cluster_id) in dict:
+            dict[str(cluster_id)].append(vertex_id)
+        else:
+            dict[str(cluster_id)] = [vertex_id]
+    return dict
