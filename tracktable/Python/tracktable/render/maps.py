@@ -80,9 +80,12 @@ CONVENIENCE_MAPS = {
         'max_corner': (155, -10)
     },
 
+    # Cartopy complains and renders a map with the wrong dimensions
+    # if min_corner and max_corner are equal mod 360, so we're excluding
+    # a tiny sliver of the world.
     'world': {
         'min_corner': (-180, -90),
-        'max_corner': (180, 90)
+        'max_corner': (179.999, 90)
     }
 }
 
