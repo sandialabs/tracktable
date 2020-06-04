@@ -34,7 +34,7 @@ import random
 import sys
 from six.moves import range
 
-from tracktable.analysis.dbscan import compute_cluster_labels
+from tracktable.analysis.dbscan import compute_cluster_labels, cluster_labels_to_dict
 
 # Test dbscan in 3 dimensions
 
@@ -122,14 +122,63 @@ def test_clusters():
         print("ERROR: Cluster IDs for bare points do not match cluster IDs for decorated points.")
         print("First 10 for bare points: {}".format(sorted_int_ids[0:10]))
         print("First 10 for decorated points (result): {}".format(sorted_string_ids[0:10]))
-
+        return 1
+    
+    return 0
 #    print("Cluster IDs: {}".format(cluster_ids))
 
 # ----------------------------------------------------------------------
 
-def main():
-    test_clusters()
+def test_cluster_dictionary():
+    random.seed(0)
+
+    print("Creating points")
+    corner_points = place_corner_clusters()
+    noise_points = place_noise_points([0.5, 0.5, 0.5], [10, 10, 10], 100)
+
+    all_points = corner_points + noise_points
+
+    vertex_ids_as_strings = [ str(i) for i in range(len(all_points)) ]
+    decorated_points = list(zip(all_points, vertex_ids_as_strings))
+    
+    print("Learning cluster IDs for bare points.")
+    int_cluster_ids = compute_cluster_labels(all_points,
+                                             [0.05, 0.05, 0.05],
+                                             4)
+    
+    bare_point_dict = cluster_labels_to_dict(int_cluster_ids)
+                                             
+    print("Learning cluster IDs for decorated points.")
+    string_cluster_ids = compute_cluster_labels(decorated_points,
+                                                [0.05, 0.05, 0.05],
+                                                4)
+
+    decorated_point_dict = cluster_labels_to_dict(string_cluster_ids)                                            
+    
+    for (v_id, c_id) in int_cluster_ids:
+        if str(c_id) not in bare_point_dict:
+            print("ERROR: Cluster IDs for bare point not found in cluster dictionary as a key.")
+            return 1
+        if v_id not in bare_point_dict[str(c_id)]:
+            print("ERROR: Vector IDs for bare point not found in cluster dictionary as a value.")
+            return 1    
+        
+    for (v_id, c_id) in string_cluster_ids:
+        if str(c_id) not in decorated_point_dict:
+            print("ERROR: Cluster IDs for decorated point not found in cluster dictionary as a key.")
+            return 1
+        if v_id not in decorated_point_dict[str(c_id)]:
+            print("ERROR: Vector IDs for decorated point not found in cluster dictionary as a value.")
+            return 1    
+            
     return 0
+    
+# ----------------------------------------------------------------------
+
+def main():
+    num_errors = test_clusters()
+    num_errors += test_cluster_dictionary()
+    return num_errors
 
 # ----------------------------------------------------------------------
 
