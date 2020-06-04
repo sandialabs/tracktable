@@ -75,25 +75,40 @@ def main():
     num_point_properties = 5
     num_trajectory_properties = 15
 
+
     original_trajectories = [ tt_generators.generate_random_trajectory(Trajectory,
                                                                        num_point_properties,
                                                                        num_trajectory_properties) for i in range(num_trajectories) ]
 
+    #Test single trajectory
+    trajectories_as_string = write_trajectories_to_string(original_trajectories[0])
+    reconstituted_trajectories = read_trajectories_from_string(trajectories_as_string)
+    
+    if len(reconstituted_trajectories) != 1:
+        print("ERROR: Reconstituted array contains {}, which is more than 1.".format(len(original_trajectories[0]), len(reconstituted_trajectories)))
+        return 1
+        
+    if original_trajectories[0] != reconstituted_trajectories[0]:
+            print("ERROR: Trajectory was not reconstituted successfully.")
+            print("Original trajectory ({}):\n{}".format(repr(original_trajectories[0]), str(original_trajectories[0])))
+            print("Reconstituted trajectory ({}):\n{}".format(repr(reconstituted_trajectories[0]), str(reconstituted_trajectories[0])))
+            num_errors += 1    
+                                                                       
+    #Test Array of Trajectories
     trajectories_as_string = write_trajectories_to_string(original_trajectories)
-    # reconstituted_trajectories = read_trajectories_from_string(trajectories_as_string)
+    reconstituted_trajectories = read_trajectories_from_string(trajectories_as_string)
 
-    # if len(original_trajectories) != len(reconstituted_trajectories):
-    #     print("ERROR: Original trajectory array contains {} entries.  Reconstituted array contains {}.".format(len(original_trajectories), len(reconstituted_trajectories)))
-    #     return 1
+    if len(original_trajectories) != len(reconstituted_trajectories):
+        print("ERROR: Original trajectory array contains {} entries.  Reconstituted array contains {}.".format(len(original_trajectories), len(reconstituted_trajectories)))
+        return 1
 
-    # num_errors = 0
-    # for i in range(num_trajectories):
-    #     if original_trajectories[i] != reconstituted_trajectories[i]:
-    #         print("ERROR: Trajectory {} was not reconstituted successfully.".format(i))
-    #         print("Original trajectory ({}):\n{}".format(repr(original_trajectories[i]), str(original_trajectories[i])))
-    #         print("Reconstituted trajectory ({}):\n{}".format(repr(reconstituted_trajectories[i]), str(reconstituted_trajectories[i])))
-    #         num_errors += 1
-
+    for i in range(num_trajectories):
+        if original_trajectories[i] != reconstituted_trajectories[i]:
+            print("ERROR: Trajectory {} was not reconstituted successfully.".format(i))
+            print("Original trajectory ({}):\n{}".format(repr(original_trajectories[i]), str(original_trajectories[i])))
+            print("Reconstituted trajectory ({}):\n{}".format(repr(reconstituted_trajectories[i]), str(reconstituted_trajectories[i])))
+            num_errors += 1
+            
     return (num_errors != 0)
 
 if __name__ == '__main__':

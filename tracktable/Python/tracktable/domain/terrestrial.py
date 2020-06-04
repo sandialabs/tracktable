@@ -37,7 +37,7 @@ from tracktable.lib._terrestrial import TrajectoryReaderTerrestrial as Trajector
 from tracktable.lib._terrestrial import BoundingBoxTerrestrial as BoundingBox
 from tracktable.lib._terrestrial import BasePointWriterTerrestrial as BasePointWriter
 from tracktable.lib._terrestrial import TrajectoryPointWriterTerrestrial as TrajectoryPointWriter
-from tracktable.lib._terrestrial import TrajectoryWriterTerrestrial as TrajectoryWriter
+from tracktable.lib._terrestrial import TrajectoryWriterTerrestrial
 
 DIMENSION = 2
 
@@ -51,7 +51,7 @@ domain_classes = {
     'BoundingBox': BoundingBox,
     'BasePointWriter': BasePointWriter,
     'TrajectoryPointWriter': TrajectoryPointWriter,
-    'TrajectoryWriter': TrajectoryWriter
+    'TrajectoryWriter': TrajectoryWriterTerrestrial
 }
 
 for domain_class in [
@@ -63,7 +63,18 @@ for domain_class in [
         TrajectoryReader,
         BasePointWriter,
         TrajectoryPointWriter,
-        TrajectoryWriter,
+        TrajectoryWriterTerrestrial,
         BoundingBox ]:
     domain_class.domain_classes = domain_classes
     domain_class.DOMAIN = "terrestrial"
+
+class TrajectoryWriter:
+    def __init__(self, output):
+        self.writer = TrajectoryWriterTerrestrial(output)
+    
+    def write(self, trajectories):
+        if isinstance(trajectories, list):
+            self.writer.write(trajectories)
+        else:
+            self.writer.write([trajectories])
+    

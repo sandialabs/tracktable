@@ -38,8 +38,7 @@ from tracktable.lib._cartesian2d import BoundingBoxCartesian2D as BoundingBox
 from tracktable.lib._cartesian2d import TrajectoryReaderCartesian2D as TrajectoryReader
 from tracktable.lib._cartesian2d import BasePointWriterCartesian2D as BasePointWriter
 from tracktable.lib._cartesian2d import TrajectoryPointWriterCartesian2D as TrajectoryPointWriter
-from tracktable.lib._cartesian2d import TrajectoryWriterCartesian2D as TrajectoryWriter
-
+from tracktable.lib._cartesian2d import TrajectoryWriterCartesian2D
 DIMENSION = 2
 
 domain_classes = {
@@ -52,7 +51,7 @@ domain_classes = {
     'BoundingBox': BoundingBox,
     'BasePointWriter': BasePointWriter,
     'TrajectoryPointWriter': TrajectoryPointWriter,
-    'TrajectoryWriter': TrajectoryWriter
+    'TrajectoryWriter': TrajectoryWriterCartesian2D
 }
 
 
@@ -65,10 +64,20 @@ for domain_class in [
         TrajectoryReader,
         BasePointWriter,
         TrajectoryPointWriter,
-        TrajectoryWriter,
+        TrajectoryWriterCartesian2D,
         BoundingBox ]:
     domain_class.domain_classes = domain_classes
     domain_class.DOMAIN = "cartesian2d"
 
 def identity_projection(*coord_lists):
     return coord_lists
+    
+class TrajectoryWriter:
+    def __init__(self, output):
+        self.writer = TrajectoryWriterCartesian2D(output)
+    
+    def write(self, trajectories):
+        if isinstance(trajectories, list):
+            self.writer.write(trajectories)
+        else:
+            self.writer.write([trajectories])
