@@ -75,6 +75,11 @@ if (PY_CARTOPY_MODULE)
   add_python_test(P_Mapmaker_Europe
     tracktable.render.tests.test_mapmaker_europe "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
   )
+  
+  add_python_test(P_Render_Trajectories
+    tracktable.render.tests.test_render_trajectories "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/" "${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable/examples/data/"
+  )
+  
 else (PY_CARTOPY_MODULE)
   message(STATUS "Cartopy module not found. Rendering tests will not be executed and rendering module will not execute with current python implementation.")
   message(STATUS "Rendering modules will be installed, but you must add cartopy to your current environment or change to a python environment with cartopy for rendering to work.")

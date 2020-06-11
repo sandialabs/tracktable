@@ -35,4 +35,4 @@ regular Cartesian space or on a (world) map.  The 'maps' module
 provides a friendly way to get a map of various parts of the world.
 """
 
-pass
+from .render_trajectories import render_trajectories
