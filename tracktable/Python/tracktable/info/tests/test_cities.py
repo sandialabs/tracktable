@@ -35,20 +35,19 @@ from tracktable.info import cities
 from tracktable.core import Timestamp
 import importlib
 import pprint
-
+from tracktable.domain.terrestrial import TrajectoryPoint, BasePoint
 
 #Search for Paris in the US, using lat lon
 # There are multiple Paris's in the US.
 # Will use lat long of Paris France, should return 
 # one in US though!
 def test_paris_us_lat_lon():
-    city = cities.get_city("Paris", "us", (50, 2))
+    city = cities.get_city("Paris", "US", (50, 2))
 
     if (city == None or city.name != "Paris") or \
         (city.country_code != "us") or \
         (city.population != 5073) or \
-        (city.latitude != 44.2597222) or \
-        (city.longitude != -70.5011111):
+        (city.location != BasePoint(44.2597222, -70.5011111)):
         print("Failed test_paris_us_lat_lon")
         return 1
         
@@ -56,28 +55,54 @@ def test_paris_us_lat_lon():
 
 # Searching with lat lon close to Phillipines will return Albuquerque PH
 # Not using the US version since default is to return the largest town
-def test_abq_with_lat_lon():
+def test_abq_with_tuple():
     city = cities.get_city("Albuquerque", None, (10, 120))
     
     if (city == None or city.name != "Albuquerque") or \
         (city.country_code != "ph") or \
         (city.population != 2730) or \
-        (city.latitude != 9.608056) or \
-        (city.longitude != 123.958056):
+        (city.location != BasePoint(9.608056, 123.958056)):
         print("Failed test_abq_with_lat_lon")
         return 1
         
     return 0
 
-# Searching by country in this example will return something smaller than Albuquerque US
-def test_abq_with_country():
-    city = cities.get_city("Albuquerque", "ph")
+# Searching with lat lon close to Phillipines will return Albuquerque PH
+# Not using the US version since default is to return the largest town
+def test_abq_with_basepoint():
+    city = cities.get_city("Albuquerque", None, BasePoint(10, 120))
     
     if (city == None or city.name != "Albuquerque") or \
         (city.country_code != "ph") or \
         (city.population != 2730) or \
-        (city.latitude != 9.608056) or \
-        (city.longitude != 123.958056):
+        (city.location != BasePoint(9.608056, 123.958056)):
+        print("Failed test_abq_with_lat_lon")
+        return 1
+        
+    return 0    
+
+# Searching with lat lon close to Phillipines will return Albuquerque PH
+# Not using the US version since default is to return the largest town
+def test_abq_with_trajpoint():
+    city = cities.get_city("Albuquerque", None, TrajectoryPoint(10, 120))
+    
+    if (city == None or city.name != "Albuquerque") or \
+        (city.country_code != "ph") or \
+        (city.population != 2730) or \
+        (city.location != BasePoint(9.608056, 123.958056)):
+        print("Failed test_abq_with_lat_lon")
+        return 1
+        
+    return 0    
+    
+# Searching by country in this example will return something smaller than Albuquerque US
+def test_abq_with_country():
+    city = cities.get_city("Albuquerque", "PH")
+    
+    if (city == None or city.name != "Albuquerque") or \
+        (city.country_code != "ph") or \
+        (city.population != 2730) or \
+        (city.location != BasePoint(9.608056, 123.958056)):
         print("Failed test_abq_with_country")
         return 1
         
@@ -90,8 +115,7 @@ def test_abq_name_only():
     if (city == None or city.name != "Albuquerque") or \
         (city.country_code != "us") or \
         (city.population != 487378) or \
-        (city.latitude != 35.0844444) or \
-        (city.longitude != -106.6505556):
+        (city.location != BasePoint(35.0844444, -106.6505556)):
         print("Failed test_abq_name_only")
         return 1
         
@@ -101,7 +125,9 @@ def main():
     error_count = 0
     error_count += test_abq_name_only()
     error_count += test_abq_with_country()
-    error_count += test_abq_with_lat_lon()
+    error_count += test_abq_with_tuple()
+    error_count += test_abq_with_basepoint()
+    error_count += test_abq_with_trajpoint()
     error_count += test_paris_us_lat_lon()
     return error_count
 
