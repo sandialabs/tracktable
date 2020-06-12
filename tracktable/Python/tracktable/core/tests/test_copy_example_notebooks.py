@@ -41,7 +41,7 @@ import tempfile
 
 
 def test_copy_example_notebooks(destdir):
-
+    
     # Get a list of all the example notebooks
     here = os.path.dirname(__file__)
     notebook_dir = os.path.normpath(
@@ -87,7 +87,10 @@ def main():
 
     notebook_outdir = tempfile.mkdtemp(prefix=test_output_dir)
     error_count = 0
+    #Test with pre made directory
     error_count += test_copy_example_notebooks(notebook_outdir)
+    #Test without pre made directory
+    error_count += test_copy_example_notebooks(notebook_outdir+"XYZ")
 
     return error_count
 
