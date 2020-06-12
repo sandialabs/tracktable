@@ -92,7 +92,7 @@ import logging
 from math import inf
 
 from tracktable.core.geomath import latitude, longitude, distance
-from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
+from tracktable.domain.terrestrial import TrajectoryPoint, BasePoint
 CITY_TABLE = None
 CITY_HEADERS = None
 
@@ -105,8 +105,7 @@ class CityInfo(object):
       country_code (string): 2-character abbreviation for country
       name (string): City name
       population (integer): Estimated population
-      latitude (float): Latitude of city location
-      longitude (float): Longitude of city location
+      location (TerrestrialBasePoint ): location of city
     """
 
     def __init__(self):
@@ -114,8 +113,7 @@ class CityInfo(object):
         self.country_code = None
         self.name = None
         self.population = None
-        self.latitude = None
-        self.longitude = None
+        self.location = None
 
 # ----------------------------------------------------------------------
 
@@ -209,12 +207,13 @@ def largest_cities_in_bbox(bbox_min=(-180, -90),
 
     # ----------------------------------------------------------------------
     
-def get_city(name, country=None, latlong=None):
+def get_city(name, country=None, location=None):
     """
-    Returns a city object from a name string, optionally 2 char country code, optional lat/long coordinates.
-      In the case that multiple cities with the same name are found, the closest to the lat and lon will be used.
-      In the case that multiple cities are found and lat and lon is not used, the city with the largest population
-      will be returned. 
+    Returns a city that most closely matches the input data.
+        In the case that multiple cities with the same name are found,
+        the closest to the given location will be used. In the case that
+        multiple cities are found and location is not used, the city
+        with the largest population will be returned. 
     
     Valid:
         London, UK
@@ -226,7 +225,7 @@ def get_city(name, country=None, latlong=None):
         name (string): City name to search for
         country (string): two character country code
             Defaults to None.
-        latlong (TrajectoryPoint): longitude and latitude to search near
+        location (tuple, TrajectoryPoint, BasePoint): location to search near
             Defaults to None
 
     Returns:
@@ -244,33 +243,42 @@ def get_city(name, country=None, latlong=None):
     POP = 2
     LAT = 3
     LONG = 4
-    
+
+    #Convert location input if needed
+    location_point = location
+    print(type(location))
+    if type(location) is not BasePoint and location is not None: 
+        location_point = BasePoint(location)
+        
     city_info = CityInfo()
-    
-    if country == None:
+
+    if country is None:
         # Get cities with this name
-        city_list = [city for city in city_list if (city[CITY] == name)]
+        city_list = [city for city in city_list \
+                    if (city[CITY].lower() == name.lower())]
     else:
         # Get cities with this name AND this country code
-        city_list = [city for city in city_list if ((city[CITY] == name) & (city[COUNTRY] == country))]
-    
+        city_list = [city for city in city_list \
+                    if ((city[CITY].lower() == name.lower()) and \
+                    (city[COUNTRY].lower() == country.lower()))]
+                    
     if len(city_list) == 0:
         return None
 
-    if latlong != None:
+    if location_point is not None:
         # Find the distance of each town form the target lat/long
         closest_city_distance = inf
         closest_city = None
         for city in city_list:
-            city_distance = distance(TerrestrialTrajectoryPoint(city[LAT], city[LONG]), TerrestrialTrajectoryPoint(latlong))
+            city_distance = distance(BasePoint(city[LAT],city[LONG]),\
+                          location_point)
             if city_distance < closest_city_distance:
                 closest_city = city
                 closest_city_distance = city_distance
         city_info.country_code =  closest_city[COUNTRY]
         city_info.name = closest_city[CITY]
         city_info.population = closest_city[POP]
-        city_info.latitude = closest_city[LAT]
-        city_info.longitude = closest_city[LONG]
+        city_info.location = BasePoint(closest_city[LAT], closest_city[LONG])
         return city_info
     
     # Get the biggest city 
@@ -283,8 +291,7 @@ def get_city(name, country=None, latlong=None):
     city_info.country_code =  biggest_city[COUNTRY]
     city_info.name = biggest_city[CITY]
     city_info.population = biggest_city[POP]
-    city_info.latitude = biggest_city[LAT]
-    city_info.longitude = biggest_city[LONG]
+    city_info.location = BasePoint(biggest_city[LAT], biggest_city[LONG])
     return city_info
 
 HEADINGS = [ u"Country",u"AccentCity",'Population','Latitude','Longitude' ]
