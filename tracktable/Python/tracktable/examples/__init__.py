@@ -32,8 +32,9 @@
 import glob
 import os.path
 import shutil
+import pathlib
 
-def copy_example_notebooks(destdir):
+def copy_example_notebooks(destdir, create_dir=True):
     """Copy Jupyter notebooks to a specified directory
 
     We bundle several example Jupyter notebooks with Tracktable.
@@ -47,6 +48,10 @@ def copy_example_notebooks(destdir):
 
     Arguments:
         destdir {string}: Destination directory for notebooks
+
+    Keyword Arguments:
+        create_directory {boolean]: Create directory if it doesn't
+            already exist.  Defaults to True.
 
     Returns:
         No return value.
@@ -63,6 +68,10 @@ def copy_example_notebooks(destdir):
 
     here = os.path.dirname(__file__)
     notebook_dir = os.path.join(here, 'notebook_examples')
+
+    if create_dir:
+        pathlib.Path(destdir).mkdir(parents=True, exist_ok=True)
+
     all_notebooks = glob.glob('{}/*.ipynb'.format(notebook_dir))
     for notebook in all_notebooks:
         shutil.copy(notebook, destdir)
