@@ -48,7 +48,10 @@ def copy_example_notebooks(destdir, create_dir=True):
 
     Arguments:
         destdir {string}: Destination directory for notebooks
-        create_dir {boolean]: Create directory if it doesn't already exist.
+
+    Keyword Arguments:
+        create_directory {boolean]: Create directory if it doesn't
+            already exist.  Defaults to True.
 
     Returns:
         No return value.
@@ -65,7 +68,7 @@ def copy_example_notebooks(destdir, create_dir=True):
 
     here = os.path.dirname(__file__)
     notebook_dir = os.path.join(here, 'notebook_examples')
-    
+
     if create_dir:
         pathlib.Path(destdir).mkdir(parents=True, exist_ok=True)
 
