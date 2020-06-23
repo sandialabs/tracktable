@@ -146,20 +146,25 @@ def test_cluster_dictionary():
                                              [0.05, 0.05, 0.05],
                                              4)
     
-    bare_point_dict = cluster_labels_to_dict(int_cluster_ids)
+    bare_point_dict = cluster_labels_to_dict(int_cluster_ids, all_points)
                                              
     print("Learning cluster IDs for decorated points.")
     string_cluster_ids = compute_cluster_labels(decorated_points,
                                                 [0.05, 0.05, 0.05],
                                                 4)
 
-    decorated_point_dict = cluster_labels_to_dict(string_cluster_ids)                                            
+    decorated_point_dict = cluster_labels_to_dict(string_cluster_ids, decorated_points)                                            
     
     for (v_id, c_id) in int_cluster_ids:
         if str(c_id) not in bare_point_dict:
             print("ERROR: Cluster IDs for bare point not found in cluster dictionary as a key.")
             return 1
-        if v_id not in bare_point_dict[str(c_id)]:
+        vid_found = False
+        for (fv, vec_id) in bare_point_dict[str(c_id)]:
+            if v_id == vec_id: 
+                vid_found = True
+                break
+        if not vid_found:
             print("ERROR: Vector IDs for bare point not found in cluster dictionary as a value.")
             return 1    
         
@@ -167,10 +172,14 @@ def test_cluster_dictionary():
         if str(c_id) not in decorated_point_dict:
             print("ERROR: Cluster IDs for decorated point not found in cluster dictionary as a key.")
             return 1
-        if v_id not in decorated_point_dict[str(c_id)]:
+        vid_found = False
+        for (fv, vec_id) in decorated_point_dict[str(c_id)]:
+            if v_id == vec_id: 
+                vid_found = True
+                break
+        if not vid_found:
             print("ERROR: Vector IDs for decorated point not found in cluster dictionary as a value.")
-            return 1    
-            
+            return 1            
     return 0
     
 # ----------------------------------------------------------------------

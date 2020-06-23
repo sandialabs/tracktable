@@ -36,6 +36,38 @@ from tracktable.lib import _dbscan_clustering
 from tracktable.domain.feature_vectors import convert_to_feature_vector
 import logging
 
+def is_decorated(point):
+    """Returns True if point is decorated
+    
+    A decorated point contains more than the individual point data. 
+    
+    Args:
+        point (Tuple): Usually this will be the first point from a 
+            feature vector. It will either only contain the point
+            data or it may also contain other features and labels. 
+    
+    Returns:
+        Boolean indicating the point is decorated or not
+        
+    """
+
+    logger = logging.getLogger(__name__)
+    logger.debug("Testing for point decoration.  First point: {}".format(
+        point))
+    try:
+        if len(point) == 2 and len(point[0]) > 0:
+            logger.debug(
+                ("Points are decorated. First point: {}").format(
+                    point))
+            return True
+            
+    except TypeError:
+        # The second element of the point is something that doesn't
+        # have a len().  It is probably a coordinate, meaning we've
+        # got bare points.
+        return False
+    return False     
+
 
 def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_size):
     """Use DBSCAN to compute clusters for a set of points.
@@ -57,27 +89,16 @@ def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_si
     instead, the vertex IDs will be whatever you supplied.
 
     """
-
-    # Are we dealing with decorated points?
-    decorated_points = False
-    first_point = feature_vectors[0]
-    vertex_ids = list(range(len(feature_vectors)))
-
     logger = logging.getLogger(__name__)
-    logger.debug("Testing for point decoration.  First point: {}".format(
-        first_point))
-    try:
-        if len(first_point) == 2 and len(first_point[0]) > 0:
-            logger.debug(
-                ("Points are decorated. First point: {}").format(
-                    first_point))
-            decorated_points = True
-            vertex_ids = [ point[1] for point in feature_vectors ]
-    except TypeError:
-        # The second element of the point is something that doesn't
-        # have a len().  It is probably a coordinate, meaning we've
-        # got bare points.
-        pass
+    
+    # Are we dealing with decorated points?
+    first_point = feature_vectors[0]
+    decorated_points = is_decorated(first_point)
+    
+    if decorated_points:
+        vertex_ids = [ point[1] for point in feature_vectors ]
+    else:
+        vertex_ids = list(range(len(feature_vectors)))
 
     if not decorated_points:
         logger.debug("Points are not decorated", logger)
@@ -108,12 +129,36 @@ def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_si
     return final_labels
 
    
-def cluster_labels_to_dict(cluster_labels):
-    """Creates a dictionary from cluster label pairs."""
+def cluster_labels_to_dict(cluster_labels, feature_vectors):
+    """Returns a dictionary from array of cluster label pairs.
+    
+    The dictionary uses the cluster labels as keys. The values of each 
+        key is an array of tuples containing the feature vector data. In
+        the case of undecorated points, the vertex id is also included 
+        in the tuple. 
+    
+    Args:
+        cluster_labels (Array of Tuples): pairs of cluster ids and 
+            vector ids. The vector ids map to the index of points
+            in the feature vector. This is usually generated from the
+            compute_cluster_labels function.
+        feature_vectors (Array of Tuples): the feature vectors used to 
+            compute the cluster labels.
+    
+    Returns:
+        Dictionary of cluster labels mapped to feature vectors.
+    """
+    decorated_points = is_decorated(feature_vectors[0])
     dict = {}
-    for (vertex_id, cluster_id) in cluster_labels:
-        if str(cluster_id) in dict:
-            dict[str(cluster_id)].append(vertex_id)
+    for (v_id, c_id) in cluster_labels:
+        if str(c_id) in dict:
+            if decorated_points:
+                dict[str(c_id)].append(feature_vectors[int(v_id)])
+            else:
+                dict[str(c_id)].append((feature_vectors[int(v_id)], v_id))
         else:
-            dict[str(cluster_id)] = [vertex_id]
+            if decorated_points:
+                dict[str(c_id)] = [feature_vectors[int(v_id)]]
+            else:
+                dict[str(c_id)] = [(feature_vectors[int(v_id)], v_id)]
     return dict
