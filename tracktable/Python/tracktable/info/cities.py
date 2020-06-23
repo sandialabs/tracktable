@@ -255,7 +255,6 @@ def get_city(name, country=None, location=None):
     city_info = CityInfo()
 
     name_lc = name.lower()
-    country_lc = country.lower()
 
     if country is None:
         # Get cities with this name
@@ -265,6 +264,7 @@ def get_city(name, country=None, location=None):
         ]
     else:
         # Get cities with this name AND this country code
+        country_lc = country.lower()
         city_list = [
             city for city in city_list
             if ((city[CITY].lower() == name_lc) and
