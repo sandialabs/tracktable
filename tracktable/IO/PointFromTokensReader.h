@@ -499,7 +499,7 @@ protected:
           ++(this->NumParseErrors);
           }
         }
-      if (!NextPoint)
+      if (NextPoint == 0)
         {
           TRACKTABLE_LOG(log::info) << "Done reading points.  "
                                     << "Generated " << this->NumPoints << " points correctly and "
