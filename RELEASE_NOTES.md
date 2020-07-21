@@ -6,7 +6,8 @@ This is a patch release.
 
 ### NEW FEATURES SINCE 1.3.0
 
-* This release includes the beta launch of interactive trajectory rendering in Jupyter notebooks using [Folium](https://python-visualization.github.io/folium/).  There is an example of how to do this in the Render_Trajectories example notebook.  The notebooks can either be downloaded from Tracktable's web site (XXX NEED TO FIX CASCADE) or copied from an installation using :python:`tracktable.examples.copy_example_notebooks('/where/to/put/them')`.  Expect tweaks to the API for interactive trajectories between now and the official launch in 1.4.0.
+* This release includes the beta launch of interactive trajectory rendering in Jupyter notebooks using [Folium](https://python-visualization.github.io/folium/).  There is an example of how to do this in the Render_Trajectories example notebook.  The notebooks can either be downloaded from Tracktable's web site (
+<https://tracktable.sandia.gov/downloads/documentation.html>) or copied from an installation using :python:`tracktable.examples.copy_example_notebooks('/where/to/put/them')`.  Expect tweaks to the API for interactive trajectories between now and the official launch in 1.4.0.
 
 * The trajectory writers (:python:`tracktable.domain.<domain>.TrajectoryWriter`) will now accept single trajectories as well as lists of trajectories as arguments to `write()`.  
 
