@@ -1,6 +1,48 @@
-## Tracktable Release Notes
+# Tracktable Release Notes
 
-VERSION 1.3.0, 19 May 2020
+## VERSION 1.3.1, 21 July 2020
+
+This is a patch release.  
+
+### NEW FEATURES SINCE 1.3.0
+
+* This release includes the beta launch of interactive trajectory rendering in Jupyter notebooks using [Folium](https://python-visualization.github.io/folium/).  There is an example of how to do this in the Render_Trajectories example notebook.  The notebooks can either be downloaded from Tracktable's web site (XXX NEED TO FIX CASCADE) or copied from an installation using :python:`tracktable.examples.copy_example_notebooks('/where/to/put/them')`.  Expect tweaks to the API for interactive trajectories between now and the official launch in 1.4.0.
+
+* The trajectory writers (:python:`tracktable.domain.<domain>.TrajectoryWriter`) will now accept single trajectories as well as lists of trajectories as arguments to `write()`.  
+
+* New function: :python:`tracktable.info.cities.get_city()` will retrieve City objects based on spelling, location, or country.
+
+* New function: :python:`tracktable.analysis.dbscan.cluster_labels_to_dict` will create a dictionary containing cluster IDs and feature vectors that can easily be converted to a [Pandas] DataFrame.  We would like to hear feedback on how this function could better suit your use case.
+
+* Added capability: Trajectories in C++ now have reverse iterators and explicit functions for const iterators.  Added `rbegin()`, `rend()`, `crbegin()` and `crend()`.  
+
+### BUGS FIXED SINCE 1.3.0
+
+(Note: the issue numbers are internal to our development process.  We don't yet have a way to expose our issue queue to the outside world.)
+
+* Issue #181: Cartopy maps have wrong aspect ratio when min_longitude and max_longitude are the same.  
+
+* Issue #182: :python:`tracktable.examples.copy_example_notebooks()` will now create the destination directory for you if it does not already exist.
+
+* Issue #184: In an attempt to make PointReader quieter, we accidentally made it even noisier.  
+
+* Issue #76: The Simple Clustering example refers to a data set that is not included in Tracktable.  We've moved the notebook back into Work In Progress status until we can fix this.
+
+* Issue #202: If you install Tracktable's Python package on a very, very new Windows system, you might be missing the Visual C++ runtime.  This is now mentioned in our documentation and FAQ.  We don't currently have a way to distribute that ourselves.
+
+### HOTFIXES SINCE 1.3.0
+
+We launched 1.3.0 without the Jupyter notebooks in the wheel.  Oops.  
+
+### KNOWN ISSUES
+
+We believe there are no major bugs loose at the moment.
+
+
+
+
+
+## VERSION 1.3.0, 19 May 2020
 
 This is a feature release.  
 
