@@ -59,6 +59,7 @@ This template is for creating a Tracktable release that will go out to the world
     * [ ] `.zip` file
     * [ ] Upload to Cascade
     * [ ] Include links on Documentation page
+    * [ ] Update release notes on Cascade
 - [ ] Example Notebooks
     * [ ] `.tar.gz` file
     * [ ] `.zip` file
@@ -71,10 +72,10 @@ This template is for creating a Tracktable release that will go out to the world
     * [ ] Make `.tar.bz2` version
     * [ ] Make `.zip` version
     * [ ] Upload to Cascade
-- [ ] Push source code to `sandialabs/tracktable` on Gitlab
 - [ ] Announcement
     * [ ] Send to tracktable-develop
     * [ ] Post on Cascade
 - [ ] Finalize
     * [ ] Create and handle merge request for release branch
     * [ ] Publish updates on Cascade to `https://tracktable.sandia.gov`
+    * [ ] Push source code to `sandialabs/tracktable` on Github
