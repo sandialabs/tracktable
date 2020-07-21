@@ -57,6 +57,12 @@ This template is for creating a Tracktable release that will go out to the world
     * [ ] `.tar.gz` file
     * [ ] `.zip` file
     * [ ] Upload to Cascade
+    * [ ] Include links on Documentation page
+- [ ] Example Notebooks
+    * [ ] `.tar.gz` file
+    * [ ] `.zip` file
+    * [ ] Upload to Cascade
+    * [ ] Include links on Documentation page
 - [ ] Source Code
     * [ ] Check out clean copy
     * [ ] Delete `.git` directory
