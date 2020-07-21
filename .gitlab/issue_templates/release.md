@@ -39,9 +39,7 @@ This template is for creating a Tracktable release that will go out to the world
     * [ ] Top-level CMakeLists.txt
     * [ ] Documentation/conf.py
     * [ ] Documentation/conf.py.in
-    * [ ] Documentation/Doxyfile.in
     * [ ] Documentation/readthedocs/Doxyfile-readthedocs
-    * [ ] packaging/rpm/rhel7/tracktable.spec.in
     * [ ] tracktable/Python/tracktable/__init__.py
 - [ ] Wheels
     * [ ] Build Wheels
