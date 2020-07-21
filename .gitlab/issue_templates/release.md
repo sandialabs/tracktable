@@ -35,6 +35,13 @@ This template is for creating a Tracktable release that will go out to the world
 
 - [ ] Create release branch from `develop`
 - [ ] Bump Libtool version numbers
+- [ ] Bump version numbers
+    * [ ] Top-level CMakeLists.txt
+    * [ ] Documentation/conf.py
+    * [ ] Documentation/conf.py.in
+    * [ ] Documentation/Doxyfile.in
+    * [ ] Documentation/readthedocs/Doxyfile-readthedocs
+    * [ ] packaging/rpm/rhel7/tracktable.spec.in
 - [ ] Wheels
     * [ ] Build Wheels
         - [ ] Linux
