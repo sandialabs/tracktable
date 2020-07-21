@@ -34,6 +34,7 @@ This template is for creating a Tracktable release that will go out to the world
 ### Checklist
 
 - [ ] Create release branch from `develop`
+- [ ] Bump Libtool version numbers
 - [ ] Wheels
     * [ ] Build Wheels
         - [ ] Linux
