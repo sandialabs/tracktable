@@ -46,6 +46,7 @@ This template is for creating a Tracktable release that will go out to the world
         - [ ] Linux
         - [ ] Windows
         - [ ] MacOS
+    * [ ] Generate GPG signatures
     * [ ] Upload wheels to PyPI
     * [ ] Upload wheels to Cascade
 - [ ] Release Notes
