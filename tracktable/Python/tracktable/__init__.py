@@ -40,7 +40,7 @@ in kilometers.
 
 # \defgroup Tracktable_Python Python components of Tracktable
 
-__version__ = "1.3.0"
+__version__ = "1.3.1"
 __title__ = "Tracktable"
 __description__ = "Trajectory Analysis and Visualization"
 __url__ = "https://tracktable.sandia.gov"
@@ -54,7 +54,7 @@ __copyright__ = "Copyright (c) 2014-2020 National Technology and Engineering Sol
 
 from .core import register_core_types
 
-# We always start out with the log level set to INFO.  
+# We always start out with the log level set to INFO.
 # You can set it lower in your own code if you want.
 import logging
 import tracktable.core.log

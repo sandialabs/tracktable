@@ -38,7 +38,7 @@ from tracktable.lib._cartesian3d import BoundingBoxCartesian3D as BoundingBox
 from tracktable.lib._cartesian3d import TrajectoryReaderCartesian3D as TrajectoryReader
 from tracktable.lib._cartesian3d import BasePointWriterCartesian3D as BasePointWriter
 from tracktable.lib._cartesian3d import TrajectoryPointWriterCartesian3D as TrajectoryPointWriter
-from tracktable.lib._cartesian3d import TrajectoryWriterCartesian3D as TrajectoryWriter
+from tracktable.lib._cartesian3d import TrajectoryWriterCartesian3D
 
 DIMENSION = 3
 
@@ -52,7 +52,7 @@ domain_classes = {
     'BoundingBox': BoundingBox,
     'BasePointWriter': BasePointWriter,
     'TrajectoryPointWriter': TrajectoryPointWriter,
-    'TrajectoryWriter': TrajectoryWriter
+    'TrajectoryWriter': TrajectoryWriterCartesian3D
 }
 
 for domain_class in [
@@ -64,7 +64,17 @@ for domain_class in [
         TrajectoryReader,
         BasePointWriter,
         TrajectoryPointWriter,
-        TrajectoryWriter,
+        TrajectoryWriterCartesian3D,
         BoundingBox ]:
     domain_class.domain_classes = domain_classes
     domain_class.DOMAIN = "cartesian3d"
+
+class TrajectoryWriter:
+    def __init__(self, output):
+        self.writer = TrajectoryWriterCartesian3D(output)
+    
+    def write(self, trajectories):
+        if isinstance(trajectories, list):
+            self.writer.write(trajectories)
+        else:
+            self.writer.write([trajectories])

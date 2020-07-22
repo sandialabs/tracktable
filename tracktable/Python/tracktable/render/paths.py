@@ -49,9 +49,10 @@ import matplotlib.collections
 import matplotlib.colors
 
 from matplotlib.collections import LineCollection
+from matplotlib.colors import ListedColormap
 from six.moves import range
 import numpy
-
+import cartopy.crs
 
 # ----------------------------------------------------------------------
 
@@ -141,6 +142,40 @@ def points_to_segments(point_list, maximum_distance=None):
 
     return segments
 
+# ----------------------------------------------------------------------
+
+def concat_color_maps(color_maps, scalars_list, color_scale): #scalars list is list of arrays
+    """Concatenate a list of color maps into a single color map with adjusted scalars and color_scale
+
+    Args:
+       color_maps: a list of color_maps to concatenate
+       scalars_list: a list of numpy arrays where each array contains the scalars associated with the 
+                     respective color_map
+
+    Lists are assumed to be the same length
+"""
+    all_color_maps = []
+    N = 256 # number of colors per color_map once combined
+    for color_map in color_maps:
+        cmap = color_map
+        if isinstance(color_map, str):
+            cmap = matplotlib.cm.get_cmap(color_map, N)
+        all_color_maps.append(cmap(numpy.linspace(0,1,N)))
+    stacked_colors = numpy.vstack(all_color_maps)
+    new_color_map = ListedColormap(stacked_colors)
+    
+    num_colors = N*len(color_maps)
+    new_scalars = []
+    for i,scalars in enumerate(scalars_list):
+        # To deal with potential boundary issues when colors are combined into a single map the where statment was
+        # added below.  The last color in a map has an inclusive range (including 1.0 or the max value), but when
+        # combinging 2 colors, for example, the first may have a range up to but not including 0.5, but a value of 1.0
+        # on the old color mpa may be mapped to 0.5 on the new color map (which now maps to an adjascent color map).
+        # If a maximum scalar value of N is used we change it to N-1 in the where statement below.
+        vals = (numpy.array(scalars)*N).astype(int)
+        new_scalars.append(((N*i)+numpy.where(vals==N, N-1, vals))/num_colors)
+    new_color_scale = color_scale #TODO support multiple scales later?
+    return new_color_map, new_scalars, new_color_scale
 
 # ----------------------------------------------------------------------
 
@@ -157,7 +192,12 @@ def draw_traffic(traffic_map,
                  label_generator=None,
                  label_kwargs=dict(),
                  axes=None,
-                 zorder=8):
+                 zorder=8,
+                 transform=cartopy.crs.Geodetic(),
+                 show_points=False,
+                 point_size=12,
+                 point_color='',
+                 show_lines=True):
     """Draw a set of (possibly decorated trajectories.
 
     Args:
@@ -167,14 +207,18 @@ def draw_traffic(traffic_map,
        trajectory_scalar_generator: Function to generate scalars for a trajectory (default None)
        trajectory_linewidth_generator: Function to generate path widths for a trajectory (default None)
        linewidth: Constant linewidth if no generator is supplied (default 0.1, measured in points)
-       dot_size: Radius (in points, default 2) of spot that will be drawn at the head of each trajectory
-       dot_color: Color of spot that will be drawn at the head of each trajectory
-       label_objects: Boolean (default False) deciding whether to draw object_id at head of each trajectory
+       dot_size: Radius (in points, default 2) of a dot dawn at the latest point of each trajectory
+       dot_color: Color of spot that will be drawn at the latest point of each trajectory
+       label_objects: Boolean (default False) whether to draw object_id at latest point of each trajectory
        label_generator: Function to generate label for a trajectory (default None)
        label_kwargs: Dictionary of arguments to be passed to labeler (FIXME)
        axes: Matplotlib axes object into which trajectories will be rendered
        zorder: Layer into which trajectories will be drawn (default 8).
-
+       transform: the input projection (default cartopy.crs.Geodetic())
+       show_points: whether or not to show the points along the trajectory
+       point_size: radius of the points along the path (in points default=12)
+       point_color: color of the points along the path
+       show_lines: whether or not to show the trajectory lines
     Returns:
        List of Matplotlib artists
 
@@ -238,19 +282,19 @@ def draw_traffic(traffic_map,
 
     ``dot_size``: float (default 2)
 
-    If this value is non-zero then a dot will be drawn at the head of
-    each trajectory.  It will be dot_size points in radius and will be
-    colored with whatever scalar is present at the head of the
-    trajectory.
+    If this value is non-zero then a dot will be drawn at the point on
+    each trajectory that has the largest timestamp.  It will be dot_size 
+    points in radius and will be colored with whatever scalar is present 
+    at that point of the trajectory.
 
-    TODO: Add a dot_size_generator argument to allow programmatic
+    TODO: Add a point_size_generator argument to allow programmatic
     control of this argument.
 
     ``label_objects``: boolean (default False)
 
-    You can optionally label the head of each trajectory.  To do so
-    you must supply 'label_objects=True' and also a function for the
-    label_generator argument.
+    You can optionally label the point with the largest timestamp in 
+    each trajectory.  To do so you must supply 'label_objects=True' and 
+    also a function for the label_generator argument.
 
     ``label_generator``: function(TrajectoryPoint) -> string
 
@@ -276,7 +320,39 @@ def draw_traffic(traffic_map,
     Height level where the trajectories will be drawn.  If you want
     them to be on top of the map and anything else you draw on it then
     make this value large.  It has no range limit.
+
+    ``transform``: cartopy.crs.CRS (default cartopy.crs.Geodetic())
+
+    The input projection.  Needed to get nearly any projection but PlateCarree 
+    to work correctly. 
+
+    ``show_points``: boolean (default False)
+
+    True if points along the trajectory should be rendered
+
+    ``point_size``: int (default 12)
+
+    If show_poitns is true, the size of the markers rendered at each point
+        in the trajectory.
+
+    ``point_color``: string (default '')
+
+    If show_points is true, the color of the markers rendered at each point
+        in the trajectory
+
+    ``show_lines``: boolean (default True)
+
+    True if the trajectory lines (piecewise-linear path) should be rendered
+
     """
+    if transform is None:
+        transform = cartopy.crs.Geodetic()
+
+    if axes is None:
+        axes = matplotlib.pyplot.gca()
+
+    if isinstance(axes, matplotlib.axes._axes.Axes): # if not GeoAxes
+        transform = None
 
     logger = logging.getLogger(__name__)
     all_artists = []
@@ -289,13 +365,13 @@ def draw_traffic(traffic_map,
     # If the user hasn't specified a custom linewidth function then we
     # use the value of the linewidth argument throughout.
     if trajectory_linewidth_generator is None:
-        trajectory_linewidth_generator = lambda trajectory: [ linewidth ] * len(trajectory)
+        trajectory_linewidth_generator = lambda trajectory: [ linewidth ] * (len(trajectory)-1)
 
     # If there is no scalar generator then we will automatically
     # generate scalars for each trajectory that begin at 0 and end at
     # 1.
     if trajectory_scalar_generator is None:
-        trajectory_scalar_generator = lambda trajectory: numpy.linspace(0, 1, len(trajectory))
+        trajectory_scalar_generator = lambda trajectory: numpy.linspace(0, 1, len(trajectory)-1)
 
     if label_generator is None:
         if label_objects:
@@ -304,9 +380,6 @@ def draw_traffic(traffic_map,
                             "weird."))
             label_generator = lambda thing: thing
 
-    if axes is None:
-        axes = matplotlib.pyplot.gca()
-
     trajectory_number = 0
     total_points = 0
     max_batch_size = 1000
@@ -314,6 +387,10 @@ def draw_traffic(traffic_map,
     current_batch_paths = []
     current_batch_scalars = []
     current_batch_linewidths = []
+    current_batch_color_maps = []
+    if show_points:
+        current_batch_points_x = []
+        current_batch_points_y = []
 
     # We want to ignore individual segments that span most of the way across
     # the map.  These are almost always errors in the data, especially where
@@ -333,6 +410,11 @@ def draw_traffic(traffic_map,
     num_trajectories_rendered = 0
     num_trajectories_examined = 0
 
+    single_color_map = True
+    if isinstance(color_map, list):
+        single_color_map = False
+
+    t_ind = 0
     for trajectory in trajectory_iterable:
         num_trajectories_examined += 1
 
@@ -356,6 +438,9 @@ def draw_traffic(traffic_map,
             local_x[i] = trajectory[i][0]
             local_y[i] = trajectory[i][1]
 
+        if show_points:
+            current_batch_points_x.append(local_x[:-1])
+            current_batch_points_y.append(local_y[:-1]) #all but last
         # Now we turn that list of n points into a list of n-1 line
         # segments.  We shouldn't have any degenerate segments because
         # of the call to remove_duplicate_points() earlier.
@@ -370,9 +455,14 @@ def draw_traffic(traffic_map,
             # batch
             local_scalars = trajectory_scalar_generator(trajectory)
             current_batch_linewidths.append(
-                trajectory_linewidth_generator(trajectory)[0:-1])
+                trajectory_linewidth_generator(trajectory))
             current_batch_paths.append(local_segments)
-            current_batch_scalars.append(local_scalars[0:-1])
+            current_batch_scalars.append(local_scalars)
+            if not single_color_map:
+                if len(color_map) > t_ind: #in case the lengths of trajs and color_maps lists differ
+                    current_batch_color_maps.append(color_map[t_ind])
+                else:
+                    current_batch_color_maps.append('BrBG') #fallback 
 
             # The lead point is the last point in the trajectory
             if label_generator is not None:
@@ -385,43 +475,103 @@ def draw_traffic(traffic_map,
             # Now we've processed some traffic and made it into line
             # segments.  Time to create the line segment collection that we
             # can plot.
-            segment_collection = LineCollection(numpy.vstack(
-                                                    current_batch_paths),
-                                                norm=color_scale,
-                                                cmap=color_map,
+            if not single_color_map:
+                new_color_map, new_scalars, new_color_scale = concat_color_maps(current_batch_color_maps,
+                                                                                current_batch_scalars,
+                                                                                color_scale)
+            else:
+                new_color_map = color_map
+                new_scalars = current_batch_scalars
+                new_color_scale = color_scale
+
+            stacked_scalars = numpy.hstack(new_scalars)
+            if show_lines:
+                segment_collection = LineCollection(numpy.vstack(
+                                                        current_batch_paths),
+                                                    norm=new_color_scale,
+                                                    cmap=new_color_map,
+                                                    linewidth=numpy.hstack(
+                                                        current_batch_linewidths),
+                                                    zorder=zorder,
+                                                    transform=transform)
+
+                segment_collection.set_array(stacked_scalars)
+
+                all_artists.append(segment_collection)
+                axes.add_collection(segment_collection)
+
+            if show_points:
+                colors = stacked_scalars
+                if point_color != '':
+                    colors = point_color
+                point_collection = traffic_map.scatter(numpy.hstack(current_batch_points_x),
+                                                       numpy.hstack(current_batch_points_y),
+                                                       s=point_size,
+                                                       linewidth=0,
+                                                       marker='o',
+                                                       zorder=zorder+1,
+                                                       cmap = new_color_map,
+                                                       c = colors,
+                                                       transform=transform)
+                all_artists.append(point_collection)
+
+            current_batch_scalars = []
+            current_batch_linewidths = []
+            current_batch_paths = []
+            current_batch_color_maps = []
+            if show_points:
+                current_batch_points_x = []
+                current_batch_points_y = []
+
+        t_ind+=1
+
+    # one more batch now that we're done
+    if len(current_batch_paths) > 0:
+        if not single_color_map:
+            new_color_map, new_scalars, new_color_scale = concat_color_maps(current_batch_color_maps,
+                                                                            current_batch_scalars,
+                                                                            color_scale)
+        else:
+            new_color_map = color_map
+            new_scalars = current_batch_scalars
+            new_color_scale = color_scale
+
+        stacked_scalars = numpy.hstack(new_scalars)
+        if show_lines:
+            segment_collection = LineCollection(numpy.vstack(current_batch_paths),
+                                                norm=new_color_scale,
+                                                cmap=new_color_map,
                                                 linewidth=numpy.hstack(
                                                     current_batch_linewidths),
-                                                zorder=zorder)
-
-            stacked_scalars = numpy.hstack(current_batch_scalars)
+                                                zorder=zorder,
+                                                transform=transform)
             segment_collection.set_array(stacked_scalars)
 
             all_artists.append(segment_collection)
             axes.add_collection(segment_collection)
 
-            current_batch_scalars = []
-            current_batch_linewidths = []
-            current_batch_paths = []
-
-    # one more batch now that we're done
-    if len(current_batch_paths) > 0:
-        segment_collection = LineCollection(numpy.vstack(current_batch_paths),
-                                            norm=color_scale,
-                                            cmap=color_map,
-                                            linewidth=numpy.hstack(
-                                                current_batch_linewidths),
-                                            zorder=zorder)
-
-        stacked_scalars = numpy.hstack(current_batch_scalars)
-        segment_collection.set_array(stacked_scalars)
-
-        all_artists.append(segment_collection)
-
-        axes.add_collection(segment_collection)
+        if show_points:
+            colors = stacked_scalars
+            if point_color != '':
+                colors = point_color
+            point_collection = traffic_map.scatter(numpy.hstack(current_batch_points_x),
+                                                   numpy.hstack(current_batch_points_y),
+                                                   s=point_size,
+                                                   linewidth=0,
+                                                   marker='o',
+                                                   zorder=zorder+1,
+                                                   cmap = new_color_map,
+                                                   c = colors,
+                                                   transform=transform)
+            all_artists.append(point_collection)
 
         current_batch_scalars = []
         current_batch_linewidths = []
         current_batch_paths = []
+        current_batch_color_maps = []
+        if show_points:
+            current_batch_points_x = []
+            current_batch_points_y = []
 
     if len(lead_point_x) > 0:
         if dot_size:
@@ -431,7 +581,11 @@ def draw_traffic(traffic_map,
                 dot_zorder = None
 
             if dot_color == 'body':
-                dot_color_kwargs = {'cmap': color_map,
+                if not single_color_map:
+                    curr_color_map = color_map[0]
+                else:
+                    curr_color_map = color_map
+                dot_color_kwargs = {'cmap': curr_color_map,
                                     'c': lead_point_scalars}
             else:
                 dot_color_kwargs = {'c': dot_color}
@@ -444,7 +598,8 @@ def draw_traffic(traffic_map,
                                           linewidth=0,
                                           marker='o',
                                           zorder=dot_zorder,
-                                          **dot_color_kwargs)
+                                          **dot_color_kwargs,
+                                          transform=transform)
             all_artists.append(dot_collection)
 
         if label_objects:
