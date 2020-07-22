@@ -102,9 +102,9 @@ include(GNUInstallDirs)
 # +1 :  ? :  0 == new interface that breaks old one
 #  ? :  ? :  0 == no new interfaces, but breaks apps
 #  ? : +1 :  ? == just some internal changes, nothing breaks but might work better
-set(UNIX_SO_VERSION_CURRENT  2)
+set(UNIX_SO_VERSION_CURRENT  3)
 set(UNIX_SO_VERSION_REVISION 0)
-set(UNIX_SO_VERSION_AGE      1)
+set(UNIX_SO_VERSION_AGE      2)
 
 #-------------------------------------------------------------------------
 # End RELEASE VARIABLES

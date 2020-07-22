@@ -94,6 +94,8 @@ public:
   typedef std::vector<PointT> point_vector_type;
   typedef typename point_vector_type::iterator iterator;
   typedef typename point_vector_type::const_iterator const_iterator;
+  typedef typename point_vector_type::reverse_iterator reverse_iterator;
+  typedef typename point_vector_type::const_reverse_iterator const_reverse_iterator;
   typedef typename point_vector_type::size_type size_type;
   typedef typename point_vector_type::value_type value_type;
   typedef typename point_vector_type::difference_type difference_type;
@@ -777,6 +779,12 @@ public:
    */
   const_iterator begin() const { return this->Points.begin(); }
 
+  /** Return an iterator pointing to the beginning of the trajectory
+   *
+   * The point underneath this iterator cannot be changed.
+   */
+  const_iterator cbegin() const noexcept { return this->Points.cbegin(); }
+
   /** Return an iterator pointing beyond the last point in the trajectory
    *
    * The point underneath this iterator, if there is one, can be changed.
@@ -789,6 +797,47 @@ public:
    */
   const_iterator end() const { return this->Points.end(); }
 
+  /** Return an iterator pointing beyond the last point in the trajectory
+   *
+   * The point underneath this iterator, if there is one, cannot be changed.
+   */
+  const_iterator cend() const noexcept { return this->Points.cend(); }
+
+  /** Return a reverse_iterator pointing to the end of the trajectory
+   *
+   * The point underneath this iterator can be changed.
+   */
+  reverse_iterator rbegin() { return this->Points.rbegin(); }
+
+  /** Return a reverse_iterator pointing to the end of the trajectory
+   *
+   * The point underneath this iterator cannot be changed.
+   */
+  const_reverse_iterator rbegin() const { return this->Points.rbegin(); }
+
+  /** Return a reverse_iterator pointing to the end of the trajectory
+   *
+   * The point underneath this iterator cannot be changed.
+   */
+  const_reverse_iterator crbegin() const noexcept { return this->Points.crbegin(); }
+
+  /** Return an iterator pointing beyond the first point in the trajectory
+   *
+   * The point underneath this iterator, if there is one, can be changed.
+   */
+  reverse_iterator rend() { return this->Points.rend(); }
+
+  /** Return an iterator pointing beyond the last point in the trajectory
+   *
+   * The point underneath this iterator, if there is one, cannot be changed.
+   */
+  const_reverse_iterator rend() const { return this->Points.rend(); }
+  
+  /** Return an iterator pointing beyond the last point in the trajectory
+   *
+   * The point underneath this iterator, if there is one, cannot be changed.
+   */
+  const_reverse_iterator crend() const noexcept { return this->Points.crend(); }
   
 };
 

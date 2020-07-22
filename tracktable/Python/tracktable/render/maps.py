@@ -133,7 +133,7 @@ def _flatten(l, ltypes=(list, tuple)):
 
 def airport_map(airport_id,
                 region_size=(200, 200),
-                projection=cartopy.crs.Miller):
+                projection=None):
     """Draw a map for a region surrounding an airport.
 
     map_for_airport(airport_code, (string - example 'ORD' or 'KORD' for O'Hare
@@ -155,6 +155,9 @@ def airport_map(airport_id,
 
     This function returns axes for Matplotlib.
     """
+
+    if projection is None:
+        projection = cartopy.crs.Miller
 
     _ensure_airports_loaded()
     airport_info = airports.airport_information(airport_id)
@@ -208,7 +211,7 @@ def airport_map(airport_id,
 
 def instantiate_map(min_corner,
                     max_corner,
-                    projection=cartopy.crs.Miller):
+                    projection=None):
     """Draw a map with custom projection and bounding box.
 
     If min_corner and max_corner are set then we will set the map

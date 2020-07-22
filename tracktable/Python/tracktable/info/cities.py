@@ -88,11 +88,11 @@ cities.py - Locations and population values for many cities of the world
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import print_function, absolute_import, division
-
 import logging
+from math import inf
 
-from tracktable.core.geomath import latitude, longitude
-
+from tracktable.core.geomath import latitude, longitude, distance
+from tracktable.domain.terrestrial import TrajectoryPoint, BasePoint
 CITY_TABLE = None
 CITY_HEADERS = None
 
@@ -105,8 +105,7 @@ class CityInfo(object):
       country_code (string): 2-character abbreviation for country
       name (string): City name
       population (integer): Estimated population
-      latitude (float): Latitude of city location
-      longitude (float): Longitude of city location
+      location (TerrestrialBasePoint ): location of city
     """
 
     def __init__(self):
@@ -114,8 +113,7 @@ class CityInfo(object):
         self.country_code = None
         self.name = None
         self.population = None
-        self.latitude = None
-        self.longitude = None
+        self.location = None
 
 # ----------------------------------------------------------------------
 
@@ -207,5 +205,107 @@ def largest_cities_in_bbox(bbox_min=(-180, -90),
                            reverse=True)
     return sorted_cities[0:count]
 
+# ----------------------------------------------------------------------
 
-HEADINGS = [ u"Country",u"AccentCity",'Population','Latitude','Longitude' ]
+
+def get_city(name, country=None, location=None):
+    """
+    Returns a city that most closely matches the input data.
+        In the case that multiple cities with the same name are found,
+        the closest to the given location will be used. In the case that
+        multiple cities are found and location is not used, the city
+        with the largest population will be returned.
+
+    Valid:
+        London, UK
+        Springfield, US, with one of the many valid lats or longs
+        Springfield, None, with one of the many valid lats or longs
+        Qandahar (there’s only one Qandahar in the world)
+
+    Arguments:
+        name (string): City name to search for
+
+    Keyword Arguments:
+        country (string): two character country code.  Defaults to None.
+        location (tuple, TrajectoryPoint, BasePoint): location to search near
+            Defaults to None.
+
+    Returns:
+        A CityInfo object or None if no records are found.
+    """
+    global CITY_TABLE
+    if not CITY_TABLE:
+        from tracktable.info.data.city_table import city_table as cities
+        CITY_TABLE = cities
+
+    city_list = CITY_TABLE
+
+    COUNTRY = 0
+    CITY = 1
+    POP = 2
+    LAT = 3
+    LONG = 4
+
+    # Convert location input if needed
+    location_point = location
+    print(type(location))
+    if type(location) is not BasePoint and location is not None:
+        location_point = BasePoint(location)
+
+    city_info = CityInfo()
+
+    name_lc = name.lower()
+
+    if country is None:
+        # Get cities with this name
+        city_list = [
+            city for city in city_list
+            if (city[CITY].lower() == name_lc)
+        ]
+    else:
+        # Get cities with this name AND this country code
+        country_lc = country.lower()
+        city_list = [
+            city for city in city_list
+            if ((city[CITY].lower() == name_lc) and
+                (city[COUNTRY].lower() == country_lc))
+        ]
+
+    if len(city_list) == 0:
+        return None
+
+    if location_point is not None:
+        # Find the distance of each town from the target lat/long
+        closest_city_distance = inf
+        closest_city = None
+        for city in city_list:
+            city_distance = distance(
+                BasePoint(city[LAT], city[LONG]),
+                location_point)
+            if city_distance < closest_city_distance:
+                closest_city = city
+                closest_city_distance = city_distance
+
+        city_info.country_code = closest_city[COUNTRY]
+        city_info.name = closest_city[CITY]
+        city_info.population = closest_city[POP]
+        city_info.location = BasePoint(closest_city[LAT], closest_city[LONG])
+        return city_info
+
+    # Get the biggest city
+    biggest_city_population = -inf
+    biggest_city = None
+    for city in city_list:
+        if city[POP] > biggest_city_population:
+            biggest_city = city
+            biggest_city_population = city[POP]
+    city_info.country_code = biggest_city[COUNTRY]
+    city_info.name = biggest_city[CITY]
+    city_info.population = biggest_city[POP]
+    city_info.location = BasePoint(biggest_city[LAT], biggest_city[LONG])
+    return city_info
+
+
+HEADINGS = [
+    u'Country', u'AccentCity', u'Population', u'Latitude', u'Longitude'
+    ]

@@ -38,6 +38,7 @@ from __future__ import print_function, division
 
 import logging
 import numpy as np
+import re
 
 try:
     import PIL
@@ -48,6 +49,14 @@ except ImportError:
          "Python image library (PIL or Pillow) not available. "
          "Image tests will automatically fail."))
     PIL_AVAILABLE=False
+
+try:
+    import difflib
+    DIFF_AVAILABLE=True
+except ImportError:
+    get_logger(__name__).log(LogLevel.WARNING,
+        ("difflib library not available.  HTML test will automatically fail."))
+    DIFF_AVAILABLE=False
 
 import datetime
 import io
@@ -211,4 +220,68 @@ def create_random_trajectory_point(point_class):
     my_point.object_id = "random_object_id_{}".format(random.randint(1, 1000))
 
     return my_point
+
+# ----------------------------------------------------------------------
+# option to ignore the uuids in var names
+def compare_html_docs(expected, actual, ignore_uuids=False):
+    """Compare two html documents 
+    Compares the two documents given and optionally ignores certain uuids
+    (helpful for comparing html output from folium)
+    """
+   
+    global DIFF_AVAILABLE
+    if not DIFF_AVAILABLE:
+        return False
+    else:
+        with open(expected, 'r') as expected_file, open(actual, 'r') as actual_file:
+            expected_html_doc = expected_file.read()
+            actual_html_doc = actual_file.read()
+            if ignore_uuids:  #UUIDs in var names don't match, so remove
+                print('Removing UUIDs from html output')
+                expected_html_doc = re.sub('map_................................', 'map_', expected_html_doc)
+                expected_html_doc = re.sub('popup_................................', 'popup_', expected_html_doc)
+                expected_html_doc = re.sub('circle_marker_................................', 'circle_marker_', expected_html_doc)
+                expected_html_doc = re.sub('poly_line_................................', 'poly_line_', expected_html_doc)
+                expected_html_doc = re.sub('html_................................', 'html_', expected_html_doc)
+                expected_html_doc = re.sub('tile_layer_................................', 'tile_layer_', expected_html_doc)
+
+                actual_html_doc = re.sub('map_................................', 'map_', actual_html_doc)
+                actual_html_doc = re.sub('popup_................................', 'popup_', actual_html_doc)
+                actual_html_doc = re.sub('circle_marker_................................', 'circle_marker_', actual_html_doc)
+                actual_html_doc = re.sub('poly_line_................................', 'poly_line_', actual_html_doc)
+                actual_html_doc = re.sub('html_................................', 'html_', actual_html_doc)
+                actual_html_doc = re.sub('tile_layer_................................', 'tile_layer_', actual_html_doc)
+            expected_html_lines = [line for line in expected_html_doc.split('\n')]
+            actual_html_lines = [line for line in actual_html_doc.split('\n')]
+            #differ = difflib.Differ()
+            print("comparing "+expected+" and "+actual+"...")
+            diff = list(difflib.unified_diff(expected_html_lines, actual_html_lines))
+            if diff:
+                print("Error: "+expected+" and "+actual+" differ:")
+                for line in diff:
+                    print(line)
+                return False
+            print("html matches")
+            return True
+
+# ----------------------------------------------------------------------
+
+def compare_html_to_ground_truth(filename,
+                                 ground_truth_dir,
+                                 test_dir, ignore_uuids=False):
+    """Compare an HTML document to a ground truth HTML document
+    Append filename to given paths and compare the HTML documents
+    at those locations.  Ignore certain UUIDs if set.
+    """
+    test_filename = os.path.join(test_dir, filename)
+    expected_filename = os.path.join(ground_truth_dir, filename)
+
+    result = compare_html_docs(expected_filename,
+                               test_filename,
+                               ignore_uuids=ignore_uuids)
+
+    if not result:
+        return ERROR
+    else:
+        return NO_ERROR
 

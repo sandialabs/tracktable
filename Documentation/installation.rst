@@ -22,6 +22,19 @@ cartopy`` should do it.
 
 After you have installed Cartopy, retry ``pip install tracktable``.
 
+Note for Windows Users
+----------------------
+
+If you are using Tracktable under Windows, you might also need to install
+the C++ runtime library.  This is a necessary component for any program
+compiled with Microsoft's Visual C++ suite.  You can get it from the following
+URL:
+
+<https://aka.ms/vs/16/release/vc_redist.x64.exe>
+
+The most common indication that you're missing this library is an import
+error referring to the "_core_types" library when you try to import Tracktable
+in a Python interpreter.
 
 Installing from Source
 ======================

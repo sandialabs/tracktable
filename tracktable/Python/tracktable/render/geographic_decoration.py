@@ -112,7 +112,11 @@ def draw_cities(map_axes,
                 dot_size=2,
                 label_color='white',
                 dot_color='white',
-                zorder=10):
+                zorder=10,
+                transform = None):
+
+    if transform is None:
+        transform = cartopy.crs.Geodetic()
 
     artists = []
     if cities_to_draw and len(cities_to_draw) > 0:
@@ -125,7 +129,8 @@ def draw_cities(map_axes,
                 city_latitudes,
                 s=dot_size,
                 color=dot_color,
-                zorder=zorder
+                zorder=zorder,
+                transform=transform
             ))
 
         # Label them with their names
@@ -141,7 +146,8 @@ def draw_cities(map_axes,
                 color=label_color,
                 ha="left",
                 va="center",
-                zorder=zorder
+                zorder=zorder,
+                transform=transform
             )
             artists.append(text_artist)
 
