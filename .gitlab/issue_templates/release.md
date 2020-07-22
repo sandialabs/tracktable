@@ -34,11 +34,19 @@ This template is for creating a Tracktable release that will go out to the world
 ### Checklist
 
 - [ ] Create release branch from `develop`
+- [ ] Bump Libtool version numbers
+- [ ] Bump version numbers
+    * [ ] Top-level CMakeLists.txt
+    * [ ] Documentation/conf.py
+    * [ ] Documentation/conf.py.in
+    * [ ] Documentation/readthedocs/Doxyfile-readthedocs
+    * [ ] tracktable/Python/tracktable/__init__.py
 - [ ] Wheels
     * [ ] Build Wheels
         - [ ] Linux
         - [ ] Windows
         - [ ] MacOS
+    * [ ] Generate GPG signatures
     * [ ] Upload wheels to PyPI
     * [ ] Upload wheels to Cascade
 - [ ] Release Notes
@@ -50,6 +58,12 @@ This template is for creating a Tracktable release that will go out to the world
     * [ ] `.tar.gz` file
     * [ ] `.zip` file
     * [ ] Upload to Cascade
+    * [ ] Include links on Documentation page
+- [ ] Example Notebooks
+    * [ ] `.tar.gz` file
+    * [ ] `.zip` file
+    * [ ] Upload to Cascade
+    * [ ] Include links on Documentation page
 - [ ] Source Code
     * [ ] Check out clean copy
     * [ ] Delete `.git` directory
@@ -57,10 +71,16 @@ This template is for creating a Tracktable release that will go out to the world
     * [ ] Make `.tar.bz2` version
     * [ ] Make `.zip` version
     * [ ] Upload to Cascade
-- [ ] Push source code to `sandialabs/tracktable` on Gitlab
+- [ ] Web Site
+    * [ ] Announcement on front page
+    * [ ] Release Notes 
+    * [ ] Links to new documentation
+    * [ ] Links to new example notebooks
+    * [ ] Links to wheels
+    * [ ] Links to source code
 - [ ] Announcement
     * [ ] Send to tracktable-develop
-    * [ ] Post on Cascade
 - [ ] Finalize
     * [ ] Create and handle merge request for release branch
     * [ ] Publish updates on Cascade to `https://tracktable.sandia.gov`
+    * [ ] Push source code to `sandialabs/tracktable` on Github
