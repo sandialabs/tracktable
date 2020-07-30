@@ -163,6 +163,12 @@ public:
       return *this;
     }
 
+    /// Make this trajectory a clone of another
+  Trajectory& clone() const
+  {
+      return *(new Trajectory(*this));
+  }
+
   /** Return the start time if available.
    *
    * If there are any points in the trajectory this method will return

@@ -49,6 +49,8 @@
 #include <boost/python/module.hpp>
 #include <boost/python/def.hpp>
 #include <boost/python/return_internal_reference.hpp>
+#include <boost/python/return_value_policy.hpp>
+#include <boost/python/return_by_value.hpp>
 #include <boost/python/def_visitor.hpp>
 
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>

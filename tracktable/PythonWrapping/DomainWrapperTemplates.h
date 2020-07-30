@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -463,6 +463,7 @@ class trajectory_methods : public boost::python::def_visitor<trajectory_methods>
                   .add_property("domain", point_domain_name<wrapped_type>)
                   .add_property("trajectory_id", &wrapped_type::trajectory_id)
                   .add_property("object_id", &wrapped_type::object_id)
+                  .def("clone", &wrapped_type::clone, return_value_policy<return_by_value>())
                   .def(self == self)
                   .def(self != self)
                   .def_pickle(GenericSerializablePickleSuite<wrapped_type>())
