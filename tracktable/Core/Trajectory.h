@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -676,6 +676,20 @@ public:
     {
       return this->Points.back();
     }
+
+   /** Insert a single element into the trajectory at an arbitrary index.
+   *
+   * Insert a point into any index in the trajectory.  All points
+   * after this location will be moved farther down.
+   *
+   * @param[in]   index   Location to insert the point
+   * @param[in]   value      Point to insert
+   */
+   void insert(int index, point_type const& value)
+   {
+       this->Points.insert(this->begin()+ index, value);
+       this->compute_current_length(std::distance(this->begin(), this->begin() + index));
+   }
 
   /** Insert a single element into the trajectory at an arbitrary position.
    *
