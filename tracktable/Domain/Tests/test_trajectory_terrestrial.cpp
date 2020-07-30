@@ -89,6 +89,15 @@ int test_trajectory()
   path.set_property("string", test_string_property);
   path.set_property("timestamp", test_timestamp_property);
 
+  trajectory_type new_path = path.clone();
+  if (new_path.object_id() != obj_id)
+  {
+      std::cerr << "ERROR: Expected trajectory object ID to be "
+          << obj_id << " after adding points.  Instead it was "
+          << new_path.object_id() << ".\n";
+      ++error_count;
+  }
+
   if (path.object_id() != obj_id)
     {
     std::cerr << "ERROR: Expected trajectory object ID to be "

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2018 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -101,6 +101,15 @@ def test_trajectory():
         sys.stderr.write('\n')
         sys.stderr.write(str(my_trajectory[0]))
         sys.stderr.write('\n')    
+
+        print("Testing clone")
+    copied_trajectory = my_trajectory.clone()
+    for i in range(0, len(my_trajectory)):
+        error_count += verify_point(my_trajectory[i], copied_trajectory[i], "Cloning Test")
+    copied_trajectory[0][0] = 0.0
+    if my_trajectory[0][0] == 0.0:
+        sys.stderr.write('ERROR: Cloned trajectory not a deep copy')
+        error_count += 1        
     
     print("Testing from_position_list")
     if len(my_trajectory) != 5:
