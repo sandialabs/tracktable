@@ -466,6 +466,7 @@ class trajectory_methods : public boost::python::def_visitor<trajectory_methods>
                   .add_property("trajectory_id", &wrapped_type::trajectory_id)
                   .add_property("object_id", &wrapped_type::object_id)
                   .def("insert", insert)
+                  .def("clone", &wrapped_type::clone, return_value_policy<return_by_value>())
                   .def(self == self)
                   .def(self != self)
                   .def_pickle(GenericSerializablePickleSuite<wrapped_type>())
