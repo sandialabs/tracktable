@@ -28,7 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-from __futurue__ import print_function, division, absolute_import
+from __future__ import print_function, division, absolute_import
 
 import sys
 import random
@@ -38,7 +38,7 @@ from tracktable.domain.tests import create_points_and_trajectories as tt_generat
 from tracktable.domain import terrestrial, cartesian2d, cartesian3d
 from tracktable.core import geomath 
 
-def main()
+def main():
 
     random.seed(0)
     error_count = 0
@@ -53,24 +53,23 @@ def main()
 
         new_traj = traj[1:5]
         if len(new_traj) != 4:
-          print("ERROR: In trajectory type ", trajectory_proto, " slicing should result in 4 points
-           but was actually ", len(new_traj))
-          error_count += 1
+            print("ERROR: In trajectory type ", trajectory_proto, " slicing should result in 4 points but was actually ", len(new_traj))
+            error_count += 1
         if not new_traj.has_property("number"):
-          print("ERROR: Trajectory of type ", trajectory_proto, " slicing did not have property number")
-	  error_count += 1
-	elif not new_traj.properties["number"] == traj.properties["number"]:
-   	  print("ERROR: Trajectory of type ", trajectory_proto, " has property number but was suppose to have
-            value", traj.properties["number"]," but instead has value ", new_traj.properties["number"])
-	  error_count += 1
+            print("ERROR: Trajectory of type ", trajectory_proto, " slicing did not have property number")
+            error_count += 1
+        elif not new_traj.properties["number"] == traj.properties["number"]:
+            print("ERROR: Trajectory of type ", trajectory_proto, " has property number but was suppose to have value",
+                 traj.properties["number"]," but instead has value ", new_traj.properties["number"])
+            error_count += 1
 
-	if not new_traj.has_property("pilot"):
-	  print("ERROR: Trajectory of type ", trajectory_proto, " slicing did not have property pilot")
-	  error_count += 1
-	elif not new_traj.properties["pilot"] == traj.properties["pilot"]:
-	  print("ERROR: Trajectory of type ", trajectory_proto, " has property pilot but was suppose to have 
-           value ", traj.properties["pilot"], " but instead has value ", new_traj.properties["pilot"])
-	  error_count += 1
+        if not new_traj.has_property("pilot"):
+            print("ERROR: Trajectory of type ", trajectory_proto, " slicing did not have property pilot")
+            error_count += 1
+        elif not new_traj.properties["pilot"] == traj.properties["pilot"]:
+            print("ERROR: Trajectory of type ", trajectory_proto, " has property pilot but was suppose to have value ",
+                 traj.properties["pilot"], " but instead has value ", new_traj.properties["pilot"])
+            error_count += 1
 
     return error_count
 
