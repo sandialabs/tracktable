@@ -51,6 +51,7 @@
 #include <tracktable/PythonWrapping/PythonAwarePointReader.h>
 #include <tracktable/PythonWrapping/PythonAwareTrajectoryReader.h>
 #include <tracktable/PythonWrapping/PythonTypedObjectWriter.h>
+//#include <tracktable/PythonWrapping/TrajectoryIndexingSuite.h>
 
 using tracktable::domain::terrestrial::base_point_type;
 using tracktable::domain::terrestrial::trajectory_point_type;

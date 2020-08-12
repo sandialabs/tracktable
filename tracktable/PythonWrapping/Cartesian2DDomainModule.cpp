@@ -51,6 +51,7 @@
 #include <tracktable/PythonWrapping/PythonAwarePointReader.h>
 #include <tracktable/PythonWrapping/PythonAwareTrajectoryReader.h>
 #include <tracktable/PythonWrapping/PythonTypedObjectWriter.h>
+#include <tracktable/PythonWrapping/TrajectoryIndexingSuite.h>
 
 using tracktable::domain::cartesian2d::base_point_type;
 using tracktable::domain::cartesian2d::trajectory_point_type;
@@ -263,7 +264,7 @@ void install_cartesian2d_trajectory_wrappers()
     .def("__iter__", iterator<trajectory_type>())
     .def(self==self)
     .def(self!=self)
-    .def(vector_indexing_suite<trajectory_type>())
+    .def(tracktable::python_wrapping::trajectory_indexing_suite<trajectory_type>())
     ;
 }
 

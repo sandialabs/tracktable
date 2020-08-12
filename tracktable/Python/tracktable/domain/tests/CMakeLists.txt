@@ -225,3 +225,8 @@ add_python_test(
   P_TrajectoryId
   ${DOMAIN}.test_trajectory_id
   )
+
+add_python_test(
+  P_TrajectorySlicing
+  ${DOMAIN}.test_trajectory_slicing
+  )
