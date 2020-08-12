@@ -29,15 +29,6 @@
  */
 
 
-// Tracktable Trajectory Library
-//
-// Boost.Python code to wrap std::pair.  Needs to be instantiated
-// explicitly for each pair type.
-//
-// This is from
-//
-// https://stackoverflow.com/questions/16497889/how-to-expose-stdpair-to-python-using-boostpython/*
-
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
 namespace tracktable { namespace python_wrapping {
@@ -51,26 +42,28 @@ namespace tracktable { namespace python_wrapping {
        {
           template <class Container, bool NoProxy>
           class final_trajectory_derived_policies
-             : public trajectory_indexing_suite<Container,
-               NoProxy, final_trajectory_derived_policies<Container, NoProxy> > {};
+             : public trajectory_indexing_suite<
+	           Container,
+                   NoProxy, 
+                   final_trajectory_derived_policies<Container, NoProxy> 
+	           > 
+	   {};
        }
   
 	template <class Container, bool NoProxy = false, class DerivedPolicies = detail::final_trajectory_derived_policies<Container, NoProxy>>
 	class trajectory_indexing_suite
-           :public boost::python::vector_indexing_suite<Container, DerivedPolicies, NoProxy>
-
+	  : public boost::python::vector_indexing_suite<Container, NoProxy, DerivedPolicies>
         {
         public:
            
 	   typedef typename Container::size_type index_type;
           
-           template <class Class>
-           static object
+  	   static boost::python::object
            get_slice(Container& container, index_type from, index_type to)
  	   {
 		if (from > to)
-		  return object(Container()); 
-		return object(Container(container.begin()+from, container.begin()+to, container));
+		  return boost::python::object(Container()); 
+		return boost::python::object(Container(container.begin()+from, container.begin()+to, container));
 	   }
 	};	 
 
