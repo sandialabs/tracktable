@@ -1,26 +1,26 @@
-# stages:
-#   - build
+stages:
+  - build
 
-# compile-win:
-#   stage: build
-#   tags: 
-#     - windows
-#   script:
-#     - xcopy * C:\Git\tracktable /E /H /Y
-#     - cd C:\TrackTable
-#     - set HTTP_PROXY=http://wwwproxy.sandia.gov:80
-#     - set HTTPS_PROXY=http://wwwproxy.sandia.gov:80
-#     - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" ALL_BUILD.vcxproj /t:Rebuild /p:Configuration=Release /m:8'
-#     - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process --output-on-failure -C Release'
-#   retry: 2
+compile-win:
+  stage: build
+  tags: 
+    - windows
+  script:
+    - xcopy * C:\Git\tracktable /E /H /Y
+    - cd C:\TrackTable
+    - set HTTP_PROXY=http://wwwproxy.sandia.gov:80
+    - set HTTPS_PROXY=http://wwwproxy.sandia.gov:80
+    - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" ALL_BUILD.vcxproj /t:Rebuild /p:Configuration=Release /m:8'
+    - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process --output-on-failure -C Release'
+  retry: 2
 
-# compile-macos:
-#   stage: build
-#   tags: 
-#     - macos
-#   script:
-#     - cmake .
-#     - make -j8
-#     - cmake .
-#     - ctest . --output-on-failure
-#   retry: 2
+compile-macos:
+  stage: build
+  tags: 
+    - macos
+  script:
+    - cmake .
+    - make -j8
+    - cmake .
+    - ctest . --output-on-failure
+  retry: 2
