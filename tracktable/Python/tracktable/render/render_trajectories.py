@@ -246,10 +246,11 @@ def path_length_fraction_generator(trajectory):
     prev_point = trajectory[0]
     cum_distance = 0
     for point in trajectory[1:]:
-        cum_distance += distance(prev_point,point) 
+        cum_distance += distance(prev_point,point)
         dist_fractions.append(cum_distance)
         prev_point = point
-    dist_fractions = [d / cum_distance for d in dist_fractions]
+    if cum_distance != 0:
+        dist_fractions = [d / cum_distance for d in dist_fractions]
     return dist_fractions
 
 # ----------------------------------------------------------------------
@@ -551,6 +552,7 @@ def render_trajectories_folium(trajectories,
                                #folium specific
                                tiles='cartodbdark_matter',
                                attr=".",
+                               crs="EPSG3857",
                                point_popup_properties = [],
                                show_distance_geometry = False,
                                distance_geometry_depth = 4,
@@ -574,7 +576,8 @@ def render_trajectories_folium(trajectories,
         return
 
     if map == None:
-        map = fol.Map(tiles=tiles, attr=attr, control_scale = show_scale,
+        map = fol.Map(tiles=tiles, attr=attr, crs=crs,
+                      control_scale = show_scale,
                       max_zoom=max_zoom)
 
     for i, trajectory in enumerate(trajectories):
