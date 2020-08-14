@@ -51,6 +51,7 @@
 #include <tracktable/PythonWrapping/PythonAwarePointReader.h>
 #include <tracktable/PythonWrapping/PythonAwareTrajectoryReader.h>
 #include <tracktable/PythonWrapping/PythonTypedObjectWriter.h>
+#include <tracktable/PythonWrapping/TrajectoryIndexingSuite.h>
 
 using tracktable::domain::terrestrial::base_point_type;
 using tracktable::domain::terrestrial::trajectory_point_type;
@@ -201,7 +202,7 @@ void install_terrestrial_trajectory_wrappers()
     .def(tracktable::python_wrapping::trajectory_methods())
     .def(self==self)
     .def(self!=self)
-    .def(vector_indexing_suite<trajectory_type>())
+    .def(tracktable::python_wrapping::trajectory_indexing_suite<trajectory_type>())
     ;
 }
 
