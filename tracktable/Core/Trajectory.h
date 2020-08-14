@@ -113,7 +113,8 @@ public:
   ~Trajectory() { }
 
   /// Create a trajectory a copy of another
-  Trajectory(const Trajectory& other) :
+  
+Trajectory(const Trajectory& other) :
     UUID(other.UUID),
     Points(other.Points),
     Properties(other.Properties)
@@ -153,6 +154,16 @@ public:
         this->set_uuid();
       this->compute_current_length(0);
     }
+
+  template<class InputIterator>
+  Trajectory(InputIterator first, InputIterator last, const Trajectory& original)
+     : UUID(), 
+     Points(first, last), 
+     Properties(original.Properties)
+     {
+       this->set_uuid();
+       this->compute_current_length(0);
+     }
 
   /// Make this trajectory a copy of another
   Trajectory& operator=(const Trajectory& other)

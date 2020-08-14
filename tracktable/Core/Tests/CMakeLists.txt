@@ -184,6 +184,11 @@ add_executable(test_memory_use
   )
 set_property(TARGET test_memory_use                     PROPERTY FOLDER "Tests")
 
+add_executable(test_trajectory_slicing
+  test_trajectory_slicing.cpp
+  )
+set_property(TARGET test_trajectory_slicing             PROPERTY FOLDER "Tests")
+
 # ----------------------------------------------------------------------
 
 target_link_libraries(test_distance
@@ -326,6 +331,11 @@ target_link_libraries(test_memory_use
   ${Boost_LIBRARIES}
   )
 
+target_link_libraries(test_trajectory_slicing
+  TracktableCore
+  ${Boost_LIBRARIES} 
+  )
+
 # ----------------------------------------------------------------------
 
 add_test(
@@ -454,4 +464,9 @@ add_test(
 add_test(
   NAME C_TimestampFormat
   COMMAND test_timestamp_format
+  )
+
+add_test(
+  NAME C_TrajectorySlicing
+  COMMAND test_trajectory_slicing
   )
