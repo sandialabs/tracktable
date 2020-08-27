@@ -133,9 +133,8 @@ int test_slicing()
 {
   TrajectoryLonLat trajectory = make_test_surface_trajectory();
 
-  //
-  //TrajectoryLonLat subset = TrajectoryLonLat(trajectory.begin()+4, trajectory.begin()+18, trajectory);
-  TrajectoryLonLat subset (trajectory.begin()+4, trajectory.begin()+18, trajectory);  
+  // This causes a compile error on Windows
+  TrajectoryLonLat subset = TrajectoryLonLat(trajectory.begin()+4, trajectory.begin()+18, trajectory);  
 
   if (subset.size() != 14){
      std::cout << "ERROR: test_slicing: Expected 14 points but got " << subset.size() << " points";
@@ -143,7 +142,9 @@ int test_slicing()
   }
   return 0;
 }
+
 // -----------------------------------------------------------------------
+
 int test_property_number()
 {
   TrajectoryLonLat trajectory = make_test_surface_trajectory();
