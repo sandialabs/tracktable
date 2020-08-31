@@ -2,7 +2,6 @@
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
-
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -28,22 +27,11 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+include_directories( ${PROJECT_SOURCE_DIR})
 
-#
-# This is tracktable/C++/CMakeLists.txt.
-#
-
-add_subdirectory(Core)
-add_subdirectory(Domain)
-add_subdirectory(IO)
-add_subdirectory(Analysis)
-add_subdirectory(ThirdParty)
-
-if (BUILD_EXAMPLES)
-add_subdirectory(Examples)
-endif (BUILD_EXAMPLES)
-
-if (TRACKTABLE_PYTHON)
-  add_subdirectory(Python)
-  add_subdirectory(PythonWrapping)
-endif (TRACKTABLE_PYTHON)
+add_library( TracktableTest OBJECT
+             CatchMain.cpp
+             catch2.hpp
+           )
+## Should be no reason to install catch header
+## Should be no reason to install library, unless we decide to install tests for some reason
