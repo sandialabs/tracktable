@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -64,6 +64,9 @@ from tracktable.lib._domain_algorithm_overloads import convex_hull_area as _conv
 from tracktable.lib._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
 from tracktable.lib._domain_algorithm_overloads import convex_hull_centroid as _convex_hull_centroid
 from tracktable.lib._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
+from tracktable.lib._domain_algorithm_overloads import current_length as _current_length
+from tracktable.lib._domain_algorithm_overloads import current_length_fraction as _current_length_fraction
+from tracktable.lib._domain_algorithm_overloads import current_time_fraction as _current_time_fraction
 
 import logging
 LOGGER = logging.getLogger(__name__)
@@ -986,3 +989,41 @@ def kms_to_lat(kms, latitude):
     return kms / latitude_degree_size(latitude)
 
 # ----------------------------------------------------------------------
+
+def current_length_fraction(point):
+
+    """Return the fraction length of a point in a trajectory
+
+    This is the fraction length of all segments in the trajectory up to
+    the given point.
+
+    Args:
+      point (Point): Point whose current length fraction we want
+
+    Returns:
+      Fraction of total length up to this point.
+
+    """
+
+    return _current_length_fraction(point)
+    
+# ----------------------------------------------------------------------   
+ 
+def current_time_fraction(point):
+
+    """Return the fraction duration of a point in trajectory
+
+    This is the fraction duration of all segments in the trajectory up to
+    the given point.
+
+    Args:
+      point (Point): Point whose current duration fraction we want
+
+    Returns:
+      Fraction of total duration up to this point.
+
+    """
+
+    return _current_time_fraction(point)
+    
+# ----------------------------------------------------------------------   
