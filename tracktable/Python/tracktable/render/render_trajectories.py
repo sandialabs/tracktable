@@ -249,7 +249,8 @@ def path_length_fraction_generator(trajectory):
         cum_distance += distance(prev_point,point) 
         dist_fractions.append(cum_distance)
         prev_point = point
-    dist_fractions = [d / cum_distance for d in dist_fractions]
+    if cum_distance != 0:
+        dist_fractions = [d / cum_distance for d in dist_fractions]
     return dist_fractions
 
 # ----------------------------------------------------------------------
