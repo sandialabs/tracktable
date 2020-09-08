@@ -237,6 +237,11 @@ def compare_html_docs(expected, actual, ignore_uuids=False):
             expected_html_doc = expected_file.read()
             actual_html_doc = actual_file.read()
             if ignore_uuids:  #UUIDs in var names don't match, so remove
+                print('Removing Leaflet versions from html output')
+                expected_html_doc = re.sub('leaflet@.....', 'leaflet@', expected_html_doc)
+
+                actual_html_doc = re.sub('leaflet@.....', 'leaflet@', actual_html_doc)
+
                 print('Removing UUIDs from html output')
                 expected_html_doc = re.sub('map_................................', 'map_', expected_html_doc)
                 expected_html_doc = re.sub('popup_................................', 'popup_', expected_html_doc)
