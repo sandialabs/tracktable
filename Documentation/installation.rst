@@ -75,10 +75,15 @@ Python
 * Matplotlib 2.0+ - http://matplotlib.org
 * Cartopy - https://scitools.org.uk/cartopy/docs/latest/
     * NOTE: Tracktable 1.1 and earlier used Basemap (http://matplotlib.org/basemap) for rendering.
+    * NOTE: On Ubuntu ``libproj-dev`` and ``proj-bin`` need to be installed prior to installing Cartopy
 * PyTZ - https://pypi.python.org/pypi/pytz/
 * Shapely - https://pypi.python.org/pypi/Shapely
+    * When installing on Ubuntu, Shapely needs to be installed with no binaries i.e. ``pip install --no-binary shapely shapely``
 * Six - https://pypi.org/project/six/
 * PyProj - https://pypi.org/project/pyproj/
+* Folium - https://pypi.org/project/folium/
+* Scipy - https://pypi.org/project/scipy/
+    * NOTE: This package only needs to be installed manually on Linux
 
 C++
 ^^^
@@ -115,10 +120,10 @@ Other
 If you want to build documentation you will also need the following packages:
 
 * Sphinx - http://sphinx-doc.org
+* Sphinx Read the Docs theme - https://sphinx-rtd-theme.readthedocs.io/en/latest
 * napoleon - https://sphinxcontrib-napoleon.readthedocs.org/en/latest
    * This is bundled with Sphinx as of version 1.3.
 * Breathe - http://breathe.readthedocs.org/en/latest/
-* Sphinx Read the Docs theme - https://sphinx-rtd-theme.readthedocs.io/en/latest
 * Doxygen - http://www.doxygen.nl/index.html
 * Graphviz (for dot executable)- https://www.graphviz.org/
 
@@ -216,7 +221,11 @@ a moment, several new options will appear including
 to ``ON``. Without these options you will not be able to use any of
 Tracktable's Python components.  Set the value of
 ``CMAKE_INSTALL_PREFIX`` to the directory where you want to install
-the software.  Press 'c' or click the 'Configure' button again to
+the software.  To build the documentation set the ``BUILD_DOCUMENTATION``
+or ``BUILD_DOCUMENTATION_CXX_ONLY`` options to ``ON`` once you have the
+respective tools installed. There is no option to only build the Python
+documentation since the Python documentation build process depends upon
+the C++ documentation.Press 'c' or click the 'Configure' button again to
 incorporate your choice.
 
 Now you need to set options that are normally hidden.  Press 't' or
