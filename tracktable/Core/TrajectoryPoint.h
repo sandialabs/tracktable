@@ -334,6 +334,63 @@ public:
       this->CurrentLength = length;
     }
 
+  /// Get fraction of total length of trajectory up to this point
+  //
+  // When we build a trajectory this property will be set to the 
+  // fraction of length of the trajectory up to this point.  This 
+  // will be 0.0 at the very first point and range up to 1.0 
+  // thereafter.
+  //
+  // The initial value of current_length_fraction is -1.0 to indicate that it is
+  // not yet set.
+  //
+  // \return fraction of Trajectory length so far
+  double current_length_fraction() const
+    {
+      return this->CurrentLengthFraction;
+    }
+
+  /// Set fraction of total length of trajectory up to this point
+  //
+  // You will almost certainly not need to call this method yourself.
+  // It is the responsibility of the Trajectory class to compute and
+  // set the lengths.
+  //
+  // \param fraction Fraction of Trajectory Length up to this point
+  void set_current_length_fraction(double fraction)
+    {
+      this->CurrentLengthFraction = fraction;
+    }   
+
+  /// Get fraction of total duration of trajectory up to this point
+  //
+  // When we build a trajectory this property will be set to the 
+  // fraction of duration of the trajectory up to this point.  This 
+  // will be 0.0 at the very first point and range up to 1.0 
+  // thereafter.
+  //
+  // The initial value of current_time_fraction is -1.0 to indicate that it is
+  // not yet set.
+  //
+  // \return fraction of Trajectory duration so far
+  double current_time_fraction() const
+    {
+      return this->CurrentTimeFraction;
+    }
+
+  /// Set fraction of total duration of trajectory up to this point
+  //
+  // You will almost certainly not need to call this method yourself.
+  // It is the responsibility of the Trajectory class to compute and
+  // set the fractions.
+  //
+  // \param fraction Fraction of Trajectory Duration up to this point
+  void set_current_time_fraction(double fraction)
+    {
+      this->CurrentTimeFraction = fraction;
+    } 
+
+    
   /// INTERNAL METHOD
   //
   // This method is for use by the Python wrappers that can provide
@@ -355,6 +412,10 @@ public:
 protected:
   /// Length of trajectory up to this point
   double CurrentLength;
+  /// Length fraction of trajectory up to this point
+  double CurrentLengthFraction;
+  /// Duration fraction of trajectory up to this point
+  double CurrentTimeFraction;
   /// Storage for a point's object ID
   std::string ObjectId;
   /// Storage for a point's named properties

@@ -1,6 +1,6 @@
 # -*- Mode: cmake; -*-
 #
-# Copyright (c) 2014-2018 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -97,6 +97,7 @@ set( Core_Detail_AlgorithmSignatures_HEADERS
   detail/algorithm_signatures/Extrapolate.h
   detail/algorithm_signatures/Intersects.h
   detail/algorithm_signatures/Length.h
+  detail/algorithm_signatures/LengthFractionAtPoint.h
   detail/algorithm_signatures/PointAtFraction.h
   detail/algorithm_signatures/PointAtTime.h
   detail/algorithm_signatures/RadiusOfGyration.h
@@ -105,6 +106,7 @@ set( Core_Detail_AlgorithmSignatures_HEADERS
   detail/algorithm_signatures/SphericalCoordinateAccess.h
   detail/algorithm_signatures/SubsetDuringInterval.h
   detail/algorithm_signatures/TimeAtFraction.h
+  detail/algorithm_signatures/TimeFractionAtPoint.h
   detail/algorithm_signatures/TransferProperties.h
   detail/algorithm_signatures/TurnAngle.h
 )

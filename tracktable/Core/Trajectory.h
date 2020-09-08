@@ -39,9 +39,11 @@
 
 #include <tracktable/Core/detail/algorithm_signatures/EndToEndDistance.h>
 #include <tracktable/Core/detail/algorithm_signatures/Length.h>
+#include <tracktable/Core/detail/algorithm_signatures/LengthFractionAtPoint.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtFraction.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtTime.h>
 #include <tracktable/Core/detail/algorithm_signatures/TimeAtFraction.h>
+#include <tracktable/Core/detail/algorithm_signatures/TimeFractionAtPoint.h>
 #include <tracktable/Core/detail/algorithm_signatures/SubsetDuringInterval.h>
 
 #include <tracktable/Core/detail/implementations/PointAtFraction.h>
@@ -62,6 +64,7 @@
 #include <ostream>
 #include <vector>
 #include <typeinfo>
+#include <iostream>
 
 namespace tracktable {
 
@@ -152,7 +155,7 @@ Trajectory(const Trajectory& other) :
     {
       if (generate_uuid)
         this->set_uuid();
-      this->compute_current_length(0);
+      this->compute_current_features(0);
     }
 
   template<class InputIterator>
@@ -162,7 +165,7 @@ Trajectory(const Trajectory& other) :
      Properties(original.Properties)
      {
        this->set_uuid();
-       this->compute_current_length(0);
+       this->compute_current_features(0);
      }
 
   /// Make this trajectory a copy of another
@@ -465,7 +468,7 @@ Trajectory(const Trajectory& other) :
   void assign(iter_type iter_begin, iter_type iter_end)
     {
       this->Points.assign(iter_begin, iter_end);
-      this->compute_current_length(0);
+      this->compute_current_features(0);
     }
 
   /** Check whether one trajectory is equal to another by comparing all the points.
@@ -537,7 +540,7 @@ Trajectory(const Trajectory& other) :
   void push_back(point_type const& pt)
     {
       this->Points.push_back(pt);
-      this->compute_current_length(this->size() - 1);
+      this->compute_current_features(this->size() - 1);
     }
 
   /** Retrieve the point at a given index with bounds checking.
@@ -598,7 +601,7 @@ Trajectory(const Trajectory& other) :
       if (result != this->end())
         {
         // XXX CHECK THIS
-        this->compute_current_length(std::distance(this->begin(), result));
+        this->compute_current_features(std::distance(this->begin(), result));
         }
       return result;
     }
@@ -622,7 +625,7 @@ Trajectory(const Trajectory& other) :
       if (result != this->end())
         {
         // XXX CHECK THIS
-        this->compute_current_length(std::distance(this->begin(), result));
+        this->compute_current_features(std::distance(this->begin(), result));
         }
       return result;
     }
@@ -699,7 +702,7 @@ Trajectory(const Trajectory& other) :
    void insert(int index, point_type const& value)
    {
        this->Points.insert(this->begin()+ index, value);
-       this->compute_current_length(std::distance(this->begin(), this->begin() + index));
+       this->compute_current_features(std::distance(this->begin(), this->begin() + index));
    }
 
   /** Insert a single element into the trajectory at an arbitrary position.
@@ -713,7 +716,7 @@ Trajectory(const Trajectory& other) :
   iterator insert(iterator position, point_type const& value)
     {
       iterator result(this->Points.insert(position, value));
-      this->compute_current_length(std::distance(this->begin(), position));
+      this->compute_current_features(std::distance(this->begin(), position));
       return result;
     }
 
@@ -730,7 +733,7 @@ Trajectory(const Trajectory& other) :
   void insert(iterator position, size_type n, point_type const& value)
     {
       this->Points.insert(position, n, value);
-      this->compute_current_length(std::distance(this->begin(), position));
+      this->compute_current_features(std::distance(this->begin(), position));
     }
 
   /** Insert a range of points into the trajectory.
@@ -747,10 +750,10 @@ Trajectory(const Trajectory& other) :
   void insert(iterator position, InputIterator first, InputIterator last)
     {
       this->Points.insert(position, first, last);
-      this->compute_current_length(std::distance(this->begin(), position));
+      this->compute_current_features(std::distance(this->begin(), position));
     }
 
-  void compute_current_length(std::size_t start_index)
+  void compute_current_features(std::size_t start_index)
     {
       if (start_index >= this->size())
         {
@@ -771,7 +774,31 @@ Trajectory(const Trajectory& other) :
             );
           }
         }
+        
+      for (std::size_t i = 0; i < this->size(); ++i)
+        {
+        if (i == 0)
+          {
+          (*this)[i].set_current_length_fraction(0.0);
+          (*this)[i].set_current_time_fraction(0.0);
+          }
+        else
+          {
+          (*this)[i].set_current_length_fraction(
+            (*this)[i].current_length() /
+            (*this)[this->size()-1].current_length()
+            );
+
+           (*this)[i].set_current_time_fraction(
+            static_cast<double>(((*this)[i].timestamp() - 
+             (*this)[0].timestamp()).total_seconds()) /
+            static_cast<double>(((*this)[this->size()-1].timestamp() - 
+             (*this)[0].timestamp()).total_seconds()) 
+           );
+
+        }
     }
+  }
 
   //@}
   // ************************************************************
