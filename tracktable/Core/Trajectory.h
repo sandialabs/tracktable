@@ -86,7 +86,7 @@ template< class PointT >
 class Trajectory
 {
   friend class boost::serialization::access;
-  
+
 public:
   /// Convenient aliases for template parameters and types from internal storage
   //
@@ -116,7 +116,7 @@ public:
   ~Trajectory() { }
 
   /// Create a trajectory a copy of another
-  
+
 Trajectory(const Trajectory& other) :
     UUID(other.UUID),
     Points(other.Points),
@@ -131,6 +131,7 @@ Trajectory(const Trajectory& other) :
    *
    * @param[in] n             Length of the trajectory
    * @param[in] initial_value Point to be used to fill the new vector
+   * @param[in] generate_uuid Flag to generate a UUID for the trajectory
    */
 
   Trajectory(size_type n, point_type initial_value=point_type(), bool generate_uuid=true)
@@ -147,6 +148,7 @@ Trajectory(const Trajectory& other) :
    *
    * @param[in] first   Iterator pointing to the first point for the new trajectory
    * @param[in] last    Iterator pointing past the last point for the new trajectory
+   * @param[in] generate_uuid Flag to generate a UUID for the trajectory
    */
   template<class InputIterator>
   Trajectory(InputIterator first, InputIterator last, bool generate_uuid=true)
@@ -160,8 +162,8 @@ Trajectory(const Trajectory& other) :
 
   template<class InputIterator>
   Trajectory(InputIterator first, InputIterator last, const Trajectory& original)
-     : UUID(), 
-     Points(first, last), 
+     : UUID(),
+     Points(first, last),
      Properties(original.Properties)
      {
        this->set_uuid();
@@ -280,11 +282,11 @@ Trajectory(const Trajectory& other) :
    *
    * Return a mostly-unique ID for the trajectory incorporating its object
    * ID, start time and end time.  If the trajectory is empty then we
-   * return the string "(empty)".  
+   * return the string "(empty)".
    *
    * Note that if you have multiple trajectories with the same object ID,
    * start time and end time, this identifier will not be unique.
-   * 
+   *
    */
   std::string trajectory_id() const
     {
@@ -667,7 +669,7 @@ Trajectory(const Trajectory& other) :
    *
    * \return Last point in trajectory (mutable reference)
    *
-   * \note 
+   * \note
    * If you call this on an empty trajectory the behavior is
    * undefined.  Dereferencing back() on an empty trajectory will
    * probably crash your program.
@@ -681,7 +683,7 @@ Trajectory(const Trajectory& other) :
    *
    * \return Last point in trajectory (immutable reference)
    *
-   * \note 
+   * \note
    * If you call this on an empty trajectory the behavior is
    * undefined.  Dereferencing back() on an empty trajectory will
    * probably crash your program.
@@ -774,7 +776,7 @@ Trajectory(const Trajectory& other) :
             );
           }
         }
-        
+
       for (std::size_t i = 0; i < this->size(); ++i)
         {
         if (i == 0)
@@ -790,10 +792,10 @@ Trajectory(const Trajectory& other) :
             );
 
            (*this)[i].set_current_time_fraction(
-            static_cast<double>(((*this)[i].timestamp() - 
+            static_cast<double>(((*this)[i].timestamp() -
              (*this)[0].timestamp()).total_seconds()) /
-            static_cast<double>(((*this)[this->size()-1].timestamp() - 
-             (*this)[0].timestamp()).total_seconds()) 
+            static_cast<double>(((*this)[this->size()-1].timestamp() -
+             (*this)[0].timestamp()).total_seconds())
            );
 
         }
@@ -890,13 +892,13 @@ public:
    * The point underneath this iterator, if there is one, cannot be changed.
    */
   const_reverse_iterator rend() const { return this->Points.rend(); }
-  
+
   /** Return an iterator pointing beyond the last point in the trajectory
    *
    * The point underneath this iterator, if there is one, cannot be changed.
    */
   const_reverse_iterator crend() const noexcept { return this->Points.crend(); }
-  
+
 };
 
 } // exit namespace tracktable
