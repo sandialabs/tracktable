@@ -22,6 +22,25 @@ cartopy`` should do it.
 
 After you have installed Cartopy, retry ``pip install tracktable``.
 
+Anaconda Virtual Environment
+----------------------------
+If Anaconda is installed then the Anaconda virtual environment command
+below will create and configure a virtual environment that is ready to use Tracktable.
+Enter the following commands in a command/terminal/Anaconda prompt.
+
+* Create the Anaconda virtual environment:
+    * ::
+
+        conda create --name tracktable --channel defaults --channel conda-forge --yes python pip folium pyshp pytz cartopy pip[tracktable]
+* Verify that the ``tracktable`` virtual environment was created:
+    * ``conda env list``
+* Activate the virtual environment:
+    * ``conda activate tracktable``
+* Deactivate the virtual environment:
+    * ``conda deactivate``
+* If the virtual environment is no longer needed then it can be removed by running:
+    * ``conda remove --name tracktable --all``
+
 Note for Windows Users
 ----------------------
 
