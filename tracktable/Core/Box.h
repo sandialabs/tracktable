@@ -46,7 +46,7 @@ namespace tracktable {
  * that holds two points representing opposite corners.
  *
  * Don't instantiate this class directly.  Instead, use
- * tracktable::domain::<name>::box_type so that you get the correct
+ * \c "tracktable::domain::<name>::box_type" so that you get the correct
  * distance functions.
  *
  */
