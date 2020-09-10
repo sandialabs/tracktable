@@ -130,8 +130,8 @@ public:
 
   /** Convenience constructor.
    *
-   * @param[in] longitude Longitude in degrees
-   * @param[in] latitude  Latitude in degrees
+   * @param[in] _longitude Longitude in degrees
+   * @param[in] _latitude  Latitude in degrees
    */
   TerrestrialPoint(double _longitude, double _latitude) {
     this->set_longitude(_longitude);
@@ -221,8 +221,8 @@ public:
   TerrestrialTrajectoryPoint& operator=(TerrestrialTrajectoryPoint&& other) = default;
   /** Convenience constructor.
    *
-   * @param[in] longitude Longitude in degrees
-   * @param[in] latitude  Latitude in degrees
+   * @param[in] _longitude Longitude in degrees
+   * @param[in] _latitude  Latitude in degrees
    */
   TerrestrialTrajectoryPoint(double _longitude, double _latitude) {
     this->set_longitude(_longitude);
@@ -253,7 +253,7 @@ public:
 
   /** Returns ECEF values for lon/lat points.  Uses a km convention.
    * @note this expects an altitude in km (not ft or m). Change ratio if the altitude is not km
-   * @param _ratio The value to multiply altitude by to get km
+   * @param ratio The value to multiply altitude by to get km
    * @param _altitudeString The label of the property that contains altitude
    * @returns 3D Earth Centered, Earth Fixed point in km
    * @throw PropertyDoesNotExist if we can't find altitude
