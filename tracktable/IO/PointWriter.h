@@ -170,7 +170,7 @@ public:
    * NOTE: You are resposible for ensuring that the stream does not go
    * out of scope until you are done writing points.
    *
-   * @param[in] output_stream Stream where points will be written
+   * @param[in] out Stream where points will be written
    */
 
   void set_output(std::ostream& out)
@@ -191,7 +191,7 @@ public:
    * This string will be inserted between each field as points are
    * written.
    *
-   * @param[in] delimiter Delimiter string
+   * @param[in] delim Delimiter string
    */
 
   void set_field_delimiter(string_type const& delim)
@@ -211,7 +211,7 @@ public:
    * This string will be written after each point.  By default it's
    * std::endl (the newline string).
    *
-   * @param[in] separator: String separator
+   * @param[in] sep String separator
    */
   void set_record_delimiter(string_type const& sep)
     {
@@ -361,7 +361,7 @@ public:
    * value.  This method lets you set how nulls will be written to
    * disk.  The default value is the empty string "".
    *
-   * @param[in] null_value   Desired string representation of nulls
+   * @param[in] _null_value   Desired string representation of nulls
    */
 
   void set_null_value(string_type const& _null_value)

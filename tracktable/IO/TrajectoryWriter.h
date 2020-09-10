@@ -175,7 +175,7 @@ public:
    * value.  This method lets you set how nulls will be written to
    * disk.  The default value is the empty string "".
    *
-   * @param[in] null_value   Desired string representation of nulls
+   * @param[in] new_null_value   Desired string representation of nulls
    */
 
   void set_null_value(string_type const& new_null_value)
