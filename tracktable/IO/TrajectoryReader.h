@@ -187,7 +187,7 @@ public:
 
   /** Specify string value to be interpreted as null
    *
-   * @param[in] null_value String to interpret as null
+   * @param[in] _null_value String to interpret as null
    */
   void set_null_value(string_type const& _null_value)
     {
@@ -210,7 +210,7 @@ public:
    * We read our input from C++ std::istreams.  The stream you supply
    * will be traversed exactly once.
    *
-   * @param[in] input Stream from which we will read points
+   * @param[in] _input Stream from which we will read points
    */
   void set_input(std::istream& _input)
     {
@@ -444,7 +444,7 @@ private:
                                                          trajectory);
       if (trajectory != 0 && trajectory->size() != num_points)
         {
-        TRACKTABLE_LOG(log::error) 
+        TRACKTABLE_LOG(log::error)
                   << "Trajectory reader tried to populate a new trajectory from tokens but got "
                   << trajectory->size()
                   << " points.  We were expecting "
@@ -463,7 +463,7 @@ private:
       this->PointReader.set_input_range(input_range_begin,
                                         input_range_end);
       trajectory->assign(this->PointReader.begin(), this->PointReader.end());
-      TRACKTABLE_LOG(log::trace) 
+      TRACKTABLE_LOG(log::trace)
                 << "populate_trajectory_points: Trajectory now contains "
                 << trajectory->size() << " points\n";
     }
