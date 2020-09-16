@@ -34,7 +34,7 @@ import operator
 import os
 import os.path
 
-from tracktable.core.compatibility import UnicodeCSVDictReader
+from csv import DictReader
 
 # if sys.version_info[0] > 2:
 #     pass # python 3
@@ -78,7 +78,7 @@ def build_airport_dict():
     This function is called whenever the user tries to look up an
     airport.  It checks to make sure the table has been populated and,
     if not, loads it from disk.
-
+    
     Returns:
       None
 
@@ -106,9 +106,9 @@ def build_airport_dict():
                                    'utc_offset',
                                    'daylight_savings' ]
 
-#        with open(data_filename, mode='r', encoding='utf-8') as infile:
-        with open(data_filename, mode='r') as infile:
-            csvreader = UnicodeCSVDictReader(
+        with open(data_filename, mode='r', encoding='utf-8') as infile:
+#        with open(data_filename, mode='r') as infile:
+            csvreader = DictReader(
                 infile,
                 delimiter=',',
                 quotechar='"',
@@ -132,12 +132,12 @@ def build_airport_dict():
                     airport.iata_code = None
                 else:
                     AIRPORT_DICT[airport.iata_code] = airport
-
+                    
                 if len(airport.icao_code) == 0:
                     airport.icao_code = None
                 else:
-                    AIRPORT_DICT[airport.icao_code] = airport
-
+                    AIRPORT_DICT[airport.icao_code] = airport    
+                    
             # now we add traffic information - rank each airport by
             # the amount of traffic it sees in some arbitrary period
             from tracktable.info.data.airport_traffic import AIRPORTS_BY_TRAFFIC
@@ -204,7 +204,7 @@ def all_airports():
     if len(AIRPORT_DICT) == 0:
         build_airport_dict()
 
-    return AIRPORT_DICT.values()
+    return list(set(AIRPORT_DICT.values()))
 
 # ----------------------------------------------------------------------
 
