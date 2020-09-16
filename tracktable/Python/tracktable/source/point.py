@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 """
-tracktable.source.scatter - Ways to generate points around a seed point
+tracktable.source.point - Ways to generate points around a seed point
 """
 
 from __future__ import division, print_function, absolute_import
@@ -42,19 +42,19 @@ from six.moves import range
 def random_box_uniform(min_corner, max_corner, num_points=100):
     """Generate points uniformly within a bounding box
 
-    This will generate points according to a uniform random 
+    This will generate points according to a uniform random
     distribution within a specified bounding box.
 
     Note that the uniformity is with respect to each dimension,
     not the underlying metric.  You will only get spatially uniform
-    points if (1) the bounding box is square and (2) the coordinate 
-    system is isotropic with respect to the underlying surface.  
+    points if (1) the bounding box is square and (2) the coordinate
+    system is isotropic with respect to the underlying surface.
     Cartesian coordinate systems are such.  Geographic coordinates
     (longitude/latitude) are not -- the width of 1 degree of
     longitude changes as a function of latitude.
 
     Arguments:
-        min_corner (Tracktable point type): lower left / SW corner of 
+        min_corner (Tracktable point type): lower left / SW corner of
            bounding box
         max_corner (Tracktable point type): upper right / NE corner of
            bounding box
@@ -86,10 +86,10 @@ def random_circle_linear_falloff(seed_point,
           release.
 
     Args:
-       seed_point (tracktable.domain.terrestrial.BasePoint): Center of 
+       seed_point (tracktable.domain.terrestrial.BasePoint): Center of
            point cloud
        num_points (integer, default 100): Number of points to generate
-       max_radius (float, non-negative): How far the points can be from 
+       max_radius (float, non-negative): How far the points can be from
            the center (default 100km)
 
     Returns:
