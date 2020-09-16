@@ -36,7 +36,7 @@ given the name of the domain and the parameters you want to apply.
 TODO: Add support for point writers as well.
 """
 
-from tracktable.domain import select_domain_from_name
+from tracktable.domain import domain_module_from_name
 
 def trajectory_point_reader(
     infile,
@@ -49,7 +49,7 @@ def trajectory_point_reader(
     latitude_column=3,
     x_column=2,
     y_column=3,
-    z_column=4, 
+    z_column=4,
     string_fields=dict(),
     real_fields=dict(),
     time_fields=dict()
@@ -59,17 +59,17 @@ def trajectory_point_reader(
     Tracktable point readers live in the domain modules:
     `tracktable.domain.<domain_name>.TrajectoryPointReader`
     where `domain_name` is one of `terrestrial`, `cartesian2d`
-    or `cartesian3d`.  This is a convenience function to set 
+    or `cartesian3d`.  This is a convenience function to set
     one up.
 
     A trajectory point must have all of the following elements:
 
-    1.  An object ID.  We use the object ID to group points into 
+    1.  An object ID.  We use the object ID to group points into
         trajectories.
     2.  A timestamp.  For the purposes of this function, that timestamp
-        must be in the format 'YYYY-mm-dd HH:MM:SS' where YYYY is the 
+        must be in the format 'YYYY-mm-dd HH:MM:SS' where YYYY is the
         4-digit year, mm is the 2-digit month, dd is the 2-digit day of
-        the month, and HH:MM:SS are the 2-digit hours, minutes, and 
+        the month, and HH:MM:SS are the 2-digit hours, minutes, and
         seconds within the day, respectively.
     3.  Coordinates.  For the terrestrial domain, these coordinates are
         longitude and latitude.  For the cartesian2d domain, these are
@@ -77,14 +77,14 @@ def trajectory_point_reader(
 
     By default, we look for the object ID in column 0, the timestamp in
     column 1, longitude (or x) in column 2, latitude (or y) in column 3,
-    and the Z coordinate in column 4.  We only pay attention to the 
+    and the Z coordinate in column 4.  We only pay attention to the
     coordinate assignments for the selected point domain.
 
     You may also specify other fields to be added to each point.  See the
     documentation for the `string_fields`, `real_fields` and `time_fields`
     keyword arguments.
 
-    This function will probably move into the main library at some point 
+    This function will probably move into the main library at some point
     soon.  We will keep a binding here to avoid breaking existing code.
 
     Arguments:
@@ -93,13 +93,13 @@ def trajectory_point_reader(
     Keyword arguments:
         comment_character {character}: Any row where this is the first
             non-whitespace character will be ignored.  (default '#')
-        delimiter {character}: What character separates columns? 
+        delimiter {character}: What character separates columns?
             (default ',')
-        domain {string}: Which point domain will the points belong to? 
+        domain {string}: Which point domain will the points belong to?
             (default 'terrestrial')
-        object_id_column {int}: Which column contains the object ID 
+        object_id_column {int}: Which column contains the object ID
             (default 0)
-        timestamp_column {int}: Which column contains the timestamp 
+        timestamp_column {int}: Which column contains the timestamp
             (default 1)
         longitude_column {int}: Which column contains the longitude for
             each point? (default 2, assumes terrestrial domain)
@@ -128,7 +128,7 @@ def trajectory_point_reader(
             the point's properties. The timestamps must be in the same
             format as for the point as a whole, namely `YYYY-mm-dd HH:MM:SS`.
             (default: empty)
-    
+
     Returns:
         Trajectory point reader from the appropriate domain with all fields
         configured according to arguments.  Iterate over the reader object
@@ -180,7 +180,7 @@ def base_point_reader(
     latitude_column=3,
     x_column=2,
     y_column=3,
-    z_column=4, 
+    z_column=4,
     string_fields=dict(),
     real_fields=dict(),
     time_fields=dict()
@@ -190,7 +190,7 @@ def base_point_reader(
     Tracktable point readers live in the domain modules:
     `tracktable.domain.<domain_name>.PointReader`
     where `domain_name` is one of `terrestrial`, `cartesian2d`
-    or `cartesian3d`.  This is a convenience function to set 
+    or `cartesian3d`.  This is a convenience function to set
     one up.
 
     A base (undecorated) point must have all of the following elements:
@@ -199,15 +199,15 @@ def base_point_reader(
         longitude and latitude.  For the cartesian2d domain, these are
         x and y.  The cartesian3d domain adds z.
 
-    By default, we expect longitude (or x) in column 2, latitude (or y) 
-    in column 3, and the Z coordinate in column 4.  We only pay attention 
+    By default, we expect longitude (or x) in column 2, latitude (or y)
+    in column 3, and the Z coordinate in column 4.  We only pay attention
     to the coordinate assignments for the selected point domain.
 
     The difference between base points and trajectory points is that base
     points don't have an object ID, a timestamp, or any metadata fields:
     just coordinates.
 
-    This function will probably move into the main library at some point 
+    This function will probably move into the main library at some point
     soon.  We will keep a binding here to avoid breaking existing code.
 
     Arguments:
@@ -216,9 +216,9 @@ def base_point_reader(
     Keyword arguments:
         comment_character {character}: Any row where this is the first
             non-whitespace character will be ignored.  (default '#')
-        delimiter {character}: What character separates columns? 
+        delimiter {character}: What character separates columns?
             (default ',')
-        domain {string}: Which point domain will the points belong to? 
+        domain {string}: Which point domain will the points belong to?
             (default 'terrestrial')
         longitude_column {int}: Which column contains the longitude for
             each point? (default 2, assumes terrestrial domain)
@@ -230,7 +230,7 @@ def base_point_reader(
             each point? (default 3, assumes cartesian2d or cartesian3d)
         z_column {int}: Which column contains the X coordinate for
             each point? (default 4, assumes cartesian3d)
-    
+
     Returns:
         Base point reader from the appropriate domain with all fields
         configured according to arguments.  Iterate over the reader object
@@ -257,7 +257,7 @@ def base_point_reader(
     return reader
 
 ###
-### Below this point are the utility functions that apply arguments 
+### Below this point are the utility functions that apply arguments
 ### to readers.
 ###
 
@@ -271,8 +271,8 @@ def _configure_reader_trajectory_point_fields(
     ):
 
     """Configure a point reader to load metadata fields
-    
-    This is a utility function.  See the arguments for 
+
+    This is a utility function.  See the arguments for
     configure_trajectory_point_reader for information on
     the parameters here.
     """
@@ -282,7 +282,7 @@ def _configure_reader_trajectory_point_fields(
 
     for (field, column) in string_fields.items():
         reader.set_string_field_column(field, column)
-    
+
     for (field, column) in real_fields.items():
         reader.set_real_field_column(field, column)
 
@@ -311,12 +311,12 @@ def _configure_reader_coordinates(
             reader.coordinates[2] = kwargs['z_column']
     else:
         raise KeyError('Unsupported domain: {}'.format(domain))
-    
 
-def _configure_reader_file_properties(reader,                        
+
+def _configure_reader_file_properties(reader,
                                       comment_character='#',
                                       delimiter=','):
-   
+
     """Configure delimiter and comment character for a reader
 
     This is a utility function.

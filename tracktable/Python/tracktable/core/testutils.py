@@ -32,7 +32,7 @@
 from __future__ import print_function, division
 
 import filecmp
-from tracktable.logging import get_logger, LogLevel
+import logging
 
 def compare_text_files(file1, file2):
     result = filecmp.cmp(file1, file2)

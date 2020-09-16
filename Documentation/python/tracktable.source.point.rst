@@ -1,5 +1,5 @@
 ==============================
-tracktable.render.paths module
+tracktable.source.point module
 ==============================
 
 
@@ -7,7 +7,7 @@ tracktable.render.paths module
 Module contents
 ---------------
 
-.. automodule:: tracktable.render.paths
+.. automodule:: tracktable.source.point
     :members:
     :undoc-members:
     :show-inheritance:

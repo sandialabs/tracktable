@@ -1,5 +1,5 @@
 =============================
-tracktable.render.maps module
+tracktable.info.cities module
 =============================
 
 
@@ -7,7 +7,8 @@ tracktable.render.maps module
 Module contents
 ---------------
 
-.. automodule:: tracktable.render.maps
+.. automodule:: tracktable.info.cities
     :members:
     :undoc-members:
     :show-inheritance:
+

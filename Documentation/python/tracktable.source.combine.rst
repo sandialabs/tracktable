@@ -1,5 +1,5 @@
 ================================
-tracktable.core.timestamp module
+tracktable.source.combine module
 ================================
 
 
@@ -7,7 +7,7 @@ tracktable.core.timestamp module
 Module contents
 ---------------
 
-.. automodule:: tracktable.core.timestamp
+.. automodule:: tracktable.source.combine
     :members:
     :undoc-members:
     :show-inheritance:
