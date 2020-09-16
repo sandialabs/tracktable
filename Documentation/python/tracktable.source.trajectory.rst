@@ -1,5 +1,5 @@
 ===================================
-tracktable.filter.trajectory module
+tracktable.source.trajectory module
 ===================================
 
 
@@ -7,7 +7,7 @@ tracktable.filter.trajectory module
 Module contents
 ---------------
 
-.. automodule:: tracktable.filter.trajectory
+.. automodule:: tracktable.source.trajectory
     :members:
     :undoc-members:
     :show-inheritance:

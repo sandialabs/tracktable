@@ -1,5 +1,5 @@
 =================================
-tracktable.render.mapmaker module
+tracktable.core.core_types module
 =================================
 
 
@@ -7,7 +7,7 @@ tracktable.render.mapmaker module
 Module contents
 ---------------
 
-.. automodule:: tracktable.render.mapmaker
+.. automodule:: tracktable.core.core_types
     :members:
     :undoc-members:
     :show-inheritance:

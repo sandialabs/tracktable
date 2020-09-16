@@ -53,7 +53,7 @@ def set_log_level(level):
     to be fixed by release 1.4.
 
     Arguments:
-        level {integer} -- desired minimum log level.  This will
+        level (integer): desired minimum log level.  This will
             usually be one of the constants defined in the `logging`
             module: `NOTSET`, `DEBUG`, `INFO`, `WARNING`, `ERROR`,
             or `FATAL`.
@@ -90,7 +90,7 @@ def warn_deprecated(message):
     function itself.
 
     Arguments:
-        message: {string} What to print on the console
+        message (string): What to print on the console
 
     Returns:
         No return value.

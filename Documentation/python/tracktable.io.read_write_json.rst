@@ -1,5 +1,5 @@
 ====================================
-tracktable.render.histogram2d module
+tracktable.io.read_write_json module
 ====================================
 
 
@@ -7,7 +7,7 @@ tracktable.render.histogram2d module
 Module contents
 ---------------
 
-.. automodule:: tracktable.render.histogram2d
+.. automodule:: tracktable.io.read_write_json
     :members:
     :undoc-members:
     :show-inheritance:

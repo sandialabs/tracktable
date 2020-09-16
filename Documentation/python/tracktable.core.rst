@@ -4,7 +4,27 @@
 tracktable.core module
 ======================
 
+----------
+Submodules
+----------
 
+.. toctree::
+   :maxdepth: 2
+
+   tracktable.core.compatibility
+   tracktable.core.conversions
+   tracktable.core.core_types
+   tracktable.core.geomath.rst
+   tracktable.core.log.rst
+   tracktable.core.misc
+   tracktable.core.register_core_types
+   tracktable.core.simple_timezone.rst
+   tracktable.core.test_utilities
+   tracktable.core.testutils
+   tracktable.core.timestamp.rst
+
+
+---------------
 Module contents
 ---------------
 
@@ -33,7 +53,7 @@ Module contents
    Any or all of these may be left uninitialized depending on the
    user's actions although a point without coordinates is not
    especially useful.
-   
+
    We require that the coordinates be in degrees of longitude and
    latitude.  The units on all numeric properties are user-defined,
    although altitude will usually be in either feet or meters
@@ -55,8 +75,8 @@ Module contents
    Longitude is always coordinate 0 and latitude is always coordinate 1.
    We choose this ordering for consistency with the 2D Cartesian domain
    where the X coordinate is always at position 0 and the Y coordinate is
-   at position 1. Longitude is between -180 and 180 and 
-   latitude is between -90 and 90. 
+   at position 1. Longitude is between -180 and 180 and
+   latitude is between -90 and 90.
 
    .. note:: TrajectoryPoint is implemented in C++ and exposed to
              Python via the Boost.Python module.  I will include a
@@ -186,7 +206,7 @@ Module contents
       noisy or outright wrong.  Sometimes they're missing.  This
       method is for those situations.  When you call it, it will use
       the position and timestamp data to compute a speed at each point
-      in the trajectory.  This value can be accessed with 
+      in the trajectory.  This value can be accessed with
       :code:`my_speed = my_trajectory[i].properties['speed']`.
 
       .. :note:: If your position/timestamp measurements are also bad
@@ -200,9 +220,9 @@ Module contents
 
       The heading at each point of a trajectory is the direction to
       the next point.  The heading at the very last point is the same
-      as the heading at the penultimate point.  This value can be accessed with 
+      as the heading at the penultimate point.  This value can be accessed with
       :code:`my_heading = my_trajectory[i].properties['heading']`.
-      
+
 
    .. py:method:: Trajectory.intersects_box(southwest_corner, northeast_corner)
       :module: tracktable.core
@@ -348,7 +368,7 @@ Module contents
 
       :returns: Timezone-aware :py:class:`datetime <datetime.datetime>` object
 
-   .. py:staticmethod:: Timestamp.to_string(dt, format_string='%Y-%m-%d %H:%M:%S`, include_tz=False)
+   .. py:staticmethod:: Timestamp.to_string(dt, format_string='%Y-%m-%d %H:%M:%S', include_tz=False)
 
       Create a string from a timestamp.
 

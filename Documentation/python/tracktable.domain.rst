@@ -1,5 +1,5 @@
 ========================
-tracktable.filter module
+tracktable.domain module
 ========================
 
 ----------
@@ -10,14 +10,17 @@ Submodules
 .. toctree::
    :maxdepth: 2
 
-   tracktable.filter.trajectory.rst
+   tracktable.domain.cartesian2d.rst
+   tracktable.domain.cartesian3d.rst
+   tracktable.domain.feature_vectors.rst
+   tracktable.domain.terrestrial.rst
 
 
 ---------------
 Module contents
 ---------------
 
-.. automodule:: tracktable.filter
+.. automodule:: tracktable.domain
     :members:
     :undoc-members:
     :show-inheritance:

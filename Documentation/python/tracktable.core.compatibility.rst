@@ -1,5 +1,5 @@
 ====================================
-tracktable.render.histogram2d module
+tracktable.core.compatibility module
 ====================================
 
 
@@ -7,7 +7,7 @@ tracktable.render.histogram2d module
 Module contents
 ---------------
 
-.. automodule:: tracktable.render.histogram2d
+.. automodule:: tracktable.core.compatibility
     :members:
     :undoc-members:
     :show-inheritance:

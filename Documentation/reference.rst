@@ -20,15 +20,14 @@ based on speed, memory usage and algorithmic needs.
 
    python/tracktable.rst
    python/tracktable.core.rst
-   python/tracktable.core.geomath.rst
-   python/tracktable.core.log.rst
-   python/tracktable.core.simple_timezone.rst
-   python/tracktable.core.timestamp.rst
+   python/tracktable.domain.rst
    python/tracktable.feature.rst
    python/tracktable.filter.rst
    python/tracktable.info.rst
+   python/tracktable.io.rst
    python/tracktable.render.rst
    python/tracktable.script_helpers.rst
+   python/tracktable.source.rst
 
 
 C++ Interface
