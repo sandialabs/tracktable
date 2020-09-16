@@ -103,9 +103,9 @@ the reference documentation.  We use the following ones most frequently.
 Base Points
 -----------
 
-Within a domain, Tracktable uses the ``BasePoint`` class to store a bare set of coordinates.  
-These behave like vectors or sequences in that we use square brackets to set and get coordinates. 
-Access a point's coordinates as if the point were an array using 
+Within a domain, Tracktable uses the ``BasePoint`` class to store a bare set of coordinates.
+These behave like vectors or sequences in that we use square brackets to set and get coordinates.
+Access a point's coordinates as if the point were an array using
 ``[]``.  In Python::
 
     from tracktable.domain.terrestrial import BasePoint
@@ -419,6 +419,26 @@ trajectory as we like and then select which one to use (and how) at
 render time.
 
 .. todo:: Code example for annotations
+
+--------
+Analysis
+--------
+Once the points or trajectories have been generated and annotated we may need
+to perform analysis to determine information about the points or trajectories
+such as clustering, distance geometry or nearest neighbors.
+
+The ``tracktable.analysis`` module contains the submodules necessary to
+to perform these types of analyses on points or trajectories. The
+``tracktable.analysis.dbscan`` submodule will perform the density-based spatial
+clustering of applications with noise analysis to determine the clustering of the
+feature vector points. The ``tracktable.analysis.distance_geometry`` submodule will
+compute the multilevel distance geometry for a trajectory based on either ``length``
+or ``time``. The ``tracktable.analysis.rtree`` submodule will generate an rtree that
+will compute the nearest neighbors based on provided points within a clustering box.
+
+.. todo:: Code examples for Analysis modules
+.. todo Find the best location for this section
+.. todo Add additional/clarifying language
 
 .. _userguide-render-modules:
 

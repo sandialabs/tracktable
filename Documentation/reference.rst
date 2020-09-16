@@ -19,6 +19,7 @@ based on speed, memory usage and algorithmic needs.
    :maxdepth: 10
 
    python/tracktable.rst
+   python/tracktable.analysis
    python/tracktable.core.rst
    python/tracktable.core.geomath.rst
    python/tracktable.core.log.rst
