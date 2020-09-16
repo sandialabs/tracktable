@@ -1,27 +1,35 @@
-TracktableCore module
-=====================
+======================
+Tracktable Core Module
+======================
 
-.. doxygenclass:: tracktable::PointBase
-   :members:
-   :private-members:
 
-.. doxygenclass:: tracktable::PointCartesian
-   :members:
-   :protected-members:
-   :private-members:
+---------------
+Module Contents
+---------------
 
-.. doxygenclass:: tracktable::PointLonLat
-   :members:
-   :protected-members:
-   :private-members:
+----------
+Submodules
+----------
 
-.. doxygenclass:: tracktable::Trajectory
-   :members:
-   :protected-members:
-   :private-members:
+.. toctree::
+   :maxdepth: 2
 
-.. doxygenclass:: tracktable::TrajectoryPoint
-   :members:
-   :protected-members:
-   :private-members:
-
+   tracktable.core.Box.rst
+   tracktable.core.FloatingPointComparison.rst
+   tracktable.core.GeometricMean.rst
+   tracktable.core.GeometricMedian.rst
+   tracktable.core.Logging.rst
+   tracktable.core.MemoryUse.rst
+   tracktable.core.PointArithmetic.rst
+   tracktable.core.PointBase.rst
+   tracktable.core.PointCartesian.rst
+   tracktable.core.PointLonLat.rst
+   tracktable.core.PropertyConverter.rst
+   tracktable.core.PropertyMap.rst
+   tracktable.core.PropertyValue.rst
+   tracktable.core.Timestamp.rst
+   tracktable.core.TimestampConverter.rst
+   tracktable.core.TracktableCommon.rst
+   tracktable.core.Trajectory.rst
+   tracktable.core.TrajectoryPoint.rst
+   tracktable.core.UUID.rst

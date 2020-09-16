@@ -28,55 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// This is a wrapper for the Boost rtree implementation in
-// boost::geometry::index.  Its purpose is to insulate you, the user,
-// from having to care about all the complexity (and power) involved
-// in boost::geometry::index::rtree.  You supply a value type (which
-// can be a point, a pair or a tuple) and we do the rest.
-//
-// The disadvantage is that you're restricted from using some of the
-// more powerful query capabilities, including user-defined predicates
-// and query combination.
-//
-// Quick Start:
-//
-// typedef tracktable::RTree<my_point_type> rtree_type;
-//
-// rtree_type my_tree;
-//
-// for (int i = 0; i < my_points.size(); ++i)
-//   my_tree.insert(my_points[i]);
-//
-// std::vector<my_point_type> results;
-//
-// my_tree.find_points_inside_box(min_corner, max_corner, std::back_inserter(results));
-//
-// (your results vector now contains all the points inside the box)
-//
-// You can populate this R-tree with any point type known to
-// Tracktable / boost::geometry.  This includes base_point_type and
-// trajectory_point_type from all the domains as well as any other
-// point that you have registered with boost::geometry.
-//
-// You can also populate the R-tree with std::pair<>s and
-// boost::tuple<>s where the first element of the pair / tuple is one
-// of the point types listed above.  Note that when you query the
-// r-tree, *only* the geometry will be used in the query: the
-// auxiliary information is preserved but never compared.
-//
-// When querying the r-tree, you must use the same geometric point
-// type that you used to populate it.  Like the values stored in the
-// tree, you can specify the search point(s) as a point type, a
-// std::pair<> or a boost::tuple<> whose first element is the
-// geometry.  This is just for convenience: the only part that will be
-// used for the search is the geometry.
-//
-// You may only modify the contents of the R-tree with insert(),
-// remove() and clear().  There is no way to get a reference to an
-// internal element and modify it directly as you can do with
-// std::vector, std::map and friends.  Doing so would break the search
-// structure.
-
 #ifndef __tracktable_RTree_h
 #define __tracktable_RTree_h
 
@@ -96,6 +47,56 @@ namespace bgi = boost::geometry::index;
 
 namespace tracktable {
 
+/**
+ * This is a wrapper for the Boost rtree implementation in
+ * boost::geometry::index.  Its purpose is to insulate you, the user,
+ * from having to care about all the complexity (and power) involved
+ * in boost::geometry::index::rtree.  You supply a value type (which
+ * can be a point, a pair or a tuple) and we do the rest.
+ *
+ * The disadvantage is that you're restricted from using some of the
+ * more powerful query capabilities, including user-defined predicates
+ * and query combination.
+ *
+ * Quick Start:
+ *
+ * typedef tracktable::RTree<my_point_type> rtree_type;
+ *
+ * rtree_type my_tree;
+ *
+ * for (int i = 0; i < my_points.size(); ++i)
+ *   my_tree.insert(my_points[i]);
+ *
+ * std::vector<my_point_type> results;
+ *
+ * my_tree.find_points_inside_box(min_corner, max_corner, std::back_inserter(results));
+ *
+ * (your results vector now contains all the points inside the box)
+ *
+ * You can populate this R-tree with any point type known to
+ * Tracktable / boost::geometry.  This includes base_point_type and
+ * trajectory_point_type from all the domains as well as any other
+ * point that you have registered with boost::geometry.
+ *
+ * You can also populate the R-tree with std::pair<>s and
+ * boost::tuple<>s where the first element of the pair / tuple is one
+ * of the point types listed above.  Note that when you query the
+ * r-tree, *only* the geometry will be used in the query: the
+ * auxiliary information is preserved but never compared.
+ *
+ * When querying the r-tree, you must use the same geometric point
+ * type that you used to populate it.  Like the values stored in the
+ * tree, you can specify the search point(s) as a point type, a
+ * std::pair<> or a boost::tuple<> whose first element is the
+ * geometry.  This is just for convenience: the only part that will be
+ * used for the search is the geometry.
+ *
+ * You may only modify the contents of the R-tree with insert(),
+ * remove() and clear().  There is no way to get a reference to an
+ * internal element and modify it directly as you can do with
+ * std::vector, std::map and friends.  Doing so would break the search
+ * structure.
+ */
 template<
   typename value_type,
   typename rtree_algorithm_type = bgi::quadratic<16>
