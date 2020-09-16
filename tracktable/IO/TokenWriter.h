@@ -28,12 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** Write tokens to a stream
- *
- * Supply your tokens in a form that can be converted to strings.  Set
- * your record delimiter (usually newline or similar) and your field
- * delimiter (tab, comma or similar).  Done.
- */
 
 #ifndef __tracktable_TokenWriter_h
 #define __tracktable_TokenWriter_h
@@ -49,6 +43,13 @@
 #include <boost/throw_exception.hpp>
 
 namespace tracktable {
+
+/** Write tokens to a stream
+ *
+ * Supply your tokens in a form that can be converted to strings.  Set
+ * your record delimiter (usually newline or similar) and your field
+ * delimiter (tab, comma or similar).  Done.
+ */
 
 class TokenWriter
 {
