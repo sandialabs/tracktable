@@ -57,7 +57,7 @@ namespace tracktable {
  * Args:
  *   none
  *
- * Return value: 
+ * Return value:
  *   Maximum memory use in bytes or zero if the value
  *   cannot be determined on this OS.
  */
@@ -71,11 +71,11 @@ TRACKTABLE_CORE_EXPORT std::size_t peak_memory_use();
  * Args:
  *   none
  *
- * Return value: 
+ * Return value:
  *   Current memory use in bytes or zero if the value
  *   cannot be determined on this OS.
  */
-    
+
 TRACKTABLE_CORE_EXPORT std::size_t current_memory_use();
 
 };

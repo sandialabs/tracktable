@@ -163,6 +163,11 @@ else:
     }
 breathe_default_project = "tracktable_cpp"
 
+breathe_projects_source = {
+    'tracktable_cpp':
+        (tracktable_src + "/tracktable", ["Analysis/", "Core/", "Domain/", "IO/"])
+    }
+
 # -- Options for HTML output ----------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for

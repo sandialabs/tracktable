@@ -46,12 +46,13 @@ Our first release is focused on getting enough capability out there to
 start rendering maps and movies.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 5
 
+   cpp/tracktable.analysis.rst
    cpp/tracktable.core.rst
    cpp/tracktable.domain.rst
    cpp/tracktable.io.rst
-   cpp/tracktable.analysis.rst
+   cpp/tracktable.namespaces.rst
 
 .. todo:: Clean up table of contents.  Look at tracktable.render.rst
           for an example.
