@@ -1,5 +1,5 @@
 ================================
-tracktable.core.timestamp module
+tracktable.info.timezones module
 ================================
 
 
@@ -7,7 +7,7 @@ tracktable.core.timestamp module
 Module contents
 ---------------
 
-.. automodule:: tracktable.core.timestamp
+.. automodule:: tracktable.info.timezones
     :members:
     :undoc-members:
     :show-inheritance:

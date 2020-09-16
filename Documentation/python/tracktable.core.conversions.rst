@@ -1,5 +1,5 @@
 ==================================
-tracktable.render.colormaps module
+tracktable.core.conversions module
 ==================================
 
 
@@ -7,7 +7,7 @@ tracktable.render.colormaps module
 Module contents
 ---------------
 
-.. automodule:: tracktable.render.colormaps
+.. automodule:: tracktable.core.conversions
     :members:
     :undoc-members:
     :show-inheritance:

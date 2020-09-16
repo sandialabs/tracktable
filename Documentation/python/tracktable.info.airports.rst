@@ -1,5 +1,5 @@
 ===============================
-tracktable.core.geomath module
+tracktable.info.airports module
 ===============================
 
 
@@ -7,7 +7,7 @@ tracktable.core.geomath module
 Module contents
 ---------------
 
-.. automodule:: tracktable.core.geomath
+.. automodule:: tracktable.info.airports
     :members:
     :undoc-members:
     :show-inheritance:
