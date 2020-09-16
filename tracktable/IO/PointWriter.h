@@ -28,18 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** Write points of any type as delimited text
- *
- * This class writes a sequence of points to a file in delimited text
- * format.  You can control the destination, the delimiter, the record
- * separator (usually newline) and whether or not a header line is
- * written.
- *
- * The header line contains information about the point's dimension,
- * coordinate system, object ID and timestamp (for trajectory points)
- * and custom properties (if any).
- */
-
 #ifndef __TRACKTABLE_POINT_WRITER_H
 #define __TRACKTABLE_POINT_WRITER_H
 
@@ -109,12 +97,24 @@ void do_write_properties(point_t const& point, PropertyConverter& formatter, out
 
 namespace tracktable {
 
+/** Write points of any type as delimited text
+ *
+ * This class writes a sequence of points to a file in delimited text
+ * format.  You can control the destination, the delimiter, the record
+ * separator (usually newline) and whether or not a header line is
+ * written.
+ *
+ * The header line contains information about the point's dimension,
+ * coordinate system, object ID and timestamp (for trajectory points)
+ * and custom properties (if any).
+ */
+
+class PointWriter
+{
 // XXX Do I need _dllexport / _dllimport for classes with template members?
 
 // XXX What else do I need to change in order to make this work with
 // multiple string types?
-class PointWriter
-{
 public:
 
   PointWriter()

@@ -28,13 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** Basic arithmetic operations for all point types.
- *
- * These operations are wrappers around boost::geometry's point
- * arithmetic operations.  You can (obviously) call boost::geometry
- * directly if you want but this will also let you use more natural
- * arithmetic operations on points.
- */
 
 #ifndef __tracktable_BasicPointMath_h
 #define __tracktable_BasicPointMath_h
@@ -45,7 +38,16 @@
 #include <boost/type_traits/is_base_of.hpp>
 #include <cmath>
 
-namespace tracktable { namespace arithmetic {
+namespace tracktable {
+
+/** Basic arithmetic operations for all point types.
+ *
+ * These operations are wrappers around boost::geometry's point
+ * arithmetic operations.  You can (obviously) call boost::geometry
+ * directly if you want but this will also let you use more natural
+ * arithmetic operations on points.
+ */
+namespace arithmetic {
 
 // original code follows
 template<class PointT>
