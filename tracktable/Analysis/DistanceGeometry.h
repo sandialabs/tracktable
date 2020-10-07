@@ -194,7 +194,7 @@ _distance_geometry(
       double control_point_distance = tracktable::distance(
         control_points[i], control_points[i+1]
         );
-      distance_geometry_distances.push_back(control_point_distance / travel_distance);
+      distance_geometry_distances.push_back(control_point_distance / (travel_distance / d));
     }
   }
   return distance_geometry_distances;
