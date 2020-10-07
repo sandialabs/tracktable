@@ -25,6 +25,37 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-include_directories(${PROJECT_SOURCE_DIR} ${Tracktable_BINARY_DIR})
+# So far this is a header-only library.  The lack of any library files being
+# built is not an error.
 
-add_subdirectory(Tests)
+include_directories(
+  ${Tracktable_SOURCE_DIR}
+  ${Boost_INCLUDE_DIR}
+)
+
+if (BUILD_TESTING)
+  add_subdirectory(Tests)
+endif (BUILD_TESTING)
+
+set( DataGenerators_HEADERS
+  PointGenerator.h
+)
+
+# This adds this folder to Visual Studio on Windows so that files
+# are visible without creating a build command.
+add_custom_target( TracktableDataGenerators
+    SOURCES
+    ${DataGenerators_HEADERS}
+    )
+
+# And this puts those files in their own folder in Visual Studio.
+source_group( "Header Files" 
+    ${DataGenerators_HEADERS}
+    )
+
+# This adds the files in DataGenerators_HEADERS to the list of files
+# that will be copied during 'make install'.
+install(
+  FILES ${DataGenerators_HEADERS}
+  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/DataGenerators
+)

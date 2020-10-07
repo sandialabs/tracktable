@@ -27,11 +27,19 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-include_directories( ${PROJECT_SOURCE_DIR})
+include_directories(
+  ${Tracktable_SOURCE_DIR}
+)
 
-add_library( TracktableTest OBJECT
-             CatchMain.cpp
-             catch2.hpp
-           )
-## Should be no reason to install catch header
-## Should be no reason to install library, unless we decide to install tests for some reason
+set(Catch2_HEADERS
+    TracktableCatch2.h
+    catch2.hpp
+    )
+
+add_library(TracktableTestSupport INTERFACE)
+# target_sources(TracktableTestSupport INTERFACE 
+#     ${Catch2_HEADERS}
+#     )
+
+# We don't have any install_files() directives in this file because
+# this library is meant to be used only for internal test cases.
