@@ -72,10 +72,6 @@ import logging
 LOGGER = logging.getLogger(__name__)
 DOMAIN_MODULE = None
 
-
-
-
-
 def xcoord(thing):
     """Return what we think is the X-coordinate for an object.
 
@@ -1026,4 +1022,75 @@ def current_time_fraction(point):
 
     return _current_time_fraction(point)
     
-# ----------------------------------------------------------------------   
+# ----------------------------------------------------------------------
+
+def current_time_fraction(point):
+
+    """Return the fraction duration of a point in trajectory
+
+    This is the fraction duration of all segments in the trajectory up to
+    the given point.
+
+    Args:
+      point (Point): Point whose current duration fraction we want
+
+    Returns:
+      Fraction of total duration up to this point.
+
+    """
+
+    return _current_time_fraction(point)
+    
+# ----------------------------------------------------------------------     
+
+def ECEF(point, ratio = 1.0, altitudeString = ""):
+    """Convert point to ECEF. Altitude is in km.
+
+    Converts Terrestrial points to cartesian coordinates.
+
+    Args:
+       points: A point to convert
+       ratio: conversion ratio from km to result
+       altitudeString: String label of altitude property
+
+    Returns:
+       Single Cartesian 3D point
+    """
+
+    return point.ECEF(ratio, altitudeString);
+
+# ---------------------------------------------------------------------- 
+
+def ECEF_from_feet(point, altitudeString = "altitude"):
+    """Convert point to ECEF using altitude in feet
+
+    Converts Terrestrial points to cartesian coordinates.
+
+    Args:
+       points: A point to convert
+       altitudeString: String label of altitude property
+
+    Returns:
+       Single Cartesian 3D point
+    """
+
+    return point.ECEF_from_feet(altitudeString);
+
+# ---------------------------------------------------------------------- 
+
+def ECEF_from_meters(point, altitudeString = "altitude"):
+    """Convert point to ECEF using altitude in meters
+
+    Converts Terrestrial points to cartesian coordinates.
+
+    Args:
+       points: A point to convert
+       altitudeString: String label of altitude property
+
+    Returns:
+       Single Cartesian 3D point
+    """
+
+    return point.ECEF_from_meters(altitudeString);
+
+# ---------------------------------------------------------------------- 

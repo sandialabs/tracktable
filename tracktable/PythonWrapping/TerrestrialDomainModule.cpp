@@ -142,16 +142,20 @@ void install_terrestrial_trajectory_point_wrappers()
 {
   using namespace boost::python;
   using tracktable::python_wrapping::make_point_2d;
-
+  //deal with overloaded ECEF function
+  CartesianPoint3D(trajectory_point_type::*ECEF)
+      (const double ratio, const std::string&) const = &trajectory_point_type::ECEF;
   class_< trajectory_point_type >("TrajectoryPointTerrestrial")
     .def(tracktable::python_wrapping::basic_point_methods())
     .def(tracktable::python_wrapping::point_to_string_methods())
     .def(tracktable::python_wrapping::property_access_suite())
     .def(tracktable::python_wrapping::trajectory_point_methods())
     .def("__init__", make_constructor(make_point_2d<trajectory_point_type>))
+    .def("ECEF", ECEF)
+    .def("ECEF_from_feet", &trajectory_point_type::ECEF_from_feet)
+    .def("ECEF_from_meters", &trajectory_point_type::ECEF_from_meters)
     ;
-
-}
+ }
 
 // ----------------------------------------------------------------------
 
