@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -69,3 +69,5 @@ add_python_test(P_TestDistance tracktable.core.tests.test_distance)
 add_python_test(P_TestKM2LonLat tracktable.core.tests.test_kms_to_lon_lat)
 
 add_python_test(P_LogLevel tracktable.core.tests.test_log_level)
+
+add_python_test(P_TerrestrialECEF tracktable.core.tests.test_terrestrial_ECEF)

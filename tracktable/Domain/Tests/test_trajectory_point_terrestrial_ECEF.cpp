@@ -43,13 +43,15 @@
 #include <tracktable/Core/TrajectoryPoint.h>
 
 #include <tracktable/Domain/Terrestrial.h>
+#include <tracktable/Domain/Cartesian3D.h>
 
 typedef tracktable::domain::terrestrial::TerrestrialPoint TerrestrialPoint;
 typedef tracktable::domain::terrestrial::TerrestrialTrajectoryPoint TerrestrialTrajectoryPoint;
+typedef tracktable::domain::cartesian3d::CartesianPoint3D CartesianPoint3D;
 
 //----------------------------------------------------
 
-int verify_result(tracktable::PointCartesian<3> actual, tracktable::PointCartesian<3> expected, const char* description, double tolerance_fraction=1e-4)
+int verify_result(CartesianPoint3D actual, CartesianPoint3D expected, const char* description, double tolerance_fraction=1e-4)
 {
     std::ostringstream errbuf;
 
@@ -104,7 +106,7 @@ int run_test()
     northpole2.set_property("altitude",100);
     TerrestrialTrajectoryPoint albuquerque = create_terrestrial_point(35.0844, -106.6504);
 
-    tracktable::PointCartesian<3> actual, expected;
+    CartesianPoint3D actual, expected;
     actual = lonlatzero.ECEF();
     expected[0] = 6378.137;
     expected[1] = 0.0;
