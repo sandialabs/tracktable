@@ -34,7 +34,7 @@ tracktable.render.paths - Functions to render trajectories as curves on a map
 
 If you're trying to figure out how to render a bunch of trajectories,
 take a look at draw_traffic and at
-tracktable/examples/render_trajectories_from_csv.py.  Those will get you
+tracktable/examples/render_trajectories_from_csv.py. Those will get you
 pointed in the right direction.
 
 """
@@ -60,8 +60,8 @@ def remove_duplicate_points(trajectory):
     """Create a new trajectory with no adjacent duplicate points
 
     Duplicate positions in a trajectory lead to degenerate line
-    segments.  This, in turn, gives some of the back-end renderers
-    fits.  The cleanest thing to do is to use the input trajectory to
+    segments. This, in turn, gives some of the back-end renderers
+    fits. The cleanest thing to do is to use the input trajectory to
     compute a new one s.t. no segments are degenerate.
 
     There's still one problem case: if the entire trajectory is a
@@ -101,11 +101,21 @@ def points_to_segments(point_list, maximum_distance=None):
     """points_to_segments(point_list, maximum_distance=None) -> segment_list
 
     Given a list of N points, create a list of the N-1 line segments
-    that connect them.  Each segment is a list containing two points.
+    that connect them. Each segment is a list containing two points.
     If a value is supplied for maximum_distance, any segment longer than
     that distance will be ignored.
 
     In English: We discard outliers.
+
+    Args:
+        point_list (list): List of points to be connected
+
+    Keyword Args:
+        maximum_distance (float): Maximum length that a segment can be
+
+    Returns:
+        Segements that connect the points
+
     """
 
     def cart2_distance(point1, point2):
@@ -144,15 +154,20 @@ def points_to_segments(point_list, maximum_distance=None):
 
 # ----------------------------------------------------------------------
 
-def concat_color_maps(color_maps, scalars_list, color_scale): #scalars list is list of arrays
+def concat_color_maps(color_maps, scalars_list, color_scale):
     """Concatenate a list of color maps into a single color map with adjusted scalars and color_scale
 
-    Args:
-       color_maps: a list of color_maps to concatenate
-       scalars_list: a list of numpy arrays where each array contains the scalars associated with the 
-                     respective color_map
-
     Lists are assumed to be the same length
+
+    Args:
+       color_maps (list): a list of color_maps to concatenate
+       scalars_list (list[numpy arrays]): a list of numpy arrays where each array contains the scalars associated with the
+                     respective color_map
+       color_scale (matplotlib.colors.Normalize() or LogNorm()): Linear or logarithmic color scale
+
+    Returns:
+        Concatenated, scaled and adjusted single color map
+
 """
     all_color_maps = []
     N = 256 # number of colors per color_map once combined
@@ -163,12 +178,12 @@ def concat_color_maps(color_maps, scalars_list, color_scale): #scalars list is l
         all_color_maps.append(cmap(numpy.linspace(0,1,N)))
     stacked_colors = numpy.vstack(all_color_maps)
     new_color_map = ListedColormap(stacked_colors)
-    
+
     num_colors = N*len(color_maps)
     new_scalars = []
     for i,scalars in enumerate(scalars_list):
         # To deal with potential boundary issues when colors are combined into a single map the where statment was
-        # added below.  The last color in a map has an inclusive range (including 1.0 or the max value), but when
+        # added below. The last color in a map has an inclusive range (including 1.0 or the max value), but when
         # combinging 2 colors, for example, the first may have a range up to but not including 0.5, but a value of 1.0
         # on the old color mpa may be mapped to 0.5 on the new color map (which now maps to an adjascent color map).
         # If a maximum scalar value of N is used we change it to N-1 in the where statement below.
@@ -201,56 +216,57 @@ def draw_traffic(traffic_map,
     """Draw a set of (possibly decorated trajectories.
 
     Args:
-       traffic_map: Map projection (Basemap or Cartesian)
-       color_map: String (colormap name) or Matplotlib colormap object
-       color_scale: Linear or logarithmic scale (matplotlib.colors.Normalize() or LogNorm())
-       trajectory_scalar_generator: Function to generate scalars for a trajectory (default None)
-       trajectory_linewidth_generator: Function to generate path widths for a trajectory (default None)
-       linewidth: Constant linewidth if no generator is supplied (default 0.1, measured in points)
-       dot_size: Radius (in points, default 2) of a dot dawn at the latest point of each trajectory
-       dot_color: Color of spot that will be drawn at the latest point of each trajectory
-       label_objects: Boolean (default False) whether to draw object_id at latest point of each trajectory
-       label_generator: Function to generate label for a trajectory (default None)
-       label_kwargs: Dictionary of arguments to be passed to labeler (FIXME)
-       axes: Matplotlib axes object into which trajectories will be rendered
-       zorder: Layer into which trajectories will be drawn (default 8).
-       transform: the input projection (default cartopy.crs.Geodetic())
-       show_points: whether or not to show the points along the trajectory
-       point_size: radius of the points along the path (in points default=12)
-       point_color: color of the points along the path
-       show_lines: whether or not to show the trajectory lines
+       traffic_map:                     Map projection (Basemap or Cartesian)
+       trajectory_iterable:
+
+    Keyword Args:
+       color_map (str or Matplotlib colormap):                      The name of a registered color map (Default: 'BrBG')
+       color_scale (matplotlib.colors.Normalize() or LogNorm()):    Linear or logarithmic scale (Default: matplotlib.colors.Normalize())
+       trajectory_scalar_generator (Trajectory function):           Function to generate scalars for a trajectory  (Default: None)
+       trajectory_linewidth_generator (Trajectory function):        Function to generate path widths for a trajectory  (Default: None)
+       linewidth (float):                                           Constant linewidth if no generator is supplied (default 0.1, measured in points) (Default: 1)
+       dot_size (float):                                            Radius (in points) of a dot dawn at the latest point of each trajectory (Default: 2)
+       dot_color (str):                                             Color of spot that will be drawn at the latest point of each trajectory (Default: 'white')
+       label_objects (bool):                                        Whether to draw object_id at latest point of each trajectory (Default: False)
+       label_generator (TrajectoryPoint function):                  Function to generate label for a trajectory  (Default: None)
+       label_kwargs (dict):                                         Dictionary of arguments to be passed to labeler (FIXME) (Default: dict())
+       axes (Matplotlib axes):                                      Which trajectories will be rendered (Default: None)
+       zorder (int):                                                Layer into which trajectories will be drawn (Default: 8)
+       transform (cartopy.crs.CRS):                                 The input projection (Default: cartopy.crs.Geodetic())
+       show_points (bool):                                          Whether or not to show the points along the trajectory (Default: False)
+       point_size (float):                                          Radius of the points along the path (in points default=12) (Default: 12)
+       point_color (str):                                           Color of the points along the path (Default: '')
+       show_lines (bool):                                           Whether or not to show the trajectory lines (Default: True)
+
     Returns:
        List of Matplotlib artists
 
-
-
     Parameters in more detail:
-
 
     ``traffic_map``: Map instance (no default)
 
     Cartopy GeoAxes instance of the space in which trajectories will be
-    rendered.  We don't actually render into this object.  Instead we
+    rendered. We don't actually render into this object. Instead we
     use it to project points from longitude/latitude space down into
-    the map's local coordinate system.  Take a look at
+    the map's local coordinate system. Take a look at
     tracktable.render.maps for several ways to create this map including
     a few convenience functions for common regions.
 
     ``trajectory_iterable``: iterable(Trajectory) (no default)
 
-    Sequence of Trajectory objects.  We will traverse this exactly
-    once.  It can be any Python iterable.
+    Sequence of Trajectory objects. We will traverse this exactly
+    once. It can be any Python iterable.
 
     ``color_map``: Matplotlib color map or string (default 'BrBG')
 
     Either a Matplotlib color map object or a string denoting the name
-    of a registered color map.  See the Matplotlib documentation for
+    of a registered color map. See the Matplotlib documentation for
     the names of the built-ins and the tracktable.render.colormaps
     module for several more examples and a way to create your own.
 
     ``color_scale``: Matplotlib color normalizer (default Normalize())
 
-    Object that maps your scalar range onto a colormap.  This will
+    Object that maps your scalar range onto a colormap. This will
     usually be either matplotlib.colors.Normalize() or
     matplotlib.colors.LogNorm() for linear and logarithmic mapping
     respectively.
@@ -258,8 +274,8 @@ def draw_traffic(traffic_map,
     ``trajectory_scalar_generator``: function(Trajectory) -> list(float)
 
     You can color each line segment in a trajectory with your choice
-    of scalars.  This argument must be a function that computes those
-    scalars for a trajectory or else None if you don't care.  The
+    of scalars. This argument must be a function that computes those
+    scalars for a trajectory or else None if you don't care. The
     scalar function should take a Trajectory as its input and return a
     list of len(trajectory) - 1 scalars, one for each line segment to
     be drawn.
@@ -267,24 +283,24 @@ def draw_traffic(traffic_map,
     ``trajectory_linewidth_generator``: function(Trajectory) -> list(float)
 
     Just as you can generate a scalar (and thus a color) for each line
-    segment, you can also generate a width for that segment.  If you
+    segment, you can also generate a width for that segment. If you
     supply a value for this argument then it should take a Trajectory
     as its input and return a list of len(trajectory)-1 scalars
-    specifying the width for each segment.  This value is measured in
-    points.  If you need a single linewidth all the way through use
+    specifying the width for each segment. This value is measured in
+    points. If you need a single linewidth all the way through use
     the 'linewidth' argument.
 
     ``linewidth``: float (default 0.1)
 
     This is the stroke width measured in points that will be used to
-    draw the line segments in each trajectory.  If you need different
+    draw the line segments in each trajectory. If you need different
     per-segment widths then use trajectory_linewidth_generator.
 
     ``dot_size``: float (default 2)
 
     If this value is non-zero then a dot will be drawn at the point on
-    each trajectory that has the largest timestamp.  It will be dot_size 
-    points in radius and will be colored with whatever scalar is present 
+    each trajectory that has the largest timestamp. It will be dot_size
+    points in radius and will be colored with whatever scalar is present
     at that point of the trajectory.
 
     TODO: Add a point_size_generator argument to allow programmatic
@@ -292,39 +308,39 @@ def draw_traffic(traffic_map,
 
     ``label_objects``: boolean (default False)
 
-    You can optionally label the point with the largest timestamp in 
-    each trajectory.  To do so you must supply 'label_objects=True' and 
+    You can optionally label the point with the largest timestamp in
+    each trajectory. To do so you must supply 'label_objects=True' and
     also a function for the label_generator argument.
 
     ``label_generator``: function(TrajectoryPoint) -> string
 
-    Construct a label for the specified trajectory.  The result must
-    be a string.  This argument is ignored if label_objects is False.
+    Construct a label for the specified trajectory. The result must
+    be a string. This argument is ignored if label_objects is False.
 
     TODO: Test whether Unicode strings will work here.
 
     ``label_text_kwargs``: dict (default empty)
 
-    We ultimately render labels using matplotlib.axes.Text().  If you
+    We ultimately render labels using matplotlib.axes.Text(). If you
     want to pass in arguments to change the font, font size, angle or
     other parameters, specify them here.
 
     ``axes``: matplotlib.axes.Axes (default pyplot.gca())
 
     This is the axis frame that will hold the Matplotlib artists that
-    will render the trajectories.  By default it will be whatever
+    will render the trajectories. By default it will be whatever
     pyplot thinks the current axis set is.
 
     ``zorder``: int (default 8)
 
-    Height level where the trajectories will be drawn.  If you want
+    Height level where the trajectories will be drawn. If you want
     them to be on top of the map and anything else you draw on it then
-    make this value large.  It has no range limit.
+    make this value large. It has no range limit.
 
     ``transform``: cartopy.crs.CRS (default cartopy.crs.Geodetic())
 
-    The input projection.  Needed to get nearly any projection but PlateCarree 
-    to work correctly. 
+    The input projection. Needed to get nearly any projection but PlateCarree
+    to work correctly.
 
     ``show_points``: boolean (default False)
 
@@ -333,12 +349,12 @@ def draw_traffic(traffic_map,
     ``point_size``: int (default 12)
 
     If show_poitns is true, the size of the markers rendered at each point
-        in the trajectory.
+    in the trajectory.
 
     ``point_color``: string (default '')
 
     If show_points is true, the color of the markers rendered at each point
-        in the trajectory
+    in the trajectory
 
     ``show_lines``: boolean (default True)
 
@@ -376,7 +392,7 @@ def draw_traffic(traffic_map,
     if label_generator is None:
         if label_objects:
             logger.warning(("Object labels requested in draw_traffic but no "
-                            "label formatter is present.  Labels will look "
+                            "label formatter is present. Labels will look "
                             "weird."))
             label_generator = lambda thing: thing
 
@@ -393,7 +409,7 @@ def draw_traffic(traffic_map,
         current_batch_points_y = []
 
     # We want to ignore individual segments that span most of the way across
-    # the map.  These are almost always errors in the data, especially where
+    # the map. These are almost always errors in the data, especially where
     # segments cross the limb of the map.
     if hasattr(traffic_map, 'get_extent'):
         map_extent = traffic_map.get_extent()
@@ -403,7 +419,7 @@ def draw_traffic(traffic_map,
     else:
         # The above kluge is really only there for terrestrial maps so
         # that we can detect and ignore points that cross the map
-        # discontinuity.  If we're in Cartesian-land then it's not a
+        # discontinuity. If we're in Cartesian-land then it's not a
         # problem.
         max_segment_length = None
 
@@ -442,7 +458,7 @@ def draw_traffic(traffic_map,
             current_batch_points_x.append(local_x[:-1])
             current_batch_points_y.append(local_y[:-1]) #all but last
         # Now we turn that list of n points into a list of n-1 line
-        # segments.  We shouldn't have any degenerate segments because
+        # segments. We shouldn't have any degenerate segments because
         # of the call to remove_duplicate_points() earlier.
 
         local_segments = points_to_segments(
@@ -462,7 +478,7 @@ def draw_traffic(traffic_map,
                 if len(color_map) > t_ind: #in case the lengths of trajs and color_maps lists differ
                     current_batch_color_maps.append(color_map[t_ind])
                 else:
-                    current_batch_color_maps.append('BrBG') #fallback 
+                    current_batch_color_maps.append('BrBG') #fallback
 
             # The lead point is the last point in the trajectory
             if label_generator is not None:
@@ -473,7 +489,7 @@ def draw_traffic(traffic_map,
 
         if len(current_batch_paths) >= max_batch_size:
             # Now we've processed some traffic and made it into line
-            # segments.  Time to create the line segment collection that we
+            # segments. Time to create the line segment collection that we
             # can plot.
             if not single_color_map:
                 new_color_map, new_scalars, new_color_scale = concat_color_maps(current_batch_color_maps,
@@ -611,21 +627,18 @@ def draw_traffic(traffic_map,
 
 
 def unwrap_path(locs):
-    """
-    Function:
-        Inspects a list of [lat, lon] coordinates. If the trajectory crosses
+    """Inspects a list of [lat, lon] coordinates. If the trajectory crosses
 	the antimeridian (180 deg. Long), 'unwrap' the trajectory by projecting
 	longitudinal values onto >+180 or <-180. This will prevent horizontal
 	lines from streaking across a mercator projection, when plotting the
 	trajectory in mapping packages like Folium. Operates by comparing pairs
 	of elements (coord. point tuples) for the entire list.
 
-    Input:
-        locs: a list of (lat,lon) tuples
+    Args:
+        locs (list): A list of (lat,lon) tuples
 
-    Output:
-        None
-        modifies the locs[] list in-place.
+    Returns:
+        No return value, modifies the locs[] list in-place.
     """
 
     # 't' is an arbitrary threshold for comparing suqsequent points. If they are 'far enough' apart,

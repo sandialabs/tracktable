@@ -53,6 +53,17 @@
 #include <tracktable/PythonWrapping/PythonTypedObjectWriter.h>
 #include <tracktable/PythonWrapping/TrajectoryIndexingSuite.h>
 
+#include <tracktable/PythonWrapping/DocStrings/GenericBasePointDocs.h>
+#include <tracktable/PythonWrapping/DocStrings/GenericBasePointReaderDocs.h>
+#include <tracktable/PythonWrapping/DocStrings/GenericBasePointWriterDocs.h>
+#include <tracktable/PythonWrapping/DocStrings/GenericBoundingBoxDocs.h>
+#include <tracktable/PythonWrapping/DocStrings/GenericTrajectoryDocs.h>
+#include <tracktable/PythonWrapping/DocStrings/GenericTrajectoryPointDocs.h>
+#include <tracktable/PythonWrapping/DocStrings/GenericTrajectoryPointReaderDocs.h>
+#include <tracktable/PythonWrapping/DocStrings/GenericTrajectoryPointWriterDocs.h>
+#include <tracktable/PythonWrapping/DocStrings/GenericTrajectoryReaderDocs.h>
+#include <tracktable/PythonWrapping/DocStrings/GenericTrajectoryWriterDocs.h>
+
 using tracktable::domain::cartesian2d::base_point_type;
 using tracktable::domain::cartesian2d::trajectory_point_type;
 using tracktable::domain::cartesian2d::trajectory_type;
@@ -65,7 +76,6 @@ using tracktable::domain::cartesian2d::box_type;
 
 
 namespace {
-
 // ----------------------------------------------------------------------
 
 void set_min_corner(box_type& box, base_point_type const& corner)
@@ -127,7 +137,7 @@ void install_cartesian2d_box_wrappers()
   using namespace boost::python;
   using namespace tracktable::python_wrapping;
 
-  class_<box_type>("BoundingBoxCartesian2D")
+  class_<box_type>("BoundingBoxCartesian2D", tracktable::python_wrapping::docstrings::GenericBoundingBoxDocString)
     .def("__init__", make_constructor(make_box<base_point_type, box_type>))
     .def("__init__", make_constructor(make_box<trajectory_point_type, box_type>))
     .def("__init__", make_constructor(make_box_2d_from_objects<box_type>))
@@ -143,7 +153,7 @@ void install_cartesian2d_base_point_wrappers()
 
   using tracktable::python_wrapping::make_point_2d;
 
-  class_< base_point_type >("BasePointCartesian2D")
+  class_< base_point_type >("BasePointCartesian2D", tracktable::python_wrapping::docstrings::GenericBasePointDocString)
     .def(tracktable::python_wrapping::basic_point_methods())
     .def(tracktable::python_wrapping::base_point_to_string_methods("tracktable.domain.cartesian2d.BasePoint"))
     .def("__init__", make_constructor(make_point_2d<base_point_type>))
@@ -157,7 +167,7 @@ void install_cartesian2d_trajectory_point_wrappers()
   using namespace boost::python;
   using tracktable::python_wrapping::make_point_2d;
 
-  class_< trajectory_point_type >("TrajectoryPointCartesian2D")
+  class_< trajectory_point_type >("TrajectoryPointCartesian2D", tracktable::python_wrapping::docstrings::GenericTrajectoryPointDocString)
     .def("__init__", make_constructor(make_point_2d<trajectory_point_type>))
     .def(tracktable::python_wrapping::basic_point_methods())
     .def(tracktable::python_wrapping::point_to_string_methods())
@@ -176,12 +186,12 @@ void install_point_reader_wrappers()
   typedef tracktable::PythonAwarePointReader<base_point_reader_type> python_base_point_reader_type;
   typedef tracktable::PythonAwarePointReader<trajectory_point_reader_type> python_trajectory_point_reader_type;
 
-  class_<python_base_point_reader_type>("BasePointReaderCartesian2D")
+  class_<python_base_point_reader_type>("BasePointReaderCartesian2D", tracktable::python_wrapping::docstrings::GenericBasePointReaderDocString)
     .def(tracktable::python_wrapping::basic_point_reader_methods())
     .def(tracktable::python_wrapping::cartesian2d_point_reader_methods())
     ;
 
-  class_<python_trajectory_point_reader_type>("TrajectoryPointReaderCartesian2D")
+  class_<python_trajectory_point_reader_type>("TrajectoryPointReaderCartesian2D", tracktable::python_wrapping::docstrings::GenericTrajectoryPointReaderDocString)
     .def(tracktable::python_wrapping::basic_point_reader_methods())
     .def(tracktable::python_wrapping::trajectory_point_reader_methods())
     .def(tracktable::python_wrapping::cartesian2d_point_reader_methods())
@@ -196,7 +206,7 @@ void install_trajectory_reader_wrappers()
 
   typedef tracktable::PythonAwareTrajectoryReader<trajectory_reader_type> python_trajectory_reader_type;
 
-  class_<python_trajectory_reader_type>("TrajectoryReaderCartesian2D")
+  class_<python_trajectory_reader_type>("TrajectoryReaderCartesian2D", tracktable::python_wrapping::docstrings::GenericTrajectoryReaderDocString)
     .def(tracktable::python_wrapping::trajectory_reader_methods())
     ;
 }
@@ -216,7 +226,7 @@ void install_point_writer_wrappers()
     tracktable::domain::cartesian2d::trajectory_point_type
     > trajectory_point_writer_t;
 
-  class_< base_point_writer_t >("BasePointWriterCartesian2D")
+  class_< base_point_writer_t >("BasePointWriterCartesian2D", tracktable::python_wrapping::docstrings::GenericBasePointWriterDocString)
     .def(tracktable::python_wrapping::common_writer_methods())
     .add_property("write_header",
                   &base_point_writer_t::write_header,
@@ -224,7 +234,7 @@ void install_point_writer_wrappers()
     ;
 
 
-  class_< trajectory_point_writer_t >("TrajectoryPointWriterCartesian2D")
+  class_< trajectory_point_writer_t >("TrajectoryPointWriterCartesian2D", tracktable::python_wrapping::docstrings::GenericTrajectoryPointWriterDocString)
     .def(tracktable::python_wrapping::common_writer_methods())
     .add_property("write_header",
                   &trajectory_point_writer_t::write_header,
@@ -244,7 +254,7 @@ void install_trajectory_writer_wrappers()
     tracktable::domain::cartesian2d::trajectory_type
     > trajectory_writer_t;
 
-  class_< trajectory_writer_t >("TrajectoryWriterCartesian2D")
+  class_< trajectory_writer_t >("TrajectoryWriterCartesian2D", tracktable::python_wrapping::docstrings::GenericTrajectoryWriterDocString)
     .def(tracktable::python_wrapping::common_writer_methods())
     ;
 }
@@ -256,7 +266,7 @@ void install_cartesian2d_trajectory_wrappers()
 {
   using namespace boost::python;
 
-  class_< trajectory_type >("TrajectoryCartesian2D")
+  class_< trajectory_type >("TrajectoryCartesian2D", tracktable::python_wrapping::docstrings::GenericTrajectoryDocString)
     .def(tracktable::python_wrapping::property_access_suite())
     .def(tracktable::python_wrapping::trajectory_methods())
     .def("from_position_list", tracktable::python_wrapping::trajectory_from_position_list<trajectory_type>, return_value_policy<manage_new_object>())

@@ -42,6 +42,7 @@ Documentation
 
    installation.rst
    user_guide.rst
+   user_guide/example_data.rst
    examples/index.rst
    reference.rst
    conventions.rst

@@ -46,14 +46,14 @@ class Airport(object):
     """Information about a single airport
 
     Attributes:
-      iata_code (string): 3-letter IATA airport identifier
-      icao_code (string): 4-leter ICAO airport identifier
-      name (string): Human-readable airport name
-      city (string): City where airport is located
-      country (string): Country where airport is located
+      iata_code (str): 3-letter IATA airport identifier
+      icao_code (str): 4-leter ICAO airport identifier
+      name (str): Human-readable airport name
+      city (str): City where airport is located
+      country (str): Country where airport is located
       position (tuple): (longitude, latitude, altitude) position of airport
-      size_rank (integer): Approximate rank among all the world's airports
-      utc_offset (integer): Local time zone as an offset from UTC
+      size_rank (int): Approximate rank among all the world's airports
+      utc_offset (int): Local time zone as an offset from UTC
     """
 
     def __init__(self):
@@ -76,9 +76,9 @@ def build_airport_dict():
     """Assemble the airport dictionary on first access
 
     This function is called whenever the user tries to look up an
-    airport.  It checks to make sure the table has been populated and,
+    airport. It checks to make sure the table has been populated and,
     if not, loads it from disk.
-    
+
     Returns:
       None
 
@@ -132,12 +132,12 @@ def build_airport_dict():
                     airport.iata_code = None
                 else:
                     AIRPORT_DICT[airport.iata_code] = airport
-                    
+
                 if len(airport.icao_code) == 0:
                     airport.icao_code = None
                 else:
-                    AIRPORT_DICT[airport.icao_code] = airport    
-                    
+                    AIRPORT_DICT[airport.icao_code] = airport
+
             # now we add traffic information - rank each airport by
             # the amount of traffic it sees in some arbitrary period
             from tracktable.info.data.airport_traffic import AIRPORTS_BY_TRAFFIC
@@ -156,7 +156,7 @@ def airport_information(airport_code):
     """Look up information about an airport
 
     Args:
-      airport_code: ICAO or IATA code for an airport
+      airport_code (str): ICAO or IATA code for an airport
 
     Returns:
       Airport object containing requested information.
@@ -178,10 +178,10 @@ def airport_size_rank(airport_code):
     """Return an airport's global rank by size
 
     Args:
-      airport_code (string): IATA or ICAO airport identifier
+      airport_code (str): IATA or ICAO airport identifier
 
     Returns:
-      Integer ranking.  1 is the largest, higher values are smaller.
+      Integer ranking. 1 is the largest, higher values are smaller.
     """
 
     try:
@@ -402,11 +402,11 @@ def airport_tier(airport_code):
     """Return an estimated tier for an airport
 
     We divide airports roughly into 4 tiers (chosen purely by hand)
-    for a classification task.  This function lets us retrieve the
+    for a classification task. This function lets us retrieve the
     tier assigned to any given airport.
 
     Args:
-      airport_code (string): IATA/ICAO airport identifier
+      airport_code (str): IATA/ICAO airport identifier
 
     Returns:
       String: tier1, tier2, tier3 or tier4

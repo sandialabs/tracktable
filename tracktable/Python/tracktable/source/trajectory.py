@@ -41,9 +41,9 @@ class AssembleTrajectoryFromPoints(object):
     """Turn a sequence of points into a set of trajectories
 
     We begin with an input sequence of TrajectoryPoints sorted by
-    increasing timestamp.  As we iterate over that sequence, we
+    increasing timestamp. As we iterate over that sequence, we
     separate points by their object IDs and build up a new trajectory
-    for each object ID.  When we see a gap of duration
+    for each object ID. When we see a gap of duration
     'separation_time' or distance 'separation_distance' between the
     previous and latest point for a given object ID, we package up the
     points so far, emit a new trajectory and use the latest point to
@@ -59,17 +59,20 @@ class AssembleTrajectoryFromPoints(object):
             than this many points will be discarded
 
     Example:
-       p_source = SomePointSource()
-       (configure point source here)
 
-       t_source = AssembleTrajectoryFromPoints()
-       t_source.input = p_source.points()
-       t_source.separation_time = datetime.timedelta(minutes=30)
-       t_source.separation_distance = 100
-       t_source.minimum_length = 10
+    .. code-block:: python
 
-       for trajectory in t_source.trajectories():
-          (do whatever you want)
+        p_source = SomePointSource()
+        (configure point source here)
+
+        t_source = AssembleTrajectoryFromPoints()
+        t_source.input = p_source.points()
+        t_source.separation_time = datetime.timedelta(minutes=30)
+        t_source.separation_distance = 100
+        t_source.minimum_length = 10
+
+        for trajectory in t_source.trajectories():
+            # (do whatever you want)
 
     """
 
@@ -77,7 +80,7 @@ class AssembleTrajectoryFromPoints(object):
         """Initialize an assembler
 
         Separation time will be set to 30 minutes and separation
-        distance will be set to infinity by default.  Trajectory
+        distance will be set to infinity by default. Trajectory
         minimum length will be set to 2.
         """
 
@@ -95,12 +98,12 @@ class AssembleTrajectoryFromPoints(object):
         Once you have supplied a point source in the 'input' attribute
         (which can be any iterable but is commonly the output of a
         PointSource) you can call trajectories() to get an iterable of
-        trajectories.  All the computation happens on demand so the
+        trajectories. All the computation happens on demand so the
         execution time between getting one trajectory and getting the
         next one is unpredictable.
 
         There are only loose guarantees on the order in which
-        trajectories become available.  Given trajectories A and B, if
+        trajectories become available. Given trajectories A and B, if
         timestamp(A.end) < timestamp(B.end) then A will come up before
         B.
 
@@ -179,7 +182,7 @@ class AssembleTrajectoryFromPoints(object):
                     updates_so_far.append(point)
 
             # Every so often we need to go through and flush out
-            # trajectories that are in progress.  We can only do this
+            # trajectories that are in progress. We can only do this
             # if the user has supplied a split_threshold_time
             # parameter.
             #
@@ -222,7 +225,7 @@ class AssembleTrajectoryFromPoints(object):
                             trajectories_in_progress[object_id] = update_list
 
         # We've finished iterating over all the position updates in
-        # the window.  Go through all the position updates we're still
+        # the window. Go through all the position updates we're still
         # hanging onto and make trajectories out of them.
         for (object_id, update_list) in trajectories_in_progress.items():
             if len(update_list) >= self.minimum_length:
@@ -248,7 +251,7 @@ class AssembleTrajectoryFromPoints(object):
 
 
         logger.info(
-            ("Done assembling trajectories.  {} trajectories produced and "
+            ("Done assembling trajectories. {} trajectories produced and "
              "{} discarded for having fewer than {} points.").format(
                  self.valid_trajectory_count,
                  self.invalid_trajectory_count,
@@ -256,7 +259,7 @@ class AssembleTrajectoryFromPoints(object):
 
         if self.valid_trajectory_count == 0:
             logger.warning(
-                ("Perplexity: No trajectories produced.  Are you sure your "
+                ("Perplexity: No trajectories produced. Are you sure your "
                  "delimiters and your column assignments are correct?"))
         return
 
