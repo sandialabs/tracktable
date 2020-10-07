@@ -40,9 +40,13 @@ import datetime
 import sys
 
 def trajectory_from_dictionary(dictionary):
-    """Returns a trajectory constructed from the given dictionary.
+    """Constructes a trajectory from the given dictionary.
+
     Args:
-       dictionary: the dictionary to convert into a trajectory
+       dictionary (dict): the dictionary to convert into a trajectory
+
+    Returns:
+        Trajectory constructed from the dictionary
     """
 
     #verify domain is valid and import appropriate domain
@@ -104,9 +108,13 @@ def trajectory_from_dictionary(dictionary):
     return trajectory
 
 def dictionary_from_trajectory(trajectory):
-    """Returns a dictionary constructed from the given trajectory
+    """Constructes dictionary from the given trajectory
+
     Args:
-       trajectory: the trajectory to convert into a dictonary representation
+       trajectory (Trajectory): the trajectory to convert into a dictonary representation
+
+    Returns:
+        Dictionary constructed from the trajectory
     """
 
     dictionary = {}
@@ -119,9 +127,9 @@ def dictionary_from_trajectory(trajectory):
         if isinstance(value, datetime.datetime):
             dictionary['trajectory_properties'].update({name: {'type': type(value).__name__, 'value': Timestamp.to_string(value, include_tz=False)}})
         else:
-            # Python 2 has both 'int' and 'long' data types.  The
+            # Python 2 has both 'int' and 'long' data types. The
             # first is your system's ordinary integer; the second is
-            # arbitrary-precision.  In Python 3, all integers are of
+            # arbitrary-precision. In Python 3, all integers are of
             # type 'int' and are of arbitrary precision.
             if sys.version_info[0] == 2 and type(value) is long:
                 type_name = 'int'

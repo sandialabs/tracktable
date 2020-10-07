@@ -65,13 +65,13 @@ Arguments:
 |   Populate field NAME with column COL as a number
 |
 | ``--timestamp-field-column NAME COL``
-|   Populate field NAME with column COL as a timestamp.  Not the same as the timestamp column.
+|   Populate field NAME with column COL as a timestamp. Not the same as the timestamp column.
 |
 | ``--object-id-column COL``
-|   Populate the point's object ID with column COL.  Only applies to trajectory points.
+|   Populate the point's object ID with column COL. Only applies to trajectory points.
 |
 | ``--timestamp-column COL``
-|   Populate the point's timestamp with column C.  Only applies to trajectory points.
+|   Populate the point's timestamp with column C. Only applies to trajectory points.
 
 
 
@@ -101,11 +101,11 @@ def install_group():
                           description="Parameters for parsing points from delimited text files")
 
     add_argument("delimited_text_point_reader", [ '--delimiter' ],
-                 help='Character that separates fields in the input file.  Use any single character.  The string "tab" will be interpreted as the tab character.',
+                 help='Character that separates fields in the input file. Use any single character. The string "tab" will be interpreted as the tab character.',
                  default=',' )
 
     add_argument("delimited_text_point_reader", [ '--comment-character' ],
-                 help='Character that indicates comment lines in the input file.  Lines where this is the first non-whitespace character will be ignored.',
+                 help='Character that indicates comment lines in the input file. Lines where this is the first non-whitespace character will be ignored.',
                  default='#' )
 
     add_argument("delimited_text_point_reader", [ '--domain' ],
@@ -115,7 +115,7 @@ def install_group():
 #    add_argument("delimited_text_point_reader", [ '--coordinate-column' ],
 #                 nargs=2,
 #                 action='append',
-#                 help='Populate coordinate X using the contents of column Y.  You probably want to use "--x-column", "--y-column", "--longitude-column" and "--latitude-column" instead.')
+#                 help='Populate coordinate X using the contents of column Y. You probably want to use "--x-column", "--y-column", "--longitude-column" and "--latitude-column" instead.')
 
     add_argument("delimited_text_point_reader", [ '--longitude-column' ],
                  type=int,

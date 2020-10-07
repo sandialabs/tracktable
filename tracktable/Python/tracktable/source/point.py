@@ -46,10 +46,10 @@ def random_box_uniform(min_corner, max_corner, num_points=100):
     distribution within a specified bounding box.
 
     Note that the uniformity is with respect to each dimension,
-    not the underlying metric.  You will only get spatially uniform
+    not the underlying metric. You will only get spatially uniform
     points if (1) the bounding box is square and (2) the coordinate
     system is isotropic with respect to the underlying surface.
-    Cartesian coordinate systems are such.  Geographic coordinates
+    Cartesian coordinate systems are such. Geographic coordinates
     (longitude/latitude) are not -- the width of 1 degree of
     longitude changes as a function of latitude.
 
@@ -82,7 +82,7 @@ def random_circle_linear_falloff(seed_point,
     point.
 
     NOTE: Right now this function is specialized for terrestrial
-          coordinates.  That will be fixed in an upcoming point
+          coordinates. That will be fixed in an upcoming point
           release.
 
     Args:

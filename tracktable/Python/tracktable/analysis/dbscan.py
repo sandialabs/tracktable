@@ -38,21 +38,21 @@ import logging
 
 def is_decorated(point):
     """Returns True if point is decorated
-    
-    A decorated point contains more than the individual point data. 
-    
+
+    A decorated point contains more than the individual point data.
+
     Args:
-        point (Tuple): Usually this will be the first point from a 
+        point (tuple): Usually this will be the first point from a
             feature vector. It will either only contain the point
-            data or it may also contain other features and labels. 
-    
+            data or it may also contain other features and labels.
+
     Returns:
         Boolean indicating the point is decorated or not
-        
+
     """
 
     logger = logging.getLogger(__name__)
-    logger.debug("Testing for point decoration.  First point: {}".format(
+    logger.debug("Testing for point decoration. First point: {}".format(
         point))
     try:
         if len(point) == 2 and len(point[0]) > 0:
@@ -60,41 +60,43 @@ def is_decorated(point):
                 ("Points are decorated. First point: {}").format(
                     point))
             return True
-            
+
     except TypeError:
         # The second element of the point is something that doesn't
-        # have a len().  It is probably a coordinate, meaning we've
+        # have a len(). It is probably a coordinate, meaning we've
         # got bare points.
         return False
-    return False     
+    return False
 
 
 def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_size):
     """Use DBSCAN to compute clusters for a set of points.
 
     DBSCAN is a clustering algorithm that looks for regions of high
-    density in a set of points.  Connected regions of high density are
-    identified as clusters.  Small regions of low density or even
+    density in a set of points. Connected regions of high density are
+    identified as clusters. Small regions of low density or even
     single points get identified as noise (belonging to no cluster).
 
-    There are three arguments to the process.  First, you supply the points
-    to cluster.  Second, you ask for cluster labels with respect to
-    two parameters: the search box size (defining "nearby" points) and
-    the minimum number of points that you're willing to call a
-    cluster.
+    Arguments:
+        feature_vectors (list): The points to cluster.
+        search_box_half_span (int): The cluster labels with respect to
+            two parameters: the search box size (defining "nearby" points)
+        min_cluster_size (int): The minimum number of points that you're willing to call a
+            cluster.
 
-    You will get back a list of (vertex_id, cluster_id) pairs.  If you
-    supplied a list of points as input the vertex IDs will be indices
-    into that list.  If you supplied pairs of (my_vertex_id, point)
-    instead, the vertex IDs will be whatever you supplied.
+    Returns:
+        You will get back a list of (vertex_id, cluster_id) pairs. If you
+        supplied a list of points as input the vertex IDs will be indices
+        into that list. If you supplied pairs of (my_vertex_id, point)
+        instead, the vertex IDs will be whatever you supplied.
 
     """
     logger = logging.getLogger(__name__)
-    
+
     # Are we dealing with decorated points?
     first_point = feature_vectors[0]
     decorated_points = is_decorated(first_point)
-    
+
     if decorated_points:
         vertex_ids = [ point[1] for point in feature_vectors ]
     else:
@@ -128,23 +130,23 @@ def compute_cluster_labels(feature_vectors, search_box_half_span, min_cluster_si
 
     return final_labels
 
-   
+
 def cluster_labels_to_dict(cluster_labels, feature_vectors):
     """Returns a dictionary from array of cluster label pairs.
-    
-    The dictionary uses the cluster labels as keys. The values of each 
+
+    The dictionary uses the cluster labels as keys. The values of each
         key is an array of tuples containing the feature vector data. In
-        the case of undecorated points, the vertex id is also included 
-        in the tuple. 
-    
+        the case of undecorated points, the vertex id is also included
+        in the tuple.
+
     Args:
-        cluster_labels (Array of Tuples): pairs of cluster ids and 
+        cluster_labels (Array of Tuples): pairs of cluster ids and
             vector ids. The vector ids map to the index of points
             in the feature vector. This is usually generated from the
             compute_cluster_labels function.
-        feature_vectors (Array of Tuples): the feature vectors used to 
+        feature_vectors (Array of Tuples): the feature vectors used to
             compute the cluster labels.
-    
+
     Returns:
         Dictionary of cluster labels mapped to feature vectors.
     """

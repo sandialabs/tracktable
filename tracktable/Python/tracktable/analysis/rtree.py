@@ -52,13 +52,12 @@ class RTree(object):
     def points(self):
         """Return the points currently held in the r-tree
 
-        Note: this will return the points as originally supplied by
+        NOTE: this will return the points as originally supplied by
         the user, not the feature vectors that actually populate the
         tree.
 
         Returns: Sequence of points originally supplied
         """
-
 
         return self._original_points
 
@@ -67,14 +66,14 @@ class RTree(object):
         """Populate the r-tree with a new set of points
 
         You must supply points (points in space or feature vectors)
-        with dimension between 1 and 30.  A new R-tree will be
+        with dimension between 1 and 30. A new R-tree will be
         initialized with copies of those points.
 
-        NOTE: This version of the code does indeed copy the points.  A
+        NOTE: This version of the code does indeed copy the points. A
         future version might get around that.
 
         Args:
-           new_points: List of points to use
+           new_points (list): List of points to use
         """
 
         if new_points != self._original_points:
@@ -94,12 +93,35 @@ class RTree(object):
     # ----------------------------------------------------------------------
 
     def find_nearest_neighbors(self, seed_point, num_neighbors):
+        """Find points near a search point
+
+        Finds the K nearest neighbors to a search point.
+        Note that if the search point is already present in the R-tree
+        then it will be one of the results returned.
+
+        Args:
+           seed_point (Tracktable point): Point whose neighbors you want to find
+           num_neighbors (int): How many neighbors to find
+
+        Returns: Sequence of points originally supplied
+        """
         return self._tree.find_nearest_neighbors(convert_to_feature_vector(seed_point),
                                                  num_neighbors)
 
     # ----------------------------------------------------------------------
 
     def find_points_in_box(self, min_corner, max_corner):
+        """Find points inside a box
+
+        Finds all of the points in a box between minimum
+        and maximum corner points.
+
+        Args:
+           min_corner (Tracktable point): Minimum corner to bound the box
+           max_corner (Tracktable point): Maximum corner to bound the box
+
+        Returns: Sequence of points originally supplied
+        """
         return self._tree.find_points_in_box(
             convert_to_feature_vector(min_corner),
             convert_to_feature_vector(max_corner)
