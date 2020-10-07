@@ -52,6 +52,25 @@ def render_histogram(map_projection,
                      colorscale=matplotlib.colors.Normalize(),
                      zorder=10,
                      axes=None):
+    """Render a histogram for the given map projection.
+
+    Args:
+       map_projection (Basemap): Map to render onto
+       point_source (iterable): Sequence of 2D points. This will
+          be traversed only once.
+       bounding_box (point2d): Bounding box of area to generate histogram
+
+    Keyword Args:
+       bin_size (int): Boundary size for bins (Default: 1)
+       colormap (str or Colormap): Colors to use for histogram (Default: 'gist_heat')
+       colorscale (matplotlib.colors.Normalize or subclass): Mapping from bin counts to color. Useful values are matplotlib.colors.Normalize() and matplotlib.colors.LogNorm(). (Default: matplotlib.colors.Normalize())
+       zorder (int): Image priority for rendering. Higher values will be rendered on top of actors with lower z-order. (Default: 10)
+       axes (matplotlib.axes.Axes): Axes to render into. Defaults to "current axes" as defined by Matplotlib. (Default:None)
+
+    Returns:
+       A rendered histogram onto the map.
+
+    """
 
     # This should wind up as a 2-dimensional point type
     try:
@@ -130,22 +149,22 @@ def cartesian(point_source,
     at least 2 elements long whose first two elements are numbers.
 
     Since we only traverse the point iterable once we require that
-    you supply a bounding box.  Any points outside this bounding
+    you supply a bounding box. Any points outside this bounding
     box will be ignored.
 
     Args:
-       point_source (iterable): Sequence of 2D points.  This will
+       point_source (iterable): Sequence of 2D points. This will
           be traversed only once.
        bbox_lowerleft (point2d): Lower left corner of bounding box
           for histogram
        bbox_upperright (point2d): Upper right corner of bounding box
 
     Keyword Args:
-       resolution (two integers): Resolution for histogram
-       colormap (string or Colormap): Colors to use for histogram
-       colorscale (matplotlib.colors.Normalize or subclass): Mapping from bin counts to color.  Useful values are matplotlib.colors.Normalize() and matplotlib.colors.LogNorm().
-       axes (matplotlib.axes.Axes): Axes to render into.  Defaults to "current axes" as defined by Matplotlib.
-       zorder (integer): Image priority for rendering.  Higher values will be rendered on top of actors with lower z-order.
+       resolution (two ints): Resolution for histogram (Default: (400, 400))
+       colormap (str or Colormap): Colors to use for histogram (Default: 'gist_heat')
+       colorscale (matplotlib.colors.Normalize or subclass): Mapping from bin counts to color. Useful values are matplotlib.colors.Normalize() and matplotlib.colors.LogNorm(). (Default: matplotlib.colors.Normalize())
+       axes (matplotlib.axes.Axes): Axes to render into. Defaults to "current axes" as defined by Matplotlib. (Default: None)
+       zorder (int): Image priority for rendering. Higher values will be rendered on top of actors with lower z-order. (Default: 2)
 
     Side Effects:
        Actors will be added to the supplied axes.
@@ -166,7 +185,7 @@ def cartesian(point_source,
     y_bins = numpy.linspace(bbox_lowerleft[1], bbox_upperright[1], resolution[1] + 1)
 
     # Bin the latitude and longitude values to produce a count in each
-    # box.  Since numpy.histogram2d does not follow the Cartesian
+    # box. Since numpy.histogram2d does not follow the Cartesian
     # convention of x-before-y (as documented in the numpy.histogram2D
     # docs) we have to supply (y, x) rather than (x, y).
     density, x_shape, y_shape = numpy.histogram2d(y_coords, x_coords,
@@ -196,26 +215,26 @@ def geographic(map_projection,
     """Render a 2D histogram (heatmap) onto a geographic map
 
     Args:
-      mymap (Basemap): Map to render onto
+      map_projection (Basemap): Map to render onto
       point_source (iterable): Sequence of TrajectoryPoint objects
 
-    Kwargs:
+    Keyword Args:
       bin_size (float): Histogram bins will be this many degrees on
-         each size.  Defaults to 1.
-      colormap (string or Matplotlib colormap): Color map for
-         resulting image.  Defaults to 'gist_heat'.
+         each size. Defaults to 1. (Default: 1)
+      colormap (str or Matplotlib colormap): Color map for
+         resulting image. Defaults to 'gist_heat'. (Default: 'gist_heat')
       colorscale (matplotlib.colors.Normalize or subclass): Mapping
-         from histogram bin count to color.  Defaults to a linear
-         mapping (matplotlib.colors.Normalize().  The other useful
+         from histogram bin count to color. Defaults to a linear
+         mapping (matplotlib.colors.Normalize(). The other useful
          value is matplotlib.colors.LogNorm() for a logarithmic
-         mapping.  You can specify a range if you want to but by
-         default it will be adapted to the data.
-      zorder (integer): Rendering priority for the histogram.  Objects
+         mapping. You can specify a range if you want to but by
+         default it will be adapted to the data. (Default: matplotlib.colors.Normalize())
+      zorder (int): Rendering priority for the histogram. Objects
          with higher priority will be rendered on top of those with
-         lower priority.  Defaults to 2 (probably too low).
-      axes (matplotlib.axes.Axes): Axes instance to render into.  If
+         lower priority. Defaults to 2 (probably too low). (Default: 10)
+      axes (matplotlib.axes.Axes): Axes instance to render into. If
          no value is specified we will use the current axes as returned
-         by pyplot.gca().
+         by pyplot.gca(). (Default: None)
 
     Returns:
       List of actors added to the axes
@@ -226,7 +245,7 @@ def geographic(map_projection,
 
     Known Bugs:
       * The interface does not match the one for the Cartesian
-        histogram.  Most notably, you specify resolution explicitly
+        histogram. Most notably, you specify resolution explicitly
         for the Cartesian histogram and implicitly (via box size) for
         this one.
 
@@ -234,7 +253,7 @@ def geographic(map_projection,
         south pole.
 
       * You can't specify a histogram area that crosses the longitude
-        discontinuity at longitude = +/- 180.  This should be relatively
+        discontinuity at longitude = +/- 180. This should be relatively
         easy to fix.
     """
 
@@ -308,10 +327,20 @@ def geographic(map_projection,
                               colorscale=colorscale,
                               zorder=zorder)
 
-   
+
 # ----------------------------------------------------------------------
 
 def save_density_array(density, outfile):
+    """Save and output the density array to a file.
+
+    Args:
+       density (tuple): Density to be saved to file
+       outfile (str): Filename to save output
+
+    Returns:
+       No return value.
+
+    """
     outfile.write('{} {}\n'.format(density.shape[0], density.shape[1]))
     rows = density.shape[0]
     columns = density.shape[1]
@@ -324,6 +353,16 @@ def save_density_array(density, outfile):
 # ----------------------------------------------------------------------
 
 def load_density_array(infile):
+    """Load the density array from a file.
+
+    Args:
+       infile (str): Filename for input
+
+    Returns:
+       The density array in the file.
+
+    """
+
     first_line = infile.readline()
     words = first_line.strip().split(' ')
     dims = [ int(word) for word in words ]
@@ -351,10 +390,26 @@ def draw_density_array(density,
                        colorscale=None,
                        zorder=10,
                        axes=None):
+    """Render a histogram for the given map projection.
 
+    Args:
+       density (iterable): Density array that will be drawn onto the map
+       map_projection (Basemap): Map to render onto
+       bounding_box (point2d): Bounding box of area to gdraw the
+
+    Keyword Args:
+       colormap (str or Colormap): Colors to use for histogram (Default: None)
+       colorscale (matplotlib.colors.Normalize or subclass): Mapping from bin counts to color. Useful values are matplotlib.colors.Normalize() and matplotlib.colors.LogNorm(). (Default: None)
+       zorder (int): Image priority for rendering. Higher values will be rendered on top of actors with lower z-order. (Default: 10)
+       axes (matplotlib.axes.Axes): Axes to render into. Defaults to "current axes" as defined by Matplotlib. (Default:None)
+
+    Returns:
+       The density rendered onto the map.
+
+    """
 
     # Yes, it looks like we've got the indices backwards on
-    # density.shape[].  Recall that the X coordinate refers to
+    # density.shape[]. Recall that the X coordinate refers to
     # columns, typically dimension 1, while the Y coordinate refers to
     # rows, typically dimension 0.
     x_bins = numpy.linspace(bounding_box.min_corner[0],

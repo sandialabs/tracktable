@@ -29,7 +29,7 @@
 
 """test_utilities - Functions to verify test output
 
-Our Python tests typically create text files or images.  This module
+Our Python tests typically create text files or images. This module
 contains functions that will let us easily verify that they match our
 ground truth files, including computing differences where appropriate.
 """
@@ -55,7 +55,7 @@ try:
     DIFF_AVAILABLE=True
 except ImportError:
     get_logger(__name__).log(LogLevel.WARNING,
-        ("difflib library not available.  HTML test will automatically fail."))
+        ("difflib library not available. HTML test will automatically fail."))
     DIFF_AVAILABLE=False
 
 import datetime
@@ -78,17 +78,27 @@ ERROR = 1
 # ----------------------------------------------------------------------
 
 def image_mse(imageA, imageB):
-    # the 'Mean Squared Error' between the two images is the
-    # sum of the squared difference between the two images;
-    # NOTE: the two images must have the same dimension
+    """ Compute the 'Mean Squared Error' between two images
+
+    The 'Mean Squared Error' is the sum of the squared
+    difference between the two images
+
+    Args:
+      imageA (str): Filename for image A
+
+      imageB (str): Filename for image B
+
+    Returns:
+      the MSE, the lower the error, the more "similar" the two images are
+
+    """
+
     imageA = np.array(imageA)
     imageB = np.array(imageB)
 
     err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
     err /= float(imageA.shape[0] * imageA.shape[1])
 
-    # return the MSE, the lower the error, the more "similar"
-    # the two images are
     return err
 
 # ----------------------------------------------------------------------
@@ -97,11 +107,12 @@ def compare_images(expected, actual, tolerance=1):
     """Compare two images pixel-by-pixel.
 
     Args:
-      image1 (str): Filename for image 1
+      expected (str): Filename for expected image
 
-      image2 (str): Filename for image 2
+      actual (str): Filename for actual image
 
-      tolerance (float): Number from 0 to 255 describing how much per-pixel difference is acceptable
+    Keyword Args:
+      tolerance (float): Number from 0 to 255 describing how much per-pixel difference is acceptable (Default: 1)
 
     Returns:
       None if images compare equal, string explaining problem if images are different
@@ -109,7 +120,7 @@ def compare_images(expected, actual, tolerance=1):
     Note:
       At present we delegate this to Matplotlib's image comparison
       routine since it does all kinds of nice conversions and
-      measurements.  We will bring this in-house if we ever need to.
+      measurements. We will bring this in-house if we ever need to.
     """
 
     global PIL_AVAILABLE
@@ -132,6 +143,23 @@ def compare_image_to_ground_truth(filename,
                                   ground_truth_dir,
                                   test_dir,
                                   tolerance=1):
+    """Compare test image to ground truth image.
+
+    Args:
+      filename (str): Filename for image
+
+      ground_truth_dir (str): Path to ground truth directory
+
+      test_dir (str): Path to test directory
+
+    Keyword Args:
+      tolerance (float): Number from 0 to 255 describing how much per-pixel difference is acceptable (Default: 1)
+
+    Returns:
+      Error or No Error depending on result of comparison
+
+    """
+
     test_image_filename = os.path.join(test_dir, filename)
     expected_image_filename = os.path.join(ground_truth_dir, filename)
 
@@ -224,11 +252,11 @@ def create_random_trajectory_point(point_class):
 # ----------------------------------------------------------------------
 # option to ignore the uuids in var names
 def compare_html_docs(expected, actual, ignore_uuids=False):
-    """Compare two html documents 
+    """Compare two html documents
     Compares the two documents given and optionally ignores certain uuids
     (helpful for comparing html output from folium)
     """
-   
+
     global DIFF_AVAILABLE
     if not DIFF_AVAILABLE:
         return False
@@ -276,7 +304,7 @@ def compare_html_to_ground_truth(filename,
                                  test_dir, ignore_uuids=False):
     """Compare an HTML document to a ground truth HTML document
     Append filename to given paths and compare the HTML documents
-    at those locations.  Ignore certain UUIDs if set.
+    at those locations. Ignore certain UUIDs if set.
     """
     test_filename = os.path.join(test_dir, filename)
     expected_filename = os.path.join(ground_truth_dir, filename)

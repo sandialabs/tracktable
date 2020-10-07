@@ -106,6 +106,10 @@ def _ensure_cities_loaded():
 
 
 def available_maps():
+    """ Supply available maps
+    Returns:
+        All available maps
+    """
     global CONVENIENCE_MAPS
     return CONVENIENCE_MAPS.keys()
 
@@ -136,24 +140,28 @@ def airport_map(airport_id,
                 projection=None):
     """Draw a map for a region surrounding an airport.
 
-    map_for_airport(airport_code, (string - example 'ORD' or 'KORD' for O'Hare
-                    region_size = (200,200)
-                    projection=cartopy.crs.Miller) -> Matplotlib axes
-
     Create a map for the region surrounding the requested airport.
 
     The region will be a rectangle in lon/lat space with the specified
-    width and height in KM.  We'll do our best to convert those into a
+    width and height in KM. We'll do our best to convert those into a
     lat/lon bounding box.
 
-    We default to the Miller Cylindrical projection.  It does a pretty
+    We default to the Miller Cylindrical projection. It does a pretty
     good job of showing the world in familiar shapes although
-    distortion sets in above/below about 50 degrees.  Fortunately,
-    things are still quite recognizable.  If you would prefer a
+    distortion sets in above/below about 50 degrees. Fortunately,
+    things are still quite recognizable. If you would prefer a
     different projection then change the value of projection from
     cartopy.crs.Miller to something else.
 
-    This function returns axes for Matplotlib.
+    Args:
+        airport_id (str): ID of the airport to generate a map around. example 'ORD' or 'KORD' for O'Hare.
+
+    Keyword Args:
+        region_size (point2d): (Default: (200, 200))
+        projection (Matplotlib axes): (Default: None)
+
+    Returns:
+        This function returns axes for Matplotlib.
     """
 
     if projection is None:
@@ -215,17 +223,18 @@ def instantiate_map(min_corner,
     """Draw a map with custom projection and bounding box.
 
     If min_corner and max_corner are set then we will set the map
-    extents to match.  If they are None then we will stick with
-    whatever the defaults for the map projection are.  You will always
+    extents to match. If they are None then we will stick with
+    whatever the defaults for the map projection are. You will always
     want to specify the extents unless the projection doesn't have any
     (e.g. whole-globe projections) or is defined with special extents
     (the OSGB projection, sensible for the UK and not much else).
 
-
     Args:
-      min_corner: (lon, lat) coordinates of southwest corner
-      max_corner: (lon, lat) coordinates of northeast corner
-      projection (optional): a projection from cartopy.crs
+      min_corner (point2d): (lon, lat) coordinates of southwest corner
+      max_corner (point2d): (lon, lat) coordinates of northeast corner
+
+    Keyword Args:
+      projection (Matplotlib axes): a projection from cartopy.crs (Default: None)
 
     Returns:
       Matplotlib Axes instance
@@ -247,7 +256,7 @@ def instantiate_map(min_corner,
         )
 
     logger = logging.getLogger(__name__)
-    logger.debug(("instantiate_map: Map successfully instantiated.  "
+    logger.debug(("instantiate_map: Map successfully instantiated. "
                   "Axes: {}").format(axes))
     axes.tracktable_projection = projection
     return axes
@@ -275,15 +284,18 @@ def predefined_map(mapname,
 
     For the airport and city maps you may specify an additional
     'region_size' argument that gives the desired width and height of
-    the map region in KM.  For example, a 200km-by-100km window
+    the map region in KM. For example, a 200km-by-100km window
     centered on St. Louis airport could be created this way:
 
     my_map_axes = predefined_map('airport:STL',
                                  region_size=(200, 100))
 
     Args:
-      mapname: String naming which predefined map you want
-      region_size (optional): 2-element tuple with (width, height) as km
+        mapname (str): String naming which predefined map you want
+
+    Keyword Arg:
+        region_size (point2d): 2-element tuple with (width, height) as km (Default: (200, 200))
+        projection (Matplotlib axes): a projection from cartopy.crs (Default: None)
 
     Returns:
       Matplotlib axes (via Cartopy) into which you can render your data
@@ -314,6 +326,8 @@ def predefined_map(mapname,
 
 
 def city_map(*args):
+    """ city_map is not implemented yet
+    """
     raise NotImplementedError("city_map not yet implemented")
 
 # ---------------------------------------------------------------------
@@ -324,12 +338,14 @@ def region_map(region_name,
     """Create map for predefined region
 
     Create a geographic map for one of several common regions in the
-    world.  For a list of supported regions please see
+    world. For a list of supported regions please see
     tracktable.maps.available_maps().
 
     Args:
-       region_name (string): Name of desired region
-       projection_name (optional): Cartopy projection if you want to override the default
+       region_name (str): Name of desired region
+
+    Keyword Arguments:
+       projection (Matplotlib axes): a projection from cartopy.crs (Default: None)
 
     Returns:
        Cartopy axes for given region

@@ -40,7 +40,7 @@ def interleave_points_by_timestamp(*point_sources):
     from all sources, again sorted by increasing timestamp.
 
     Note that this function reads all the points into memory in order
-    to build a priority queue.  If you're feeling ambitious, feel free
+    to build a priority queue. If you're feeling ambitious, feel free
     to write a new version that keeps only a single point in memory
     from each source at any time.
 

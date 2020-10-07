@@ -60,35 +60,37 @@ def draw_analog_clock_on_map(time,
 
     Args:
       time (datetime.datetime): Time to display
+
+    Keyword Arguments:
       offset (datetime.timedelta): Offset for local time zone.  This
            will be added to the 'time' argument to determine the
-           time that will actually be displayed.
-      center (2-tuple in [0,1] * [0, 1]): image-space center of clock
-      radius (float in [0, 1]): Radius of clock face
-      axes (matplotlib.axes.Axes): axes to render into
-      use_short_side_for_radius (boolean): Clock radius will 
-           be calculated relative to short side of figure
+           time that will actually be displayed. (Default: None)
+      center (2-tuple in [0,1] * [0, 1]): image-space center of clock (Default: (0.5,0.5))
+      radius (float in [0, 1]): Radius of clock face (Default: 0.05)
+      axes (matplotlib.axes.Axes): axes to render into (Default: None)
+      use_short_side_for_radius (boolean): Clock radius will
+           be calculated relative to short side of figure (Default: True)
       long_hand_radius (float in [0, 1]): Radius of minute hand relative
-           to radius of clock face
+           to radius of clock face (Default: 0.9)
       short_hand_radius (float in [0,1]): Radius of hour hand relative
-           to radius of clock face
+           to radius of clock face (Default: 0.5)
       tickmarks (boolean): Whether or not to place tickmarks at every
-           hour around the clock face
+           hour around the clock face (Default: True)
       tickmark_length (float in [0,1]): Length of tickmarks relative
-           to clock face radius
-      color (colorspec): Color for clock face and hands
-      linewidth (float): Thickness (in points) of lines drawn
+           to clock face radius (Default: 0.25)
+      color (colorspec): Color for clock face and hands (Default: 'white')
+      linewidth (float): Thickness (in points) of lines drawn (Default: 1)
       zorder (integer): Ordering of clock in image element stack
-           (higher values are on top)
-      label (string): Label text to display near clock
+           (higher values are on top) (Default: 4)
+      label (string): Label text to display near clock (Default: None)
       label_placement (string): One of 'top', 'bottom'.  Determines
-           where label will be rendered relative to clock face
+           where label will be rendered relative to clock face (Default: 'top')
       label_kwargs (dict): Arguments to be passed to Matplotlib
-           text renderer for label
+           text renderer for label (Default: dict())
 
     Side Effects:
       The clock actors will be added to the 'axes' argument or (if no
-         axes are supplied) to the current Matplotlib axes.
+            axes are supplied) to the current Matplotlib axes.
 
     Returns:
       A list of Matplotlib artists added to the figure.
@@ -263,8 +265,17 @@ def digital_clock(time,
                   **kwargs):
     """Add a digital clock (a string representation of time) to the image at a user-specified location
 
-    XXX: This function may go away since it doesn't provide any useful
+    NOTE: This function may go away since it doesn't provide any useful
     enhancement over just adding a text actor ourselves.
+
+    Args:
+        time (datetime.datetime): Current timestamp to display
+        formatter (str): Timestamp to use as formatter
+        position (tuple): Location to display the clock
+        kwargs (dict): Arguments to be passed to Matplotlib text renderer for label
+
+    Returns:
+        A list of Matplotlib figure text added to the figure.
 
     """
 
