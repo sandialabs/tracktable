@@ -25,11 +25,44 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-include_directories(${PROJECT_SOURCE_DIR} ${Tracktable_BINARY_DIR})
+# We search for Boost anew in test directories because the test cases may
+# need Boost components that the library code does not.
+unset(Boost_FOUND)
+get_filename_component(_TEST_NAME_TMP ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+get_filename_component(_TEST_NAME_2 ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+get_filename_component(_TEST_NAME_1 ${_TEST_NAME_TMP} NAME)
+message(STATUS "Looking for Boost components needed for C++ tests in ${_TEST_NAME_1}/${_TEST_NAME_2}")
+find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
+  COMPONENTS
+    ${BOOST_CORE_COMPONENTS_NEEDED}
+    ${BOOST_TEST_COMPONENTS}
+  )
 
-## Point Generators
-add_executable(GeneratorTest $<TARGET_OBJECTS:TracktableTest>
-                             PointGenerator_TEST.cpp)
-add_test(NAME C_GeneratorTest COMMAND GeneratorTest WORKING_DIRECTORY ${PROJECT_BINARY_DIR}) #TODO, why is this not working?
-target_link_libraries(GeneratorTest TracktableCore TracktableDomain)
+include_directories(
+  ${Tracktable_SOURCE_DIR}
+  ${Tracktable_BINARY_DIR}
+  ${Boost_INCLUDE_DIR}
+)
 
+add_executable( PointGenerator_TEST
+    PointGenerator_TEST.cpp
+    )
+
+target_link_libraries( PointGenerator_TEST
+    TracktableCore
+    TracktableDomain
+    TracktableTestSupport
+    ${Boost_LIBRARIES}
+    )
+
+add_test( 
+    NAME C_PointGenerator
+    COMMAND PointGenerator_TEST
+    WORKING_DIRECTORY ${Tracktable_BINARY_DIR}
+    )
+
+# Keep the test cases in a separate folder in Visual Studio
+set_property(
+    TARGET PointGenerator_TEST 
+    PROPERTY FOLDER "Tests"
+    )

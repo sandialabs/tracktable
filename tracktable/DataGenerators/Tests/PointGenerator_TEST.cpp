@@ -1,6 +1,6 @@
 #include <tracktable/DataGenerators/PointGenerator.h>
 
-#include <tracktable/ThirdParty/catch2.hpp>
+#include <tracktable/ThirdParty/TracktableCatch2.h>
 
 using PointT = PointGenerator<tracktable::domain::terrestrial::trajectory_type::point_type>::PointT;
 // 35.0844° N, 106.6504° W
