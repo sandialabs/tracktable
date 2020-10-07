@@ -56,11 +56,12 @@ def set_log_level(level):
         level (integer): desired minimum log level.  This will
             usually be one of the constants defined in the `logging`
             module: `NOTSET`, `DEBUG`, `INFO`, `WARNING`, `ERROR`,
-            or `FATAL`.
+            or `FATAL`. ie, set_log_level(logging.DEBUG)
 
     Returns:
         No return value.
     """
+    logging.basicConfig()
     logging.getLogger().setLevel(level)
     cpp_logging.set_cpp_log_level(level)
 
