@@ -128,15 +128,15 @@ int test_cartesian2d_dg_by_distance()
   
   std::vector<double> expected_dg_values = {
     0.0, 
-    0.353553, 
-    0.353553, 
-    0.263523, 
-    0.235702, 
-    0.263523,
-    0.25,
-    0.25,
-    0.25,
-    0.25};
+    0.707107, 
+    0.707107, 
+    0.790569, 
+    0.707107, 
+    0.790569,
+    1.0,
+    1.0,
+    1.0,
+    1.0};
 
   error_count += compare_vectors(
     expected_dg_values,
