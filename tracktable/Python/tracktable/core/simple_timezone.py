@@ -43,16 +43,18 @@ class SimpleTimeZone(tzinfo):
 
     Attributes:
       offset (datetime.timedelta): Offset from UTC
-      name (string): Human-readable name for timezone
+      name (str): Human-readable name for timezone
+
     """
 
     def __init__(self, hours=0, minutes=0, name='UTC'):
         """Initialize a timezone to UTC.
 
-        Args:
-           hours (integer): Hours away from UTC (default 0)
-           minutes (integer): Minutes to add to the hours (default 0)
-           name (string): Human-readable name for time zone (default 'UTC')
+        Keyword Args:
+           hours (integer): Hours away from UTC (Default: 0)
+           minutes (integer): Minutes to add to the hours (Default: 0)
+           name (str): Human-readable name for time zone (Default: 'UTC')
+
         """
 
         self.offset = timedelta(hours=hours, minutes=minutes)

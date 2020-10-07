@@ -31,16 +31,16 @@
 
 This argument group contains just those parameters that are specific
 to movie rendering such as the encoder to use, frames per second,
-duration, etc.  Image-related stuff such as resolution and DPI is in
+duration, etc. Image-related stuff such as resolution and DPI is in
 the 'image' argument group.
 
 Note that the timezone label is not a natural fit for this argument
-group.  I haven't yet figured out where else to put it.
+group. I haven't yet figured out where else to put it.
 
 Arguments:
 
 | ``--encoder NAME``
-|   Which movie encoder to use.  Defaults to FFMPEG.
+|   Which movie encoder to use. Defaults to FFMPEG.
 |
 | ``--duration NN``
 |   How many seconds long the movie should be
@@ -87,7 +87,7 @@ def install_group():
     add_argument("movie_rendering", [ "--encoder" ],
                  default="ffmpeg",
                  choices=[ "ffmpeg", "mencoder", "avconv", "imagemagick" ],
-                 help="Which encoder to use.  NOTE: All options may not be available on all systems.")
+                 help="Which encoder to use. NOTE: All options may not be available on all systems.")
 
     add_argument("movie_rendering", [ "--duration" ],
                  type=int,
@@ -119,7 +119,7 @@ def install_group():
     add_argument("movie_rendering", [ '--resolution', '-r' ],
                  nargs=2,
                  type=int,
-                 help='Resolution of movie frames.  Defaults to 800 600.')
+                 help='Resolution of movie frames. Defaults to 800 600.')
 
     add_argument("movie_rendering", [ '--dpi' ],
                  type=int,

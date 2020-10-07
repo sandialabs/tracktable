@@ -35,7 +35,7 @@ from tracktable.lib import _logging as cpp_logging
 import logging
 import warnings
 
-# The logging module doesn't have loglevel TRACE by default.  I think
+# The logging module doesn't have loglevel TRACE by default. I think
 # it should.
 
 logging.TRACE = 5
@@ -45,15 +45,15 @@ def set_log_level(level):
     """Set the global log level for both C++ and Python code
 
     In Release 1.3, Tracktable uses separate loggers for its
-    C++ and Python code.  This function will set the log level
+    C++ and Python code. This function will set the log level
     on both of them at once.
 
     NOTE: There is not yet a way to redirect log messages generated
-    in C++ to any sink other than standard error.  Expect this
+    in C++ to any sink other than standard error. Expect this
     to be fixed by release 1.4.
 
     Arguments:
-        level (integer): desired minimum log level.  This will
+        level (int): desired minimum log level. This will
             usually be one of the constants defined in the `logging`
             module: `NOTSET`, `DEBUG`, `INFO`, `WARNING`, `ERROR`,
             or `FATAL`.
@@ -69,8 +69,8 @@ def log_level():
     """Retrieve the global log level
 
     This is a convenience function provided for symmetry with
-    `set_log_level`.  It retrieves the current log level and
-    returns it as an integer.  You could just as easily call
+    `set_log_level`. It retrieves the current log level and
+    returns it as an integer. You could just as easily call
     logging.getLogger().getEffectiveLevel().
 
     Arguments:
@@ -86,11 +86,11 @@ def warn_deprecated(message):
     """Warn the caller that a function is deprecated
 
     This function prints a message and possibly raises an exception when
-    a deprecated function is called.  It must be used in the body of the
+    a deprecated function is called. It must be used in the body of the
     function itself.
 
     Arguments:
-        message (string): What to print on the console
+        message (str): What to print on the console
 
     Returns:
         No return value.

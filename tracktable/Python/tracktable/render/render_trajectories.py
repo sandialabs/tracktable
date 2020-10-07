@@ -31,15 +31,15 @@
 tracktable.render.render_trajectories - render trajectories in python
 
 This is a set of function that intend to allow user-friendly rendering
-of trajectories.  A user should be able to simply use the funection 
+of trajectories. A user should be able to simply use the funection
 render_trajectories(trajs) passing a single parameter that is a list
-of trajectories and get a rendering of those trajectories, whether 
-running as an interactive map inside of a noetbook or from the command 
-line and saved as a static image to a file.  
+of trajectories and get a rendering of those trajectories, whether
+running as an interactive map inside of a noetbook or from the command
+line and saved as a static image to a file.
 
-In addition render_trajectories supports many parameters to enable 
-specifying a myriad of options for rendering the trajectories, 
-including allowing users to explicitly specify the rendering backend.  
+In addition render_trajectories supports many parameters to enable
+specifying a myriad of options for rendering the trajectories,
+including allowing users to explicitly specify the rendering backend.
 """
 
 import folium as fol
@@ -67,8 +67,21 @@ import hashlib
 #todo should this return anything?
 def render_trajectories_separate(trajectories, backend='', **kwargs):
     """Render a list of trajectories such that each trajectory is
-    rendered separately in its own map.  See render_trajectories for 
-    parameters"""
+    rendered separately in its own map. See render_trajectories for
+    parameters
+
+    Args:
+        trajectories (list): List of trajectories to render
+
+    Keyword Args:
+        backend (str): The backend to use for rendering default is folium if in a notebook and cartopy otherwise.
+        kwargs (dict): Additional parameters to customize the rendered trajectory
+
+    Returns:
+        No return value
+
+    """
+
     for traj in trajectories:
         render_trajectories(traj, backend=backend, show=True, **kwargs)
 
@@ -79,116 +92,121 @@ def render_trajectories_separate(trajectories, backend='', **kwargs):
 #todo support list of linewidhts?  maybe just mapper
 def render_trajectories(trajectories, backend='', **kwargs):
     """Render a list of trajectories
-    This function renders a list of trajectories.  
+    This function renders a list of trajectories.
 
     Arguments:
-        trajectories {trajectory object or list of trajectory objects}: 
+        trajectories (Trajectory object or list of Trajectory objects):
             A list of trajectories to render
+
     Keyword arguments:
-        backend {string}: The backend to use for rendering
+        backend (str): The backend to use for rendering
             default is folium if in a notebook and cartopy otherwise.
-        map {map object for given backend}: rather than create a new 
+        map (map object for given backend): rather than create a new
             map, append to this given map
-        obj_ids {string or list of strings}: only display trajecteories 
-            whose object id matches the given string or a string from 
+        obj_ids (str or list of str): only display trajecteories
+            whose object id matches the given string or a string from
             the given list of strings.
-        map_bbox {[minLon, maxLon, minLat, maxLat]}: bounding box for 
-            custom map extent.  By default automatically set to 
+        map_bbox ([minLon, maxLon, minLat, maxLat]): bounding box for
+            custom map extent. By default automatically set to
             make all trajectories visible.
-        show_lines {boolean}: whether or not to show the line segments
-            of the trajecotry (defulat=True)
-        gradient_hue {float or list of floats}: hue or list of hues 
+        show_lines (bool): whether or not to show the line segments
+            of the trajecotry (Default: True)
+        gradient_hue (float or list of floats): hue or list of hues
             (one per trajectory) to be used in definig the gradient color
-            map (dark to light) for the trajectories.  Only used if 
-            line_color and color_map are not used (set to ''). 
-            If line_color, color_map and gradient_hue are all unset the 
-            default behavior is to set the gradient_hue based on a hash 
+            map (dark to light) for the trajectories. Only used if
+            line_color and color_map are not used (set to '').
+            If line_color, color_map and gradient_hue are all unset the
+            default behavior is to set the gradient_hue based on a hash
             of the object_id
-        color_map {name of standard colormap as string or matplotlib 
-            color_map object or list of either}: The color map to use 
+        color_map (name of standard colormap as string or matplotlib
+            color_map object or list of either): The color map to use
             in rendering the segments of each trajectory. Overrides the
-            gradient_hue value. Can be a list of color map objects or 
-            a list of matplotlib color map name strings the same length 
-            the length of the list of trajectories. Only used if 
+            gradient_hue value. Can be a list of color map objects or
+            a list of matplotlib color map name strings the same length
+            the length of the list of trajectories. Only used if
             line_color is not used (set to '').
-        line_color {name of standard color as string, hex color string
-            or matplotlib color object, or list of any of these}: The 
-            single color to use for all the segments in each trajectory. 
-            Overrides color_map and gradient_hue values.  Can be a list 
-            of matplotlib color name strings, hex color strings or 
-            matplotlib color objects the same length as the length of 
-            the list of trajectories.  
-        linewidth {float}: Width of the trajectory segments. 
-            (default folium 2.5, cartopy 2)
-        show_points {boolean} whether or not to show the points along
-            the trajecotry (defulat=False)
-        point_size {float} radius of the points along the path 
-            (default folium 0.6, cartopy 10.0)
-        point_color = {name of standard color as string, hex color string
-            or matplotlib color object, or list of any of these}: The 
-            single color to use for all the points in each trajectory. 
-            Can be a list of matplotlib color name strings, hex color 
-            strings or matplotlib color objects the same length as the 
-            length of the list of trajectories. If not specified, the 
+        line_color (name of standard color as string, hex color string
+            or matplotlib color object, or list of any of these): The
+            single color to use for all the segments in each trajectory.
+            Overrides color_map and gradient_hue values. Can be a list
+            of matplotlib color name strings, hex color strings or
+            matplotlib color objects the same length as the length of
+            the list of trajectories.
+        linewidth (float): Width of the trajectory segments.
+            (Default: folium 2.5, cartopy 2)
+        show_points (bool): whether or not to show the points along
+            the trajecotry (Default: False)
+        point_size (float): radius of the points along the path
+            (Default: folium 0.6, cartopy 10.0)
+        point_color = (name of standard color as string, hex color string
+            or matplotlib color object, or list of any of these): The
+            single color to use for all the points in each trajectory.
+            Can be a list of matplotlib color name strings, hex color
+            strings or matplotlib color objects the same length as the
+            length of the list of trajectories. If not specified, the
             color matches the segment incident at the point.
-        dot_size {float}: radius of a dot drawn at the latest point of 
-            each trajectory (default folium 0.7, cartopy 10.0)
-        dot_color {name of standard color as string, hex color string or 
-            matplotlib color object} Color of spot that will be drawn at 
-            the latest point of each trajecctory (default = 'white')
-        trajectory_scalar_generator {function}: Function to generate 
-            scalars for a trajectory 
-            (default path_length_fraction_generator)
-        trajectory_linewidth_generator {function}: Function to generate 
-            path widths for a trajectory (default None)
-        color_scale Linear or logarithmic scale 
-            (default matplotlib.colors.Normalize(vmin=0, vmax=1)) 
-            other options: LogNorm()
-        show {boolean} whether or not to show the result (if possible) 
+        dot_size (float): radius of a dot drawn at the latest point of
+            each trajectory (Default: folium 0.7, cartopy 10.0)
+        dot_color (name of standard color as string, hex color string or
+            matplotlib color object): Color of spot that will be drawn at
+            the latest point of each trajecctory (Default: 'white')
+        trajectory_scalar_generator (function): Function to generate
+            scalars for a trajectory
+            (Default: path_length_fraction_generator)
+        trajectory_linewidth_generator (function): Function to generate
+            path widths for a trajectory (Default: None)
+        color_scale (matplotlib.colors.Normalize() or LogNorm()): Linear or logarithmic scale
+            (Default: matplotlib.colors.Normalize(vmin=0, vmax=1))
+        show (bool): whether or not to show the result (if possible)
             (default True) if saving to a file, might not want to view.
-        save {boolean} whether or not to save the result to a file.  
-            For folium the results can be saved to an html file. For 
-            cartopy the results can be saved as an image.  If no filename
+        save (bool): whether or not to save the result to a file.
+            For folium the results can be saved to an html file. For
+            cartopy the results can be saved as an image. If no filename
             is given, a default filename including the timestamp is used.
-            (default False) 
-        filename {string} Path and filename to save the results to, if
-            save is set to True. If no filename is given, a default 
+            (default False)
+        filename (str): Path and filename to save the results to, if
+            save is set to True. If no filename is given, a default
             filename including the timestamp is used.
 
     Folium-specific Keyword Arguments:
-        tiles {string} map tiles to use for folium. Can be a string name
-            of a folium supported maptiles set or a Leaflet-style URL in 
+        tiles (str): map tiles to use for folium. Can be a string name
+            of a folium supported maptiles set or a Leaflet-style URL in
             this format: http://{s}.yourtiles.com/{z}/{x}/{y}.png
-            (default='cartodbdark_matter')
+            (Default: 'cartodbdark_matter')
             Other options:
                 "OpenStreetMap”
-                “StamenTerrain” 
+                “StamenTerrain”
                 "StamenToner"
                 "StamenWatercolor"
                 “CartoDBPositron”
                 "CartoDBDark_Matter"
-        attr {string} attribution string for custom tile set 
-            (default "."),
-        point_popup_properties {list of strings}: names of the properties
-            to include in the popup which is displayed when clicking on 
+        attr (str): attribution string for custom tile set
+            (Default: "."),
+        point_popup_properties (list of strings): Names of the properties
+            to include in the popup which is displayed when clicking on
             a point (when show_points==True).
-        show_distance_geometry {boolean} whether or not to show the 
-            distance geometry information for the trajectories 
-            (default False)
-        distance_geometry_depth {int} if show_distance_geometry is True,
-            the depth of the distance geometry calculation (default=4)
-        show_scale {boolean} whether or not to show the scale of the 
-            current map in the lower-lefthand corner (default = True)
-        max_zoom {int}: The maximum zoom level for the given map tiles
+        show_distance_geometry (bool): Whether or not to show the
+            distance geometry information for the trajectories
+            (Default: False)
+        distance_geometry_depth (int): if show_distance_geometry is True,
+            the depth of the distance geometry calculation (Default: 4)
+        show_scale (bool): whether or not to show the scale of the
+            current map in the lower-lefthand corner (Default: True)
+        max_zoom (int): The maximum zoom level for the given map tiles
             this may need to be increased if there is a need to zoom in
-            very close (default = 22)
+            very close (Default: 22)
 
     Cartopy-specific Keyword Arguments:
-        map_projection {cartopy.crs projection object} Projection to use
-            to display the map (default=cartopy.crs.Miller)
-        transform {cartopy.crs projection object} the input projection 
-            (default=Geodetic())
+        map_projection (cartopy.crs projection object): Projection to use
+            to display the map (Default: cartopy.crs.Miller)
+        transform (cartopy.crs projection object): the input projection
+            (Default: Geodetic())
+
+    Returns:
+        Rendered trajectories
+
     """
+
     render_function = render_trajectories_folium
 
     if backend == 'folium':
@@ -208,7 +226,7 @@ def render_trajectories(trajectories, backend='', **kwargs):
             if type(trajectories) is not list or len(trajectories) <= 10000:
                 render_function = render_trajectories_folium
             else:
-                print("Too many trajectories to plot with folium.  Reverting to non-interactive backend.  Override with backend='folium'")
+                print("Too many trajectories to plot with folium. Reverting to non-interactive backend. Override with backend='folium'")
                 render_function = render_trajectories_cartopy
         else:
             render_function = render_trajectories_cartopy
@@ -224,13 +242,18 @@ def render_trajectory(trajectory, backend='', **kwargs):
     calls render_trajectories, which also handles single trajectories.
 
     Arguments:
-        trajectory -- The trajectory object to render
+        trajectory (Trajectory): The trajectory object to render
 
     Keyword Arguments:
-        backend -- the rendering backend (cartopy, folium, etc)
+        backend (str): the rendering backend (cartopy, folium, etc)
             default is folium if in a notebook and cartopy otherwise.
-        see render_trajectories for other arguments
+        kwargs (dict): see render_trajectories for other arguments
+
+    Returns:
+        No return value
+
     """
+
     render_trajectories(trajectory, backend, **kwargs)
 
 # ----------------------------------------------------------------------
@@ -238,10 +261,18 @@ def render_trajectory(trajectory, backend='', **kwargs):
 
 def path_length_fraction_generator(trajectory):
     """Generator to produce path length fraction scalars
-    A genertor that given a trajectory will generate a scalar for each 
-    point such that each scalar represents the fraction of the total 
-    length along the path at the associated point.  
+    A genertor that given a trajectory will generate a scalar for each
+    point such that each scalar represents the fraction of the total
+    length along the path at the associated point.
+
+    Arguments:
+        trajectory (Trajectory): The trajectory to use for generating scaler values
+
+    Returns:
+        Fraction length scalar values for each point in the trajectory
+
     """
+
     dist_fractions = []
     prev_point = trajectory[0]
     cum_distance = 0
@@ -258,20 +289,34 @@ def path_length_fraction_generator(trajectory):
 
 def get_constant_color_cmap(color):
     """Returns a colormap containing the single color given
+
+    Args:
+        color (str): Color to get colormap from
+    Returns:
+        Returns a colormap containing the single color given
+
     """
+
     if isinstance(color, str):
         return ListedColormap(np.array(matplotlib.colors.to_rgba(color)))
     else:
         return ListedColormap(np.array(color)) #TODO handle errors
 
 # ----------------------------------------------------------------------
-    
+
 
 def progress_linewidth_generator(trajectory):
     """Generator to produce progress linewidth scalars
     A generator that given a trajectory will generate a scalar for each
-    point such that each scalar represents a good width value for the 
+    point such that each scalar represents a good width value for the
     fraction of points that come before that point in the trajectory.
+
+    Arguments:
+        trajectory (Trajectory): The trajectory to use for generating scaler values
+
+    Returns:
+        Linewidth scalar values for each point in the trajectory
+
     """
     widths = []
     tlen = len(trajectory)
@@ -289,6 +334,18 @@ def get_color_mapper(color_scale, color_map):
     """Returns an object that can translate scalars into colors
        Returns an object that can produce for any scalar the correct RGBA
        color from the given color_map using the given color_scale.
+
+    Args:
+        color_scale (matplotlib.colors.Normalize() or LogNorm()): Linear or logarithmic scale
+        color_map (name of standard colormap as string or matplotlib
+            color_map object or list of either): The color map to use
+            in rendering the segments of each trajectory.
+
+    Returns:
+       An object that can translate scalars into colors
+       and an object that can produce for any scalar the correct RGBA
+       color from the given color_map using the given color_scale.
+
     """
     cmap = plt.get_cmap(color_map)
     return matplotlib.cm.ScalarMappable(norm=color_scale, cmap=cmap)
@@ -297,16 +354,16 @@ def get_color_mapper(color_scale, color_map):
 
 
 def hue_gradient_cmap(hue, chop_frac=.29):
-    """Returns a color map which progresses from dark to light given a 
+    """Returns a color map which progresses from dark to light given a
        specific hue
 
     Args:
-       hue: the hue to generate the color map for.  (0 to 1)
-       chop_frac: the fraction of the beginning and end of the total 
+       hue (str or float): the hue to generate the color map for. (0 to 1)
+       chop_frac (float): the fraction of the beginning and end of the total
            gradient to chop off so as to not be too light or dark.
 
     Returns:
-       color map object which can be passed to matplotlib's cmap param 
+       color map object which can be passed to matplotlib's cmap param
            or render_trajectories color_map
     """
     if isinstance(hue, str):
@@ -314,7 +371,7 @@ def hue_gradient_cmap(hue, chop_frac=.29):
     rgb = hsv_to_rgb([hue, 1.0, 1.0])
     N = 128
     vals = np.ones((N*2, 4))
-    vals[:, 0] = np.concatenate([np.linspace(rgb[0]*chop_frac, rgb[0], N), np.linspace(rgb[0], 1.0-((1.0-rgb[0])*chop_frac), N)]) 
+    vals[:, 0] = np.concatenate([np.linspace(rgb[0]*chop_frac, rgb[0], N), np.linspace(rgb[0], 1.0-((1.0-rgb[0])*chop_frac), N)])
     vals[:, 1] = np.concatenate([np.linspace(rgb[1]*chop_frac, rgb[1], N), np.linspace(rgb[1], 1.0-((1.0-rgb[1])*chop_frac), N)])
     vals[:, 2] = np.concatenate([np.linspace(rgb[2]*chop_frac, rgb[2], N), np.linspace(rgb[2], 1.0-((1.0-rgb[2])*chop_frac), N)])
     return ListedColormap(vals)
@@ -328,8 +385,44 @@ def setup_colors(line_color, color_map, gradient_hue, point_color,
     """ Processes the color optins and returns the current color maps
     This function determines what the current color map should be for
     lines and points given the various releated parameters and returns
-    color maps for points and for lines.  
+    color maps for points and for lines.
+
+    Args:
+        line_color (name of standard color as string, hex color string
+            or matplotlib color object, or list of any of these): The
+            single color to use for all the segments in each trajectory.
+            Overrides color_map and gradient_hue values. Can be a list
+            of matplotlib color name strings, hex color strings or
+            matplotlib color objects the same length as the length of
+            the list of trajectories.
+        color_map (name of standard colormap as string or matplotlib
+            color_map object or list of either): The color map to use
+            in rendering the segments of each trajectory.
+        gradient_hue (float or list of floats): hue or list of hues
+            (one per trajectory) to be used in definig the gradient color
+            map (dark to light) for the trajectories. Only used if
+            line_color and color_map are not used (set to '').
+            If line_color, color_map and gradient_hue are all unset the
+            default behavior is to set the gradient_hue based on a hash
+            of the object_id
+        point_color = (name of standard color as string, hex color string
+            or matplotlib color object, or list of any of these): The
+            single color to use for all the points in each trajectory.
+            Can be a list of matplotlib color name strings, hex color
+            strings or matplotlib color objects the same length as the
+            length of the list of trajectories. If not specified, the
+            color matches the segment incident at the point.
+        color_scale (matplotlib.colors.Normalize() or LogNorm()): Linear or logarithmic scale
+        objid (str): ID used for MD5 Hash
+        i (int): Index for lists
+        linewidth_generator (function): Function to generate
+            linewidths
+
+    Returns:
+        Current color maps
+
     """
+
     if line_color != '' and line_color != []:
         if isinstance(line_color, list):
             current_cmap = ListedColormap([line_color[i]])
@@ -360,21 +453,29 @@ def setup_colors(line_color, color_map, gradient_hue, point_color,
     mapper = None
     point_mapper = None
     if type(current_cmap) is not ListedColormap \
-       or len(current_cmap.colors) != 1 or linewidth_generator != None: 
+       or len(current_cmap.colors) != 1 or linewidth_generator != None:
         mapper = get_color_mapper(color_scale, current_cmap)
     if type(current_point_cmap) is not ListedColormap \
-       or len(current_point_cmap.colors) != 1: 
+       or len(current_point_cmap.colors) != 1:
         point_mapper = get_color_mapper(color_scale,
                                         current_cmap)
 
     return current_cmap, current_point_cmap, mapper, point_mapper
-    
+
 # ----------------------------------------------------------------------
 
 
 def point_tooltip(current_point):
     """Formats the tooltip string for a point
+
+    Args:
+        current_point (point): Current point of the trajectory
+
+    Returns:
+        Current points timestamp
+
     """
+
     return current_point.timestamp.strftime("%H:%M:%S")
 
 # ----------------------------------------------------------------------
@@ -382,7 +483,16 @@ def point_tooltip(current_point):
 
 def point_popup(current_point, point_popup_properties):
     """Formats the popup string for a point
+
+    Args:
+        current_point (point): Current point of the trajectory
+        point_popup_properties (list): Point properties
+
+    Returns:
+        String of point properties
+
     """
+
     popup_str_point = str(current_point.object_id)+'<br>'+ \
         current_point.timestamp.strftime("%H:%M:%S")+'<br>Lat='+ \
         str(current_point[1])+'<br>Lon='+str(current_point[0])
@@ -403,7 +513,20 @@ def render_point_folium(current_point,
                         point_popup_properties, coord, point_radius,
                         point_color, map):
     """Renders a point to the folium map
+
+    Args:
+        current_point (point): Current point of the trajectory
+        point_popup_properties (list): Point properties
+        coord (tuple): Coordinates to render point
+        point_radius (int): Size of the point to render
+        point_color (str): Color of the point to render
+        map (Basemap): Folium map
+
+    Returns:
+        No return value
+
     """
+
     tooltip_str_point = point_tooltip(current_point)
     popup_point = fol.Popup(point_popup(current_point,
                                         point_popup_properties),
@@ -421,7 +544,17 @@ def render_point_folium(current_point,
 def render_distance_geometry_folium(distance_geometry_depth,
                                     traj, map):
     """Renders the distance geometry calculations to the folium map
+
+    Args:
+        distance_geometry_depth (int): The depth of the distance geometry calculation
+        traj (Trajectory): The trajectory
+        map (Basemap): Folium map
+
+    Returns:
+        No return value
+
     """
+
     #cp=control_point
     cp_colors = ['red', 'blue', 'yellow', 'purple']+ \
         [random_color() for i in range(4, distance_geometry_depth)]
@@ -447,15 +580,21 @@ def render_distance_geometry_folium(distance_geometry_depth,
             fol.CircleMarker(cp_coord, radius=4, fill=True,
                              color=control_color,
                              tooltip=round(cp_fractions[i], 7),
-                             popup=popup).add_to(map)    
-    
+                             popup=popup).add_to(map)
+
 # ----------------------------------------------------------------------
 
 
-def hash_short_md5(string): 
-    """Given any string, returns a number between 0 and 1.  The same 
+def hash_short_md5(string):
+    """Given any string, returns a number between 0 and 1. The same
        number is always returned given the same string. Internally uses
        hashlib.md5, but only uses the first quarter of the full hash
+
+    Args:
+        string (str): String to be hashed
+
+    Returns:
+        0 or 1
     """
     return int(hashlib.md5(string.encode('utf-8')).hexdigest()[:8],
                base=16)/((2**32)-1)
@@ -467,8 +606,35 @@ def hash_short_md5(string):
 
 def common_processing(trajectories, obj_ids, line_color, color_map,
                       gradient_hue):
+    """Common processing functionality
+
+    Args:
+        trajectories (list): List of Trajectories
+        obj_ids (list): List of IDs
+        line_color (name of standard color as string, hex color string
+            or matplotlib color object, or list of any of these): The
+            single color to use for all the segments in each trajectory.
+            Overrides color_map and gradient_hue values. Can be a list
+            of matplotlib color name strings, hex color strings or
+            matplotlib color objects the same length as the length of
+            the list of trajectories.
+        color_map (name of standard colormap as string or matplotlib
+            color_map object or list of either): The color map to use
+            in rendering the segments of each trajectory.
+        gradient_hue (float or list of floats): hue or list of hues
+            (one per trajectory) to be used in definig the gradient color
+            map (dark to light) for the trajectories. Only used if
+            line_color and color_map are not used (set to '').
+            If line_color, color_map and gradient_hue are all unset the
+            default behavior is to set the gradient_hue based on a hash
+            of the object_id
+
+    Returns:
+        trajectories, line_color, color_map and gradient_hue
+
+    """
     #handle a single traj as input
-    if type(trajectories) is not list: 
+    if type(trajectories) is not list:
         trajectories = [trajectories]
 
     #filter trajectories list by obj_ids if specified
@@ -485,7 +651,7 @@ def common_processing(trajectories, obj_ids, line_color, color_map,
             trajectories = filtered_trajs
 
     #now handle some color processing
-        
+
     #translate strings into colormaps
     if type(color_map) is str and color_map != '':
         color_map = matplotlib.cm.get_cmap(color_map)
@@ -505,13 +671,13 @@ def common_processing(trajectories, obj_ids, line_color, color_map,
         times_to_repeat = ceil(len(trajectories)/len(color_map))
         color_map = color_map * times_to_repeat
 
-    # Handle too few hews (say that 5 times fast) ;)
+    # Handle too few hues (say that 5 times fast) ;)
     if type(gradient_hue) is list and len(trajectories) > len(gradient_hue):
         times_to_repeat = ceil(len(trajectories)/len(gradient_hue))
         gradient_hue = gradient_hue * times_to_repeat
-    
+
     return trajectories, line_color, color_map, gradient_hue
-    
+
 # ----------------------------------------------------------------------
 
 
@@ -530,7 +696,7 @@ def render_trajectories_folium(trajectories,
                                map = None,
                                obj_ids = [],
                                #\/format [minLon, maxLon, minLat, maxLat]
-                               map_bbox = None, 
+                               map_bbox = None,
                                show_lines = True,
                                gradient_hue = None,
                                color_map = '',
@@ -543,7 +709,7 @@ def render_trajectories_folium(trajectories,
                                dot_size = 0.7,
                                dot_color = 'white',
                                trajectory_scalar_generator = path_length_fraction_generator,
-                               trajectory_linewidth_generator = None, 
+                               trajectory_linewidth_generator = None,
                                color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1),
                                show = False,
                                save=False,
@@ -589,7 +755,7 @@ def render_trajectories_folium(trajectories,
                 scalars = trajectory_scalar_generator(trajectory)
             if trajectory_linewidth_generator:
                 #Note: lines invisible below about .37
-                widths = trajectory_linewidth_generator(trajectory) 
+                widths = trajectory_linewidth_generator(trajectory)
 
             current_color_map, current_point_cmap, mapper, point_mapper = \
                 setup_colors(line_color, color_map, gradient_hue,
@@ -598,7 +764,7 @@ def render_trajectories_folium(trajectories,
                              trajectory_linewidth_generator)
         else:
             rgb = hsv_to_rgb([hash_short_md5(trajectory[0].object_id), 1.0, 1.0])
-            current_color_map = ListedColormap([rgb2hex(rgb)]) 
+            current_color_map = ListedColormap([rgb2hex(rgb)])
 
         if show_lines:
             popup_str = str(trajectory[0].object_id)+'<br>'+ \
@@ -630,12 +796,12 @@ def render_trajectories_folium(trajectories,
             for i, c in enumerate(coordinates[:-1]): #all but last (dot)
                 point_radius = point_size
                 if type(current_point_cmap) is ListedColormap \
-                   and len(current_point_cmap.colors) == 1: # one color 
+                   and len(current_point_cmap.colors) == 1: # one color
                     current_point_color = current_point_cmap.colors[0]
                 else:
                     current_point_color = \
                         rgb2hex(point_mapper.to_rgba(scalars[i]))
-                    
+
                 render_point_folium(trajectory[i],
                                     point_popup_properties, c,
                                     point_radius,
@@ -675,6 +841,16 @@ def render_trajectories_folium(trajectories,
 #fit_bounds
 
 def transform(point, scale):
+    """ Transform the given point based on the scale factor
+
+    Args:
+        point (point): Point transform
+        scale (int): Scale factor to transform by
+
+    Return:
+        Scaled (x,y) values
+
+    """
     EARTH_RADIUS = 6378137 #combine these to a global var
     transform_factor = 0.5 / (math.pi * EARTH_RADIUS)
     x = scale * ((transform_factor*point[0])+0.5)
@@ -683,6 +859,16 @@ def transform(point, scale):
 
 #spherical mercator projection #checked with https://epsg.io/transform#s_srs=4326&t_srs=3857
 def project_spherical_mercator(latlng):
+    """ Project the spherical mercator for a given lat long value
+
+    Args:
+        latlng (point): Point transform
+
+    Return:
+        Projection of spherical mercator
+
+    """
+
     EARTH_RADIUS = 6378137
     MAX_LATITUDE = 85.0511287798
     d = math.pi / 180.0
@@ -692,24 +878,53 @@ def project_spherical_mercator(latlng):
     return (EARTH_RADIUS * latlng[0] * d, EARTH_RADIUS * math.log((1+sin) / (1-sin)) / 2)
 
 def crs_zoom(scale):
+    """ Zoom the CRS based on scale factor
+    """
     return math.log(scale / 256) / math.log(2)
 
 def crs_scale(zoom):
+    """ Scale the CRS based on zoom factor
+    """
     return 256 * math.pow(2, zoom)
 
-#projects a geographical coordinate according to the projection of the map's CRS then scales it according to zoom and the CRS's Transformation.  The result is a poxel coord relative to the CRS origin
 def project(latlng, zoom):
+    """ Projects a geographical coordinate according to the projection of the map's CRS then scales it according to zoom and the CRS's Transformation
+
+    Args:
+        latlng (point): Point to project
+        zoom (int): Zoom value to scale by
+
+    Returns:
+        Pixel coord relative to the CRS origin
+    """
     #check zoom?
     projectedPoint = project_spherical_mercator(latlng)
     scale = crs_scale(zoom)
-    return transform(projectedPoint, scale);
+    return transform(projectedPoint, scale)
 
 def get_scale_zoom(scale, from_zoom):
+    """ Get zoom scale factor
+    """
     zoom = crs_zoom(scale * crs_scale(from_zoom))
     return zoom # check for Nan?
 
-#returns tne maximum zoom level on which the given bounds fit to the map vie in its entirety
 def get_bounds_zoom(map, bounds, inside=True, size=[960,400], padding=[0,0]): #ignore padding for now #fix size
+    """ Get the zoom if the bounding box corners
+
+    Args:
+        map (Basemap): Map containing bounding box
+        bounds (point): Long-Lat point of the bounding box corners
+
+    Keyword Arguments:
+        inside (bool): Flag to indicate inside of the bounding box
+        size (list): Size of the bouning box
+        padding (list): Padding of boundries
+
+    Returns:
+        The maximum zoom level on which the given bounds fit to the map vie in its entirety
+
+    """
+
     #bounds is min_corner max_corner lon,lat
     #size = size=padding
     #boundsSize = toBounds(this.project(se, zoom), this.project(nw, zoom)).getSize()
@@ -731,11 +946,11 @@ def get_bounds_zoom(map, bounds, inside=True, size=[960,400], padding=[0,0]): #i
     scale = max(scalex, scaley)
     if inside:
         scale = min(scalex, scaley)
-    
+
     zoom = get_scale_zoom(scale, current_zoom)
-    
+
     #snap? could add later
-    
+
     return max(map.min_zoom, min(map.max_zoom, zoom))
 
 
@@ -746,6 +961,17 @@ def render_point_ipyleaflet(current_point,
                         point_popup_properties, coord, point_radius,
                         point_color, map):
     """Renders a point to the ipyleaflet map
+        Args:
+        current_point (point): Current point of the trajectory
+        point_popup_properties (list): Point properties
+        coord (tuple): Coordinates to render point
+        point_radius (int): Size of the point to render
+        point_color (str): Color of the point to render
+        map (Basemap): ipyleaflet map
+
+    Returns:
+        No return value
+
     """
     import ipyleaflet as ipl #for now don't require unless using
     from ipywidgets import HTML # is this dependency okay?
@@ -770,7 +996,7 @@ def render_trajectories_ipyleaflet(trajectories,
                                map = None,
                                obj_ids = [],
                                #\/format [minLon, maxLon, minLat, maxLat]
-                               map_bbox = None, 
+                               map_bbox = None,
                                show_lines = True,
                                gradient_hue = None,
                                color_map = '',
@@ -783,7 +1009,7 @@ def render_trajectories_ipyleaflet(trajectories,
                                dot_size = 0.7,
                                dot_color = 'white',
                                trajectory_scalar_generator = path_length_fraction_generator,
-                               trajectory_linewidth_generator = None, 
+                               trajectory_linewidth_generator = None,
                                color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1),
                                show = False, #by default when map is returned it shows. #todo can we fix this?
                                save=False,
@@ -862,7 +1088,7 @@ def render_trajectories_ipyleaflet(trajectories,
         #   basemap = ipl.basemaps.Strava.Winter
 
         map = ipl.Map(basemap=basemap, scroll_wheel_zoom=True, max_zoom=max_zoom)#changed #should we support disable scorlling?
-        
+
         map.layout.width = '960px' #required to get fit bounds to work right #todo should be a parameter
         map.layout.height = '400px'
 
@@ -877,7 +1103,7 @@ def render_trajectories_ipyleaflet(trajectories,
             scalars = trajectory_scalar_generator(trajectory)
         if trajectory_linewidth_generator:
             #Note: lines invisible below about .37
-            widths = trajectory_linewidth_generator(trajectory) 
+            widths = trajectory_linewidth_generator(trajectory)
 
         current_color_map, current_point_cmap, mapper, point_mapper = \
             setup_colors(line_color, color_map, gradient_hue,
@@ -896,7 +1122,7 @@ def render_trajectories_ipyleaflet(trajectories,
                and trajectory_linewidth_generator == None: #Polyline ok
                 line = ipl.Polyline(locations=coordinates,
                                     color=current_color_map.colors[0],
-                                    weight = int(linewidth+0.5), opacity = 1,                                
+                                    weight = int(linewidth+0.5), opacity = 1,
                                     fill=False) #added
                 map.add_layer(line)#changed
                 #fol.PolyLine(coordinates,
@@ -913,7 +1139,7 @@ def render_trajectories_ipyleaflet(trajectories,
                     segment_color = rgb2hex(mapper.to_rgba(scalars[i]))
                     line = ipl.Polyline(locations=[last_pos, pos],
                                         color=segment_color,
-                                        weight = int(weight+0.5), opacity = 1,                                
+                                        weight = int(weight+0.5), opacity = 1,
                                         fill=False) #added
                     map.add_layer(line)#changed
                     #fol.PolyLine([last_pos,pos],
@@ -925,12 +1151,12 @@ def render_trajectories_ipyleaflet(trajectories,
             for i, c in enumerate(coordinates[:-1]): #all but last (dot)
                 point_radius = point_size*4
                 if type(current_point_cmap) is ListedColormap \
-                   and len(current_point_cmap.colors) == 1: # one color 
+                   and len(current_point_cmap.colors) == 1: # one color
                     current_point_color = current_point_cmap.colors[0]
                 else:
                     current_point_color = \
                         rgb2hex(point_mapper.to_rgba(scalars[i]))
-                    
+
                 render_point_ipyleaflet(trajectory[i],
                                         point_popup_properties, c,
                                         point_radius,
@@ -961,7 +1187,7 @@ def render_trajectories_ipyleaflet(trajectories,
         map.center = (center_lat, center_lon)#added
         map.zoom=get_bounds_zoom(map, raw_bbox)-1 #hack
     #    map.fit_bounds(bounding_box_for_folium(trajectories))
-    
+
     if save:  #saves as .html document
         if not filename:
             datetime_str = datetime.now().strftime("%Y-%m-%dT%H%M%S-%f")
@@ -970,7 +1196,7 @@ def render_trajectories_ipyleaflet(trajectories,
     if show:
         display(map)
     return map
-#todo look into deckgl and tripslayer and mapbox. 
+#todo look into deckgl and tripslayer and mapbox.
 # ----------------------------------------------------------------------
 
 
@@ -984,7 +1210,7 @@ def render_trajectories_bokeh(trajectories,
     """Render a list of trajectories using the bokeh backend
     This function renders a list of trajectories to a bokeh map.
 
-    Currently not officially supported.  Just for evaluation!
+    Currently not officially supported. Just for evaluation!
     """
     from bokeh.plotting import figure, show, output_file
     from bokeh.tile_providers import get_provider, Vendors
@@ -999,7 +1225,7 @@ def render_trajectories_bokeh(trajectories,
                           color_map,gradient_hue)
     if not trajectories:
         return
-    
+
     if in_notebook():
         output_notebook()
 
@@ -1028,14 +1254,14 @@ def render_trajectories_bokeh(trajectories,
                           line_width=2, color=color)
             #may need to rework with multiple trajectories? TODO
             hover_tool = HoverTool(tooltips=trajectory[0].object_id,
-                                   renderers=[line])  
+                                   renderers=[line])
             p.tools.append(hover_tool)
         if show_points:
             points = p.circle(x='x_values', y='y_values', source=source,
                               size=3, color=color)
             #may need to rework with multiple trajectories? TODO
             hover_tool_point = HoverTool(tooltips='@timestamps',
-                                         renderers=[points])  
+                                         renderers=[points])
             p.tools.append(hover_tool_point)
 
     show(p)
@@ -1049,7 +1275,7 @@ def render_trajectories_cartopy(trajectories,
                                 map = None,
                                 obj_ids = [],
                                 map_bbox = [],
-                                show_lines=True,   
+                                show_lines=True,
                                 gradient_hue = None,
                                 color_map = '',
                                 line_color = '',
@@ -1061,7 +1287,7 @@ def render_trajectories_cartopy(trajectories,
                                 dot_size = 0.7,
                                 dot_color = 'white',
                                 trajectory_scalar_generator = path_length_fraction_generator,
-                                trajectory_linewidth_generator = None, 
+                                trajectory_linewidth_generator = None,
                                 color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1),
                                 show = True,
                                 save=False,
@@ -1084,13 +1310,13 @@ def render_trajectories_cartopy(trajectories,
 
     if not show_dot:
         dot_size = 0
-    
+
     if in_notebook():
         if show:
             #below effectively does %matplotlib inline (display inline)
             get_ipython().magic("matplotlib inline")   #TODO may casue issues may want to remove
             #TODO figure out how to get matplotlib not to show after
-            #     executing code a second time.  
+            #     executing code a second time.
     figure = plt.figure(dpi=100, figsize=(12,6.75))
     if not map_bbox: #if it's empty
         map_bbox = compute_bounding_box(itertools.chain(*trajectories),
@@ -1120,7 +1346,7 @@ def render_trajectories_cartopy(trajectories,
         else:
            color_maps.append(hue_gradient_cmap(hash_short_md5(trajectory[0].object_id)))
 
-    if map == None:   
+    if map == None:
         (map, map_actors) = mapmaker(domain='terrestrial',
                                      map_name='custom',
                                      map_bbox=map_bbox,
