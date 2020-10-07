@@ -56,6 +56,7 @@
 #include <tracktable/Core/Trajectory.h>
 
 #include <tracktable/Domain/DomainMacros.h>
+#include <tracktable/Domain/Cartesian3D.h>
 
 #include <tracktable/IO/PointReader.h>
 #include <tracktable/IO/TrajectoryReader.h>
@@ -67,6 +68,8 @@
 #include <string>
 
 #include <tracktable/Domain/TracktableDomainWindowsHeader.h>
+
+typedef tracktable::domain::cartesian3d::CartesianPoint3D CartesianPoint3D;
 
 // ----------------------------------------------------------------------
 //
@@ -147,7 +150,7 @@ public:
    * @note this expects an altitude in km (not ft or m).
    * @returns 3D Earth Centered, Earth Fixed point in km
    */
-  static PointCartesian<3> ECEF_from_km(const coord_type _longitude, const coord_type _latitude,
+  static CartesianPoint3D ECEF_from_km(const coord_type _longitude, const coord_type _latitude,
                                 const double _altitude) {
     constexpr double a = 6378.137;
     constexpr double e2 = 8.1819190842622e-2 * 8.1819190842622e-2;
@@ -158,7 +161,7 @@ public:
     pt[0] = NAC * cos(_longitude);
     pt[1] = NAC * sin(_longitude);
     pt[2] = (n * (1.0 - e2) + _altitude) * sinLatitude;
-    return PointCartesian<3>(pt);
+    return CartesianPoint3D(pt);
   }
 };
 
@@ -244,7 +247,7 @@ public:
    * @note this expects an altitude in km (not ft or m).
    * @returns 3D Earth Centered, Earth Fixed point in km
    */
-  PointCartesian<3> ECEF() const {
+  CartesianPoint3D ECEF() const {
     double altitude = this->real_property("altitude");
     coord_type longitude = conversions::radians(this->get<0>());
     coord_type latitude = conversions::radians(this->get<1>());
@@ -258,11 +261,17 @@ public:
    * @returns 3D Earth Centered, Earth Fixed point in km
    * @throw PropertyDoesNotExist if we can't find altitude
    */
-  PointCartesian<3> ECEF(const double ratio, const std::string& _altitudeString) const {
+  CartesianPoint3D ECEF(const double ratio, const std::string& _altitudeString) const {
+    double altitude;
     bool ok = false;
-    const double altitude = ratio * this->real_property(_altitudeString, &ok);
-    if (!ok) {
-      throw PropertyDoesNotExist(_altitudeString);
+    if (_altitudeString.length() != 0) 
+    {
+      altitude = ratio * this->real_property(_altitudeString, &ok);
+      if (!ok) {
+        throw PropertyDoesNotExist(_altitudeString);
+      }
+    } else {
+      altitude = 0.0;
     }
     coord_type longitude = conversions::radians(this->get<0>());
     coord_type latitude = conversions::radians(this->get<1>());
@@ -275,7 +284,7 @@ public:
    * @returns 3D Earth Centered, Earth Fixed point in km
    * @throw PropertyDoesNotExist if we can't find altitude
    */
-  PointCartesian<3> ECEF_from_feet(const std::string& _altitudeString = "altitude") const {
+  CartesianPoint3D ECEF_from_feet(const std::string& _altitudeString = "altitude") const {
     // NOTE: Potential for this number ratio to be slightly different between
     // machines of differing precisions.
     constexpr auto feetToKilometers = 1.0 / 3280.839895013123;
@@ -288,7 +297,7 @@ public:
    * @returns 3D Earth Centered, Earth Fixed point in km
    * @throw PropertyDoesNotExist if we can't find altitude
    */
-  PointCartesian<3> ECEF_from_meters(const std::string& _altitudeString = "altitude") const {
+  CartesianPoint3D ECEF_from_meters(const std::string& _altitudeString = "altitude") const {
     constexpr auto metersToKilometers = 1.0 / 1000.0;
     return ECEF(metersToKilometers, _altitudeString);
   }
