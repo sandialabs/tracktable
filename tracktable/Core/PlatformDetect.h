@@ -33,7 +33,7 @@
  *
  * In order to provide platform-dependent features like a check on
  * memory usage, we need to determine what platform (operating system)
- * we're on.  The cleanest way to do that at compile time is to look
+ * we're on. The cleanest way to do that at compile time is to look
  * at the different symbols defined by the preprocessor.
  *
  * The checks in this header file were written with reference to the

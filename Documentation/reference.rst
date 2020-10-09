@@ -50,6 +50,7 @@ start rendering maps and movies.
 
    cpp/tracktable.analysis.rst
    cpp/tracktable.core.rst
+   cpp/tracktable.data_generators.rst
    cpp/tracktable.domain.rst
    cpp/tracktable.io.rst
    cpp/tracktable.namespaces.rst

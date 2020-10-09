@@ -36,16 +36,16 @@
 #include <stdexcept>
 #include <iostream>
 
-namespace tracktable { 
+namespace tracktable {
 
-/** Generic reader that exposes an InputIterator
+/** Generic reader that exposes an `InputIterator`
  *
  * This reader implements a pattern where new objects can be retrieved
  * one at a time and exposes the resulting sequence as an
- * InputIterator.  You must implement the following method:
+ * `InputIterator`. You must implement the following method:
  *
- * sequence_object_type* next_item(): Retrieve and return the next
- * item in the sequence (or NULL if the sequence has terminated).
+ * `sequence_object_type* next_item()`: Retrieve and return the next
+ * item in the sequence (or `NULL` if the sequence has terminated).
  *
  * The template takes care of the mechanics of exposing the objects
  * and maintaining references for as long as necessary.
@@ -58,11 +58,19 @@ template<typename sequence_object_type>
 class GenericReader
 {
 public:
+  /// Instantiate an empty reader
   GenericReader() { }
+
+  /** Copy contructor, create a reader with a copy of another
+   *
+   * @param [in] other Reader to copy from
+   */
   GenericReader(GenericReader const& other)
     : CurrentSequenceObject(other.CurrentSequenceObject)
     , PreviousSequenceObject(other.PreviousSequenceObject)
     { }
+
+  /// Destructor for a generic reader
   virtual ~GenericReader() { }
 
 private:
@@ -70,12 +78,18 @@ private:
   sequence_object_ptr CurrentSequenceObject;
   sequence_object_ptr PreviousSequenceObject;
 
+  /** Advance the pointer to the next item in the sequence
+   */
   virtual void advance()
     {
       this->PreviousSequenceObject = this->CurrentSequenceObject;
       this->CurrentSequenceObject = sequence_object_ptr(this->next_item());
     }
 
+  /** Check if the sequence is finished
+   *
+   * @return Boolean indicating completion of sequence
+   */
   virtual bool sequence_is_finished() const
     {
       return (this->CurrentSequenceObject == 0);
@@ -83,9 +97,15 @@ private:
 
 
 protected:
+    /// Pure virtual function to get the next item in the sequence
     virtual sequence_object_ptr next_item() = 0;
 
 private:
+  /** Generic input iterator class
+   *
+   * Generates a iterator that can traverse the given parent
+   * generic reader sequence
+   */
   class GenericInputIterator : public std::iterator<
   std::input_iterator_tag,
   sequence_object_type
@@ -101,10 +121,12 @@ private:
     typedef value_type const*       const_pointer;
     typedef std::input_iterator_tag iterator_category;
 
+    /// Instantiate an empty input iterator
     GenericInputIterator()
       : Parent(0)
       { }
 
+    /// Copy contructor, create a input iterator with a copy of a parent `GenericReader`
     GenericInputIterator(GenericReader* parent)
       : Parent(parent)
       {
@@ -114,11 +136,13 @@ private:
           }
       }
 
+    /// Copy contructor, create a input iterator with a copy of another
     GenericInputIterator(GenericInputIterator const& other)
       : CurrentSequenceObject(other.CurrentSequenceObject)
       , Parent(other.Parent)
       { }
 
+    /// Destructor for a generic input iterator
     virtual ~GenericInputIterator() { }
 
     GenericInputIterator& operator=(GenericInputIterator const& other)
@@ -128,6 +152,13 @@ private:
         return *this;
       }
 
+    /** Check whether one iterator is equal to another by comparing all the items.
+     *
+     * Two items are equal if all of their points are equal.
+     *
+     * @param [in] other Iterator for comparison
+     * @return Boolean indicating equivalency
+     */
     bool operator==(GenericInputIterator const& other) const
       {
         if (this->Parent == other.Parent)
@@ -145,37 +176,63 @@ private:
           }
         else
           {
-          // The sources are not equal.  The iterators cannot be
+          // The sources are not equal. The iterators cannot be
           // equal.
           return false;
           }
       }
 
+    /** Check whether two iterators are unequal.
+     *
+     * @param [in] other Iterator for comparison
+     * @return Boolean indicating equivalency
+     */
     bool operator!=(GenericInputIterator const& other) const
       {
         return !(*this == other);
       }
 
+    /** Multiply an iterator.
+     *
+     * @return Result of the multiplication
+     */
     reference operator*()
       {
         return *this->CurrentSequenceObject;
       }
 
+    /** Multiply an iterator.
+     *
+     * @return Result of the multiplication
+     */
     const_reference operator*() const
       {
         return *this->CurrentSequenceObject;
       }
 
+    /** Get the current iterator object.
+     *
+     * @return Current iterator
+     */
     pointer operator->()
       {
         return this->CurrentSequenceObject;
       }
 
+    /** Get the current iterator object.
+     *
+     * @return Current iterator
+     */
     const_pointer operator->() const
       {
         return this->CurrentSequenceObject;
       }
 
+    /** Advance the iterator to the next position in the sequence.
+     *
+     * @return Pointer to the next iterator in the sequence
+     * @throw std::runtime_error If iterator is at the end of the sequence
+     */
     GenericInputIterator& operator++()
       {
         if (this->Parent == 0)
@@ -206,6 +263,11 @@ private:
         return *this;
       }
 
+    /** Advance the iterator to the next position in the sequence.
+     *
+     * @return Pointer to the next iterator in the sequence
+     * @throw std::runtime_error If iterator is at the end of the sequence
+     */
     GenericInputIterator operator++(int)
       {
         GenericInputIterator old(*this);
@@ -225,12 +287,15 @@ public:
 
   /** Get an iterator pointing to the current sequence
    *
-   * NOTE: We assume that begin() will usually be called just once
-   * in order to iterate over the entire sequence from beginning to
-   * end.  Since this is an InputIterator, we do not guarantee that
-   * calling begin() a second time will yield a new iterator that
-   * will reproduce the sequence.  (In fact, we can almost guarantee
-   * the opposite.)
+   * @note
+   *    We assume that `begin()` will usually be called just once
+   *    in order to iterate over the entire sequence from beginning to
+   *    end. Since this is an `InputIterator`, we do not guarantee that
+   *    calling `begin()` a second time will yield a new iterator that
+   *    will reproduce the sequence. (In fact, we can almost guarantee
+   *    the opposite.)
+   *
+   * @return Iterator pointing to current sequence
    */
 
   GenericInputIterator begin()
@@ -248,6 +313,7 @@ public:
 
   /** Get an iterator pointing past the end of the sequence
    *
+   * @return Iterator pointing to end of sequence
    */
   GenericInputIterator end()
     {

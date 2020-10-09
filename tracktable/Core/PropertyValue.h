@@ -72,59 +72,107 @@ class NullValue
 {
 public:
   friend class boost::serialization::access;
-  
+
   PropertyUnderlyingType ExpectedType;
 
+  /** Instantiate NullValue using a default type
+   */
   NullValue()
     : ExpectedType(TYPE_UNKNOWN)
     { }
+
+  /** Instantiate NullValue with a specified value
+   *
+   * @param [in] my_type Value to set as null value
+   */
   NullValue(PropertyUnderlyingType my_type)
     : ExpectedType(my_type)
     { }
+
+  /** Copy contructor, NullValue with a copy of another
+   *
+   * @param [in] other NullValue to copy from
+   */
   NullValue(NullValue const& other) :
     ExpectedType(other.ExpectedType)
     { }
+
+  /** Assign a NullValue to the value of another.
+   *
+   * @param [in] other NullValue to assign value of
+   * @return NullValue with the new assigned value
+   */
   void operator=(NullValue const& other)
     {
       this->ExpectedType = other.ExpectedType;
     }
+
+  /** Check whether one NullValue is equal to another by comparing the properties.
+   *
+   * Two items are equal if all of their properties are equal.
+   *
+   * @param [in] other NullValue for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator==(NullValue const& /*other*/) const
     {
       return false;
     }
+
+  /** Check whether two NullValue are unequal.
+   *
+   * @param [in] other NullValue for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator!=(NullValue const& /*other*/) const
     {
       return true;
     }
+
+  /** Check whether NullValue is less than another.
+   *
+   * @param [in] other NullValue for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator<(NullValue const& other) const
     {
       return (this->ExpectedType < other.ExpectedType);
     }
 
 private:
+  /** Serialize the coordinates to an archive
+   *
+   * @param [in] ar Archive to serialize to
+   * @param [in] version Version of the archive
+   */
   template<typename Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
     ar & BOOST_SERIALIZATION_NVP(this->ExpectedType);
   }
-  
+
 };
 
+/** Write a null value to a stream as a string
+ *
+ * @param [in] os Stream to write to
+ * @param [in] box Box to write to string
+ */
 TRACKTABLE_CORE_EXPORT std::ostream& operator<<(std::ostream& out, NullValue const& value);
 
 
-/*! \brief Discriminated union type for properties
+/*! @brief Discriminated union type for properties
  *
- * We support four data types for properties: 
- * double-precision float, string, timestamp, and Null.  If you do not
- * initialize a variant then its type will be Null by default.
+ * We support four data types for properties:
+ * `double-precision float`, `string`, `timestamp, and `Null`. If you do not
+ * initialize a variant then its type will be `Null` by default.
  *
- * Note that there is not a separate integer data type.  You'll need
- * to use doubles for that.  This is a deliberate decision: we run
+ * Note that there is not a separate integer data type. You'll need
+ * to use doubles for that. This is a deliberate decision: we run
  * into compiler troubles trying to serialize and unserialize property
  * values if we allow integers as a distinct type.
  *
- * Under the hood this will probably always be a boost::variant but we
+ * Under the hood this will probably always be a `boost::variant` but we
  * will provide our own interface so that you don't have to know or care
  * exactly how Boost does it.
  */
@@ -146,11 +194,6 @@ inline PropertyValue make_null(PropertyUnderlyingType null_type)
 }
 
 /** Provides a total order comparison of all PropertyValue instances allowing for floating point epsilon differences
- * @param value1 The first property value instance to compare
- * @param value2 The second property value instance to compare
- * @param difference The allowed difference between doubles to still maintain equality. The meaning of this parameter is controlled by is_epsilon_difference
- * @param is_epsilon_difference If true, difference will be treated as the machine specific epsilon difference and if false as a relative difference
- * @return -1 if value1 < value2, 0 if value1 == value2, 1 if value1 > value2
  *
  * Compares two property values to provide a total ordering.
  *
@@ -159,7 +202,7 @@ inline PropertyValue make_null(PropertyUnderlyingType null_type)
  *
  * When the property values are of the same type a logical comparison of the values is performed.
  *
- * When the parameters contain double values the parameters difference and is_epsilon_difference
+ * When the parameters contain double values the parameters difference and `is_epsilon_difference`
  * will control tests of equality. Machine epsilon is an upper bound on the rounding error that
  * can occur in floating point arithmetic for a specific type.
  *
@@ -169,10 +212,16 @@ inline PropertyValue make_null(PropertyUnderlyingType null_type)
  * https://en.wikipedia.org/wiki/Machine_epsilon
  * https://www.boost.org/doc/libs/1_72_0/libs/math/doc/html/math_toolkit/float_comparison.html
  * Knuth D.E. The art of computer programming, vol II, section 4.2, Floating-Point Comparison 4.2.2, pages 198-220
+ *
+ * @param [in] value1 The first property value instance to compare
+ * @param [in] value2 The second property value instance to compare
+ * @param [in] difference The allowed difference between doubles to still maintain equality. The meaning of this parameter is controlled by is_epsilon_difference
+ * @param [in] is_epsilon_difference If true, difference will be treated as the machine specific epsilon difference and if false as a relative difference
+ * @return -1 if value1 < value2, 0 if value1 == value2, 1 if value1 > value2
  */
 TRACKTABLE_CORE_EXPORT int compare(const PropertyValue& value1, const PropertyValue& value2, double difference=1.0, bool is_epsilon_difference=true);
 
-/*! \brief Check to see whether a property value is null.
+/*! @brief Check to see whether a property value is null.
  *
  * @return True/false depending on whether or not the supplied value is null
  */
@@ -180,16 +229,16 @@ TRACKTABLE_CORE_EXPORT int compare(const PropertyValue& value1, const PropertyVa
 TRACKTABLE_CORE_EXPORT bool is_property_null(PropertyValue const& value);
 
 
-/*! \brief Get a property's underlying type.
+/*! @brief Get a property's underlying type.
  *
  * Retrieve a numeric constant that specifies the type stored in a
- * property.  This function is meant to help with serialization.
+ * property. This function is meant to help with serialization.
  */
 
 TRACKTABLE_CORE_EXPORT PropertyUnderlyingType property_underlying_type(PropertyValue const& value);
 
 
-/*! \brief Utility method: convert a string to a PropertyUnderlyingType.
+/*! @brief Utility method: convert a string to a PropertyUnderlyingType.
  */
 
 template<typename text_type>
@@ -199,13 +248,13 @@ PropertyUnderlyingType string_to_property_type(text_type const& input)
   return static_cast<PropertyUnderlyingType>(i_property_type);
 }
 
- 
-/*! \brief Return a property's data type as a string
+
+/*! @brief Return a property's data type as a string
  */
 
 TRACKTABLE_CORE_EXPORT tracktable::string_type property_type_as_string(tracktable::PropertyValue const& p);
 
-/*! \brief Utility method: convert a source type (usually a string) to a PropertyValue.
+/*! @brief Utility method: convert a source type (usually a string) to a PropertyValue.
  *
  */
 
@@ -236,7 +285,7 @@ PropertyValue to_property_variant(source_type const& source, PropertyUnderlyingT
 } // namespace tracktable
 
 namespace tracktable { namespace algorithms {
-    
+
 TRACKTABLE_CORE_EXPORT PropertyValue interpolate_property(PropertyValue const& left,
                                                            PropertyValue const& right,
                                                            double t);
@@ -263,19 +312,19 @@ void load(Archive& ar, tracktable::PropertyUnderlyingType& value, const unsigned
   switch (value_as_int)
     {
     case 0: {
-    value = tracktable::TYPE_UNKNOWN; 
+    value = tracktable::TYPE_UNKNOWN;
     }; break;
     case 1: {
     value = tracktable::TYPE_REAL;
     }; break;
     case 2: {
-    value = tracktable::TYPE_STRING; 
+    value = tracktable::TYPE_STRING;
     }; break;
     case 3: {
-    value = tracktable::TYPE_TIMESTAMP; 
+    value = tracktable::TYPE_TIMESTAMP;
     }; break;
     case 5: {
-    value = tracktable::TYPE_NULL; 
+    value = tracktable::TYPE_NULL;
     }; break;
     }
 }

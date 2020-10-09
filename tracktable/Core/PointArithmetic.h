@@ -42,14 +42,21 @@ namespace tracktable {
 
 /** Basic arithmetic operations for all point types.
  *
- * These operations are wrappers around boost::geometry's point
- * arithmetic operations.  You can (obviously) call boost::geometry
+ * These operations are wrappers around `boost::geometry`'s point
+ * arithmetic operations. You can (obviously) call `boost::geometry`
  * directly if you want but this will also let you use more natural
  * arithmetic operations on points.
  */
 namespace arithmetic {
 
-// original code follows
+/** Add two points
+ *
+ * @param [in] left Point to add
+ * @param [in] right Point to add
+ *
+ * @return Sum of points
+ */
+
 template<class PointT>
 PointT add(PointT const& left, PointT const& right)
 {
@@ -58,12 +65,28 @@ PointT add(PointT const& left, PointT const& right)
   return result;
 }
 
+/** Add two points in place
+ *
+ * @param [in] left Point to add
+ * @param [in] right Point to add
+ *
+ * @return Sum of points
+ */
+
 template<class PointT>
 PointT add_in_place(PointT& left, PointT const& right)
 {
   boost::geometry::add_point(left, right);
   return left;
 }
+
+/** Subtract two points
+ *
+ * @param [in] left Point to subtract
+ * @param [in] right Point to subtract
+ *
+ * @return Difference of points
+ */
 
 template<class PointT>
 PointT subtract(PointT const& left, PointT const& right)
@@ -73,12 +96,28 @@ PointT subtract(PointT const& left, PointT const& right)
   return result;
 }
 
+/** Subtract two points in place
+ *
+ * @param [in] left Point to subtract
+ * @param [in] right Point to subtract
+ *
+ * @return Difference of points
+ */
+
 template<class PointT>
 PointT subtract_in_place(PointT left, PointT const& right)
 {
   boost::geometry::subtract_point(left, right);
   return left;
 }
+
+/** Multiply two points
+ *
+ * @param [in] left Point to multiply
+ * @param [in] right Point to multiply
+ *
+ * @return Product of points
+ */
 
 template<class PointT>
 PointT multiply(PointT const& left, PointT const& right)
@@ -88,12 +127,28 @@ PointT multiply(PointT const& left, PointT const& right)
   return result;
 }
 
+/** Multiply two points in place
+ *
+ * @param [in] left Point to multiply
+ * @param [in] right Point to multiply
+ *
+ * @return Product of points
+ */
+
 template<class PointT>
 PointT multiply_in_place(PointT& left, PointT const& right)
 {
   boost::geometry::multiply_point(left, right);
   return left;
 }
+
+/** Multiply a point by a scalar
+ *
+ * @param [in] left Point to multiply
+ * @param [in] value Scalar to multiply point by
+ *
+ * @return Scaled point product
+ */
 
 template<class PointT, typename ScalarT>
 PointT multiply_scalar(PointT const& left, ScalarT const& value)
@@ -103,12 +158,28 @@ PointT multiply_scalar(PointT const& left, ScalarT const& value)
   return result;
 }
 
+/** Multiply a point by a scalar in place
+ *
+ * @param [in] left Point to multiply
+ * @param [in] value Scalar to multiply point by
+ *
+ * @return Scaled point product
+ */
+
 template<class PointT, typename ScalarT>
 PointT multiply_scalar_in_place(PointT& left, ScalarT const& value)
 {
   boost::geometry::multiply_value(left, value);
   return left;
 }
+
+/** Divide two points
+ *
+ * @param [in] left Point to divide
+ * @param [in] right Point to divide
+ *
+ * @return Quotient of point
+ */
 
 template<class PointT>
 PointT divide(PointT const& left, PointT const& right)
@@ -118,12 +189,28 @@ PointT divide(PointT const& left, PointT const& right)
   return result;
 }
 
+/** Divide two points in place
+ *
+ * @param [in] left Point to divide
+ * @param [in] right Point to divide
+ *
+ * @return Quotient of point
+ */
+
 template<class PointT>
 PointT divide_in_place(PointT& left, PointT const& right)
 {
   boost::geometry::divide_point(left, right);
   return left;
 }
+
+/** Divide a point by a scalar
+ *
+ * @param [in] left Point to divide
+ * @param [in] value Scalar to divide point by
+ *
+ * @return Scaled point quotient
+ */
 
 template<class PointT, typename ScalarT>
 PointT divide_scalar(PointT const& left, ScalarT const& value)
@@ -133,6 +220,14 @@ PointT divide_scalar(PointT const& left, ScalarT const& value)
   return result;
 }
 
+/** Divide a point by a scalar in place
+ *
+ * @param [in] left Point to divide
+ * @param [in] value Scalar to divide point by
+ *
+ * @return Scaled point quotient
+ */
+
 template<class PointT, typename ScalarT>
 PointT divide_scalar_in_place(PointT& left, ScalarT const& value)
 {
@@ -140,11 +235,26 @@ PointT divide_scalar_in_place(PointT& left, ScalarT const& value)
   return left;
 }
 
+/** Compute dot product of two points
+ *
+ * @param [in] left Point to use during computation
+ * @param [in] right Point to use during computation
+ *
+ * @return Sum of point products
+ */
+
 template<class PointT>
 double dot(PointT const& left, PointT const& right)
 {
   return boost::geometry::dot_product(left, right);
 }
+
+/** Square the given point
+ *
+ * @param [in] left Point to square
+ *
+ * @return Squared value of point
+ */
 
 template<class PointT>
 double norm_squared(PointT const& left)
@@ -152,11 +262,23 @@ double norm_squared(PointT const& left)
   return boost::geometry::dot_product(left, left);
 }
 
+/** Square root the given point
+ *
+ * @param [in] left Point to take the square root of
+ *
+ * @return Square root value of point
+ */
+
 template<class PointT>
 double norm(PointT const& left)
 {
   return sqrt(norm_squared(left));
 }
+
+/** Zeroize the point
+ *
+ * @return Zeroized point
+ */
 
 template<class PointT>
 PointT zero()
