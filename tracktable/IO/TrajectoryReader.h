@@ -83,17 +83,31 @@ private:
   typedef tracktable::StringTokenizingReader<skip_comments_reader_type::iterator> string_tokenizer_type;
 
 public:
+  /** Instantiate TrajectoryReader using a default configuration
+   *
+   * @copydoc TrajectoryReader::set_default_configuration()
+   */
   TrajectoryReader()
     {
       this->set_default_configuration();
     }
 
+  /** Instantiate a TrajectoryReader using a `std::istream` and default configuration
+   *
+   * @copydoc TrajectoryReader::set_default_configuration()
+   *
+   * @param [in] infile Stream to read input from
+   */
   TrajectoryReader(std::istream& infile)
     {
       this->set_input(infile);
       this->set_default_configuration();
     }
 
+  /** Copy contructor, create a reader with a copy of another
+   *
+   * @param [in] other TrajectoryReader to copy from
+   */
   TrajectoryReader(TrajectoryReader const& other)
     : LineReader(other.LineReader)
     , PointReader(other.PointReader)
@@ -104,6 +118,16 @@ public:
     {
     }
 
+  /// Destructor
+  virtual ~TrajectoryReader()
+    {
+    }
+
+  /** Assign a TrajectoryReader to the value of another.
+   *
+   * @param [in] other TrajectoryReader to assign value of
+   * @return Reader with the new assigned value
+   */
   TrajectoryReader& operator=(TrajectoryReader const& other)
     {
       this->LineReader         = other.LineReader;
@@ -115,10 +139,13 @@ public:
       return *this;
     }
 
-  virtual ~TrajectoryReader()
-    {
-    }
-
+  /** Check whether one reader is equal to another by comparing all the properties.
+   *
+   * Two readers are equal if all of their properties are equal.
+   *
+   * @param [in] other TrajectoryReader for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator==(TrajectoryReader const& other) const
     {
       return (
@@ -130,6 +157,11 @@ public:
         );
     }
 
+  /** Check whether two TrajectoryReaders are unequal.
+   *
+   * @param [in] other TrajectoryReader for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator!=(TrajectoryReader const& other) const
     {
       return !(*this == other);
@@ -145,7 +177,7 @@ public:
    * column 1 is the timestamp, and columns 2 through D+1 (inclusive)
    * are the coordinates.
    *
-   * These are the default settings.  You can override any or all of
+   * These are the default settings. You can override any or all of
    * them after you instantiate the reader.
    */
 
@@ -162,12 +194,12 @@ public:
   /** Specify comment character for skipping lines
    *
    * A line is a comment if and only if its first non-whitespace
-   * character is the comment character ('#' by default).  We will
-   * skip such lines entirely.  We do not handle inline or trailing
+   * character is the comment character ('#' by default). We will
+   * skip such lines entirely. We do not handle inline or trailing
    * comments: a line will either be included in its entirety or
    * skipped completely.
    *
-   * @param[in] comment Single character
+   * @param [in] comment Single character
    */
   void set_comment_character(string_type const& comment)
     {
@@ -187,7 +219,7 @@ public:
 
   /** Specify string value to be interpreted as null
    *
-   * @param[in] _null_value String to interpret as null
+   * @param [in] _null_value String to interpret as null
    */
   void set_null_value(string_type const& _null_value)
     {
@@ -207,10 +239,10 @@ public:
 
   /** Supply input stream from delimited text source.
    *
-   * We read our input from C++ std::istreams.  The stream you supply
+   * We read our input from C++ std::istreams. The stream you supply
    * will be traversed exactly once.
    *
-   * @param[in] _input Stream from which we will read points
+   * @param [in] _input Stream from which we will read points
    */
   void set_input(std::istream& _input)
     {
@@ -227,8 +259,8 @@ public:
 
   /** Retrieve the current input stream.
    *
-   * BUG: We currently have no way to indicate whether the stream is
-   * valid.
+   * @bug
+   *    We currently have no way to indicate whether the stream is valid.
    *
    * @return Stream being used for input.
    */
@@ -240,10 +272,10 @@ public:
   /** Enable/disable warnings during parsing.
    *
    * We may run into type mismatches and bad casts while we're parsing
-   * headers and data.  This flag determines whether or not warnings
+   * headers and data. This flag determines whether or not warnings
    * will be printed.
    *
-   * @param[in] onoff  Warnings are on / off
+   * @param [in] onoff  Warnings are on / off
    */
 
   void set_warnings_enabled(bool onoff)
@@ -251,7 +283,7 @@ public:
       this->WarningsEnabled = onoff;
     }
 
-  /** Check whether warnings are enablde
+  /** Check whether warnings are enable
    *
    * @return Whether or not warnings are on
    */
@@ -264,13 +296,13 @@ public:
   /** Set one or more characters as field delimiters.
    *
    * Each character in the argument to this function will be treated
-   * as a potential field delimiter.  If you supply ``",|"`` as your
+   * as a potential field delimiter. If you supply `",|"` as your
    * delimiter then both the comma and the exclamation point will be
    * used to tokenize field.
    *
    * This function invalidates any outstanding iterators.
    *
-   * @param[in] delimiters String containing all desired delimiter characters
+   * @param [in] delimiters String containing all desired delimiter characters
    */
 
   void set_field_delimiter(string_type const& delimiters)
@@ -287,12 +319,20 @@ public:
       return this->StringTokenizer.field_delimiter();
     }
 
+  /** Set the format of the timestamp
+   *
+   * @param [in] format String containing the format of the time stamp
+   */
   void set_timestamp_format(string_type const& format)
   {
     this->TimestampFormat = format;
     this->PointReader.set_timestamp_format(this->TimestampFormat);
   }
 
+  /** Retrieve the format of the timestamp
+   *
+   * @return The timestamp format
+   */
   string_type timestamp_format() const
   {
     return this->TimestampFormat;
@@ -315,6 +355,10 @@ private:
   bool WarningsEnabled;
   io::detail::TrajectoryHeader ParseTrajectoryHeader;
 
+  /** Increment the iterator the next item to be read in
+   *
+   * @return The next item
+   */
   trajectory_shared_ptr_type next_item()
     {
       while (this->TokenizedInputBegin != this->TokenizedInputEnd)
@@ -339,6 +383,10 @@ private:
       return trajectory_shared_ptr_type();
     }
 
+  /** Parse the read in trajectory
+   *
+   * @param tokens Tokens that are read in and parsed
+   */
   trajectory_shared_ptr_type
   parse_trajectory(string_vector_type const& tokens)
     {
@@ -347,7 +395,7 @@ private:
         // Create a new trajectory object, but we won't spend time generating a uuid
         trajectory_shared_ptr_type trajectory(new trajectory_type(false));
 
-//        io::detail::TrajectoryHeader header(this->PropertyReadWrite);
+        // io::detail::TrajectoryHeader header(this->PropertyReadWrite);
         this->ParseTrajectoryHeader.set_timestamp_input_format(this->TimestampFormat);
 
         std::size_t tokens_consumed_by_header = this->ParseTrajectoryHeader.read_from_tokens(tokens.begin(), tokens.end());
@@ -380,14 +428,21 @@ private:
 
   // ----------------------------------------------------------------------
 
+  /** Populate the trajectorie's points
+   *
+   * @param [in] token_begin Start of tokens read in
+   * @param [in] token_end End of tokens read in
+   * @param [in] num_points Num of points expected to be in trajectory
+   * @param [in] trajectory Trajectory to populate
+   */
   void populate_trajectory_points(token_iter_type token_begin,
                                   token_iter_type token_end,
                                   std::size_t num_points,
                                   trajectory_shared_ptr_type trajectory)
     {
       // We already have the parsed tokens so we can skip the first
-      // several stages of the point reader.  However, the token
-      // reader expects its input one line at a time.  In order to
+      // several stages of the point reader. However, the token
+      // reader expects its input one line at a time. In order to
       // separate those out we need to read the point header.
       io::detail::PointHeader header;
       header.read_from_tokens(token_begin, token_end);
@@ -420,7 +475,7 @@ private:
         if (std::distance(point_range_end, token_end) < num_tokens_in_point_record)
           {
           TRACKTABLE_LOG(log::warning)
-             << "Trajectory reader fell off the end of tokens for points.  "
+             << "Trajectory reader fell off the end of tokens for points. "
              << "There is probably a missing property value in one of the point records.\n";
           std::ostringstream outbuf;
           outbuf << "Trajectory tokens: ";
@@ -447,13 +502,19 @@ private:
         TRACKTABLE_LOG(log::error)
                   << "Trajectory reader tried to populate a new trajectory from tokens but got "
                   << trajectory->size()
-                  << " points.  We were expecting "
+                  << " points. We were expecting "
                   << num_points << ".\n";
         }
     }
 
   // ----------------------------------------------------------------------
 
+  /** Populate the trajectories points from token ranges
+   *
+   * @param [in] input_range_begin Start of range to read in
+   * @param [in] input_range_end End of range to read in
+   * @param [in] trajectory Trajectory to populate
+   */
   void populate_trajectory_points_from_token_ranges(
     token_range_vector_type::iterator input_range_begin,
     token_range_vector_type::iterator input_range_end,

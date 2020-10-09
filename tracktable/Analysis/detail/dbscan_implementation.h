@@ -105,7 +105,7 @@ namespace tracktable { namespace analysis { namespace detail { namespace impleme
  *
  * If you would rather use a slightly more convenient interface
  * please refer to the functions in
- * ``Analysis/ComputeDBSCANClustering.h``.
+ * `Analysis/ComputeDBSCANClustering.h`.
  *
  *
  * For more information about the DBSCAN algorithm please refer to the
@@ -178,10 +178,10 @@ public:
    * You will need to call cluster_membership_lists() or
    * point_cluster_labels() to get the results back.
    *
-   * @param[in] point_begin            Iterator for beginning of input points
-   * @param[in] point_end              Iterator past end of input points
-   * @param[in] epsilon_box_half_span  "Nearby" distance in each dimension
-   * @param[in] min_cluster_size       Minimum number of points for a cluster
+   * @param [in] point_begin            Iterator for beginning of input points
+   * @param [in] point_end              Iterator past end of input points
+   * @param [in] epsilon_box_half_span  "Nearby" distance in each dimension
+   * @param [in] min_cluster_size       Minimum number of points for a cluster
    * @return    Number of clusters detected (cluster 0 is noise)
    */
 
@@ -246,7 +246,7 @@ public:
    * nearby neighbors to qualify as cluster points in their own right
    * and (2) were not neighbors of any points that did.
    *
-   * @param[out] output  Cluster membership lists.
+   * @param [out] output  Cluster membership lists.
    */
 
   void cluster_membership_lists(int_vector_vector_type& output)
@@ -267,7 +267,7 @@ public:
    * enough nearby neighbors to qualify as cluster points in their own
    * right and (2) were not neighbors of any points that did.
    *
-   * @param[out] cluster_labels   Labels for each point in the input.
+   * @param [out] cluster_labels   Labels for each point in the input.
    */
 
   void point_cluster_labels(int_vector_type& out_labels)
@@ -316,11 +316,11 @@ protected:
    *
    * This is the driver method that implements the skeleton of DBSCAN.
    *
-   * @param[in] points                Points with indices attached
-   * @param[in] min_cluster_size      Minimum number of points in neighborhood
+   * @param [in] points                Points with indices attached
+   * @param [in] min_cluster_size      Minimum number of points in neighborhood
    *                                  required to define a core point
-   * @param[in] epsilon_box_half_span Search range in each direction
-   * @param[in] rtree                 Boost RTree to accelerate neighborhood
+   * @param [in] epsilon_box_half_span Search range in each direction
+   * @param [in] rtree                 Boost RTree to accelerate neighborhood
    *                                  queries
    */
 
@@ -412,7 +412,7 @@ protected:
       TRACKTABLE_LOG(log::info) << "Cluster statistics:";
       for (size_t i = 0; i < this->num_core_points.size(); ++i)
         {
-        TRACKTABLE_LOG(log::info) 
+        TRACKTABLE_LOG(log::info)
                   << "C " << i << ": "
                   << this->ClusterMembership[i].size() << " points, "
                   << this->num_core_points[i] << " core points, "
@@ -433,11 +433,11 @@ protected:
    * interior of a cluster and, if so, discovering the rest of that
    * cluster.
    *
-   * @param[in] seed_point        Point to examine for cluster-ness
-   * @param[in] min_cluster_size  Minimum neighbor count for core points
-   * @param[in] epsilon_box_half_span  Search range in each direction
-   * @param[in] next_cluster_id   Numeric ID for new cluster
-   * @param[in] rtree             Search structure for neighbor queries
+   * @param [in] seed_point        Point to examine for cluster-ness
+   * @param [in] min_cluster_size  Minimum neighbor count for core points
+   * @param [in] epsilon_box_half_span  Search range in each direction
+   * @param [in] next_cluster_id   Numeric ID for new cluster
+   * @param [in] rtree             Search structure for neighbor queries
    * @return  Boolean - whether or not a new cluster was discovered
    */
 
@@ -534,7 +534,7 @@ protected:
    * list.  This function extracts those results and builds cluster
    * membership lists that are more useful to the user.
    *
-   * @param[in] points          Points labeled with cluster IDs
+   * @param [in] points          Points labeled with cluster IDs
    * @param[in[ max_cluster_id  ID of last cluster found
    */
   void build_cluster_membership_lists(const indexed_point_vector_type& points,
@@ -561,8 +561,8 @@ protected:
    * the length of the epsilon_box_half_span parameters.  If they are all
    * the same, you just a sphere, and a traditional DBSCAN
    *
-   * @param[in] points                  Points labeled with cluster IDs
-   * @param[in] epsilon_box_half_span   Scaling parameters for ellipsoid
+   * @param [in] points                  Points labeled with cluster IDs
+   * @param [in] epsilon_box_half_span   Scaling parameters for ellipsoid
    */
   void ellipsoid_filter(std::vector<rtree_value_type>& points,
                         const point_type& box_center,

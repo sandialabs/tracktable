@@ -37,17 +37,29 @@
 
 namespace tracktable {
 
+/** Simple class to encapsulate IO parsing errors
+ */
 class ParseError : public std::runtime_error
 {
 public:
+
+  /// Instantiate an unspecified parse exception
   ParseError()
     : std::runtime_error("unspecified parse error")
     { }
 
+  /** Instantiate an parse exception for a give error string
+   *
+   * @param [in] err String indicating the type of exception
+   */
   ParseError(std::string const& err)
     : std::runtime_error(err)
     { }
 
+  /** Instantiate an parse exception for a give error string
+   *
+   * @param [in] err Char array indicating the type of exception
+   */
   ParseError(const char* err)
     : std::runtime_error(err)
     { }
@@ -56,14 +68,24 @@ public:
 
 // ----------------------------------------------------------------------
 
+/** Simple class to encapsulate empty coordinate parsing error
+ */
 class EmptyCoordinateError : public ParseError
 {
 public:
+  /** Instantiate a empty coordinate exception for a give error string
+   *
+   * @param [in] which_coordinate Value indicating which coordinate was empty
+   */
   EmptyCoordinateError(std::size_t which_coordinate)
     : ParseError(format_empty_coordinate_message(which_coordinate))
     { }
 
 private:
+  /** Format the output error string for the empty coordinate
+   *
+   * @param [in] which_coordinate Which coordinate is empty
+   */
   static std::string format_empty_coordinate_message(std::size_t which_coordinate)
     {
       std::ostringstream errbuf;
@@ -74,15 +96,24 @@ private:
 
 // ----------------------------------------------------------------------
 
-
+/** Simple class to encapsulate empty field parsing error
+ */
 class EmptyFieldError : public ParseError
 {
 public:
+  /** Instantiate a empty field exception for a give error string
+   *
+   * @param [in] field_name String indicating which field was empty
+   */
   EmptyFieldError(std::string const& field_name)
     : ParseError(format_empty_field_message(field_name))
     { }
 
 private:
+  /** Format the output error string for the empty field
+   *
+   * @param [in] which_coordinate Which coordinate is empty
+   */
   static std::string format_empty_field_message(std::string const& field_name)
     {
       std::ostringstream errbuf;
@@ -95,10 +126,17 @@ private:
 
 // ----------------------------------------------------------------------
 
+/** Simple class to encapsulate lexical cast error
+ */
 class LexicalCastError : public ParseError
 {
 public:
-public:
+  /** Instantiate a empty lexical cast exception for a give error string
+   *
+   * @param [in] field_name Name of the field that was going to be ccoverted
+   * @param [in] string_value String that was going to be converted
+   * @param [in] expected_type Type that the string_value was going to be coverted to
+   */
   LexicalCastError(
     std::string const& field_name,
     std::string const& string_value,
@@ -108,6 +146,12 @@ public:
     { }
 
 private:
+  /** Format the output error string for the lexical cast error
+   *
+   * @param [in] field_name Name of the field that was going to be ccoverted
+   * @param [in] string_value String that was going to be converted
+   * @param [in] expected_type Type that the string_value was going to be coverted to
+   */
   static std::string format_convert_error_message(
     std::string const& field_name,
     std::string const& string_value,

@@ -58,12 +58,12 @@
 namespace tracktable {
 
 /**
- * \class PointCartesian
+ * @class PointCartesian
  *
- * \brief N-dimensional point in Cartesian space
+ * @brief N-dimensional point in Cartesian space
  *
  * This specializes PointBase to exist in a Cartesian coordinate
- * system and be usable with boost::geometry.  You must still
+ * system and be usable with `boost::geometry`. You must still
  * instantiate it explicitly with the number of dimensions.
  */
 
@@ -72,28 +72,33 @@ class PointCartesian : public PointBase<Dimension>
 {
 public:
   friend class boost::serialization::access;
-  
+
   /// Convenient alias for the parent class
   typedef PointBase<Dimension> Superclass;
 
   /// Create an uninitialized point
   PointCartesian() { }
 
+  /// Destructor for a point
   ~PointCartesian() { }
 
-  /// Make this point into a copy of another
-  //
-  // \param other Point we want to copy
+  /** Make this point into a copy of another
+  *
+  * @param [in] other Point we want to copy
+  */
   PointCartesian(Superclass const& other)
     {
       detail::assign_coordinates<Dimension>::apply(*this, other);
     }
 
-  /// Create a point with user-supplied coordinates
-  //
-  // Populate the point from an array of coordinates.  The caller is
-  // responsible for ensuring that the array is large enough to
-  // contain the right number of coordinates.
+  /** Create a point with user-supplied coordinates
+  *
+  * Populate the point from an array of coordinates. The caller is
+  * responsible for ensuring that the array is large enough to
+  * contain the right number of coordinates.
+  *
+  * @param [in] coordinates Coordinates to use when creating a point
+  */
   PointCartesian(const double* coordinates)
     {
       for (std::size_t i = 0; i < Dimension; ++i)
@@ -102,6 +107,10 @@ public:
         }
     }
 
+  /** Convert point coordinates to a string
+   *
+   * @return Coordinates string
+   */
   std::string to_string() const
     {
       std::ostringstream outbuf;
@@ -116,6 +125,11 @@ public:
     }
 
 public:
+  /** Serialize the coordinates to an archive
+   *
+   * @param [in] ar Archive to serialize to
+   * @param [in] version Version of the archive
+   */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
@@ -126,6 +140,11 @@ public:
 
 } // exit namespace tracktable
 
+/** Write a point to a stream as a string
+ *
+ * @param [in] os Stream to write to
+ * @param [in] pt Point to write to string
+ */
 template<std::size_t dim>
 std::ostream& operator<<(std::ostream& out, tracktable::PointCartesian<dim> const& pt)
 {
@@ -141,13 +160,14 @@ std::ostream& operator<<(std::ostream& out, tracktable::PointCartesian<dim> cons
 
 namespace tracktable { namespace algorithms {
 
-/// Interpolate between two PointCartesian objects
-//
-// This is a standard Tracktable algorithm that must be implemented
-// for any two things that you might want to interpolate, generally
-// points.  In this case we default to linear interpolation between
-// coordinates.
-
+/** Interpolate between two PointCartesian objects
+ *
+ * This is a standard Tracktable algorithm that must be implemented
+ * for any two things that you might want to interpolate, generally
+ * points. In this case we default to linear interpolation between
+ * coordinates.
+ *
+ */
 template<std::size_t Dimension>
 struct interpolate< PointCartesian<Dimension> >
 {
@@ -215,8 +235,8 @@ struct domain<PointCartesian<Dimension> >
 {
   typedef domains::generic type;
 };
-      
-    
+
+
 } } // exit namespace tracktable::traits
 
 // ----------------------------------------------------------------------
@@ -224,9 +244,9 @@ struct domain<PointCartesian<Dimension> >
 // BOOST GEOMETRY POINT TRAITS
 //
 // Below this point are the templates that register PointCartesian
-// with boost::geometry.  If we do this right (using partial
+// with boost::geometry. If we do this right (using partial
 // specialization) then you can declare a PointCartesian<D> and have
-// it work automatically.  *If* we do it right... and if the compiler
+// it work automatically. *If* we do it right... and if the compiler
 // obliges.
 //
 // ----------------------------------------------------------------------

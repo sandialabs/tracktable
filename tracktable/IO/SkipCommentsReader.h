@@ -41,16 +41,16 @@
 namespace tracktable {
 
 /**
- * \class SkipCommentsReader
- * \brief Loop over a set of lines and skip comments.
+ * @class SkipCommentsReader
+ * @brief Loop over a set of lines and skip comments.
  *
  * Comments in a text file are often denoted by some special character
- * like '#' as the first non-whitespace character on a line.  This
+ * like '#' as the first non-whitespace character on a line. This
  * filter takes a stream of lines and produces a stream that omits all
  * comment lines.
  *
  * Note that we only intercept lines where the comment character is at
- * the beginning of the line.  This filter will not detect lines where
+ * the beginning of the line. This filter will not detect lines where
  * you attempt to remove data at the end by putting the comment
  * character somewhere in the middle.
  *
@@ -58,8 +58,9 @@ namespace tracktable {
  * Its main purpose is to be part of the stack that makes up
  * PointReader.
  *
- * NOTE: Although the CommentCharacter member is a string and can have
- * arbitrary length, we only care about the first character.
+ * @note
+ *    Although the CommentCharacter member is a string and can have
+ *    arbitrary length, we only care about the first character.
  */
 
 template<typename IteratorT>
@@ -70,10 +71,15 @@ public:
   typedef typename IteratorT::value_type        value_type;
   typedef typename value_type::value_type       char_type;
 
+  /// Instantiate a default SkipCommentsReader
   SkipCommentsReader() : CommentCharacter("#")
     {
     }
 
+  /** Copy contructor, create a reader with a copy of another
+   *
+   * @param [in] other SkipCommentsReader to copy from
+   */
   SkipCommentsReader(const SkipCommentsReader& other)
     : InnerBegin(other.InnerBegin),
       InnerEnd(other.InnerEnd),
@@ -81,6 +87,12 @@ public:
     {
     }
 
+  /** Instantiate a reader with a start and finish points along with a comment delimter
+   *
+   * @param [in] start Iterator to start from
+   * @param [in] finish Iterator to end at
+   * @param [in] comment Character signifying a comment
+   */
   SkipCommentsReader(inner_iterator_type const& start, inner_iterator_type const& finish, std::string const& comment="#")
     : InnerBegin(start),
       InnerEnd(finish),
@@ -88,20 +100,42 @@ public:
     {
     }
 
+  /// Destructor
   virtual ~SkipCommentsReader()
     {
     }
 
+  /** Specify comment character for skipping lines
+   *
+   * A line is a comment if and only if its first non-whitespace
+   * character is the comment character (`#` by default). We will
+   * skip such lines entirely. We do not handle inline or trailing
+   * comments: a line will either be included in its entirety or
+   * skipped completely.
+   *
+   * @param [in] comment Single character
+   */
   void set_comment_character(std::string const& c)
   {
     this->CommentCharacter = c;
   }
 
+  /** Retrieve current value of comment character.
+   *
+   * This function invalidates any outstanding iterators.
+   *
+   * @return Current value of comment character
+   */
   std::string const& comment_character() const
   {
     return this->CommentCharacter;
   }
 
+  /** Assign a SkipCommentsReader to the value of another.
+   *
+   * @param [in] other SkipCommentsReader to assign value of
+   * @return Reader with the new assigned value
+   */
   SkipCommentsReader& operator=(SkipCommentsReader const& other)
     {
       this->InnerBegin = other.InnerBegin;
@@ -110,6 +144,13 @@ public:
       return *this;
     }
 
+  /** Check whether one reader is equal to another by comparing all the properties.
+   *
+   * Two readers are equal if all of their properties are equal.
+   *
+   * @param [in] other SkipCommentsReader for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator==(SkipCommentsReader const& other) const
     {
       return (this->InnerBegin == other.InnerBegin &&
@@ -117,11 +158,21 @@ public:
               this->CommentCharacter == other.CommentCharacter);
     }
 
+  /** Check whether two SkipCommentsReader are unequal.
+   *
+   * @param [in] other SkipCommentsReader for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator!=(SkipCommentsReader const& other) const
     {
       return !(*this == other);
     }
 
+  /** Set the beginning and the end of the input range
+   *
+   * @param [in] start The iterator to use for the start of input
+   * @param [in] finish The iterator to use for the end of input
+   */
   void set_input_range(inner_iterator_type const& start,
                        inner_iterator_type const& finish)
   {
@@ -136,8 +187,8 @@ private:
 
 protected:
   /*
-   * \class SkipCommentsIterator
-   * \brief This does the actual work of filtering lines.
+   * @class SkipCommentsIterator
+   * @brief This does the actual work of filtering lines.
    */
   class SkipCommentsIterator : public std::iterator< std::input_iterator_tag,
                                                      typename inner_iterator_type::value_type,
@@ -149,9 +200,16 @@ protected:
     typedef typename inner_iterator_type::value_type             value_type;
     typedef typename inner_iterator_type::value_type::value_type char_type;
 
+    /// Instantiate an default SkipCommentsIterator
     SkipCommentsIterator() : CommentCharacter("#")
       { }
 
+  /** Instantiate a reader with a start and finish points along with a comment delimter
+   *
+   * @param [in] Begin Iterator to start from
+   * @param [in] End Iterator to end at
+   * @param [in] Comment Character signifying a comment
+   */
     SkipCommentsIterator(inner_iterator_type Begin, inner_iterator_type End, std::string const& Comment)
       : InnerIterator(Begin),
         InnerEnd(End),
@@ -161,15 +219,25 @@ protected:
         this->_advance_to_valid_string();
       }
 
+  /** Copy contructor, create a reader with a copy of another
+   *
+   * @param [in] other SkipCommentsIterator to copy from
+   */
     SkipCommentsIterator(SkipCommentsIterator const& other)
       : InnerIterator(other.InnerIterator),
         InnerEnd(other.InnerEnd),
         CommentCharacter(other.CommentCharacter)
       { }
 
+    /// Destructor
     ~SkipCommentsIterator()
       { }
 
+    /** Assign a SkipCommentsIterator to the value of another.
+     *
+     * @param [in] other SkipCommentsReader to assign value of
+     * @return Reader with the new assigned value
+     */
     SkipCommentsIterator& operator=(SkipCommentsIterator const& other)
       {
         this->InnerIterator = other.InnerIterator;
@@ -178,16 +246,28 @@ protected:
         return *this;
       }
 
+    /** Multiply an iterator.
+     *
+     * @return Result of the multiplication
+     */
     value_type const& operator*() const
       {
         return *(this->InnerIterator);
       }
 
+    /** Get the current iterator object.
+     *
+     * @return Current iterator
+     */
     value_type const* operator->() const
       {
         return this->InnerBegin.operator->();
       }
 
+    /** Advance the iterator to the next position in the sequence.
+     *
+     * @return Pointer to the next iterator in the sequence
+     */
     SkipCommentsIterator& operator++()
       {
         assert(this->InnerIterator != this->InnerEnd);
@@ -196,6 +276,10 @@ protected:
         return *this;
       }
 
+    /** Advance the iterator to the next position in the sequence.
+     *
+     * @return Pointer to the next iterator in the sequence
+     */
     SkipCommentsIterator& operator++(int)
       {
         SkipCommentsIterator prev(*this);
@@ -203,6 +287,13 @@ protected:
         return prev;
       }
 
+    /** Check whether one SkipCommentsReader is equal to another by comparing all the properties.
+     *
+     * Two SkipCommentsReaders are equal if all of their properties are equal.
+     *
+     * @param [in] other SkipCommentsReader for comparison
+     * @return Boolean indicating equivalency
+     */
     bool operator==(SkipCommentsIterator const& other) const
       {
         return (this->InnerIterator == other.InnerIterator &&
@@ -210,6 +301,11 @@ protected:
                 this->CommentCharacter == other.CommentCharacter);
       }
 
+    /** Check whether two iterators are unequal.
+     *
+     * @param [in] other Iterator for comparison
+     * @return Boolean indicating equivalency
+     */
     bool operator!=(SkipCommentsIterator const& other) const
       {
         return ( !(*this == other) );
@@ -220,6 +316,8 @@ protected:
     inner_iterator_type InnerEnd;
     std::string         CommentCharacter;
 
+    /** @internal
+    */
     void _advance_to_valid_string()
       {
         value_type next_string = this->operator*();
@@ -231,6 +329,8 @@ protected:
           }
       }
 
+    /** @internal
+    */
     bool _string_is_comment(value_type const& test_string) const
       {
         for (typename value_type::const_iterator iter = test_string.begin();
@@ -254,7 +354,7 @@ protected:
             }
           }
         // If we get to this point then the string is entirely blank,
-        // which is not a comment string.  The caller can decide what to
+        // which is not a comment string. The caller can decide what to
         // do with it.
         return false;
       }
@@ -264,27 +364,48 @@ public:
   typedef SkipCommentsIterator iterator;
   typedef SkipCommentsIterator const const_iterator;
 
+  /** Get an iterator pointing to the current sequence
+   *
+   * @return Iterator pointing to current sequence
+   */
   iterator begin() const
     {
       return SkipCommentsIterator(this->InnerBegin, this->InnerEnd, this->CommentCharacter);
     }
 
+  /** Get an iterator pointing past the end of the sequence
+   *
+   * @return Iterator pointing to end of sequence
+   */
   iterator end() const
     {
       return SkipCommentsIterator(this->InnerEnd, this->InnerEnd, this->CommentCharacter);
     }
 
+  /** Get an iterator pointing to the beginning of the stream
+   *
+   * @return Iterator pointing to current stream
+   */
   const_iterator const_begin() const
     {
       return this->begin();
     }
 
+  /** Get an iterator pointing to the end of the stream
+   *
+   * @return Iterator pointing to end of current stream
+   */
   const_iterator const_end() const
     {
       return this->end();
     }
 };
 
+/** Create the SkipCommentsReader for a given range
+ *
+ * @param [in] start_iter Iterator to start from
+ * @param [in] end_iter Iteratror to end at
+ */
 template<typename iter_type>
 SkipCommentsReader<iter_type>
   make_skip_comments_reader(iter_type start_iter, iter_type end_iter)

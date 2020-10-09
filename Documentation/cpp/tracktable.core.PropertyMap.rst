@@ -1,6 +1,6 @@
-======================
-PointArithmetic Module
-======================
+==================
+PropertyMap Module
+==================
 
 
 ---------------
@@ -13,6 +13,9 @@ Module Contents
 .. doxygenfunction:: tracktable::string_property
 .. doxygenfunction:: tracktable::real_property
 .. doxygenfunction:: tracktable::timestamp_property
+.. todo:: Breathe doesn't easily support overloaded functions utilizing ``doxygenfunction::``, need to figure out
+          how to handle the manually declared overloaded functions. This is why ``set_property`` throws the following
+          warnings.
 .. doxygenfunction:: tracktable::set_property (PropertyMap& properties, string_type const& name, double value)
 .. doxygenfunction:: tracktable::set_property (PropertyMap& properties, string_type const& name, string_type const& value)
 .. doxygenfunction:: tracktable::set_property (PropertyMap& properties, string_type const& name, Timestamp const& value)

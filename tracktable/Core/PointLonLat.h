@@ -61,14 +61,14 @@
 
 namespace tracktable {
 
-// \ingroup C++
+// @ingroup C++
 // @{
 
 /**
- * \class PointLonLat
- * \brief 2D point on a sphere
+ * @class PointLonLat
+ * @brief 2D point on a sphere
  *
- * This class specializes PointBase to use boost::geometry in a
+ * This class specializes PointBase to use `boost::geometry` in a
  * spherical-equatorial coordinate system -- the familiar
  * longitude/latitude mapping onto a sphere.
  *
@@ -78,7 +78,7 @@ class TRACKTABLE_CORE_EXPORT PointLonLat : public PointBase<2>
 {
 public:
   friend class boost::serialization::access;
-  
+
   /// Convenient alias for superclass
   typedef PointBase<2> Superclass;
   typedef Superclass::coordinate_type coord_type;
@@ -86,28 +86,31 @@ public:
   /// Create an uninitialized point
   PointLonLat() { }
 
-  /// Create a 2D point on a sphere (convenience constructor)
-  //
-  // Since this class is explicitly about a point in a 2-dimensional
-  // domain we provide a convenience constructor to let you
-  // instantiate and populate one with one line.
+  /** Create a 2D point on a sphere (convenience constructor)
+   *
+   * Since this class is explicitly about a point in a 2-dimensional
+   * domain we provide a convenience constructor to let you
+   * instantiate and populate one with one line.
+   */
   PointLonLat(coord_type const& a, coord_type const& b)
     {
       this->set<0>(a);
       this->set<1>(b);
     }
 
-  /// Create a 2D point on a sphere (convenience constructor)
-  //
-  // Populate the point from an array of coordinates.  The caller is
-  // responsible for ensuring that the array is large enough to
-  // contain the right number of coordinates.
+  /** Create a 2D point on a sphere (convenience constructor)
+   *
+   * Populate the point from an array of coordinates. The caller is
+   * responsible for ensuring that the array is large enough to
+   * contain the right number of coordinates.
+   */
   PointLonLat(const double* coordinates)
     {
       this->set<0>(coordinates[0]);
       this->set<1>(coordinates[1]);
     }
 
+  /// Destructor for a point
   ~PointLonLat() { }
 
   /// Make this point a copy of a generic 2D point
@@ -131,7 +134,7 @@ public:
 
   /** Set this point's longitude.
    *
-   * @param[in] new_longitude   New value for longitude
+   * @param [in] new_longitude   New value for longitude
    */
   void set_longitude(coord_type const& new_longitude)
     {
@@ -146,13 +149,17 @@ public:
 
   /** Set this point's latitude.
    *
-   * @param[in] new_latitude   New value for latitude
+   * @param [in] new_latitude   New value for latitude
    */
   void set_latitude(coord_type const& new_latitude)
     {
       this->set<1>(new_latitude);
     }
 
+  /** Convert point coordinates to a string
+   *
+   * @return Coordinates string
+   */
   std::string to_string() const
     {
     std::ostringstream outbuf;
@@ -161,6 +168,11 @@ public:
     }
 
 private:
+  /** Serialize the coordinates to an archive
+   *
+   * @param [in] ar Archive to serialize to
+   * @param [in] version Version of the archive
+   */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
@@ -171,11 +183,16 @@ private:
 
 } // namespace tracktable
 
+/** Write a point to a stream as a string
+ *
+ * @param [in] os Stream to write to
+ * @param [in] pt Point to write to string
+ */
 TRACKTABLE_CORE_EXPORT std::ostream&
 operator<<(std::ostream& os, tracktable::PointLonLat const& pt);
 
 // This macro call registers this point class for use with
-// boost::geometry.  We have to do this before we define any of our
+// boost::geometry. We have to do this before we define any of our
 // own traits.
 
 BOOST_GEOMETRY_REGISTER_POINT_2D_GET_SET(
@@ -230,7 +247,7 @@ struct domain<PointLonLat>
 // ALGORITHMS
 //
 // Here are the implementations for the common algorithms we want to
-// run on points.  These are set up by the #includes at the top of the
+// run on points. These are set up by the #includes at the top of the
 // file that reach into detail/algorithm_signatures.
 //
 // ----------------------------------------------------------------------
@@ -239,7 +256,7 @@ namespace tracktable { namespace algorithms {
 
 // Distance is not defined here because as a member of the generic
 // point domain we inherit the definition in PointBase.h.
-    
+
 // The signed turn angle is defined so that a right turn is positive.
 
 template<>
@@ -255,9 +272,9 @@ struct signed_turn_angle<PointLonLat>
 };
 
 // You may well ask why we've got a templated apply method here when
-// we're talking about the PointLonLat class.  The reason is that
+// we're talking about the PointLonLat class. The reason is that
 // we're not just implementing this for PointLonLat but for subclasses
-// that behave like PointLonLat.  The template lets us construct and
+// that behave like PointLonLat. The template lets us construct and
 // turn whatever point type we're asked for instead of just
 // PointLonLat.
 
@@ -291,7 +308,7 @@ struct simplify_linestring<PointLonLat>
     {
       // Since we measure distances for PointLonLat in kilometers, we
       // have to convert back to degrees before we call the real
-      // simplify().  Note that here we use degrees and NOT radians
+      // simplify(). Note that here we use degrees and NOT radians
       // since the coordinate system is
       // boost::geometry::cs<spherical_equatorial<degree>>.
       double tolerance_in_radians = tolerance / tracktable::conversions::constants::EARTH_RADIUS_IN_KM;
