@@ -28,8 +28,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/* 
- * No, this isn't a typo.  The warning flags for Clang and GCC really
+/*
+ * No, this isn't a typo. The warning flags for Clang and GCC really
  * do differ by a single letter.
  */
 

@@ -100,7 +100,7 @@ namespace tracktable {
 /** Write points of any type as delimited text
  *
  * This class writes a sequence of points to a file in delimited text
- * format.  You can control the destination, the delimiter, the record
+ * format. You can control the destination, the delimiter, the record
  * separator (usually newline) and whether or not a header line is
  * written.
  *
@@ -117,11 +117,19 @@ class PointWriter
 // multiple string types?
 public:
 
+  /** Instantiate PointWriter using a default configuration
+   *
+   * @copydoc PointWriter::set_default_configuration()
+   */
   PointWriter()
     {
       this->set_default_configuration();
     }
 
+  /** Copy contructor, PointWriter with a copy of another
+   *
+   * @param [in] other PointWriter to copy from
+   */
   PointWriter(PointWriter const& other)
     : CoordinatePrecision(other.CoordinatePrecision)
     , PropertyWriter(other.PropertyWriter)
@@ -131,12 +139,23 @@ public:
     {
     }
 
+  /** Instantiate a PointWriter using a `std::ostream` and default configuration
+   *
+   * @copydoc PointWriter::set_default_configuration()
+   *
+   * @param [in] ostream Output to write points to
+   */
   PointWriter(std::ostream& _output)
     {
       this->set_default_configuration();
       this->set_output(_output);
     }
 
+  /** Assign a PointWriter to the value of another.
+   *
+   * @param [in] other PointWriter to assign value of
+   * @return PointWriter with the new assigned value
+   */
   PointWriter& operator=(PointWriter const& other)
     {
       this->TokenSink = other.TokenSink;
@@ -147,6 +166,13 @@ public:
       return *this;
     }
 
+  /** Check whether one PointWriter is equal to another by comparing the properties.
+   *
+   * Two items are equal if all of their properties are equal.
+   *
+   * @param [in] other PointWriter for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator==(PointWriter const& other) const
     {
       return (
@@ -158,6 +184,11 @@ public:
 	      );
     }
 
+  /** Check whether two PointWriter are unequal.
+   *
+   * @param [in] other PointWriter for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator!=(PointWriter const& other) const
     {
       return ( (*this == other) == false );
@@ -165,12 +196,13 @@ public:
 
   /** Set the stream where points will be written
    *
-   * This can be any std::ostream.
+   * This can be any `std::ostream`.
    *
-   * NOTE: You are resposible for ensuring that the stream does not go
-   * out of scope until you are done writing points.
+   * @note
+   *    You are resposible for ensuring that the stream does not go
+   *    out of scope until you are done writing points.
    *
-   * @param[in] out Stream where points will be written
+   * @param [in] out Stream where points will be written
    */
 
   void set_output(std::ostream& out)
@@ -180,7 +212,9 @@ public:
 
   /** Return the stream where points will be written
    *
+   * @return output stream
    */
+
   std::ostream& output() const
     {
       return this->TokenSink.output();
@@ -191,7 +225,7 @@ public:
    * This string will be inserted between each field as points are
    * written.
    *
-   * @param[in] delim Delimiter string
+   * @param [in] delim Delimiter string
    */
 
   void set_field_delimiter(string_type const& delim)
@@ -200,7 +234,10 @@ public:
     }
 
   /** Return the field delimiter
+   *
+   * @return Field delimiter
    */
+
   string_type field_delimiter() const
     {
       return this->TokenSink.field_delimiter();
@@ -208,10 +245,10 @@ public:
 
   /** Set the record separator (end-of-line string)
    *
-   * This string will be written after each point.  By default it's
-   * std::endl (the newline string).
+   * This string will be written after each point. By default it's
+   * `std::endl` (the newline string).
    *
-   * @param[in] sep String separator
+   * @param [in] sep String separator
    */
   void set_record_delimiter(string_type const& sep)
     {
@@ -221,14 +258,14 @@ public:
   /** Set format for writing timestamps
    *
    * There are as many ways to write timestamps as there are programs
-   * to write them.  We have our default (YYYY-MM-DD HH:MM:SS) but
+   * to write them. We have our default (YYYY-MM-DD HH:MM:SS) but
    * sometimes you will need to specify some other format for
    * interoperability.
    *
    * This method sets a format string for timestamps using the flags
-   * in boost::date_time::time_facet.  If you do not call it,
+   * in `boost::date_time::time_facet`.
    *
-   * @param[in] format Format string for timestamps
+   * @param [in] format Format string for timestamps
    */
 
    void set_timestamp_format(string_type const& format)
@@ -237,12 +274,18 @@ public:
      this->PropertyWriter.set_timestamp_output_format(format);
    }
 
+  /** Retrieve the timestamp format
+   *
+   * @return The time timestamp format
+   */
   string_type timestamp_format() const
   {
     return this->TimestampFormat;
   }
 
-  /** Return the record separator (end-of-line string)
+  /** Retrieve the record separator (end-of-line string)
+   *
+   * @return Return the record separator (end-of-line string)
    */
 
   string_type record_delimiter() const
@@ -253,11 +296,11 @@ public:
   /** Set the quote character
    *
    * This character *may* be used to enclose a field containing lots
-   * of characters that would otherwise need to be escaped.  We have
+   * of characters that would otherwise need to be escaped. We have
    * to know what it is so that we can escape it ourselves when we
    * encounter the quote character inside fields.
    *
-   * @param[in] quotes: Zero or one character to be used as
+   * @param [in] quotes: Zero or one character to be used as
    * quotation marks
    */
   void set_quote_character(string_type const& quotes)
@@ -266,6 +309,8 @@ public:
     }
 
   /** Return the current quote characters
+   *
+   * @return Current quote character
    */
 
   string_type quote_character() const
@@ -276,11 +321,11 @@ public:
   /** Set whether or not to write a header
    *
    * The header string describes the contents of a point: coordinate
-   * system, properties (if any), number of coordinates.  By default
-   * it will be written at the beginning of a sequence of points.  You
+   * system, properties (if any), number of coordinates. By default
+   * it will be written at the beginning of a sequence of points. You
    * can turn it off with this function.
    *
-   * @param[in] onoff Boolean flag
+   * @param [in] onoff Boolean flag
    */
   void set_write_header(bool onoff)
     {
@@ -288,12 +333,23 @@ public:
     }
 
   /** Return whether or not the header will be written
+   *
+   * @return The flag indicating to write the header or not
    */
   bool write_header() const
     {
       return this->WriteHeader;
     }
 
+  /** Write out the points
+   *
+   * The difference between `write()` and `write_point_header_tokens()` is that
+   * `write()` inserts a record seperator after the header and after each point
+   *
+   * @param [in] point_begin Point to start writing from
+   * @param [in] point_end Last point to write out
+   * @return The number of points written
+   */
   template<typename point_iter_type>
   int write(point_iter_type point_begin,
             point_iter_type point_end)
@@ -306,9 +362,9 @@ public:
         return 0;
         }
 
-      // The difference between write() and write_to_tokens() is that
+      // The difference between write() and write_point_header_tokens() is that
       // write() inserts record separators after the header and after
-      // each point.  Otherwise we would just call write_to_tokens()
+      // each point. Otherwise we would just call write_point_header_tokens()
       // here.
       string_vector_type tokens;
       if (this->WriteHeader)
@@ -337,12 +393,12 @@ public:
   /** Set the decimal precision for writing coordinates
    *
    * Internally, Tracktable stores coordinates as double-precision
-   * floating numbers.  It is highly unlikely that trajectory data
-   * needs absolutely all of that precision.  Since it takes up lots
+   * floating numbers. It is highly unlikely that trajectory data
+   * needs absolutely all of that precision. Since it takes up lots
    * of space when we write data to disk, it is useful to be able to
    * ask for reduced (or increased) precision.
    *
-   * @param[in] num_digits   Number of digits of precision
+   * @param [in] num_digits   Number of digits of precision
    */
   void set_coordinate_precision(std::size_t num_digits)
     {
@@ -350,6 +406,10 @@ public:
       this->PropertyWriter.set_decimal_precision(num_digits);
     }
 
+  /** Retreive the coordinate decimal precision
+   *
+   * @return The decimal precision
+   */
   std::size_t coordinate_precision() const
     {
       return this->CoordinatePrecision;
@@ -358,10 +418,10 @@ public:
   /** Set the string representation for nulls
    *
    * Property values that were never set are considered to hold a null
-   * value.  This method lets you set how nulls will be written to
-   * disk.  The default value is the empty string "".
+   * value. This method lets you set how nulls will be written to
+   * disk. The default value is the empty string "".
    *
-   * @param[in] _null_value   Desired string representation of nulls
+   * @param [in] _null_value   Desired string representation of nulls
    */
 
   void set_null_value(string_type const& _null_value)
@@ -369,6 +429,10 @@ public:
       this->PropertyWriter.set_null_value(_null_value);
     }
 
+  /** Retreive the null value
+   *
+   * @return The representation of the null value
+   */
   string_type null_value() const
     {
       return this->PropertyWriter.null_value();
@@ -383,6 +447,17 @@ private:
   TokenWriter                  TokenSink;
   bool                         WriteHeader;
 
+  /** Set the default configuration values of the writer
+   *
+   * Defaults:
+   *    * coordinate_precision = 8
+   *    * field_delimiter = ","
+   *    * null_value = ""
+   *    * quote_character = """
+   *    * record_delimiter = "\\n"
+   *    * timestamp_format = "%Y-%m-%d %H:%M:%S"
+   *    * write_header = true
+   */
   void set_default_configuration()
     {
       this->set_coordinate_precision(8);
@@ -394,19 +469,22 @@ private:
       this->set_write_header(true);
     }
 
-  //
-  // Header structure:
-  //
-  // 1.  Header token (currently *P*)
-  // 2.  Domain
-  // 3.  Dimension
-  // 4.  HasObjectId
-  // 5.  HasTimestamp
-  // 6.  Number of properties
-  // 7, 8: name, type of custom property #1
-  // 9, 10: name, type of custom property #2
-  // (etc)
-
+  /** Write tokens out the header
+   *
+   * Header structure:
+   *  1. Header token (currently *P*)
+   *  2. Domain
+   *  3. Dimension
+   *  4. HasObjectId
+   *  5. HasTimestamp
+   *  6. Number of properties
+   *  7, 8: name, type of custom property #1
+   *  9, 10: name, type of custom property #2
+   *  (etc)
+   *
+   * @param [in] example_point Point to generate an example output from
+   * @param [in] _output Where to write the tokens to
+   */
   template<typename point_type, typename out_iter_type>
   void write_point_header_tokens(point_type const& example_point,
                                  out_iter_type _output)
@@ -418,6 +496,12 @@ private:
 
   // ----------------------------------------------------------------------
 
+  /** Write out multiple point tokens
+   *
+   * @param [in] point_begin Point to start writing from
+   * @param [in] point_end Last point to write out
+   * @param [in] _output Where to write the tokens to
+   */
   template<typename point_iter_type, typename out_iter_type>
   int write_many_points_to_tokens(point_iter_type point_begin,
                                   point_iter_type point_end,
@@ -444,6 +528,12 @@ private:
 
   // ----------------------------------------------------------------------
 
+  /** Write out point tokens
+   *
+   * @param [in] point Point to write out
+   * @param [in] _output Where to write the tokens to
+   * @param [in] num_properties_expected The number of properties the point has
+   */
   template<typename point_type, typename out_iter_type>
   void write_point_tokens(point_type const& point,
                           out_iter_type _output,

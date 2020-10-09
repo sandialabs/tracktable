@@ -165,7 +165,7 @@ breathe_default_project = "tracktable_cpp"
 
 breathe_projects_source = {
     'tracktable_cpp':
-        (tracktable_src + "/tracktable", ["Analysis/", "Core/", "Domain/", "IO/"])
+        (tracktable_src + "/tracktable", ["Analysis/", "Core/", "Domain/", "IO/", "DataGenerators/"])
     }
 
 # -- Options for HTML output ----------------------------------------------

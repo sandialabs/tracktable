@@ -49,9 +49,9 @@
 
 #if defined(WIN32)
 // This warning shows up when you call std::copy with pointer
-// arguments.  The Visual C++ compiler is being extra careful because
+// arguments. The Visual C++ compiler is being extra careful because
 // it can't do range checking on bare pointers the way it might be
-// able to with iterators.  Caution is well and good but this idiom
+// able to with iterators. Caution is well and good but this idiom
 // shows up in many places in Boost... leading to a great many
 // spurious warnings that make it hard to find the real problems.
 // Hence this change.
@@ -63,8 +63,10 @@ namespace tracktable {
 
 namespace settings {
 
-// This will be used in all point classes.
+/// This will be used in all point classes.
 typedef double point_coordinate_type;
+
+/// This will be used in all point classes.
 typedef std::string string_type;
 
 }
@@ -90,7 +92,7 @@ namespace tracktable { namespace algorithms {
 // This is so basic as to be needed everywhere.
 
 template<>
-struct interpolate<std::string> : interpolate_nearest_neighbor<std::string> 
+struct interpolate<std::string> : interpolate_nearest_neighbor<std::string>
 { };
 
 } } // exit namespace tracktable::algorithms

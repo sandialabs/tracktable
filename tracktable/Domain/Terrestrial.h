@@ -33,13 +33,13 @@
  *
  * When we reason about objects on the surface of the Earth we use
  * human-scale measurements such as kilometers for distance, square
- * kilometers for area, and km per hour for speed.  Point and
+ * kilometers for area, and km per hour for speed. Point and
  * trajectory types in the Terrestrial domain adhere to these
  * standards.
  *
  * We also provide the 'altitude' trait for terrestrial trajectory
- * points.  We recommend that you use altitude values measured in
- * meters wherever possible.  However, we acknowledge that the
+ * points. We recommend that you use altitude values measured in
+ * meters wherever possible. However, we acknowledge that the
  * international standard of describing aircraft altitudes in feet (or
  * hundreds of feet) may make that a more convenient scale.
  */
@@ -76,7 +76,7 @@ typedef tracktable::domain::cartesian3d::CartesianPoint3D CartesianPoint3D;
 // Part 1: Instantiate the classes for this domain.
 //
 // These are TerrestrialPoint, TerrestrialTrajectoryPoint and
-// TerrestrialTrajectory.  These classes are almost entirely
+// TerrestrialTrajectory. These classes are almost entirely
 // boilerplate.
 //
 // Once we've defined them we alias them to base_point_type,
@@ -93,14 +93,14 @@ class PropertyDoesNotExist : public std::runtime_error {
 };
 
 /**
- * \class TerrestrialPoint
- * \brief 2D point on a sphere
+ * @class TerrestrialPoint
+ * @brief 2D point on a sphere
  *
- * This class represents a point on a sphere.  Its coordinates are
+ * This class represents a point on a sphere. Its coordinates are
  * measured in degrees of longitude and latitude.
  *
- * Distances between TerrestrialPoints are measured in kilometers.
- * Speeds between two TerrestrialTrajectoryPoints will be measured in
+ * Distances between `TerrestrialPoints` are measured in kilometers.
+ * Speeds between two `TerrestrialTrajectoryPoints` will be measured in
  * kilometers per hour.
  */
 
@@ -113,12 +113,22 @@ public:
   /// Create an uninitialized point
   TerrestrialPoint() = default;
 
-  /// Copy constructor: make this point like another
+  /** Copy constructor: make this point like another
+   *
+   * @param [in] other Const point to make a copy of
+   */
   TerrestrialPoint(TerrestrialPoint const& other) = default;
+
+  /** Copy constructor: make this point like another
+   *
+   * @param [in] other Const point to make a copy of
+   */
   TerrestrialPoint(TerrestrialPoint&& other) = default;
 
-  /// Copy constructor: use PointLonLat instances as if they were
-  /// TerrestrialPoint instances
+  /** Copy constructor: use PointLonLat instances as if they were TerrestrialPoint instances
+   *
+   * @param [in] other Const point to make a copy of
+   */
   TerrestrialPoint(Superclass const& other) : PointLonLat(other) {}
 
   /// Empty destructor - nothing to do here
@@ -133,22 +143,33 @@ public:
 
   /** Convenience constructor.
    *
-   * @param[in] _longitude Longitude in degrees
-   * @param[in] _latitude  Latitude in degrees
+   * @param [in] _longitude Longitude in degrees
+   * @param [in] _latitude  Latitude in degrees
    */
   TerrestrialPoint(double _longitude, double _latitude) {
     this->set_longitude(_longitude);
     this->set_latitude(_latitude);
   }
 
+  /** Serialize the points to an archive
+   *
+   * @param [in] ar Archive to serialize to
+   * @param [in] version Version of the archive
+   */
   template <class Archive>
   void serialize(Archive& ar, const unsigned int /*version*/) {
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
   }
 
-  /** Returns ECEF values for lon, lat, and altitude.  Uses a km convention.
+  /** Returns ECEF values for lon, lat, and altitude. Uses a km convention.
+   *
    * @note this expects an altitude in km (not ft or m).
-   * @returns 3D Earth Centered, Earth Fixed point in km
+   *
+   * @param [in] _longitude Longitude in degrees
+   * @param [in] _latitude Latitude in degrees
+   * @param [in] _altitude Altitude in km
+   *
+   * @return 3D Earth Centered, Earth Fixed point in km
    */
   static CartesianPoint3D ECEF_from_km(const coord_type _longitude, const coord_type _latitude,
                                 const double _altitude) {
@@ -168,21 +189,21 @@ public:
 // ----------------------------------------------------------------------
 
 // If you write libraries for Microsoft platforms you will have to
-// care about this warning sooner or later.  Warning #4251 says
+// care about this warning sooner or later. Warning #4251 says
 // "This type must have a DLL interface in order to be used by
-// clients of <class>".  After you dig through the layers, this
+// clients of <class>". After you dig through the layers, this
 // ends up meaning "You cannot use STL classes in the interface of a
 // method or function if you expect your library to work with any
 // compiler other than the one you're using right now."
 //
-// This is a symptom of a bigger problem.  Since the STL does not have
+// This is a symptom of a bigger problem. Since the STL does not have
 // a single standard implementation (for good reason) you cannot assume
-// that my std::map is the same on the inside as your std::map.  Idioms
+// that my std::map is the same on the inside as your std::map. Idioms
 // such as PIMPL are one approach to minimizing the impact.
 //
 // The bottom line is that yea, verily, you cannot use STL classes as
 // arguments or return values in your library's interface unless it will
-// only ever be used by the same compiler that built it.  We are going to
+// only ever be used by the same compiler that built it. We are going to
 // proclaim that this is the case for Tracktable and put great big warnings
 // in the developer documentation to that effect.
 //
@@ -205,10 +226,22 @@ public:
   /// Create an uninitialized point
   TerrestrialTrajectoryPoint() = default;
 
-  /// Copy constructor: make this point like another
+    /** Copy constructor: make this point like another
+   *
+   * @param [in] other Const point to make a copy of
+   */
   TerrestrialTrajectoryPoint(TerrestrialTrajectoryPoint const& other) = default;
+
+    /** Copy constructor: make this point like another
+   *
+   * @param [in] other Point to make a copy of
+   */
   TerrestrialTrajectoryPoint(TerrestrialTrajectoryPoint&& other) = default;
-  /// Copy constructor: use superclass as self
+
+  /** Copy constructor: use PointLonLat instances as if they were TerrestrialTrajectoryPoint instances
+   *
+   * @param [in] other Const point to make a copy of
+   */
   TerrestrialTrajectoryPoint(Superclass const& other)
     : Superclass(other)
     { }
@@ -222,10 +255,11 @@ public:
     return *this;
   }
   TerrestrialTrajectoryPoint& operator=(TerrestrialTrajectoryPoint&& other) = default;
+
   /** Convenience constructor.
    *
-   * @param[in] _longitude Longitude in degrees
-   * @param[in] _latitude  Latitude in degrees
+   * @param [in] _longitude Longitude in degrees
+   * @param [in] _latitude  Latitude in degrees
    */
   TerrestrialTrajectoryPoint(double _longitude, double _latitude) {
     this->set_longitude(_longitude);
@@ -235,17 +269,19 @@ public:
   /** @name Earth Centered Earth Fixed
    * This group of functions is useful for converting longitude and latitude to a
    * cartesian point. A static method is provided to convert any arbitrary point.
-   * ECEF_from_feet will be the most common use case. Multiple functions will throw
-   * an exception if altitude is not present. To bypass exception throws, use ECEF(ratio,altString)
+   * `ECEF_from_feet` will be the most common use case. Multiple functions will throw
+   * an exception if altitude is not present. To bypass exception throws, use `ECEF(ratio,altString)`
    * with the appropriate ratio to convert to km and the name of the property you
    * are expecting to find altitude in.
    * @sa TerrestrialPoint::ECEF
    * @{
    */
 
-  /** Returns ECEF values for lon/lat points.  Uses a km convention.
+  /** Returns ECEF values for lon/lat points. Uses a km convention.
+   *
    * @note this expects an altitude in km (not ft or m).
-   * @returns 3D Earth Centered, Earth Fixed point in km
+   *
+   * @return 3D Earth Centered, Earth Fixed point in km
    */
   CartesianPoint3D ECEF() const {
     double altitude = this->real_property("altitude");
@@ -254,17 +290,21 @@ public:
     return TerrestrialPoint::ECEF_from_km(longitude, latitude, altitude);
   }
 
-  /** Returns ECEF values for lon/lat points.  Uses a km convention.
+  /** Returns ECEF values for lon/lat points. Uses a km convention.
+   *
    * @note this expects an altitude in km (not ft or m). Change ratio if the altitude is not km
-   * @param ratio The value to multiply altitude by to get km
-   * @param _altitudeString The label of the property that contains altitude
-   * @returns 3D Earth Centered, Earth Fixed point in km
+   *
+   * @param [in] ratio The value to multiply altitude by to get km
+   * @param [in] _altitudeString The label of the property that contains altitude
+   *
+   * @return 3D Earth Centered, Earth Fixed point in km
+   *
    * @throw PropertyDoesNotExist if we can't find altitude
    */
   CartesianPoint3D ECEF(const double ratio, const std::string& _altitudeString) const {
     double altitude;
     bool ok = false;
-    if (_altitudeString.length() != 0) 
+    if (_altitudeString.length() != 0)
     {
       altitude = ratio * this->real_property(_altitudeString, &ok);
       if (!ok) {
@@ -278,10 +318,14 @@ public:
     return TerrestrialPoint::ECEF_from_km(longitude, latitude, altitude);
   }
 
-  /** Returns ECEF values for lon/lat points.  Uses a km convention.
+  /** Returns ECEF values for lon/lat points. Uses a km convention.
+   *
    * @note  this expects an altitude in feet.
-   * @param _altitudeString The label of the property that contains altitude
-   * @returns 3D Earth Centered, Earth Fixed point in km
+   *
+   * @param [in] _altitudeString The label of the property that contains altitude
+   *
+   * @return 3D Earth Centered, Earth Fixed point in km
+   *
    * @throw PropertyDoesNotExist if we can't find altitude
    */
   CartesianPoint3D ECEF_from_feet(const std::string& _altitudeString = "altitude") const {
@@ -291,10 +335,14 @@ public:
     return ECEF(feetToKilometers, _altitudeString);
   }
 
-  /** Returns ECEF values for lon/lat points.  Uses a km convention.
+  /** Returns ECEF values for lon/lat points. Uses a km convention.
+   *
    * @note this expects an altitude in meters.
-   * @param _altitudeString The label of the property that contains altitude
-   * @returns 3D Earth Centered, Earth Fixed point in km
+   *
+   * @param [in] _altitudeString The label of the property that contains altitude
+   *
+   * @return 3D Earth Centered, Earth Fixed point in km
+   *
    * @throw PropertyDoesNotExist if we can't find altitude
    */
   CartesianPoint3D ECEF_from_meters(const std::string& _altitudeString = "altitude") const {
@@ -304,6 +352,11 @@ public:
   /// @}
 
 private:
+  /** Serialize the points to an archive
+   *
+   * @param [in] ar Archive to serialize to
+   * @param [in] version Version of the archive
+   */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int  /*version*/)
   {
@@ -425,7 +478,7 @@ struct speed_between<tracktable::domain::terrestrial::TerrestrialTrajectoryPoint
     }
 };
 
-// All of the other algorithms are the defaults.  These macros
+// All of the other algorithms are the defaults. These macros
 // make it cleaner to express that.
 
 

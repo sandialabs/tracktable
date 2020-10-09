@@ -49,8 +49,15 @@ const double ZERO_ABSOLUTE_TOLERANCE=1e-5;
 
 }
 
-
 // ----------------------------------------------------------------------
+
+/** Compare values to determine if they are almost equal
+ *
+ *  @param [in] a First value to use in comparison
+ *  @param [in] b Second value to use in comparison
+ *  @param [in] tolerance Tolerance for determining comparision, options are
+ *    `settings::EQUALITY_RELATIVE_TOLERANCE` (default value) or `settings::ZERO_ABSOLUTE_TOLERANCE`
+ */
 
 template<typename T>
 bool almost_equal(
@@ -73,7 +80,7 @@ bool almost_equal(
   else if (a == 0 || b == 0 || diff < std::numeric_limits<T>::epsilon())
     {
     // Either they're both close to zero or one of them actually is
-    // zero.  Relative error is less meaningful here.
+    // zero. Relative error is less meaningful here.
     return (diff < tolerance);
     }
   else
@@ -87,6 +94,13 @@ bool almost_equal(
 }
 
 // ----------------------------------------------------------------------
+
+/** Determine if value is almost zero
+ *
+ *  @param [in] z Value to determine if almost zero
+ *  @param [in] epsilon Limit for determining value, options are
+ *    `settings::EQUALITY_RELATIVE_TOLERANCE` or `settings::ZERO_ABSOLUTE_TOLERANCE` (default value)
+ */
 
 template<typename T>
 bool almost_zero(

@@ -43,12 +43,12 @@
 namespace tracktable {
 
 /**
- * \class StringTokenizingReader
- * \brief Iterate over a range of input strings and tokenize each one.
+ * @class StringTokenizingReader
+ * @brief Iterate over a range of input strings and tokenize each one.
  *
  * This is the third of four steps in the pipeline of reading points
- * in from a file.  The first is to read in a file line-by-line.  The
- * second is to filter out those lines that are comments.  The third
+ * in from a file. The first is to read in a file line-by-line. The
+ * second is to filter out those lines that are comments. The third
  * is to tokenize the lines that survive into little bits that we can
  * then use to populate a point.
  *
@@ -107,6 +107,7 @@ public:
     {
     }
 
+  /// Destructor
   virtual ~StringTokenizingReader()
     {
     }
@@ -115,6 +116,8 @@ public:
    *
    * The single character in the string you supply will be used as a
    * field delimiter.
+   *
+   * @param [in] delim Delimiter character to be set
    */
   void set_field_delimiter(string_type const& delim)
   {
@@ -131,16 +134,18 @@ public:
   /** Set the escape character to use in tokenization.
    *
    * You must supply a string with either 0 or 1 character to be used
-   * as an escape character.  The escape character removes the special
+   * as an escape character. The escape character removes the special
    * properties of whatever character follows, usually a newline,
    * separator or quote character.
+   *
+   * @param [in] escape Escape character to be set
    */
   void set_escape_character(string_type const& escape)
   {
     this->EscapeCharacter = escape;
   }
 
-  /** Return the escape characters currently in use.
+  /** @return The escape characters currently in use.
    */
   string_type escape_character() const
     {
@@ -150,23 +155,30 @@ public:
   /** Set the quote character to use in tokenization.
    *
    * The single character in the string you supply (assuming it is not
-   * empty) will be used as a quote character.  Inside a quoted string
+   * empty) will be used as a quote character. Inside a quoted string
    * (a string that begins and ends with the quote character), field
-   * delimiters (e.g. comma) will be ignored.  Also, inside a quoted
+   * delimiters (e.g. comma) will be ignored. Also, inside a quoted
    * string, embedded quote characters must be escaped.
+   *
+   * @param [in] quote Quote character to be set
    */
   void set_quote_character(string_type const& quote)
     {
       this->QuoteCharacter = quote;
     }
 
-  /** Return the quote characters currently in use.
+  /** @return the quote characters currently in use.
    */
   string_type quote_character() const
     {
       return this->QuoteCharacter;
     }
 
+  /** Assign a StringTokenizingReader to the value of another.
+   *
+   * @param [in] other StringTokenizingReader to assign value of
+   * @return Reader with the new assigned value
+   */
   StringTokenizingReader& operator=(StringTokenizingReader const& other)
     {
       this->InputLinesBegin  = other.InputLinesBegin;
@@ -177,6 +189,13 @@ public:
       return *this;
     }
 
+  /** Check whether one reader is equal to another by comparing all the properties.
+   *
+   * Two readers are equal if all of their properties are equal.
+   *
+   * @param [in] other StringTokenizingReader for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator==(StringTokenizingReader const& other) const
     {
       return (
@@ -188,11 +207,21 @@ public:
         );
     }
 
+  /** Check whether two StringTokenizingReader are unequal.
+   *
+   * @param [in] other StringTokenizingReader for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator!=(StringTokenizingReader const& other) const
     {
       return !(*this == other);
     }
 
+  /** Set the beginning and the end of the input range
+   *
+   * @param [in] start The iterator to use for the start of input
+   * @param [in] finish The iterator to use for the end of input
+   */
   void set_input_range(input_line_iter_type const& start,
                        input_line_iter_type const& finish)
   {
@@ -217,6 +246,8 @@ private:
 
 protected:
 
+  /** Class for the tokenized string iterator
+   */
   class TokenizedStringIterator : public std::iterator<
     std::input_iterator_tag,
     token_iterator_pair,
@@ -234,6 +265,8 @@ protected:
     string_type EscapeCharacter;
     string_type QuoteCharacter;
 
+    /** @internal
+     */
     void _tokenize_this_line()
     {
       if (this->InputLinesBegin == this->InputLinesEnd) return;
@@ -250,32 +283,46 @@ protected:
     typedef typename tokenizer_type::iterator iterator;
     typedef token_iterator_pair value_type;
 
+    /// Instantiate a default TokenizedStringIterator
     TokenizedStringIterator()
       : Tokenizer(0)
       { }
 
+    /// Destructor
     ~TokenizedStringIterator()
       {
       delete this->Tokenizer;
       }
 
-  TokenizedStringIterator(
-    input_line_iter_type Begin,
-    input_line_iter_type End,
-    string_type const& Delim,
-    string_type const& Escape,
-    string_type const& Quote
-    )
-    : Tokenizer(0),
-      InputLinesBegin(Begin),
-      InputLinesEnd(End),
-      FieldDelimiter(Delim),
-      EscapeCharacter(Escape),
-      QuoteCharacter(Quote)
-      {
-        this->_tokenize_this_line();
-      }
+    /** Instantiate a TokenizedStringIterator using specified properties
+     *
+     * @param [in] Begin Iterator to start at
+     * @param [in] End Iterator to end at
+     * @param [in] Delim Character to use for delimiting
+     * @param [in] Escape Character to use for escaping
+     * @param [in] Quote Character to use for quoting
+     */
+    TokenizedStringIterator(
+      input_line_iter_type Begin,
+      input_line_iter_type End,
+      string_type const& Delim,
+      string_type const& Escape,
+      string_type const& Quote
+      )
+      : Tokenizer(0),
+        InputLinesBegin(Begin),
+        InputLinesEnd(End),
+        FieldDelimiter(Delim),
+        EscapeCharacter(Escape),
+        QuoteCharacter(Quote)
+        {
+          this->_tokenize_this_line();
+        }
 
+    /** Copy contructor, create a TokenizedStringIterator with a copy of another
+     *
+     * @param [in] other TokenizedStringIterator to copy from
+     */
     TokenizedStringIterator(TokenizedStringIterator const& other)
       : Tokenizer(0),
         TokenRangeCurrentString(other.TokenRangeCurrentString),
@@ -291,6 +338,11 @@ protected:
         this->_tokenize_this_line();
         }
 
+    /** Assign a TokenizedStringIterator to the value of another.
+     *
+     * @param [in] other TokenizedStringIterator to assign value of
+     * @return TokenizedStringIterator with the new assigned value
+     */
     TokenizedStringIterator& operator=(TokenizedStringIterator const& other)
       {
         this->InputLinesBegin  = other.InputLinesBegin;
@@ -302,16 +354,28 @@ protected:
         return *this;
       }
 
+    /** Multiply an iterator.
+     *
+     * @return Result of the multiplication
+     */
     token_iterator_pair const& operator*() const
       {
         return this->TokenRangeCurrentString;
       }
 
+    /** Get the current iterator object.
+     *
+     * @return Current iterator
+     */
     token_iterator_pair const* operator->() const
       {
         return &(this->TokenRangeCurrentString);
       }
 
+    /** Advance the iterator to the next position in the sequence.
+     *
+     * @return Pointer to the next iterator in the sequence
+     */
     TokenizedStringIterator& operator++()
       {
         assert(this->InputLinesBegin != this->InputLinesEnd);
@@ -322,6 +386,10 @@ protected:
         return *this;
       }
 
+    /** Advance the iterator to the next position in the sequence.
+     *
+     * @return Pointer to the next iterator in the sequence
+     */
     TokenizedStringIterator& operator++(int)
       {
         TokenizedStringIterator prev(*this);
@@ -329,6 +397,13 @@ protected:
         return prev;
       }
 
+    /** Check whether one TokenizedStringIterator is equal to another by comparing all the properties.
+     *
+     * Two TokenizedStringIterators are equal if all of their properties are equal.
+     *
+     * @param [in] other TokenizedStringIterator for comparison
+     * @return Boolean indicating equivalency
+     */
     bool operator==(TokenizedStringIterator const& other) const
       {
         return (this->InputLinesBegin  == other.InputLinesBegin &&
@@ -338,6 +413,11 @@ protected:
                 this->QuoteCharacter   == other.QuoteCharacter);
       }
 
+    /** Check whether two iterators are unequal.
+     *
+     * @param [in] other Iterator for comparison
+     * @return Boolean indicating equivalency
+     */
     bool operator!=(TokenizedStringIterator const& other) const
       {
         return ( !(*this == other) );
@@ -350,21 +430,50 @@ public:
   typedef TokenizedStringIterator iterator;
   typedef TokenizedStringIterator const const_iterator;
 
+  /** Return an iterator to the first parsed point.
+   *
+   * This will take the parameters you've established for the input
+   * stream, comment character, delimiters and field/column mapping
+   * and start up the whole parsing pipeline. You can iterate through
+   * in the standard C++ fashion until you reach the `end()`.
+   *
+   * @note
+   *    Any changes you make to the parser configuration will
+   *    invalidate existing iterators.
+   *
+   * @return Iterator to first parsed point
+   */
   iterator begin() const
     {
       return TokenizedStringIterator(this->InputLinesBegin, this->InputLinesEnd, this->FieldDelimiter, this->EscapeCharacter, this->QuoteCharacter);
     }
 
+  /** Return an iterator to detect when parsing has ended.
+   *
+   * This iterator is guaranteed to not point at any valid
+   * TrajectoryPoint. The only time when `begin() == end()` will be
+   * when all points have been parsed from the input stream.
+   *
+   * @return Iterator past end of point sequence
+   */
   iterator end() const
     {
       return TokenizedStringIterator(this->InputLinesEnd, this->InputLinesEnd, this->FieldDelimiter, this->EscapeCharacter, this->QuoteCharacter);
     }
 
+  /** Get an iterator pointing to the beginning of the stream
+   *
+   * @return Iterator pointing to current stream
+   */
   const_iterator const_begin() const
     {
       return this->begin();
     }
 
+  /** Get an iterator pointing to the end of the stream
+   *
+   * @return Iterator pointing to end of current stream
+   */
   const_iterator const_end() const
     {
       return this->end();
