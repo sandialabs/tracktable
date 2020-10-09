@@ -35,7 +35,7 @@
  * Overview
  * --------
  *
- * We have two goals here.  First, give you a one-function interface
+ * We have two goals here. First, give you a one-function interface
  * to DBSCAN: pass in a list of points, a search box and a minimum
  * cluster size, get back a vector of (vertex ID, cluster ID) labels.
  * Second, make it easy to say "These points are actually on the
@@ -46,15 +46,15 @@
  * ---------
  *
  * Our implementation of DBSCAN is templated on point type and uses
- * boost::geometry for all of its distance math.  This means that it
+ * boost::geometry for all of its distance math. This means that it
  * will automatically adapt to whatever coordinate system you're using
  * for your points as long as Boost knows what to do with it.
  *
- * This is usually great.  However, there are times when it will slow
- * you down tremendously.  For example, if you're clustering a bunch
+ * This is usually great. However, there are times when it will slow
+ * you down tremendously. For example, if you're clustering a bunch
  * of points that are very close together on the surface of a sphere,
  * you might do just fine by pretending that the space is Cartesian
- * (flat) instead of spherical.  That will run dramatically more
+ * (flat) instead of spherical. That will run dramatically more
  * quickly and with greater precision than the trigonometry necessary
  * for doing distance computations on a sphere.
  */
@@ -78,14 +78,16 @@ namespace tracktable {
  * This function runs DBSCAN on a list of points and returns its
  * results as a vector of integers, one for each input point.
  *
- * When you call cluster_with_dbscan you must indicate the type of
+ * When you call `cluster_with_dbscan` you must indicate the type of
  * point (and thus the coordinate space) that you want to use for the
- * clustering.  This lets you choose (for example) to run in Cartesian
+ * clustering. This lets you choose (for example) to run in Cartesian
  * space rather than longitude/latitude space if you're sure your
  * points don't run into the poles or the longitude discontinuity at
  * +/= 180.
  *
- * Here's an example::
+ * Example:
+ *
+ * @code
  *
  * typedef tracktable::cartesian2d::BasePoint point2d;
  * std::vector<tracktable::cartesian2d::BasePoint> my_points;
@@ -102,18 +104,20 @@ namespace tracktable {
  *    std::back_inserter(cluster_labels)
  * );
  *
+ * @endcode
+ *
  * The search box must be specified in the coordinate system in which
  * you want to do the clustering.
  *
- * @param[in] input_begin   Iterator for beginning of input points
- * @param[in] input_end     Iterator for end of input points
- * @param[in] search_box_half_span  Distance defining "nearby" in all dimensions
- * @param[in] minimum_cluster_size  Minimum number of neighbors for core points
- * @param[out] output_sink  (Vertex ID, Cluster ID) for each point
+ * @param [in] input_begin   Iterator for beginning of input points
+ * @param [in] input_end     Iterator for end of input points
+ * @param [in] search_box_half_span  Distance defining "nearby" in all dimensions
+ * @param [in] minimum_cluster_size  Minimum number of neighbors for core points
+ * @param [out] output_sink  (Vertex ID, Cluster ID) for each point
  * @return Number of clusters discovered
  *
- * You can also pass in points as a std::pair<MyPoint, Foo> where Foo
- * is your own arbitrary ID.  In that case, the returned labels will
+ * You can also pass in points as a `std::pair<MyPoint, Foo>` where Foo
+ * is your own arbitrary ID. In that case, the returned labels will
  * be (Foo, int).
  */
 
@@ -145,15 +149,16 @@ int cluster_with_dbscan(
 
 /** Convert cluster labels into cluster membership lists
  *
- * The label output from cluster_with_dbscan is a list of (vertex_id,
- * cluster_id) pairs.  It is often useful to have cluster membership
+ * The label output from `cluster_with_dbscan` is a list of (vertex_id,
+ * cluster_id) pairs. It is often useful to have cluster membership
  * represented instead as lists of the vertices that belong to each
- * cluster.  This function converts a list of IDs to a list of
- * members.  The output will be saved as a sequence of std::vectors
+ * cluster. This function converts a list of IDs to a list of
+ * members. The output will be saved as a sequence of `std::vector`s
  * written in order of ascending cluster ID.
  *
  * Example:
  *
+ * @code
  * typedef std::pair<my_point, my_id> labeled_point_type;
  * tyepdef std::pair<my_id, int> cluster_label_type;
  * std::vector<labeled_point_type> my_labeled_points;
@@ -175,10 +180,11 @@ int cluster_with_dbscan(
  *   cluster_labels.end(),
  *   std::back_inserter(membership_lists)
  * );
+ * @endcode
  *
- * @param[in] label_begin   Iterator for beginning of DBSCAN cluster labels
- * @param[in] label_end     Iterator for end of DBSCAN cluster labels
- * @param[out] output_membership_lists  (Vertex ID, Cluster ID) for each point
+ * @param [in] label_begin   Iterator for beginning of DBSCAN cluster labels
+ * @param [in] label_end     Iterator for end of DBSCAN cluster labels
+ * @param [out] output_membership_lists  (Vertex ID, Cluster ID) for each point
  * @return Number of clusters discovered
  *
  */

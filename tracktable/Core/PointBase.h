@@ -64,15 +64,18 @@
 namespace tracktable {
 
 /** Base class for all points in Tracktable
- * \ingroup Tracktable_CPP
+ * @ingroup Tracktable_CPP
  *
  * This class defines a point independent of the number of coordinates
- * or the data type.  You will not use this directly.  Instead, you'll
- * use one of the coordinate-specific versions like PointBaseCartesian
- * or PointBaseLonLat.
+ * or the data type.
+ *
+ * @note
+ *    You will not use this directly. Instead, you'll
+ *    use one of the coordinate-specific versions like PointBaseCartesian
+ *    or PointBaseLonLat.
  *
  * PointBase and all of its subclasses will be registered with
- * boost::geometry so that you can use all of the generic geometry
+ * `boost::geometry` so that you can use all of the generic geometry
  * algorithms.
  */
 
@@ -81,14 +84,17 @@ class PointBase
 {
 public:
   friend class boost::serialization::access;
-  
+
   typedef tracktable::settings::point_coordinate_type coordinate_type;
   typedef tracktable::settings::point_coordinate_type element_type;
 
   /// Initialize an empty point
   PointBase() { }
 
-  /// Initialize a copy of another point
+  /** Copy contructor, create a PointBase with a copy of another
+   *
+   * @param [in] other PointBase to copy from
+   */
   PointBase(PointBase const& other)
     {
       detail::assign_coordinates<Dimension>::apply(*this, other);
@@ -106,7 +112,13 @@ public:
    * Since this is Boost, you set and get coordinates by specifying
    * the coordinate at compile time:
    *
-   * `double x = point.get<0>();`
+   * @code
+   *
+   * double x = point.get<0>();
+   *
+   * @endcode
+   *
+   * @return The value of a particular coordinate
    */
 
   template<std::size_t d>
@@ -122,7 +134,13 @@ public:
    * Since this is Boost, you set and get coordinates by specifying
    * the coordinate at compile time:
    *
+   * @code
+   *
    * point.set<0>(new_value);
+   *
+   * @endcode
+   *
+   * @param [in] new_value The value to assign to the coordinate
    */
 
   template<std::size_t d>
@@ -138,8 +156,14 @@ public:
    * You can use operator[] whether or not you know the coordinate you
    * want ahead of time.
    *
+   * @code
+   *
    * double x = point[0];
    * point[0] = x;
+   *
+   * @endcode
+   *
+   * @return The value of the coordinate
    */
 
   coordinate_type const& operator[](std::size_t d) const
@@ -153,8 +177,14 @@ public:
    * You can use operator[] whether or not you know the coordinate you
    * want ahead of time.
    *
+   * @code
+   *
    * double x = point[0];
    * point[0] = x;
+   *
+   * @endcode
+   *
+   * @return The value of the coordinate
    */
 
   coordinate_type& operator[](std::size_t d)
@@ -165,7 +195,11 @@ public:
 
   /** Check two points for equality
    *
-   * This requires that the two points have the same dimension.
+   * @note
+   *    This requires that the two points have the same dimension.
+   *
+   * @param [in] other PointBase for comparison
+   * @return Boolean indicating equivalency
    */
   bool operator==(PointBase const& other) const
     {
@@ -173,6 +207,9 @@ public:
     }
 
   /** Check two points for inequality
+   *
+   * @param [in] other PointBase for comparison
+   * @return Boolean indicating equivalency
    */
   bool operator!=(PointBase const& other) const
     {
@@ -180,6 +217,9 @@ public:
     }
 
   /** Make this point a copy of a different one
+   *
+   * @param [in] other PointBase to assign value of
+   * @return PointBase with the new assigned value
    */
   PointBase& operator=(PointBase const& other)
     {
@@ -187,7 +227,8 @@ public:
       return *this;
     }
 
-  /** Get the number of dimensions in this point
+  /**
+   * @return The number of dimensions in this point
    */
 
   std::size_t size() const
@@ -199,19 +240,24 @@ protected:
   /// Storage for the coordinate values
   coordinate_type Coordinates[Dimension];
 
+  /** Serialize the coordinates to an archive
+   *
+   * @param [in] ar Archive to serialize to
+   * @param [in] version Version of the archive
+   */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
     ar & boost::serialization::make_nvp("Coordinates", this->Coordinates);
   }
-  
+
 };
 
 } // exit namespace tracktable
 
 // We need to tell boost::geometry a few things about PointBase so
-// that we can copy coordinates back and forth.  This does not
-// actually make the class usable with boost::geometry.  Among other
+// that we can copy coordinates back and forth. This does not
+// actually make the class usable with boost::geometry. Among other
 // things, it's missing a coordinate system.
 
 namespace boost { namespace geometry { namespace traits {

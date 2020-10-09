@@ -54,7 +54,7 @@ private:
 
 // ----------------------------------------------------------------------
 
-/*! \brief Point plus index and cluster ID
+/*! @brief Point plus index and cluster ID
  *
  * We keep our own list of points internally in DBSCAN along with an
  * index into the original list, a cluster ID (if set) and a flag to
@@ -77,13 +77,13 @@ public:
   typedef PointT point_type;
 
   IndexedPoint() : PointId(-1), ClusterId(0) { }
-  IndexedPoint(PointT const& point_to_index) 
+  IndexedPoint(PointT const& point_to_index)
     : Point(point_to_index)
     , PointId(-1)
     , ClusterId(0)
     , Visited(false) { }
 
-  IndexedPoint(PointT const& point_to_index, int index) 
+  IndexedPoint(PointT const& point_to_index, int index)
     : Point(point_to_index)
     , PointId(index)
     , ClusterId(0)
