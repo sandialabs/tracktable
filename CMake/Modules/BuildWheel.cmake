@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC . Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -172,7 +172,7 @@ function(build_wheel _build_directory _base_directory _output_directory _setup_p
       WORKING_DIRECTORY ${_base_directory}
       )
   endif()
-  
+
   if (NOT ${_wheel_build_result} EQUAL 0)
     message(ERROR "Error while building wheel: ${_wheel_build_result}")
   elseif (NOT WIN32)
@@ -187,8 +187,8 @@ function(build_wheel _build_directory _base_directory _output_directory _setup_p
     ${_output_directory}/tracktable-*-${_implementation_version}-none-${_platform}.whl
     LIST_DIRECTORIES false
     )
-    
- 
+
+
 
   # We don't know what the exact filename is going to be.  It depends
   # on information scattered in several different locations.  Let's
@@ -246,8 +246,8 @@ function(build_wheel _build_directory _base_directory _output_directory _setup_p
       return()
     endif ()
   endforeach ()
-    
- 
+
+
 endfunction(build_wheel)
 
 
@@ -275,7 +275,7 @@ message(STATUS "INFO: Wheel fixer is ${FIX_WHEEL_EXECUTABLE}")
 message(STATUS "DEBUG: CMake ARGC is ${CMAKE_ARGC} (we use up to ARGV8 by default; CMake itself gets an extra three directories)")
 
 # YOU ARE HERE
-# 
+#
 # Pass the Boost library directory as one of the arguments to BuildWheel.cmake in PythonWrapping/CMakeLists.txt.
 #
 # Grab any arguments after CMAKE_ARGV8 as extra search paths.  Pass those to the build_wheel function.
@@ -292,10 +292,10 @@ endif()
 
 build_wheel(
   ${BUILD_TREE_ROOT}
-  ${INSTALL_TREE_ROOT} 
-  ${OUTPUT_DIRECTORY} 
-  ${SETUP_SCRIPT} 
-  ${PYTHON_INTERPRETER} 
+  ${INSTALL_TREE_ROOT}
+  ${OUTPUT_DIRECTORY}
+  ${SETUP_SCRIPT}
+  ${PYTHON_INTERPRETER}
   ${FIX_WHEEL_EXECUTABLE}
   ${EXTRA_SEARCH_PATHS}
   )

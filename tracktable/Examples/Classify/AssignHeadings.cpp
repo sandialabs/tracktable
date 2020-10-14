@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -47,9 +47,9 @@ void AssignTrajectoryHeadings(trajectory_type &trajectory)
     trajectory[0].set_property("heading",0.0);
     return;
   }
-    
+
   for (unsigned int i = 0; i < trajectory.size()-1; ++i)
-    trajectory[i].set_property("heading", 
+    trajectory[i].set_property("heading",
      tracktable::bearing(trajectory[i],trajectory[i+1]));
   trajectory[trajectory.size()-1] = trajectory[trajectory.size()-2];
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -94,4 +94,4 @@ def main():
 
 if __name__ == '__main__':
     sys.exit(main())
-    
+

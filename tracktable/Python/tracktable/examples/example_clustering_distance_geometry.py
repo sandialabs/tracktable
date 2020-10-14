@@ -1,22 +1,22 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
 # are met:
-# 
+#
 # 1. Redistributions of source code must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
-# 
+#
 # 2. Redistributions in binary form must reproduce the above copyright
 #    notice, this list of conditions and the following disclaimer in the
 #    documentation and/or other materials provided with the distribution.
-#   
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -28,19 +28,19 @@
 # THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-# 
+#
 
 # # Trajectory Clustering Example
-# 
+#
 # This notebook is an end-to-end example of how to cluster trajectories in Tracktable using distance geometry.  It goes through the following steps:
-# 
+#
 # 1.  Read in points from a file.
 # 2.  Assemble those points into trajectories.
 # 3.  Create a distance geometry signature for each trajectory.
 # 4.  Using those signatures as feature vectors, compute clusters using DBSCAN.
 # 5.  Print statistics about each cluster.
 # 6.  Render the resulting clusters onto a map.
-# 
+#
 # Eventually, distance geometry computation will move into the library itself.
 
 # Set up Matplotlib to render in a notebook before anyone else can change its back end.
@@ -48,19 +48,19 @@ import matplotlib
 get_ipython().run_line_magic('matplotlib', 'inline')
 
 
-# Compute an N-point distance geometry signature    
-#     
-# Distance geometry is a technique for characterizing a curve in space by measuring the distances between evenly spaced points (called control points) on the curve. This implementation has three parameters:    
-#   1. A trajectory    
-#   2. The number of control points     
-#   3. Whether to normalize the distances in the signature so that the largest distance is always 1.    
-#     
-# The number of control points controls the fidelity of the resulting signature. The more control points, the more accurately the features of the curve can be represented, but the longer it takes to compute.    
-#     
-# Normalizing the distance allows shape-based comparison between trajectories by taking the dot product of their respective distance geometry signatures. The higher the dot product, the more similar the trajectories. There are many possible normalization schemes; this is the one we find useful.    
-#     
-# Returns:    
-#   tracktable.domain.feature_vectors.FeatureVectorNN where NN is the size of the resulting distance geometry signature. 
+# Compute an N-point distance geometry signature
+#
+# Distance geometry is a technique for characterizing a curve in space by measuring the distances between evenly spaced points (called control points) on the curve. This implementation has three parameters:
+#   1. A trajectory
+#   2. The number of control points
+#   3. Whether to normalize the distances in the signature so that the largest distance is always 1.
+#
+# The number of control points controls the fidelity of the resulting signature. The more control points, the more accurately the features of the curve can be represented, but the longer it takes to compute.
+#
+# Normalizing the distance allows shape-based comparison between trajectories by taking the dot product of their respective distance geometry signatures. The higher the dot product, the more similar the trajectories. There are many possible normalization schemes; this is the one we find useful.
+#
+# Returns:
+#   tracktable.domain.feature_vectors.FeatureVectorNN where NN is the size of the resulting distance geometry signature.
 
 from tracktable.domain.feature_vectors import convert_to_feature_vector
 from tracktable.core.geomath import point_at_length_fraction
@@ -70,10 +70,10 @@ def distance_geometry_signature(trajectory, num_control_points=4, normalize_dist
     # Sets the distance increment for control points based on the number of control points
     # Calculates the fractions of the trajectory where control points should be
     # Gives the values where the control points are located
-    control_point_increment = 1.0/(num_control_points-1)    
-    control_point_fractions = [control_point_increment * i for i in range(num_control_points)]    
+    control_point_increment = 1.0/(num_control_points-1)
+    control_point_fractions = [control_point_increment * i for i in range(num_control_points)]
     control_points = [point_at_length_fraction(trajectory, t) for t in control_point_fractions]
-    
+
     # A signature is a collection of the calculated distances that will be converted to a feature vector
     signature = []
     # Calculate the list of distances
@@ -134,7 +134,7 @@ minimum_cluster_size = 5
 cluster_labels = compute_cluster_labels(feature_vectors, search_box_span, minimum_cluster_size)
 
 
-# Cluster Statistics    
+# Cluster Statistics
 # Here we calculate the size of the clusters we labeled.
 
 # Assemble each cluster as a list of its component trajectories.
@@ -158,7 +158,7 @@ for(cid, cluster) in clusters.items():
     print("{}: {}".format(cluster_name(cid), len(cluster)))
 
 
-# Cluster Visualization    
+# Cluster Visualization
 # You can use pyplot to see your clusters that were created
 
 from tracktable.render import paths

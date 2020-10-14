@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2018 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -110,7 +110,7 @@ def main():
     error_count += test_kms_to_lat()
 
     return error_count
-    
+
 # ----------------------------------------------------------------------
 
 if __name__ == '__main__':

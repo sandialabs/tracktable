@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -7,7 +7,7 @@
 
 //
 //   TwoPortals
-//   
+//
 // First example of finding two portals in the flight data
 //
 // Created by Danny Rintoul
@@ -20,12 +20,12 @@
 
 /*
 void WriteAllFlights(Pair_heap &pairs,
- const unsigned int level, const unsigned int interval_x, 
+ const unsigned int level, const unsigned int interval_x,
  const unsigned int interval_y);
 */
 
 void FindMultiplePortals(Trajectories &trajectories, Pair_heap &pairs,
- PP &US, const unsigned int level, 
+ PP &US, const unsigned int level,
  const unsigned int interval_x, const unsigned int interval_y);
 
 int main(int argc, char *argv[])
@@ -57,12 +57,12 @@ int main(int argc, char *argv[])
 }
 /*
 void WriteAllFlights(Pair_heap &pairs,
- const unsigned int level, const unsigned int interval_x, 
+ const unsigned int level, const unsigned int interval_x,
  const unsigned int interval_y)
 {
   double max_sep = 0.0;
   int i = 1;
-  do 
+  do
   {
     while (RefinePairs(pairs,level,interval_x,interval_y));
 //    if (pairs.top().sep < max_sep)
@@ -77,11 +77,11 @@ void WriteAllFlights(Pair_heap &pairs,
     ++i;
   } while (pairs.size() > 0);
 
-  return;  
+  return;
 }
 */
-void FindMultiplePortals(Trajectories &trajectories, Pair_heap &pairs, 
- PP &US, const unsigned int level, const unsigned int interval_x, 
+void FindMultiplePortals(Trajectories &trajectories, Pair_heap &pairs,
+ PP &US, const unsigned int level, const unsigned int interval_x,
  const unsigned int interval_y)
 {
   static int i = 0;

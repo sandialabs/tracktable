@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -56,7 +56,7 @@ struct compute_convex_hull_aspect_ratio<
       typedef typename iterator::value_type point_type;
       typedef boost::geometry::model::polygon<point_type> polygon_type;
       polygon_type hull;
-      
+
       implementations::compute_convex_hull_terrestrial(point_begin, point_end, hull);
       point_type centroid(
         compute_convex_hull_centroid<
@@ -101,7 +101,7 @@ struct compute_convex_hull_aspect_ratio<
     else
       {
         double result = long_axis / short_axis;
-        if (std::isnan(result)) 
+        if (std::isnan(result))
         {
           return 0;
         } else {

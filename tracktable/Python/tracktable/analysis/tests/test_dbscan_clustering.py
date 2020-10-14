@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -102,7 +102,7 @@ def test_clusters():
 
     vertex_ids_as_strings = [ str(i) for i in range(len(all_points)) ]
     decorated_points = list(zip(all_points, vertex_ids_as_strings))
-    
+
     print("Learning cluster IDs for bare points.")
     int_cluster_ids = compute_cluster_labels(all_points,
                                              [0.05, 0.05, 0.05],
@@ -117,13 +117,13 @@ def test_clusters():
 
     sorted_int_ids = sorted(int_cluster_ids, key=operator.itemgetter(0))
     sorted_string_ids = sorted(recomputed_int_ids, key=operator.itemgetter(0))
-    
+
     if (sorted_int_ids != sorted_string_ids):
         print("ERROR: Cluster IDs for bare points do not match cluster IDs for decorated points.")
         print("First 10 for bare points: {}".format(sorted_int_ids[0:10]))
         print("First 10 for decorated points (result): {}".format(sorted_string_ids[0:10]))
         return 1
-    
+
     return 0
 #    print("Cluster IDs: {}".format(cluster_ids))
 
@@ -140,48 +140,48 @@ def test_cluster_dictionary():
 
     vertex_ids_as_strings = [ str(i) for i in range(len(all_points)) ]
     decorated_points = list(zip(all_points, vertex_ids_as_strings))
-    
+
     print("Learning cluster IDs for bare points.")
     int_cluster_ids = compute_cluster_labels(all_points,
                                              [0.05, 0.05, 0.05],
                                              4)
-    
+
     bare_point_dict = cluster_labels_to_dict(int_cluster_ids, all_points)
-                                             
+
     print("Learning cluster IDs for decorated points.")
     string_cluster_ids = compute_cluster_labels(decorated_points,
                                                 [0.05, 0.05, 0.05],
                                                 4)
 
-    decorated_point_dict = cluster_labels_to_dict(string_cluster_ids, decorated_points)                                            
-    
+    decorated_point_dict = cluster_labels_to_dict(string_cluster_ids, decorated_points)
+
     for (v_id, c_id) in int_cluster_ids:
         if str(c_id) not in bare_point_dict:
             print("ERROR: Cluster IDs for bare point not found in cluster dictionary as a key.")
             return 1
         vid_found = False
         for (fv, vec_id) in bare_point_dict[str(c_id)]:
-            if v_id == vec_id: 
+            if v_id == vec_id:
                 vid_found = True
                 break
         if not vid_found:
             print("ERROR: Vector IDs for bare point not found in cluster dictionary as a value.")
-            return 1    
-        
+            return 1
+
     for (v_id, c_id) in string_cluster_ids:
         if str(c_id) not in decorated_point_dict:
             print("ERROR: Cluster IDs for decorated point not found in cluster dictionary as a key.")
             return 1
         vid_found = False
         for (fv, vec_id) in decorated_point_dict[str(c_id)]:
-            if v_id == vec_id: 
+            if v_id == vec_id:
                 vid_found = True
                 break
         if not vid_found:
             print("ERROR: Vector IDs for decorated point not found in cluster dictionary as a value.")
-            return 1            
+            return 1
     return 0
-    
+
 # ----------------------------------------------------------------------
 
 def main():
@@ -193,6 +193,6 @@ def main():
 
 if __name__ == '__main__':
     sys.exit(main())
-    
 
-          
+
+

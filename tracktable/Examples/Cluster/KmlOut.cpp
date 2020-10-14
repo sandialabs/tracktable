@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -67,7 +67,7 @@ std::string getColorString(void)
   std::stringstream s;
   s << std::hex << std::setfill('0') << std::uppercase;
   // Stupid setw isn't sticky...
-  s << "FF" << std::setw(2) << rand() % 255 << std::setw(2) 
+  s << "FF" << std::setw(2) << rand() % 255 << std::setw(2)
    << rand() % 255 << std::setw(2) << rand() % 255;
 
   return s.str();
@@ -96,7 +96,7 @@ void writeKmlSepTrajectories(Trajectories &trajectories, const std::string &outp
   // Someone should look into that.  It uses the flight info for the name
   // in the KML file if it has it.  Otherwise, it uses a generic name.
 
-void writeKmlTrajectory(trajectory_type &trajectory, 
+void writeKmlTrajectory(trajectory_type &trajectory,
  std::ostream &outfile, const std::string &ColorString, const double &width)
 {
   writeKmlHeader(outfile);
@@ -105,7 +105,7 @@ void writeKmlTrajectory(trajectory_type &trajectory,
     boost::posix_time::to_iso_extended_string(trajectory.start_time());
   std::string end_time =
     boost::posix_time::to_iso_extended_string(trajectory.end_time());
-	std::string s = 
+	std::string s =
     boost::gregorian::to_simple_string(trajectory.start_time().date());
   outfile << "<Style id=\"" << style << "\">" << std::endl;
   outfile << "  <LineStyle>" << std::endl;
@@ -117,7 +117,7 @@ void writeKmlTrajectory(trajectory_type &trajectory,
   outfile << "<Placemark>" << std::endl;
   outfile << "  <name>" << style + "-" + s << "</name>" << std::endl;
   outfile << "  <TimeSpan> <begin>" << start_time << "</begin>" << std::endl;
-  outfile << "             <end>" << end_time << "</end> </TimeSpan>" << 
+  outfile << "             <end>" << end_time << "</end> </TimeSpan>" <<
    std::endl;
   outfile << "  <styleUrl>#" << style << "</styleUrl>" << std::endl;
   outfile << "  <LineString>" << std::endl;
@@ -134,7 +134,7 @@ void writeKmlTrajectory(trajectory_type &trajectory,
   return;
 }
 
-void writeKmlTrajectories(Trajectories &trajectories, 
+void writeKmlTrajectories(Trajectories &trajectories,
  const std::string &file_name)
 {
   std::ofstream outfile(file_name.c_str());
@@ -148,7 +148,7 @@ void writeKmlTrajectories(Trajectories &trajectories,
 	    boost::posix_time::to_iso_extended_string(itr->start_time());
 	  std::string end_time =
 	    boost::posix_time::to_iso_extended_string(itr->end_time());
-//		std::string s = 
+//		std::string s =
 //    boost::gregorian::to_simple_string(itr->get_start_time().date());
 	  outfile << "<Style id=\"" << style << "\">" << std::endl;
 	  outfile << "  <LineStyle>" << std::endl;
@@ -159,13 +159,13 @@ void writeKmlTrajectories(Trajectories &trajectories,
 	  outfile << "</Style>" << std::endl;
 	  outfile << "<Placemark>" << std::endl;
 	  outfile << "  <TimeSpan> <begin>" << start_time << "</begin>" << std::endl;
-	  outfile << "             <end>" << end_time << "</end> </TimeSpan>" << 
+	  outfile << "             <end>" << end_time << "</end> </TimeSpan>" <<
 	   std::endl;
 	  outfile << "  <styleUrl>#" << style << "</styleUrl>" << std::endl;
 	  outfile << "  <LineString>" << std::endl;
 	  outfile << "    <coordinates>" << std::endl;
 	  for (T_itr itr2 = itr->begin(); itr2 != itr->end(); ++itr2) {
-	    outfile << "    " << itr2->longitude() << "," << itr2->latitude() << 
+	    outfile << "    " << itr2->longitude() << "," << itr2->latitude() <<
       std::endl;
     }
 	  outfile << "    </coordinates>" << std::endl;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -32,7 +32,7 @@
 #define __my_pq
 #include <algorithm>
 #include <queue>
- 
+
 template<class T, class Container = std::vector<T>, class Comp = std::less<typename Container::value_type> > class my_pq : public std::priority_queue<T, Container, Comp> {
 public:
   typedef std::vector<T> TVec;

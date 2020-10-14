@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -33,39 +33,39 @@
 
 namespace tracktable { namespace python_wrapping {
 
-	
+
     // Forward declaration
        template <class Container, bool NoProxy, class DerivedPolicies>
        class trajectory_indexing_suite;
-    
+
        namespace detail
        {
           template <class Container, bool NoProxy>
           class final_trajectory_derived_policies
              : public trajectory_indexing_suite<
 	           Container,
-                   NoProxy, 
-                   final_trajectory_derived_policies<Container, NoProxy> 
-	           > 
+                   NoProxy,
+                   final_trajectory_derived_policies<Container, NoProxy>
+	           >
 	   {};
        }
-  
+
 	template <class Container, bool NoProxy = false, class DerivedPolicies = detail::final_trajectory_derived_policies<Container, NoProxy>>
 	class trajectory_indexing_suite
 	  : public boost::python::vector_indexing_suite<Container, NoProxy, DerivedPolicies>
         {
         public:
-           
+
 	   typedef typename Container::size_type index_type;
-          
+
   	   static boost::python::object
            get_slice(Container& container, index_type from, index_type to)
  	   {
 		if (from > to)
-		  return boost::python::object(Container()); 
+		  return boost::python::object(Container());
 		return boost::python::object(Container(container.begin()+from, container.begin()+to, container));
 	   }
-	};	 
+	};
 
 }
 }

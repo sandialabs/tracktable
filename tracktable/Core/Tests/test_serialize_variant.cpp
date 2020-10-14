@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -43,7 +43,7 @@ template<typename thing_type>
 thing_type serialized_copy(thing_type const& thing)
 {
   thing_type restored_thing;
-  
+
   std::ostringstream temp_out;
   boost::archive::text_oarchive archive_out(temp_out);
   archive_out << thing;
@@ -120,14 +120,14 @@ test_property_variant_serialization()
               << "This shouldn't happen -- nulls can never equal each other.\n";
     error_count += 1;
     }
-  
+
   return error_count;
 }
 
 // ----------------------------------------------------------------------
 
 
-  
+
 int
 main(int argc, char *argv[])
 {

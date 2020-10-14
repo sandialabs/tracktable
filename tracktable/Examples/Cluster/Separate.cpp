@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -15,7 +15,7 @@
 #include "Separate.h"
 #include <boost/bind.hpp>
 
-void separateMapFlights(Trajectory_map &traj_map, Trajectories &trajectories, 
+void separateMapFlights(Trajectory_map &traj_map, Trajectories &trajectories,
  const int min_flight_size, const int max_flight_gap)
 {
 
@@ -31,11 +31,11 @@ void separateMapFlights(Trajectory_map &traj_map, Trajectories &trajectories,
      boost::bind(&Traj_Point::timestamp,_2));
     separateFlights(map_itr->second,trajectories);
   }
-  
+
   return;
 }
-void separateFlights(std::vector<Traj_Point> &tps, 
- Trajectories &trajectories, const int min_flight_size, 
+void separateFlights(std::vector<Traj_Point> &tps,
+ Trajectories &trajectories, const int min_flight_size,
  const int max_flight_gap)
 {
   // Simple for loop to separate the individual flights.  There is an
@@ -59,7 +59,7 @@ void separateFlights(std::vector<Traj_Point> &tps,
   return;
 }
 
-bool apartInTime(const Traj_Point& tp1, const Traj_Point &tp2, 
+bool apartInTime(const Traj_Point& tp1, const Traj_Point &tp2,
  const int max_time_gap)
 { return (tp2.timestamp() - tp1.timestamp()) >=
    boost::posix_time::time_duration(boost::posix_time::minutes(max_time_gap));

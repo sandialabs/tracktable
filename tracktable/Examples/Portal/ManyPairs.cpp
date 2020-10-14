@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -7,7 +7,7 @@
 
 //
 //   ManyPairs
-//   
+//
 // First example of finding two portals in the flight data
 //
 // Created by Danny Rintoul
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
   Flights flights;
 
   readAirDataFile(data_file,sep_char,flights);
-  
+
 
   // Clean up the data
 
@@ -74,5 +74,5 @@ void FindMultiplePortals(my_pq<Portal_pair> &pairs, PP &US, const unsigned int l
     RemoveTopPair(pairs,US);
   }
 
-  return;  
+  return;
 }

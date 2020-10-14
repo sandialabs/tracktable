@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -65,10 +65,10 @@ def almost_equal(a, b, epsilon=1e-6):
         return (delta / max_abs) <= epsilon
     else: # both zero
         return True
-    
+
 def carefully_compare_trajectories(t1, t2):
     print("Comparing trajectories with fine-toothed comb.")
-    
+
     if len(t1) != len(t2):
         print("ERROR: Trajectory 1 has {} points and trajectory 2 has {}.".format(len(t1), len(t2)))
         return

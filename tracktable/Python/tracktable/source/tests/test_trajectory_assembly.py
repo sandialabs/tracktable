@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -99,7 +99,7 @@ def run_test():
     trajectory_assembler = AssembleTrajectoryFromPoints()
     trajectory_assembler.input = all_points
     trajectory_assembler.separation_time = timedelta(minutes=30)
-    trajectory_assembler.separation_distance = 100 
+    trajectory_assembler.separation_distance = 100
     trajectory_assembler_minimum_length = 10
 
     print("Done instantiating assembler")

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -149,7 +149,7 @@ int test_simplify_linestring()
   int error_count = 0;
   if (simplified.size() != 5)
     {
-      TRACKTABLE_LOG(error) 
+      TRACKTABLE_LOG(error)
           << "test_simplify_linestring on "
 			    << typeid(linestring_type).name()
 			    << ": Simplified linestring has "
@@ -161,11 +161,11 @@ int test_simplify_linestring()
 
   if (simplified[0] != linestring[0])
     {
-      TRACKTABLE_LOG(error) 
+      TRACKTABLE_LOG(error)
           << "test_simplify_linestring on "
 			    << typeid(linestring_type).name()
 			    << ": Expected first point to be the same as from the input.  "
-			    << "Original first point: " << linestring[0].to_string() 
+			    << "Original first point: " << linestring[0].to_string()
           << "  "
 			    << "Simplified first point: " << simplified[0].to_string();
     ++error_count;
@@ -174,11 +174,11 @@ int test_simplify_linestring()
 
   if (simplified[1] != linestring[3])
     {
-    TRACKTABLE_LOG(error) 
+    TRACKTABLE_LOG(error)
       << "test_simplify_linestring on "
       << typeid(linestring_type).name()
       << ": Expected second point to be the same as point 3 from the input.  "
-      << "Original point: " << linestring[3].to_string() 
+      << "Original point: " << linestring[3].to_string()
       << "  "
       << "Simplified first point: " << simplified[1].to_string();
     ++error_count;
@@ -191,7 +191,7 @@ int test_simplify_linestring()
       << "test_simplify_linestring on "
       << typeid(linestring_type).name()
       << ": Expected middle point to be the same as point 4 from the input.  "
-      << "Original point: " << linestring[4].to_string() 
+      << "Original point: " << linestring[4].to_string()
       << "  "
       << "Simplified first point: " << simplified[2].to_string();
     ++error_count;
@@ -217,7 +217,7 @@ int test_simplify_linestring()
       << "test_simplify_linestring on "
       << typeid(linestring_type).name()
       << ": Expected point 4 to be the same as point 8 from the input."
-      << "Original point: " << linestring[8].to_string() 
+      << "Original point: " << linestring[8].to_string()
       << "  "
       << "Simplified first point: " << simplified[4].to_string();
     ++error_count;
@@ -234,7 +234,7 @@ int test_simplify_linestring()
 
   if (error_count != 0)
     {
-    TRACKTABLE_LOG(debug) << "Original linestring: " 
+    TRACKTABLE_LOG(debug) << "Original linestring: "
                           << linestring_to_string(linestring.begin(), linestring.end());
     TRACKTABLE_LOG(debug) << "Simplified linestring: "
                           << linestring_to_string(simplified.begin(), simplified.end());

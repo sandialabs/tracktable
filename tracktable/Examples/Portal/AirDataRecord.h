@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -72,13 +72,13 @@ public:
   FlightPoint(point_2d pt) : TimeStampedLatLon(pt) {};
 
   std::string get_id() const {return id;}
-  std::string get_id_long() const {return id + "-" + 
+  std::string get_id_long() const {return id + "-" +
     boost::gregorian::to_simple_string(get_time().date());}
   int get_altitude() const {return altitude;}
   int get_heading() const {return heading;}
   int get_speed() const {return speed;}
 
-// Note:  curvature is defined as the difference of the incoming and outgoing 
+// Note:  curvature is defined as the difference of the incoming and outgoing
 // angles, divided by half the sum of the incoming and outgoing distances.
 
   double get_curvature() const {return curvature;}
@@ -113,14 +113,14 @@ BOOST_GEOMETRY_REGISTER_LINESTRING(FlightTrajectory)
 // Okay.  Everything so far has been pretty straightforward.  Now, we inherit
 // from FlightTrajectory to make our flight.  The Flight has things in
 // addition to the trajectory points, such as max values and characteristics
-// of the points as a whole.  The difficult decision is whether or not to 
+// of the points as a whole.  The difficult decision is whether or not to
 // make the class by making the FlightTrajectory a member, or whether to
 // inherit FlightTrajectory.  It's more of an "is-a" relationship in my mind
-// and it makes certain idioms simpler.  However, some folks consider the 
+// and it makes certain idioms simpler.  However, some folks consider the
 // inheritance of things like std::vector (that essentially what a linestring
 // is) to be verboten.  You essentially lose their constructors, destructors
 // and other things.  C11++ has nice ways of dealing with that, but our version
-// does not.  
+// does not.
 
 class Flight : public FlightTrajectory
 {
@@ -148,16 +148,16 @@ public:
   boost::posix_time::ptime get_start_time() const {return start_time;}
   boost::posix_time::ptime get_end_time() const {return end_time;}
   std::string get_flight_id() const {return flight_id;}
-  std::string get_flight_id_long() const {return flight_id + "-" + 
+  std::string get_flight_id_long() const {return flight_id + "-" +
     boost::gregorian::to_simple_string(start_time.date());}
   double get_dsort_field() const {return dsort_field;}
   void set_max_altitude(const int &a) {max_altitude = a; return;}
   void set_total_distance(const double &d) {total_distance = d; return;}
   void set_end_to_end_distance(const double &d) {end_to_end_distance = d; return;}
   void set_max_speed(const int &s) {max_speed = s; return;}
-  void set_start_time(const boost::posix_time::ptime &t) 
+  void set_start_time(const boost::posix_time::ptime &t)
    {start_time = t; return;}
-  void set_end_time(const boost::posix_time::ptime &t) 
+  void set_end_time(const boost::posix_time::ptime &t)
    {end_time = t; return;}
   void set_flight_id(const std::string &s) {flight_id = s; return;}
   void set_dsort_field(const double &d) {dsort_field = d; return;}

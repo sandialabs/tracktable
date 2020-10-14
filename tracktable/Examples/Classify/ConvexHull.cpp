@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -95,7 +95,7 @@ double GetHullEccentricity(trajectory_type &trajectory)
 
   return sqrt(1.0 - pow(min_dist/max_dist,2.0));
 }
-  
+
 double GetHullAspectRatio(trajectory_type &trajectory)
 {
   // The way this works is that it finds a crude measure of the eccentricity
@@ -204,7 +204,7 @@ void NorthPoleHull(TrackLonLat &data, TrackLonLat &hull)
 {
 
   // We don't do much on 2-D flat planes, so I don't have a typedef here,
-  // as if to say, "This is unusual".  
+  // as if to say, "This is unusual".
 
   boost::geometry::model::polygon<point_xy> projection;
   boost::geometry::model::linestring<point_xy> flat_hull;
@@ -241,7 +241,7 @@ void NorthPoleHull(TrackLonLat &data, TrackLonLat &hull)
 
   return;
 }
-    
+
 void ReturnPoints(TrackLonLat &data, point_ll center)
 {
   // Just invert the previous rotation.

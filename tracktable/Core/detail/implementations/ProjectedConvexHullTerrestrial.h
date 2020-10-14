@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -61,10 +61,10 @@ void RotatePointsToNorthPole(iterator point_begin, iterator point_end,
                              PointLonLat const& centroid)
 {
   // Rotate so that the center is at longitude 0.0.  No trig required.
-  TRACKTABLE_LOG(log::trace) 
+  TRACKTABLE_LOG(log::trace)
     << "RotatePointsToNorthPole: Removing latitude excess "
     << centroid[1];
-  
+
   for (iterator here = point_begin; here != point_end; ++here)
     {
     double new_lon = fmod(here->template get<0>() - centroid.get<0>(),

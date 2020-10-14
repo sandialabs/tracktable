@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -187,7 +187,7 @@ int test_rtree_with_pair_value()
     min_point[i] = 0;
     max_point[i] = 0;
     }
-  
+
   min_point[0] = -5;
   min_point[1] = 0;
   max_point[0] = 5;

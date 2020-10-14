@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -82,17 +82,17 @@ def main():
     #Test single trajectory
     trajectories_as_string = write_trajectories_to_string(original_trajectories[0])
     reconstituted_trajectories = read_trajectories_from_string(trajectories_as_string)
-    
+
     if len(reconstituted_trajectories) != 1:
         print("ERROR: Reconstituted array contains {}, which is more than 1.".format(len(original_trajectories[0]), len(reconstituted_trajectories)))
         return 1
-        
+
     if original_trajectories[0] != reconstituted_trajectories[0]:
             print("ERROR: Trajectory was not reconstituted successfully.")
             print("Original trajectory ({}):\n{}".format(repr(original_trajectories[0]), str(original_trajectories[0])))
             print("Reconstituted trajectory ({}):\n{}".format(repr(reconstituted_trajectories[0]), str(reconstituted_trajectories[0])))
-            num_errors += 1    
-                                                                       
+            num_errors += 1
+
     #Test Array of Trajectories
     trajectories_as_string = write_trajectories_to_string(original_trajectories)
     reconstituted_trajectories = read_trajectories_from_string(trajectories_as_string)
@@ -107,7 +107,7 @@ def main():
             print("Original trajectory ({}):\n{}".format(repr(original_trajectories[i]), str(original_trajectories[i])))
             print("Reconstituted trajectory ({}):\n{}".format(repr(reconstituted_trajectories[i]), str(reconstituted_trajectories[i])))
             num_errors += 1
-            
+
     return (num_errors != 0)
 
 

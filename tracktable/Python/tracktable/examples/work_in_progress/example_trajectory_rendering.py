@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -31,8 +31,8 @@
 """example_trajectory_rendering - Arguments and code for drawing trajectories
 
 This file contains a complete, runnable example of how to render
-trajectories onto a map (example_trajectory_rendering()) as well as 
-utility functions that you can use in your own code.  Those functions 
+trajectories onto a map (example_trajectory_rendering()) as well as
+utility functions that you can use in your own code.  Those functions
 address questions such as...
 
 * How should the line segments in the trajectory be colored?
@@ -66,7 +66,7 @@ def example_trajectory_rendering():
     # First, We will need data points built into trajectories. Replace the following with your own code to build the trajectories or use the provided example.
     fileName = './tracktable/examples/data/SampleTrajectories.csv'
     trajectories = example_trajectory_builder(fileName)
-    
+
     # Set up the canvas and map projection
     dpi = 160
     figure = pyplot.figure(figsize=[20, 15])
@@ -112,7 +112,7 @@ def example_trajectory_rendering():
 
     color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1)
     render_trajectories(mymap, trajectories, trajectory_linewidth=2)
-    
+
     print("STATUS: Saving figure to file")
     pyplot.savefig('./Example_Trajectory_Rendering_CONUS.png',
                    figsize=[800,600],
@@ -121,14 +121,14 @@ def example_trajectory_rendering():
                    facecolor='black')
 
     pyplot.close()
-    
+
 
 # ----------------------------------------------------------------------
 
 def initialize_matplotlib_figure(figure_size_in_inches,
                                  axis_span=[0, 0, 1, 1],
                                  facecolor='black',
-                                 edgecolor='black'): 
+                                 edgecolor='black'):
     """Initialize a figure for Matplotlib to draw into.
 
     Args:
@@ -175,9 +175,9 @@ def render_trajectories(basemap,
                         axes=None):
     """Render decorated trajectories onto a map instance.
 
-    Given a map instance (usually axes from Cartopy) and an iterable 
-    containing trajectories, draw the trajectories onto the map with 
-    the specified appearance parameters.  You can control the trajectory 
+    Given a map instance (usually axes from Cartopy) and an iterable
+    containing trajectories, draw the trajectories onto the map with
+    the specified appearance parameters.  You can control the trajectory
     color, linewidth, z-order and whether or not a dot is drawn at the
     head of each path.
 
@@ -219,7 +219,7 @@ def render_trajectories(basemap,
 
     if trajectory_color_type == 'scalar':
         annotator = annotations.retrieve_feature_function(trajectory_color)
-        
+
         def annotation_generator(traj_source):
             for trajectory in traj_source:
                 yield(annotator(trajectory))

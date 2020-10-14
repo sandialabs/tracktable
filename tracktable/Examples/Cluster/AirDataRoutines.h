@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
  */
 
-// 
+//
 // AirDataRoutines
 //
 // This routine simply reads in the data from flight records that are stored
@@ -27,10 +27,10 @@ int readAirDataFile(std::string &input_file, std::string& sep_char,
 int readTrajectoryFile(std::string &input_file, std::string &sep_char,
  BasicTrajectory &trajectory);
 
-double distFromTrack(const point_ll &point, 
+double distFromTrack(const point_ll &point,
  const TrackLonLat &tps);
 
-void readJSONData(BasicTrajectory &trajectory, 
+void readJSONData(BasicTrajectory &trajectory,
  std::string &output_file);
 
 double HeadingDifference(const double h2, const double h1);

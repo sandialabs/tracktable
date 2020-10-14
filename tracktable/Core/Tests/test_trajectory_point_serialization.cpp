@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -44,7 +44,7 @@ template<typename point_type>
 point_type serialized_copy(point_type const& input_point)
 {
   point_type restored_point;
-  
+
   std::ostringstream temp_out;
   boost::archive::text_oarchive archive_out(temp_out);
   archive_out << input_point;
@@ -74,7 +74,7 @@ test_trajectory_point_lonlat_serialization()
   point.set_property("test_string_property", "Frodo lives!");
   point.set_property("test_timestamp_property", tracktable::time_from_string("2000-01-02 03:04:05"));
   point.set_timestamp(tracktable::time_from_string("2001-02-03 04:05:06"));
-    
+
   point_copy = serialized_copy(point);
   if (point != point_copy)
     {
@@ -95,7 +95,7 @@ test_trajectory_point_lonlat_serialization()
 // ----------------------------------------------------------------------
 
 
-  
+
 int
 main(int argc, char *argv[])
 {
