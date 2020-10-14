@@ -213,7 +213,7 @@ add_test(
 )
 
 add_test(
-  NAME C_IntegratedPointReader_TestPointFields
+  NAME C_IntegratedPointReader_PointFields
   COMMAND test_point_fields 826 ${Tracktable_SOURCE_DIR}/TestData/Points/SampleNFlights.csv
 )
 

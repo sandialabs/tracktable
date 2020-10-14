@@ -37,7 +37,7 @@ set(DOMAIN "tracktable.domain.tests")
 
 add_python_test(P_BasePointToString ${DOMAIN}.test_base_point_to_string)
 
-add_python_test(P_TestDomainNames ${DOMAIN}.test_domain_names)
+add_python_test(P_DomainNames ${DOMAIN}.test_domain_names)
 
 add_python_test(P_GeometricMedian ${DOMAIN}.test_geometric_median)
 
@@ -224,13 +224,13 @@ add_python_test(
 add_python_test(
   P_CurrentLengthFraction
   ${DOMAIN}.test_current_length_fraction
-  )  
+  )
 
 add_python_test(
   P_CurrentTimeFraction
   ${DOMAIN}.test_current_time_fraction
-  )    
-  
+  )
+
 add_python_test(
   P_TrajectoryId
   ${DOMAIN}.test_trajectory_id
