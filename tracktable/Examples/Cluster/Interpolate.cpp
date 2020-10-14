@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -7,7 +7,7 @@
 
 //
 //   Interpolate
-//   
+//
 // Do Interpolations
 //
 // Created by Danny Rintoul
@@ -37,10 +37,10 @@ Traj_Point GetInterpolatedPoint(
   Traj_Point fp;
   fp.set_timestamp(t);
   std::pair<BasicTrajectory::const_iterator,
-   BasicTrajectory::const_iterator> itrs; 
+   BasicTrajectory::const_iterator> itrs;
 
   itrs = std::equal_range(trajectory.begin(),trajectory.end(),
-   fp,boost::bind(&Traj_Point::timestamp,_1) < 
+   fp,boost::bind(&Traj_Point::timestamp,_1) <
    boost::bind(&Traj_Point::timestamp,_2));
 
   BasicTrajectory::const_iterator lower = itrs.first;
@@ -52,7 +52,7 @@ Traj_Point GetInterpolatedPoint(
     do {
       --lower;
     } while (lower->timestamp() >= t);
-    
+
     boost::posix_time::time_duration interval_t, interval_frac_t;
 
     interval_t = upper->timestamp() - lower->timestamp();
@@ -76,7 +76,7 @@ boost::posix_time::ptime GetInterpolatedTime(
   if (frac == 1.0)
     return trajectory.back().timestamp();
 
-  boost::posix_time::time_duration total_time = 
+  boost::posix_time::time_duration total_time =
    trajectory.back().timestamp() - trajectory.front().timestamp();
 
   long delta_sec = static_cast<long>(frac*total_time.total_seconds());

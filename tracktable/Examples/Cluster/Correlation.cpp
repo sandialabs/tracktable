@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -49,12 +49,12 @@ void Correlation(std::vector<feature_vector>& features)
 
   double N = static_cast<double>(features.size());
 
-  for (unsigned int i = 0; i < features.size(); ++i) 
+  for (unsigned int i = 0; i < features.size(); ++i)
     for (unsigned int j = 0; j < 10; ++j) {
       mean[j] += features[i][j]/N;
     }
 
-  for (unsigned int i = 0; i < features.size(); ++i) 
+  for (unsigned int i = 0; i < features.size(); ++i)
     for (unsigned int j = 0; j < 10; ++j) {
       sq_mean[j] += (features[i][j] - mean[j]) * (features[i][j] - mean[j]);
     }
@@ -65,7 +65,7 @@ void Correlation(std::vector<feature_vector>& features)
         cov[i][j] += ((features[k][i]-mean[i]) * (features[k][j]-mean[j]))
          /(sqrt(sq_mean[i]*sq_mean[j]));
 
-  
+
   for (unsigned int i = 0; i < 10; ++i) {
     for (unsigned int j = 0; j <= i; ++j)
       std::cout << cov[i][j] << "\t";

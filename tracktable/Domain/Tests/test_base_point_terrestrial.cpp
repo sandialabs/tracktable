@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -131,7 +131,7 @@ int test_point_lonlat()
 
   point2_lonlat albuquerque, wellington, new_york, north_pole, south_pole, roswell, santa_fe;
   point2_lonlat access_test;
-  
+
   tracktable::set_latitude_from_degrees(access_test, 40.0);
   tracktable::set_longitude_from_degrees(access_test, -120.0);
 
@@ -152,7 +152,7 @@ int test_point_lonlat()
 		<< tracktable::longitude_as_degrees(access_test)
 		<< "\n";
     }
-				
+
   tracktable::set_latitude_from_radians(access_test, 1.57);
   tracktable::set_longitude_from_radians(access_test, -1.57);
 
@@ -173,7 +173,7 @@ int test_point_lonlat()
 		<< tracktable::longitude_as_degrees(access_test)
 		<< "\n";
     }
-  
+
   santa_fe.set_latitude(35.6672);
   santa_fe.set_longitude(-105.9644);
 

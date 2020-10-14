@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC . Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -37,7 +37,7 @@
 # extension that is also linked with the Python library.  If we can
 # detect this interpreter we can substitute a different set of link
 # flags.
-# 
+#
 # We do this by trying to import the 'conda' module.  This program is
 # Anaconda's package manager.  It is very unlikely that an Anaconda
 # installation will not have it.

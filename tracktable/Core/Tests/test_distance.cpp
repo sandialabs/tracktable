@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2014-2018 National Technology and Engineering
+* Copyright (c) 2014-2020 National Technology and Engineering
 * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 * with National Technology and Engineering Solutions of Sandia, LLC,
 * the U.S. Government retains certain rights in this software.
@@ -150,34 +150,34 @@ int run_test()
 
     int error_count = 0;
     double actual, expected;
-    
+
     std::cout << "Testing Terrestrial Distance" << std::endl;
 
     TrajectoryPointLonLat albuquerque = create_trajectory_point(35.0844, -106.6504);
     TerrestrialTrajectoryPoint albuquerque2 = create_terrestrial_trajectory_point(35.0844, -106.6504);
     LonLatPoint albuquerque3 = create_point(35.0844, -106.6504);
     TerrestrialPoint albuquerque4 = create_terrestrial_point(35.0844, -106.6504);
-        
+
     TrajectoryPointLonLat dallas = create_trajectory_point(32.8205, -96.8716);
     TerrestrialTrajectoryPoint dallas2 = create_terrestrial_trajectory_point(32.8205, -96.8716);
     LonLatPoint dallas3 = create_point(32.8205, -96.8716);
     TerrestrialPoint dallas4 = create_terrestrial_point(32.8205, -96.8716);
-    
+
     TrajectoryPointLonLat el_paso = create_trajectory_point(31.7619, -106.4850);
     TerrestrialTrajectoryPoint el_paso2 = create_terrestrial_trajectory_point(31.7619, -106.4850);
     LonLatPoint el_paso3 = create_point(31.7619, -106.4850);
     TerrestrialPoint el_paso4 = create_terrestrial_point(31.7619, -106.4850);
-        
+
     TrajectoryPointLonLat san_antonio = create_trajectory_point(29.4813, -98.6544);
     TerrestrialTrajectoryPoint san_antonio2 = create_terrestrial_trajectory_point(29.4813, -98.6544);
     LonLatPoint san_antonio3 = create_point(29.4813, -98.6544);
     TerrestrialPoint san_antonio4 = create_terrestrial_point(29.4813, -98.6544);
-    
+
     TrajectoryPointLonLat houston = create_trajectory_point(29.8168, -74.0060);
     TerrestrialTrajectoryPoint houston2 = create_terrestrial_trajectory_point(29.8168, -74.0060);
     LonLatPoint houston3 = create_point(29.8168, -74.0060);
     TerrestrialPoint houston4 = create_terrestrial_point(29.8168, -74.0060);
-    
+
     TrajectoryLonLat ep_to_dal;
     ep_to_dal.push_back(el_paso);
     ep_to_dal.push_back(dallas);
@@ -234,14 +234,14 @@ int run_test()
     expected = 0.0;
     actual = distance(ep_to_dal, sa_to_abq);
     error_count += verify_result(actual, expected, "TerrestrialTrajectory to TerrestrialTrajectory Intersecting");
-        
+
     std::cout << "Testing Cartesian 2D Distance" << std::endl;
-    
+
     TrajectoryCartesian2dPoint point00 = create_cartesian2d_point(0,0);
     TrajectoryCartesian2dPoint point01 = create_cartesian2d_point(0,1);
     TrajectoryCartesian2dPoint point11 = create_cartesian2d_point(1,1);
     TrajectoryCartesian2dPoint point22 = create_cartesian2d_point(2,2);
-    
+
     TrajectoryCartesian2d traj1;
     traj1.push_back(point00);
     traj1.push_back(point01);
@@ -262,7 +262,7 @@ int run_test()
     error_count += verify_result(actual, expected, "TrajectoryCartesian2dPoint to TrajectoryCartesian2d");
 
     std::cout << "Testing Cartesian 3D Distance" << std::endl;
-    
+
     TrajectoryCartesian3dPoint point000 = create_cartesian3d_point(0,0,0);
     TrajectoryCartesian3dPoint point001 = create_cartesian3d_point(0,0,1);
     TrajectoryCartesian3dPoint point111 = create_cartesian3d_point(1,1,1);

@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2014-2018 National Technology and Engineering
+* Copyright (c) 2014-2020 National Technology and Engineering
 * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 * with National Technology and Engineering Solutions of Sandia, LLC,
 * the U.S. Government retains certain rights in this software.
@@ -63,15 +63,15 @@ namespace tracktable { namespace algorithms {
     struct radius_of_gyration<tracktable::Trajectory<point_type> >
     {
       typedef tracktable::Trajectory<point_type> TrajectoryT;
-      
+
       static inline double apply(TrajectoryT const& path)
       {
         // Sanity check: if a trajectory has fewer than 3 points its
         // radius of gyration is by definition zero
         if (path.size() < 2) return 0;
-        
+
         point_type centroid = tracktable::convex_hull_centroid(path);
-        
+
         double sum = 0.0;
         double size = 0.0;
         for (typename TrajectoryT::const_iterator itr = path.begin(); itr != path.end(); itr++)

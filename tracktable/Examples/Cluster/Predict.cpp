@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -35,7 +35,7 @@
 #include <numeric>
 #include <boost/bind.hpp>
 
-void Predict(Trajectories &trajectories, std::vector<my_data> &features, 
+void Predict(Trajectories &trajectories, std::vector<my_data> &features,
  std::vector<my_data> &to_be_predicted, unsigned int sample_size)
 {
   // Use the rtree from "my_rtree.h", and the value typedef.  The value
@@ -61,14 +61,14 @@ void Predict(Trajectories &trajectories, std::vector<my_data> &features,
   print_mem_usage();
 
   // Define the the number of trajectories that will be used to predict
-  // the destination.  The bins vector will be used to hold the result of 
+  // the destination.  The bins vector will be used to hold the result of
   // how far down the potential list of predicted destinations you need to
   // go to find the right destination.  The bins vector is a little larger
   // to hold the count of getting it wrong.
 
   std::vector<unsigned int> bins(sample_size+1);
 
-  // Okay.  Here is where the work is done.  Go through each flight and 
+  // Okay.  Here is where the work is done.  Go through each flight and
   // find all of its neighbors to predict where it will land.
 
   std::vector<my_data>::iterator orig = to_be_predicted.begin();
@@ -77,7 +77,7 @@ void Predict(Trajectories &trajectories, std::vector<my_data> &features,
 
     // Note we are getting more results than sample_size.  This is because
     // we will throw out the hit that corresponds to the trajectory itself.
-    // It would be cheating to use that for prediction. 
+    // It would be cheating to use that for prediction.
 
     my_rtree::const_query_iterator it =
      rtree.qbegin(boost::geometry::index::nearest(orig->Point,sample_size+10));
@@ -89,15 +89,15 @@ void Predict(Trajectories &trajectories, std::vector<my_data> &features,
 
 //	  rtree.query(boost::geometry::index::nearest(orig->Point,sample_size+1),
 //	   std::back_inserter(result_n));
-	
+
     // typedef for storing the destination/weight pair.
     typedef std::pair<std::string,double> w_pair;
     std::map<w_pair::first_type,w_pair::second_type> weights;
 //    Trajectories results;
 
-    std::string dest = orig->index->front().string_property("dest");	
+    std::string dest = orig->index->front().string_property("dest");
 	  double total_weight = 0.0;
-	
+
     // Take the results from the rtree query, and then build a vector that
     // has the resulting flights.  In addition, build a table of weights for
     // each potential destination (via a map) using what is essentially a
@@ -116,7 +116,7 @@ void Predict(Trajectories &trajectories, std::vector<my_data> &features,
 	  }
 
     // An intermediate step.  Basically, the elements of the map are sorted
-    // by key (destination) not by value (weight).  We put them in a vector 
+    // by key (destination) not by value (weight).  We put them in a vector
     // that will be sorted by value since that is how we will use them.
 
     std::vector<w_pair> sorted(weights.begin(),weights.end());
@@ -130,7 +130,7 @@ void Predict(Trajectories &trajectories, std::vector<my_data> &features,
     // Here is where we fill the bin of whether they were ther first guess,
     // second guess, etc., or wrong. The wrong answers go in the 0 bin.
     // The number is done by iterator subtraction, which is a totally
-    // valid way to do things in C++.  Note that if pos == sorted.size(), 
+    // valid way to do things in C++.  Note that if pos == sorted.size(),
     // then the find_if returned sorted.end() and the value was
     // not found.
 
@@ -153,11 +153,11 @@ void Predict(Trajectories &trajectories, std::vector<my_data> &features,
   int total = 0;
   for (unsigned int i = 1; i < bins.size(); ++i) {
     total += bins[i];
-    std::cout << "bins[" << i << "] = " << bins[i] << ", total = " << 
-     total << ", cumulative fraction  = " << 
+    std::cout << "bins[" << i << "] = " << bins[i] << ", total = " <<
+     total << ", cumulative fraction  = " <<
      double(total)/double(to_be_predicted.size()) << std::endl;
   }
-  std::cout << "Got " << bins[0] << " (" << 
+  std::cout << "Got " << bins[0] << " (" <<
    double(bins[0])/double(to_be_predicted.size()) << " fraction) wrong" << std::endl;
 
   return;

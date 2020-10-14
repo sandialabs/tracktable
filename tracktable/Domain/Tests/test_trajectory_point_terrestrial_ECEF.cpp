@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2014-2018 National Technology and Engineering
+* Copyright (c) 2014-2020 National Technology and Engineering
 * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 * with National Technology and Engineering Solutions of Sandia, LLC,
 * the U.S. Government retains certain rights in this software.
@@ -96,7 +96,7 @@ int run_test()
     using namespace tracktable;
 
     int error_count = 0;
-    
+
     std::cout << "Testing ECEF function" << std::endl;
 
     TerrestrialTrajectoryPoint lonlatzero = create_terrestrial_point(0.0, 0.0);
@@ -112,25 +112,25 @@ int run_test()
     expected[1] = 0.0;
     expected[2] = 0.0;
     error_count += verify_result(actual, expected, "LonLatZero");
-        
+
     actual = equatorpoint.ECEF();
     expected[0] = 0.0;
     expected[1] = 6378.137;
     expected[2] = 0.0;
     error_count += verify_result(actual, expected, "EquatorPoint");
-        
+
     actual = northpole.ECEF();
     expected[0] = 0.0;
     expected[1] = 0.0;
     expected[2] = 6356.75231;
     error_count += verify_result(actual, expected, "NorthPole",1e-4);
-        
+
     actual = northpole2.ECEF();
     expected[0] = 0.0;
     expected[1] = 0.0;
     expected[2] = 6456.75231;
     error_count += verify_result(actual, expected, "NorthPole2",1e-4);
-        
+
     actual = albuquerque.ECEF();
     expected[0] = -1497.14022;
     expected[1] = -5005.96887;
@@ -141,7 +141,7 @@ int run_test()
     bool thrown = false;
     try {
         actual = albuquerque.ECEF_from_feet();
-    } catch(tracktable::domain::terrestrial::PropertyDoesNotExist &e) {   
+    } catch(tracktable::domain::terrestrial::PropertyDoesNotExist &e) {
         thrown = true;
     }
     if (!thrown) {

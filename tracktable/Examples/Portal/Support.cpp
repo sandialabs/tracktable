@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 National Technology and Engineering
+ * Copyright (c) 2013-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -7,7 +7,7 @@
 
 //
 //   Supporting tools
-//   
+//
 // A simple example how one can find similar trajectorys using control points
 //
 // Created by Danny Rintoul
@@ -27,10 +27,10 @@ Traj_Point GetInterpolatedPoint(const Trajectory &trajectory, double frac)
 
   Traj_Point fp;
   fp.set_time(t);
-  std::pair<Trajectory::const_iterator,Trajectory::const_iterator> itrs; 
+  std::pair<Trajectory::const_iterator,Trajectory::const_iterator> itrs;
 
   itrs = std::equal_range(trajectory.begin(),trajectory.end(),
-   fp,boost::bind(&Traj_Point::get_time,_1) < 
+   fp,boost::bind(&Traj_Point::get_time,_1) <
    boost::bind(&Traj_Point::get_time,_2));
 
   if (itrs.first == itrs.second) {
@@ -56,7 +56,7 @@ Traj_Point GetInterpolatedPoint(const Trajectory &trajectory, double frac)
   }
 }
 
-boost::posix_time::ptime GetInterpolatedTime(const Trajectory &trajectory, 
+boost::posix_time::ptime GetInterpolatedTime(const Trajectory &trajectory,
  double frac)
 {
   if (frac == 0.0)
@@ -65,7 +65,7 @@ boost::posix_time::ptime GetInterpolatedTime(const Trajectory &trajectory,
   if (frac == 1.0)
     return trajectory.back().get_time();
 
-  boost::posix_time::time_duration total_time = 
+  boost::posix_time::time_duration total_time =
    trajectory.back().get_time() - trajectory.front().get_time();
 
   long delta_sec = static_cast<long>(frac*total_time.total_seconds());

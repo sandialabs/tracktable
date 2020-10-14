@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -74,7 +74,7 @@ int read_asdi_trajectories(
   point_reader.set_timestamp_column(1);
   point_reader.set_longitude_column(2);
   point_reader.set_latitude_column(3);
-  
+
   trajectory_builder.set_input(point_reader.begin(), point_reader.end());
 
   std::cout << "Reading trajectories...\n";

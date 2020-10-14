@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -39,12 +39,12 @@
 #include <tracktable/Core/TrajectoryPoint.h>
 #include "CleanTrajectory.h"
 
-void CleanTrajectories(Trajectories& trajectories, int min_flight_size, 
- int min_time_between_points, double max_distance_between_points, 
+void CleanTrajectories(Trajectories& trajectories, int min_flight_size,
+ int min_time_between_points, double max_distance_between_points,
  int max_altitude_change, int min_altitude)
 {
   for_each(trajectories.begin(),trajectories.end(),
-   boost::bind(CleanTrajectory,_1,min_flight_size,min_time_between_points, 
+   boost::bind(CleanTrajectory,_1,min_flight_size,min_time_between_points,
    max_distance_between_points,max_altitude_change,min_altitude));
 
   trajectories.erase(std::remove_if(trajectories.begin(),trajectories.end(),
@@ -55,11 +55,11 @@ void CleanTrajectories(Trajectories& trajectories, int min_flight_size,
 
 // ----------------------------------------------------------------------
 
-void CleanTrajectory(BasicTrajectory& traj, int min_flight_size, 
- int min_time_between_points, double max_distance_between_points, 
+void CleanTrajectory(BasicTrajectory& traj, int min_flight_size,
+ int min_time_between_points, double max_distance_between_points,
  int max_altitude_change, int min_altitude)
 {
-  traj.erase(std::unique(traj.begin(),traj.end(), 
+  traj.erase(std::unique(traj.begin(),traj.end(),
    boost::bind(badPoint,_1,_2,min_time_between_points,
    max_distance_between_points,max_altitude_change,min_altitude)),traj.end());
 }
@@ -69,10 +69,10 @@ void CleanTrajectory(BasicTrajectory& traj, int min_flight_size,
 // Is this correct?  I can't find any way to reproduce this number.
 #define EARTH_RADIUS_IN_NM 3343.89849
 
-bool badPoint(const Traj_Point &p1, 
+bool badPoint(const Traj_Point &p1,
               const Traj_Point &p2,
               int min_time_between_points, // seconds
-              double max_distance_between_points, // measured in nm 
+              double max_distance_between_points, // measured in nm
               int max_altitude_change, // measured in feet
               int min_altitude) // measured in feet
 {
