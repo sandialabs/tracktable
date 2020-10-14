@@ -353,7 +353,7 @@ target_link_libraries(test_memory_use
 
 target_link_libraries(test_trajectory_slicing
   TracktableCore
-  ${Boost_LIBRARIES} 
+  ${Boost_LIBRARIES}
   )
 
 # ----------------------------------------------------------------------
@@ -412,27 +412,27 @@ add_test(
 )
 
 add_test(
-  NAME C_TestCurrentLength
+  NAME C_CurrentLength
   COMMAND test_current_length
 )
 
 add_test(
-  NAME C_TestCurrentLengthFraction
+  NAME C_CurrentLengthFraction
   COMMAND test_current_length_fraction
 )
 
 add_test(
-  NAME C_TestCurrentTimeFraction
+  NAME C_CurrentTimeFraction
   COMMAND test_current_time_fraction
 )
 
 add_test(
-  NAME C_TestPointGeometryMath
+  NAME C_PointGeometryMath
   COMMAND test_point_geometry_math
 )
 
 add_test(
-  NAME C_TestPointGeometricMedian
+  NAME C_PointGeometricMedian
   COMMAND test_point_geometric_median
 )
 
