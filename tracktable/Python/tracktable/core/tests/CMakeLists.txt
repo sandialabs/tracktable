@@ -34,13 +34,13 @@
 
 include(PythonTest)
 
-add_python_test(P_TestConvexHullArea tracktable.core.tests.test_convex_hull_area)
+add_python_test(P_ConvexHullArea tracktable.core.tests.test_convex_hull_area)
 
-add_python_test(P_TestConvexHullAspectRatio tracktable.core.tests.test_convex_hull_aspect_ratio)
+add_python_test(P_ConvexHullAspectRatio tracktable.core.tests.test_convex_hull_aspect_ratio)
 
-add_python_test(P_TestConvexHullCentroid tracktable.core.tests.test_convex_hull_centroid)
+add_python_test(P_ConvexHullCentroid tracktable.core.tests.test_convex_hull_centroid)
 
-add_python_test(P_TestConvexHullPerimeter tracktable.core.tests.test_convex_hull_perimeter)
+add_python_test(P_ConvexHullPerimeter tracktable.core.tests.test_convex_hull_perimeter)
 
 add_python_test(P_CopyExampleNotebooks tracktable.core.tests.test_copy_example_notebooks "${Tracktable_BINARY_DIR}/TestOutput/")
 
@@ -52,21 +52,21 @@ add_python_test(P_ParseTimestampNoTimeZone tracktable.core.tests.parse_timestamp
 
 add_python_test(P_ParseTimestampWithTimeZone tracktable.core.tests.parse_timestamp_with_time_zone)
 
-add_python_test(P_TestSpeedBetween tracktable.core.tests.test_speed_between)
+add_python_test(P_SpeedBetween tracktable.core.tests.test_speed_between)
 
-add_python_test(P_TestTrajectoryTypes tracktable.core.tests.test_trajectory_types)
+add_python_test(P_TrajectoryTypes tracktable.core.tests.test_trajectory_types)
 
-add_python_test(P_TestPointTypes tracktable.core.tests.test_point_types)
+add_python_test(P_PointTypes tracktable.core.tests.test_point_types)
 
-add_python_test(P_TestRadiusGyration tracktable.core.tests.test_trajectory_radius_of_gyration)
+add_python_test(P_RadiusGyration tracktable.core.tests.test_trajectory_radius_of_gyration)
 
-add_python_test(P_TestComputeBoundingBox tracktable.core.tests.test_compute_bounding_box)
+add_python_test(P_ComputeBoundingBox tracktable.core.tests.test_compute_bounding_box)
 
-add_python_test(P_TestComputeBoundingBoxAfterPickle tracktable.core.tests.test_compute_bounding_box_after_pickle)
+add_python_test(P_ComputeBoundingBoxAfterPickle tracktable.core.tests.test_compute_bounding_box_after_pickle)
 
-add_python_test(P_TestDistance tracktable.core.tests.test_distance)
+add_python_test(P_Distance tracktable.core.tests.test_distance)
 
-add_python_test(P_TestKM2LonLat tracktable.core.tests.test_kms_to_lon_lat)
+add_python_test(P_KM2LonLat tracktable.core.tests.test_kms_to_lon_lat)
 
 add_python_test(P_LogLevel tracktable.core.tests.test_log_level)
 
