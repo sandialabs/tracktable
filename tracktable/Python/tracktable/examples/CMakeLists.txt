@@ -35,23 +35,15 @@
 # This does not yet test the Jupyter notebooks.
 
 include(PythonTest)
+include(FindPythonModule)
 
 set(EXAMPLE_MODULE tracktable.examples)
 set(EXAMPLES ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable/examples)
 
-execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
-      "import re; import cartopy; print(re.compile('/__init__.py.*').sub('',cartopy.__file__))"
-      RESULT_VARIABLE CARTOPY_MODULE_STATUS
-      OUTPUT_VARIABLE CARTOPY_MODULE_LOCATION
-      ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-#message("CARTOPY_MODULE_STATUS ${CARTOPY_MODULE_STATUS}")
-#message("CARTOPY_MODULE_LOCATION ${CARTOPY_MODULE_LOCATION}")
-if(NOT CARTOPY_MODULE_STATUS)
-      set(PY_CARTOPY_MODULE ${CARTOPY_MODULE_LOCATION} CACHE STRING
-          "Location of Python module cartopy")
-endif(NOT CARTOPY_MODULE_STATUS)
+find_python_module(cartopy CARTOPY_MODULE_STATUS CARTOPY_MODULE_LOCATION)
+
 find_package_handle_standard_args(PY_cartopy_module DEFAULT_MSG PY_CARTOPY_MODULE)
-#message("PY_CARTOPY_MODULE ${PY_CARTOPY_MODULE}")
+# message("PY_CARTOPY_MODULE ${PY_CARTOPY_MODULE}")
 
 if (PY_CARTOPY_MODULE)
   add_python_test(
