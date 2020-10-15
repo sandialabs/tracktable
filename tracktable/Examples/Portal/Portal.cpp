@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -12,13 +12,13 @@
 //
 //
 // Created by Danny Rintoul
-// 
+//
 
 #include <algorithm>
 #include <iterator>
 #include <boost/bind.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/geometry/arithmetic/arithmetic.hpp> 
+#include <boost/geometry/arithmetic/arithmetic.hpp>
 #include <boost/geometry/algorithms/intersects.hpp>
 #include <boost/geometry/algorithms/intersection.hpp>
 #include <boost/geometry/algorithms/distance.hpp>
@@ -29,7 +29,7 @@
 #include "Portal.h"
 #include "KmlOut.h"
 
-void SubDividePortal(PP &parent, unsigned int interval_x, 
+void SubDividePortal(PP &parent, unsigned int interval_x,
  unsigned int interval_y)
 {
   trajectory_point_type orig_ll = parent->min_corner();
@@ -56,12 +56,12 @@ void SubDividePortal(PP &parent, unsigned int interval_x,
     }
 
   // Now, go through all of the trajectories associated with the parent portal
-  // and assign them to the child portals by testing intersection.  
+  // and assign them to the child portals by testing intersection.
   // This is potentially inefficient.
 
-  for (fp_itr itr = parent->trajectories.begin(); 
+  for (fp_itr itr = parent->trajectories.begin();
    itr != parent->trajectories.end(); ++itr)
-    for (pp_itr itr2 = parent->children.begin(); 
+    for (pp_itr itr2 = parent->children.begin();
      itr2 != parent->children.end(); ++itr2)
       if (FPIntersects(*itr,*itr2))
         (*itr2)->trajectories.insert(*itr);
@@ -75,10 +75,10 @@ void SubDividePortal(PP &parent, unsigned int interval_x,
 }
 
 int RefinePairs(Pair_heap &pairs,
- const unsigned int depth, const unsigned int interval_x, 
+ const unsigned int depth, const unsigned int interval_x,
  const unsigned int interval_y)
 {
-  if (!pairs.empty() && ((pairs.top().p1->level < depth) || 
+  if (!pairs.empty() && ((pairs.top().p1->level < depth) ||
    (pairs.top().p2->level < depth))) {
     RefineTopPair(pairs,depth,interval_x,interval_y);
     return 1;
@@ -87,11 +87,11 @@ int RefinePairs(Pair_heap &pairs,
 }
 
 void RefineTopPair(Pair_heap &pairs,
- const unsigned int depth, const unsigned int interval_x, 
+ const unsigned int depth, const unsigned int interval_x,
  const unsigned int interval_y)
 {
 
-  // Decompose the first portal by default (it's the largest), or 
+  // Decompose the first portal by default (it's the largest), or
   // do the second if the first is already small enough
 
   PP shrink, keep;
@@ -111,7 +111,7 @@ void RefineTopPair(Pair_heap &pairs,
 
   // Now reassign the pairs
 
-  for (pp_itr itr = shrink->children.begin(); itr 
+  for (pp_itr itr = shrink->children.begin(); itr
    != shrink->children.end(); ++itr) {
     if (PortalDist(*itr,keep) < pairs.min_sep /* degrees */)
       continue;
@@ -149,7 +149,7 @@ void MakeNewPair(Pair_heap &pairs, PP &p1, PP &p2)
 
 void RemoveTopPair(Pair_heap &pairs, Trajectories &trajectories, PP &US)
 {
-  
+
   std::vector<trajectory_type*> to_remove;
   std::set_intersection(pairs.top().p1->trajectories.begin(),
                         pairs.top().p1->trajectories.end(),
@@ -175,7 +175,7 @@ void RemoveTopPair(Pair_heap &pairs, Trajectories &trajectories, PP &US)
 
 void RemoveTopPairClipped(Pair_heap &pairs, Trajectories &trajectories, PP &US)
 {
-  
+
   std::vector<trajectory_type*> to_remove;
   std::set_intersection(pairs.top().p1->trajectories.begin(),
                         pairs.top().p1->trajectories.end(),
@@ -187,7 +187,7 @@ void RemoveTopPairClipped(Pair_heap &pairs, Trajectories &trajectories, PP &US)
 
   pairs.pop();  // Finally remove the top one
 
-  // Now that the trajectories are removed and added, 
+  // Now that the trajectories are removed and added,
   // we have to go through and redo the
   // Portal_pairs.  We need to recalculate their overlap and re-heap them.
 
@@ -214,7 +214,7 @@ void RemoveTopPortal(my_pq<PP,std::vector<PP>,PPCompare> &portals, PP &US)
 void RemoveTrajectories(PP &portal, Trajectories &trajectories,
  std::vector<trajectory_type*> &to_remove)
 {
-  
+
   std::vector<trajectory_type*>::iterator itr = to_remove.begin();
   for(; itr != to_remove.end(); ++itr) {
     PortalRemoveTrajectory(portal,*itr);
@@ -248,7 +248,7 @@ void UpdatePairVal(Portal_pair &pp)
     else if (*itr2 < *itr1) ++itr2;
     else {
       if (WithinPortalEllipse(pp,*itr1,1.01))
-        ++pp.val; 
+        ++pp.val;
       ++itr1; ++itr2;
     }
   }
@@ -261,8 +261,8 @@ void UpdatePairSep(Portal_pair &pp)
   pp.sep = PortalDist(pp.p1,pp.p2);
 }
 
-int RefineSingles(my_pq<PP,std::vector<PP>,PPCompare> &portals, 
- const unsigned int depth, const unsigned int interval_x, 
+int RefineSingles(my_pq<PP,std::vector<PP>,PPCompare> &portals,
+ const unsigned int depth, const unsigned int interval_x,
  const unsigned int interval_y)
 {
   if (portals.top()->level < depth) {
@@ -272,19 +272,19 @@ int RefineSingles(my_pq<PP,std::vector<PP>,PPCompare> &portals,
     return 0;
 }
 
-void RefineTopSingle(my_pq<PP,std::vector<PP>,PPCompare> &portals, 
- const unsigned int depth, const unsigned int interval_x, 
+void RefineTopSingle(my_pq<PP,std::vector<PP>,PPCompare> &portals,
+ const unsigned int depth, const unsigned int interval_x,
  const unsigned int interval_y)
 {
   PP shrink = portals.top();
   portals.pop();
 
   SubDividePortal(shrink,interval_x,interval_y);
-  for (pp_itr itr = shrink->children.begin(); 
+  for (pp_itr itr = shrink->children.begin();
    itr != shrink->children.end(); ++itr)
     portals.push(*itr);
 }
-  
+
 std::ostream& operator<< (std::ostream &out, Portal &p)
 {
   out << "Level :" << p.level << std::endl;
@@ -327,7 +327,7 @@ T_itr &first_pt, T_itr &last_pt)
     std::cout << "Warning, trajectory->size() = " << trajectory->size() << std::endl;
 
   for (T_itr itr = trajectory->begin(); itr != trajectory->end()-1; ++itr) {
-    temp = 
+    temp =
      boost::geometry::model::segment<trajectory_point_type>(*itr,*(itr+1));
     if (boost::geometry::intersects(temp,*pp.p1)) {
       cur_box1 = itr;
@@ -350,11 +350,11 @@ T_itr &first_pt, T_itr &last_pt)
   if (!prev) {
     std::cout << "Something is very wrong!" << std::endl;
   }
-  
+
   return;
 }
 
-bool WithinPortalEllipse(const Portal_pair &pp, trajectory_type *trajectory, 
+bool WithinPortalEllipse(const Portal_pair &pp, trajectory_type *trajectory,
  const double &ecc)
 {
 
@@ -362,8 +362,8 @@ bool WithinPortalEllipse(const Portal_pair &pp, trajectory_type *trajectory,
   GetTwoPortalSegment(pp,trajectory,first_pt,last_pt);
   trajectory_type trajectory_portion(first_pt,last_pt);
 
-  if (!trajectory_portion.empty() && 
-   (boost::geometry::length(trajectory_portion) < 
+  if (!trajectory_portion.empty() &&
+   (boost::geometry::length(trajectory_portion) <
    ecc*boost::geometry::distance(trajectory_portion.front(),
    trajectory_portion.back()))) {
     return true;
@@ -372,8 +372,8 @@ bool WithinPortalEllipse(const Portal_pair &pp, trajectory_type *trajectory,
   return false;
 }
 
-void ClipTrajectory(PP &portal, 
- Trajectories &trajectories, trajectory_type *trajectory, 
+void ClipTrajectory(PP &portal,
+ Trajectories &trajectories, trajectory_type *trajectory,
  T_itr &first_pt, T_itr &last_pt)
 {
   trajectory_type part1(trajectory->begin(),first_pt);
@@ -383,7 +383,7 @@ void ClipTrajectory(PP &portal,
     trajectories.push_back(part1);
     AddTrajectory(portal,&(trajectories.back()));
   }
-  
+
   if (part2.size() > 4) {
     trajectories.push_back(part2);
     AddTrajectory(portal,&(trajectories.back()));
@@ -419,14 +419,14 @@ void ListRemoveTrajectory(Trajectories &trajectories, trajectory_type *t)
 
 void AddTrajectory(PP &portal, trajectory_type *to_add)
 {
-  
+
   portal->trajectories.insert(to_add);
 
   // Note, this assumes that the child portal exists.  Right now that
   // assumption is true, but it won't always be.  Basically, sub-dividing is
-  // a separate operation.  
+  // a separate operation.
 
-  for (pp_itr itr = portal->children.begin(); 
+  for (pp_itr itr = portal->children.begin();
    itr != portal->children.end(); ++itr)
     if (FPIntersects(to_add,*itr))
       AddTrajectory(*itr,to_add);

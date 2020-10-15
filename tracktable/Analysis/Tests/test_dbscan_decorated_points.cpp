@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -162,7 +162,7 @@ void test_dbscan()
   typedef std::pair<point_type, int> labeled_point_type;
   typedef std::vector<point_type> point_vector_type;
   typedef std::vector<int> label_vector_type;
-  
+
   typedef std::vector<labeled_point_type> labeled_point_vector_type;
 
   std::cout << "test_dbscan_decorated_points: "
@@ -188,7 +188,7 @@ void test_dbscan()
   typename label_vector_type::iterator vertex_id_iter = vertex_ids.begin();
   typedef std::pair<int, int> vertex_cluster_label;
   std::vector<vertex_cluster_label> dbscan_results;
-  
+
   for (; point_iter != hd_points.end(); ++point_iter, ++vertex_id_iter)
     {
     labeled_points.push_back(labeled_point_type(*point_iter, 100 * (*vertex_id_iter)));
@@ -203,7 +203,7 @@ void test_dbscan()
 
   std::cout << "num_clusters: " << num_clusters << "\n";
   std::cout << "num_points: " << labeled_points.size() << "\n";
-  
+
 #if 0
   std::cout << "Vertex ID and cluster label for each point:\n";
 
@@ -216,7 +216,7 @@ void test_dbscan()
     }
   std::cout << "Done testing DBSCAN with labeled points.";
 #endif
-  
+
 }
 
 // ----------------------------------------------------------------------

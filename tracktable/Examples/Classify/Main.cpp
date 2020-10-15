@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -86,7 +86,7 @@ int main(int argc, char* argv[])
                                     trajectories.end(),
                                     (boost::bind(absolute_curvature<trajectory_type>, _1) < 3600)),
                      trajectories.end());
-  
+
   /*
   trajectories.erase(std::remove_if(trajectories.begin(),trajectories.end(),
    boost::bind(std::divides<double>(),

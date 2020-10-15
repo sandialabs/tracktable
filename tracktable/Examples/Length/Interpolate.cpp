@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -7,7 +7,7 @@
 
 //
 //   Interpolate
-//   
+//
 // Do Interpolations
 //
 // Created by Danny Rintoul
@@ -17,7 +17,7 @@
 #include <numeric>
 #include <boost/bind.hpp>
 
-bool len_compare(const trajectory_point_type &p1, 
+bool len_compare(const trajectory_point_type &p1,
  const trajectory_point_type &p2) {
   return p1.real_property("length") < p2.real_property("length");
 }
@@ -41,7 +41,7 @@ trajectory_point_type GetLengthInterpolatedPoint(
   trajectory_point_type fp;
   fp.set_property("length", len);
   std::pair<trajectory_type::const_iterator,
-   trajectory_type::const_iterator> itrs; 
+   trajectory_type::const_iterator> itrs;
 
   itrs = std::equal_range(trajectory.begin(),trajectory.end(),
    fp,&len_compare);
@@ -55,10 +55,10 @@ trajectory_point_type GetLengthInterpolatedPoint(
     do {
       --lower;
     } while (lower->real_property("length") >= len);
-    
+
     double interval_len, interval_frac_len;
 
-    interval_len = upper->real_property("length") - 
+    interval_len = upper->real_property("length") -
      lower->real_property("length");
     interval_frac_len = len - lower->real_property("length");
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -50,7 +50,7 @@ def create_trajectory():
 
 
     source = path_point_source.TrajectoryPointSource(AirTrajectoryPoint)
-    source.start_time = 
+    source.start_time =
     source.end_time = Timestamp.from_any('2014-01-01 04:00:00')
     source.start_point = los_angeles
     source.end_point = new_york
@@ -104,4 +104,4 @@ def main():
 if __name__ == '__main__':
     sys.exit(main())
 
-    
+

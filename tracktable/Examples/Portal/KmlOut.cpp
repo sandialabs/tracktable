@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -68,7 +68,7 @@ std::string getColorString(void)
   std::stringstream s;
   s << std::hex << std::setfill('0') << std::uppercase;
   // Stupid setw isn't sticky...
-  s << "FF" << std::setw(2) << rand() % 255 << std::setw(2) 
+  s << "FF" << std::setw(2) << rand() % 255 << std::setw(2)
    << rand() % 255 << std::setw(2) << rand() % 255;
 
   return s.str();
@@ -90,7 +90,7 @@ void writeKmlFlight(trajectory_type &trajectory, std::ostream &outfile,
     boost::posix_time::to_iso_extended_string(trajectory.start_time());
   std::string end_time =
     boost::posix_time::to_iso_extended_string(trajectory.end_time());
-	std::string s = 
+	std::string s =
     boost::gregorian::to_simple_string(trajectory.start_time().date());
   outfile << "<Style id=\"" << style << "\">" << std::endl;
   outfile << "  <LineStyle>" << std::endl;
@@ -102,7 +102,7 @@ void writeKmlFlight(trajectory_type &trajectory, std::ostream &outfile,
   outfile << "<Placemark>" << std::endl;
   outfile << "  <name>" << style + "-" + s << "</name>" << std::endl;
   outfile << "  <TimeSpan> <begin>" << start_time << "</begin>" << std::endl;
-  outfile << "             <end>" << end_time << "</end> </TimeSpan>" << 
+  outfile << "             <end>" << end_time << "</end> </TimeSpan>" <<
    std::endl;
   outfile << "  <styleUrl>#" << style << "</styleUrl>" << std::endl;
   outfile << "  <LineString>" << std::endl;
@@ -134,7 +134,7 @@ void writeKmlFlights(Trajectories &trajectories, const std::string &file_name)
 	    boost::posix_time::to_iso_extended_string(itr->start_time());
 	  std::string end_time =
 	    boost::posix_time::to_iso_extended_string(itr->end_time());
-		std::string s = 
+		std::string s =
 	    boost::gregorian::to_simple_string(itr->start_time().date());
 	  outfile << "<Style id=\"" << style << "\">" << std::endl;
 	  outfile << "  <LineStyle>" << std::endl;
@@ -147,7 +147,7 @@ void writeKmlFlights(Trajectories &trajectories, const std::string &file_name)
 	  outfile << "<Placemark>" << std::endl;
 //	  outfile << "  <name>" << style + "-" + s << "</name>" << std::endl;
 	  outfile << "  <TimeSpan> <begin>" << start_time << "</begin>" << std::endl;
-	  outfile << "             <end>" << end_time << "</end> </TimeSpan>" << 
+	  outfile << "             <end>" << end_time << "</end> </TimeSpan>" <<
 	   std::endl;
 	  outfile << "  <styleUrl>#" << style << "</styleUrl>" << std::endl;
 	  outfile << "  <LineString>" << std::endl;
@@ -166,7 +166,7 @@ void writeKmlFlights(Trajectories &trajectories, const std::string &file_name)
 
 }
 /*
-void writeKmlFlight(const Ls &trajectory, std::ostream &outfile, 
+void writeKmlFlight(const Ls &trajectory, std::ostream &outfile,
  const std::string &ColorString, const double &width)
 {
 //  writeKmlHeader(outfile);
@@ -184,7 +184,7 @@ void writeKmlFlight(const Ls &trajectory, std::ostream &outfile,
   outfile << "  <styleUrl>#" << style << "</styleUrl>" << std::endl;
   outfile << "  <LineString>" << std::endl;
   outfile << "    <coordinates>" << std::endl;
-  for (Ls::const_iterator itr = trajectory.begin(); 
+  for (Ls::const_iterator itr = trajectory.begin();
    itr != trajectory.end(); ++itr)
     outfile << "    " << itr->get<0>() << "," << itr->get<1>() <<
      "," <<  0.0  << std::endl;
@@ -239,7 +239,7 @@ void writeKmlPortalPair(const Portal_pair &pp, const std::string &file_name)
 	    boost::posix_time::to_iso_extended_string(itr->start_time());
 	  std::string end_time =
 	    boost::posix_time::to_iso_extended_string(itr->end_time());
-		std::string s = 
+		std::string s =
 	    boost::gregorian::to_simple_string(itr->start_time().date());
 	  outfile << "<Style id=\"" << style << "\">" << std::endl;
 	  outfile << "  <LineStyle>" << std::endl;
@@ -252,7 +252,7 @@ void writeKmlPortalPair(const Portal_pair &pp, const std::string &file_name)
 	  outfile << "<Placemark>" << std::endl;
 //	  outfile << "  <name>" << style + "-" + s << "</name>" << std::endl;
 	  outfile << "  <TimeSpan> <begin>" << start_time << "</begin>" << std::endl;
-	  outfile << "             <end>" << end_time << "</end> </TimeSpan>" << 
+	  outfile << "             <end>" << end_time << "</end> </TimeSpan>" <<
 	   std::endl;
 	  outfile << "  <styleUrl>#" << style << "</styleUrl>" << std::endl;
 	  outfile << "  <LineString>" << std::endl;
@@ -272,18 +272,18 @@ void writeKmlPortalPair(const Portal_pair &pp, const std::string &file_name)
   outfile.close();
 }
 
-void writeKmlPortalPairClipped(const Portal_pair &pp, 
+void writeKmlPortalPairClipped(const Portal_pair &pp,
  const std::string &file_name)
 {
   std::vector<trajectory_type> trajectories;
 
   std::set<trajectory_type*>::iterator itr1 = pp.p1->trajectories.begin();
   std::set<trajectory_type*>::iterator itr2 = pp.p2->trajectories.begin();
-  while (itr1 != pp.p1->trajectories.end() && 
+  while (itr1 != pp.p1->trajectories.end() &&
    itr2 != pp.p2->trajectories.end()) {
     if (*itr1 < *itr2) ++itr1;
     else if (*itr2 < *itr1) ++itr2;
-    else { 
+    else {
       trajectory_type::iterator first_pt, last_pt;
       GetTwoPortalSegment(pp,*itr1,first_pt,last_pt);
       trajectory_type clipped(first_pt,last_pt);
@@ -306,7 +306,7 @@ void writeKmlPortalPairClipped(const Portal_pair &pp,
   std::string style = "LineString";
 //  std::string color("FFFFFFFF");
 
-  for (std::vector<trajectory_type>::iterator itr = trajectories.begin(); 
+  for (std::vector<trajectory_type>::iterator itr = trajectories.begin();
    itr != trajectories.end(); ++itr) {
 	  outfile << "<Style id=\"" << style << "\">" << std::endl;
 	  outfile << "  <LineStyle>" << std::endl;

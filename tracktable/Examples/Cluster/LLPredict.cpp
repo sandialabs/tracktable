@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -36,7 +36,7 @@
 #include <numeric>
 #include <boost/bind.hpp>
 
-void LLPredict(Trajectories &trajectories, std::vector<my_data> &features, 
+void LLPredict(Trajectories &trajectories, std::vector<my_data> &features,
  std::vector<my_data> &to_be_predicted, unsigned int sample_size)
 {
   // Use the rtree from "my_rtree.h", and the value typedef.  The value
@@ -61,7 +61,7 @@ void LLPredict(Trajectories &trajectories, std::vector<my_data> &features,
   std::cout << "Inserted into rtree" << std::endl;
   print_mem_usage();
 
-  // Okay.  Here is where the work is done.  Go through each flight and 
+  // Okay.  Here is where the work is done.  Go through each flight and
   // find all of its neighbors to predict where it will land.
 
   std::vector<double> dists;
@@ -71,7 +71,7 @@ void LLPredict(Trajectories &trajectories, std::vector<my_data> &features,
 
     // Note we are getting more results than sample_size.  This is because
     // we will throw out the hits that corresponds to the trajectory itself.
-    // It would be cheating to use that for prediction. 
+    // It would be cheating to use that for prediction.
 
     my_rtree::const_query_iterator it =
      rtree.qbegin(boost::geometry::index::nearest(orig->Point,sample_size+10));
@@ -82,15 +82,15 @@ void LLPredict(Trajectories &trajectories, std::vector<my_data> &features,
     }
 //	  rtree.query(boost::geometry::index::nearest(orig->Point,sample_size+1),
 //	   std::back_inserter(result_n));
-	
+
     // typedef for storing the destination/weight pair.
     typedef std::pair<point_ll,double> w_pair;
     std::vector<w_pair> weights;
 //    Trajectories results;
 
-    point_ll dest = orig->index->back();	
+    point_ll dest = orig->index->back();
 	  double total_weight = 0.0;
-	
+
     // Take the results from the rtree query, and then build a vector that
     // has the resulting flights.  In addition, build a table of weights for
     // each potential destination (via a map) using what is essentially a
@@ -113,9 +113,9 @@ void LLPredict(Trajectories &trajectories, std::vector<my_data> &features,
     std::sort(weights.begin(),weights.end(),
      boost::bind(&w_pair::second,_1) > boost::bind(&w_pair::second,_2));
 
-    // Code to find the nearest hit.  It shouldn't be this ugly.  
+    // Code to find the nearest hit.  It shouldn't be this ugly.
 
-    std::vector<w_pair>::iterator small = 
+    std::vector<w_pair>::iterator small =
      std::min_element(weights.begin(),weights.end(),
      boost::bind(std::less<double>(),
      boost::bind(tracktable::algorithms::distance<point_ll>::apply,

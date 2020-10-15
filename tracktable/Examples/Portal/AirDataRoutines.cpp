@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -8,7 +8,7 @@
 //
 // AirDataRoutines
 //
-// Just reads in a file full of the air data records.  Doesn't do a 
+// Just reads in a file full of the air data records.  Doesn't do a
 // lot of error checking.  So far, the files have all had 17 columns
 // as advertised. The problem is that some of the columns are empty.
 //
@@ -23,7 +23,7 @@
 #include <tracktable/IO/PointReader.h>
 #include <boost/bind.hpp>
 
-int readAirDataFile(std::string &input_file, std::string& sep_char, 
+int readAirDataFile(std::string &input_file, std::string& sep_char,
  Trajectories& trajectories)
 {
   Trajectory_map traj_map;
@@ -94,7 +94,7 @@ void GetMajorAirports(std::vector<std::string> &airports)
   return;
 }
 
-bool HasMajorAirports(Trajectory &trajectory, 
+bool HasMajorAirports(Trajectory &trajectory,
  std::vector<std::string> &airports)
 {
   return std::binary_search(airports.begin(),airports.end(),

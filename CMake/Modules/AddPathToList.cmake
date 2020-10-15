@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC . Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -37,10 +37,10 @@
 # starting_list: Path list to which we will append
 # new_path: Path to add to list
 # OUTPUT: Name of output variable.  This variable will store the result.
- 
+
 function(add_path_to_list starting_list new_path OUTPUT)
 	if (MINGW OR MSVC)
-	  # Escape all the semicolons in the existing path so 
+	  # Escape all the semicolons in the existing path so
 	  # that CMake won't interpret them as new variables.
 	  string(REPLACE ";" "\\;" ${starting_list} _escaped_path)
 	  set( ${OUTPUT} "${_escaped_path}\\;${new_path}" PARENT_SCOPE)

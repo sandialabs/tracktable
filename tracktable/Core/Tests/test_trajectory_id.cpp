@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -62,7 +62,7 @@ test_trajectory_id()
 
   initial_point.set_object_id("MyPoint");
   initial_point.set_timestamp(tracktable::time_from_string("2001-02-03 04:05:06"));
-    
+
   for (int i = 0; i < 10; ++i)
     {
     trajectory_point_type my_point(initial_point);
@@ -101,7 +101,7 @@ test_trajectory_id()
 // ----------------------------------------------------------------------
 
 
-  
+
 int
 main(int argc, char *argv[])
 {

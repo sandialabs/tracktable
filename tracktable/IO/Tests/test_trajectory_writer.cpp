@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -83,7 +83,7 @@ template<class thing_with_properties>
 void generate_arbitrary_properties(std::size_t how_many,
                                    thing_with_properties& destination)
 {
-  
+
   for (std::size_t i = 0; i < how_many; ++i)
     {
     int i_property_type = (i % 3) + 1;
@@ -173,14 +173,14 @@ void test_trajectory_writer(std::size_t howmany)
 
   std::cout << "Trajectory has "
             << my_trajectory.__properties().size() << " properties set\n";
-  
+
   tracktable::ostringstream_type outbuf;
   tracktable::TrajectoryWriter writer(outbuf);
   writer.write(my_trajectory);
   std::cout << "Trajectory writer output:\n";
   std::cout << outbuf.str();
   std::cout << "(end)\n";
-  
+
 }
 
 int

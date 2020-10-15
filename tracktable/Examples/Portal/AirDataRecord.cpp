@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
  */
 
-// 
+//
 // AirDataRecord
 //
 // Supporting routines for AirDataRecord.h
@@ -17,15 +17,15 @@
 #include <boost/geometry/algorithms/distance.hpp>
 
   // A little mini-function that determines if two flights are "equal".  There
-  // are clearly a lot of ways to define this.  We could perhaps have lots of 
-  // these sorts of functions.  Equality is defined by having the same 
-  // object_id and being within 10 minutes of each other.  If you are clever, 
-  // you actually don't really need these but can write things on the fly 
+  // are clearly a lot of ways to define this.  We could perhaps have lots of
+  // these sorts of functions.  Equality is defined by having the same
+  // object_id and being within 10 minutes of each other.  If you are clever,
+  // you actually don't really need these but can write things on the fly
   // with boost::bind.
 
 bool sameFlight(const Traj_Point &fp1, const Traj_Point &fp2)
-{ return (fp1.get_id() == fp2.get_id()) && 
-   ((fp2.get_time() - fp1.get_time()) < 
+{ return (fp1.get_id() == fp2.get_id()) &&
+   ((fp2.get_time() - fp1.get_time()) <
    boost::posix_time::time_duration(boost::posix_time::minutes(10)));
 }
 
@@ -45,7 +45,7 @@ bool apartInTime(const Traj_Point &fp1, const Traj_Point &fp2)
   // flight.
 
 bool Traj_Point::operator < (const Traj_Point &fp) const
-  {return ((id < fp.get_id()) || 
+  {return ((id < fp.get_id()) ||
    ((get_id() == fp.get_id()) && (get_time() < fp.get_time())));}
 
   // Also define a sort that goes strictly by time.
@@ -55,26 +55,26 @@ bool timeSort(const Traj_Point &fp1, const Traj_Point &fp2)
 
   // Describes all of the conditions for throwing away a data point as bad
   // compared to the previous one.  Some of the numbers are a bit arbitrary
-  // but they'll vary from application to application.  
+  // but they'll vary from application to application.
 
 bool badPoint(const Traj_Point &fp1, const Traj_Point &fp2) {
 
   // Maximum distance we'll allow between two points, in nautical miles
   double max_dist = 1.0;
   double min_dist = 0.0;
-  
+
   // Maximum altitude difference we'll allow, in feet
   int max_alt_change = 75000;
 
   return  // The logic follows..
 
   // If the points are less than 30 seconds apart, throw them out
-   ((fp2.get_time() - fp1.get_time()) < 
+   ((fp2.get_time() - fp1.get_time()) <
    boost::posix_time::time_duration(boost::posix_time::seconds(10))) ||
 
   // Or, if the latlon are the same, throw them out.  This gets around the
-  // problem of some latlon staying constant for different time periods and 
-  // making some of the derived calculations nonsensical.  Sure, this 
+  // problem of some latlon staying constant for different time periods and
+  // making some of the derived calculations nonsensical.  Sure, this
   // could be valid for a helicopter, but for now, we lose it.
 
    (boost::geometry::distance<point_2d,point_2d>(fp1,fp2) == 0.0) ||

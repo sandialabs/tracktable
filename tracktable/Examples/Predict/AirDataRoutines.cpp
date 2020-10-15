@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013-2017 National Technology and Engineering
+ * Copyright (c) 2013-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -8,7 +8,7 @@
 //
 // AirDataRoutines
 //
-// Just reads in a file full of the air data records.  Doesn't do a 
+// Just reads in a file full of the air data records.  Doesn't do a
 // lot of error checking.  So far, the files have all had 17 columns
 // as advertised. The problem is that some of the columns are empty.
 //
@@ -24,7 +24,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <tracktable/IO/PointReader.h>
 
-int readAirDataFile(std::string &input_file, std::string& sep_char, 
+int readAirDataFile(std::string &input_file, std::string& sep_char,
  Trajectories& trajectories)
 {
   Trajectory_map traj_map;
@@ -65,7 +65,7 @@ int readAirDataFile(std::string &input_file, std::string& sep_char,
   return 0;
 }
 
-int readTrajectoryFile(std::string &input_file, std::string &sep_char, 
+int readTrajectoryFile(std::string &input_file, std::string &sep_char,
  BasicTrajectory &trajectory)
 {
   std::ifstream in(input_file.c_str());
@@ -95,7 +95,7 @@ void readJSONData(BasicTrajectory &trajectory, std::string &output_file)
 {
   boost::property_tree::ptree pt;
 
-  boost::posix_time::ptime t = 
+  boost::posix_time::ptime t =
    boost::posix_time::time_from_string("2013-01-01 00:00:00");
 
   std::string line;
@@ -127,7 +127,7 @@ void readJSONData(BasicTrajectory &trajectory, std::string &output_file)
   }
 
   return;
-} 
+}
 
 double HeadingDifference(const double h2, const double h1)
 {
@@ -170,6 +170,6 @@ bool HasConsistentDestination(BasicTrajectory &trajectory)
 {
   return !trajectory.front().string_property("dest").empty() &&
    !trajectory.back().string_property("dest").empty() &&
-   (trajectory.front().string_property("dest") == 
+   (trajectory.front().string_property("dest") ==
    trajectory.back().string_property("dest"));
 }

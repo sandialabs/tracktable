@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -81,7 +81,7 @@ double compute_great_circle_central_angle(
   double lat2 = tracktable::latitude_as_radians(end);
 
   double d_lon = (lon2 - lon1)/2.0;
-  double angle = acos( cos(lat1 - lat2) - 
+  double angle = acos( cos(lat1 - lat2) -
    2.0 * cos(lat1) * cos(lat2) * sin(d_lon) * sin(d_lon) );
   return angle;
 }

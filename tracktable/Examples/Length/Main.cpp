@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -44,7 +44,7 @@
 #include "KmlOut.h"
 #include "ParseCommandLine.h"
 
-double ControlPointDistance(trajectory_type trajectory, 
+double ControlPointDistance(trajectory_type trajectory,
  std::pair<double,double> control_point) {
   return boost::geometry::distance(
     GetLengthInterpolatedPoint(trajectory,control_point.first),
@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
   feature_vector search_box;
   for (unsigned int i = 0; i < 15; ++i)
     search_box[i] = 0.1;
-  
+
   typedef std::pair<int, int> cluster_label_type;
   typedef std::vector<cluster_label_type> cluster_label_vector_type;
   typedef std::vector<int> vertex_id_vector_type;
@@ -133,11 +133,11 @@ int main(int argc, char* argv[])
 
   Correlation(features);
 
-  for (unsigned int clus_num = 1; 
+  for (unsigned int clus_num = 1;
    clus_num <= 50 && clus_num < membership.size(); ++clus_num) {
     for (unsigned int i = 0; i < membership[clus_num].size(); ++i) {
-      std::string s = "output" + 
-       boost::lexical_cast<std::string>(clus_num) + "/" 
+      std::string s = "output" +
+       boost::lexical_cast<std::string>(clus_num) + "/"
        + trajectories[membership[clus_num][i]].object_id() + "-" +
        boost::gregorian::to_simple_string(trajectories[membership[clus_num][i]].start_time().date()) + ".kml";
       std::ofstream outfile(s.c_str());
