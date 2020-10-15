@@ -79,7 +79,7 @@ include(GNUInstallDirs)
 #
 # A libtool version number C.R.A has three components:
 #
-# C - current library interface ID (abbreviated CURRENT), an integer.  
+# C - current library interface ID (abbreviated CURRENT), an integer.
 # Any release that makes user-visible changes to the interface must
 # increment CURRENT.
 #
@@ -88,15 +88,15 @@ include(GNUInstallDirs)
 # break existing code should increment REVISION.  Reset REVISION
 # to zero whenever CURRENT changes.
 #
-# A - "age" of this release (abbreviated AGE).  (CURRENT - AGE) is the 
+# A - "age" of this release (abbreviated AGE).  (CURRENT - AGE) is the
 # oldest interface version supported by a release.  If a new release breaks
-# existing code, AGE must be reset to 0.  If a new release adds new features 
-# and does not break existing code, AGE should be incremented by 1.  
+# existing code, AGE must be reset to 0.  If a new release adds new features
+# and does not break existing code, AGE should be incremented by 1.
 #
-# NOTE: This version information is often referred to as the 
-# "compatibility version".  It is not the same as the version number 
+# NOTE: This version information is often referred to as the
+# "compatibility version".  It is not the same as the version number
 # that is often attached to the software release as a whole.
-#                                      
+#
 # Quick reference:
 # CURRENT : REVISION : AGE
 # +1 :  ? : +1 == new interface that does not break old one
@@ -269,6 +269,8 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
       DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}/cpp_reference
     )
 
+    include(FindPythonModule)
+
     # We have found Sphinx, but that isn't the end of it. We need to make sure the sphinx_rtd_theme is accessible
     if(NOT BUILD_DOCUMENTATION_CXX_ONLY)
       unset(Sphinx_FOUND)
@@ -278,43 +280,12 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
         message(ERROR ": Please provide the path to the Sphinx executable.")
       endif (NOT Sphinx_FOUND)
 
-      execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
-        "import re; import sphinx; print(re.compile('/__init__.py.*').sub('',sphinx.__file__))"
-        RESULT_VARIABLE SPHINX_MODULE_STATUS
-        OUTPUT_VARIABLE SPHINX_MODULE_LOCATION
-        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-      #message("SPHINX_MODULE_STATUS ${SPHINX_MODULE_STATUS}")
-      #message("SPHINX_MODULE_LOCATION ${SPHINX_MODULE_LOCATION}")
-      # The status is empty if everything went ok, but if it has anything in it there was an error
-      if(SPHINX_MODULE_STATUS)
-        message(ERROR ": Python module 'sphinx' is required to build Python documentation. Install the sphinx module or enable BUILD_DOCUMENTATION_CXX_ONLY.  If you are certain that Sphinx is already installed, make sure Python3_EXECUTABLE is correct.")
-      endif(SPHINX_MODULE_STATUS)
+      find_python_module(sphinx SPHINX_MODULE_STATUS SPHINX_MODULE_LOCATION)
 
-      execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
-        "import re; import sphinx_rtd_theme; print(re.compile('/__init__.py.*').sub('',sphinx_rtd_theme.__file__))"
-        RESULT_VARIABLE SPHINX_RTD_THEME_STATUS
-        OUTPUT_VARIABLE SPHINX_RTD_THEME_LOCATION
-        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-      #message("SPHINX_RTD_THEME_STATUS ${SPHINX_RTD_THEME_STATUS}")
-      #message("SPHINX_RTD_THEME_LOCATION ${SPHINX_RTD_THEME_LOCATION}")
-      # The status is empty if everything went ok, but if it has anything in it there was an error
-      if(SPHINX_RTD_THEME_STATUS)
-        message(ERROR ": Python module 'sphinx_rtd_theme' is required to build Python documentation. Install the sphinx_rtd_theme module or enable BUILD_DOCUMENTATION_CXX_ONLY.  If you are certain that sphinx_rtd_theme is already installed, make sure Python3_EXECUTABLE is correct.")
-      endif(SPHINX_RTD_THEME_STATUS)
+      find_python_module(sphinx_rtd_theme SPHINX_MODULE_STATUS SPHINX_MODULE_LOCATION)
 
-      execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
-        "import re; import breathe; print(re.compile('/__init__.py.*').sub('',breathe.__file__))"
-        RESULT_VARIABLE BREATHE_STATUS
-        OUTPUT_VARIABLE BREATHE_LOCATION
-        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-      # The status is empty if everything went ok, but if it has anything in it there was an error
-      if(BREATHE_STATUS)
-        message(ERROR ": Python module 'breathe' is required to build Python documentation. Install the breathe module or enable BUILD_DOCUMENTATION_CXX_ONLY.  If you are certain that breathe is already installed, make sure Python3_EXECUTABLE is correct.")
-      endif(BREATHE_STATUS)
-      
+      find_python_module(breathe SPHINX_MODULE_STATUS SPHINX_MODULE_LOCATION)
+
       # Yes, I'm writing a file into the source tree.  Sphinx requires
       # that its configuration file (conf.py) exist in the source tree
       # even though it can put all of its generated files elsewhere.
