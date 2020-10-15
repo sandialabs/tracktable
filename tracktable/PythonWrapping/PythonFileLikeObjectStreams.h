@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -146,7 +146,7 @@ public:
     boost::python::object write_result(this->Writer(data));
     boost::python::extract<std::streamsize> bytes_written(write_result);
 #endif
-    
+
     return (bytes_written.check() ? bytes_written() : n);
   }
 
@@ -157,7 +157,7 @@ public:
       {
         return true;
       }
-   
+
       if (this->Flusher != boost::python::object())
         {
         if (!this->Flusher.is_none())
@@ -174,12 +174,12 @@ private:
   boost::python::object Writer;
 
   // Check 'stream.closed is True'
-  // 
+  //
   // Every Python object derived from io.IOBase has an attribute 'closed'.
-  // This function checks its value while being appropriately careful 
+  // This function checks its value while being appropriately careful
   // about whether the attribute exists.
-  // 
-  // If for any reason we cannot determine the value of the attribute, 
+  //
+  // If for any reason we cannot determine the value of the attribute,
   // we return false -- that is, as far as we can tell the stream is
   // still open.
   bool stream_is_closed()
@@ -190,7 +190,7 @@ private:
     if (this->Destination != object())
     {
       object closed_attr(getattr(this->Destination, "closed", object()));
-      if (closed_attr != object()) 
+      if (closed_attr != object())
       {
         extract<bool> get_closed(closed_attr);
         if (get_closed.check())

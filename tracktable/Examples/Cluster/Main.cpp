@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -44,14 +44,14 @@
 
 typedef tracktable::domain::feature_vectors::FeatureVector<10> feature_vector;
 
-trajectory_point_type GetInterpolatedPoint(trajectory_type trajectory, 
+trajectory_point_type GetInterpolatedPoint(trajectory_type trajectory,
  double frac) {
   return tracktable::point_at_time(trajectory,
    tracktable::interpolate(trajectory.start_time(),
    trajectory.end_time(),frac));
 }
 
-double ControlPointDistance(trajectory_type trajectory, 
+double ControlPointDistance(trajectory_type trajectory,
  std::pair<double,double> control_point) {
   return boost::geometry::distance(
     GetInterpolatedPoint(trajectory,control_point.first),
@@ -155,11 +155,11 @@ int main(int argc, char* argv[])
 
   Correlation(features);
 /*
-  for (unsigned int clus_num = 2; 
+  for (unsigned int clus_num = 2;
    clus_num <= 20 && clus_num < membership.size(); ++clus_num) {
     for (unsigned int i = 0; i < membership[clus_num].size(); ++i) {
-      std::string s = "output" + 
-       boost::lexical_cast<std::string>(clus_num) + "/" 
+      std::string s = "output" +
+       boost::lexical_cast<std::string>(clus_num) + "/"
        + trajectories[membership[clus_num][i]].object_id() + ".kml";
       std::ofstream outfile(s.c_str());
       writeKmlTrajectory(trajectories[membership[clus_num][i]],

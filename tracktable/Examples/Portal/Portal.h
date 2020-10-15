@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
  */
 
-// 
+//
 // Portal
 //
 // A simple definition of a portal
@@ -30,13 +30,13 @@ class Portal : public boost::geometry::model::box<trajectory_point_type>
 {
 public:
   Portal() {};
-  Portal(const boost::geometry::model::box<trajectory_point_type>& b) : 
+  Portal(const boost::geometry::model::box<trajectory_point_type>& b) :
    boost::geometry::model::box<trajectory_point_type>(b) {};
 
   unsigned int level;
   std::set<trajectory_type*> trajectories;
   std::list<boost::shared_ptr<Portal> > children;
-  bool operator < (const Portal &p) 
+  bool operator < (const Portal &p)
    const {return (trajectories.size() < p.trajectories.size());}
 };
 
@@ -74,29 +74,29 @@ public:
   unsigned int min_val;
 };
 
-void SubDividePortal(PP &parent, unsigned int interval_x = 2, 
+void SubDividePortal(PP &parent, unsigned int interval_x = 2,
  unsigned int inverval_y = 2);
 int RefinePairs(Pair_heap &pairs,
- const unsigned int depth, const unsigned int interval_x = 2, 
+ const unsigned int depth, const unsigned int interval_x = 2,
  const unsigned int interval_y = 2);
 void RefineTopPair(Pair_heap &pairs,
- const unsigned int depth, const unsigned int interval_x = 2, 
+ const unsigned int depth, const unsigned int interval_x = 2,
  const unsigned int interval_y = 2);
 void MakeNewPair(Pair_heap &pairs, PP &p1, PP &p2);
 void RemoveTopPair(Pair_heap &pairs, PP &US);
-void RemoveTopPair(Pair_heap &pairs, 
+void RemoveTopPair(Pair_heap &pairs,
  Trajectories &trajectories, PP &US);
-void RemoveTrajectories(PP &US, Trajectories &trajectories, 
+void RemoveTrajectories(PP &US, Trajectories &trajectories,
  std::vector<trajectory_type*> &to_remove);
 void RemoveClippedTrajectories(PP &portal, Trajectories &trajectories,
  std::vector<trajectory_type*> &to_remove, const Portal_pair &pp);
 void UpdatePairVal(Portal_pair &pp);
 void UpdatePairSep(Portal_pair &pp);
-int RefineSingles(my_pq<PP,std::vector<PP>,PPCompare> &portals, 
- const unsigned int depth, const unsigned int interval_x = 2, 
+int RefineSingles(my_pq<PP,std::vector<PP>,PPCompare> &portals,
+ const unsigned int depth, const unsigned int interval_x = 2,
  const unsigned int interval_y = 2);
-void RefineTopSingle(my_pq<PP,std::vector<PP>,PPCompare> &portals, 
- const unsigned int depth, const unsigned int interval_x = 2, 
+void RefineTopSingle(my_pq<PP,std::vector<PP>,PPCompare> &portals,
+ const unsigned int depth, const unsigned int interval_x = 2,
  const unsigned int interval_y = 2);
 void RemoveTopPortal(my_pq<PP,std::vector<PP>,PPCompare> &portals, PP &US);
 bool FPIntersects(const trajectory_type* fp, const PP &pp);
@@ -107,7 +107,7 @@ bool WithinPortalEllipse(const Portal_pair &pp, trajectory_type *trajectory,
  const double &ecc);
 void RemoveTopPairClipped(Pair_heap &pairs,
  Trajectories &trajectories, PP &US);
-void ClipTrajectory(PP &portal, Trajectories &trajectories, 
+void ClipTrajectory(PP &portal, Trajectories &trajectories,
  trajectory_type *trajectory, T_itr &first_pt, T_itr &last_pt);
 void AddTrajectory(PP &portal, trajectory_type *to_add);
 void GetTwoPortalSegment(const Portal_pair &pp, trajectory_type *trajectory,

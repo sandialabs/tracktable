@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -110,10 +110,10 @@ struct DBSCAN_Driver
       Tracktable_INPUT_POINT_TYPE_MUST_MATCH_TEMPLATE_ARGUMENT,
       (input_point_type, dispatch_point_type)
     );
-    
+
     input_point_type actual_search_box;
     boost::geometry::assign(actual_search_box, search_box_half_span);
-    
+
     implementation::DBSCAN<input_point_type> dbscan;
     int num_clusters = dbscan.learn_clusters(
       input_begin, input_end,
@@ -124,13 +124,13 @@ struct DBSCAN_Driver
 
     std::vector<int> vertex_cluster_ids;
     dbscan.point_cluster_labels(vertex_cluster_ids);
-    
+
     for (std::size_t i = 0; i < vertex_cluster_ids.size(); ++i)
       {
       *output_sink = std::make_pair(boost::numeric_cast<int>(i), vertex_cluster_ids[i]);
       ++output_sink;
       }
-    
+
   return num_clusters;
   }
 };
@@ -163,13 +163,13 @@ struct DBSCAN_Driver<
       Tracktable_DBSCAN_PAIR_DISPATCH_TYPE_MUST_MATCH_INPUT_VALUE_TYPE,
       (dispatch_point_type, input_point_pair_type)
     );
-    
+
     BOOST_MPL_ASSERT_MSG(
       (boost::is_same<input_metadata_type, MetadataT>::value),
       Tracktable_DBSCAN_PAIR_METADATA_TYPES_MUST_MATCH,
       (input_point_pair_type, input_metadata_type, MetadataT)
     );
-    
+
     BOOST_MPL_ASSERT_MSG(
       (boost::is_same<input_point_type, PointT>::value),
       Tracktable_INPUT_POINT_TYPE_MUST_MATCH_TEMPLATE_ARGUMENT,
@@ -183,9 +183,9 @@ struct DBSCAN_Driver<
       (input_metadata_type, output_metadata_type)
     );
 #endif
-    
+
     typedef std::pair<int, int> raw_vertex_cluster_label_type;
-    
+
     std::vector<raw_vertex_cluster_label_type> raw_labels;
     DBSCAN_Driver<input_point_type> driver;
     int num_clusters = driver(
@@ -202,7 +202,7 @@ struct DBSCAN_Driver<
       {
       saved_metadata.push_back(input_begin->second);
       }
-    
+
     for (std::vector<raw_vertex_cluster_label_type>::iterator iter = raw_labels.begin();
          iter != raw_labels.end();
          ++iter)

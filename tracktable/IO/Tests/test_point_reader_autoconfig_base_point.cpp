@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -63,7 +63,7 @@ int test_point_reader()
   writer.write(points.begin(), points.end());
 
   std::cout << "Point writer output:\n" << outbuf.str() << "(end)\n";
-  
+
   std::string writer_result(outbuf.str());
   std::istringstream inbuf(writer_result);
 
@@ -91,7 +91,7 @@ int test_point_reader()
     if ((*before_iter) != (*after_iter))
       {
       std::cout << "ERROR: Point "
-                << point_id 
+                << point_id
                 << " does not match after writing and reading back in.  Before:\n"
                 << *before_iter << "\nAfter: " << *after_iter << "\n";
       ++error_count;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -29,7 +29,7 @@
  */
 
 #include "Initial.h"
-#include <boost/geometry/algorithms/intersects.hpp> 
+#include <boost/geometry/algorithms/intersects.hpp>
 
 void MakeInitialPairs(Trajectories &trajectories, PP &Full,
  Pair_heap &pairs, unsigned int thresh)
@@ -59,7 +59,7 @@ void MakeInitialPairs(Trajectories &trajectories, PP &Full,
 }
 
 void MakeInitialSingles(Trajectories &trajectories, PP &Full,
- my_pq<PP,std::vector<PP>,PPCompare> &portals, const unsigned int &x_div, 
+ my_pq<PP,std::vector<PP>,PPCompare> &portals, const unsigned int &x_div,
  const unsigned int &y_div, unsigned int thresh)
 {
 

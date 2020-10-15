@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2019 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -154,7 +154,7 @@ struct generic_point_at_length_fraction
             {
                 TRACKTABLE_LOG(log::warning)
                   << "WARNING: Trajectory::point_at_time: This shouldn't ever happen.  "
-                  << "before: " << *before << " " 
+                  << "before: " << *before << " "
                   << "after: " << *after << " "
                   << "equal_or_after: " << *equal_or_after;
                 before = equal_or_after;

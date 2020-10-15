@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -57,7 +57,7 @@ int test_point_writer()
 
     next_point.set_timestamp(tracktable::time_from_string("2015-01-05 18:00:00"));
     next_point.set_object_id("test_object");
-    
+
     // Set example string, numeric and timestamp properties
     std::ostringstream outbuf;
     next_point.set_property("basic_string", "Hi Mom!");

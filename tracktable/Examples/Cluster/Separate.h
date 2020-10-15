@@ -1,11 +1,11 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
  */
 
-// 
+//
 // Separate
 //
 // Separates a list of points into actual trajectories
@@ -25,10 +25,10 @@ void separateMapFlights(Trajectory_map& traj_map, Trajectories &trajectories,
  const int min_flight_size = MIN_FLIGHT_SIZE,
  const int max_time_gap = MAX_TIME_GAP);
 
-void separateFlights(std::vector<tracktable::TrajectoryPoint<tracktable::PointLonLat> > &fps, 
+void separateFlights(std::vector<tracktable::TrajectoryPoint<tracktable::PointLonLat> > &fps,
  Trajectories &trajectories, const int min_flight_size = MIN_FLIGHT_SIZE,
  const int max_time_gap = MAX_TIME_GAP);
 
-bool apartInTime(const tracktable::TrajectoryPoint<tracktable::PointLonLat>& tp1, 
+bool apartInTime(const tracktable::TrajectoryPoint<tracktable::PointLonLat>& tp1,
  const tracktable::TrajectoryPoint<tracktable::PointLonLat> &tp2, const int max_time_gap = MAX_TIME_GAP);
 #endif

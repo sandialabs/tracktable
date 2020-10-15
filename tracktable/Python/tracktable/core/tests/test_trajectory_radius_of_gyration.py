@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2018 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -62,7 +62,7 @@ def verify_result(expected, actual, test):
     if (abs(actual - expected) > .1):
         sys.stderr.write('ERROR: {} does not match. Expected radius of gyration {}, but returned {}.\n'.format(test,expected,actual))
         return 1
-  
+
     return 0
 
 
@@ -71,7 +71,7 @@ def test_radius_of_gyration():
     print("Testing Radius of Gyration")
 
     error_count = 0;
-    
+
     albuquerque = create_point(35.0844, -106.6504, "short_flight")
     denver = create_point(39.7392, -104.9903, "short_flight")
     el_paso = create_point(31.7619, -106.4850, "short_flight")
@@ -118,7 +118,7 @@ def test_radius_of_gyration():
     expected_one_point_radius = 0.0
 
     one_point = TerrestrialTrajectory.from_position_list([el_paso])
-    
+
     one_point_radius = geomath.radius_of_gyration(one_point)
     error_count += verify_result(expected_one_point_radius, one_point_radius, "One point flight")
 
@@ -126,7 +126,7 @@ def test_radius_of_gyration():
     expected_cartesian2d_radius = 0.707
 
     cart_trajectory = Cartesian2dTrajectory.from_position_list([point1, point2, point3, point4])
-    
+
     cart2d_radius = geomath.radius_of_gyration(cart_trajectory)
     error_count += verify_result(expected_cartesian2d_radius, cart2d_radius, "Four points cartesian")
 

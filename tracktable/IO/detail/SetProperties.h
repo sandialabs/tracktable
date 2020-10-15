@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -36,7 +36,7 @@
 #include <tracktable/Core/PropertyConverter.h>
 #include "PropertyMapReadWrite.h"
 
-namespace tracktable { namespace io { namespace detail { 
+namespace tracktable { namespace io { namespace detail {
 
 typedef std::vector<std::string> string_vector_type;
 
@@ -56,7 +56,7 @@ struct set_properties
     {
       if (field_map.size() > 0)
         {
-        TRACKTABLE_LOG(log::warning) 
+        TRACKTABLE_LOG(log::warning)
           << "You are attempting to set "
           << "properties on a point of type "
           << typeid(point).name()
@@ -86,7 +86,7 @@ struct set_properties<PointT, true>
         std::string field_name((*iter).first);
         std::size_t column((*iter).second.column);
         if (column == -1) continue;
-        
+
         tracktable::PropertyUnderlyingType type((*iter).second.type);
 
         std::string raw_value(tokens.at(column));
@@ -97,7 +97,7 @@ struct set_properties<PointT, true>
           }
         catch (std::exception& e)
           {
-          TRACKTABLE_LOG(log::debug) 
+          TRACKTABLE_LOG(log::debug)
             << "WARNING: Parse error while trying to set field '"
             << field_name << "' from string '"
             << raw_value << "': "
@@ -122,7 +122,7 @@ struct set_object_id
     {
       if (ObjectIdColumn != -1)
         {
-        TRACKTABLE_LOG(log::warning) 
+        TRACKTABLE_LOG(log::warning)
                   << "WARNING: You are attempting to set "
                   << "an object ID on a point of type "
                   << typeid(point).name()
@@ -164,7 +164,7 @@ struct set_timestamp
     {
       if (TimestampColumn != -1)
         {
-        TRACKTABLE_LOG(log::warning) 
+        TRACKTABLE_LOG(log::warning)
                   << "WARNING: You are attempting to set "
                   << "a timestamp on a point of type "
                   << typeid(point).name()
@@ -195,7 +195,7 @@ struct set_timestamp<PointT, true>
         }
       catch (std::exception& e)
         {
-        TRACKTABLE_LOG(log::warning) 
+        TRACKTABLE_LOG(log::warning)
                   << "Error while setting timestamp: "
                   << e.what() << "\n"
                   << "Timestamp string was '"

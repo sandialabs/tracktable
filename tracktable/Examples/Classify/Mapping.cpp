@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -21,7 +21,7 @@ double HeadingDifference(const double h2, const double h1)
 }
 
 double TrajHeadingDifference(
-                             const trajectory_point_type &t2, 
+                             const trajectory_point_type &t2,
                              const trajectory_point_type &t1)
 {
   double h2 = t2.real_property("heading");
@@ -50,7 +50,7 @@ unsigned int TurnArounds(trajectory_type const &trajectory)
   bool found = false;
 
   do {
-    diff = fabs(itr1->real_property("heading") - 
+    diff = fabs(itr1->real_property("heading") -
                 itr2->real_property("heading"));
 
     if (fabs(diff - 180.0) < 2.0)
@@ -68,7 +68,7 @@ unsigned int TurnArounds(trajectory_type const &trajectory)
 
     if (found)
       {
-        int leap = 
+        int leap =
           std::min(static_cast<int>(std::distance(itr2,trajectory.end())),5);
         // The 5 above is related to how far away you want to go before you
         // define another turnaround
@@ -99,7 +99,7 @@ double StraightFraction(trajectory_type const& trajectory)
                               trajectory.end(),
                               !boost::bind(std::less<double>(),
                                            boost::bind(AbsTrajHeadingDifference,_1,_2), 2.0));
-    
+
                                            // boost::bind(fabs,
                                            //             (boost::bind(TrajHeadingDifference,_1,_2))),2.0));
 

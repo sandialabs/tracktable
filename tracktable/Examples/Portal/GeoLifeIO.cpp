@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -9,7 +9,7 @@
 //
 // GeoLifeIO
 //
-// Just reads in a file full of the GeoLife records.  Doesn't do a 
+// Just reads in a file full of the GeoLife records.  Doesn't do a
 // lot of error checking.
 //
 // Created by Danny Rintoul.
@@ -17,7 +17,7 @@
 #include "GeoLifeIO.h"
 #include <boost/algorithm/string.hpp>
 
-int readGeoLifeFile(std::string &input_file, std::string& sep_char, 
+int readGeoLifeFile(std::string &input_file, std::string& sep_char,
  Flights& flights)
 {
   Flight_map flight_map;
@@ -37,7 +37,7 @@ int readGeoLifeFile(std::string &input_file, std::string& sep_char,
   {
     if (line[0] == '#') continue;
 
-    boost::char_separator<char> 
+    boost::char_separator<char>
      sep(sep_char.c_str(),"",boost::keep_empty_tokens);
     boost::tokenizer<boost::char_separator<char> > tok(line,sep);
     std::vector<std::string> tok_vector(tok.begin(),tok.end());
@@ -55,7 +55,7 @@ int readGeoLifeFile(std::string &input_file, std::string& sep_char,
 
     if (tok_vector[time_col].empty()) continue;
     boost::algorithm::trim(tok_vector[time_col]);
-    boost::posix_time::ptime time = 
+    boost::posix_time::ptime time =
      boost::posix_time::time_from_string(tok_vector[time_col]);
     fp.set_time(time);
 
@@ -100,6 +100,6 @@ void separateGeoLife(Flight_map& flight_map, Flights& flights)
   //  separateFlights(map_itr->second,flights);
     flights.push_back(Flight(FlightTrajectory(map_itr->second.begin(),map_itr->second.end())));
   }
-  
+
   return;
 }

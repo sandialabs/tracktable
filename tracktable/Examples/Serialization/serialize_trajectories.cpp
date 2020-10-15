@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -31,7 +31,7 @@
 
 /* Compare storage costs for various methods of serializing trajectories
  *
- * We have three ways to save trajectories: 
+ * We have three ways to save trajectories:
  *
  * 1. tracktable::TrajectoryWriter (C++, Python)
  *    This uses our own home-grown delimited text format.  It is rather
@@ -39,7 +39,7 @@
  *
  * 2. tracktable.io.read_write_json (Python)
  *    Write to JSON.  This is also rather verbose and has trouble with
- *    incremental loads. 
+ *    incremental loads.
  *
  * 3. boost::serialization
  *    Write to Boost's archive format (text, binary or XML).  This
@@ -87,7 +87,7 @@ build_trajectory(int num_points=100)
   initial_point.set_property("test_string_property", "Frodo lives!");
   initial_point.set_property("test_timestamp_property", tracktable::time_from_string("2000-01-02 03:04:05"));
   initial_point.set_timestamp(tracktable::time_from_string("2001-02-03 04:05:06"));
-    
+
   for (int i = 0; i < num_points; ++i)
     {
     trajectory_point_type my_point(initial_point);
@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
 
   trajectory_type base_trajectory = build_trajectory(points_per_trajectory);
   std::vector<trajectory_type> trajectories(num_trajectories, base_trajectory);
-  
+
   std::size_t tracktable_trajectory_writer_storage = test_tracktable_trajectory_writer_storage(trajectories);
   std::size_t boost_text_storage = test_boost_text_storage(trajectories);
   std::size_t boost_binary_storage = test_boost_binary_storage(trajectories);
@@ -178,11 +178,11 @@ int main(int argc, char* argv[])
   std::cout << "Storage comparison for different serialization formats\n";
   std::cout << "Trajectories: " << num_trajectories << "\n";
   std::cout << "Points per trajectory: " << points_per_trajectory << "\n";
-  
+
   std::cout << "\ttracktable::TrajectoryWriter: " << tracktable_trajectory_writer_storage << "\n";
   std::cout << "\tboost::text_oarchive: " << boost_text_storage << "\n";
   std::cout << "\tboost::binary_oarchive: " << boost_binary_storage << "\n";
   std::cout << "\tboost::xml_oarchive: " << boost_xml_storage << "\n";
-  
+
   return 0;
 }

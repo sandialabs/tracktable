@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2014-2018 National Technology and Engineering
+* Copyright (c) 2014-2020 National Technology and Engineering
 * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 * with National Technology and Engineering Solutions of Sandia, LLC,
 * the U.S. Government retains certain rights in this software.
@@ -38,7 +38,7 @@
 
 #include <boost/mpl/assert.hpp>
 
-namespace tracktable { namespace algorithms { 
+namespace tracktable { namespace algorithms {
 
 template<typename T>
 struct radius_of_gyration

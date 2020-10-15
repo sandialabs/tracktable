@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -41,25 +41,25 @@
 
 #define MIN_FLIGHT_SIZE 20 // Minimum number of points for a flight
 #define MAX_DIST_SEP 60.0 // Maximum allowed distance between point in nm
-#define MAX_ALT_CHANGE 75000 // Maximum altitude change between points 
+#define MAX_ALT_CHANGE 75000 // Maximum altitude change between points
 #define MIN_TIME_SEP 30 // Minimum time separation between points in seconds
 #define MIN_ALT 0 // Minimum altitude for valid points
 
-void CleanTrajectories(Trajectories& trajectories, 
- int min_flight_size=MIN_FLIGHT_SIZE, 
- int min_time_between_points=MIN_TIME_SEP, 
- double max_distance_between_points=MAX_DIST_SEP, 
+void CleanTrajectories(Trajectories& trajectories,
+ int min_flight_size=MIN_FLIGHT_SIZE,
+ int min_time_between_points=MIN_TIME_SEP,
+ double max_distance_between_points=MAX_DIST_SEP,
  int max_altitude_change=MAX_ALT_CHANGE, int min_altitude=MIN_ALT);
 
-void CleanTrajectory(BasicTrajectory& trajectory, 
- int min_flight_size=MIN_FLIGHT_SIZE, 
- int min_time_between_points=MIN_TIME_SEP, 
- double max_distance_between_points=MAX_DIST_SEP, 
+void CleanTrajectory(BasicTrajectory& trajectory,
+ int min_flight_size=MIN_FLIGHT_SIZE,
+ int min_time_between_points=MIN_TIME_SEP,
+ double max_distance_between_points=MAX_DIST_SEP,
  int max_altitude_change=MAX_ALT_CHANGE, int min_altitude=MIN_ALT);
 
-bool badPoint(const tracktable::TrajectoryPoint<tracktable::PointLonLat>& fp1, 
- const tracktable::TrajectoryPoint<tracktable::PointLonLat>& fp2, 
- int min_time_between_points, double max_distance_between_points, 
+bool badPoint(const tracktable::TrajectoryPoint<tracktable::PointLonLat>& fp1,
+ const tracktable::TrajectoryPoint<tracktable::PointLonLat>& fp2,
+ int min_time_between_points, double max_distance_between_points,
  int max_altitude_change, int min_altitude);
 
 #endif
