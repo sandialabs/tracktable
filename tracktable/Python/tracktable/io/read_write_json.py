@@ -40,6 +40,17 @@ from tracktable.io.read_write_dictionary import dictionary_from_trajectory
 
 # below by Mirec Miskuf from: https://stackoverflow.com/questions/956867/how-to-get-string-objects-instead-of-unicode-from-json
 def json_loads_byteified(json_text):
+    """Constructes a byteified json string from the given json text.
+
+    Leveraged from: https://stackoverflow.com/questions/956867/how-to-get-string-objects-instead-of-unicode-from-json
+
+    Args:
+       json_text (json): the json to convert into a json string
+
+    Returns:
+        Returns a byteified json string constructed from the given json text
+
+    """
     return _byteify(
         json.loads(json_text, object_hook=_byteify),
         ignore_dicts=True
@@ -64,28 +75,59 @@ def _byteify(data, ignore_dicts = False):
     return data
 
 def trajectory_from_json(json_string):
-    """Returns a trajectory constructed from the given json string.
+    """Constructes a trajectory from the given json string.
+
     Args:
-       json: the json to convert into a trajectory
+       json_string (json): the json to convert into a trajectory
+
+    Returns:
+        Returns a trajectory constructed from the given json string
+
     """
+
     if sys.version_info[0] < 3:
         return trajectory_from_dictionary(json_loads_byteified(json_string))
     else:
         return trajectory_from_dictionary(json.loads(json_string))
 
 def json_from_trajectory(trajectory):
-    """Returns a json string constructed from the given trajectory
+    """Constructes a json string from the given trajectory
+
     Args:
-       trajectory: the trajectory to convert into a dictonary representation
+       trajectory (Trajectory): the trajectory to convert into a json representation
+
+    Returns:
+        Returns a json string constructed from the given trajectory
+
     """
 
     return json.dumps(dictionary_from_trajectory(trajectory), sort_keys=True)
 
 def trajectory_from_json_file(json_filename):
+    """Constructes a trajectory from the given json file
+
+    Args:
+       json_filename (File): the json file to convert into a trajectory representation
+
+    Returns:
+        Returns a trajectory constructed from the given json file
+
+    """
+
     json_string = open(json_filename).read() #todo handle error
     return trajectory_from_json(json_string)
 
 def json_file_from_trajectory(trajectory, json_filename):
+    """Constructes a json file from the given trajectory
+
+    Args:
+       json_filename (File): the json file to convert into a trajectory representation
+       trajectory (Trajectory): the trajectory to convert into a json representation
+
+    Returns:
+        Returns a trajectory constructed from the given json file
+
+    """
     with open(json_filename, 'w') as outfile: #todo handle error
         outfile.write(json_from_trajectory(trajectory))
 

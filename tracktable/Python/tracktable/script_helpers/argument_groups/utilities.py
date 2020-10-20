@@ -48,17 +48,17 @@ def _create_argument_group(group_name,
     """Register a new, empty group of arguments
 
     Arguments to configure different capabilities tend to come in
-    groups.  For example, movie-making includes frames per second,
-    movie duration, encoder type and encoder options.  This function
+    groups. For example, movie-making includes frames per second,
+    movie duration, encoder type and encoder options. This function
     lets you create such subject-related groups.
 
-    Note that this function only *creates* the group.  You still have to
+    Note that this function only *creates* the group. You still have to
     populate it using register_argument (q.v.).
 
     Args:
        group_name (string): Name of the group you want to add.
-       title (string): Title of the group.  Not required but highly recommended.
-       description (string): Description / help text.  Not required but highly recommended.
+       title (string): Title of the group. Not required but highly recommended.
+       description (string): Description / help text. Not required but highly recommended.
 
     Returns:
        The name of the group just added.
@@ -134,7 +134,7 @@ def _use_argument_group(group_name, parser):
        KeyError: the desired argument group does not exist
 
     Once you have registered one or more arguments in a group, call
-    use_arguments to add them to a parser.  They will be added to a
+    use_arguments to add them to a parser. They will be added to a
     group in that parser.
 
     Examples:
@@ -176,10 +176,10 @@ def _extract_arguments(group_name, parsed_args, switch_character='-'):
     """Extract a group of arguments from a Namespace into a dict
 
     Argument groups make it easy to include a batch of options all at
-    once.  This function is the next step: after you've used
+    once. This function is the next step: after you've used
     argparse.ArgumentParser to parse a set of command-line arguments,
     you use extract_arguments to extract a group of arguments
-    into a dict.  This dict can then be passed on to a function as a
+    into a dict. This dict can then be passed on to a function as a
     set of keyword arguments.
 
     The difference between this and calling vals() on the namespace
@@ -229,8 +229,8 @@ def _arg_to_destvar(arg, switch_character='-'):
     """INTERNAL: Look up the destination variable an argument writes into
 
     The argparse library allows you to specify the name of the
-    property into which an argument's value will be stored.  This
-    function abstracts that away.  When you call it you will get back
+    property into which an argument's value will be stored. This
+    function abstracts that away. When you call it you will get back
     our best guess at the property that will contain values for the
     specified argument.
 

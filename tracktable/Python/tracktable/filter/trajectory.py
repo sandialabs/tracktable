@@ -62,12 +62,12 @@ class ClipToTimeWindow(object):
           once unless you collect it in a list yourself.
 
         Yields:
-           Trajectories derived from input trajectories.  Each trajectory
+           Trajectories derived from input trajectories. Each trajectory
              is guaranteed to fall entirely within the window specified by
-             self.start_time and self.end_time.  If one of the input
+             self.start_time and self.end_time. If one of the input
              trajectories extends beyond that boundary, a new endpoint will
              be interpolated so that it begins or ends precisely at the
-             boundary.  Trajectories entirely outside the boundary will be
+             boundary. Trajectories entirely outside the boundary will be
              returned as empty trajectories with 0 points.
         """
 
@@ -75,7 +75,7 @@ class ClipToTimeWindow(object):
             raise ValueError("ClipToTimeWindow: No input source!  Set 'input' to a valid trajectory source.")
 
         if self.start_time is None or self.end_time is None:
-            raise ValueError("ClipToTimeWindow: Incomplete time window!  You must set both 'start_time' and 'end_time'.  The current time window is ({}, {}).".format(self.start_time, self.end_time))
+            raise ValueError("ClipToTimeWindow: Incomplete time window!  You must set both 'start_time' and 'end_time'. The current time window is ({}, {}).".format(self.start_time, self.end_time))
 
         for trajectory in self.input:
             subset = geomath.subset_during_interval(trajectory,
@@ -91,14 +91,13 @@ class FilterByBoundingBox(object):
     """FilterByBoundingBox: Eliminate trajectories that don't intersect a given box
 
     Given a source that produces Trajectories, return only those
-    trajectories that intersect the specified bounding box.  No
+    trajectories that intersect the specified bounding box. No
     clipping or subsetting is performed: if at least one point is
     within the desired region you will get the entire trajectory back.
 
     Attributes:
       input (iterable): Sequence of Trajectory objects
-      bbox_min (TrajectoryPoint):  Southwest corner of bounding box
-      bbox_max (TrajectoryPoint): Northeast corner of bounding box
+      box (tuple): Bounding box
     """
 
     def __init__(self):
@@ -134,7 +133,7 @@ class FilterByAltitude(object):
     trajectories that have at least one point between min_altitude and
     max_altitude.
 
-    Like FilterByBoundingBox, no clipping will take place.  If a
+    Like FilterByBoundingBox, no clipping will take place. If a
     trajectory crosses the specified interval at all then you will get
     the whole thing back.
 

@@ -28,6 +28,10 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+"""
+cartesian2d - Configure and output cartesian3d trajectories
+"""
+
 from tracktable.lib._cartesian3d import BasePointCartesian3D as BasePoint
 from tracktable.lib._cartesian3d import TrajectoryPointCartesian3D as TrajectoryPoint
 from tracktable.lib._cartesian3d import TrajectoryCartesian3D as Trajectory
@@ -70,10 +74,26 @@ for domain_class in [
     domain_class.DOMAIN = "cartesian3d"
 
 class TrajectoryWriter:
+    """ Simple class to encapsulate the Trajectory Writer capabilities
+            of the Cartesian3D domain
+
+    Attributes:
+      writer (TrajectoryWriterCartesian3D): Output writer for a Cartesian3D trajectory
+      output (StringIO.StringIO or io.BytesIO buffer): String or Byte buffer to output to
+
+    """
     def __init__(self, output):
         self.writer = TrajectoryWriterCartesian3D(output)
-    
+
     def write(self, trajectories):
+        """ Write the Cartesian3D trajectories
+
+            Args:
+                trajectories (list): List of trajectories to be written out
+
+            Returns:
+                No return value
+        """
         if isinstance(trajectories, list):
             self.writer.write(trajectories)
         else:

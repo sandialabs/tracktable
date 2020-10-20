@@ -39,6 +39,7 @@ if (BUILD_TESTING)
   add_subdirectory(core/tests)
   add_subdirectory(domain/tests)
   add_subdirectory(examples)
+  add_subdirectory(examples/data/generators/tests)
   add_subdirectory(io/tests)
   add_subdirectory(info/tests)
   add_subdirectory(render/tests)
@@ -84,6 +85,12 @@ file(GLOB example_data_files "examples/data/*.*")
 install(
   FILES ${example_data_files}
   DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/data
+)
+
+file(GLOB example_data_generator_files "examples/data/generators/*.py")
+install(
+  FILES ${example_data_generator_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/data/generators
 )
 
 file(GLOB feature_files "feature/*.py")

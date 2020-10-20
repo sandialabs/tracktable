@@ -139,15 +139,15 @@ int test_terrestrial_dg_by_distance()
   // draw for the trajectory.
   std::vector<double> expected_dg_values = {
     0.0, 
-    0.354458, 
-    0.354458, 
-    0.264464, 
-    0.236972, 
-    0.264464,
-    0.25,
-    0.25,
-    0.25,
-    0.25};
+    0.708916, 
+    0.708916, 
+    0.793393, 
+    0.710916, 
+    0.793393,
+    0.999999,
+    0.999999,
+    0.999999,
+    0.999999};
 
   error_count += compare_vectors(
     expected_dg_values,

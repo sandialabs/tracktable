@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -456,13 +456,17 @@ class trajectory_methods : public boost::python::def_visitor<trajectory_methods>
 	void visit(ClassT& c) const
 	{
 		typedef typename ClassT::wrapped_type wrapped_type;
+        typedef typename wrapped_type::point_type point_type;
 		using namespace boost::python;
-
+        //deal with the fact that insert is already overloaded
+        void (wrapped_type::*insert)(int, point_type const&) = &wrapped_type::insert;
 		c
                   .add_property("duration", &wrapped_type::duration)
                   .add_property("domain", point_domain_name<wrapped_type>)
                   .add_property("trajectory_id", &wrapped_type::trajectory_id)
                   .add_property("object_id", &wrapped_type::object_id)
+                  .def("insert", insert)
+                  .def("clone", &wrapped_type::clone, return_value_policy<return_by_value>())
                   .def(self == self)
                   .def(self != self)
                   .def_pickle(GenericSerializablePickleSuite<wrapped_type>())

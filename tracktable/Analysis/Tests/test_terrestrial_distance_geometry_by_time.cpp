@@ -144,15 +144,15 @@ int test_terrestrial_dg_by_distance()
   std::vector<double> terrestrial_dg = tracktable::distance_geometry_by_time(trajectory, 4);
   std::vector<double> expected_dg_values = {
     0.0, 
-    0.354458, 
-    0.354458, 
-    0.25, 
-    0.354458, 
-    0.25,
-    0.1875,
-    0.258467,
-    0.258467,
-    0.1875
+    0.708916, 
+    0.708916, 
+    0.75, 
+    1.063374, 
+    0.75,
+    0.75,
+    1.033868,
+    1.033868,
+    0.75
   };
 
   error_count += compare_vectors(

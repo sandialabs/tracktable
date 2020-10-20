@@ -63,7 +63,9 @@ def make_simple_colormap(color_list, name=None):
 
     Args:
       color_list (list): List of color specifications (described above)
-      name (string): Optional name for the color map for registration
+
+    Keyword Args:
+      name (str): Optional name for the color map for registration
 
     Returns:
       A new matplotlib colormap object.

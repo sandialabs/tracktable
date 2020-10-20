@@ -1,71 +1,28 @@
-tracktable.script_helpers.argument_groups package
-=================================================
+================================================
+tracktable.script_helpers.argument_groups module
+================================================
 
-These are the predefined argument groups that come with Tracktable.
+----------
+Submodules
+----------
 
-.. todo: Change the docstring for each install_group function to list
-   the arguments involved
+.. toctree::
+   :maxdepth: 2
 
-tracktable.script_helpers.argument_groups.dt_point_loader module
-----------------------------------------------------------------
+   tracktable.script_helpers.argument_groups.dt_point_loader
+   tracktable.script_helpers.argument_groups.image
+   tracktable.script_helpers.argument_groups.mapmaker
+   tracktable.script_helpers.argument_groups.movie_rendering
+   tracktable.script_helpers.argument_groups.parallel
+   tracktable.script_helpers.argument_groups.trajectory_assembly
+   tracktable.script_helpers.argument_groups.trajectory_rendering
+   tracktable.script_helpers.argument_groups.utilities
 
-.. automodule:: tracktable.script_helpers.argument_groups.dt_point_loader
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
-tracktable.script_helpers.argument_groups.mapmaker module
----------------------------------------------------------
-
-.. automodule:: tracktable.script_helpers.argument_groups.mapmaker
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tracktable.script_helpers.argument_groups.movie_rendering module
-----------------------------------------------------------------
-
-.. automodule:: tracktable.script_helpers.argument_groups.movie_rendering
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tracktable.script_helpers.argument_groups.parallel module
----------------------------------------------------------
-
-.. automodule:: tracktable.script_helpers.argument_groups.parallel
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tracktable.script_helpers.argument_groups.trajectory_assembly module
---------------------------------------------------------------------
-
-.. automodule:: tracktable.script_helpers.argument_groups.trajectory_assembly
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tracktable.script_helpers.argument_groups.trajectory_rendering module
----------------------------------------------------------------------
-
-.. automodule:: tracktable.script_helpers.argument_groups.trajectory_rendering
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tracktable.script_helpers.argument_groups.utilities module
-----------------------------------------------------------
-
-.. automodule:: tracktable.script_helpers.argument_groups.utilities
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
+---------------
 Module contents
 ---------------
+
+These are the predefined argument groups that come with Tracktable.
 
 .. automodule:: tracktable.script_helpers.argument_groups
     :members:

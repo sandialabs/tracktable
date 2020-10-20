@@ -50,14 +50,13 @@ def data_directory():
     We bundle a few example data files inside Tracktable.  This
     function will give you the path to those.  Use it as follows:
 
-    import os.path
-    from tracktable.core import data_directory
+    .. code-block:: python
 
-    with open(os.path.join(data_directory(), "SampleASDI.csv")) as asdi_file:
-         # Do your own stuff with the data
+        import os.path
+            from tracktable.core import data_directory
 
-    Arguments:
-        No arguments.
+            with open(os.path.join(data_directory(), "SampleASDI.csv")) as asdi_file:
+                # Do your own stuff with the data
 
     Returns:
         Path to Tracktable example data files.

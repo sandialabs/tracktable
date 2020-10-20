@@ -36,17 +36,17 @@ from tracktable.render import maps
 
 The Mapmaker argument group contains (almost) everything we think you
 might need in order to draw a map of part of the Earth, including
-decorating it with borders and cities.  It can also be used to specify
-a map for a 2D Cartesian data set, albeit with some awkwardness.  This
+decorating it with borders and cities. It can also be used to specify
+a map for a 2D Cartesian data set, albeit with some awkwardness. This
 will be fixed soon.
 
 Arguments:
 
 | ``--domain NAME``
-|   Point domain for your data.  This will be one of 'terrestrial', 'cartesian2d', 'cartesian3d'.
+|   Point domain for your data. This will be one of 'terrestrial', 'cartesian2d', 'cartesian3d'.
 |
 | ``--map NAME``
-|   Name of map that you want.  See tracktable.render.maps.available_maps() for options.  There is also a "custom" map type where you supply your own bounding box.
+|   Name of map that you want. See tracktable.render.maps.available_maps() for options. There is also a "custom" map type where you supply your own bounding box.
 |
 | ``--omit-coastlines``
 |   Do not draw continent boundaries
@@ -76,7 +76,7 @@ Arguments:
 |   Line width (in points) for continental coastlines
 |
 | ``--continent-zorder NUMBER``
-|   Layer (Z-order, integer) for continental coastlines.  Higher numbers are drawn on top of lower numbers.
+|   Layer (Z-order, integer) for continental coastlines. Higher numbers are drawn on top of lower numbers.
 |
 | ``--country-color COLOR``
 |   Color (name or hex string) for country borders
@@ -118,7 +118,7 @@ Arguments:
 |   Axis-aligned bounding box for map.
 |
 | ``--map-projection STRING``
-|   Map projection string for Basemap.  Defaults to 'mill' (Miller cylindrical).
+|   Map projection string for Basemap. Defaults to 'mill' (Miller cylindrical).
 
 """
 
@@ -146,11 +146,11 @@ def install_group():
     create_argument_group("mapmaker",
                           title="Create and annotate a geographic map",
 
-                          description="Here you can set all of the options for creating and annotating your map.  These include asking for a predefined map of a region of the world, a map around an airport, a map of the whole world, whether or not to draw continents, country borders, state/province borders (in the US and Canada), cities and longitude/latitude lines.  The ability to specify a fully arbitrary map will come eventually.")
+                          description="Here you can set all of the options for creating and annotating your map. These include asking for a predefined map of a region of the world, a map around an airport, a map of the whole world, whether or not to draw continents, country borders, state/province borders (in the US and Canada), cities and longitude/latitude lines. The ability to specify a fully arbitrary map will come eventually.")
 
     add_argument("mapmaker", [ "--domain" ],
                  default="terrestrial",
-                 help="Point domain for your data.  This should be 'terrestrial' if your points are in longitude/latitude format or 'cartesian' if your points are in regular 2D space.")
+                 help="Point domain for your data. This should be 'terrestrial' if your points are in longitude/latitude format or 'cartesian' if your points are in regular 2D space.")
 
     add_argument("mapmaker", [ "--map" ],
                  default="region:world",

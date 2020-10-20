@@ -1,34 +1,19 @@
+======================
 tracktable.info module
-=======================
+======================
 
+----------
 Submodules
 ----------
 
-tracktable.info.airports module
--------------------------------
+.. toctree::
+   :maxdepth: 2
 
-.. automodule:: tracktable.info.airports
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   tracktable.info.airports.rst
+   tracktable.info.cities.rst
+   tracktable.info.timezones.rst
 
-tracktable.info.cities module
------------------------------
-
-.. automodule:: tracktable.info.cities
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tracktable.info.timezones module
---------------------------------
-
-.. automodule:: tracktable.info.timezones
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
+---------------
 Module contents
 ---------------
 

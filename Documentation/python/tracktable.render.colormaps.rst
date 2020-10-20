@@ -1,5 +1,11 @@
+==================================
 tracktable.render.colormaps module
 ==================================
+
+
+---------------
+Module contents
+---------------
 
 .. automodule:: tracktable.render.colormaps
     :members:

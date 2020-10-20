@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2018 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -179,10 +179,25 @@ add_executable(test_current_length
   )
 set_property(TARGET test_current_length                 PROPERTY FOLDER "Tests")
 
+add_executable(test_current_length_fraction
+  test_current_length_fraction.cpp
+  )
+set_property(TARGET test_current_length_fraction        PROPERTY FOLDER "Tests")
+
+add_executable(test_current_time_fraction
+  test_current_time_fraction.cpp
+  )
+set_property(TARGET test_current_time_fraction        PROPERTY FOLDER "Tests")
+
 add_executable(test_memory_use
   test_memory_use.cpp
   )
 set_property(TARGET test_memory_use                     PROPERTY FOLDER "Tests")
+
+add_executable(test_trajectory_slicing
+  test_trajectory_slicing.cpp
+  )
+set_property(TARGET test_trajectory_slicing             PROPERTY FOLDER "Tests")
 
 # ----------------------------------------------------------------------
 
@@ -212,6 +227,16 @@ target_link_libraries(test_convex_hull_perimeter
 )
 
 target_link_libraries(test_current_length
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
+target_link_libraries(test_current_length_fraction
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
+target_link_libraries(test_current_time_fraction
   TracktableCore
   ${Boost_LIBRARIES}
 )
@@ -326,6 +351,11 @@ target_link_libraries(test_memory_use
   ${Boost_LIBRARIES}
   )
 
+target_link_libraries(test_trajectory_slicing
+  TracktableCore
+  ${Boost_LIBRARIES} 
+  )
+
 # ----------------------------------------------------------------------
 
 add_test(
@@ -384,6 +414,16 @@ add_test(
 add_test(
   NAME C_TestCurrentLength
   COMMAND test_current_length
+)
+
+add_test(
+  NAME C_TestCurrentLengthFraction
+  COMMAND test_current_length_fraction
+)
+
+add_test(
+  NAME C_TestCurrentTimeFraction
+  COMMAND test_current_time_fraction
 )
 
 add_test(
@@ -454,4 +494,9 @@ add_test(
 add_test(
   NAME C_TimestampFormat
   COMMAND test_timestamp_format
+  )
+
+add_test(
+  NAME C_TrajectorySlicing
+  COMMAND test_trajectory_slicing
   )

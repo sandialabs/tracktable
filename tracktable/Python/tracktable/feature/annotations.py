@@ -44,14 +44,24 @@ ALL_ANNOTATIONS = {}
 # ----------------------------------------------------------------------
 
 def climb_rate(trajectory, max_climb=2000):
-    """climb_rate: Annotate points in an AirTrajectory with climb rate
+    """Annotate points in an AirTrajectory with climb rate
 
     usage: climb_rate(t: AirTrajectory) -> None
 
     This will add a property 'climb_rate' to each point in the input
-    trajectory.  This is measured in units/sec and is computed as
+    trajectory. This is measured in units/sec and is computed as
     (points[n].altitude - points[n-1].altitude) /
     (points[n].timestamp - points[n-1].timestamp).
+
+    Args:
+        trajectory (Trajectory): Trajectory to be annotated with climb rate
+
+    Keyword Args:
+        max_climb (int): max climb rate (Default: 2000)
+
+    Returns:
+        Trajectory annotated with climb rate
+
     """
 
     if len(trajectory) == 0:
@@ -82,6 +92,19 @@ def climb_rate(trajectory, max_climb=2000):
 # ----------------------------------------------------------------------
 
 def get_climb_rate(trajectory, max_velocity=2000):
+    """Return a vector of scalars for point-to-point climb rate
+
+    Args:
+        trajectory (Trajectory): Trajectory to be annotated with climb rate
+
+    Keyword Args:
+        max_velocity (int): max possible velocity to use when calculating climb rate (Default: 2000)
+
+    Returns:
+        A vector of scalars with point-to-point climb rates
+
+    """
+
     scalars = numpy.zeros(len(trajectory))
 
     for i in range(len(trajectory)):
@@ -104,14 +127,15 @@ def get_airspeed(trajectory, min_speed=0, max_speed=980):
     It will map the 'speed' property into a range from 0 to 1.
 
     Args:
-       trajectory (tracktable.core.Trajectory): Trajectory containing speeds
+       trajectory (Trajectory): Trajectory containing speeds
 
-    Kwargs:
-       min_speed (float): Minimum speed in kilometers per hour.  This will be mapped to the bottom of the scalar range and thus the bottom of the color map.  Defaults to 0.
-       max_speed (float): Maximum speed in kilometers per hour.  This will be mapped to the top of the scalar range and thus the top of the color map.  Defaults to 980 (0.8 Mach, a common maximum permitted speed for civilian airliners).
+    Keyword Args:
+       min_speed (float): Minimum speed in kilometers per hour. This will be mapped to the bottom of the scalar range and thus the bottom of the color map. Defaults to 0. (Default: 0)
+       max_speed (float): Maximum speed in kilometers per hour. This will be mapped to the top of the scalar range and thus the top of the color map. Defaults to 980 (0.8 Mach, a common maximum permitted speed for civilian airliners). (Default: 980)
 
     Returns:
        A vector of scalars that can be used as input to a colormap.
+
     """
 
     return _get_scaled_speed(trajectory, min_speed=min_speed, max_speed=max_speed)
@@ -125,14 +149,15 @@ def get_speed_over_water(trajectory, min_speed=0, max_speed=60):
     It will map the 'speed' property into a range from 0 to 1.
 
     Args:
-       trajectory (tracktable.core.Trajectory): Trajectory containing speeds
+       trajectory (Trajectory): Trajectory containing speeds
 
-    Kwargs:
-       min_speed (float): Minimum speed in kilometers per hour.  This will be mapped to the bottom of the scalar range and thus the bottom of the color map.  Defaults to 0.
-       max_speed (float): Maximum speed in kilometers per hour.  This will be mapped to the top of the scalar range and thus the top of the color map.  Defaults to 60 km/h (32 knots, very fast for big ships but slower than the maximum speed of high-speed civilian ferries).
+    Keyword Args:
+       min_speed (float): Minimum speed in kilometers per hour. This will be mapped to the bottom of the scalar range and thus the bottom of the color map. Defaults to 0. (Default: 0)
+       max_speed (float): Maximum speed in kilometers per hour. This will be mapped to the top of the scalar range and thus the top of the color map. Defaults to 60 km/h (32 knots, very fast for big ships but slower than the maximum speed of high-speed civilian ferries).  (Default: 60)
 
     Returns:
        A vector of scalars that can be used as input to a colormap.
+
     """
 
     return _get_scaled_speed(trajectory, min_speed=min_speed, max_speed=max_speed)
@@ -141,10 +166,11 @@ def get_speed(trajectory):
     """Get the speed for a trajectory without any scaling.
 
     Args:
-      trajectory (tracktable.core.Trajectory): Trajectory containing speeds
+      trajectory (Trajectory): Trajectory containing speeds
 
     Returns:
       Numpy array containing the speed value for each point
+
     """
     scalars = numpy.zeros(len(trajectory))
     for i in range(len(trajectory)):
@@ -161,11 +187,9 @@ def _get_scaled_speed(trajectory, min_speed, max_speed):
     It will map the 'speed' property into a range from 0 to 1.
 
     Args:
-       trajectory (tracktable.core.Trajectory): Trajectory containing speeds
-
-    Kwargs:
-       min_speed (float): Minimum speed in kilometers per hour.  No default.
-       max_speed (float): Maximum speed in kilometers per hour.  No default.
+       trajectory (Trajectory): Trajectory containing speeds
+       min_speed (float): Minimum speed in kilometers per hour. No default.
+       max_speed (float): Maximum speed in kilometers per hour. No default.
 
     Returns:
        A vector of scalars that can be used as input to a colormap.
@@ -182,6 +206,15 @@ def _get_scaled_speed(trajectory, min_speed, max_speed):
 # ----------------------------------------------------------------------
 
 def get_progress(trajectory):
+    """Return a vector of scalars for point-to-point flight progress
+
+    Args:
+        trajectory (Trajectory): Trajectory containing flight progress
+
+    Returns:
+        A vector of scalars with point-to-point flight progress
+
+    """
 
     scalars = numpy.zeros(len(trajectory))
 
@@ -193,14 +226,20 @@ def get_progress(trajectory):
 # ----------------------------------------------------------------------
 
 def progress(trajectory):
-
-    """progress: Annotate points in an AirTrajectory with flight progress
+    """Annotate points in an AirTrajectory with flight progress
 
     usage: progress(t: AirTrajectory) -> None
 
     This will add a property "progress" to each point in the input
-    trajectory.  This property will be 0 at the first point, 1 at the
+    trajectory. This property will be 0 at the first point, 1 at the
     last point, and spaced evenly in between.
+
+    Args:
+        trajectory (Trajectory): Trajectory to be annotated with flight progress
+
+    Returns:
+        Trajectory annotated with flight progress
+
     """
 
     if len(trajectory) == 0:
@@ -219,6 +258,19 @@ def progress(trajectory):
 # ----------------------------------------------------------------------
 
 def compute_speed_from_positions(trajectory):
+    """Annotate points in an Trajectory with point-to-point speeds
+
+    This will add a property "speed" to each point in the input
+    trajectory. This property will be 0 at the first point, 1 at the
+    last point, and spaced evenly in between.
+
+    Args:
+        trajectory (Trajectory): Trajectory to be annotated with speeds
+
+    Returns:
+        Trajectory annotated with point-to-point speeds
+    """
+
     for i in range(len(trajectory) - 1):
         speed_between_points = geomath.speed_between_points(trajectory[i], trajectory[i+1])
         trajectory[i].speed = speed_between_points
@@ -239,14 +291,41 @@ def register_annotation(feature_name, compute_feature, retrieve_feature):
 # ----------------------------------------------------------------------
 
 def retrieve_feature_function(name):
+    """Supply feature function
+
+    Args:
+        name (str): Name of feature
+
+    Returns:
+        Function related to the feature
+
+    """
+
     global ALL_ANNOTATIONS
     return ALL_ANNOTATIONS[name][0]
 
 def retrieve_feature_accessor(name):
+    """Supply feature accessor
+
+    Args:
+        name (str): Name of feature
+
+    Returns:
+        Accessor related to the feature
+
+    """
+
     global ALL_ANNOTATIONS
     return ALL_ANNOTATIONS[name][1]
 
 def available_annotations():
+    """Supply all available annotations
+
+    Returns:
+        All of the possible annotation types
+
+    """
+
     global ALL_ANNOTATIONS
     return ALL_ANNOTATIONS.keys()
 

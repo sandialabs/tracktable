@@ -31,13 +31,13 @@
 """Customized version of argparse with Response Files
 
 Regular argparse has some support for response files but they're
-pretty bare.  There's nowhere to put comments, for example.  This
-subclass enhances that.  It adds a few capabilities:
+pretty bare. There's nowhere to put comments, for example. This
+subclass enhances that. It adds a few capabilities:
 
 * Argument Groups - Use a group of thematically-related arguments all
   at once instead of having to insert them one by one
 
-* Response Files - Response files can have comments in them.  They
+* Response Files - Response files can have comments in them. They
   will be automatically parsed from the command line.
 
 * --write-response-file - Like --help, this will write an example
@@ -65,8 +65,8 @@ class ArgumentParser(standard_argparse.ArgumentParser):
     """Enhanced version of the standard Python ArgumentParser.
 
     Attributes:
-      add_response_file (boolean): Add the '--write-response-file' option.
-      comment_character (string): This character indicates that a line in
+      add_response_file (bool): Add the '--write-response-file' option.
+      comment_character (str): This character indicates that a line in
         a response file should be ignored.
 
     ORIGINAL ARGPARSE DOCUMENTATION:
@@ -74,8 +74,8 @@ class ArgumentParser(standard_argparse.ArgumentParser):
     Object for parsing command line strings into Python objects.
 
     Keyword Arguments:
-        - prog -- The name of the program (default: sys.argv[0])
-        - usage -- A usage message (default: auto-generated from arguments)
+        - prog -- The name of the program (Default: sys.argv[0])
+        - usage -- A usage message (Default: auto-generated from arguments)
         - description -- A description of what the program does
         - epilog -- Text following the argument descriptions
         - parents -- Parsers whose arguments should be copied into this one
@@ -99,18 +99,18 @@ class ArgumentParser(standard_argparse.ArgumentParser):
         """Initialize custom argument parser
 
         Initialize our version of ArgumentParser that can handle
-        response files with comments.  The only real difference from
+        response files with comments. The only real difference from
         the parent class's constructor is that we include an argument
         for the comment character.
 
-        Kwargs:
-          add_response_file (boolean): Whether to include the argument
-             for --write-response-file.  Defaults to true.
-          fromfile_prefix_chars (string): Characters that will indicate
+        Keyword Args:
+          add_response_file (bool): Whether to include the argument
+             for --write-response-file. Defaults to true.
+          fromfile_prefix_chars (str): Characters that will indicate
              a response file on the command line instead of an argument.
-          prefix_chars (string): Characters that will indicate an argument
+          prefix_chars (str): Characters that will indicate an argument
              name instead of a value or a positional argument.
-          comment_character (string): Character in response file that
+          comment_character (str): Character in response file that
              will indicate that a line is a comment.
           kwargs: Any other arguments will be passed on to the regular
              ArgParse constructor
@@ -147,17 +147,17 @@ class ArgumentParser(standard_argparse.ArgumentParser):
         """Write an example response file
 
         Write a response file with every line commented out to the
-        specified file-like object.  It will be populated with every
+        specified file-like object. It will be populated with every
         argument (positional and optional) that has been configured
         for this parser including descent into any argument groups.
         The '--help' and '--write-response-file' arguments will be
         omitted.
 
-        Args:
-           out: File-like object for output
+        Keyword Args:
+           out (File): File-like object for output (Default: sys.stdout)
 
         Returns:
-           None
+           No return value
         """
 
         writer = _ResponseFileWriter(out)
@@ -173,15 +173,18 @@ class ArgumentParser(standard_argparse.ArgumentParser):
     def _read_args_from_files(self, arg_strings, file_depth=0):
         """Recursively expand arguments that refer to response files
 
-        Internal method.  Given a list of arguments, traverse it and
-        look for strings that indicate response files.  Load those
+        Internal method. Given a list of arguments, traverse it and
+        look for strings that indicate response files. Load those
         response files and repeat the process with their contents.
 
         NOTE: This function is not smart enough to guard against
         self-referencing response files.
 
         Args:
-           List of argument strings to examine
+           arg_strings (list): List of argument strings to examine
+
+        Keyword Args:
+            file_depth (int): Depth that the file is at (Default: 0)
 
         Returns:
            List of argument strings, including contents of any and all
@@ -217,7 +220,7 @@ def _load_response_file(filename,
                         fromfile_prefix_chars='@'):
     """Load a set of arguments from a response file
 
-    Open and read a response file.  Ignore lines whose first
+    Open and read a response file. Ignore lines whose first
     non-whitespace character is the comment character.
 
     Args:
@@ -247,9 +250,9 @@ def _text_line_to_args(text,
                        fromfile_prefix_chars='@'):
     """Internal method - read args from a line of text
 
-    Take a line of text.  Unless it starts with a comment character,
+    Take a line of text. Unless it starts with a comment character,
     split it into words (obeying quotes as the shell would) and treat
-    them each as an argument.  Return the list of arguments, including
+    them each as an argument. Return the list of arguments, including
     expanding response files if found.
 
     Args:
@@ -290,7 +293,7 @@ class _WriteResponseFile(standard_argparse.Action):
     Args:
       option_strings: Strings that can invoke command
 
-    Kwargs:
+    Keyword Args:
       dest: Not Used
       default: Not Used
       help: Not Used
@@ -319,7 +322,7 @@ class _WriteResponseFile(standard_argparse.Action):
              Defaults to SUPPRESS since there isn't one.
            help (string): Help message for the argument.
              Defaults to None - we always supply this elsewhere.
-           kwargs (dict): Any other arguments.  Passed along to the
+           kwargs (dict): Any other arguments. Passed along to the
              standard argparse.Action constructor.
         """
 
@@ -342,7 +345,7 @@ def _get_argument_name(arg):
     """Try to retrieve an argument name from an Action record.
 
     Look at the option_strings member in the action and return the
-    first one.  Hopefully that will be the longest.  If there are no
+    first one. Hopefully that will be the longest. If there are no
     option strings then we're dealing with a positional argument --
     say so.
 
@@ -405,7 +408,7 @@ class _ResponseFileWriter(object):
     def write_action_group(self, group):
         """Write all the actions in a group
 
-        Write a new section in a response file.  This will include the
+        Write a new section in a response file. This will include the
         action group's title and description if available, all the
         actions in that group, and any subgroups.
 
@@ -441,7 +444,7 @@ class _ResponseFileWriter(object):
         """Write a single action to a response file.
 
         Write the action's help message (if any), option name (if any)
-        and default value (if any) to a file.  The text will be
+        and default value (if any) to a file. The text will be
         commented out so that the user can choose which things to
         configure and which to leave alone.
 

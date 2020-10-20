@@ -1,3 +1,33 @@
+#
+# Copyright (c) 2014-2017 National Technology and Engineering
+# Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
+# with National Technology and Engineering Solutions of Sandia, LLC,
+# the U.S. Government retains certain rights in this software.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+# notice, this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
 """Render cities, coastlines, etc onto maps"""
 
 from __future__ import print_function, absolute_import, division
@@ -21,16 +51,19 @@ def draw_largest_cities(map_axes,
     """Decorate a map with the N largest cities
 
     Args:
-       map_axes:           Map to decorate
-       minimum_population: Draw cities with at least this large a population
-       label_size:         Font size (points) for label
-       dot_size:           Size (in points) of dot marking city location
-       label_color:        Color (name or hex string) for city labels
-       dot_color:          Color (name or hex string) for city markesr
-       zorder:             Image layer (z-order) for cities
+       map_axes (GeoAxes): Map to decorate
+       num_cities (int): Draw cities with at least this large a population
+
+    Keyword Args:
+       label_size (int): Font size (points) for label (Default: 10)
+       dot_size (int): Size (in points) of dot marking city location (Default: 2)
+       label_color (str): Color (name or hex string) for city labels (Default: 'white')
+       dot_color (str): Color (name or hex string) for city markers (Default: 'white')
+       zorder (int): Image layer (z-order) for cities (Default: 10)
 
     Returns:
        A list of artists added to the map
+
     """
 
 #    map_extent = map_axes.get_extent(map_axes.tracktable_projection)
@@ -69,14 +102,16 @@ def draw_cities_larger_than(map_axes,
     """Decorate a map with all cities larger than a given population
 
     Args:
-       mymap:              Basemap instance to decorate
-       minimum_population: Draw cities with at least this large a population
-       label_size:         Font size (points) for label
-       dot_size:           Size (in points) of dot marking city location
-       label_color:        Color (name or hex string) for city labels
-       dot_color:          Color (name or hex string) for city markesr
-       zorder:             Image layer (z-order) for cities
-       axes:               Matplotlib axes instance to render into
+       mymap (Basemap): Basemap instance to decorate
+       minimum_population (int): Draw cities with at least this large a population
+
+    Keyword Args:
+       label_size (int): Font size (points) for label (Default: 10)
+       dot_size (int): Size (in points) of dot marking city location (Default: 2)
+       label_color (str): Color (name or hex string) for city labels (Default: 'white')
+       dot_color (str): Color (name or hex string) for city markers (Default: 'white')
+       zorder (int): Image layer (z-order) for cities (Default: 10)
+       axes (Matplotlib axes): Matplotlib axes instance to render into (Default: None)
 
     Returns:
        A list of artists added to the axes
@@ -114,6 +149,24 @@ def draw_cities(map_axes,
                 dot_color='white',
                 zorder=10,
                 transform = None):
+    """Decorate a map with specified number of cities
+
+    Args:
+       map_axes (GeoAxes): Map to decorate
+       cities_to_draw (int): Draw specified amount of cities
+
+    Keyword Args:
+       label_size (int): Font size (points) for label (Default: 10)
+       dot_size (int): Size (in points) of dot marking city location (Default: 2)
+       label_color (str): Color (name or hex string) for city labels (Default: 'white')
+       dot_color (str): Color (name or hex string) for city markers (Default: 'white')
+       zorder (int): Image layer (z-order) for cities (Default: 10)
+       transform (cartopy crs object): Transform the corrdinate system (Default: None)
+
+    Returns:
+       A list of artists added to the axes
+
+    """
 
     if transform is None:
         transform = cartopy.crs.Geodetic()
@@ -162,6 +215,22 @@ def draw_countries(map_axes,
                    edgecolor='#606060',
                    resolution='10m',
                    **kwargs):
+    """Decorate a map with countries
+
+    Args:
+       map_axes (GeoAxes): Map to decorate
+
+    Keyword Args:
+       linewidth (float): Width of the country borders (Default: 0.5)
+       zorder (int): Image layer (z-order) for countries (Default: 4)
+       edgecolor (str): Color (name or hex string) for country borders (Default: '#606060')
+       resolution (str): Detail of country borders (Default: '10m')
+       kwargs (dict): Arguments to be passed to Matplotlib text renderer for label (Default: dict())
+
+    Returns:
+       A list of Matplotlib artists added to the figure.
+
+    """
 
     country_borders = cartopy.feature.NaturalEarthFeature(
         'cultural',
@@ -187,6 +256,23 @@ def draw_states(map_axes,
                 facecolor='#606060',
                 edgecolor='#A0A0A0',
                 **kwargs):
+    """Decorate a map with states
+
+    Args:
+       map_axes (GeoAxes): Map to decorate
+
+    Keyword Args:
+       resolution (str): Detail of state borders (Default: '10m')
+       linewidth (float): Width of the state borders (Default: 0.25)
+       zorder (int): Image layer (z-order) for countries (Default: 3)
+       facecolor (str): Color (name or hex string) for states (Default: '#606060')
+       edgecolor (str): Color (name or hex string) for state borders (Default: '#A0A0A0')
+       kwargs (dict): Arguments to be passed to Matplotlib text renderer for label (Default: dict())
+
+    Returns:
+       A list of Matplotlib artists added to the figure.
+
+    """
 
     return [map_axes.add_feature(
         cartopy.feature.STATES.with_scale(resolution),
@@ -208,16 +294,18 @@ def draw_coastlines(map_axes,
     """Draw coastlines onto a GeoAxes instance
 
     Args:
-       map_axes: GeoAxes from mapmaker
+       map_axes (GeoAxes): GeoAxes from mapmaker
 
     Keyword Args:
-       border_color (colorspec): Color for coastlines (default #808080, a medium gray)
-       resolution (string): Resolution for coastlines.  A value of None means 'don't draw'.  The values '110m', '50m' and '10m' specify increasingly detailed coastlines.  Defaults to '110m'.
-       linewidth (float): Stroke width in points for coastlines.  Defaults to 0.2.
-       zorder (int): Drawing layer for coastlines.  Layers with higher Z-order are drawn on top of those with lower Z-order.
+       border_color (colorspec): Color for coastlines (Default: #808080, Medium Gray)
+       resolution (str): Resolution for coastlines.  A value of None means 'don't draw'.  The values '110m', '50m' and '10m' specify increasingly detailed coastlines. (Default: '50m')
+       linewidth (float): Stroke width in points for coastlines.  (Defaults: 0.2)
+       zorder (int): Drawing layer for coastlines.  Layers with higher Z-order are drawn on top of those with lower Z-order. (Default: 5)
+       kwargs (dict): Arguments to be passed to Matplotlib text renderer for label (Default: dict())
 
     Returns:
        A list of Matplotlib artists added to the map.
+
     """
 
     coastlines = cartopy.feature.NaturalEarthFeature(
@@ -249,9 +337,14 @@ def fill_land(map_axes,
       map_axes (GeoAxes): Map instance to render onto
 
     Keyword Args:
-      land_color (string): Color specification for land.  Can be either a common name or a 6-digit hex string.
-      linewidth (float): Stroke width (in points) for coastlines
-      zorder (integer or None): Image layer for coastlines
+       edgecolor (str): Color (name or hex string) for land borders (Default: 'none')
+       facecolor (str): Color (name or hex string) for land (Default: '#303030')
+       linewidth (float): Width of the land borders (Default: 0.1)
+       resolution (str): Detail of land borders (Default: '110m')
+       zorder (int): Image layer (z-order) for countries (Default: None)
+
+    Returns:
+       A list of Matplotlib artists added to the map.
 
     TODO:
       Is this the method that mapmaker actually uses?
@@ -285,12 +378,13 @@ def fill_oceans(map_axes,
       map_axes (GeoAxes): Map instance to render onto
 
     Keyword Args:
-      resolution (string): One of '110m', '50m' or '10m' in increasing order of fidelity
-      water_color (string): Color specification for water.  Can be either a common name or a 6-digit hex string.
-      zorder (integer or None): Image layer for coastlines
+      facecolor (str): Color (name or hex string) for ocean (Default: '#101020')
+      resolution (str): Detail of ocean borders (Default: '110m')
+      zorder (int): Image layer (z-order) for oceans (Default: None)
 
-    TODO:
-      Does this also fill lakes?  Apparently not.
+    Returns:
+       A list of Matplotlib artists added to the map.
+
     """
 
     oceans = cartopy.feature.NaturalEarthFeature(
@@ -321,9 +415,14 @@ def fill_lakes(map_axes,
       map_axes (GeoAxes): Map instance to render onto
 
     Keyword Args:
-      resolution (string): One of '110m', '50m' or '10m' in increasing order of fidelity
-      facecolor (string): Color specification for water.  Can be either a common name or a 6-digit hex string.
-      zorder (integer or None): Image layer for coastlines
+      edgecolor (str): Color (name or hex string) for lake borders (Default: 'none')
+      facecolor (str): Color (name or hex string) for lakes (Default: '#101020')
+      resolution (str): Detail of lake borders (Default: '110m')
+      zorder (int): Image layer (z-order) for lake (Default: None)
+
+    Returns:
+       A list of Matplotlib artists added to the map.
+
     """
 
     lakes = cartopy.feature.NaturalEarthFeature(
@@ -344,6 +443,24 @@ def draw_lonlat(map_axes,
                 zorder=5,
                 linewidth=0.25,
                 color='#C0C0C0'):
+    """Fill in lonlat
+
+    Given a GeoAxes instance, fill in the lonlat lines on a map with a
+    specified color.
+
+    Args:
+      map_axes (GeoAxes): Map instance to render onto
+
+    Keyword Args:
+      spacing (int): Spacing between the lon lat lines (Default: 10)
+      zorder (int): Image layer (z-order) for lonlat lines (Default: 5)
+      linewidth (float): Width of the lonlat lines (Default: 0.25)
+      color (str): Color (name or hex string) for lonlat lines (Default: '#C0C0C0')
+
+    Returns:
+       A list of Matplotlib artists added to the map.
+
+    """
 
     artist = map_axes.gridlines(
         color=color,
@@ -361,11 +478,13 @@ def draw_scale(mymap,
                label_size,
                linewidth=1,
                zorder=20):
+    """ draw_scale has not been implemented yet
+    """
 
     raise NotImplementedError(
       ("tracktable.render.geographic_decoration.draw_scale has not "
        "been ported to Cartopy"))
-    
+
     artists = []
 
     artists.append(
@@ -506,9 +625,11 @@ def _draw_map_scale_label(mymap,
 # ----------------------------------------------------------------------
 
 def fill_background(mymap, border_color='#000000', bgcolor='#000000', linewidth=1):
+    """ fill_background has not been implemented yet
+    """
     raise NotImplementedError(
       ("tracktable.render.geographic_decoration: fill_background has not "
        "been ported to Cartopy"))
-    
+
     result = mymap.drawmapboundary(color=border_color, fill_color=bgcolor, linewidth=linewidth)
     return result

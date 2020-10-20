@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -88,6 +88,15 @@ int test_trajectory()
   path.set_property("double", test_double_property);
   path.set_property("string", test_string_property);
   path.set_property("timestamp", test_timestamp_property);
+
+  trajectory_type new_path = path.clone();
+  if (new_path.object_id() != obj_id)
+  {
+      std::cerr << "ERROR: Expected trajectory object ID to be "
+          << obj_id << " after adding points.  Instead it was "
+          << new_path.object_id() << ".\n";
+      ++error_count;
+  }
 
   if (path.object_id() != obj_id)
     {
