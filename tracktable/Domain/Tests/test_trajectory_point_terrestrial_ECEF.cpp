@@ -43,13 +43,15 @@
 #include <tracktable/Core/TrajectoryPoint.h>
 
 #include <tracktable/Domain/Terrestrial.h>
+#include <tracktable/Domain/Cartesian3D.h>
 
 typedef tracktable::domain::terrestrial::TerrestrialPoint TerrestrialPoint;
 typedef tracktable::domain::terrestrial::TerrestrialTrajectoryPoint TerrestrialTrajectoryPoint;
+typedef tracktable::domain::cartesian3d::CartesianPoint3D CartesianPoint3D;
 
 //----------------------------------------------------
 
-int verify_result(tracktable::PointCartesian<3> actual, tracktable::PointCartesian<3> expected, const char* description, double tolerance_fraction=1e-4)
+int verify_result(CartesianPoint3D actual, CartesianPoint3D expected, const char* description, double tolerance_fraction=1e-4)
 {
     std::ostringstream errbuf;
 
@@ -104,7 +106,7 @@ int run_test()
     northpole2.set_property("altitude",100);
     TerrestrialTrajectoryPoint albuquerque = create_terrestrial_point(35.0844, -106.6504);
 
-    tracktable::PointCartesian<3> actual, expected;
+    CartesianPoint3D actual, expected;
     actual = lonlatzero.ECEF();
     expected[0] = 6378.137;
     expected[1] = 0.0;
@@ -135,6 +137,31 @@ int run_test()
     expected[2] = 3645.53304;
     error_count += verify_result(actual, expected, "Albuquerque");
 
+    std::cout << "Testing exception throw" << std::endl;
+    bool thrown = false;
+    try {
+        actual = albuquerque.ECEF_from_feet();
+    } catch(tracktable::domain::terrestrial::PropertyDoesNotExist &e) {   
+        thrown = true;
+    }
+    if (!thrown) {
+      std::cout << "Failed to throw exception when attribute not present" << std::endl;
+      ++error_count;
+    }
+    std::cout << "Testing ECEF_from_meters" << std::endl;
+    albuquerque.set_property("altitude", 1000);
+    actual = albuquerque.ECEF_from_meters();
+    expected[0] = -1497.375;
+    expected[1] = -5006.753;
+    expected[2] = 3646.108;
+    error_count += verify_result(actual, expected, "AlbuquerqueMetters",1e-2);
+    std::cout << "Testing ECEF_from_feet" << std::endl;
+    albuquerque.set_property("height", 1000);
+    actual = albuquerque.ECEF_from_feet("height");
+    expected[0] = -1497.212;
+    expected[1] = -5006.208;
+    expected[2] = 3645.708;
+    error_count += verify_result(actual, expected, "AlbuquerqueFeet", 1e-2);
     return error_count;
 }
 

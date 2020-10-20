@@ -19,16 +19,16 @@ based on speed, memory usage and algorithmic needs.
    :maxdepth: 10
 
    python/tracktable.rst
+   python/tracktable.analysis
    python/tracktable.core.rst
-   python/tracktable.core.geomath.rst
-   python/tracktable.core.log.rst
-   python/tracktable.core.simple_timezone.rst
-   python/tracktable.core.timestamp.rst
+   python/tracktable.domain.rst
    python/tracktable.feature.rst
    python/tracktable.filter.rst
    python/tracktable.info.rst
+   python/tracktable.io.rst
    python/tracktable.render.rst
    python/tracktable.script_helpers.rst
+   python/tracktable.source.rst
 
 
 C++ Interface
@@ -46,12 +46,13 @@ Our first release is focused on getting enough capability out there to
 start rendering maps and movies.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 5
 
+   cpp/tracktable.analysis.rst
    cpp/tracktable.core.rst
    cpp/tracktable.domain.rst
    cpp/tracktable.io.rst
-   cpp/tracktable.analysis.rst
+   cpp/tracktable.namespaces.rst
 
 .. todo:: Clean up table of contents.  Look at tracktable.render.rst
           for an example.

@@ -38,7 +38,7 @@ def distance_geometry_by_distance(trajectory, depth):
     """Compute distance geometry signature sampled by length
 
     This function computes the multilevel distance geometry
-    for a given trajectory.  Each level *d* approximates the
+    for a given trajectory. Each level *d* approximates the
     input trajectory with *d* equal-length line segments.
     The distance geometry values for that level are the lengths
     of all *d* line segments, normalized to lie between 0 and 1.
@@ -49,21 +49,21 @@ def distance_geometry_by_distance(trajectory, depth):
 
     This implementation creates the endpoints of the line segments
     by sampling the trajectory at fractions of total distance
-    traveled.  To sample by total duration, use
+    traveled. To sample by total duration, use
     distance_geometry_by_time().
 
     Arguments:
-        trajectory {Tracktable trajectory}: Input curve to analyze
-        depth {integer}: How many levels to compute.  Must
+        trajectory (Tracktable trajectory): Input curve to analyze
+        depth (int): How many levels to compute. Must
             be greater than zero.
 
     Returns:
         List of distance geometry values laid out consecutively by
-            increasing depth.
+        increasing depth.
 
     Raises:
-        ValueError: 'depth' is not a positive integer
-        BoostPythonArgumentException: 'trajectory' is not a Tracktable
+        ValueError: ``depth`` is not a positive integer
+        BoostPythonArgumentException: ``trajectory`` is not a Tracktable
             trajectory
     """
 
@@ -80,7 +80,7 @@ def distance_geometry_by_time(trajectory, depth):
     """Compute distance geometry signature sampled by time
 
     This function computes the multilevel distance geometry
-    for a given trajectory.  Each level *d* approximates the
+    for a given trajectory. Each level *d* approximates the
     input trajectory with *d* equal-length line segments.
     The distance geometry values for that level are the lengths
     of all *d* line segments, normalized to lie between 0 and 1.
@@ -95,17 +95,17 @@ def distance_geometry_by_time(trajectory, depth):
     distance_geometry_by_distance().
 
     Arguments:
-        trajectory {Tracktable trajectory}: Input curve to analyze
-        depth {integer}: How many levels to compute.  Must
+        trajectory (Tracktable trajectory): Input curve to analyze
+        depth (int): How many levels to compute. Must
             be greater than zero.
 
     Returns:
         List of distance geometry values laid out consecutively by
-            increasing depth.
+        increasing depth.
 
     Raises:
-        ValueError: 'depth' is not a positive integer
-        BoostPythonArgumentException: 'trajectory' is not a Tracktable
+        ValueError: ``depth`` is not a positive integer
+        BoostPythonArgumentException: ``trajectory`` is not a Tracktable
             trajectory
     """
 

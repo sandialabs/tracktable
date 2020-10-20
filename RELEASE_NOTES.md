@@ -1,5 +1,49 @@
 # Tracktable Release Notes
 
+## VERSION 1.4.0, 14 October 2020
+
+This is a feature release.
+
+### NEW FEATURES SINCE 1.3.1
+
+The main feature is an implementation of ECEF (Earth Centered / Earth Fixed) coordinates.  ECEF coordinates (see [Wikipedia](https://en.wikipedia.org/wiki/ECEF)) are a 3D Cartesian space where the Earth lies centered within the cube whose corners are [-1, -1, -1] and [1, 1, 1].  This coordinate frame rotates with the Earth: x=0 will always be aligned with the prime meridian.
+
+You can get an ECEF version of a terrestrial point by calling :python:`tracktable.core.geomath.ECEF(my_point, altitude_field="altitude")`, :python:`tracktable.core.geomath.ECEF_from_feet(my_point, altitude_in_feet)`, and :python:`tracktable.core.geomath.ECEF_from_meters(my_point, altitude_in_meters)`.  These functions are also available in C++ as members of :cpp:`tracktable::domain::terrestrial::TerrestrialTrajectoryPoint`.
+
+We have also added a `clone()` method to trajectories in Python.  This will return a new copy of a trajectory instead of a pointer to the original.  This method is unneeded in C++: :cpp:`new_trajectory = original_trajectory` will suffice.
+
+We have updated the insert() method for trajectories in Python to allow multiple points to be inserted with one function call.  Similarly, slicing a trajectory (like any other list) will now return a new trajectory that inherits its parent's metadata.
+
+Interactive trajectory rendering is available in :python:`tracktable.render.render_trajectories.render_trajectories()`.  This will use [Folium](https://python-visualization.github.io/folium/) if you are inside a Jupyter notebook and [Cartopy](https://scitools.org.uk/cartopy/docs/latest/) otherwise.  We intend to clean up the API for trajectory rendering for 1.5.0.
+
+Alert readers will notice some infrastructure for test data generators.  These are still work in progress and are slated for release in 1.5.0.
+
+The latest release in our Github repository (https://github.com/sandialabs/tracktable) is now on branch 'main'.  The branch named 'master' is deprecated and will be emptied out in release 1.5.0 except for a text file pointing visitors to the branch 'main'.
+
+### BUGS FIXED SINCE 1.3.1
+
+Many undocumented functions and methods are now documented.  This is a major effort under way.  We encourage users to send us bug reports on documentation that is missing or still in error.
+
+Specific issues:
+
+* #86: Avoid a divide-by-zero issue when rendering trajectories that don't move
+
+* #212: Propagate coordinate system through Cartopy rendering so data stays aligned with map
+
+* #245: Distance geometry values were not being scaled properly
+
+* #250: Spherical clustering option is missing on DBSCAN bindings
+
+
+### KNOWN ISSUES IN 1.4.0
+
+Functions in binary extension classes are not yet included in the documentation.  
+
+Point readers will trip an assertion and probably crash when reading a file that does not end with a newline.
+
+
+
+
 ## VERSION 1.3.1, 21 July 2020
 
 This is a patch release.  

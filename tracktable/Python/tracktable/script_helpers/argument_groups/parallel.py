@@ -36,7 +36,7 @@ movies in parallel.
 Arguments:
 
 | ``--processors NUMBER``
-|   How many processes to spawn.  The default value (0) means 'one process per detected core on the system'.
+|   How many processes to spawn. The default value (0) means 'one process per detected core on the system'.
 """
 
 
@@ -58,5 +58,5 @@ def install_group():
                      [ "--processors" ],
                      type=int,
                      default=0,
-                     help="How many processes to spawn.  The default value (0) means 'one process for each detected core on the system'.")
+                     help="How many processes to spawn. The default value (0) means 'one process for each detected core on the system'.")
 

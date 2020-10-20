@@ -28,18 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** L1 multivariate median for all point types.
- *
- * The L1 multivariate median generalizes the concept of the familiar
- * 1-dimensional median.  Given a set of points x_i, the median y =
- * M(x_i) is the point that minimizes the sum of the distances to the
- * points x_i.
- *
- * There is no closed-form expression for the L1 median so we compute
- * it with an iterative algorithm.
- *
- */
-
 #ifndef __tracktable_GeometricMedian_h
 #define __tracktable_GeometricMedian_h
 
@@ -58,6 +46,18 @@
 #include <limits>
 
 namespace tracktable { namespace arithmetic {
+
+/** L1 multivariate median for all point types.
+ *
+ * The L1 multivariate median generalizes the concept of the familiar
+ * 1-dimensional median.  Given a set of points x_i, the median y =
+ * M(x_i) is the point that minimizes the sum of the distances to the
+ * points x_i.
+ *
+ * There is no closed-form expression for the L1 median so we compute
+ * it with an iterative algorithm.
+ *
+ */
 
 template<typename forward_iterator_type>
 typename std::iterator_traits<forward_iterator_type>::value_type

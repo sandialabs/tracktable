@@ -28,6 +28,9 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+"""
+cartesian2d - Configure and output cartesian2d trajectories
+"""
 
 from tracktable.lib._cartesian2d import BasePointCartesian2D as BasePoint
 from tracktable.lib._cartesian2d import TrajectoryPointCartesian2D as TrajectoryPoint
@@ -70,13 +73,38 @@ for domain_class in [
     domain_class.DOMAIN = "cartesian2d"
 
 def identity_projection(*coord_lists):
+    """ Return the input corrdinate tuple to determine indentity
+        projection
+
+        Args:
+            coord_lists (tuple): Tuple of coordinates
+
+        Returns:
+           coord_lists
+    """
     return coord_lists
-    
+
 class TrajectoryWriter:
+    """ Simple class to encapsulate the Trajectory Writer capabilities
+            of the Cartesian2D domain
+
+    Attributes:
+      writer (TrajectoryWriterCartesian2D): Output writer for a Cartesian2D trajectory
+      output (StringIO.StringIO or io.BytesIO buffer): String or Byte buffer to output to
+
+    """
     def __init__(self, output):
         self.writer = TrajectoryWriterCartesian2D(output)
-    
+
     def write(self, trajectories):
+        """ Write the Cartesian2D trajectories
+
+            Args:
+                trajectories (list): List of trajectories to be written out
+
+            Returns:
+                No return value
+        """
         if isinstance(trajectories, list):
             self.writer.write(trajectories)
         else:

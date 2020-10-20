@@ -1,34 +1,20 @@
-tracktable.source package
+=========================
+tracktable.source module
 =========================
 
+----------
 Submodules
 ----------
 
-tracktable.source.combine module
---------------------------------
+.. toctree::
+   :maxdepth: 2
 
-.. automodule:: tracktable.source.combine
-    :members:
-    :undoc-members:
-    :show-inheritance:
+   tracktable.source.combine.rst
+   tracktable.source.path_point_source.rst
+   tracktable.source.point.rst
+   tracktable.source.trajectory.rst
 
-tracktable.source.path_point_source module
-------------------------------------------
-
-.. automodule:: tracktable.source.path_point_source
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-tracktable.source.trajectory module
------------------------------------
-
-.. automodule:: tracktable.source.trajectory
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-
+---------------
 Module contents
 ---------------
 
