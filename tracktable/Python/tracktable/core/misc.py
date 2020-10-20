@@ -53,13 +53,13 @@ class IterableWrapper(object):
     def __next__(self):
         """Internal method
 
-        This is how Python objects iterate.  You get things from them
+        This is how Python objects iterate. You get things from them
         by calling __next__() over and over until they raise
         StopIteration to tell you that there's nothing left.
 
-        NOTE: This has changed in Python 3.7.  The proper way to
+        NOTE: This has changed in Python 3.7. The proper way to
         return from a generator is now 'return' instead of 'raise
-        StopIteration()'.  See PEP 0479 for the details:
+        StopIteration()'. See PEP 0479 for the details:
 
         https://www.python.org/dev/peps/pep-0479/
 

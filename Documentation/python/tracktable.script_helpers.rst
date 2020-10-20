@@ -1,20 +1,22 @@
-tracktable.script_helpers package
-=================================
+================================
+tracktable.script_helpers module
+================================
 
+----------
 Submodules
 ----------
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
+   tracktable.script_helpers.argparse.rst
    tracktable.script_helpers.argument_groups.rst
 
-
+---------------
 Module contents
 ---------------
 
 .. automodule:: tracktable.script_helpers
     :members:
-
-.. automodule::  tracktable.script_helpers.argparse
-    :members:
+    :undoc-members:
+    :show-inheritance:

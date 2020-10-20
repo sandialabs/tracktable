@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2018 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -88,10 +88,29 @@ def test_trajectory():
     boston_return.set_property('favorite_food', 'baked_beans')
     boston_return.set_property('name', 'Boston')
 
-    round_trip = [ boston, miami, san_francisco, seattle, boston_return ]
+    round_trip = [ boston, miami, san_francisco, boston_return ]
 
     my_trajectory = TerrestrialTrajectory.from_position_list(round_trip)
+    
+    print("Testing insert")
+    my_trajectory.insert(3, seattle)
+    test_point = my_trajectory[3]
+    if test_point != seattle:
+        sys.stderr.write('ERROR: Expected fourth point in trajectory to be Seattle.  Instead it claims to be {}.  Dumps of original and restored points follow.\n'.format(test_point.property('name')))
+        sys.stderr.write(str(seattle))
+        sys.stderr.write('\n')
+        sys.stderr.write(str(my_trajectory[0]))
+        sys.stderr.write('\n')    
 
+        print("Testing clone")
+    copied_trajectory = my_trajectory.clone()
+    for i in range(0, len(my_trajectory)):
+        error_count += verify_point(my_trajectory[i], copied_trajectory[i], "Cloning Test")
+    copied_trajectory[0][0] = 0.0
+    if my_trajectory[0][0] == 0.0:
+        sys.stderr.write('ERROR: Cloned trajectory not a deep copy')
+        error_count += 1        
+    
     print("Testing from_position_list")
     if len(my_trajectory) != 5:
         sys.stderr.write('ERROR: Expected length of trajectory to be 5 points but it was {}\n'.format(len(my_trajectory)))

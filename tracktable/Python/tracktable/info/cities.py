@@ -36,12 +36,12 @@ cities.py - Locations and population values for many cities of the world
 
 #
 # This code is derived from a list of cities provided by MaxMind at
-# http://www.maxmind.com/en/worldcities.  Here is the license under
+# http://www.maxmind.com/en/worldcities. Here is the license under
 # which we use and redistribute the data:
 #
 # OPEN DATA LICENSE for MaxMind WorldCities and Postal Code Databases
 #
-# Copyright (c) 2008 MaxMind Inc.  All Rights Reserved.
+# Copyright (c) 2008 MaxMind Inc. All Rights Reserved.
 #
 # The database uses toponymic information, based on the Geographic
 # Names Data Base, containing official standard names approved by the
@@ -52,7 +52,7 @@ cities.py - Locations and population values for many cities of the world
 # protected by 10 United States Code Section 445.
 #
 # It also uses free population data from Stefan Helders www.world-gazetteer.com.
-# Visit his website to download the free population data.  Our database
+# Visit his website to download the free population data. Our database
 # combines Stefan's population data with the list of all cities in the world.
 #
 # All advertising materials and documentation mentioning features or
@@ -102,10 +102,10 @@ class CityInfo(object):
     """Brief information about a city.
 
     Attributes:
-      country_code (string): 2-character abbreviation for country
-      name (string): City name
-      population (integer): Estimated population
-      location (TerrestrialBasePoint ): location of city
+      country_code (str): 2-character abbreviation for country
+      name (str): City name
+      population (int): Estimated population
+      location (TerrestrialBasePoint): location of city
     """
 
     def __init__(self):
@@ -122,13 +122,13 @@ def cities_in_bbox(bbox_min=(-180, -90),
                    minimum_population=0):
     """Return all the cities in a bounding box.
 
-    Kwargs:
+    Keyword Args:
       bbox_min (TrajectoryPoint): Southwest corner of bounding box,
-         default (-180, -90)
+          (Default: (-180, -90))
       bbox_max (TrajectoryPoint): Northeast corner of bounding box,
-         default (180, 90)
-      minimum_population (integer): Cities with lower population than
-         this will not be returned.  Default 0.
+         (Default: (180, 90))
+      minimum_population (int): Cities with lower population than
+         this will not be returned.  (Default: 0).
 
     Returns:
       List of CityInfo objects.
@@ -188,12 +188,12 @@ def largest_cities_in_bbox(bbox_min=(-180, -90),
 
     A city's size is measured by its population.
 
-    Args:
+    Keyword Args:
       bbox_min (TrajectoryPoint): Southwest corner of bounding box.
-        Defaults to (-180, -90).
+        (Default: to (-180, -90)).
       bbox_max (TrajectoryPoint): Northeast corner of bounding box.
-        Defaults to (180, 90).
-      count (integer): How many cities to return.  Defaults to 10.
+        (Default: to (180, 90)).
+      count (int): How many cities to return.  (Default: 10).
 
     Returns:
       A list of CityInfo objects.
@@ -223,12 +223,12 @@ def get_city(name, country=None, location=None):
         Qandahar (there’s only one Qandahar in the world)
 
     Arguments:
-        name (string): City name to search for
+        name (str): City name to search for
 
     Keyword Arguments:
-        country (string): two character country code.  Defaults to None.
+        country (str): two character country code.  (Default: None).
         location (tuple, TrajectoryPoint, BasePoint): location to search near
-            Defaults to None.
+             (Default: None).
 
     Returns:
         A CityInfo object or None if no records are found.

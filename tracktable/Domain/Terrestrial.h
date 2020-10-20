@@ -44,8 +44,8 @@
  * hundreds of feet) may make that a more convenient scale.
  */
 
-#ifndef __tracktable_domain_Terrestrial_h
-#define __tracktable_domain_Terrestrial_h
+#ifndef tracktable_domain_Terrestrial_h
+#define tracktable_domain_Terrestrial_h
 
 #include <tracktable/Core/FloatingPointComparison.h>
 #include <tracktable/Core/TracktableCommon.h>
@@ -56,6 +56,7 @@
 #include <tracktable/Core/Trajectory.h>
 
 #include <tracktable/Domain/DomainMacros.h>
+#include <tracktable/Domain/Cartesian3D.h>
 
 #include <tracktable/IO/PointReader.h>
 #include <tracktable/IO/TrajectoryReader.h>
@@ -67,6 +68,8 @@
 #include <string>
 
 #include <tracktable/Domain/TracktableDomainWindowsHeader.h>
+
+typedef tracktable::domain::cartesian3d::CartesianPoint3D CartesianPoint3D;
 
 // ----------------------------------------------------------------------
 //
@@ -82,6 +85,12 @@
 // ----------------------------------------------------------------------
 
 namespace tracktable { namespace domain { namespace terrestrial {
+
+/** An exception to be used when a property cannot be found */
+class PropertyDoesNotExist : public std::runtime_error {
+ public:
+  PropertyDoesNotExist(std::string _property) : std::runtime_error(_property) {}
+};
 
 /**
  * \class TerrestrialPoint
@@ -99,48 +108,60 @@ class TerrestrialPoint : public PointLonLat
 {
 public:
   friend class boost::serialization::access;
-  typedef PointLonLat Superclass;
+  using Superclass = PointLonLat;
 
   /// Create an uninitialized point
-  TerrestrialPoint() { }
+  TerrestrialPoint() = default;
 
   /// Copy constructor: make this point like another
-  TerrestrialPoint(TerrestrialPoint const& other)
-    : PointLonLat(other)
-    { }
+  TerrestrialPoint(TerrestrialPoint const& other) = default;
+  TerrestrialPoint(TerrestrialPoint&& other) = default;
 
   /// Copy constructor: use PointLonLat instances as if they were
   /// TerrestrialPoint instances
-  TerrestrialPoint(Superclass const& other)
-    : PointLonLat(other)
-    { }
+  TerrestrialPoint(Superclass const& other) : PointLonLat(other) {}
 
   /// Empty destructor - nothing to do here
-  virtual ~TerrestrialPoint() { }
+  ~TerrestrialPoint() override = default;
 
   /// Explicitly delegate assignment to prevent compiler hijinks
-  TerrestrialPoint& operator=(TerrestrialPoint const& other)
-  {
+  TerrestrialPoint& operator=(TerrestrialPoint const& other) {
     this->Superclass::operator=(other);
     return *this;
   }
+  TerrestrialPoint& operator=(TerrestrialPoint&& other) = default;
 
   /** Convenience constructor.
    *
-   * @param[in] longitude Longitude in degrees
-   * @param[in] latitude  Latitude in degrees
+   * @param[in] _longitude Longitude in degrees
+   * @param[in] _latitude  Latitude in degrees
    */
-  TerrestrialPoint(double _longitude, double _latitude)
-    {
+  TerrestrialPoint(double _longitude, double _latitude) {
     this->set_longitude(_longitude);
     this->set_latitude(_latitude);
-    }
+  }
 
-public:
-  template<class Archive>
-  void serialize(Archive& ar, const unsigned int version)
-  {
+  template <class Archive>
+  void serialize(Archive& ar, const unsigned int /*version*/) {
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
+  }
+
+  /** Returns ECEF values for lon, lat, and altitude.  Uses a km convention.
+   * @note this expects an altitude in km (not ft or m).
+   * @returns 3D Earth Centered, Earth Fixed point in km
+   */
+  static CartesianPoint3D ECEF_from_km(const coord_type _longitude, const coord_type _latitude,
+                                const double _altitude) {
+    constexpr double a = 6378.137;
+    constexpr double e2 = 8.1819190842622e-2 * 8.1819190842622e-2;
+    const auto sinLatitude = sin(_latitude);
+    const auto n = a / sqrt((1.0 - e2 * sinLatitude * sinLatitude));
+    const auto NAC = (n + _altitude) * cos(_latitude);
+    coord_type pt[3];
+    pt[0] = NAC * cos(_longitude);
+    pt[1] = NAC * sin(_longitude);
+    pt[2] = (n * (1.0 - e2) + _altitude) * sinLatitude;
+    return CartesianPoint3D(pt);
   }
 };
 
@@ -178,65 +199,113 @@ class TerrestrialTrajectoryPoint : public TrajectoryPoint<TerrestrialPoint>
 {
 public:
   friend class boost::serialization::access;
-  
-  typedef TrajectoryPoint<TerrestrialPoint> Superclass;
+
+  using Superclass = TrajectoryPoint<TerrestrialPoint>;
 
   /// Create an uninitialized point
-  TerrestrialTrajectoryPoint() { }
+  TerrestrialTrajectoryPoint() = default;
 
   /// Copy constructor: make this point like another
-  TerrestrialTrajectoryPoint(TerrestrialTrajectoryPoint const& other)
-    : Superclass(other)
-    { }
-
+  TerrestrialTrajectoryPoint(TerrestrialTrajectoryPoint const& other) = default;
+  TerrestrialTrajectoryPoint(TerrestrialTrajectoryPoint&& other) = default;
   /// Copy constructor: use superclass as self
   TerrestrialTrajectoryPoint(Superclass const& other)
     : Superclass(other)
     { }
 
   /// Empty destructor: nothing to do here.
-  virtual ~TerrestrialTrajectoryPoint() { }
+  ~TerrestrialTrajectoryPoint() override = default;
 
   /// Explicitly delegate assignment to prevent compiler hijinks.
-  TerrestrialTrajectoryPoint& operator=(TerrestrialTrajectoryPoint const& other)
-  {
+  TerrestrialTrajectoryPoint& operator=(TerrestrialTrajectoryPoint const& other) {
     this->Superclass::operator=(other);
     return *this;
   }
-
+  TerrestrialTrajectoryPoint& operator=(TerrestrialTrajectoryPoint&& other) = default;
   /** Convenience constructor.
    *
-   * @param[in] longitude Longitude in degrees
-   * @param[in] latitude  Latitude in degrees
+   * @param[in] _longitude Longitude in degrees
+   * @param[in] _latitude  Latitude in degrees
    */
-  TerrestrialTrajectoryPoint(double _longitude, double _latitude)
-    {
+  TerrestrialTrajectoryPoint(double _longitude, double _latitude) {
     this->set_longitude(_longitude);
     this->set_latitude(_latitude);
-    }
+  }
 
-  // Returns ECEF values for lon/lat points.  Uses a km convention.  
-  // Note that this expects an altitude in km (not ft or m).  This is easy
-  // to change but the whole convention of feet seems unconventional
-  PointCartesian<3> ECEF() const
+  /** @name Earth Centered Earth Fixed
+   * This group of functions is useful for converting longitude and latitude to a
+   * cartesian point. A static method is provided to convert any arbitrary point.
+   * ECEF_from_feet will be the most common use case. Multiple functions will throw
+   * an exception if altitude is not present. To bypass exception throws, use ECEF(ratio,altString)
+   * with the appropriate ratio to convert to km and the name of the property you
+   * are expecting to find altitude in.
+   * @sa TerrestrialPoint::ECEF
+   * @{
+   */
+
+  /** Returns ECEF values for lon/lat points.  Uses a km convention.
+   * @note this expects an altitude in km (not ft or m).
+   * @returns 3D Earth Centered, Earth Fixed point in km
+   */
+  CartesianPoint3D ECEF() const {
+    double altitude = this->real_property("altitude");
+    coord_type longitude = conversions::radians(this->get<0>());
+    coord_type latitude = conversions::radians(this->get<1>());
+    return TerrestrialPoint::ECEF_from_km(longitude, latitude, altitude);
+  }
+
+  /** Returns ECEF values for lon/lat points.  Uses a km convention.
+   * @note this expects an altitude in km (not ft or m). Change ratio if the altitude is not km
+   * @param ratio The value to multiply altitude by to get km
+   * @param _altitudeString The label of the property that contains altitude
+   * @returns 3D Earth Centered, Earth Fixed point in km
+   * @throw PropertyDoesNotExist if we can't find altitude
+   */
+  CartesianPoint3D ECEF(const double ratio, const std::string& _altitudeString) const {
+    double altitude;
+    bool ok = false;
+    if (_altitudeString.length() != 0) 
     {
-      coord_type lon = conversions::radians(this->get<0>());
-      coord_type lat = conversions::radians(this->get<1>());
-      double alt = this->real_property("altitude");
-      coord_type pt[3];
-      double a = 6378.137;
-      double e2 = 8.1819190842622e-2*8.1819190842622e-2;
-      double n = a/sqrt((1.0 - e2*pow(sin(lat),2.0)));
-      pt[0] = (n+alt)*cos(lat)*cos(lon);
-      pt[1] = (n+alt)*cos(lat)*sin(lon);
-      pt[2] = (n*(1.0-e2)+alt)*sin(lat);
-
-      return PointCartesian<3>(pt);
+      altitude = ratio * this->real_property(_altitudeString, &ok);
+      if (!ok) {
+        throw PropertyDoesNotExist(_altitudeString);
+      }
+    } else {
+      altitude = 0.0;
     }
+    coord_type longitude = conversions::radians(this->get<0>());
+    coord_type latitude = conversions::radians(this->get<1>());
+    return TerrestrialPoint::ECEF_from_km(longitude, latitude, altitude);
+  }
+
+  /** Returns ECEF values for lon/lat points.  Uses a km convention.
+   * @note  this expects an altitude in feet.
+   * @param _altitudeString The label of the property that contains altitude
+   * @returns 3D Earth Centered, Earth Fixed point in km
+   * @throw PropertyDoesNotExist if we can't find altitude
+   */
+  CartesianPoint3D ECEF_from_feet(const std::string& _altitudeString = "altitude") const {
+    // NOTE: Potential for this number ratio to be slightly different between
+    // machines of differing precisions.
+    constexpr auto feetToKilometers = 1.0 / 3280.839895013123;
+    return ECEF(feetToKilometers, _altitudeString);
+  }
+
+  /** Returns ECEF values for lon/lat points.  Uses a km convention.
+   * @note this expects an altitude in meters.
+   * @param _altitudeString The label of the property that contains altitude
+   * @returns 3D Earth Centered, Earth Fixed point in km
+   * @throw PropertyDoesNotExist if we can't find altitude
+   */
+  CartesianPoint3D ECEF_from_meters(const std::string& _altitudeString = "altitude") const {
+    constexpr auto metersToKilometers = 1.0 / 1000.0;
+    return ECEF(metersToKilometers, _altitudeString);
+  }
+  /// @}
 
 private:
   template<class Archive>
-  void serialize(Archive& ar, const unsigned int version)
+  void serialize(Archive& ar, const unsigned int  /*version*/)
   {
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
   }
@@ -247,34 +316,18 @@ private:
 # pragma warning( pop )
 #endif
 
+using base_point_type = TerrestrialPoint;
+using linestring_type = std::vector<base_point_type>;
+using trajectory_point_type = TerrestrialTrajectoryPoint;
+using trajectory_type = Trajectory<trajectory_point_type>;
+using base_point_reader_type = PointReader<base_point_type>;
+using trajectory_point_reader_type = PointReader<trajectory_point_type>;
+using trajectory_reader_type = TrajectoryReader<trajectory_type>;
+using box_type = boost::geometry::model::box<base_point_type>;
 
-typedef TerrestrialPoint base_point_type;
-typedef std::vector<base_point_type> linestring_type;
-typedef TerrestrialTrajectoryPoint trajectory_point_type;
-typedef Trajectory<trajectory_point_type> trajectory_type;
-typedef PointReader<base_point_type> base_point_reader_type;
-typedef PointReader<trajectory_point_type> trajectory_point_reader_type;
-typedef TrajectoryReader<trajectory_type> trajectory_reader_type;
-typedef boost::geometry::model::box<base_point_type> box_type;
-
-
-#if 0
-inline std::ostream& operator<<(std::ostream& out, base_point_type const& pt)
-{
-  out << pt.to_string();
-  return out;
-}
-
-inline std::ostream& operator<<(std::ostream& out, trajectory_point_type const& pt)
-{
-  out << pt.to_string();
-  return out;
-}
-#else
 TRACKTABLE_DOMAIN_EXPORT std::ostream& operator<<(std::ostream& out, base_point_type const& pt);
 
 TRACKTABLE_DOMAIN_EXPORT std::ostream& operator<<(std::ostream& out, trajectory_point_type const& pt);
-#endif
 
 } } } // namespace tracktable::domain::terrestrial
 
@@ -293,7 +346,7 @@ namespace tracktable { namespace traits {
 namespace domains {
   struct terrestrial { };
 }
-    
+
 template<>
 struct point_domain_name<tracktable::domain::terrestrial::TerrestrialPoint>
 {
@@ -334,8 +387,6 @@ TRACKTABLE_DELEGATE_TRAJECTORY_POINT_TRAITS(
 
 namespace tracktable { namespace algorithms {
 
-namespace bg = boost::geometry;
-
 // Distance between points is measured in km, not radians
 template<>
 struct distance<
@@ -355,8 +406,8 @@ struct distance<
 template<>
 struct speed_between<tracktable::domain::terrestrial::TerrestrialTrajectoryPoint>
 {
-  typedef tracktable::domain::terrestrial::TerrestrialPoint base_point_type;
-  typedef tracktable::domain::terrestrial::TerrestrialTrajectoryPoint point_type;
+  using base_point_type = tracktable::domain::terrestrial::TerrestrialPoint;
+  using point_type = tracktable::domain::terrestrial::TerrestrialTrajectoryPoint;
 
   inline static double apply(point_type const& from, point_type const& to)
     {
@@ -400,7 +451,7 @@ TT_DOMAIN::TerrestrialTrajectory, \
 Trajectory<TT_DOMAIN::TerrestrialTrajectoryPoint>, \
 ALGORITHM \
 )
-    
+
 TT_DELEGATE_BASE_POINT_ALGORITHM(interpolate)
 TT_DELEGATE_BASE_POINT_ALGORITHM(extrapolate)
 TT_DELEGATE_BASE_POINT_ALGORITHM(bearing)
@@ -418,7 +469,7 @@ TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM(unsigned_turn_angle)
 template<>
 struct length<tracktable::domain::terrestrial::trajectory_type>
 {
-  typedef tracktable::domain::terrestrial::trajectory_type trajectory_type;
+  using trajectory_type = tracktable::domain::terrestrial::trajectory_type;
 
   inline static double apply(trajectory_type const& trajectory)
     {
@@ -431,13 +482,13 @@ struct length<tracktable::domain::terrestrial::trajectory_type>
 
 TRACKTABLE_DELEGATE_POINT_DOMAIN_NAME_TRAIT(tracktable::domain::terrestrial)
 TRACKTABLE_DELEGATE_DOMAIN_TRAIT(tracktable::domain::terrestrial, tracktable::traits::domains::terrestrial)
-    
+
 #undef TT_DOMAIN
 #undef TT_DELEGATE_BASE_POINT_ALGORITHM
 #undef TT_DELEGATE_TRAJECTORY_POINT_ALGORITHM
 #undef TT_DELEGATE_TRAJECTORY_ALGORITHM
 #undef TT_DELEGATE_TRAJECTORY_POINT_TRAIT
-    
+
 #endif // DOXYGEN_SHOULD_SKIP_THIS
 
 #endif

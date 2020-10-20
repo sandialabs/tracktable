@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -35,15 +35,15 @@ namespace tracktable { namespace conversions {
 
 
 namespace constants {
-const double PI = 3.141592653589793238462643383;
-const double EARTH_RADIUS_IN_KM = 6371;
-const double EARTH_RADIUS_IN_MI = 3959;
-const double EARTH_RADIUS_IN_NM = 3440;
-const double DEGREES_PER_RADIAN = 57.29577951308232087679;
-const double RADIANS_PER_DEGREE = .01745329251994329576;
-const double SECONDS_PER_HOUR = 3600.0;
-const double HOURS_PER_SECOND = 0.0027777777777777;
-const double METERS_PER_FOOT = 0.3048; //exact
+constexpr double PI = 3.141592653589793238462643383;
+constexpr double EARTH_RADIUS_IN_KM = 6371;
+constexpr double EARTH_RADIUS_IN_MI = 3959;
+constexpr double EARTH_RADIUS_IN_NM = 3440;
+constexpr double DEGREES_PER_RADIAN = 57.29577951308232087679;
+constexpr double RADIANS_PER_DEGREE = .01745329251994329576;
+constexpr double SECONDS_PER_HOUR = 3600.0;
+constexpr double HOURS_PER_SECOND = 0.0027777777777777;
+constexpr double METERS_PER_FOOT = 0.3048; //exact
 }
 
 /** Convert radians to degrees.

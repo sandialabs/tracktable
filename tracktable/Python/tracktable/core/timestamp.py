@@ -66,7 +66,9 @@ def localize_timestamp(naive_ts, utc_offset=0):
 
     Args:
       naive_ts (datetime): Timestamp to localize
-      utc_offset (integer): Number of hours offset from UTC.  You can also specify a fraction of an hour as '0530', meaning 5 hours 30 minutes.
+
+    Keyword Args:
+      utc_offset (integer): Number of hours offset from UTC.  You can also specify a fraction of an hour as '0530', meaning 5 hours 30 minutes.  (Default: 0)
 
     Returns:
       A new datetime imbued with the desired time zone
@@ -144,10 +146,10 @@ class Timestamp(object):
         Python 3.4 or newer to get that.
 
         Args:
-          timestring (string): String containing your timestamp
+          timestring (str): String containing your timestamp
 
-        Kwargs:
-          format_string (string): Format string for datetime.strptime
+        Keyword Arguments:
+            format_string (str): Format string for datetime.strptime
 
         Returns:
           An aware datetime object.  By default this will be imbued
@@ -246,7 +248,7 @@ class Timestamp(object):
           always represent UTC times until I implement it otherwise
 
         Args:
-          thing: String, datetime, or dict (see above)
+          thing (Various): String, datetime, or dict (see above)
 
         Returns:
           Timezone-aware datetime object
@@ -328,9 +330,11 @@ class Timestamp(object):
 
         Args:
           dt (datetime): Timestamp object to stringify
-          format_string (string): String to pass to datetime.strftime()
-            that describes format
-          include_tz: Whether or not to append timezone UTC offset
+
+        Keyword Args:
+          format_string (str): String to pass to datetime.strftime()
+            that describes format (Default: '%Y-%m-%d %H:%M:%S)
+          include_tz (bool): Whether or not to append timezone UTC offset  (Default: True)
 
         Returns:
           String version of timestamp
@@ -355,7 +359,9 @@ class Timestamp(object):
 
         Args:
           dt (datetime): Timezone-aware datetime object
-          include_tz (boolean): Whether or not to append a '+XXXX' timezone offset
+
+        Keyword Args:
+          include_tz (bool): Whether or not to append a '+XXXX' timezone offset (Default: True)
 
         Returns:
           String representation of the timestamp
@@ -452,7 +458,7 @@ def _fastparse(text):
     to a slower but more robust method.
 
     Args:
-      text (string): String representation of timestamp
+      text (str): String representation of timestamp
 
     Returns:
       Timezone-aware datetime object

@@ -28,7 +28,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** Geometric mean for all point types.
+/* Geometric mean for all point types.
  *
  * This is the familiar mean in both weighted and un-weighted
  * varieties.
@@ -44,7 +44,7 @@
 
 namespace tracktable { namespace arithmetic {
 
-/*
+/**
  * NOTE: This function requires a ForwardIterator as its argument.  A
  * ForwardIterator is one that can be traversed and dereferenced more
  * than once.

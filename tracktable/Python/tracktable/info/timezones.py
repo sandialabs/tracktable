@@ -43,6 +43,13 @@ TIMEZONE_BOUNDARIES = None
 TIMEZONE_STRUCTS = dict()
 
 def load_timezone_shapefile():
+    """Load in the timezone shapefile and extract the timezone boundaries.
+
+    Returns:
+        No return value.
+
+    """
+
     raise NotImplementedError("load_timezone_shapefile needs a shapefile reader!")
     global TIMEZONE_BOUNDARIES
     logger = logging.getLogger(__name__)
@@ -86,6 +93,15 @@ def load_timezone_shapefile():
 # ----------------------------------------------------------------------
 
 def find_containing_timezone(longitude, latitude):
+    """Returns a timezone that contains the given long-lat.
+
+    Arguments:
+        longitude (float): Longitude of location to find timezone
+        latitude (float): Latitude of location to find timezone
+
+    Returns:
+        Timezone or None if no timezone is found.
+    """
     global TIMEZONE_BOUNDARIES, TIMEZONE_STRUCTS
     if not TIMEZONE_BOUNDARIES:
         load_timezone_shapefile()
@@ -105,12 +121,36 @@ def find_containing_timezone(longitude, latitude):
 # ----------------------------------------------------------------------
 
 def print_file():
+    """Print the filename name.
+
+    Returns:
+        No return value.
+
+    """
+
     print("__file__: %s" % __file__)
 
 def retrieve_file():
+    """Return the given input file.
+
+    Returns:
+        ``__file__``.
+
+    """
+
     return __file__
 
 def local_time_for_position(position):
+    """For a given .
+
+    Arguments:
+        position (Point): Point containing longitude and latitude values
+
+    Returns:
+        Positions timezone or timestamp if no timezone is found.
+
+    """
+
     timezone = find_containing_timezone(position.longitude, position.latitude)
     if timezone:
         return position.timestamp.astimezone(timezone)

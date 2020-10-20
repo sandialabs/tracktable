@@ -28,6 +28,10 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+"""
+terrestrial - Configure and output terrestrial trajectories
+"""
+
 from tracktable.lib._terrestrial import BasePointTerrestrial as BasePoint
 from tracktable.lib._terrestrial import TrajectoryPointTerrestrial as TrajectoryPoint
 from tracktable.lib._terrestrial import TrajectoryTerrestrial as Trajectory
@@ -69,12 +73,27 @@ for domain_class in [
     domain_class.DOMAIN = "terrestrial"
 
 class TrajectoryWriter:
+    """ Simple class to encapsulate the Trajectory Writer capabilities
+            of the Terrestrial domain
+
+    Attributes:
+      writer (TrajectoryWriterTerrestrial): Output writer for Terrestrial trajectories
+      output (StringIO.StringIO or io.BytesIO buffer): String or Byte buffer to output to
+
+    """
     def __init__(self, output):
         self.writer = TrajectoryWriterTerrestrial(output)
-    
+
     def write(self, trajectories):
+        """ Write the Terrestrial trajectories
+
+            Args:
+                trajectories (list): List of trajectories to be written out
+
+            Returns:
+                No return value
+        """
         if isinstance(trajectories, list):
             self.writer.write(trajectories)
         else:
             self.writer.write([trajectories])
-    

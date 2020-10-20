@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -37,6 +37,8 @@ add_subdirectory(Core)
 add_subdirectory(Domain)
 add_subdirectory(IO)
 add_subdirectory(Analysis)
+add_subdirectory(ThirdParty)
+add_subdirectory(DataGenerators)
 
 if (BUILD_EXAMPLES)
 add_subdirectory(Examples)
