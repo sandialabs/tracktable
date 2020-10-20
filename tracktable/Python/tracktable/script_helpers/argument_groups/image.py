@@ -38,10 +38,10 @@ Use this group as follows::
 Arguments:
 
 | ``--dpi NUMBER``
-| Dots per inch for the image.  This determines font height and line width in pixels.
+| Dots per inch for the image. This determines font height and line width in pixels.
 |
 | ``--resolution XRES YRES``
-| Image resolution.  This can be almost arbitrarily large subject to your computer's memory limits.
+| Image resolution. This can be almost arbitrarily large subject to your computer's memory limits.
 
 """
 
@@ -72,7 +72,7 @@ def install_group():
                  nargs=1,
                  type=int,
                  default=72,
-                 help='Dots per inch (DPI) for image.  This determines font height and line width.')
+                 help='Dots per inch (DPI) for image. This determines font height and line width.')
 
     add_argument("image", [ '--resolution' ],
                  nargs=2,

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -222,6 +222,21 @@ add_python_test(
   )
 
 add_python_test(
+  P_CurrentLengthFraction
+  ${DOMAIN}.test_current_length_fraction
+  )  
+
+add_python_test(
+  P_CurrentTimeFraction
+  ${DOMAIN}.test_current_time_fraction
+  )    
+  
+add_python_test(
   P_TrajectoryId
   ${DOMAIN}.test_trajectory_id
+  )
+
+add_python_test(
+  P_TrajectorySlicing
+  ${DOMAIN}.test_trajectory_slicing
   )

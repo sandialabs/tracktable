@@ -109,7 +109,7 @@ namespace tracktable {
  * @param[in] input_end     Iterator for end of input points
  * @param[in] search_box_half_span  Distance defining "nearby" in all dimensions
  * @param[in] minimum_cluster_size  Minimum number of neighbors for core points
- * @param[out] output_cluster_labels  (Vertex ID, Cluster ID) for each point
+ * @param[out] output_sink  (Vertex ID, Cluster ID) for each point
  * @return Number of clusters discovered
  *
  * You can also pass in points as a std::pair<MyPoint, Foo> where Foo
@@ -177,8 +177,8 @@ int cluster_with_dbscan(
  * );
  *
  * @param[in] label_begin   Iterator for beginning of DBSCAN cluster labels
- * @param[in] input_end     Iterator for end of DBSCAN cluster labels
- * @param[out] output_cluster_labels  (Vertex ID, Cluster ID) for each point
+ * @param[in] label_end     Iterator for end of DBSCAN cluster labels
+ * @param[out] output_membership_lists  (Vertex ID, Cluster ID) for each point
  * @return Number of clusters discovered
  *
  */
@@ -193,7 +193,7 @@ int build_cluster_membership_lists(
   typedef typename ClusterLabelIteratorT::value_type::first_type vertex_id_type;
   typedef std::vector<vertex_id_type> vertex_id_vector_type;
   typedef std::map<int, vertex_id_vector_type> member_map_type;
-  
+
   member_map_type membership_lists;
 
   while (label_begin != label_end)
@@ -217,7 +217,7 @@ int build_cluster_membership_lists(
     *output_membership_lists = iter->second;
     ++output_membership_lists;
     }
-  
+
   return boost::numeric_cast<int>(membership_lists.size());
 }
 

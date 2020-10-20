@@ -1,9 +1,20 @@
-TracktableAnalysis module
-=========================
+==========================
+Tracktable Analysis Module
+==========================
+
 
 ---------------
-Module contents
+Module Contents
 ---------------
 
+----------
+Submodules
+----------
 
-.. doxygenfunction:: tracktable::cluster_with_dbscan
+.. toctree::
+   :maxdepth: 2
+
+   tracktable.analysis.AssembleTrajectories.rst
+   tracktable.analysis.ComputeDBSCANClustering.rst
+   tracktable.analysis.DistanceGeometery.rst
+   tracktable.analysis.RTree.rst

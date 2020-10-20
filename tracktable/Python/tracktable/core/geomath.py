@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -28,7 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-This file contains useful math functions.  Some of them will be
+This file contains useful math functions. Some of them will be
 related to geography such as 'find the distance between these two
 points on the globe'.
 """
@@ -64,29 +64,29 @@ from tracktable.lib._domain_algorithm_overloads import convex_hull_area as _conv
 from tracktable.lib._domain_algorithm_overloads import convex_hull_aspect_ratio as _convex_hull_aspect_ratio
 from tracktable.lib._domain_algorithm_overloads import convex_hull_centroid as _convex_hull_centroid
 from tracktable.lib._domain_algorithm_overloads import radius_of_gyration as _radius_of_gyration
+from tracktable.lib._domain_algorithm_overloads import current_length as _current_length
+from tracktable.lib._domain_algorithm_overloads import current_length_fraction as _current_length_fraction
+from tracktable.lib._domain_algorithm_overloads import current_time_fraction as _current_time_fraction
 
 import logging
 LOGGER = logging.getLogger(__name__)
 DOMAIN_MODULE = None
 
 
-
-
-
 def xcoord(thing):
     """Return what we think is the X-coordinate for an object.
 
     If the supplied thing has a property named 'x' then we return
-    that.  Otherwise we try to return its first element.
+    that. Otherwise we try to return its first element.
 
     Args:
-       point: Object with an 'x' property or tuple of numbers
+       thing (Tracktable object): Object with an 'x' property or tuple of numbers
 
     Returns:
        Number corresponding to x coordinate
 
     Raises:
-       AttributeError if attempt at access fails
+       AttributeError: if attempt at access fails
     """
 
     try:
@@ -98,16 +98,16 @@ def ycoord(thing):
     """Return what we think is the Y-coordinate for an object.
 
     If the supplied thing has a property named 'y' then we return
-    that.  Otherwise we try to return its second element.
+    that. Otherwise we try to return its second element.
 
     Args:
-       point: Object with an 'y' property or tuple of numbers
+       thing (Tracktable object): Object with an 'y' property or tuple of numbers
 
     Returns:
        Number corresponding to y coordinate
 
     Raises:
-       AttributeError if attempt at access fails
+       AttributeError: if attempt at access fails
     """
 
     try:
@@ -119,11 +119,12 @@ def longitude(thing):
     """Return the longitude from a point or tuple
 
     It is often convenient to specify a point as a (lon, lat) tuple
-    instead of a fullfledged TrajectoryPoint.  By using this function
+    instead of a fullfledged TrajectoryPoint. By using this function
     to look up longitude we can cope gracefully with both.
 
     Args:
-       point: TrajectoryPoint or (lon, lat) tuple
+       thing (TrajectoryPoint or (lon, lat) tuple): Object with an 'longitude'
+          property or tuple of numbers
 
     Returns:
        Longitude as float
@@ -141,11 +142,12 @@ def latitude(thing):
     """Return the latitude from a point or tuple
 
     It is often convenient to specify a point as a (lon, lat) tuple
-    instead of a fullfledged TrajectoryPoint.  By using this function
+    instead of a fullfledged TrajectoryPoint. By using this function
     to look up latitude we can cope gracefully with both.
 
     Args:
-       point: TrajectoryPoint or (lon, lat) tuple
+       thing (TrajectoryPoint or (lon, lat) tuple): Object with an 'latitude'
+          property or tuple of numbers
 
     Returns:
        Latitude as float
@@ -164,7 +166,8 @@ def longitude_or_x(thing):
     """Return the longitude or X-coordinate from a point or tuple
 
     Args:
-       point: TrajectoryPoint or (lon, lat) tuple or (x, y) point
+       thing (TrajectoryPoint, (lon, lat) tuple or (x, y) point): Object with an 'longitude'
+          or 'x' property or tuple of numbers
 
     Returns:
        Longitude/X as float
@@ -184,7 +187,8 @@ def latitude_or_y(thing):
     """Return the latitude or Y-coordinate from a point or tuple
 
     Args:
-       point: TrajectoryPoint or (lon, lat) tuple or (x, y) point
+       thing (TrajectoryPoint, (lon, lat) tuple or (x, y) point): Object with an 'latitude'
+          or 'y' property or tuple of numbers
 
     Returns:
        Latitude/Y as float
@@ -204,12 +208,13 @@ def altitude(thing):
     """Return the altitude from a point or tuple
 
     It is often convenient to specify a point as a (lon, lat,
-    altitude) tuple instead of a full-fledged TrajectoryPoint.  By
+    altitude) tuple instead of a full-fledged TrajectoryPoint. By
     using this function to look up altitude we can cope gracefully
     with both.
 
     Args:
-       point: TrajectoryPoint or (lon, lat, altitude) tuple
+       thing (TrajectoryPoint or (lon, lat, altitude) tuple): Object with an 'altitude'
+          property or tuple of numbers
 
     Returns:
        Altitude as float
@@ -231,7 +236,9 @@ def almost_equal(a, b, relative_tolerance=1e-6):
     Arguments:
        a (float): First number
        b (float): Second number
-       relative_tolerance (float): Numbers must be close to within this fraction of their average to be considered equal
+
+    Keyword Arguments:
+       relative_tolerance (float): Numbers must be close to within this fraction of their average to be considered equal (Default: 1e-6)
 
     Returns:
        True/false depending on whether or not they're equal-ish
@@ -246,6 +253,16 @@ def bearing(origin, destination):
 
     Source: http://gagravarr.livejournal.com/109998.html with modifications.
 
+    Domain Information:
+
+      Terrestrial: Returned in degrees. 0 is due north, 90 is due
+      east.
+
+      Cartesian2D: Returned in radians. 0 is positive X, pi/2 is
+      positive Y.
+
+      Cartesian3D: Not defined.
+
     Args:
        origin (BasePoint or TrajectoryPoint): start point
        destination (BasePoint or TrajectoryPoint): end point
@@ -253,15 +270,7 @@ def bearing(origin, destination):
     Returns:
        Bearing from origin to destination.
 
-    Domain Information:
 
-       Terrestrial: Returned in degrees.  0 is due north, 90 is due
-       east.
-
-       Cartesian2D: Returned in radians.  0 is positive X, pi/2 is
-       positive Y.
-
-       Cartesian3D: Not defined.
     """
 
 
@@ -272,17 +281,21 @@ def bearing(origin, destination):
 def speed_between(point1, point2):
     """Return speed in km/hr between two timestamped points.
 
+    Domain Information:
+
+      Terrestrial: Speed is in km/hr
+
+      Cartesian2D: Speed is in units/sec
+
+      Cartesian3D: Speed is in units/sec
+
     Args:
       point1 (TrajectoryPoint): Start point
       point2 (TrajectoryPoint): End point
 
     Returns:
-      Speed (as a float) measured in domain-specific units
+      Speed measured in domain-specific units as float
 
-    Domain Info:
-      Terrestrial: Speed is in km/hr
-      Cartesian2D: Speed is in units/sec
-      Cartesian3D: Speed is in units/sec
     """
 
     return _speed_between(point1, point2)
@@ -293,9 +306,17 @@ def speed_between(point1, point2):
 def signed_turn_angle(a, b, c):
     """Return signed turn angle between (a, b) and (b, c).
 
-    The magnitude of the angle tells you how far you turned.  The sign
-    of the angle tells you whether you turned right or left.  Which
+    The magnitude of the angle tells you how far you turned. The sign
+    of the angle tells you whether you turned right or left. Which
     one depends on the domain.
+
+    Domain Information:
+
+      Terrestrial: angle in degrees, positive angles are clockwise
+
+      Cartesian2D: angle in radians, positive angles are counterclockwise
+
+      Cartesian3D: not defined
 
     Args:
       a (BasePoint): first point
@@ -305,10 +326,6 @@ def signed_turn_angle(a, b, c):
     Returns:
       Signed angle in domain-dependent units
 
-    Domain:
-      Terrestrial: angle in degrees, positive angles are clockwise
-      Cartesian2D: angle in radians, positive angles are counterclockwise
-      Cartesian3D: not defined
     """
 
     return _signed_turn_angle(a, b, c)
@@ -318,9 +335,17 @@ def signed_turn_angle(a, b, c):
 def unsigned_turn_angle(a, b, c):
     """Return unsigned turn angle between (a, b) and (b, c).
 
-    The magnitude of the angle tells you how far you turned.  This
+    The magnitude of the angle tells you how far you turned. This
     function will not tell you whether you turned right or left - for
     that you need signed_turn_angle.
+
+    Domain Information:
+
+      Terrestrial: angle in degrees between 0 and 180
+
+      Cartesian2D: angle in radians between 0 and pi
+
+      Cartesian3D: angle in radians between 0 and pi
 
     Args:
       a (BasePoint): first point
@@ -329,11 +354,6 @@ def unsigned_turn_angle(a, b, c):
 
     Returns:
       Angle in domain-dependent units
-
-    Domain:
-      Terrestrial: angle in degrees between 0 and 180
-      Cartesian2D: angle in radians between 0 and pi
-      Cartesian3D: angle in radians between 0 and pi
 
     """
 
@@ -344,12 +364,14 @@ def unsigned_turn_angle(a, b, c):
 def intersects(thing1, thing2):
     """Check to see whether two geometries intersect
 
-    The geometries in question must be from the same domain.  They can
+    The geometries in question must be from the same domain. They can
     be points, trajectories, linestrings or bounding boxes.
 
     Args:
-      thing1: Geometry object
-      thing2: Geometry object
+      thing1 (points, trajectories, linestrings or bounding boxes): Geometry object
+          used for intersection calculation
+      thing2 (points, trajectories, linestrings or bounding boxes): Geometry object
+          used for intersection calculation
 
     Returns:
       True or False
@@ -360,10 +382,17 @@ def intersects(thing1, thing2):
 # ----------------------------------------------------------------------
 
 def length(trajectory):
-
     """Return the length of a path in domain-dependent units
 
     This is the total length of all segments in the trajectory.
+
+    Domain Information:
+
+      Terrestrial: distance in km
+
+      Cartesian2D: distance in units
+
+      Cartesian3D: distance in units
 
     Args:
       trajectory (Trajectory): Path whose length we want
@@ -371,10 +400,6 @@ def length(trajectory):
     Returns:
       Length in domain-dependent units
 
-    Domain:
-      Terrestrial: distance in km
-      Cartesian2D: distance in units
-      Cartesian3D: distance in units
     """
 
     return _length(trajectory)
@@ -382,10 +407,17 @@ def length(trajectory):
 # ----------------------------------------------------------------------
 
 def current_length(point):
-
     """Return the current length of a path in domain-dependent units
 
     This is the length up to the given point in a trajectory.
+
+    Domain Information:
+
+      Terrestrial: distance in km
+
+      Cartesian2D: distance in units
+
+      Cartesian3D: distance in units
 
     Args:
       Point (TrajectoryPoint): Point to which we want the length
@@ -393,10 +425,6 @@ def current_length(point):
     Returns:
       Length in domain-dependent units
 
-    Domain:
-      Terrestrial: distance in km
-      Cartesian2D: distance in units
-      Cartesian3D: distance in units
     """
 
     return _current_length(point)
@@ -408,16 +436,19 @@ def end_to_end_distance(trajectory):
     This is just the crow-flight distance between start and end points rather
     than the total distance traveled.
 
+    Domain Information:
+
+      Terrestrial: distance in km
+
+      Cartesian2D: distance in units
+
+      Cartesian3D: distance in units
+
     Args:
       trajectory (Trajectory): Path whose length we want
 
     Returns:
       Length in domain-dependent units
-
-    Domain:
-      Terrestrial: distance in km
-      Cartesian2D: distance in units
-      Cartesian3D: distance in units
 
     """
 
@@ -426,21 +457,21 @@ def end_to_end_distance(trajectory):
 # ----------------------------------------------------------------------
 
 def point_at_fraction(trajectory, time_fraction):
-    """Return a point from a trajectory at a specific fraction of its duration
+    """WARNING: This function is deprecated. Use point_at_time_fraction instead.
+
+    Return a point from a trajectory at a specific fraction of its duration
 
     This function will estimate a point at a trajectory at some
-    specific fraction of its total duration.  If the supplied
+    specific fraction of its total duration. If the supplied
     fraction does not fall exactly on a vertex of the trajectory we
     will interpolate between the nearest two points.
 
     Fractions before the beginning or after the end of the trajectory
     will return the start and end points, respectively.
 
-    WARNING: This function is deprecated.  Use point_at_time_fraction instead.
-
     Args:
       trajectory (Trajectory): Path to sample
-      time_fraction (float): Value between 0 and 1.  0 is the beginning and 1 is the end.
+      time_fraction (float): Value between 0 and 1. 0 is the beginning and 1 is the end.
 
     Returns:
       TrajectoryPoint at specified fraction
@@ -450,7 +481,7 @@ def point_at_fraction(trajectory, time_fraction):
     tracktable.core.log.warn_deprecated((
       "tracktable.core.geomath.point_at_fraction is "
       "deprecated and will be removed in a future "
-      "release.  Use tracktable.core.geomath."
+      "release. Use tracktable.core.geomath."
       "point_at_time_fraction or tracktable.core."
       "geomath.point_at_length_fraction instead."))
 
@@ -463,7 +494,7 @@ def point_at_time_fraction(trajectory, time_fraction):
     """Return a point from a trajectory at a specific fraction of its duration
 
     This function will estimate a point at a trajectory at some
-    specific fraction of its total duration.  If the supplied
+    specific fraction of its total duration. If the supplied
     fraction does not fall exactly on a vertex of the trajectory we
     will interpolate between the nearest two points.
 
@@ -472,7 +503,7 @@ def point_at_time_fraction(trajectory, time_fraction):
 
     Args:
       trajectory (Trajectory): Path to sample
-      time_fraction (float): Value between 0 and 1.  0 is the beginning and 1
+      time_fraction (float): Value between 0 and 1. 0 is the beginning and 1
           is the end.
 
     Returns:
@@ -488,7 +519,7 @@ def point_at_length_fraction(trajectory, length_fraction):
     """Return a point from a trajectory at a specific fraction of its distance
 
     This function will estimate a point at a trajectory at some
-    specific fraction of its total travel distance.  If the supplied
+    specific fraction of its total travel distance. If the supplied
     fraction does not fall exactly on a vertex of the trajectory we
     will interpolate between the nearest two points.
 
@@ -497,7 +528,7 @@ def point_at_length_fraction(trajectory, length_fraction):
 
     Args:
       trajectory (Trajectory): Path to sample
-      length_fraction (float): Value between 0 and 1.  0 is the beginning and 1 is the end.
+      length_fraction (float): Value between 0 and 1. 0 is the beginning and 1 is the end.
 
     Returns:
       TrajectoryPoint at specified fraction
@@ -512,7 +543,7 @@ def point_at_time(trajectory, when):
     """Return a point from a trajectory at a specific time
 
     This function will estimate a point at a trajectory at some
-    specific time.  If the supplied timestamp does not fall exactly on
+    specific time. If the supplied timestamp does not fall exactly on
     a vertex of the trajectory we will interpolate between the nearest
     two points.
 
@@ -536,7 +567,7 @@ def time_at_fraction(trajectory, fraction):
     """Return a time from a trajectory at a specific fraction of its duration
 
     This function will estimate a time in a trajectory at some
-    specific fraction of its total travel duration.  If the supplied
+    specific fraction of its total travel duration. If the supplied
     fraction does not fall exactly on a vertex of the trajectory we
     will interpolate between the nearest two points.
 
@@ -545,7 +576,7 @@ def time_at_fraction(trajectory, fraction):
 
     Args:
       trajectory (Trajectory): Path to sample
-      fraction (float): Value between 0 and 1.  0 is the beginning and 1 is the end.
+      fraction (float): Value between 0 and 1. 0 is the beginning and 1 is the end.
 
     Returns:
       Timestamp (datetime) at specified fraction
@@ -563,7 +594,7 @@ def subset_during_interval(trajectory, start_time, end_time):
     trajectory between two timestamps.
 
     If the time interval is entirely outside the trajectory, the
-    result will be an empty trajectory.  Otherwise we will use
+    result will be an empty trajectory. Otherwise we will use
     point_at_time to find the two endpoints and build a new trajectory
     from the endpoints and all trajectory points between them.
 
@@ -589,6 +620,12 @@ def distance(hither, yon):
 
     The points being measured must be from the same domain.
 
+    Domain Information:
+
+      Terrestrial domain returns distance in km.
+
+      Cartesian domains return distance in native units.
+
     Args:
       hither (BasePoint): point 1
       yon (BasePoint): point 2
@@ -596,9 +633,6 @@ def distance(hither, yon):
     Returns:
       Distance between hither and yon
 
-    Domain:
-      Terrestrial domain returns distance in km.
-      Cartesian domains return distance in native units.
     """
 
     return _distance(hither, yon)
@@ -608,7 +642,7 @@ def distance(hither, yon):
 def interpolate(start, end, t):
     """Interpolate between two points
 
-    This function will interpolate linearly between two points.  It is
+    This function will interpolate linearly between two points. It is
     aware of the underlying coordinate system: interpolation on the
     globe will be done along great circles and interpolation in
     Cartesian space will be done along a straight line.
@@ -631,7 +665,7 @@ def interpolate(start, end, t):
 def extrapolate(start, end, t):
     """Extrapolate between two points
 
-    This function will extrapolate linearly between two points.  It is
+    This function will extrapolate linearly between two points. It is
     aware of the underlying coordinate system: interpolation on the
     globe will be done along great circles and interpolation in
     Cartesian space will be done along a straight line.
@@ -652,6 +686,17 @@ def extrapolate(start, end, t):
 # ----------------------------------------------------------------------
 
 def sanity_check_distance_less_than(max_distance):
+    """Check and verify distance is less than max allowable distance
+
+    Args:
+      max_distance (float): Max allowable distance between points
+
+    Returns:
+      True/False indicating if distance between two points is less
+      than max distance
+
+    """
+
     def sanity_check(point1, point2):
         return ( distance(point1, point2) < max_distance )
 
@@ -663,26 +708,30 @@ def compute_bounding_box(point_sequence, buffer=()):
     """Compute a bounding box for a sequence of points.
 
     This function will construct a domain-specific bounding box over
-    an arbitrary sequence of points.  Those points must all have the
+    an arbitrary sequence of points. Those points must all have the
     same type. It can also produce a buffer of space that extends the
     bounding box some percentage beyond the min and max points. The
     implementation is fairly naive and can cause issues if the values
     extend past max values for the point/map type.
 
+    Domain Information:
+
+      Each domain returns a separate bounding box type.
+
     Args:
-      point_sequence: Iterable of points
-      buffer: tuple of ratios to extend the bounding box. This defaults
-              to an empty tuple which means no padding is added.
+      point_sequence (BasePoint or TrajectoryPoint iterable): Iterable of points
+
+    Keyword Arguments:
+      buffer (tuple): Ratios to extend the bounding box. This defaults
+              to an empty tuple which means no padding is added. (Default: ())
 
     Returns:
       Bounding box with min_corner, max_corner attributes
 
-    Domain:
-      Each domain returns a separate bounding box type.
     """
 
     # We need some machinery from tracktable.domain in order to find
-    # the correct class for the bounding box.  In order to avoid a
+    # the correct class for the bounding box. In order to avoid a
     # load-time circular import dependency, we grab it on demand
     # here.
     global DOMAIN_MODULE
@@ -720,7 +769,7 @@ def compute_bounding_box(point_sequence, buffer=()):
     elif len(buffer) != 0:
         raise ValueError("Buffer must contain exactly 0 or 2 values.")
     if num_points == 0:
-        raise ValueError("Cannot compute bounding box.  No points provided.")
+        raise ValueError("Cannot compute bounding box. No points provided.")
     else:
         global LOGGER
         LOGGER.debug("Bounding box points: {}, {}".format(
@@ -736,17 +785,19 @@ def compute_bounding_box(point_sequence, buffer=()):
 def recompute_speed(trajectory, target_attribute_name="speed"):
     """Use points and timestamps to compute speed
 
-    The speed data in trajectories is often suspect.  This method goes
+    The speed data in trajectories is often suspect. This method goes
     through and recomputes it based on the distance between
     neighboring points and the time elapsed between those points.
 
     The speed at point N is computed using the distance and time since
-    point N-1.  The speed at point 0 is copied from point 1.
+    point N-1. The speed at point 0 is copied from point 1.
 
     Args:
-      trajectory: Any Tracktable trajectory
-      target_attribute_name: Speed will be stored in this property at
-          each point.  Defaults to 'speed'.
+      trajectory (Trajectory): Any Tracktable trajectory
+
+    Keyword Arguments:
+      target_attribute_name (str): Speed will be stored in this property at
+          each point. Defaults to 'speed'. (Default: "speed")
 
     The trajectory will be modified in place instead of returning a
     new copy.
@@ -774,7 +825,7 @@ def geometric_median(points):
     or more dimensions.
 
     Args:
-       points: Iterable of points for which you want a median
+       points (BasePoint or TrajectoryPoint iterable): Points for which you want a median
 
     Returns:
        Single point of the same type that came in
@@ -796,11 +847,11 @@ def geometric_mean(points):
     coordinates.
 
     NOTE: This does not yet do the right thing with terrestrial
-    points.  It should normalize their coordinates to make sure they
+    points. It should normalize their coordinates to make sure they
     do not fall across the limb of the map before taking the average.
 
     Args:
-       points: Sequence of points for which you want a mean
+       points (BasePoint or TrajectoryPoint iterable): Points for which you want a mean
 
     Returns:
        Single point of the same type that came in
@@ -822,16 +873,16 @@ def simplify(trajectory, tolerance):
     Under the hood it uses Douglas-Peucker simplification.
 
     NOTE: The points in the output are copies of the points in the
-    input.  Changing the input after a call to simplify() will have no
+    input. Changing the input after a call to simplify() will have no
     effect on previous results.
 
     NOTE: This function only cares about geometric error in the
-    trajectory.  It does not account for error in the attributes
+    trajectory. It does not account for error in the attributes
     attached to each point.
 
     Args:
-       trajectory: Trajectory to simplify
-       tolerance:  Error tolerance measured in the trajectory's native distance
+       trajectory (Trajectory): Trajectory to simplify
+       tolerance (float):  Error tolerance measured in the trajectory's native distance
 
     Returns:
        Simplified version of trajectory
@@ -846,11 +897,11 @@ def convex_hull_perimeter(trajectory):
     """Compute the perimeter of the convex hull of a trajectory
 
     Perimeter length will be returned in the native distance units of
-    the domain.  This is kilometers for the terrestrial domain and
+    the domain. This is kilometers for the terrestrial domain and
     untyped units for Cartesian.
 
     Args:
-      trajectory: Trajectory whose hull you want to measure
+      trajectory (Trajectory): Trajectory whose hull you want to measure
 
     Returns:
       Perimeter of the trajectory's convex hull
@@ -865,11 +916,11 @@ def convex_hull_area(trajectory):
     """Compute the area of the convex hull of a trajectory
 
     Area will be returned in the native area units of
-    the domain.  This is square kilometers for the terrestrial domain and
+    the domain. This is square kilometers for the terrestrial domain and
     untyped squared units for Cartesian.
 
     Args:
-      trajectory: Trajectory whose hull you want to measure
+      trajectory (Trajectory): Trajectory whose hull you want to measure
 
     Returns:
       Area of the trajectory's convex hull
@@ -883,14 +934,14 @@ def convex_hull_area(trajectory):
 def convex_hull_aspect_ratio(trajectory):
     """Compute the aspect ratio of the convex hull of a trajectory
 
-    Aspect ratio is a dimensionless number.  It refers to the ratio of
+    Aspect ratio is a dimensionless number. It refers to the ratio of
     the shortest axis of the polygon over the longest.
 
     Note that we compute an approximation using the vertices of the
-    convex hull.  This will get better in a future release.
+    convex hull. This will get better in a future release.
 
     Args:
-      trajectory: Trajectory whose shape you want to measure
+      trajectory (Trajectory): Trajectory whose shape you want to measure
 
     Returns:
       Aspect ratio of the trajectory's convex hull
@@ -911,7 +962,7 @@ def radius_of_gyration(trajectory):
     Cartesian2D returns radians.
 
     Args:
-      trajectory: Trajectory whose shape you want to measure
+      trajectory (Trajectory): Trajectory whose shape you want to measure
 
     Returns:
       Radius of gyration of the trajectory
@@ -926,8 +977,15 @@ def convex_hull_centroid(trajectory):
     """Compute the centroid of the convex hull of a trajectory
 
     Centroid will be returned in the native units of
-    the domain.  This is: latitude, longitude (altitude) for the
+    the domain. This is: latitude, longitude (altitude) for the
     terrestrial domain; and x, y (z) for Cartesian.
+
+    Args:
+      trajectory (Trajectory): Trajectory whose shape you want to measure
+
+    Returns:
+      Centroid ratio of the trajectory's convex hull
+
     """
 
     return _convex_hull_centroid(trajectory)
@@ -939,9 +997,16 @@ def latitude_degree_size(latitude):
     latitude_degree_size(latitude: float between -90 and 90) -> float (in km)
 
     Compute the distance between adjacent degrees of latitude centered
-    on a given parallel.  This measurement is 111.694km at the equator
-    and 110.574km at the poles.  This is a small enough variation that
+    on a given parallel. This measurement is 111.694km at the equator
+    and 110.574km at the poles. This is a small enough variation that
     we'll just use linear interpolation.
+
+    Args:
+      latitude (float): Latitude
+
+    Returns:
+      The distance between adjacent degrees of latitude
+
     """
 
     return (math.fabs(latitude) / 90) * (110.574 - 111.694) + 111.594
@@ -953,8 +1018,15 @@ def longitude_degree_size(latitude):
     longitude_degree_size(latitude: float between -90 and 90) -> float (in km)
 
     Compute the distance between adjacent degrees of longitude at a
-    given latitude.  This varies from 111.32km at the equator to 0 at
+    given latitude. This varies from 111.32km at the equator to 0 at
     the poles and decreases as the cosine of increasing latitude.
+
+    Args:
+      latitude (float): Latitude
+
+    Returns:
+      The distance between adjacent degrees of longitude
+
     """
 
     def d2r(d):
@@ -970,6 +1042,14 @@ def kms_to_lon(kms, latitude):
 
     Compute the degrees-longitude conversion for a distance in km, at a given latitude.
     This is because as you move towards the poles, the km/longitude ratio decreases
+
+    Args:
+      kms (float): Kilometers
+      latitude (float): Latitude
+
+    Returns:
+      degrees-longitude conversion for a distance in km, at a given latitude
+
     """
 
     return kms / longitude_degree_size(latitude)
@@ -981,8 +1061,106 @@ def kms_to_lat(kms, latitude):
     kms_to_lat(kms: float, latitude: float between -90 and 90) -> float (in latitude)
 
     Compute the degrees-latitude conversion for a distance in km, at a given latitude.
+
+    Args:
+      kms (float): Kilometers
+      latitude (float): Latitude
+
+    Returns:
+      degrees-latitude conversion for a distance in km, at a given latitude
+
     """
 
     return kms / latitude_degree_size(latitude)
+
+# ----------------------------------------------------------------------
+
+def current_length_fraction(point):
+
+    """Return the fraction length of a point in a trajectory
+
+    This is the fraction length of all segments in the trajectory up to
+    the given point.
+
+    Args:
+      point (Point): Point whose current length fraction we want
+
+    Returns:
+      Fraction of total length up to this point.
+
+    """
+
+    return _current_length_fraction(point)
+
+# ----------------------------------------------------------------------
+
+def current_time_fraction(point):
+
+    """Return the fraction duration of a point in trajectory
+
+    This is the fraction duration of all segments in the trajectory up to
+    the given point.
+
+    Args:
+      point (Point): Point whose current duration fraction we want
+
+    Returns:
+      Fraction of total duration up to this point.
+
+    """
+
+    return _current_time_fraction(point)
+
+# ----------------------------------------------------------------------
+
+def ECEF(point, ratio = 1.0, altitudeString = ""):
+    """Convert point to ECEF. Altitude is in km.
+
+    Converts Terrestrial points to cartesian coordinates.
+
+    Args:
+       points: A point to convert
+       ratio: conversion ratio from km to result
+       altitudeString: String label of altitude property
+
+    Returns:
+       Single Cartesian 3D point
+    """
+
+    return point.ECEF(ratio, altitudeString)
+
+# ----------------------------------------------------------------------
+
+def ECEF_from_feet(point, altitudeString = "altitude"):
+    """Convert point to ECEF using altitude in feet
+
+    Converts Terrestrial points to cartesian coordinates.
+
+    Args:
+       points: A point to convert
+       altitudeString: String label of altitude property
+
+    Returns:
+       Single Cartesian 3D point
+    """
+
+    return point.ECEF_from_feet(altitudeString)
+
+# ----------------------------------------------------------------------
+
+def ECEF_from_meters(point, altitudeString = "altitude"):
+    """Convert point to ECEF using altitude in meters
+
+    Converts Terrestrial points to cartesian coordinates.
+
+    Args:
+       points: A point to convert
+       altitudeString: String label of altitude property
+
+    Returns:
+       Single Cartesian 3D point
+    """
+
+    return point.ECEF_from_meters(altitudeString)
 
 # ----------------------------------------------------------------------

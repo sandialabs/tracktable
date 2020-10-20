@@ -132,7 +132,7 @@ public:
       this->set_field_delimiter(",");
       this->set_comment_character("#");
       this->set_timestamp_format("%Y-%m-%d %H:%M:%S");
-      
+
       io::detail::set_default_configuration<
         traits::has_properties<point_type>::value,
         traits::dimension<point_type>::value
@@ -171,7 +171,7 @@ public:
    * We read our input from C++ std::istreams.  The stream you supply
    * will be traversed exactly once.
    *
-   * @param[in] input Stream from which we will read points
+   * @param[in] _input Stream from which we will read points
    */
   void set_input(std::istream& _input)
     {
@@ -476,7 +476,7 @@ public:
     {
       return this->PointTokenReader.real_field_column(field);
     }
-  
+
   /** Retrieve the column assignment for a string field.
    *
    * @param[in] field String name of field
@@ -546,7 +546,7 @@ public:
     {
       return this->PointTokenReader.timestamp_format();
     }
-  
+
   void set_null_value(string_type const& value)
     {
       this->PointTokenReader.set_null_value(value);
@@ -556,7 +556,7 @@ public:
     {
       return this->PointTokenReader.null_value();
     }
-  
+
 private:
   line_reader_type LineReader;
   skip_comments_reader_type SkipCommentsReader;

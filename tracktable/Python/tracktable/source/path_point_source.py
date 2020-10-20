@@ -59,7 +59,7 @@ class TrajectoryPointSource(object):
 
         Longitude, latitude, altitude (if present) and time will be
         interpolated evenly from start_point to end_point and
-        start_time to end_time.  Each point will have the object ID
+        start_time to end_time. Each point will have the object ID
         specified in self.object_id.
 
         Returns:

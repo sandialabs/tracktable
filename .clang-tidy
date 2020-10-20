@@ -1,0 +1,230 @@
+---
+#Checks
+Checks: "-*,readability*,bugprone*,-bugprone-argument-comment, cppcoreguidelines*,misc*, modernize*,-modernize-use-trailing-return-type"
+#Example of tailoring checks
+#Checks: "-*,readability*,-readability-magic-numbers,bugprone*,-bugprone-argument-comment, cppcoreguidelines*,-cppcoreguidelines-pro-bounds-array-to-pointer-decay, misc*,-misc-non-private-member-variables-in-classes, modernize*,-modernize-use-trailing-return-type"
+WarningsAsErrors: ""
+HeaderFilterRegex: ''
+AnalyzeTemporaryDtors: false
+#Uses .clang-format if present
+FormatStyle: none
+User: mpscogg
+# CheckOptions:
+#   ###################### Readability naming ######################################
+#   # Setup for testing fallback behavior for naming
+#   # in each category, anything lower should fallback to something above it
+#   # Fallback is not necessarily to what is directly above
+#   # If any of Case/Prefix/Suffix are specified, all three are used; fallback stops
+#   # this means if you override the case and you want to keep the suffix, you have to
+#   # copy the suffix from the fallback
+#   ################ Variables
+#   ## Variable does not fall back
+#   - { key: readability-identifier-naming.VariableCase, value: camelBack }
+#   #- { key: readability-identifier-naming.VariablePrefix, value: }
+#   #- { key: readability-identifier-naming.VariableSuffix, value: }
+#   ## Constant falls back to Variable
+#   #- { key: readability-identifier-naming.ConstantCase,   value: }
+#   #- { key: readability-identifier-naming.ConstantPrefix, value: }
+#   #- { key: readability-identifier-naming.ConstantSuffix, value: }
+#   ##### Globals
+#   ## GlobalVariable falls back to Variable
+#   - { key: readability-identifier-naming.GlobalVariableCase, value: camelBack }
+#   - { key: readability-identifier-naming.GlobalVariablePrefix, value: g_ }
+#   #- { key: readability-identifier-naming.GlobalVariableSuffix, value: }
+#   ## GlobalPointer falls back to GlobalVariable
+#   - { key: readability-identifier-naming.GlobalPointerCase, value: camelBack }
+#   - { key: readability-identifier-naming.GlobalPointerPrefix, value: g_ }
+#   - { key: readability-identifier-naming.GlobalPointerSuffix, value: _ptr }
+#   ## GlobalConstantCase falls back to ConstantVariable then GlobalVariable
+#   - { key: readability-identifier-naming.GlobalConstantCase, value: UPPER_CASE }
+#   #- { key: readability-identifier-naming.GlobalConstantPrefix, value: }
+#   #- { key: readability-identifier-naming.GlobalConstantSuffix, value: }
+#   ## GlobalConstantPointer falls back to GlobalConstant
+#   - { key: readability-identifier-naming.GlobalConstantPointerCase, value: UPPER_CASE }
+#   #- { key: readability-identifier-naming.GlobalConstantPointerPrefix, value: }
+#   - { key: readability-identifier-naming.GlobalConstantPointerSuffix, value: _PTR }
+#   ##### Members
+#   ## Member does not fall back
+#   - { key: readability-identifier-naming.MemberCase, value: camelBack }
+#   #- { key: readability-identifier-naming.MemberPrefix, value: m_ }
+#   #- { key: readability-identifier-naming.MemberSuffix, value: }
+#   ## ClassMember falls back to GlobalVariable
+#   - { key: readability-identifier-naming.ClassMemberCase, value: camelBack }
+#   - { key: readability-identifier-naming.ClassMemberPrefix, value: m_ }
+#   #- { key: readability-identifier-naming.ClassMemberSuffix, value: }
+#   ## PrivateMember falls back Member
+#   - { key: readability-identifier-naming.PrivateMemberCase,   value: camelBack}
+#   - { key: readability-identifier-naming.PrivateMemberPrefix, value: m_ }
+#   #- { key: readability-identifier-naming.PrivateMemberSuffix, value: }
+#   ## ProtectedMember falls back to Member
+#   #- { key: readability-identifier-naming.ProtectedMemberCase,   value: }
+#   #- { key: readability-identifier-naming.ProtectedMemberPrefix, value: prom_ }
+#   #- { key: readability-identifier-naming.ProtectedMemberSuffix, value: }
+#   ## PublicMember falls back to Member
+#   #- { key: readability-identifier-naming.PublicMemberCase,   value: }
+#   #- { key: readability-identifier-naming.PublicMemberPrefix, value: pubm_ }
+#   #- { key: readability-identifier-naming.PublicMemberSuffix, value: }
+#   ## ClassConstant falls back to GlobalConstant then ClassMember
+#   - { key: readability-identifier-naming.ClassConstantCase, value: UPPER_CASE }
+#   #- { key: readability-identifier-naming.ClassConstantPrefix, value: cc_ }
+#   #- { key: readability-identifier-naming.ClassConstantSuffix, value: }
+#   ## ConstantMember falls back to ConstantVariable then Public/Private/Protected/Member
+#   - { key: readability-identifier-naming.ConstantMemberCase, value: UPPER_CASE }
+#   #- { key: readability-identifier-naming.ConstantMemberPrefix, value: cm_ }
+#   #- { key: readability-identifier-naming.ConstantMemberSuffix, value: }
+#   ## ConstexprVariable will fall back to ClassConstant or GlobalVariable depending on context
+#   #- { key: readability-identifier-naming.ConstexprVariableCase, value: UPPER_CASE }
+#   #- { key: readability-identifier-naming.ConstexprVariablePrefix, value: cexpr_ }
+#   #- { key: readability-identifier-naming.ConstexprVariableSuffix, value: }
+#   ##### Locals
+#   ## LocalVariable falls back to Variable
+#   #- { key: readability-identifier-naming.LocalVariableCase,   value: }
+#   #- { key: readability-identifier-naming.LocalVariablePrefix, value: l_ }
+#   #- { key: readability-identifier-naming.LocalVariableSuffix, value: }
+#   ## LocalPointer falls back to LocalVariable
+#   - { key: readability-identifier-naming.LocalPointerCase, value: camelBack }
+#   #- { key: readability-identifier-naming.LocalPointerPrefix, value: lp_ }
+#   - { key: readability-identifier-naming.LocalPointerSuffix, value: _ptr }
+#   ## LocalConstant falls back to LocalVariable
+#   #- { key: readability-identifier-naming.LocalConstantCase,   value: }
+#   #- { key: readability-identifier-naming.LocalConstantPrefix, value: lc_ }
+#   #- { key: readability-identifier-naming.LocalConstantSuffix, value: }
+#   ## LocalConstantPointer falls back to LocalConstant then LocalPointer
+#   #- { key: readability-identifier-naming.LocalConstantPointerCase, value: }
+#   #- { key: readability-identifier-naming.LocalConstantPointerPrefix, value: lcp_ }
+#   #- { key: readability-identifier-naming.LocalConstantPointerSuffix, value:  }
+#   ## StaticVariable falls back to LocalVariable
+#   - { key: readability-identifier-naming.StaticVariableCase, value: camelBack }
+#   - { key: readability-identifier-naming.StaticVariablePrefix, value: s_ }
+#   #- { key: readability-identifier-naming.StaticVariableSuffix, value: }
+#   ## StaticConstant falls back to LocalConstant then StaticeVariable
+#   - { key: readability-identifier-naming.StaticConstantCase, value: camelBack }
+#   - { key: readability-identifier-naming.StaticConstantPrefix, value: sc_ }
+#   #- { key: readability-identifier-naming.StaticConstantSuffix, value: }
+#   ################# Enum
+#   ## Enum does not fallback
+#   - { key: readability-identifier-naming.EnumCase, value: CamelCase }
+#   #- { key: readability-identifier-naming.EnumPrefix, value: e_ }
+#   #- { key: readability-identifier-naming.EnumSuffix, value: }
+#   ## EnumConstant does not fallback
+#   - { key: readability-identifier-naming.EnumConstantCase, value: UPPER_CASE }
+#   #- { key: readability-identifier-naming.EnumConstantPrefix, value: ec_ }
+#   #- { key: readability-identifier-naming.EnumConstantSuffix, value: }
+
+#   ################# Classes
+#   ## Struct does not fall back
+#   - { key: readability-identifier-naming.StructCase, value: CamelCase }
+#   #- { key: readability-identifier-naming.StructPrefix, value: s_ }
+#   #- { key: readability-identifier-naming.StructSuffix, value: }
+#   ## Class falls back to Struct
+#   #- { key: readability-identifier-naming.ClassCase, value: CamelCase }
+#   #- { key: readability-identifier-naming.ClassPrefix, value: c_ }
+#   #- { key: readability-identifier-naming.ClassSuffix, value: }
+#   ## AbstractClass falls back to Class
+#   #- { key: readability-identifier-naming.AbstractClassCase,   value: }
+#   #- { key: readability-identifier-naming.AbstractClassPrefix, value: ac_ }
+#   #- { key: readability-identifier-naming.AbstractClassSuffix, value: }
+#   ################# Functions
+#   ## Function does not fall back
+#   - { key: readability-identifier-naming.FunctionCase, value: CamelCase }
+#   #- { key: readability-identifier-naming.FunctionPrefix, value: f_ }
+#   #- { key: readability-identifier-naming.FunctionSuffix, value: }
+#   ## GlobalFunction falls back to Function
+#   #- { key: readability-identifier-naming.GlobalFunctionCase,   value: }
+#   #- { key: readability-identifier-naming.GlobalFunctionPrefix, value: gf_ }
+#   #- { key: readability-identifier-naming.GlobalFunctionSuffix, value: }
+#   ## ConstexprFunction falls back to GlobalFunction
+#   #- { key: readability-identifier-naming.ConstexprFunctionCase,   value: }
+#   #- { key: readability-identifier-naming.ConstexprFunctionPrefix, value: cexprf_ }
+#   #- { key: readability-identifier-naming.ConstexprFunctionSuffix, value: }
+#   ## Method falls back to Function
+#   #- { key: readability-identifier-naming.MethodCase, value: CamelCase }
+#   #- { key: readability-identifier-naming.MethodPrefix, value: M_ }
+#   #- { key: readability-identifier-naming.MethodSuffix, value: }
+#   ## ClassMethod fall back to GlobalFunction
+#   #- { key: readability-identifier-naming.ClassMethodCase,   value: }
+#   #- { key: readability-identifier-naming.ClassMethodPrefix, value: CM_ }
+#   #- { key: readability-identifier-naming.ClassMethodSuffix, value: }
+#   ## ConstexprMethod falls back to ConstexprFunction
+#   #- { key: readability-identifier-naming.ConstexprMethodCase,   value: }
+#   #- { key: readability-identifier-naming.ConstexprMethodPrefix, value: cexprM_ }
+#   #- { key: readability-identifier-naming.ConstexprMethodSuffix, value: }
+#   ## PrivateMethod falls back to Method
+#   #- { key: readability-identifier-naming.PrivateMethodCase,   value: }
+#   #- { key: readability-identifier-naming.PrivateMethodPrefix, value: priM_ }
+#   #- { key: readability-identifier-naming.PrivateMethodSuffix, value: }
+#   ## ProtectedMethod falls back to Method
+#   #- { key: readability-identifier-naming.ProtectedMethodCase,   value: }
+#   #- { key: readability-identifier-naming.ProtectedMethodPrefix, value: proM_ }
+#   #- { key: readability-identifier-naming.ProtectedMethodSuffix, value: }
+#   ## PublicMethod falls back to Method
+#   #- { key: readability-identifier-naming.PublicMethodCase,   value: }
+#   #- { key: readability-identifier-naming.PublicMethodPrefix, value: pubM_ }
+#   #- { key: readability-identifier-naming.PublicMethodSuffix, value: }
+#   ## VirtualMethod will fall back to Private/Protected/PublicMethod
+#   - { key: readability-identifier-naming.VirtualMethodCase, value: CamelCase }
+#   - { key: readability-identifier-naming.VirtualMethodPrefix, value: v_ }
+#   #- { key: readability-identifier-naming.VirtualMethodSuffix, value: }
+#   ######### Parameters
+#   ## Parameter does not fallback
+#   - { key: readability-identifier-naming.ParameterCase, value: camelBack }
+#   - { key: readability-identifier-naming.ParameterPrefix, value: _ }
+#   #- { key: readability-identifier-naming.ParameterSuffix, value: }
+#   ## ConstantParameter falls back to Parameter
+#   #- { key: readability-identifier-naming.ConstantParameterCase,   value: }
+#   #- { key: readability-identifier-naming.ConstantParameterPrefix, value: cpar_ }
+#   #- { key: readability-identifier-naming.ConstantParameterSuffix, value: }
+#   ## PointerParameter does not fallback
+#   - { key: readability-identifier-naming.PointerParameterCase, value: camelBack }
+#   - { key: readability-identifier-naming.PointerParameterPrefix, value: _ }
+#   - { key: readability-identifier-naming.PointerParameterSuffix, value: _ptr }
+#   ## ConstantPointerParameter falls back to ConstantParameter then PointerParameter
+#   #- { key: readability-identifier-naming.ConstantPointerParameterCase,   value: }
+#   #- { key: readability-identifier-naming.ConstantPointerParameterPrefix, value: cPpar_ }
+#   #- { key: readability-identifier-naming.ConstantPointerParameterSuffix, value: }
+#   ######### Template
+#   ## ParameterPack does not fall back
+#   - { key: readability-identifier-naming.ParameterPackCase, value: camelBack }
+#   - { key: readability-identifier-naming.ParameterPackPrefix, value: _ }
+#   - { key: readability-identifier-naming.ParameterPackSuffix, value: _pack }
+#   ## TemplateParameter does not fall back
+#   - { key: readability-identifier-naming.TemplateParameterCase, value: UPPER_CASE }
+#   #- { key: readability-identifier-naming.TemplateParameterPrefix, value: Tpar_ }
+#   #- { key: readability-identifier-naming.TemplateParameterSuffix, value: }
+#   ## TemplateTemplateParameter falls back to TemplateParameter
+#   #- { key: readability-identifier-naming.TemplateTemplateParameterCase,   value: }
+#   #- { key: readability-identifier-naming.TemplateTemplateParameterPrefix, value: TTpar_ }
+#   #- { key: readability-identifier-naming.TemplateTemplateParameterSuffix, value: }
+#   ## TypeTemplateParameter falls back to TemplateParameter
+#   #- { key: readability-identifier-naming.TypeTemplateParameterCase,   value: }
+#   #- { key: readability-identifier-naming.TypeTemplateParameterPrefix, value: Typar_ }
+#   #- { key: readability-identifier-naming.TypeTemplateParameterSuffix, value: }
+#   ## ValueTemplateParameter falls back to TemplateParameter
+#   #- { key: readability-identifier-naming.ValueTemplateParameterCase,   value: }
+#   #- { key: readability-identifier-naming.ValueTemplateParameterPrefix, value: VTpar_ }
+#   #- { key: readability-identifier-naming.ValueTemplateParameterSuffix, value: }
+#   ####### Other
+#   ## TypeAlias does not fall back
+#   - { key: readability-identifier-naming.TypeAliasCase, value: CamelCase }
+#   #- { key: readability-identifier-naming.TypeAliasPrefix, value: ta_ }
+#   - { key: readability-identifier-naming.TypeAliasSuffix, value: _t }
+#   ## Typedef does not fall back
+#   - { key: readability-identifier-naming.TypedefCase, value: CamelCase }
+#   #- { key: readability-identifier-naming.TypedefPrefix, value: td_ }
+#   - { key: readability-identifier-naming.TypedefSuffix, value: _t }
+#   ## Union does not fall back
+#   - { key: readability-identifier-naming.UnionCase, value: CamelCase }
+#   #- { key: readability-identifier-naming.UnionPrefix, value: u_ }
+#   #- { key: readability-identifier-naming.UnionSuffix, value: }
+#   ## Namespace does not fall back
+#   #- { key: readability-identifier-naming.NamespaceCase, value: CamelCase }
+#   #- { key: readability-identifier-naming.NamespacePrefix, value: n_ }
+#   #- { key: readability-identifier-naming.NamespaceSuffix, value: }
+#   ## InlineNamespace falls back to Namespace
+#   #- { key: readability-identifier-naming.InlineNamespaceCase,   value: }
+#   #- { key: readability-identifier-naming.InlineNamespacePrefix, value: in_ }
+#   #- { key: readability-identifier-naming.InlineNamespaceSuffix, value: }
+# ################################################################################
+
+---
+

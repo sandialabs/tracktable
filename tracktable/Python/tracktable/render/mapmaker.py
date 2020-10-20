@@ -40,6 +40,18 @@ from tracktable.render import geographic_decoration as decoration
 
 
 def mapmaker(domain='terrestrial', *args, **kwargs):
+    """Generate a map for a given domain
+
+    Keyword Args:
+        domain (str): Domain to create the map in (Default: 'terrestrial')
+        args (tuple): Arguments to be passed to specific map creation (Default: tuple)
+        kwargs (dict): Any other arguments to customize the generated map (Default: dict)
+
+    Returns:
+        A terrestrial or cartesian domain map
+
+    """
+
     if kwargs.get('map_bbox', None) is not None:
         kwargs['map_bbox'] = _make_bounding_box(kwargs['map_bbox'], domain)
 
@@ -60,8 +72,20 @@ def cartesian_map(map_bbox=None,
     """Create a Cartesian map
 
     Since Cartesian space is flat and undistinguished, a "map" is just
-    a display region.  You can also change the background color and
+    a display region. You can also change the background color and
     draw axes/grid lines on the figure.
+
+    Keyword Args:
+        map_bbox ([minLon, maxLon, minLat, maxLat]): bounding box for
+            custom map extent. By default automatically set to
+            make all trajectories visible. (Default: None)
+        gridline_spacing (int): Spaceing to put between grid lines (Default: None)
+        axes (GeoAxes): Domain to create the map in (Default: None)
+        kwargs (dict): Any other arguments to customize the generated map (Default: dict)
+
+    Returns:
+        A cartesian domain map
+
     """
 
     if axes is None:
@@ -122,48 +146,57 @@ def terrestrial_map(map_name,
                     axes=None,
                     **kwargs):
 
-    """Create and decorate a map
+    """Create and decorate a terrestrial map
 
     Call the Cartopy toolkit to create a map of some predefined area,
-    up to and including the entire world.  The map will be decorated
+    up to and including the entire world. The map will be decorated
     with some subset of coastlines, country borders, state/province
     borders and cities according to the keyword arguments you supply
     to mapmaker() or terrestrial_map().
 
     Args:
-      map_name:            Region name ('region:XXX' or 'airport:XXX' or 'city:XXX' or 'custom').  Available regions are in tracktable.render.maps.available_maps().
+      map_name:            Region name ('region:XXX' or 'airport:XXX' or 'city:XXX' or 'custom'). Available regions are in tracktable.render.maps.available_maps().
 
-      draw_coastlines:     Whether or not to draw coastlines on the map
-      draw_countries:      Whether or not to draw country borders on the map
-      draw_states:         Whether or not to draw US/Canada state borders
-      draw_lonlat:         Whether or not to draw longitude/latitude lines
-      land_color:          Color name or hex string for land area
-      sea_color:           Color name or hex string for sea area
-      lonlat_spacing:      Distance in degrees between lon/lat lines
-      lonlat_color:        Color name or hex string for longitude/latitude lines
-      lonlat_linewidth:    Width (in point) for lon/lat lines
-      lonlat_zorder:       Image layer for coastlines
-      coastline_color:     Color name or hex string for coastlines
-      coastline_linewidth: Width (in points) of coastlines
-      coastline_zorder:    Image layer for coastlines
-      country_color:       Color name or hex string for coastlines
-      country_linewidth:   Width (in points) of coastlines
-      country_zorder:      Image layer for coastlines
-      state_color:         Color name or hex string for coastlines
-      state_linewidth:     Width (in points) of coastlines
-      state_zorder:        Image layer for coastlines
-      draw_largest_cities: Draw the N largest cities on the map
-      draw_cities_larger_than: Draw cities with populations greater than N
-      city_label_size:     Size (in points) for city name labels
-      city_dot_size:       Size (in points) for city markers
-      city_dot_color:      Color name or hex string for city markers
-      city_label_color:    Color name or hex string for city names
-      border_resolution:   'c', 'i', 'h' or 'f' (in increasing order of complexity)
-      axes:                Matplotlib axes to render into
-      map_bbox:            Bounding box for custom map extent
-      region_size:         Size of region depicted around an airport (km width x km height)
-      map_projection:      Cartopy CRS projection object (optional)
-      map_scale_length:    Length of map scale indicator (in km)
+    Keyword Args:
+      draw_coastlines (bool):                       Whether or not to draw coastlines on the map (Default: True)
+      draw_countries (bool):                        Whether or not to draw country borders on the map (Default: True)
+      draw_states (bool):                           Whether or not to draw US/Canada state borders (Default: True)
+      draw_lonlat (bool):                           Whether or not to draw longitude/latitude lines (Default: True)
+      fill_land (bool):                             Whether or not to fill in the land areas (Default: True)
+      fill_water (bool):                            Whether or not to fill in the land areas (Default: True)
+      land_fill_color (str):                        Color name or hex string for land area (Default: '#101010')
+      water_fill_color (str):                       Color name or hex string for sea area (Default: '#000000')
+      land_zorder (int):                            Image layer for land (Default: 4)
+      water_zorder (int):                           Image layer for sea (Default: 4)
+      lonlat_spacing (int):                         Distance in degrees between lon/lat lines (Default: 10)
+      lonlat_color (str):                           Color name or hex string for longitude/latitude lines (Default: '#A0A0A0')
+      lonlat_linewidth (float):                     Width (in point) for lon/lat lines (Default: 0.2)
+      lonlat_zorder (int):                          Image layer for coastlines (Default: 6)
+      coastline_color (str):                        Color name or hex string for coastlines (Default: '#808080')
+      coastline_linewidth (float):                  Width (in points) of coastlines (Default: 1)
+      coastline_zorder (int):                       Image layer for coastlines (Default: 5)
+      country_border_color (str):                   Color name or hex string for coastlines (Default: '#606060')
+      country_fill_color (str):                     Color name or hex string for coastlines (Default:'#303030' )
+      country_linewidth (float):                    Width (in points) of coastlines (Default: 0.5)
+      country_zorder (int):                         Image layer for coastlines (Default: 3)
+      state_border_color (str):                     Color name or hex string for coastlines (Default: '#404040')
+      state_fill_color (str):                       Color name or hex string for coastlines (Default: 'none')
+      state_linewidth (float):                      Width (in points) of coastlines (Default: 0.3)
+      state_zorder (int):                           Image layer for coastlines (Default: 2)
+      draw_largest_cities (int):                    Draw the N largest cities on the map (Default: None)
+      draw_cities_larger_than (int):                Draw cities with populations greater than N (Default: None)
+      city_label_size (int):                        Size (in points) for city name labels (Default: 12)
+      city_dot_size (int):                          Size (in points) for city markers (Default: 2)
+      city_dot_color (str):                         Color name or hex string for city markers (Default: 'white')
+      city_label_color (str):                       Color name or hex string for city names (Default: 'white')
+      city_zorder (int):                            Color name or hex string for city names (Default: 6)
+      border_resolution (str):                      Detail of borders (Default: '110m')
+      map_bbox ([minLon, maxLon, minLat, maxLat]):  Bounding box for custom map extent (Default: None)
+      map_projection (Basemap):                     Cartopy CRS projection object (optional) (Default: None)
+      map_scale_length (float):                     Length of map scale indicator (in km) (Default: None)
+      region_size (float):                          Size of region depicted around an airport (km width x km height) (Default: None)
+      axes (GeoAxes):                               Matplotlib axes to render into (Default: None)
+      kwargs (dict):                                Any other arguments to customize the generated map (Default: dict)
 
     Raises:
       KeyError: unknown map name

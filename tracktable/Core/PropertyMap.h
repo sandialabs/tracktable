@@ -129,7 +129,6 @@ TRACKTABLE_CORE_EXPORT Timestamp timestamp_property(PropertyMap const& propertie
  * value is already present it will be silently overwritten.
  */
 
-
 TRACKTABLE_CORE_EXPORT void set_property(PropertyMap& properties, string_type const& name, double value);
 TRACKTABLE_CORE_EXPORT void set_property(PropertyMap& properties, string_type const& name, string_type const& value);
 TRACKTABLE_CORE_EXPORT void set_property(PropertyMap& properties, string_type const& name, Timestamp const& value);
@@ -195,7 +194,7 @@ struct interpolate<PropertyMap>
             }
           catch (boost::bad_get& /*e*/)
             {
-            TRACKTABLE_LOG(log::warning) 
+            TRACKTABLE_LOG(log::warning)
                       << "WARNING: interpolate<PropertyMap>: "
                       << "Couldn't retrieve property '"
                       << key << "' (type "
@@ -245,7 +244,7 @@ struct extrapolate<PropertyMap>
                 }
                 catch (boost::bad_get& /*e*/)
                 {
-                    TRACKTABLE_LOG(log::warning) 
+                    TRACKTABLE_LOG(log::warning)
                         << "WARNING: extrapolate<PropertyMap>: "
                         << "Couldn't retrieve property '"
                         << key << "' (type "

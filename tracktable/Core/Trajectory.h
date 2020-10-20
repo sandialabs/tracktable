@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -39,9 +39,11 @@
 
 #include <tracktable/Core/detail/algorithm_signatures/EndToEndDistance.h>
 #include <tracktable/Core/detail/algorithm_signatures/Length.h>
+#include <tracktable/Core/detail/algorithm_signatures/LengthFractionAtPoint.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtFraction.h>
 #include <tracktable/Core/detail/algorithm_signatures/PointAtTime.h>
 #include <tracktable/Core/detail/algorithm_signatures/TimeAtFraction.h>
+#include <tracktable/Core/detail/algorithm_signatures/TimeFractionAtPoint.h>
 #include <tracktable/Core/detail/algorithm_signatures/SubsetDuringInterval.h>
 
 #include <tracktable/Core/detail/implementations/PointAtFraction.h>
@@ -62,6 +64,7 @@
 #include <ostream>
 #include <vector>
 #include <typeinfo>
+#include <iostream>
 
 namespace tracktable {
 
@@ -83,7 +86,7 @@ template< class PointT >
 class Trajectory
 {
   friend class boost::serialization::access;
-  
+
 public:
   /// Convenient aliases for template parameters and types from internal storage
   //
@@ -113,7 +116,8 @@ public:
   ~Trajectory() { }
 
   /// Create a trajectory a copy of another
-  Trajectory(const Trajectory& other) :
+
+Trajectory(const Trajectory& other) :
     UUID(other.UUID),
     Points(other.Points),
     Properties(other.Properties)
@@ -127,6 +131,7 @@ public:
    *
    * @param[in] n             Length of the trajectory
    * @param[in] initial_value Point to be used to fill the new vector
+   * @param[in] generate_uuid Flag to generate a UUID for the trajectory
    */
 
   Trajectory(size_type n, point_type initial_value=point_type(), bool generate_uuid=true)
@@ -143,6 +148,7 @@ public:
    *
    * @param[in] first   Iterator pointing to the first point for the new trajectory
    * @param[in] last    Iterator pointing past the last point for the new trajectory
+   * @param[in] generate_uuid Flag to generate a UUID for the trajectory
    */
   template<class InputIterator>
   Trajectory(InputIterator first, InputIterator last, bool generate_uuid=true)
@@ -151,8 +157,18 @@ public:
     {
       if (generate_uuid)
         this->set_uuid();
-      this->compute_current_length(0);
+      this->compute_current_features(0);
     }
+
+  template<class InputIterator>
+  Trajectory(InputIterator first, InputIterator last, const Trajectory& original)
+     : UUID(),
+     Points(first, last),
+     Properties(original.Properties)
+     {
+       this->set_uuid();
+       this->compute_current_features(0);
+     }
 
   /// Make this trajectory a copy of another
   Trajectory& operator=(const Trajectory& other)
@@ -162,6 +178,12 @@ public:
       this->Properties = other.Properties;
       return *this;
     }
+
+    /// Make this trajectory a clone of another
+  Trajectory& clone() const
+  {
+      return *(new Trajectory(*this));
+  }
 
   /** Return the start time if available.
    *
@@ -260,11 +282,11 @@ public:
    *
    * Return a mostly-unique ID for the trajectory incorporating its object
    * ID, start time and end time.  If the trajectory is empty then we
-   * return the string "(empty)".  
+   * return the string "(empty)".
    *
    * Note that if you have multiple trajectories with the same object ID,
    * start time and end time, this identifier will not be unique.
-   * 
+   *
    */
   std::string trajectory_id() const
     {
@@ -448,7 +470,7 @@ public:
   void assign(iter_type iter_begin, iter_type iter_end)
     {
       this->Points.assign(iter_begin, iter_end);
-      this->compute_current_length(0);
+      this->compute_current_features(0);
     }
 
   /** Check whether one trajectory is equal to another by comparing all the points.
@@ -520,7 +542,7 @@ public:
   void push_back(point_type const& pt)
     {
       this->Points.push_back(pt);
-      this->compute_current_length(this->size() - 1);
+      this->compute_current_features(this->size() - 1);
     }
 
   /** Retrieve the point at a given index with bounds checking.
@@ -581,7 +603,7 @@ public:
       if (result != this->end())
         {
         // XXX CHECK THIS
-        this->compute_current_length(std::distance(this->begin(), result));
+        this->compute_current_features(std::distance(this->begin(), result));
         }
       return result;
     }
@@ -605,7 +627,7 @@ public:
       if (result != this->end())
         {
         // XXX CHECK THIS
-        this->compute_current_length(std::distance(this->begin(), result));
+        this->compute_current_features(std::distance(this->begin(), result));
         }
       return result;
     }
@@ -647,7 +669,7 @@ public:
    *
    * \return Last point in trajectory (mutable reference)
    *
-   * \note 
+   * \note
    * If you call this on an empty trajectory the behavior is
    * undefined.  Dereferencing back() on an empty trajectory will
    * probably crash your program.
@@ -661,7 +683,7 @@ public:
    *
    * \return Last point in trajectory (immutable reference)
    *
-   * \note 
+   * \note
    * If you call this on an empty trajectory the behavior is
    * undefined.  Dereferencing back() on an empty trajectory will
    * probably crash your program.
@@ -670,6 +692,20 @@ public:
     {
       return this->Points.back();
     }
+
+   /** Insert a single element into the trajectory at an arbitrary index.
+   *
+   * Insert a point into any index in the trajectory.  All points
+   * after this location will be moved farther down.
+   *
+   * @param[in]   index   Location to insert the point
+   * @param[in]   value      Point to insert
+   */
+   void insert(int index, point_type const& value)
+   {
+       this->Points.insert(this->begin()+ index, value);
+       this->compute_current_features(std::distance(this->begin(), this->begin() + index));
+   }
 
   /** Insert a single element into the trajectory at an arbitrary position.
    *
@@ -682,7 +718,7 @@ public:
   iterator insert(iterator position, point_type const& value)
     {
       iterator result(this->Points.insert(position, value));
-      this->compute_current_length(std::distance(this->begin(), position));
+      this->compute_current_features(std::distance(this->begin(), position));
       return result;
     }
 
@@ -699,7 +735,7 @@ public:
   void insert(iterator position, size_type n, point_type const& value)
     {
       this->Points.insert(position, n, value);
-      this->compute_current_length(std::distance(this->begin(), position));
+      this->compute_current_features(std::distance(this->begin(), position));
     }
 
   /** Insert a range of points into the trajectory.
@@ -716,10 +752,10 @@ public:
   void insert(iterator position, InputIterator first, InputIterator last)
     {
       this->Points.insert(position, first, last);
-      this->compute_current_length(std::distance(this->begin(), position));
+      this->compute_current_features(std::distance(this->begin(), position));
     }
 
-  void compute_current_length(std::size_t start_index)
+  void compute_current_features(std::size_t start_index)
     {
       if (start_index >= this->size())
         {
@@ -740,7 +776,31 @@ public:
             );
           }
         }
+
+      for (std::size_t i = 0; i < this->size(); ++i)
+        {
+        if (i == 0)
+          {
+          (*this)[i].set_current_length_fraction(0.0);
+          (*this)[i].set_current_time_fraction(0.0);
+          }
+        else
+          {
+          (*this)[i].set_current_length_fraction(
+            (*this)[i].current_length() /
+            (*this)[this->size()-1].current_length()
+            );
+
+           (*this)[i].set_current_time_fraction(
+            static_cast<double>(((*this)[i].timestamp() -
+             (*this)[0].timestamp()).total_seconds()) /
+            static_cast<double>(((*this)[this->size()-1].timestamp() -
+             (*this)[0].timestamp()).total_seconds())
+           );
+
+        }
     }
+  }
 
   //@}
   // ************************************************************
@@ -832,13 +892,13 @@ public:
    * The point underneath this iterator, if there is one, cannot be changed.
    */
   const_reverse_iterator rend() const { return this->Points.rend(); }
-  
+
   /** Return an iterator pointing beyond the last point in the trajectory
    *
    * The point underneath this iterator, if there is one, cannot be changed.
    */
   const_reverse_iterator crend() const noexcept { return this->Points.crend(); }
-  
+
 };
 
 } // exit namespace tracktable

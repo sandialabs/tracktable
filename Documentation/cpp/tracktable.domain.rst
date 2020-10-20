@@ -2,6 +2,11 @@
 Tracktable Point Domains
 ========================
 
+
+---------------
+Module contents
+---------------
+
 Point domains are how we keep track of the different coordinate
 systems and sets of units that points can use.  For each domain we
 specify (1) a native coordinate system, (2) an ordering for
@@ -44,74 +49,14 @@ Cartesian2D domains) but not in three dimensions (the Cartesian3D
 domain).  Calls to ``signed_turn_angle()`` using 3D points will fail
 to compile.
 
-.. todo: Document which measures are implemented for each domain
+-------
+Domains
+-------
 
+.. toctree::
+   :maxdepth: 2
 
-Terrestrial Domain
-------------------
-
-Specification
-^^^^^^^^^^^^^
-
-The Terrestrial domain (``tracktable::domain::terrestrial``) concerns
-points on the surface of the Earth.  These points are located using
-longitude and latitude.  In Tracktable, longitude and latitude are
-always measured in degrees and longitude always comes first.  We
-prefer to let longitude range from -180 to 180 but the underlying math
-doesn't care.
-
-Units
-^^^^^
-
-Position in the terrestrial domain is measured in degrees of longitude
-and latitude.  Longitude is always coordinate 0 and latitude is always
-coordinate 1.  Points are presumed to lie on the surface of the Earth.
-If you want to include altitude, use the user-defined properties.
-
-Distances are measured in kilometers.  Speeds are measured in
-kilometers per hour.
-
-
-
-2D Cartesian Domain
--------------------
-
-Specification
-^^^^^^^^^^^^^
-
-The 2D Cartesian domain (``tracktable::domain::cartesian2d``) concerns
-points in a flat 2D space.  These points are located with respect to
-the origin.  Unlike the terrestrial domain, there are no
-discontinuities or distinguished points apart from the origin.
-
-Units
-^^^^^
-
-Position in 2D Cartesian space is denoted (x, y).  You, the user, can
-decide what those axes mean.  Without a tie to some underlying
-physical domain they are purely abstract.  Distances in this space are
-measured in dimensionless units.  Speed is measured in units per
-second.
-
-
-
-3D Cartesian Domain
--------------------
-
-Specification
-^^^^^^^^^^^^^
-
-The 3D Cartesian domain (``tracktable::domain::cartesian3d``) concerns
-points in a flat 3D space.  These points are located with respect to
-the origin.  Unlike the terrestrial domain, there are no
-discontinuities or distinguished points apart from the origin.
-
-Units
-^^^^^
-
-Position in 3D Cartesian space is denoted (x, y, z).  You, the user, can
-decide what those axes mean.  Without a tie to some underlying
-physical domain they are purely abstract.  Distances in this space are
-measured in dimensionless units.  Speed is measured in units per
-second.
-
+   tracktable.domain.2DCartesian.rst
+   tracktable.domain.3DCartesian.rst
+   tracktable.domain.FeatureVectors.rst
+   tracktable.domain.Terrestrial.rst

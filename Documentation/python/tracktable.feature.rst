@@ -1,18 +1,19 @@
+=========================
 tracktable.feature module
-==========================
+=========================
 
+----------
 Submodules
 ----------
 
-tracktable.feature.annotations module
--------------------------------------
 
-.. automodule:: tracktable.feature.annotations
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. toctree::
+   :maxdepth: 2
+
+   tracktable.feature.annotations.rst
 
 
+---------------
 Module contents
 ---------------
 

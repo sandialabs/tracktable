@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2014-2019 National Technology and Engineering
+* Copyright (c) 2014-2020 National Technology and Engineering
 * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 * with National Technology and Engineering Solutions of Sandia, LLC,
 * the U.S. Government retains certain rights in this software.
@@ -201,6 +201,8 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
     def("bearing", &(tracktable::bearing<TrajectoryPointTerrestrial>));
     def("speed_between", &(tracktable::speed_between<TrajectoryPointTerrestrial>));
     def("current_length", &(tracktable::current_length<TrajectoryPointTerrestrial>));
+    def("current_length_fraction", &(tracktable::current_length_fraction<TrajectoryPointTerrestrial>));
+    def("current_time_fraction", &(tracktable::current_time_fraction<TrajectoryPointTerrestrial>));
 
     def("simplify", &(tracktable::simplify<TrajectoryTerrestrial>));
     def("point_at_time_fraction", &(tracktable::point_at_time_fraction<TrajectoryTerrestrial>));
@@ -264,6 +266,8 @@ BOOST_PYTHON_MODULE(_domain_algorithm_overloads) {
     def("bearing", &(tracktable::bearing<TrajectoryPointCartesian2D>));
     def("speed_between", &(tracktable::speed_between<TrajectoryPointCartesian2D>));
     def("current_length", &(tracktable::current_length<TrajectoryPointCartesian2D>));
+    def("current_length_fraction", &(tracktable::current_length_fraction<TrajectoryPointCartesian2D>));
+    def("current_time_fraction", &(tracktable::current_time_fraction<TrajectoryPointCartesian2D>));
 
     def("simplify", &(tracktable::simplify<TrajectoryCartesian2D>));
     def("point_at_time_fraction", &(tracktable::point_at_time_fraction<TrajectoryCartesian2D>));
