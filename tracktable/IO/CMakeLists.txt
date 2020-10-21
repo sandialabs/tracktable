@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -96,6 +96,7 @@ set_property(
   PROPERTY VERSION ${TRACKTABLE_VERSION}
   )
 
+#This puts the header files under a separate folder in Visual Studio
 source_group ("Header Files\\Detail" FILES ${IO_Detail_HEADERS})
 
 generate_export_header( TracktableIO

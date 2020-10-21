@@ -26,6 +26,7 @@ based on speed, memory usage and algorithmic needs.
    python/tracktable.filter.rst
    python/tracktable.info.rst
    python/tracktable.io.rst
+   python/tracktable.lib.rst
    python/tracktable.render.rst
    python/tracktable.script_helpers.rst
    python/tracktable.source.rst

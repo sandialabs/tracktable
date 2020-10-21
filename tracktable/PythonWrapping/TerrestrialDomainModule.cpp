@@ -292,6 +292,9 @@ void install_terrestrial_domain_wrappers()
 
 BOOST_PYTHON_MODULE(_terrestrial)
 {
+  // Set docstrings to display user-defined only
+  boost::python::docstring_options doc_options(true, false, false);
+
   using namespace boost::python;
   install_terrestrial_domain_wrappers();
 #if 0
