@@ -22,12 +22,12 @@ tracktable_src = '../'
 tracktable_build = None
 
 debugging = False
-read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
-
+read_the_docs_build = (os.environ.get('READTHEDOCS', None) is not None)
 
 if read_the_docs_build or debugging:
     # We have to run these manually on readthedocs since we aren't
     # driving the build with CMake.
+    pass
     subprocess.call(['doxygen', 'readthedocs/Doxyfile-readthedocs'])
 else:
     # If we're building all of Tracktable, we're operating in
