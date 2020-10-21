@@ -1,0 +1,14 @@
+name: tracktable
+channels:
+  - defaults
+dependencies:
+  - python=3.7
+  - pip
+  - numpy
+  - pytz
+  - cartopy
+  - pyshp
+  - sphinx
+  - pip:
+    - tracktable
+    - breathe

@@ -301,5 +301,8 @@ void install_cartesian3d_domain_wrappers()
 
 BOOST_PYTHON_MODULE(_cartesian3d)
 {
+  // Set docstrings to display user-defined only
+  boost::python::docstring_options doc_options(true, false, false);
+
   install_cartesian3d_domain_wrappers();
 }
