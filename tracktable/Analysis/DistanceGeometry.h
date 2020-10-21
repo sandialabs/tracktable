@@ -210,6 +210,7 @@ _distance_geometry(
  *         elapsed. Defaults to 'true', meaning sample by distance.
  * @param [out] output The output of the creation of the control points
  */
+
 template<typename trajectory_type, typename point_type>
 void _create_control_points(unsigned int depth,
                            trajectory_type const& trajectory,

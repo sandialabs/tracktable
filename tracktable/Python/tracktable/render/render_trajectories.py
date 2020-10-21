@@ -71,7 +71,8 @@ def render_trajectories_separate(trajectories, backend='', **kwargs):
     parameters
 
     Args:
-        trajectories (list): List of trajectories to render
+        trajectories (Tracktable trajectory or list of trajectory objects):
+            List of trajectories to render
 
     Keyword Args:
         backend (str): The backend to use for rendering default is folium if in a notebook and cartopy otherwise.
@@ -88,19 +89,21 @@ def render_trajectories_separate(trajectories, backend='', **kwargs):
 # ----------------------------------------------------------------------
 
 
-#TODO should we support iterables other than list?
-#todo support list of linewidhts?  maybe just mapper
 def render_trajectories(trajectories, backend='', **kwargs):
-    """Render a list of trajectories
-    This function renders a list of trajectories.
+    """Render a list of trajectories interactively or as a static image
 
-    Arguments:
-        trajectories (Trajectory object or list of Trajectory objects):
-            A list of trajectories to render
+    This function will render a list of trajectories using Folium (for
+    interactive display) if you are in a Jupyter notebook or using Cartopy
+    (for a static image) if you are running from a script.
 
-    Keyword arguments:
-        backend (str): The backend to use for rendering
-            default is folium if in a notebook and cartopy otherwise.
+    Args:
+        trajectories (single Tracktable trajectory or list of trajectories):
+            Trajectories to render
+
+    Keyword Arguments:
+        backend (str): Which back end to use.  This can be 'folium' to force
+            Folium interactive rendering or 'cartopy' to force static images.
+            Defaults to None, which lets the renderer select automatically.
         map (map object for given backend): rather than create a new
             map, append to this given map
         obj_ids (str or list of str): only display trajecteories
@@ -167,43 +170,6 @@ def render_trajectories(trajectories, backend='', **kwargs):
         filename (str): Path and filename to save the results to, if
             save is set to True. If no filename is given, a default
             filename including the timestamp is used.
-
-    Folium-specific Keyword Arguments:
-        tiles (str): map tiles to use for folium. Can be a string name
-            of a folium supported maptiles set or a Leaflet-style URL in
-            this format: http://{s}.yourtiles.com/{z}/{x}/{y}.png
-            (Default: 'cartodbdark_matter')
-            Other options:
-                "OpenStreetMap”
-                “StamenTerrain”
-                "StamenToner"
-                "StamenWatercolor"
-                “CartoDBPositron”
-                "CartoDBDark_Matter"
-        attr (str): attribution string for custom tile set
-            (Default: "."),
-        point_popup_properties (list of strings): Names of the properties
-            to include in the popup which is displayed when clicking on
-            a point (when show_points==True).
-        show_distance_geometry (bool): Whether or not to show the
-            distance geometry information for the trajectories
-            (Default: False)
-        distance_geometry_depth (int): if show_distance_geometry is True,
-            the depth of the distance geometry calculation (Default: 4)
-        show_scale (bool): whether or not to show the scale of the
-            current map in the lower-lefthand corner (Default: True)
-        max_zoom (int): The maximum zoom level for the given map tiles
-            this may need to be increased if there is a need to zoom in
-            very close (Default: 22)
-
-    Cartopy-specific Keyword Arguments:
-        map_projection (cartopy.crs projection object): Projection to use
-            to display the map (Default: cartopy.crs.Miller)
-        transform (cartopy.crs projection object): the input projection
-            (Default: Geodetic())
-
-    Returns:
-        Rendered trajectories
 
     """
 
@@ -511,7 +477,7 @@ def point_popup(current_point, point_popup_properties):
 
 def render_point_folium(current_point,
                         point_popup_properties, coord, point_radius,
-                        point_color, map):
+                        point_color, map_canvas):
     """Renders a point to the folium map
 
     Args:
@@ -536,13 +502,13 @@ def render_point_folium(current_point,
                      fill_color=point_color,
                      color=point_color,
                      tooltip=tooltip_str_point,
-                     popup=popup_point).add_to(map)
+                     popup=popup_point).add_to(map_canvas)
 
 # ----------------------------------------------------------------------
 
 
 def render_distance_geometry_folium(distance_geometry_depth,
-                                    traj, map):
+                                    traj, map_canvas):
     """Renders the distance geometry calculations to the folium map
 
     Args:
@@ -573,14 +539,14 @@ def render_distance_geometry_folium(distance_geometry_depth,
                 val = round(distance(cps[j], cps[j+1]) / normalization_term, 4)
                 tooltip = str(j+1)+'/'+str(len(cps)-1)+' = '+str(val)
                 fol.PolyLine(line_coords, color=control_color, weight=1,
-                             tooltip=tooltip).add_to(map)
+                             tooltip=tooltip).add_to(map_canvas)
             popup=str(traj[0].object_id)+'<br>'+ \
                 traj[i].timestamp.strftime("%H:%M:%S")+'<br>Latitude='+ \
                 str(round(traj[i][1],7))+'<br>Longitude='+str(round(traj[i][0],7))
             fol.CircleMarker(cp_coord, radius=4, fill=True,
                              color=control_color,
                              tooltip=round(cp_fractions[i], 7),
-                             popup=popup).add_to(map)
+                             popup=popup).add_to(map_canvas)
 
 # ----------------------------------------------------------------------
 
@@ -693,7 +659,7 @@ def common_processing(trajectories, obj_ids, line_color, color_map,
 #todo could customize choice of mapping hues to trajs
 def render_trajectories_folium(trajectories,
                                #common arguments
-                               map = None,
+                               map_canvas = None,
                                obj_ids = [],
                                #\/format [minLon, maxLon, minLat, maxLat]
                                map_bbox = None,
@@ -741,10 +707,10 @@ def render_trajectories_folium(trajectories,
     if not trajectories:
         return
 
-    if map == None:
-        map = fol.Map(tiles=tiles, attr=attr, crs=crs,
-                      control_scale = show_scale,
-                      max_zoom=max_zoom)
+    if map_canvas == None:
+        map_canvas = fol.Map(tiles=tiles, attr=attr, crs=crs,
+                             control_scale = show_scale,
+                             max_zoom=max_zoom)
 
     for i, trajectory in enumerate(trajectories):
         coordinates = [(point[1], point[0]) for point in trajectory]
@@ -779,7 +745,7 @@ def render_trajectories_folium(trajectories,
                              color=current_color_map.colors[0],
                              weight=linewidth, opacity=1,
                              tooltip=tooltip_str,
-                             popup=popup_str).add_to(map)
+                             popup=popup_str).add_to(map_canvas)
             else: #mapped color (not solid)
                 last_pos = coordinates[0]
                 for i, pos in enumerate(coordinates[1:]):
@@ -790,7 +756,7 @@ def render_trajectories_folium(trajectories,
                     fol.PolyLine([last_pos,pos],
                                  color=segment_color, weight=weight,
                                  opacity=1, tooltip=tooltip_str,
-                                 popup=popup_str).add_to(map)
+                                 popup=popup_str).add_to(map_canvas)
                     last_pos = pos
         if show_points:
             for i, c in enumerate(coordinates[:-1]): #all but last (dot)
@@ -805,23 +771,23 @@ def render_trajectories_folium(trajectories,
                 render_point_folium(trajectory[i],
                                     point_popup_properties, c,
                                     point_radius,
-                                    current_point_color, map)
+                                    current_point_color, map_canvas)
         if show_dot:
             render_point_folium(trajectory[-1],
                                 point_popup_properties,
                                 coordinates[-1], dot_size,
-                                dot_color, map)
+                                dot_color, map_canvas)
 
         if show_distance_geometry:
             render_distance_geometry_folium(distance_geometry_depth,
                                             trajectory,
-                                            map)
+                                            map_canvas)
 
     if map_bbox:
-        map.fit_bounds([(map_bbox[2], map_bbox[0]),
+        map_canvas.fit_bounds([(map_bbox[2], map_bbox[0]),
                       (map_bbox[3], map_bbox[1])])
     else:
-        map.fit_bounds(bounding_box_for_folium(trajectories))
+        map_canvas.fit_bounds(bounding_box_for_folium(trajectories))
     if save:  #saves as .html document
         #iframe = map._repr_html_()
         #html="<html><body>"+iframe+"</body></html>"
@@ -830,10 +796,10 @@ def render_trajectories_folium(trajectories,
             filename = "trajs-"+datetime_str+'.html'
         #with open(filename, 'w') as f:
         #    f.write(html)
-        map.save(filename)
+        map_canvas.save(filename)
     if show:
-        display(map)
-    return map
+        display(map_canvas)
+    return map_canvas
 
 # ----------------------------------------------------------------------
 
@@ -908,7 +874,7 @@ def get_scale_zoom(scale, from_zoom):
     zoom = crs_zoom(scale * crs_scale(from_zoom))
     return zoom # check for Nan?
 
-def get_bounds_zoom(map, bounds, inside=True, size=[960,400], padding=[0,0]): #ignore padding for now #fix size
+def get_bounds_zoom(map_canvas, bounds, inside=True, size=[960,400], padding=[0,0]): #ignore padding for now #fix size
     """ Get the zoom if the bounding box corners
 
     Args:
@@ -928,7 +894,7 @@ def get_bounds_zoom(map, bounds, inside=True, size=[960,400], padding=[0,0]): #i
     #bounds is min_corner max_corner lon,lat
     #size = size=padding
     #boundsSize = toBounds(this.project(se, zoom), this.project(nw, zoom)).getSize()
-    current_zoom = map.zoom
+    current_zoom = map_canvas.zoom
     nw = (bounds.min_corner[0], bounds.max_corner[1])
     se = (bounds.max_corner[0], bounds.min_corner[1])
     se_proj = project(se,current_zoom)
@@ -951,15 +917,15 @@ def get_bounds_zoom(map, bounds, inside=True, size=[960,400], padding=[0,0]): #i
 
     #snap? could add later
 
-    return max(map.min_zoom, min(map.max_zoom, zoom))
+    return max(map_canvas.min_zoom, min(map_canvas.max_zoom, zoom))
 
 
 
 # ----------------------------------------------------------------------
 
 def render_point_ipyleaflet(current_point,
-                        point_popup_properties, coord, point_radius,
-                        point_color, map):
+                            point_popup_properties, coord, point_radius,
+                            point_color, map_canvas):
     """Renders a point to the ipyleaflet map
         Args:
         current_point (point): Current point of the trajectory
@@ -986,14 +952,14 @@ def render_point_ipyleaflet(current_point,
     popup_msg = HTML()
     popup_msg.value = popup_point
     marker.popup = popup_msg
-    map.add_layer(marker)
+    map_canvas.add_layer(marker)
 
 # ----------------------------------------------------------------------
 
 #todo should we add zoom parameter?
 def render_trajectories_ipyleaflet(trajectories,
                                #common arguments
-                               map = None,
+                               map_canvas = None,
                                obj_ids = [],
                                #\/format [minLon, maxLon, minLat, maxLat]
                                map_bbox = None,
@@ -1040,7 +1006,7 @@ def render_trajectories_ipyleaflet(trajectories,
     if not trajectories: #nothing to render
         return
 
-    if map == None:
+    if map_canvas == None:
         basemap = ipl.basemaps.CartoDB.DarkMatter #added
         if tiles.startswith('http://') or tiles.startswith('https://'):
             basemap = dict(url=tiles,
@@ -1087,13 +1053,13 @@ def render_trajectories_ipyleaflet(trajectories,
         #   basemap = ipl.basemaps.Strava.Water
         #   basemap = ipl.basemaps.Strava.Winter
 
-        map = ipl.Map(basemap=basemap, scroll_wheel_zoom=True, max_zoom=max_zoom)#changed #should we support disable scorlling?
+        map_canvas = ipl.Map(basemap=basemap, scroll_wheel_zoom=True, max_zoom=max_zoom)#changed #should we support disable scorlling?
 
-        map.layout.width = '960px' #required to get fit bounds to work right #todo should be a parameter
-        map.layout.height = '400px'
+        map_canvas.layout.width = '960px' #required to get fit bounds to work right #todo should be a parameter
+        map_canvas.layout.height = '400px'
 
         if show_scale:
-            map.add_control(ipl.ScaleControl(position='bottomleft'))
+            map_canvas.add_control(ipl.ScaleControl(position='bottomleft'))
 
     for i, trajectory in enumerate(trajectories):
         coordinates = [(point[1], point[0]) for point in trajectory]
@@ -1124,7 +1090,7 @@ def render_trajectories_ipyleaflet(trajectories,
                                     color=current_color_map.colors[0],
                                     weight = int(linewidth+0.5), opacity = 1,
                                     fill=False) #added
-                map.add_layer(line)#changed
+                map_canvas.add_layer(line)#changed
                 #fol.PolyLine(coordinates,
                 #             color=current_color_map.colors[0],
                 #             weight=linewidth, opacity=1,
@@ -1141,7 +1107,7 @@ def render_trajectories_ipyleaflet(trajectories,
                                         color=segment_color,
                                         weight = int(weight+0.5), opacity = 1,
                                         fill=False) #added
-                    map.add_layer(line)#changed
+                    map_canvas.add_layer(line)#changed
                     #fol.PolyLine([last_pos,pos],
                     #             color=segment_color, weight=weight,
                     #             opacity=1, tooltip=tooltip_str,
@@ -1160,17 +1126,17 @@ def render_trajectories_ipyleaflet(trajectories,
                 render_point_ipyleaflet(trajectory[i],
                                         point_popup_properties, c,
                                         point_radius,
-                                        current_point_color, map)
+                                        current_point_color, map_canvas)
         if show_dot:
             render_point_ipyleaflet(trajectory[-1],
                                     point_popup_properties,
                                     coordinates[-1], dot_size,
-                                    dot_color, map)
+                                    dot_color, map_canvas)
 
         if show_distance_geometry:
             render_distance_geometry_folium(distance_geometry_depth,
                                             trajectory,
-                                            map)
+                                            map_canvas)
 
     if map_bbox:
     #    map.fit_bounds([(map_bbox[2], map_bbox[0]),
@@ -1184,24 +1150,24 @@ def render_trajectories_ipyleaflet(trajectories,
         raw_bbox = compute_bounding_box(itertools.chain(*trajectories))
         center_lon = raw_bbox.min_corner[0] + ((raw_bbox.max_corner[0] - raw_bbox.min_corner[0])/2.0)
         center_lat = raw_bbox.min_corner[1] + ((raw_bbox.max_corner[1] - raw_bbox.min_corner[1])/2.0)
-        map.center = (center_lat, center_lon)#added
-        map.zoom=get_bounds_zoom(map, raw_bbox)-1 #hack
+        map_canvas.center = (center_lat, center_lon)#added
+        map_canvas.zoom=get_bounds_zoom(map_canvas, raw_bbox)-1 #hack
     #    map.fit_bounds(bounding_box_for_folium(trajectories))
 
     if save:  #saves as .html document
         if not filename:
             datetime_str = datetime.now().strftime("%Y-%m-%dT%H%M%S-%f")
             filename = "trajs-"+datetime_str+'.html'
-        embed_minimal_html(filename, views=[map], title='Widgets export')
+        embed_minimal_html(filename, views=[map_canvas], title='Widgets export')
     if show:
-        display(map)
-    return map
+        display(map_canvas)
+    return map_canvas
 #todo look into deckgl and tripslayer and mapbox.
 # ----------------------------------------------------------------------
 
 
 def render_trajectories_bokeh(trajectories,
-                              map = None,
+                              map_canvas = None,
                               obj_ids = [],
                               line_color = '',
                               show_lines = True,
@@ -1272,7 +1238,7 @@ def render_trajectories_bokeh(trajectories,
 #TODO could implement show distance geometry
 def render_trajectories_cartopy(trajectories,
                                 #common arguments
-                                map = None,
+                                map_canvas = None,
                                 obj_ids = [],
                                 map_bbox = [],
                                 show_lines=True,
@@ -1346,15 +1312,15 @@ def render_trajectories_cartopy(trajectories,
         else:
            color_maps.append(hue_gradient_cmap(hash_short_md5(trajectory[0].object_id)))
 
-    if map == None:
-        (map, map_actors) = mapmaker(domain='terrestrial',
+    if map_canvas == None:
+        (map_canvas, map_actors) = mapmaker(domain='terrestrial',
                                      map_name='custom',
                                      map_bbox=map_bbox,
                                      map_projection = map_projection)
 
     #color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1)
     #15 and .8 below accounts for differeing units in folium and cartopy
-    paths.draw_traffic(traffic_map = map,
+    paths.draw_traffic(traffic_map = map_canvas,
                        trajectory_iterable = trajectories,
                        color_map = color_maps,
                        color_scale = color_scale,
@@ -1375,7 +1341,7 @@ def render_trajectories_cartopy(trajectories,
         else:
             datetime_str = datetime.now().strftime("%Y-%m-%dT%H%M%S-%f")
             plt.savefig("trajs-"+datetime_str+".png")
-    return map
+    return map_canvas
 
 # ----------------------------------------------------------------------
 
