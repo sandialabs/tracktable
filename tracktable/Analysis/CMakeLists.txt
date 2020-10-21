@@ -1,6 +1,6 @@
 # -*- Mode: cmake; -*-
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -58,7 +58,7 @@ set( Detail_HEADERS
   detail/transfer_point_coordinates.h
 )
 
-#this adds the project to Visual Studio on Windows so the files are 
+#this adds the project to Visual Studio on Windows so the files are
 # visible without creating a build command
 add_custom_target( TracktableAnalysis
   SOURCES
@@ -66,7 +66,7 @@ add_custom_target( TracktableAnalysis
   ${Detail_HEADERS}
 )
 
-#This puts the header files under a separate folder in Visual Studio 
+#This puts the header files under a separate folder in Visual Studio
 source_group ("Header Files\\Detail" FILES ${Detail_HEADERS})
 
 if (BUILD_TESTING)

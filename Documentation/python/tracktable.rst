@@ -14,6 +14,7 @@ Submodules
     tracktable.filter
     tracktable.info
     tracktable.io
+    tracktable.lib
     tracktable.render
     tracktable.script_helpers
     tracktable.source

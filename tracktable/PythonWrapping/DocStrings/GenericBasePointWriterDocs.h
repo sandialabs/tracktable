@@ -42,7 +42,7 @@ const char* GenericBasePointWriterDocString =
     "written. \n"
     "\n"
     "Attributes: \n"
-    "   write_header (bool): Flag to write a header. The header string describes the contents of a point: coordinate\n"
+    "   write_header (bool): Flag to write a header. The header string describes the contents of a point: coordinate"
     "       system, properties (if any), number of coordinates.  By default it will be written at the beginning of a sequence of points.\n "
     "   output (object): Python object to write to\n"
     "   field_delimiter (str): Designated character for delimiting fields (Default: whitespace) \n"
