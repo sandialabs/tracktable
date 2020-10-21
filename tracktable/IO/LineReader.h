@@ -166,12 +166,15 @@ protected:
 
     /// Instantiate an empty reader iterator
     LineReaderIterator()
-      : Stream(0)
+      : Stream(0),
+        Counter(0)
       { }
 
     /// Copy contructor, create a line reader iterator with a copy of a `std::basic_istream`
     LineReaderIterator(istream_type* stream)
-      : Stream(stream)
+      : Stream(stream),
+        Counter(0),
+        Value("")
       {
         // When first constructed, the stream has not been read at
         // all. This corresponds to an iterator state before the
@@ -179,13 +182,14 @@ protected:
         // the first record.
         if (stream)
           {
-          this->operator++();
+            this->operator++();
           }
       }
 
     /// Copy contructor, create a line reader iterator with a copy of another
     LineReaderIterator(LineReaderIterator const& other)
       : Stream(other.Stream),
+        Counter(other.Counter),
         Value(other.Value)
       {
       }
@@ -230,12 +234,15 @@ protected:
      */
     LineReaderIterator& operator++()
       {
-      assert(this->Stream != NULL);
-      if (!getline(*this->Stream, this->Value))
-        {
-        this->Stream = NULL;
-        }
-      return *this;
+        if (!getline(*this->Stream, this->Value))
+          {
+            this->Stream = NULL;
+          }
+        else 
+          {
+            TRACKTABLE_LOG(tracktable::log::debug) << "Read Line #" << ++(this->Counter);
+          }
+        return *this;
       }
 
     /** Advance the iterator to the next line.
@@ -259,7 +266,7 @@ protected:
     bool operator==(LineReaderIterator const& other) const
       {
         return (this->Stream == other.Stream &&
-                this->Value == other.Value);
+                this->get_value() == other.get_value());
       }
 
     /** Check whether two iterators are unequal.
@@ -272,9 +279,26 @@ protected:
         return ( !(*this == other) );
       }
 
+    /** Get the stored value
+    *
+    * This is to handle the case where the stream is NULL
+    * but there wasn't a new line at the end of the file.
+    * In that case we return an empty value so that 
+    * comparisons evaluate properly.
+    *
+    * @return Value unless the Stream is Null,
+    * in which case we return an empty value
+    */
+    value_type get_value() const 
+    {
+        if (this->Stream == NULL) return "";
+        return this->Value;
+    }
+
   public:
     istream_type* Stream;
     value_type Value;
+    int Counter;
   };
 
 public:
