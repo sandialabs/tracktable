@@ -72,7 +72,9 @@ public:
   typedef typename value_type::value_type       char_type;
 
   /// Instantiate a default SkipCommentsReader
-  SkipCommentsReader() : CommentCharacter("#")
+  SkipCommentsReader() 
+    : CommentCharacter("#"), 
+      NumLinesToSkip(0)
     {
     }
 
@@ -83,7 +85,8 @@ public:
   SkipCommentsReader(const SkipCommentsReader& other)
     : InnerBegin(other.InnerBegin),
       InnerEnd(other.InnerEnd),
-      CommentCharacter(other.CommentCharacter)
+      CommentCharacter(other.CommentCharacter),
+      NumLinesToSkip(other.NumLinesToSkip)
     {
     }
 
@@ -96,9 +99,24 @@ public:
   SkipCommentsReader(inner_iterator_type const& start, inner_iterator_type const& finish, std::string const& comment="#")
     : InnerBegin(start),
       InnerEnd(finish),
-      CommentCharacter(comment)
+      CommentCharacter(comment),
+      NumLinesToSkip(0)
     {
     }
+
+  /** Instantiate a reader with a start and finish points along with number of header lines to skip
+  *
+  * @param [in] start Iterator to start from
+  * @param [in] finish Iterator to end at
+  * @param [in] skip Number of header lines to skip
+  */
+  SkipCommentsReader(inner_iterator_type const& start, inner_iterator_type const& finish, int const& skip)
+      : InnerBegin(start),
+      InnerEnd(finish),
+      CommentCharacter("#"),
+      NumLinesToSkip(skip)
+  {
+  }
 
   /// Destructor
   virtual ~SkipCommentsReader()
@@ -131,6 +149,30 @@ public:
     return this->CommentCharacter;
   }
 
+  /** Specify number of header lines to skip
+  *
+  * In the case where headers are not delimited with a comment
+  * character we allow the user to specify how many lines are 
+  * skipped at the beginning of a file.
+  *
+  * @param [in] skips Number of lines to skip
+  */
+  void set_skip_n_lines(int const& skips)
+  {
+    this->NumLinesToSkip = skips;
+  }
+
+  /** Retrieve number of header lines to skip.
+  *
+  * This function invalidates any outstanding iterators.
+  *
+  * @return Current value of number of lines to skip
+  */
+  int const& num_skips() const
+  {
+    return this->NumLinesToSkip;
+  }
+
   /** Assign a SkipCommentsReader to the value of another.
    *
    * @param [in] other SkipCommentsReader to assign value of
@@ -141,6 +183,7 @@ public:
       this->InnerBegin = other.InnerBegin;
       this->InnerEnd = other.InnerEnd;
       this->CommentCharacter = other.CommentCharacter;
+      this->NumLinesToSkip = other.NumLinesToSkip;
       return *this;
     }
 
@@ -155,7 +198,8 @@ public:
     {
       return (this->InnerBegin == other.InnerBegin &&
               this->InnerEnd == other.InnerEnd &&
-              this->CommentCharacter == other.CommentCharacter);
+              this->CommentCharacter == other.CommentCharacter &&
+              this->NumLinesToSkip == other.NumLinesToSkip);
     }
 
   /** Check whether two SkipCommentsReader are unequal.
@@ -184,6 +228,7 @@ private:
   inner_iterator_type InnerBegin;
   inner_iterator_type InnerEnd;
   std::string         CommentCharacter;
+  int                 NumLinesToSkip;
 
 protected:
   /*
@@ -201,21 +246,26 @@ protected:
     typedef typename inner_iterator_type::value_type::value_type char_type;
 
     /// Instantiate an default SkipCommentsIterator
-    SkipCommentsIterator() : CommentCharacter("#")
-      { }
+    SkipCommentsIterator()
+      : CommentCharacter("#"),
+        NumLinesToSkip(0)
+      {}
 
   /** Instantiate a reader with a start and finish points along with a comment delimter
    *
    * @param [in] Begin Iterator to start from
    * @param [in] End Iterator to end at
    * @param [in] Comment Character signifying a comment
+   * @param [in] Number of header lines to skip
    */
-    SkipCommentsIterator(inner_iterator_type Begin, inner_iterator_type End, std::string const& Comment)
+    SkipCommentsIterator(inner_iterator_type Begin, inner_iterator_type End, std::string const& Comment, int const& Skips)
       : InnerIterator(Begin),
         InnerEnd(End),
-        CommentCharacter(Comment)
+        CommentCharacter(Comment),
+        NumLinesToSkip(Skips)
       {
         // Position the iterator on the first string to be returned.
+        std::advance(this->InnerIterator, this->NumLinesToSkip);
         this->_advance_to_valid_string();
       }
 
@@ -226,8 +276,9 @@ protected:
     SkipCommentsIterator(SkipCommentsIterator const& other)
       : InnerIterator(other.InnerIterator),
         InnerEnd(other.InnerEnd),
-        CommentCharacter(other.CommentCharacter)
-      { }
+        CommentCharacter(other.CommentCharacter),
+        NumLinesToSkip(other.NumLinesToSkip)
+      {}
 
     /// Destructor
     ~SkipCommentsIterator()
@@ -243,6 +294,7 @@ protected:
         this->InnerIterator = other.InnerIterator;
         this->InnerEnd = other.InnerEnd;
         this->CommentCharacter = other.CommentCharacter;
+        this->NumLinesToSkip = other.NumLinesToSkip;
         return *this;
       }
 
@@ -271,7 +323,9 @@ protected:
     SkipCommentsIterator& operator++()
       {
         assert(this->InnerIterator != this->InnerEnd);
+       
         ++ (this->InnerIterator);
+
         this->_advance_to_valid_string();
         return *this;
       }
@@ -283,6 +337,7 @@ protected:
     SkipCommentsIterator& operator++(int)
       {
         SkipCommentsIterator prev(*this);
+        
         this->operator++();
         return prev;
       }
@@ -315,6 +370,7 @@ protected:
     inner_iterator_type InnerIterator;
     inner_iterator_type InnerEnd;
     std::string         CommentCharacter;
+    int                 NumLinesToSkip;
 
     /** @internal
     */
@@ -324,6 +380,7 @@ protected:
         while (this->_string_is_comment(next_string) &&
                this->InnerIterator != this->InnerEnd)
           {
+          
           ++(this->InnerIterator);
           next_string = this->operator*();
           }
@@ -370,7 +427,7 @@ public:
    */
   iterator begin() const
     {
-      return SkipCommentsIterator(this->InnerBegin, this->InnerEnd, this->CommentCharacter);
+      return SkipCommentsIterator(this->InnerBegin, this->InnerEnd, this->CommentCharacter, this->NumLinesToSkip);
     }
 
   /** Get an iterator pointing past the end of the sequence
@@ -379,7 +436,7 @@ public:
    */
   iterator end() const
     {
-      return SkipCommentsIterator(this->InnerEnd, this->InnerEnd, this->CommentCharacter);
+      return SkipCommentsIterator(this->InnerEnd, this->InnerEnd, this->CommentCharacter, 0);
     }
 
   /** Get an iterator pointing to the beginning of the stream

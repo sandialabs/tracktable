@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -65,6 +65,16 @@ add_executable(test_point_from_tokens_reader
   test_point_from_tokens_reader.cpp
 )
 set_property(TARGET test_point_from_tokens_reader       PROPERTY FOLDER "Tests")
+
+add_executable(test_reader_skip_headers
+  test_reader_skip_headers.cpp
+)
+set_property(TARGET test_reader_skip_headers       PROPERTY FOLDER "Tests")
+
+add_executable(test_reader_timestamp_formats
+  test_reader_timestamp_formats.cpp
+)
+set_property(TARGET test_reader_timestamp_formats       PROPERTY FOLDER "Tests")
 
 add_executable(test_integrated_point_reader_traj_lonlat
   test_integrated_point_reader_traj_lonlat.cpp
@@ -158,6 +168,16 @@ target_link_libraries(test_point_fields
   )
 
 target_link_libraries(test_point_from_tokens_reader
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
+target_link_libraries(test_reader_skip_headers
+  TracktableCore
+  ${Boost_LIBRARIES}
+)
+
+target_link_libraries(test_reader_timestamp_formats
   TracktableCore
   ${Boost_LIBRARIES}
 )
@@ -264,6 +284,15 @@ add_test(
   COMMAND test_comment_reader 15 ${Tracktable_SOURCE_DIR}/TestData/Points/PointsWithComments.csv
 )
 
+add_test(
+  NAME C_SkipHeadersReader
+  COMMAND test_reader_skip_headers 4 14 ${Tracktable_SOURCE_DIR}/TestData/Points/PointsWithSkippableHeaders.csv
+)
+
+add_test(
+  NAME C_TimestampFormatsReader
+  COMMAND test_reader_timestamp_formats ${Tracktable_SOURCE_DIR}/TestData/Timestamps/
+)
 
 add_test(
   NAME C_StringTokenizingReader
