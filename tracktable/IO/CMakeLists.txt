@@ -30,15 +30,21 @@
 
 # This is tracktable/C++/IO/CMakeLists.txt
 
+include(GenerateExportHeader)
+
 include_directories(
-  ${Tracktable_SOURCE_DIR}
+  ${PROJECT_SOURCE_DIR}
+  ${PROJECT_BINARY_DIR}
   ${Boost_INCLUDE_DIR}
 )
 
-set( IO_SRCS
-#  DelimitedTextPointReader.cpp
-  )
+if (BUILD_TESTING)
+  add_subdirectory(Tests)
+endif (BUILD_TESTING)
 
+set( IO_SOURCES
+  KmlOut.cpp
+)
 set( IO_Headers
   GenericReader.h
   LineReader.h
@@ -51,6 +57,7 @@ set( IO_Headers
   TokenWriter.h
   TrajectoryReader.h
   TrajectoryWriter.h
+  KmlOut.h
 )
 
 set ( IO_Detail_HEADERS
@@ -65,30 +72,50 @@ set ( IO_Detail_HEADERS
   detail/WriteTimestamp.h
 )
 
-# add_library( TracktableIO
-#   ${IO_SRCS}
-# )
 
-#this adds the project to Visual Studio on Windows so the files are 
+#this adds the project to Visual Studio on Windows so the files are
 # visible without creating a build command
-add_custom_target( TracktableIO
-  SOURCES
+add_library( TracktableIO
+  ${IO_SOURCES}
   ${IO_Headers}
   ${IO_Detail_HEADERS}
 )
 
-#This puts the header files under a separate folder in Visual Studio 
+target_link_libraries( TracktableIO
+   TracktableCore
+   ${Boost_LIBRARIES}
+)
+
+set_property(
+  TARGET TracktableIO
+  PROPERTY SOVERSION ${SO_VERSION}
+  )
+
+set_property(
+  TARGET TracktableIO
+  PROPERTY VERSION ${TRACKTABLE_VERSION}
+  )
+
 source_group ("Header Files\\Detail" FILES ${IO_Detail_HEADERS})
 
-# target_link_libraries( TracktableIO
-#   TracktableCore
-#   ${Boost_LIBRARIES}
-# )
+generate_export_header( TracktableIO
+   BASE_NAME TRACKTABLE_IO
+   EXPORT_MACRO_NAME TRACKTABLE_IO_EXPORT
+   STATIC_DEFINE TRACKTABLE_IO_STATIC_LIBRARY
+   EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/tracktable/IO/TracktableIOWindowsHeader.h
+   )
 
+if (APPLE)
+    set(CMAKE_INSTALL_BINDIR bin)
+    set(CMAKE_INSTALL_LIBDIR lib)
+endif ()
 
-if (BUILD_TESTING)
-  add_subdirectory(Tests)
-endif (BUILD_TESTING)
+install(
+  TARGETS TracktableIO
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
 
 install(
   FILES ${IO_Headers}
@@ -100,9 +127,3 @@ install(
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/IO/detail
 )
 
-# install(
-#   TARGETS TracktableIO
-#   RUNTIME DESTINATION bin
-#   LIBRARY DESTINATION lib
-#   ARCHIVE DESTINATION lib
-# )
