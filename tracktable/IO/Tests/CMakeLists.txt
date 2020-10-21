@@ -121,7 +121,10 @@ add_executable(test_trajectory_reader
 )
 set_property(TARGET test_trajectory_reader              PROPERTY FOLDER "Tests")
 
-
+add_executable(test_kml
+  test_kml.cpp
+)
+set_property(TARGET test_kml              PROPERTY FOLDER "Tests")
 # ----------------------------------------------------------------------
 
 target_link_libraries(test_comment_reader
@@ -200,6 +203,10 @@ target_link_libraries(test_trajectory_reader
   ${Boost_LIBRARIES}
   )
 
+target_link_libraries(test_kml
+  TracktableIO
+  ${Boost_LIBRARIES}
+  )
 # ------------------------------
 
 add_test(
@@ -278,3 +285,7 @@ add_test(
   COMMAND test_trajectory_reader
   )
 
+  add_test(
+  NAME C_Kml
+  COMMAND test_kml
+  )
