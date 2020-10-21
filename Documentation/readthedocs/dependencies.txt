@@ -1,2 +1,3 @@
 breathe==4.13.0
 sphinx==2.0.1
+folium==0.11.0

@@ -69,21 +69,17 @@
 namespace tracktable {
 
 /**
- * @class Trajectory
+ * \class Trajectory
  *
- * @brief Ordered sequence of points
+ * \brief Ordered sequence of points
  *
- * This class is the heart of most of what Tracktable does. It
+ * This class is the heart of most of what Tracktable does.  It
  * implements an ordered sequence of TrajectoryPoint objects, each of
- * which has an ID, coordinates and a timestamp. Those compose a
+ * which has an ID, coordinates and a timestamp.  Those compose a
  * trajectory.
  *
  * We provide accessors so that you can treat a Trajectory as if it
- * were a `std::vector`.
- *
- * Convenient typedefs, for template parameters and types from internal storage are provided
- * These typedefs make this class look almost exactly like a
- * std::vector so that you can cleanly use it as such with the C++ STL.
+ * were a std::vector.
  */
 
 template< class PointT >
@@ -92,6 +88,11 @@ class Trajectory
   friend class boost::serialization::access;
 
 public:
+  /// Convenient aliases for template parameters and types from internal storage
+  //
+  // These typedefs make this class look almost exactly like a
+  // std::vector so that you can cleanly use it as such with the C++
+  // STL.
   typedef PointT point_type;
   typedef std::vector<PointT> point_vector_type;
   typedef typename point_vector_type::iterator iterator;
@@ -104,36 +105,33 @@ public:
   typedef typename point_vector_type::reference reference;
   typedef typename point_vector_type::const_reference const_reference;
 
-  /** Instantiate an empty trajectory with a UUID
-   *
-   * @param [in] generate_uuid Flag to generate a UUID, default is `true`
+  /** Instantiate an empty trajectory
    */
+
   Trajectory(bool generate_uuid=true): UUID() {
     if (generate_uuid)
       this->set_uuid();
   }
 
-  /// Destructor for a trajectory
   ~Trajectory() { }
 
-  /** Copy contructor, create a Trajectory with a copy of another
-   *
-   * @param [in] other Trajectory to copy from
-   */
-  Trajectory(const Trajectory& other) :
-      UUID(other.UUID),
-      Points(other.Points),
-      Properties(other.Properties)
-      { }
+  /// Create a trajectory a copy of another
+
+Trajectory(const Trajectory& other) :
+    UUID(other.UUID),
+    Points(other.Points),
+    Properties(other.Properties)
+    {
+    }
 
   /** Create a new trajectory with pre-specified length
    *
-   * Create a new trajectory with n elements. You may also supply a
+   * Create a new trajectory with n elements.  You may also supply a
    * point that will be copied into each element.
    *
-   * @param [in] n             Length of the trajectory
-   * @param [in] initial_value Point to be used to fill the new vector
-   * @param [in] generate_uuid Flag to generate a UUID for the trajectory
+   * @param[in] n             Length of the trajectory
+   * @param[in] initial_value Point to be used to fill the new vector
+   * @param[in] generate_uuid Flag to generate a UUID for the trajectory
    */
 
   Trajectory(size_type n, point_type initial_value=point_type(), bool generate_uuid=true)
@@ -148,9 +146,9 @@ public:
    *
    * Create a new trajectory by copying points from [first, last).
    *
-   * @param [in] first   Iterator pointing to the first point for the new trajectory
-   * @param [in] last    Iterator pointing past the last point for the new trajectory
-   * @param [in] generate_uuid Flag to generate a UUID for the trajectory
+   * @param[in] first   Iterator pointing to the first point for the new trajectory
+   * @param[in] last    Iterator pointing past the last point for the new trajectory
+   * @param[in] generate_uuid Flag to generate a UUID for the trajectory
    */
   template<class InputIterator>
   Trajectory(InputIterator first, InputIterator last, bool generate_uuid=true)
@@ -162,14 +160,6 @@ public:
       this->compute_current_features(0);
     }
 
-  /** Create a new trajectory from a range of points
-   *
-   * Create a new trajectory by copying points from [first, last).
-   *
-   * @param [in] first   Iterator pointing to the first point for the new trajectory
-   * @param [in] last    Iterator pointing past the last point for the new trajectory
-   * @param [in] generate_uuid Flag to generate a UUID for the trajectory
-   */
   template<class InputIterator>
   Trajectory(InputIterator first, InputIterator last, const Trajectory& original)
      : UUID(),
@@ -180,11 +170,7 @@ public:
        this->compute_current_features(0);
      }
 
-  /** Assign a Trajectory to the value of another.
-   *
-   * @param [in] other Trajectory to assign value of
-   * @return Trajectory with the new assigned value
-   */
+  /// Make this trajectory a copy of another
   Trajectory& operator=(const Trajectory& other)
     {
       this->UUID = other.UUID;
@@ -193,10 +179,7 @@ public:
       return *this;
     }
 
-  /** Make this trajectory a clone of another
-   *
-   * @return The cloned trajectory
-   */
+    /// Make this trajectory a clone of another
   Trajectory& clone() const
   {
       return *(new Trajectory(*this));
@@ -204,10 +187,9 @@ public:
 
   /** Return the start time if available.
    *
-   * @return
-   *    If there are any points in the trajectory this method will return
-   *    the timestamp on the first point. If not, it will return an
-   *    invalid Timestamp.
+   * If there are any points in the trajectory this method will return
+   * the timestamp on the first point.  If not, it will return an
+   * invalid Timestamp.
    */
   Timestamp start_time() const
     {
@@ -223,10 +205,9 @@ public:
 
   /** Return the end time if available.
    *
-   * @return
-   *    If there are any points in the trajectory this method will return
-   *    the timestamp on the last point. If not, it will return an
-   *    invalid Timestamp.
+   * If there are any points in the trajectory this method will return
+   * the timestamp on the last point.  If not, it will return an
+   * invalid Timestamp.
    */
   Timestamp end_time() const
     {
@@ -243,7 +224,7 @@ public:
   /** Return the duration, if available.
   *
   * If there are any points in the trajectory, this method will return
-  * the duration of the trajectory. If not it will return a duration of 0.
+  * the duration of the trajectory.  If not it will return a duration of 0.
   *
   * @return the difference of end_time and start_time or 0 if no points.
   */
@@ -260,9 +241,7 @@ public:
 	  }
   }
 
-  /** Get the UUID (RFC 4122 or variant) of the trajectory.
-   *
-   * @return The UUID of the trajectory
+  /** Return the UUID (RFC 4122 or variant) of the trajectory.
    */
   const uuid_type& uuid() const {
     return this->UUID;
@@ -284,9 +263,8 @@ public:
 
   /** Return the ID of the moving object.
    *
-   * @return
-   *    If there are any points in the trajectory, return the object ID
-   *    of the first one. Otherwise return the string "(empty)".
+   * If there are any points in the trajectory, return the object ID
+   * of the first one.  Otherwise return the string "(empty)".
    */
   std::string object_id() const
     {
@@ -302,14 +280,13 @@ public:
 
   /** Return a human-readable ID for the trajectory.
    *
-   * @note
-   *    If you have multiple trajectories with the same object ID,
-   *    start time and end time, this identifier will not be unique.
+   * Return a mostly-unique ID for the trajectory incorporating its object
+   * ID, start time and end time.  If the trajectory is empty then we
+   * return the string "(empty)".
    *
-   * @return
-   *    a mostly-unique ID for the trajectory incorporating its object
-   *    ID, start time and end time. If the trajectory is empty then we
-   *    return the string "(empty)".
+   * Note that if you have multiple trajectories with the same object ID,
+   * start time and end time, this identifier will not be unique.
+   *
    */
   std::string trajectory_id() const
     {
@@ -334,7 +311,7 @@ public:
   /**
    * @name Methods related to properties
    */
-  ///@{
+  //@{
 
   /// Set a named property with a variant value (let the caller handle the type)
   void set_property(std::string const& name, PropertyValueT const& value)
@@ -342,69 +319,63 @@ public:
       ::tracktable::set_property(this->Properties, name, value);
     }
 
-  /** Retrieve a named property with checking
-   *
-   * @param [in] name Name of property to retrieve
-   * @param [in] ok If specified, this will be set to true or false as the property is found/not found
-   * @return Property as a `boost::variant`
-   */
+  /// Retrieve a named property with checking
+  //
+  // \param name Name of property to retrieve
+  // \param ok If specified, this will be set to true or false as the property is found/not found
+  // \return Property as a boost::variant
   PropertyValueT property(std::string const& name, bool *ok=0) const
     {
       return ::tracktable::property(this->Properties, name, ok);
     }
 
-  /** Retrieve a named property without safety checking
-   *
-   * It is the caller's responsibility to know whether the requested
-   * property actually exists when using this function.
-   *
-   * @param [in] name Name of property to retrieve
-   * @return Property as a `boost::variant`
-   */
+  /// Retrieve a named property without safety checking
+  //
+  // It is the caller's responsibility to know whether the requested
+  // property actually exists when using this function.
+  //
+  // \param name Name of property to retrieve
+  // \return Property as a boost::variant
   PropertyValueT property_without_checking(std::string const& name) const
     {
       bool ok;
       return ::tracktable::property(this->Properties, name, &ok);
     }
 
-  /** Safely retrieve a named property with a string value
-   *
-   * @param [in] name Name of property to retrieve
-   * @param [in] ok If specified, this will be set to true or false as the property is found/not found
-   * @return Property as a std::string
-   */
+  /// Safely retrieve a named property with a string value
+  //
+  // \param name Name of property to retrieve
+  // \param ok If specified, this will be set to true or false as the property is found/not found
+  // \return Property as a std::string
   std::string string_property(std::string const& name, bool *ok=0) const
     {
       return ::tracktable::string_property(this->Properties, name, ok);
     }
 
-  /** Safely retrieve a named property with a floating-point value
-   *
-   * @param [in] name Name of property to retrieve
-   * @param [in] ok If specified, this will be set to true or false as the property is found/not found
-   * @return Property as a double
-   */
+  /// Safely retrieve a named property with a floating-point value
+  //
+  // \param name Name of property to retrieve
+  // \param ok If specified, this will be set to true or false as the property is found/not found
+  // \return Property as a double
   double real_property(std::string const& name, bool *ok=0) const
     {
       return ::tracktable::real_property(this->Properties, name, ok);
     }
 
-  /** Safely retrieve a named property with a timestamp value
-   *
-   * @param [in] name Name of property to retrieve
-   * @param [in] ok If specified, this will be set to true or false as the property is found/not found
-   * @return Property as a timestamp
-   */
+  /// Safely retrieve a named property with a timestamp value
+  //
+  // \param name Name of property to retrieve
+  // \param ok If specified, this will be set to true or false as the property is found/not found
+  // \return Property as a timestamp
   Timestamp timestamp_property(std::string const& name, bool *ok=0) const
     {
       return ::tracktable::timestamp_property(this->Properties, name, ok);
     }
 
-  /** Check whether a property is present
-   *
-   * @param [in] name Name of desired property
-   * @return True if present, false if not
-   */
+  /// Check whether a property is present
+  //
+  // \param name Name of desired property
+  // \return True if present, false if not
   bool has_property(std::string const& name) const
     {
       return ::tracktable::has_property(this->Properties, name);
@@ -416,12 +387,6 @@ public:
    * their own access to the property map.
    */
   PropertyMap const& __properties() const { return this->Properties; }
-
-    /** @internal
-   *
-   * This method is for use by the Python wrappers that can provide
-   * their own access to the property map.
-   */
   PropertyMap& __non_const_properties() { return this->Properties; }
 
   /** @internal
@@ -431,7 +396,7 @@ public:
    */
   void __set_properties(PropertyMap const& props) { this->Properties = props; }
 
-  ///@}
+  //@}
   // ************************************************************
   // *** END doxygen group for property related methods
   // ************************************************************
@@ -444,29 +409,26 @@ public:
    * @name Methods that allow a Trajectory to be used like std::vector
    *
    * Here are all the methods that make this container usable
-   * just like a `std::vector`. There's no magic here, all we do is
+   * just like a std::vector.  There's no magic here -- all we do is
    * forward to the Points vector.
    */
-  ///@{
+  //@{
 
-  /**
-   * @return the length of the trajectory in points.
+  /** Return the length of the trajectory in points.
    */
   size_type size() const
     {
       return this->Points.size();
     }
 
-  /**
-   * @return the maximum number of entries the points array can hold.
+  /** Return the maximum number of entries the points array can hold.
    */
   size_type max_size() const
     {
       return this->Points.max_size();
     }
 
-  /**
-   * @return the current allocated capacity of the points array.
+  /** Return the current allocated capacity of the points array.
    */
   size_type capacity() const
     {
@@ -475,16 +437,15 @@ public:
 
   /** Resize the points array to contain exactly the number of entries requested.
    *
-   * @param [in] new_size Desired length of the vector
-   * @param [in] default_value Value for newly allocated entries
+   * \param new_size Desired length of the vector
+   * \param default_value Value for newly allocated entries
    */
   void resize(size_type new_size, point_type default_value=point_type())
     {
       this->Points.resize(new_size, default_value);
     }
 
-  /**
-   * @return whether or not the trajectory is empty.
+  /** Return whether or not the trajectory is empty.
    */
   bool empty() const
     {
@@ -493,7 +454,7 @@ public:
 
   /** Preallocate enough space in the array for the specified number of entries.
    *
-   * @param [in]   n   Allocate space for this many points.
+   * @param[in]   n   Allocate space for this many points.
    */
   void reserve(size_type n)
     {
@@ -502,8 +463,8 @@ public:
 
   /** Populate a trajectory from a sequence ot points.
    *
-   * @param [in] iter_begin  Iterator pointing to first point
-   * @param [in] iter_end    Iterator pointing after last point
+   * @param[in]  iter_begin  Iterator pointing to first point
+   * @param[in]  iter_end    Iterator pointing after last point
    */
   template<typename iter_type>
   void assign(iter_type iter_begin, iter_type iter_end)
@@ -519,8 +480,7 @@ public:
    * This method does not check whether the UUID's of the trajectories are equal.
    * It only checks the points of the trajectories.
    *
-   * @param [in] other Trajectory for comparison
-   * @return Boolean indicating equivalency
+   * \param other Trajectory for comparison
    */
 
   bool operator==(const Trajectory& other) const
@@ -531,8 +491,7 @@ public:
 
   /** Check whether two trajectories are unequal.
    *
-   * @param [in] other Trajectory for comparison
-   * @return Boolean indicating equivalency
+   * \param other Trajectory for comparison
    */
 
   bool operator!=(const Trajectory& other) const
@@ -542,12 +501,11 @@ public:
 
   /** Return a given point from the trajectory.
    *
-   * @note
-   *    It is the caller's responsibility to ensure
-   *    that a valid index has been requested.
+   * Return the requested point from the trajectory.  It is the
+   * caller's responsibility to ensure that a valid index has been
+   * requested.
    *
-   * @param [in] i Index of desired point
-   * @return The requested point from the trajectory.
+   * \param i Index of desired point
    */
   point_type const& operator[](size_type i) const
     {
@@ -556,17 +514,14 @@ public:
 
   /** Return a mutable reference to a given point in the trajectory.
    *
-   * @note
-   *    As with the const version of operator[], it is the caller's
-   *    responsibility to ensure that a valid index has been requested.
+   * As with the const version of operator[], it is the caller's
+   * responsibility to ensure that a valid index has been requested.
    *
-   * @note
-   *    If you change the point's coordinates you are responsible
-   *    for calling `trajectory->compute_current_length(i)` to update the
-   *    points' `current_length` parameter.
+   * \note If you change the point's coordinates you are responsible
+   * for calling trajectory->compute_current_length(i) to update the
+   * points' current_length parameter.
    *
-   * @param [in] i Index of desired point
-   * @return The requested point from the trajectory.
+   * \param i Index of desired point
    */
   point_type& operator[](size_type i)
     {
@@ -580,9 +535,9 @@ public:
    * we can be reasonable sure that suitable compilers are available
    * in all environments that we care about.
    *
-   * @param [in] pt Point to append
+   * \param pt Point to append
    *
-   * @note Why do we have this alias?
+   * \note Why do we have this alias?
    */
   void push_back(point_type const& pt)
     {
@@ -592,27 +547,20 @@ public:
 
   /** Retrieve the point at a given index with bounds checking.
    *
-   * Retrieve a point. Unlike operator[], `at()` does bounds checking
+   * Retrieve a point.  Unlike operator[], at() does bounds checking
    * and will throw an exception if you ask for a point outside the
-   * range [0, num_points].
+   * range [0, num_points).
    *
    * This version of the function will be called if you try to modify
-   * the point.
-   *
-   * Example:
-   *
-   * @code
+   * the point.  For example:
    *
    * my_trajectory.at(3).set_latitude(15);
    *
-   * @endcode
+   * \note If you modify the point's coordinates, you are responsible
+   * for calling trajectory->update_current_length(i).
    *
-   * @note
-   *    If you modify the point's coordinates, you are responsible
-   *    for calling `trajectory->update_current_length(i)`.
-   *
-   * @param [in] i Which point to retrieve
-   * @return Mutable reference to the requested point
+   * @param[in] i Which point to retrieve
+   * \return Mutable reference to the requested point
    */
   point_type& at(size_type i)
     {
@@ -621,23 +569,17 @@ public:
 
   /** Retrieve the point at a given index with bounds checking.
    *
-   * Retrieve a point. Unlike operator[], `at()` does bounds checking
+   * Retrieve a point.  Unlike operator[], at() does bounds checking
    * and will throw an exception if you ask for a point outside the
-   * range [0, num_points].
+   * range [0, num_points).
    *
    * This version of the function will be called if the compiler can
-   * tell that you're not trying to modify the point.
-   *
-   * Example:
-   *
-   * @code
+   * tell that you're not trying to modify the point.  For example:
    *
    * TrajectoryPoint my_point = my_trajectory.at(3);
    *
-   * @endcode
-   *
-   * @param [in] i Which point to retrieve
-   * @return Immutable reference to the requested point
+   * @param[in] i Which point to retrieve
+   * \return Immutable reference to the requested point
    */
   point_type const& at(size_type i) const
     {
@@ -647,14 +589,13 @@ public:
   /** Remove a point from the trajectory.
    *
    * Delete the point at the specified position (specified by an
-   * iterator). The points after the one deleted will be moved up one
+   * iterator).  The points after the one deleted will be moved up one
    * spot to fill the gap.
    *
-   * @note
-   *    This operation takes linear time in the number of points in
-   *    the trajectory.
+   * \note This operation takes linear time in the number of points in
+   * the trajectory.
    *
-   * @param [in] position  Iterator pointing at the location to erase.
+   * @param[in] position  Iterator pointing at the location to erase.
    */
   iterator erase(iterator position)
     {
@@ -669,16 +610,15 @@ public:
 
   /** Remove a range of points from the trajectory.
    *
-   * Delete points from trajectories starting at `first` and ending at
-   * the point just before `last`. Points after the deleted range
+   * Delete points from trajectories starting at 'first' and ending at
+   * the point just before 'last'.  Points after the deleted range
    * will be moved up to fill the gap.
    *
-   * @note
-   *    This operation takes linear time in the number of points in
-   *    the trajectory.
+   * \note This operation takes linear time in the number of points in
+   * the trajectory.
    *
-   * @param [in] first Iterator pointing at the first point to erase
-   * @param [in] last  Iterator pointing to the location after the last point to erase
+   * @param[in] first Iterator pointing at the first point to erase
+   * @param[in] last  Iterator pointing to the location after the last point to erase
    *
    */
   iterator erase(iterator first, iterator last)
@@ -703,10 +643,10 @@ public:
 
   /** Return the first point in the trajectory.
    *
-   * @note
-   *    If you call this on an empty trajectory the behavior is undefined.
+   * \return First point in trajectory (mutable reference)
    *
-   * @return First point in trajectory (mutable reference)
+   * \note
+   * If you call this on an empty trajectory the behavior is undefined.
    */
   point_type& front()
     {
@@ -715,10 +655,10 @@ public:
 
   /** Return the (immutable) first point in the trajectory.
    *
-   * @note
-   *    If you call this on an empty trajectory the behavior is undefined.
+   * \return First point in trajectory (immutable reference)
    *
-   * @return First point in trajectory (immutable reference)
+   * \note
+   * If you call this on an empty trajectory the behavior is undefined.
    */
    point_type const& front() const
     {
@@ -727,12 +667,12 @@ public:
 
   /** Return the last point in the trajectory.
    *
-   * @note
-   *    If you call this on an empty trajectory the behavior is
-   *    undefined. Dereferencing back() on an empty trajectory will
-   *    probably crash your program.
+   * \return Last point in trajectory (mutable reference)
    *
-   * @return Last point in trajectory (mutable reference)
+   * \note
+   * If you call this on an empty trajectory the behavior is
+   * undefined.  Dereferencing back() on an empty trajectory will
+   * probably crash your program.
    */
   point_type& back()
     {
@@ -741,12 +681,12 @@ public:
 
   /** Return the (immutable) last point in the trajectory.
    *
-   * @note
-   *    If you call this on an empty trajectory the behavior is
-   *    undefined. Dereferencing back() on an empty trajectory will
-   *    probably crash your program.
+   * \return Last point in trajectory (immutable reference)
    *
-   * @return Last point in trajectory (immutable reference)
+   * \note
+   * If you call this on an empty trajectory the behavior is
+   * undefined.  Dereferencing back() on an empty trajectory will
+   * probably crash your program.
    */
    point_type const& back() const
     {
@@ -755,13 +695,11 @@ public:
 
    /** Insert a single element into the trajectory at an arbitrary index.
    *
-   * @fn Trajectory::void insert(int index, point_type const& value)
-   *
-   * Insert a point into any index in the trajectory. All points
+   * Insert a point into any index in the trajectory.  All points
    * after this location will be moved farther down.
    *
-   * @param [in]   index   Location to insert the point
-   * @param [in]   value   Point to insert
+   * @param[in]   index   Location to insert the point
+   * @param[in]   value      Point to insert
    */
    void insert(int index, point_type const& value)
    {
@@ -769,8 +707,13 @@ public:
        this->compute_current_features(std::distance(this->begin(), this->begin() + index));
    }
 
-  /**
-   * @overload Trajectory::iterator insert(iterator position, point_type const& value)
+  /** Insert a single element into the trajectory at an arbitrary position.
+   *
+   * Insert a point into any position in the trajectory.  All points
+   * after this location will be moved farther down.
+   *
+   * @param[in]   position   Location to insert the point
+   * @param[in]   value      Point to insert
    */
   iterator insert(iterator position, point_type const& value)
     {
@@ -779,8 +722,15 @@ public:
       return result;
     }
 
-  /**
-   * @overload Trajectory::void insert(iterator position, size_type n, point_type const& value)
+  /** Fill a range in the trajectory.
+   *
+   * Insert n copes of the point specified as 'value' starting at the
+   * specified 'position'.  All points after this location will be
+   * moved farther down in the trajectory.
+   *
+   * @param[in] position  Where to insert the points
+   * @param[in] n         How many points to insert
+   * @param[in] value     What point to insert
    */
   void insert(iterator position, size_type n, point_type const& value)
     {
@@ -788,8 +738,15 @@ public:
       this->compute_current_features(std::distance(this->begin(), position));
     }
 
-  /**
-   * @overload Trajectory::void insert(iterator position, InputIterator first, InputIterator last)
+  /** Insert a range of points into the trajectory.
+   *
+   * Insert all points in the range [first, last) into the trajectory.
+   * All points after this location will be moved farther down in the
+   * trajectory.
+   *
+   * @param[in] position   Where to start inserting the points
+   * @param[in] first      The first point to insert
+   * @param[in] last       The location after the last point to insert
    */
   template<class InputIterator>
   void insert(iterator position, InputIterator first, InputIterator last)
@@ -798,10 +755,6 @@ public:
       this->compute_current_features(std::distance(this->begin(), position));
     }
 
-  /** Compute the features of trajectory for a given start index
-   *
-   * @param [in] start_index Index to start computing features of points
-   */
   void compute_current_features(std::size_t start_index)
     {
       if (start_index >= this->size())
@@ -849,7 +802,7 @@ public:
     }
   }
 
-  ///@}
+  //@}
   // ************************************************************
   // *** END doxygen group for std::vector related methods
   // ************************************************************
@@ -865,11 +818,6 @@ protected:
 
 
 private:
-  /** Serialize the points and properties to an archive
-   *
-   * @param [in] ar Archive to serialize to
-   * @param [in] version Version of the archive
-   */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
@@ -1007,7 +955,7 @@ struct point_to_trajectory_distance
  * Default implementation of end_to_end_distance
  *
  * This uses tracktable::distance to compute the distance between the
- * first and last points of the trajectory. We will probably never
+ * first and last points of the trajectory.  We will probably never
  * need to override this implementation.
  */
 template<class PointT>

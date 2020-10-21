@@ -68,7 +68,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Begin RELEASE VARIABLES
 #-------------------------------------------------------------------------
 
-set(TRACKTABLE_VERSION 1.3.0)
+set(TRACKTABLE_VERSION 1.4.0)
 set(RPM_RELEASE 6)
 
 project(Tracktable LANGUAGES CXX VERSION ${TRACKTABLE_VERSION})
@@ -103,9 +103,9 @@ include(GNUInstallDirs)
 # +1 :  ? :  0 == new interface that breaks old one
 #  ? :  ? :  0 == no new interfaces, but breaks apps
 #  ? : +1 :  ? == just some internal changes, nothing breaks but might work better
-set(UNIX_SO_VERSION_CURRENT  3)
+set(UNIX_SO_VERSION_CURRENT  4)
 set(UNIX_SO_VERSION_REVISION 0)
-set(UNIX_SO_VERSION_AGE      2)
+set(UNIX_SO_VERSION_AGE      3)
 
 #-------------------------------------------------------------------------
 # End RELEASE VARIABLES
