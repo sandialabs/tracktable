@@ -52,6 +52,8 @@ add_python_test(P_ParseTimestampNoTimeZone tracktable.core.tests.parse_timestamp
 
 add_python_test(P_ParseTimestampWithTimeZone tracktable.core.tests.parse_timestamp_with_time_zone)
 
+add_python_test(P_ReaderTimestampFormats tracktable.core.tests.test_reader_timestamps "${Tracktable_SOURCE_DIR}/TestData/Timestamps/")
+
 add_python_test(P_SpeedBetween tracktable.core.tests.test_speed_between)
 
 add_python_test(P_TrajectoryTypes tracktable.core.tests.test_trajectory_types)
