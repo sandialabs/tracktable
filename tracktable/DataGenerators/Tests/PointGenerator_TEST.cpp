@@ -2,6 +2,12 @@
 
 #include <tracktable/ThirdParty/TracktableCatch2.h>
 
+using tracktable::CircularPointGenerator;
+using tracktable::ConstantSpeedPointGenerator;
+using tracktable::GridPointGenerator;
+using tracktable::MultipleGeneratorCollator;
+using tracktable::PointGenerator;
+
 using PointT = PointGenerator<tracktable::domain::terrestrial::trajectory_type::point_type>::PointT;
 // 35.0844° N, 106.6504° W
 PointT albuquerque(-106.6504, 35.0844);

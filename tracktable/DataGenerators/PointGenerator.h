@@ -10,6 +10,8 @@
 
 #define PRINT(X) std::cout << #X ": " << (X) << std::endl;
 
+namespace tracktable {
+
 /** Point Generator for terrestrial points
  * The is a basic point generator used as a base for all others.
  * It will just keep incrementing points for a stationary object forever.
@@ -494,5 +496,9 @@ class MultipleGeneratorCollator {
   std::vector<std::shared_ptr<PointGenerator<PointT>>> generators;
   std::vector<PointT> points;
 };
+
+}//namespace tracktable
+
+#undef PRINT
 
 #endif
