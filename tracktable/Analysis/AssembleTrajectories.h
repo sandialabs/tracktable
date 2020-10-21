@@ -264,6 +264,11 @@ public:
       return this->MinimumTrajectoryLength;
     }
 
+  int cleanup_interval() const
+    {
+      return this->CleanupInterval;
+    }
+
 protected:
   /** Set the default values for a trajectory
    *
