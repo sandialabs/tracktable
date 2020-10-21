@@ -26,6 +26,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# # Trajectory Reader Example
+#
 # Purpose: Demonstrate how to create and use a Trajectory Reader
 # If you have a file of already formed trajectories, you can use the Trajectory
 # Reader to read them from file. Like the point reader, you can iterate over the

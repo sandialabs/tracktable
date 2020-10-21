@@ -26,6 +26,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+# # Point Reader Example
+#
 # Purpose: Demonstrate how to create and use a terrestrial point reader.
 # The basic object in tracktable is the point reader. This data structure reads
 # tabular data from a file and saves it as points containing, at the least, an

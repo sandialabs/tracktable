@@ -140,8 +140,11 @@ If you want to build documentation you will also need the following packages:
 
 * Sphinx - http://sphinx-doc.org
 * Sphinx Read the Docs theme - https://sphinx-rtd-theme.readthedocs.io/en/latest
+* nbsphinx - https://nbsphinx.readthedocs.io/en/latest/index.html
+* nbsphinx-link - https://nbsphinx-link.readthedocs.io/en/latest/index.html
 * napoleon - https://sphinxcontrib-napoleon.readthedocs.org/en/latest
    * This is bundled with Sphinx as of version 1.3.
+* Pandoc - https://pandoc.org/index.html
 * Breathe - http://breathe.readthedocs.org/en/latest/
 * Doxygen - http://www.doxygen.nl/index.html
 * Graphviz (for dot executable)- https://www.graphviz.org/
