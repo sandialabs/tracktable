@@ -20,14 +20,14 @@ version: 2
 sphinx:
   fail_on_warning: false
   configuration: Documentation/conf.py
-  
+
 # Eventually we will also build docs as PDF and ePub.
 # formats: all
 
+# The Docker image for building the docs
 build:
   image: latest
-  
-python:
-  version: 3.7
-  install: 
-    - requirements: Documentation/readthedocs/dependencies.txt
+
+# The Anaconda environment to build the docs
+conda:
+  environment: environment.yml

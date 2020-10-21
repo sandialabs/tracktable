@@ -54,17 +54,7 @@ autodoc_mock_imports = [
     'numpy',
     'shapefile',
     'shapely',
-    'tracktable.core.core_types', # for BoostPythonArgumentError
-    'tracktable.lib._cartesian2d',
-    'tracktable.lib._cartesian3d',
-    'tracktable.lib._core_types',
-    'tracktable.lib._dbscan_clustering',
-    'tracktable.lib._distance_geometry',
-    'tracktable.lib._domain_algorithm_overloads',
-    'tracktable.lib._feature_vector_points',
-    'tracktable.lib._logging',
-    'tracktable.lib._rtree',
-    'tracktable.lib._terrestrial'
+    'tracktable.core.core_types' # for BoostPythonArgumentError
 ]
 
 # -- General configuration ------------------------------------------------

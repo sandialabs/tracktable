@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC . Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -297,23 +297,36 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
 
       set(Sphinx_BUILD_DIR "${DOC_BINARY_DIR}/_build")
 
-
-      # NOTE: This approach to setting PYTHONPATH will only work on
-      # Unix-like systems.  In CMake 3.1 we will get the '-E env'
-      # capability which is what we really need here.  Since requiring the
-      # bleeding-edge version of CMake isn't a terribly friendly thing to
-      # do, I will probably end up faking it with batch files.
-
-      add_custom_target( doc_python ALL
-          ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
-          -b html
-          -d "${Sphinx_BUILD_DIR}/doctrees"
-          ${DOC_SOURCE_DIR}
-          ${DOC_BINARY_DIR}/html
-        COMMENT "Generating Python documentation"
-        DEPENDS doc_cxx
-        WORKING_DIRECTORY ${DOC_SOURCE_DIR}
-        )
+      if (MINGW OR MSVC)
+        string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )
+        string( REPLACE ";" "\\;" ESCAPED_PYTHONPATH "$ENV{PYTHONPATH}" )
+        add_custom_target( doc_python ALL
+            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python\\;${ESCAPED_PYTHONPATH};$ENV{PYTHONPATH} PATH=${Tracktable_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH};$ENV{PATH}
+            ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
+            -b html
+            -d "${Sphinx_BUILD_DIR}/doctrees"
+            ${DOC_SOURCE_DIR}
+            ${DOC_BINARY_DIR}/html
+          COMMENT "Generating Python documentation"
+          DEPENDS doc_cxx
+          WORKING_DIRECTORY ${DOC_SOURCE_DIR}
+          VERBATIM
+          )
+      else (MINGW OR MSVC)
+        # Trust the compiler to set RPATH so that the libraries in bin/ are accessible
+        add_custom_target( doc_python ALL
+            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python:${Tracktable_BINARY_DIR}/lib:$ENV{PYTHONPATH}
+            ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
+            -b html
+            -d "${Sphinx_BUILD_DIR}/doctrees"
+            ${DOC_SOURCE_DIR}
+            ${DOC_BINARY_DIR}/html
+          COMMENT "Generating Python documentation"
+          DEPENDS doc_cxx
+          WORKING_DIRECTORY ${DOC_SOURCE_DIR}
+          VERBATIM
+          )
+      endif (MINGW OR MSVC)
 
       install(
         DIRECTORY ${DOC_BINARY_DIR}/html
