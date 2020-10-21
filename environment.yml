@@ -1,5 +1,6 @@
 name: tracktable
 channels:
+  - conda-forge
   - defaults
 dependencies:
   - python=3.7
@@ -8,7 +9,11 @@ dependencies:
   - pytz
   - cartopy
   - pyshp
+  - ipykernel
+  - pandoc
   - sphinx
   - pip:
     - tracktable
     - breathe
+    - nbsphinx
+    - nbsphinx-link
