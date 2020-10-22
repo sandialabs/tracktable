@@ -19,7 +19,7 @@ version: 2
 # Build documentation in the Documentation/ directory using Sphinx.
 sphinx:
   fail_on_warning: false
-  configuration: Documentation/conf.py
+  configuration: Documentation/readthedocs_build/conf.py
 
 # Eventually we will also build docs as PDF and ePub.
 # formats: all

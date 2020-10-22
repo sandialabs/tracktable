@@ -18,24 +18,12 @@ import subprocess
 import sys
 import os
 
-tracktable_src = '../'
+tracktable_src = '../../'
 tracktable_build = None
 
-debugging = False
-read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
-
-
-if read_the_docs_build or debugging:
-    # We have to run these manually on readthedocs since we aren't
-    # driving the build with CMake.
-    subprocess.call(['doxygen', 'readthedocs/Doxyfile-readthedocs'])
-else:
-    # If we're building all of Tracktable, we're operating in
-    # the build directory instead of the source directory.  These
-    # variables will be filled in by CMake.
-    #
-    tracktable_src = '@Tracktable_SOURCE_DIR@'
-    tracktable_build = '@Tracktable_BINARY_DIR@'
+# We have to run these manually on readthedocs since we aren't
+# driving the build with CMake.
+subprocess.call(['doxygen', '../readthedocs/Doxyfile-readthedocs'])
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -65,7 +53,6 @@ needs_sphinx = '1.3'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -145,32 +132,16 @@ pygments_style = 'sphinx'
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
 
-# ----- Options for nbsphinx -----
+# -- Options for Breathe Doxygen <-> Sphinx bridge ------------------------
+breathe_projects = {'tracktable_cpp': '../readthedocs_build/doxygen/doxyxml'}
 
-nbsphinx_allow_errors = False # If True, the build process is continued even if an exception occurs.
-nbsphinx_execute = 'auto' # Whether to execute notebooks before conversion or not. Possible values: 'always', 'never', 'auto' (default).
-nbsphinx_timeout = -1 # Controls when a cell will time out. The timeout is given in seconds. Given -1, cells will never time out.
-nbsphinx_execute_arguments = [ # Kernel arguments used when executing notebooks.
-    "--InlineBackend.figure_formats={'svg', 'pdf'}",
-    "--InlineBackend.rc={'figure.dpi': 96}",
-]
-nbsphinx_input_prompt = 'In [%s]:' # Input prompt for code cells. %s is replaced by the execution count.
-nbsphinx_output_prompt = 'Out[%s]:' # Output prompt for code cells. %s is replaced by the execution count.
-
-# ----- Options for Breathe Doxygen <-> Sphinx bridge -----
-
-if read_the_docs_build or debugging:
-    breathe_projects = {'tracktable_cpp': 'readthedocs/doxygen/doxyxml'}
-else:
-    breathe_projects = {
-        'tracktable_cpp': os.path.join(tracktable_build, 'Documentation', 'doxyxml')
-    }
 breathe_default_project = "tracktable_cpp"
 
-breathe_projects_source = {
-    'tracktable_cpp':
-        (tracktable_src + "/tracktable", ["Analysis/", "Core/", "Domain/", "IO/", "DataGenerators/"])
-    }
+# Source of C++ files for use with breathe autogen functionality
+# breathe_projects_source = {
+#     'tracktable_cpp':
+#         (tracktable_src + "/tracktable", ["Analysis/", "Core/", "Domain/", "IO/", "DataGenerators/"])
+#     }
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -209,10 +180,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-if read_the_docs_build or debugging:
-    html_static_path = ['css']
-else:
-    html_static_path = [os.path.join(tracktable_src, 'Documentation', 'css')]
+html_static_path = ['../css']
 html_style = "tracktable.css"
 
 # Add any extra paths that contain custom files (such as robots.txt or
