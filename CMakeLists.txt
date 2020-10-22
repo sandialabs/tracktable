@@ -282,18 +282,9 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
 
       find_python_module(sphinx SPHINX_MODULE_STATUS SPHINX_MODULE_LOCATION)
 
-      find_python_module(sphinx_rtd_theme SPHINX_MODULE_STATUS SPHINX_MODULE_LOCATION)
+      find_python_module(sphinx_rtd_theme SPHINX_RTD_THEME_MODULE_STATUS SPHINX_RTD_THEME_MODULE_LOCATION)
 
-      find_python_module(breathe SPHINX_MODULE_STATUS SPHINX_MODULE_LOCATION)
-
-      # Yes, I'm writing a file into the source tree.  Sphinx requires
-      # that its configuration file (conf.py) exist in the source tree
-      # even though it can put all of its generated files elsewhere.
-      configure_file(
-        ${DOC_SOURCE_DIR}/conf.py.in
-        ${DOC_SOURCE_DIR}/conf.py
-        @ONLY
-        )
+      find_python_module(breathe BREATHE_MODULE_STATUS BREATHE_MODULE_LOCATION)
 
       set(Sphinx_BUILD_DIR "${DOC_BINARY_DIR}/_build")
 
@@ -305,6 +296,7 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
             ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
             -b html
             -d "${Sphinx_BUILD_DIR}/doctrees"
+            -c "cmake_build"
             ${DOC_SOURCE_DIR}
             ${DOC_BINARY_DIR}/html
           COMMENT "Generating Python documentation"
@@ -319,6 +311,7 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
             ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
             -b html
             -d "${Sphinx_BUILD_DIR}/doctrees"
+            -c "cmake_build"
             ${DOC_SOURCE_DIR}
             ${DOC_BINARY_DIR}/html
           COMMENT "Generating Python documentation"
