@@ -156,7 +156,7 @@ CASE_SENSE_NAMES       = NO
 # spaces.
 # Note: If this tag is empty the current directory is searched.
 
-INPUT                  = @CMAKE_SOURCE_DIR@/tracktable/Core @CMAKE_SOURCE_DIR@/tracktable/IO @CMAKE_SOURCE_DIR@/tracktable/Analysis @CMAKE_SOURCE_DIR@/tracktable/Domain
+INPUT                  = @CMAKE_SOURCE_DIR@/tracktable/Core @CMAKE_SOURCE_DIR@/tracktable/IO @CMAKE_SOURCE_DIR@/tracktable/Analysis @CMAKE_SOURCE_DIR@/tracktable/Domain @CMAKE_SOURCE_DIR@/tracktable/DataGenerators
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -374,14 +374,14 @@ HAVE_DOT               = @HAVE_DOT@
 # brief descriptions will be completely suppressed.
 # The default value is: YES.
 
-#REPEAT_BRIEF           = 
+#REPEAT_BRIEF           =
 
 # If the ALWAYS_DETAILED_SEC and REPEAT_BRIEF tags are both set to YES then
 # doxygen will generate a detailed section even if there is only a brief
 # description.
 # The default value is: NO.
 
-#ALWAYS_DETAILED_SEC    = 
+#ALWAYS_DETAILED_SEC    =
 
 # If the INLINE_INHERITED_MEMB tag is set to YES, doxygen will show all
 # inherited members of a class in the documentation of that class as if those
@@ -389,7 +389,7 @@ HAVE_DOT               = @HAVE_DOT@
 # operators of the base classes will not be shown.
 # The default value is: NO.
 
-#INLINE_INHERITED_MEMB  = 
+#INLINE_INHERITED_MEMB  =
 
 # If the FULL_PATH_NAMES tag is set to YES doxygen will prepend the full path
 # before files name in the file list and in the header files. If set to NO the

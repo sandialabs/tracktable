@@ -18,14 +18,12 @@ import subprocess
 import sys
 import os
 
-tracktable_src = '../'
+tracktable_src = '../../'
 tracktable_build = None
 
 debugging = False
-read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
 
-
-if read_the_docs_build or debugging:
+if debugging:
     # We have to run these manually on readthedocs since we aren't
     # driving the build with CMake.
     subprocess.call(['doxygen', 'readthedocs/Doxyfile-readthedocs'])
@@ -33,7 +31,6 @@ else:
     # If we're building all of Tracktable, we're operating in
     # the build directory instead of the source directory.  These
     # variables will be filled in by CMake.
-    #
     tracktable_src = '@Tracktable_SOURCE_DIR@'
     tracktable_build = '@Tracktable_BINARY_DIR@'
 
@@ -65,7 +62,6 @@ needs_sphinx = '1.3'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -159,7 +155,7 @@ nbsphinx_output_prompt = 'Out[%s]:' # Output prompt for code cells. %s is replac
 
 # ----- Options for Breathe Doxygen <-> Sphinx bridge -----
 
-if read_the_docs_build or debugging:
+if debugging:
     breathe_projects = {'tracktable_cpp': 'readthedocs/doxygen/doxyxml'}
 else:
     breathe_projects = {
@@ -167,10 +163,11 @@ else:
     }
 breathe_default_project = "tracktable_cpp"
 
-breathe_projects_source = {
-    'tracktable_cpp':
-        (tracktable_src + "/tracktable", ["Analysis/", "Core/", "Domain/", "IO/", "DataGenerators/"])
-    }
+# Source of C++ files for use with breathe autogen functionality
+# breathe_projects_source = {
+#     'tracktable_cpp':
+#         (tracktable_src + "/tracktable", ["Analysis/", "Core/", "Domain/", "IO/", "DataGenerators/"])
+#     }
 
 # -- Options for HTML output ----------------------------------------------
 
@@ -209,7 +206,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-if read_the_docs_build or debugging:
+if debugging:
     html_static_path = ['css']
 else:
     html_static_path = [os.path.join(tracktable_src, 'Documentation', 'css')]
