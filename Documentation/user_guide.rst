@@ -20,6 +20,8 @@ Basic Classes
 Domains
 -------
 
+.. todo:: Write an explanatory page for the Python domain module.
+
 Tracktable operates on points, timestamps and trajectories.  Since
 points and trajectories are meaningless without a coordinate system,
 we instantiate points and trajectories from a *domain*.  Each domain
@@ -437,8 +439,8 @@ or ``time``. The ``tracktable.analysis.rtree`` submodule will generate an rtree 
 will compute the nearest neighbors based on provided points within a clustering box.
 
 .. todo:: Code examples for Analysis modules
-.. todo Find the best location for this section
-.. todo Add additional/clarifying language
+.. todo:: Find the best location for this section
+.. todo:: Add additional/clarifying language
 
 .. _userguide-render-modules:
 
