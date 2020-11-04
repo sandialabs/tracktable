@@ -34,6 +34,7 @@ points and tracjectories can be found in the modules listed below.
    python/tracktable.analysis
    python/tracktable.core.rst
    python/tracktable.domain.rst
+   python/tracktable.examples.rst
    python/tracktable.feature.rst
    python/tracktable.filter.rst
    python/tracktable.info.rst

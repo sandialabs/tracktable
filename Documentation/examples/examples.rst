@@ -23,8 +23,8 @@ C++ Examples
 
 This section will be filled out in patch releases for 1.3 and 1.4.
 
-Python Scripts
---------------
+Python Examples
+---------------
 
 .. toctree::
    :maxdepth: 2
@@ -33,8 +33,8 @@ Python Scripts
    /examples/python_scripts/trajectory_map.rst
    /examples/python_scripts/movies.rst
 
-Jupyter Notebooks
------------------
+Jupyter Notebook Examples
+-------------------------
 
 .. toctree::
    :maxdepth: 2
@@ -47,20 +47,19 @@ Jupyter Notebooks
    Trajectory_Builder
    Trajectory_Reader
 
-There are two things you need to know. The first is that we include
-several Jupyter_ notebooks as examples of how to do various common tasks with Tracktable.
-The second is how to get them. There are two ways:
+We include several Jupyter_ notebooks as examples of how to do various common tasks with Tracktable.
+Each Jupyter notebook page listed above is an actual Jupyter notebook, including output, embedded directly in the documention.
 
- 1.  Download from `<https://tracktable.sandia.gov/downloads.html>`_ (starting with 1.3).
- 2.  The function ``tracktable.examples.copy_example_notebooks``:
 
-Example:
+There are two ways to get the notebooks if you wish to modify them or run them locally:
 
-.. code-block:: python
-
-     import tracktable.examples
-     tracktable.examples.copy_example_notebooks('/my/home/directory/notebooks')
-
+ 1.  Download from `<https://tracktable.sandia.gov/downloads/source_code.html>`_ (starting with 1.3).
+ 2.  The function ``tracktable.examples.copy_example_notebooks``
+      - Detailed information about ``copy_example_notebooks`` can be found here: :ref:`python_examples_module_label`
 
 .. _Jupyter: https://jupyter.org
+
+
+
+
 
