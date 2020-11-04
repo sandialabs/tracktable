@@ -42,15 +42,18 @@ def copy_example_notebooks(destdir, create_dir=True):
     This function will copy them to someplace more convenient.
 
     For example:
-    >>> example_path = os.path.expanduser('~/tt_examples')
-    >>> os.mkdir(example_path)
-    >>> tracktable.examples.copy_example_notebooks(example_path)
+
+    .. code-block:: python
+
+       example_path = os.path.expanduser('~/tt_examples')
+       os.mkdir(example_path)
+       tracktable.examples.copy_example_notebooks(example_path)
 
     Arguments:
-        destdir {string}: Destination directory for notebooks
+        destdir (string): Destination directory for notebooks
 
     Keyword Arguments:
-        create_directory {boolean]: Create directory if it doesn't
+        create_directory (boolean): Create directory if it doesn't
             already exist.  Defaults to True.
 
     Returns:
@@ -58,10 +61,10 @@ def copy_example_notebooks(destdir, create_dir=True):
 
     Raises:
         OSError: the copy operation failed (probably because the
-        destination directory doesn't exist)
+            destination directory doesn't exist)
 
     Note:
-        This function relies on the __file__ special variable.
+        This function relies on the ``__file__`` special variable.
         It will probably fail if Tracktable is installed as a zip
         file.
     """

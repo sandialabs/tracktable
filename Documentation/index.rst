@@ -43,7 +43,7 @@ Documentation
    installation.rst
    user_guide.rst
    user_guide/example_data.rst
-   examples/index.rst
+   examples/examples.rst
    reference.rst
    conventions.rst
    contacts.rst
