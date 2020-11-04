@@ -279,7 +279,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 
-AUTHORS = u'Andy Wilson and Danny Rintoul and Chris Valicka and Ben Newton and Phil Baxley and Kat Ward and Rick Vinyard'
+AUTHORS = u'Andy Wilson and Danny Rintoul and Chris Valicka and Ben Newton and Phil Baxley and Kat Ward and Rick Vinyard and Michael Scoggin and Michael Fadem'
 latex_documents = [
   ('index', 'Tracktable.tex', u'Tracktable Documentation', AUTHORS, 'manual')
 ]
