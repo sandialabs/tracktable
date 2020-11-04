@@ -7,27 +7,27 @@ PointGenerator Module
 Module Contents
 ---------------
 
-.. doxygenclass:: PointGenerator
+.. doxygenclass:: tracktable::PointGenerator
    :members:
    :protected-members:
    :private-members:
    :undoc-members:
-.. doxygenclass:: ConstantSpeedPointGenerator
+.. doxygenclass:: tracktable::ConstantSpeedPointGenerator
    :members:
    :protected-members:
    :private-members:
    :undoc-members:
-.. doxygenclass:: CircularPointGenerator
+.. doxygenclass:: tracktable::CircularPointGenerator
    :members:
    :protected-members:
    :private-members:
    :undoc-members:
-.. doxygenclass:: GridPointGenerator
+.. doxygenclass:: tracktable::GridPointGenerator
    :members:
    :protected-members:
    :private-members:
    :undoc-members:
-.. doxygenclass:: MultipleGeneratorCollator
+.. doxygenclass:: tracktable::MultipleGeneratorCollator
    :members:
    :protected-members:
    :private-members:

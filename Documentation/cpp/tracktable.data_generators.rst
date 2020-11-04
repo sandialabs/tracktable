@@ -1,11 +1,13 @@
-======================
-Tracktable Core Module
-======================
+================================
+Tracktable Data Generator Module
+================================
 
 
 ---------------
 Module Contents
 ---------------
+
+.. todo:: Describe this module at a high-level
 
 ----------
 Submodules
