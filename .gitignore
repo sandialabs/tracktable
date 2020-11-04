@@ -12,3 +12,4 @@ __pycache__
 *.project
 *.pydevproject
 /build/
+/.vscode/
