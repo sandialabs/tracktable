@@ -375,7 +375,7 @@ message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")
 #=========================================================================
 # Begin FindBoost
 #-------------------------------------------------------------------------
-set(BOOST_MINIMUM_VERSION_REQUIRED 1.61)
+set(BOOST_MINIMUM_VERSION_REQUIRED 1.67)
 
 # Do not use Boost's CMake modules yet.
 set(Boost_NO_BOOST_CMAKE ON)
