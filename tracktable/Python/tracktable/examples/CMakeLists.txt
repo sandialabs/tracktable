@@ -91,7 +91,7 @@ if (PY_CARTOPY_MODULE)
     --timestamp-column 1
     --x-column 2
     --y-column 3
-    --map-bbox -100 100 -100 100
+    --map-bbox -100 -100 100 100
     ${EXAMPLES}/data/SamplePointsCartesian.csv
     ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_cartesian.png
   )
