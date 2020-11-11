@@ -227,9 +227,7 @@ def main():
     pyplot.savefig(args.image_file[0],
 #                   facecolor=figure.get_facecolor(),
                    facecolor='white',
-                   figsize=figure_dimensions,
-                   dpi=dpi,
-                   frameon=False)
+                   dpi=dpi)
 
     pyplot.close()
 

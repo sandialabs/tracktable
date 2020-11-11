@@ -1,15 +1,8 @@
 .. _Example_Data:
 
-************
-Example Data
-************
-
-Tracktable example data description
-
-
-===============
-Data Generation
-===============
+**********************
+Python Data Generation
+**********************
 
 When real or quality trajectory data is not available, it is possible
 to generate data sets given some constraints. Current methods for
@@ -31,11 +24,10 @@ Important constraints for generating trajectories include speed, time between po
 and the minimum number of points that make up the trajectory.
 
 Generate Single Trajectory Between Airports
+-------------------------------------------
 
 This example shows how to retrieve airport data using airport codes and creating a single
 trajectory.
-
-In Python:
 
 .. code-block:: python
    :linenos:
@@ -57,13 +49,13 @@ In Python:
 
 
 Generate Multiple Trajectories Between Lists Of Airports
+--------------------------------------------------------
 
 This example shows how to retrieve a set of the ten largest airports and use it as input
-to the *generate_trajectories* package. Alternatively, the *airports* package could
-be used directly to get airports based on other criteria. The result will be a list
-of airports that start and end at random airports sampled from the given list.
-
-In Python:
+to the ``tracktable.examples.data.generators.generate_trajectories`` package.
+Alternatively, the ``tracktable.info.airports`` package could be used directly to get airports based
+on other criteria. The result will be a list of airports that start and end at
+random airports sampled from the given list.
 
 .. code-block:: python
    :linenos:
@@ -80,12 +72,11 @@ In Python:
 
 
 Generate Multiple Trajectories Between Random Airports
+------------------------------------------------------
 
 This example shows the method call for generating trajectories between completely
 random airports. This is done by not defining lists for the starting and ending
 points.
-
-In Python:
 
 .. code-block:: python
    :linenos:
@@ -112,8 +103,6 @@ airport examples.
 
 This example shows one method for creating the bounding boxes and using them as input to
 generate a list of 5 new trajectories.
-
-In Python:
 
 .. code-block:: python
    :linenos:
@@ -150,7 +139,7 @@ In Python:
                                                     starting_bbox,
                                                     ending_bbox,
                                                     5,
-                                                    'BBOXEXP',
+                                                    'BBOXTST',
                                                     start_time=datetime.now(),
                                                     desired_speed=400,
                                                     seconds_between_points=60,
