@@ -84,7 +84,7 @@ CONVENIENCE_MAPS = {
     # if min_corner and max_corner are equal mod 360, so we're excluding
     # a tiny sliver of the world.
     'world': {
-        'min_corner': (-180, -90),
+        'min_corner': (-179.999, -90),
         'max_corner': (179.999, 90)
     }
 }

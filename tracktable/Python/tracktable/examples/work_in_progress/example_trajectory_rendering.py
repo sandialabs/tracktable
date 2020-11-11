@@ -91,11 +91,11 @@ def example_trajectory_rendering():
                                             coastline_color='#808080',
                                             coastline_linewidth=1,
                                             coastline_zorder=5,
-                                            country_border_color='#606060',
+                                            country_color='#606060',
                                             country_fill_color='#FFFF80',
                                             country_linewidth=0.5,
                                             country_zorder=5,
-                                            state_border_color='#404040',
+                                            state_color='#404040',
                                             state_fill_color='none',
                                             state_linewidth=0.3,
                                             state_zorder=2,
@@ -115,9 +115,7 @@ def example_trajectory_rendering():
 
     print("STATUS: Saving figure to file")
     pyplot.savefig('./Example_Trajectory_Rendering_CONUS.png',
-                   figsize=[800,600],
                    dpi=dpi,
-                   frameon=False,
                    facecolor='black')
 
     pyplot.close()

@@ -6,8 +6,8 @@ Examples
 
 To help you get started using Tracktable we have included demonstrations of
 its various capabilities, Python and C++ alike, and sample data to try it
-on.  C++ examples are in the source code distribution in the directory
-``tracktable/Examples``.  Python examples are available as scripts you
+on. C++ examples are in the source code distribution in the directory
+``tracktable/Examples``. Python examples are available as scripts you
 can execute as well as Jupyter_ notebooks.
 
 Example Data
@@ -16,7 +16,7 @@ Example Data
 .. toctree::
    :maxdepth: 2
 
-   /user_guide/example_data.rst
+   /examples/python/data_generation.rst
 
 C++ Examples
 ------------
@@ -29,9 +29,9 @@ Python Examples
 .. toctree::
    :maxdepth: 2
 
-   /examples/python_scripts/heatmap.rst
-   /examples/python_scripts/trajectory_map.rst
-   /examples/python_scripts/movies.rst
+   /examples/python/heatmap.rst
+   /examples/python/trajectory_map.rst
+   /examples/python/movies.rst
 
 Jupyter Notebook Examples
 -------------------------
@@ -58,8 +58,3 @@ There are two ways to get the notebooks if you wish to modify them or run them l
       - Detailed information about ``copy_example_notebooks`` can be found here: :ref:`python_examples_module_label`
 
 .. _Jupyter: https://jupyter.org
-
-
-
-
-

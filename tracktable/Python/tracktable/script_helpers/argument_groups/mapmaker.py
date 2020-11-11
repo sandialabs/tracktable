@@ -118,7 +118,7 @@ Arguments:
 |   Axis-aligned bounding box for map.
 |
 | ``--map-projection STRING``
-|   Map projection string for Basemap. Defaults to 'mill' (Miller cylindrical).
+|   Map projection string for Basemap. Defaults to 'PlateCarree'.
 
 """
 

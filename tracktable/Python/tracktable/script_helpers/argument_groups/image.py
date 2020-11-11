@@ -69,7 +69,6 @@ def install_group():
                           description="Parameters for image size and resolution")
 
     add_argument("image", [ '--dpi' ],
-                 nargs=1,
                  type=int,
                  default=72,
                  help='Dots per inch (DPI) for image. This determines font height and line width.')
