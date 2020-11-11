@@ -296,10 +296,7 @@ def main():
                      args.scale)
 
     print("STATUS: Saving figure to file")
-    pyplot.savefig(args.image_file[0],
-                   figsize=figure_dimensions,
-                   dpi=dpi,
-                   frameon=False)
+    pyplot.savefig(args.image_file[0], dpi=dpi)
 
     pyplot.close()
 

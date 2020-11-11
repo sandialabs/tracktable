@@ -251,9 +251,7 @@ def setup_matplotlib_figure(args, renderer):
     renderer.dpi = dpi
     renderer.figure = figure
     renderer.axes = axes
-    renderer.savefig_kwargs = { 'facecolor': figure.get_facecolor(),
-                                'figsize': figure_dimensions,
-                                'frameon': False }
+    renderer.savefig_kwargs = { 'facecolor': figure.get_facecolor() }
 
 
 # ----------------------------------------------------------------------

@@ -34,6 +34,8 @@ from __future__ import print_function
 
 from matplotlib import pyplot
 
+import cartopy
+import cartopy.crs
 import logging
 from tracktable.render import maps
 from tracktable.render import geographic_decoration as decoration
@@ -89,7 +91,7 @@ def cartesian_map(map_bbox=None,
     """
 
     if axes is None:
-        axes = pyplot.gca()
+        axes = pyplot.axes(projection=cartopy.crs.PlateCarree())
 
     logging.getLogger(__name__).debug(
         "cartesian_map: map_bbox is {}".format(map_bbox))
@@ -123,11 +125,11 @@ def terrestrial_map(map_name,
                     coastline_color='#808080',
                     coastline_linewidth=1,
                     coastline_zorder=5,
-                    country_border_color='#606060',
+                    country_color='#606060',
                     country_fill_color='#303030',
                     country_linewidth=0.5,
                     country_zorder=3,
-                    state_border_color='#404040',
+                    state_color='#404040',
                     state_fill_color='none',
                     state_linewidth=0.3,
                     state_zorder=2,
@@ -175,11 +177,11 @@ def terrestrial_map(map_name,
       coastline_color (str):                        Color name or hex string for coastlines (Default: '#808080')
       coastline_linewidth (float):                  Width (in points) of coastlines (Default: 1)
       coastline_zorder (int):                       Image layer for coastlines (Default: 5)
-      country_border_color (str):                   Color name or hex string for coastlines (Default: '#606060')
+      country_color (str):                          Color name or hex string for coastlines (Default: '#606060')
       country_fill_color (str):                     Color name or hex string for coastlines (Default:'#303030' )
       country_linewidth (float):                    Width (in points) of coastlines (Default: 0.5)
       country_zorder (int):                         Image layer for coastlines (Default: 3)
-      state_border_color (str):                     Color name or hex string for coastlines (Default: '#404040')
+      state_color (str):                            Color name or hex string for coastlines (Default: '#404040')
       state_fill_color (str):                       Color name or hex string for coastlines (Default: 'none')
       state_linewidth (float):                      Width (in points) of coastlines (Default: 0.3)
       state_zorder (int):                           Image layer for coastlines (Default: 2)
@@ -255,7 +257,7 @@ def terrestrial_map(map_name,
         artists.extend(
             decoration.draw_countries(
                 map_axes,
-                edgecolor=country_border_color,
+                edgecolor=country_color,
                 facecolor=country_fill_color,
                 linewidth=country_linewidth,
                 zorder=country_zorder
@@ -265,7 +267,7 @@ def terrestrial_map(map_name,
         artists.extend(
             decoration.draw_states(
                 map_axes,
-                edgecolor=state_border_color,
+                edgecolor=state_color,
                 facecolor=state_fill_color,
                 linewidth=state_linewidth,
                 zorder=state_zorder

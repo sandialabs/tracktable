@@ -622,7 +622,7 @@ color map and where on the map the heatmap is rendered.
 We include a start-to-finish example of how to load points and render
 a heat map in the ``heatmap_from_csv.py`` script in the
 ``tracktable/examples/`` subdirectory of our Python code.  You can find
-this example on the :doc:`/examples/python_scripts/heatmap` page.
+this example on the :doc:`/examples/python/heatmap` page.
 
 .. note:: The :py:class:`histogram2d.geographic()
           <tracktable.render.histogram2d.geographic>` heat map
@@ -666,7 +666,7 @@ All of this is packaged into the function :py:func:`draw_traffic
 Like :ref:`heat maps <userguide-heat-maps>`, trajectory maps have
 their own example script ``trajectory_map_from_csv.py`` in the
 ``tracktable/examples`` directory.  You can find this example on the
-:doc:`/examples/python_scripts/trajectory_map` page.
+:doc:`/examples/python/trajectory_map` page.
 
 
 -------------
