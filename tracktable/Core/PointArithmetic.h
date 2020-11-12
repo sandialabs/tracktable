@@ -105,7 +105,7 @@ PointT subtract(PointT const& left, PointT const& right)
  */
 
 template<class PointT>
-PointT subtract_in_place(PointT left, PointT const& right)
+PointT subtract_in_place(PointT& left, PointT const& right)
 {
   boost::geometry::subtract_point(left, right);
   return left;
