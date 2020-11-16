@@ -58,6 +58,11 @@ from matplotlib import pyplot
 import matplotlib.animation
 matplotlib.use('Agg')
 
+try:
+    from tqdm import trange, tqdm
+    tqdm_installed = True
+except ImportError as e:
+    tqdm_installed = False
 
 # ----------------------------------------------------------------------
 
@@ -547,38 +552,63 @@ def render_trajectory_movie(movie_writer,
     if figure is None:
         figure = pyplot.gcf()
 
+
     with movie_writer.saving(figure, filename, dpi):
-        for i in range(0, num_frames):
-            current_time = frame_time(i)
-            trail_start_time = frame_time(i) - trail_duration
+        if(tqdm_installed):
+            for i in tqdm(range(int(num_frames)), desc="Rendering Frames", unit='frame'):
+                current_time = frame_time(i)
+                trail_start_time = frame_time(i) - trail_duration
 
-            logger.info(
-                ('Rendering frame {}: current_time {}, '
-                 'trail_start_time {}').format(
-                    i,
-                    current_time.strftime("%Y-%m-%d %H:%M:%S"),
-                    trail_start_time.strftime("%Y-%m-%d %H:%M:%S")))
+                frame_trajectories = clip_trajectories_to_interval(
+                    trajectories_on_map,
+                    start_time=trail_start_time,
+                    end_time=current_time
+                    )
 
-            frame_trajectories = clip_trajectories_to_interval(
-                trajectories_on_map,
-                start_time=trail_start_time,
-                end_time=current_time
-                )
+                # TODO: Add in scalar accessor
+                trajectory_artists = render_annotated_trajectories(
+                    frame_trajectories,
+                    axes,
+                    **trajectory_rendering_kwargs
+                    )
 
-            # TODO: Add in scalar accessor
-            trajectory_artists = render_annotated_trajectories(
-                frame_trajectories,
-                axes,
-                **trajectory_rendering_kwargs
-                )
+                # TODO: here we could also render the clock
+                movie_writer.grab_frame(**savefig_kwargs)
 
-            # TODO: here we could also render the clock
-            #
-            movie_writer.grab_frame(**savefig_kwargs)
+                # Clean up the figure for the next time around
+                for artist in trajectory_artists:
+                    artist.remove()
+        else:
+            for i in range(0, num_frames):
+                current_time = frame_time(i)
+                trail_start_time = frame_time(i) - trail_duration
 
-            # Clean up the figure for the next time around
-            for artist in trajectory_artists:
-                artist.remove()
+                logger.info(
+                    ('Rendering frame {}: current_time {}, '
+                     'trail_start_time {}').format(
+                        i,
+                        current_time.strftime("%Y-%m-%d %H:%M:%S"),
+                        trail_start_time.strftime("%Y-%m-%d %H:%M:%S")))
+
+                frame_trajectories = clip_trajectories_to_interval(
+                    trajectories_on_map,
+                    start_time=trail_start_time,
+                    end_time=current_time
+                    )
+
+                # TODO: Add in scalar accessor
+                trajectory_artists = render_annotated_trajectories(
+                    frame_trajectories,
+                    axes,
+                    **trajectory_rendering_kwargs
+                    )
+
+                # TODO: here we could also render the clock
+                movie_writer.grab_frame(**savefig_kwargs)
+
+                # Clean up the figure for the next time around
+                for artist in trajectory_artists:
+                    artist.remove()
 
 
 # ----------------------------------------------------------------------
