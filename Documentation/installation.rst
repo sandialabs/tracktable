@@ -191,6 +191,7 @@ Other
 ^^^^^
 
 * CMake 3.12+ - https://cmake.org/
+* TQDM (Optional for movie rendering examples) - https://tqdm.github.io/
 
 Build Notes for Dependencies Built from Source
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
