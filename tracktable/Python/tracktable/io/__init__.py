@@ -31,4 +31,17 @@
 This module contains code to input and output trajectories in different formats
 """
 
-pass
+import warnings
+
+# This just stops the source line from printing with the warning
+def format_warning(message, category, filename, lineno, file=None, line=None):
+        return '%s:%s: %s:%s\n' % (filename, lineno, category.__name__, message)
+
+warnings.formatwarning = format_warning
+
+# Allow the PendingDeprecationWarning through since it's disabled by default
+warnings.simplefilter("always", category=PendingDeprecationWarning)
+
+# This will display a PendingDeprecationWarning when the IO module is imported
+# TODO (mjfadem): Remove this in release 1.6
+warnings.warn(" The tracktable.io module will be be renamed to tracktable.rw in release 1.6.", category=PendingDeprecationWarning)
