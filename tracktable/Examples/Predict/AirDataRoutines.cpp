@@ -22,7 +22,7 @@
 #include <boost/foreach.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
-#include <tracktable/IO/PointReader.h>
+#include <tracktable/RW/PointReader.h>
 
 int readAirDataFile(std::string &input_file, std::string& sep_char,
  Trajectories& trajectories)

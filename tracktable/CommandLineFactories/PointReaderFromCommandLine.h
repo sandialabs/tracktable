@@ -32,7 +32,7 @@
 #include "CommandLineFactory.h"
 
 #include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/IO/PointReader.h>
+#include <tracktable/RW/PointReader.h>
 
 #include <fstream>
 

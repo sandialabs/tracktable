@@ -41,7 +41,7 @@
 #define __tracktable_PythonAwareTrajectoryReader_h
 
 #include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/IO/TrajectoryReader.h>
+#include <tracktable/RW/TrajectoryReader.h>
 #include <tracktable/PythonWrapping/PythonFileLikeObjectStreams.h>
 #include <boost/iostreams/stream.hpp>
 #include <boost/shared_ptr.hpp>

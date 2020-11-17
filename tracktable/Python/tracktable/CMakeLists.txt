@@ -40,7 +40,7 @@ if (BUILD_TESTING)
   add_subdirectory(domain/tests)
   add_subdirectory(examples)
   add_subdirectory(examples/data/generators/tests)
-  add_subdirectory(io/tests)
+  add_subdirectory(rw/tests)
   add_subdirectory(info/tests)
   add_subdirectory(render/tests)
   add_subdirectory(source/tests)
@@ -117,10 +117,10 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/info/data
 )
 
-file(GLOB io_files "io/*.py")
+file(GLOB rw_files "rw/*.py")
 install(
-  FILES ${io_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/io
+  FILES ${rw_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/rw
 )
 
 file(GLOB render_files "render/*.py")
