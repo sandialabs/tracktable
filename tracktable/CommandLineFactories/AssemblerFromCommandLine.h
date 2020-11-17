@@ -34,7 +34,7 @@
 #include <tracktable/Analysis/AssembleTrajectories.h>
 #include <tracktable/Core/Timestamp.h>
 #include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/IO/PointReader.h>
+#include <tracktable/RW/PointReader.h>
 
 namespace tracktable {
 

@@ -29,11 +29,11 @@ user-defined properties.
 
 ``base_point_reader_type``: PointReader for the domain's bare point
 type.  This is an instance of
-``tracktable::io::PointReader<base_point_type>``.
+``tracktable::rw::PointReader<base_point_type>``.
 
 ``trajectory_point_reader_type``: PointReader for the domain's
 trajectory point type.  This is an instance of
-``tracktable::io::PointReader<trajectory_point_type>``.
+``tracktable::rw::PointReader<trajectory_point_type>``.
 
 We also provide specializations of all the appropriate measurement
 functions that return their results in the domain's units.  This part

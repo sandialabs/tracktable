@@ -1,4 +1,4 @@
-# Copyright (c) 2017, National Technology & Engineering Solutions of
+# Copyright (c) 2017-2020, National Technology & Engineering Solutions of
 #   Sandia, LLC (NTESS).
 # All rights reserved.
 #
@@ -26,16 +26,21 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""tracktable.io - Input/output for Tracktable points and trajectories
-
-This module contains code to input and output trajectories in different formats
+"""tracktable.io - Alias of tracktable.rw
 """
 
+# TODO (mjfadem): Remove this file in release 1.6
+
 import warnings
+import sys
+import tracktable.rw
+import tracktable.rw.point
+import tracktable.rw.read_write_dictionary
+import tracktable.rw.read_write_json
 
 # This just stops the source line from printing with the warning
 def format_warning(message, category, filename, lineno, file=None, line=None):
-        return '%s:%s: %s:%s\n' % (filename, lineno, category.__name__, message)
+    return '%s:%s: %s:%s\n' % (filename, lineno, category.__name__, message)
 
 warnings.formatwarning = format_warning
 
@@ -43,5 +48,10 @@ warnings.formatwarning = format_warning
 warnings.simplefilter("always", category=PendingDeprecationWarning)
 
 # This will display a PendingDeprecationWarning when the IO module is imported
-# TODO (mjfadem): Remove this in release 1.6
 warnings.warn(" The tracktable.io module will be be renamed to tracktable.rw in release 1.6.", category=PendingDeprecationWarning)
+
+# Aliases to smooth the transition of tracktable.io to tracktable.rw renaming
+sys.modules['tracktable.io'] = tracktable.rw
+sys.modules['tracktable.io.point'] = tracktable.rw.point
+sys.modules['tracktable.io.read_write_dictionary'] = tracktable.rw.read_write_dictionary
+sys.modules['tracktable.io.read_write_json'] = tracktable.rw.read_write_json

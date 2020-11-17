@@ -46,8 +46,8 @@
 //#include <tracktable/Domain/Cartesian2D.h>
 //#include <tracktable/Domain/Terrestrial.h>
 
-//#include <tracktable/IO/TrajectoryWriter.h>
-//#include <tracktable/IO/PointReader.h>
+//#include <tracktable/RW/TrajectoryWriter.h>
+//#include <tracktable/RW/PointReader.h>
 
 //#include <boost/program_options.hpp>
 

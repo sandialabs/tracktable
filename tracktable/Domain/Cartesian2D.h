@@ -47,8 +47,8 @@
 #include <tracktable/Core/Trajectory.h>
 #include <tracktable/Domain/DomainMacros.h>
 #include <tracktable/Domain/TracktableDomainWindowsHeader.h>
-#include <tracktable/IO/PointReader.h>
-#include <tracktable/IO/TrajectoryReader.h>
+#include <tracktable/RW/PointReader.h>
+#include <tracktable/RW/TrajectoryReader.h>
 
 #include <boost/geometry/algorithms/length.hpp>
 

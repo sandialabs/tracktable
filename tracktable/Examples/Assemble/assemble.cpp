@@ -31,7 +31,7 @@
 #include <tracktable/CommandLineFactories/AssemblerFromCommandLine.h>
 #include <tracktable/CommandLineFactories/PointReaderFromCommandLine.h>
 #include <tracktable/Domain/Terrestrial.h>
-#include <tracktable/IO/TrajectoryWriter.h>
+#include <tracktable/RW/TrajectoryWriter.h>
 
 #include <fstream>
 

@@ -28,8 +28,8 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <tracktable/IO/PointReader.h>
-#include <tracktable/IO/PointWriter.h>
+#include <tracktable/RW/PointReader.h>
+#include <tracktable/RW/PointWriter.h>
 #include <tracktable/Core/TracktableCommon.h>
 #include <tracktable/Domain/Terrestrial.h>
 #include <boost/iterator/filter_iterator.hpp>

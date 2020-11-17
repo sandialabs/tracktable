@@ -41,8 +41,8 @@
 
 #include <tracktable/Domain/Cartesian2D.h>
 #include <tracktable/Core/Timestamp.h>
-#include <tracktable/IO/PointWriter.h>
-#include <tracktable/IO/TrajectoryWriter.h>
+#include <tracktable/RW/PointWriter.h>
+#include <tracktable/RW/TrajectoryWriter.h>
 
 #include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 #include <tracktable/PythonWrapping/BasePointToString.h>
