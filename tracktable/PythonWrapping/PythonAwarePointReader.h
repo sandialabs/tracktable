@@ -41,7 +41,7 @@
 #define __tracktable_PythonAwarePointReader_h
 
 #include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/IO/PointReader.h>
+#include <tracktable/RW/PointReader.h>
 #include <tracktable/PythonWrapping/PythonFileLikeObjectStreams.h>
 #include <boost/iostreams/stream.hpp>
 #include <boost/shared_ptr.hpp>

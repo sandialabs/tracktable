@@ -44,7 +44,7 @@
 #include <tracktable/Core/PointCartesian.h>
 #include <tracktable/Domain/DomainMacros.h>
 #include <tracktable/Domain/TracktableDomainWindowsHeader.h>
-#include <tracktable/IO/PointReader.h>
+#include <tracktable/RW/PointReader.h>
 
 #include <vector>
 #include <string>

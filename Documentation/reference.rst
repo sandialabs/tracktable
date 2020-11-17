@@ -38,7 +38,7 @@ points and tracjectories can be found in the modules listed below.
    python/tracktable.feature.rst
    python/tracktable.filter.rst
    python/tracktable.info.rst
-   python/tracktable.io.rst
+   python/tracktable.rw.rst
    python/tracktable.lib.rst
    python/tracktable.render.rst
    python/tracktable.script_helpers.rst
@@ -63,5 +63,5 @@ points and tracjectories can be found in the modules listed below.
    cpp/tracktable.core.rst
    cpp/tracktable.data_generators.rst
    cpp/tracktable.domain.rst
-   cpp/tracktable.io.rst
+   cpp/tracktable.rw.rst
    cpp/tracktable.namespaces.rst
