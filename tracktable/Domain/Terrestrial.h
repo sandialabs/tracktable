@@ -58,8 +58,8 @@
 #include <tracktable/Domain/DomainMacros.h>
 #include <tracktable/Domain/Cartesian3D.h>
 
-#include <tracktable/IO/PointReader.h>
-#include <tracktable/IO/TrajectoryReader.h>
+#include <tracktable/RW/PointReader.h>
+#include <tracktable/RW/TrajectoryReader.h>
 
 #include <boost/geometry/algorithms/length.hpp>
 

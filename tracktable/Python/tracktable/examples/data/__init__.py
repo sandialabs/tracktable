@@ -1,8 +1,6 @@
-#
-# Copyright (c) 2014-2020 National Technology and Engineering
-# Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
-# with National Technology and Engineering Solutions of Sandia, LLC,
-# the U.S. Government retains certain rights in this software.
+# Copyright (c) 2017-2020, National Technology & Engineering Solutions of
+#   Sandia, LLC (NTESS).
+# All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions

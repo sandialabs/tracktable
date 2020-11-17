@@ -20,7 +20,7 @@
 #include <iostream>
 #include <numeric>
 #include <string>
-#include <tracktable/IO/PointReader.h>
+#include <tracktable/RW/PointReader.h>
 #include <boost/bind.hpp>
 
 int readAirDataFile(std::string &input_file, std::string& sep_char,

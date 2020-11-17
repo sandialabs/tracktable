@@ -37,7 +37,7 @@
  *    This uses our own home-grown delimited text format.  It is rather
  *    verbose.
  *
- * 2. tracktable.io.read_write_json (Python)
+ * 2. tracktable.rw.read_write_json (Python)
  *    Write to JSON.  This is also rather verbose and has trouble with
  *    incremental loads.
  *
@@ -54,7 +54,7 @@
 #include <tracktable/Core/TracktableCommon.h>
 #include <tracktable/Domain/Terrestrial.h>
 
-#include <tracktable/IO/TrajectoryWriter.h>
+#include <tracktable/RW/TrajectoryWriter.h>
 
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/archive/binary_oarchive.hpp>

@@ -4,8 +4,8 @@ This is TRACKTABLE_ROOT/tracktable.  This directory holds all of the
 source code and header files.
 
 All of the Python source code is in the Python/ subdirectory.  The
-other directories here (Analysis, Core, IO, PythonWrapping) hold C++
-code.
+other directories here (Analysis, CommandLineFactories, Core, DataGenerators, Domain, RW, PythonWrapping)
+hold C++ code.
 
 The Examples subdirectory holds self-contained examples of how to use
 various features of the Tracktable C++ interface.  They will be built

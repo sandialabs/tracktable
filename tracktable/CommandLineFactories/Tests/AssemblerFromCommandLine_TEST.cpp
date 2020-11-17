@@ -29,7 +29,7 @@
  */
 #include <tracktable/CommandLineFactories/AssemblerFromCommandLine.h>
 #include <tracktable/Domain/Terrestrial.h>
-#include <tracktable/IO/PointReader.h>
+#include <tracktable/RW/PointReader.h>
 
 #include <tracktable/ThirdParty/catch2.hpp>
 
