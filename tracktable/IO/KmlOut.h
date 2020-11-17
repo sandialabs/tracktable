@@ -49,23 +49,67 @@ TRACKTABLE_IO_EXPORT std::ostream &operator<<(std::ostream &_o, const tracktable
 
 namespace tracktable {
 
+/** Handles writing tracks as kml
+ * Has lots of internal structure to make the following use cases work:
+ *
+ * std::cout << kml::header;
+ * std::cout << kml(t);
+ * std::cout << kml::footer;
+ *
+ * out = ofstream;
+ * out << kml(t);
+ *
+ * For both the above a default style will be used (green, width =3) in the case
+ * of a single trajectory and a random color will be used with the same default
+ * width=3 for a vector of trajectories.
+ * -----------------------------------------------------------------------------
+ * To control color and width:
+ *
+ * std::cout << kml::header;
+ * kml::write(std::cout, t, "AABBGGRR", 4)
+ * std::cout << kml::footer;
+ *
+ * kml::write("filname", t, "AABBGGRR", 5)
+ *
+ * These are the limits of style control at this time.
+ *
+ * TODO: Simplify use of multipoint and linepoint methods (requires placemark)
+ * TODO: Implement placemark manipulation
+ * TODO: Implement style manipulation
+ */
 class TRACKTABLE_IO_EXPORT kml {
  public:
   using TrajectoryT = tracktable::domain::terrestrial::trajectory_type;
   using VectorT = std::vector<TrajectoryT>;
   using PointT = TrajectoryT::point_type;
+  /** Helper struct that allows for for
+    * out << linestring(t)
+    * which will render as a line
+    * This will be missing some header/footer neccesary for full kml rendering */
   struct linestring {
     linestring(const TrajectoryT &_t) : trajectory(&_t) {}
     TrajectoryT const *const trajectory;
   };
+  /** Helper struct that allows for for
+   * out << multipoint(t)
+   * which will render as set of points
+   * This will be missing some header/footer neccesary for full kml rendering */
   struct multipoint {
     multipoint(const TrajectoryT &_t) : trajectory(&_t) {}
     TrajectoryT const *const trajectory;
   };
+  /** Helper struct that allows for for
+   * out << linepoints(t)
+   * which will render as lines with points
+   * This will be missing some header/footer neccesary for full kml rendering */
   struct linepoints {
     linepoints(const TrajectoryT &_t) : trajectory(&_t) {}
     TrajectoryT const *const trajectory;
   };
+  /** Helper struct that allows for for
+   * out << point(t)
+   * which will render as a single point
+   * This will be missing some header/footer neccesary for full kml rendering */
   struct point {
     point(const PointT &_t) : trajectory(&_t) {}
     PointT const *const trajectory;
@@ -74,12 +118,14 @@ class TRACKTABLE_IO_EXPORT kml {
  public:
   kml(const TrajectoryT &_t) : trajectoryPtr(&_t) {}
   kml(const VectorT &_v) : trajectoryListPtr(&_v) {}
+  /** This will start a kml file off */
   static constexpr char header[] =
       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
       "<kml xmlns=\"http://www.opengis.net/kml/2.2\" "
       "xmlns:gx=\"http://www.google.com/kml/ext/2.2\" "
       "xmlns:kml=\"http://www.opengis.net/kml/2.2\">\n"
       "<Document>\n";
+  /** This is how to close a kml file */
   static constexpr char footer[] =
       "</Document>\n"
       "</kml>";
@@ -93,7 +139,8 @@ class TRACKTABLE_IO_EXPORT kml {
  public:
   static std::string generateColorString();
 
-  /** These classes output kml
+  /** @{ @name write
+   * These methods output kml
    * if a file is specified, the header and footer are automatically written
    * if a stream is specified, the header and footer are NOT automatically written
    * write can be called with either a single trajectory or a vector */
@@ -104,13 +151,34 @@ class TRACKTABLE_IO_EXPORT kml {
                     const double &_width);
   static void write(std::ostream &_o, const TrajectoryT &_trajectory, const std::string &_color,
                     const double &_width);
+  /// @}
+  /** Writes a style
+   * @param _o Where to write
+   * @param _id The id to use for the style, referenced by placemarks later
+   * @param _color ABGR hex value for color
+   * @param _width pixel width to use */
   static void writeStyle(std::ostream &_o, const std::string &_id, const std::string &_color, double _width);
+  /** Writes a placemark that renders as lines
+   * @param _o where to write
+   * @param _trajectory what to write */
   static void writeLinestring(std::ostream &_o, const TrajectoryT &_trajectory);
+  /** Writes a placemark that renders as points
+   * @param _o where to write
+   * @param _trajectory what to write */
   static void writeMultipoint(std::ostream &_o, const TrajectoryT &_trajectory);
+  /** Writes a placemark that renders as a single point
+   * @param _o where to write
+   * @param _point what to write */
   static void writePoint(std::ostream &_o, const PointT &_point);
+  /** Writes a placemark that uses multigeomtry to render a line with points
+   * @param _o where to write
+   * @param _trajectory what to write */
   static void writeLineAndPoints(std::ostream &_o, const TrajectoryT &_trajectory);
+  /** Utility to minimize maintenance on writing points as coordinates
+   * @param _o where to write
+   * @param _point what to write */
   static void writeCoords(std::ostream &_o, const PointT &_point);
-  /** This simplifies writing individual files for a vector
+  /** This simplifies writing individual files for a set of trajectories
    * The directory to write the files is specified instead of a filename */
   static void writeToSeparateKmls(const VectorT &_trajectories, const std::string &_output_dir);
 };
