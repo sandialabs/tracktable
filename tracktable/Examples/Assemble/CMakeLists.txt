@@ -35,11 +35,11 @@ include_directories(
   ${Boost_INCLUDE_DIR}
   )
 
-add_executable( points_to_trajectories
-  points_to_trajectories.cpp
+add_executable( assemble
+  assemble.cpp
   )
 
-target_link_libraries( points_to_trajectories
+target_link_libraries( assemble
   TracktableCore
   TracktableDomain
   ${Boost_LIBRARIES}
