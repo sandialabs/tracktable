@@ -25,7 +25,7 @@ reader.set_real_field_column('speed',6)
 
 builder = AssembleTrajectoryFromPoints()
 builder.input = reader
-builder.minumum_length = 3 
+builder.minumum_length = 3
 
 trajs = list(builder.trajectories())
 
@@ -36,8 +36,8 @@ from tracktable.render.render_trajectories import render_trajectories
 
 # The only required parameter is a list of trajectories.  It's that simple.
 render_trajectories(few_trajs, backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/Default.html")
-# The default rendering assigns each object ID a hue which transitions from dark to light as the trajectory 
-# progresses.  In addition, by default, a white dot shows the point with the latest timestamp in the trajectory. 
+# The default rendering assigns each object ID a hue which transitions from dark to light as the trajectory
+# progresses.  In addition, by default, a white dot shows the point with the latest timestamp in the trajectory.
 # Hovering over a trajectory reveals its object_id, and clicking on a trajectory give the object_id and start and stop
 # time for the entire trajectory
 
@@ -50,7 +50,7 @@ render_trajectories(trajs[3], backend="folium", show=False, save=True, filename=
 render_trajectories(trajs[3], tiles='CartoDBPositron', backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/Tiles.html")
 # Options include:
 # OpenStreetMaps
-# StamenTerrain 
+# StamenTerrain
 # StamenToner
 # StamenWatercolor
 # CartoDBPositron
@@ -62,7 +62,7 @@ render_trajectories(trajs[3], tiles='http://server.arcgisonline.com/ArcGIS/rest/
 
 
 # Can specify a bounding box (default extent shows all input trajectories)
-# format of map_bbox is  [minLon, maxLon, minLat, maxLat]
+# format of map_bbox is  [minLon, minLat, maxLon, maxLat]
 render_trajectories(few_trajs, map_bbox=[-108.081, -104.811, 39.3078, 41.27], backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/Bbox.html")
 
 
@@ -76,19 +76,19 @@ render_trajectories(trajs, obj_ids=["JJJ010", "LLL012"], backend="folium", show=
 
 # Can specify a solid color for all trajectories ...
 render_trajectories([trajs[0], trajs[12]], line_color = 'red', backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/SolidSingle.html")
-#Other color strings include: ‘red’, ‘blue’, ‘green’, ‘purple’, ‘orange’, ‘darkred’,’lightred’, ‘beige’, 
-#‘darkblue’, ‘darkgreen’, ‘cadetblue’, ‘darkpurple’, ‘white’, ‘pink’, ‘lightblue’, ‘lightgreen’, ‘gray’, 
+#Other color strings include: ‘red’, ‘blue’, ‘green’, ‘purple’, ‘orange’, ‘darkred’,’lightred’, ‘beige’,
+#‘darkblue’, ‘darkgreen’, ‘cadetblue’, ‘darkpurple’, ‘white’, ‘pink’, ‘lightblue’, ‘lightgreen’, ‘gray’,
 #‘black’, ‘lightgray’
 
 
 # ... or a list of colors.  Note you can use hex string notation for the colors as well.
 render_trajectories([trajs[0], trajs[12]], line_color = ['red', '#0000FF'], backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/SolidMulti.html")
-# Hex string notation is of the format #RRGGBBAA, 
-# Red Green Blue values from 0 to 255 as 2 hex digits each, 
+# Hex string notation is of the format #RRGGBBAA,
+# Red Green Blue values from 0 to 255 as 2 hex digits each,
 # and an OPTIONAL alpha (opacity) value with same range and format.
 
 
-# The trajectories can be colored using a colormap ... 
+# The trajectories can be colored using a colormap ...
 render_trajectories([trajs[0], trajs[12]], color_map = 'BrBG', backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/ColormapSingle.html")
 
 
@@ -106,8 +106,8 @@ newcolors[:25, :] = pink # pink for takeoff (first ~10% of trajectory)
 render_trajectories([trajs[0], trajs[12]], color_map = matplotlib.colors.ListedColormap(newcolors), backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/CustomColormap.html")
 
 
-# You can specify a hue as a float between 0 and 1 which will be used to create a gradient that transitions form dark 
-# to light as the trajectory progresses 
+# You can specify a hue as a float between 0 and 1 which will be used to create a gradient that transitions form dark
+# to light as the trajectory progresses
 render_trajectories([trajs[0], trajs[12]], gradient_hue = .5, backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/GradientHueSingle.html")
 
 
@@ -124,8 +124,8 @@ import matplotlib.colors
 def altitude_generator(trajectory):
     #N-1 segments show altitude at beginning point
     return [point.properties['altitude'] for point in trajectory[:-1]]
-#Note: be sure to include the generator, and the scale for mapping scalars to the color map.  
-render_trajectories([trajs[16]], trajectory_scalar_generator = altitude_generator, 
+#Note: be sure to include the generator, and the scale for mapping scalars to the color map.
+render_trajectories([trajs[16]], trajectory_scalar_generator = altitude_generator,
                     color_scale = matplotlib.colors.Normalize(vmin=0, vmax=35000), backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/AltitudeColormap.html")
 
 
@@ -134,14 +134,14 @@ render_trajectories(trajs[26], linewidth=5, backend="folium", show=False, save=T
 
 
 # You can also adjust the width of the trajectory by some scalar.  In this case the trajectory starts out very narrow
-# and gets wider at each point it passes (as it progresses), but the color remains green throughout. 
+# and gets wider at each point it passes (as it progresses), but the color remains green throughout.
 from tracktable.render.render_trajectories import progress_linewidth_generator
 render_trajectories(trajs[28], line_color='green', trajectory_linewidth_generator=progress_linewidth_generator, backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/CustomLinewidth.html")
 
 
-# You can also show the sample points along the trajectory. By default the points are colored consistent with line 
+# You can also show the sample points along the trajectory. By default the points are colored consistent with line
 # segments
-render_trajectories(trajs[15], show_points=True, backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/DefaultPoints.html") 
+render_trajectories(trajs[15], show_points=True, backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/DefaultPoints.html")
 # Hovering over a point gives the timestamp of that point and by default, clicking on a point reveals the object_id,
 # timestamp, Latitude, and Longitude of that point.
 
