@@ -109,7 +109,7 @@ def render_trajectories(trajectories, backend='', **kwargs):
         obj_ids (str or list of str): only display trajecteories
             whose object id matches the given string or a string from
             the given list of strings.
-        map_bbox ([minLon, maxLon, minLat, maxLat]): bounding box for
+        map_bbox ([minLon, minLat, maxLon, maxLat]): bounding box for
             custom map extent. By default automatically set to
             make all trajectories visible.
         show_lines (bool): whether or not to show the line segments
@@ -661,7 +661,7 @@ def render_trajectories_folium(trajectories,
                                #common arguments
                                map_canvas = None,
                                obj_ids = [],
-                               #\/format [minLon, maxLon, minLat, maxLat]
+                               #\/format [minLon, minLat, maxLon, maxLat]
                                map_bbox = None,
                                show_lines = True,
                                gradient_hue = None,
@@ -961,7 +961,7 @@ def render_trajectories_ipyleaflet(trajectories,
                                #common arguments
                                map_canvas = None,
                                obj_ids = [],
-                               #\/format [minLon, maxLon, minLat, maxLat]
+                               #\/format [minLon, minLat, maxLon, maxLat]
                                map_bbox = None,
                                show_lines = True,
                                gradient_hue = None,
