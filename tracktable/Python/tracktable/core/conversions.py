@@ -32,6 +32,8 @@
 Unit conversions
 """
 
+import math
+
 # ----------------------------------------------------------------------
 
 def m_per_sec_to_mi_per_hr(mps):
