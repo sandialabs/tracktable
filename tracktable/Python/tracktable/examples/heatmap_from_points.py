@@ -308,7 +308,7 @@ def main():
                 data_bbox = geomath.compute_bounding_box(point_source)
             else:
                 # The bounding box on the command line is
-                # [x_min, y_min, x_max, y_max]
+                # [minLon, minLat, maxLon, maxLat]
                 data_bbox = cartesian2d.BoundingBox(
                     (args.map_bbox[0], args.map_bbox[1]),
                     (args.map_bbox[2], args.map_bbox[3])
@@ -318,7 +318,7 @@ def main():
             data_bbox = None
             if args.map_bbox is not None:
                 # The bounding box on the command line is
-                # [x_min, y_min, x_max, y_max]
+                # [minLon, minLat, maxLon, maxLat]
                 data_bbox = terrestrial.BoundingBox(
                     (args.map_bbox[0], args.map_bbox[1]),
                     (args.map_bbox[2], args.map_bbox[3])

@@ -78,7 +78,7 @@ def cartesian_map(map_bbox=None,
     draw axes/grid lines on the figure.
 
     Keyword Args:
-        map_bbox ([minLon, maxLon, minLat, maxLat]): bounding box for
+        map_bbox ([minLon, minLat, maxLon, maxLat]): bounding box for
             custom map extent. By default automatically set to
             make all trajectories visible. (Default: None)
         gridline_spacing (int): Spaceing to put between grid lines (Default: None)
@@ -193,7 +193,7 @@ def terrestrial_map(map_name,
       city_label_color (str):                       Color name or hex string for city names (Default: 'white')
       city_zorder (int):                            Color name or hex string for city names (Default: 6)
       border_resolution (str):                      Detail of borders (Default: '110m')
-      map_bbox ([minLon, maxLon, minLat, maxLat]):  Bounding box for custom map extent (Default: None)
+      map_bbox ([minLon, minLat, maxLon, maxLat]):  Bounding box for custom map extent (Default: None)
       map_projection (Basemap):                     Cartopy CRS projection object (optional) (Default: None)
       map_scale_length (float):                     Length of map scale indicator (in km) (Default: None)
       region_size (float):                          Size of region depicted around an airport (km width x km height) (Default: None)
