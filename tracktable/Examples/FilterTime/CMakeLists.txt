@@ -27,7 +27,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# This is tracktable/Examples/Assemble/CMakeLists.txt
+# This is tracktable/Examples/FilterTime/CMakeLists.txt
 
 include_directories(
   ${Tracktable_SOURCE_DIR}
@@ -35,11 +35,11 @@ include_directories(
   ${Boost_INCLUDE_DIR}
   )
 
-add_executable( filter_points_by_time
-  filter_points_by_time.cpp
+add_executable( filter_time
+  filter_by_time.cpp
   )
 
-target_link_libraries( filter_points_by_time
+target_link_libraries( filter_time
   TracktableCore
   TracktableDomain
   ${Boost_LIBRARIES}
