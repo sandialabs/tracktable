@@ -53,7 +53,7 @@
 
 import tracktable.core
 import tracktable.domain.terrestrial
-import tracktable.source.trajectory
+from tracktable.source.trajectory import AssembleTrajectoryFromPoints
 
 import datetime
 import os.path
@@ -64,7 +64,7 @@ import tempfile
 def load_trajectories(filename):
     with open(filename, 'rb') as infile:
         point_reader = tracktable.domain.terrestrial.TrajectoryPointReader(infile)
-        assembler = tracktable.source.trajectory.AssembleTrajectoryFromPoints()
+        assembler = AssembleTrajectoryFromPoints()
         assembler.input = point_reader
         assembler.separation_time = datetime.timedelta(minutes=30)
         assembler.minimum_length = 5

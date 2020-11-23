@@ -43,7 +43,6 @@ if (BUILD_TESTING)
   add_subdirectory(rw/tests)
   add_subdirectory(info/tests)
   add_subdirectory(render/tests)
-  add_subdirectory(source/tests)
  endif (BUILD_TESTING)
 
 install(
