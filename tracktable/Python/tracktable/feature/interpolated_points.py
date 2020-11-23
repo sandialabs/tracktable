@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 """
-tracktable.source.path_point_source - Generate points along a path
+tracktable.feature.interpolated_points - Generate points along a path
 """
 
 from __future__ import division, print_function, absolute_import

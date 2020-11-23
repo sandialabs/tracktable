@@ -28,4 +28,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+
+"""tracktable.data_generators - Generate points within a specified bounding box or seed point
+"""
+
 pass

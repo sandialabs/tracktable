@@ -11,6 +11,8 @@ Submodules
    :maxdepth: 2
 
    tracktable.feature.annotations.rst
+   tracktable.feature.interleave_points.rst
+   tracktable.feature.interpolated_points.rst
 
 
 ---------------
