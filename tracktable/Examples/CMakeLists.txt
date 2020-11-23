@@ -38,7 +38,7 @@ find_package(Boost
   ${BOOST_MINIMUM_VERSION_REQUIRED}
   REQUIRED
   COMPONENTS
-    ${BOOST_CORE_COMPONENTS_NEEDED}
+    ${BOOST_CORE_COMPONENTS_NEEDED} timer
     ${BOOST_EXAMPLE_COMPONENTS}
   )
 
@@ -46,7 +46,7 @@ find_package(Boost
 add_subdirectory(Assemble)
 add_subdirectory(Classify)
 add_subdirectory(Cluster)
-add_subdirectory(Filter)
+add_subdirectory(FilterTime)
 # add_subdirectory(Portal)
 add_subdirectory(Predict)
 add_subdirectory(Reduce)
