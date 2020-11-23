@@ -37,4 +37,39 @@ loaded from a file, extracted from a database or created
 algorithmically.
 """
 
-pass
+# TODO (mjfadem): Remove this file in release 1.6
+
+import warnings
+import sys
+
+import tracktable.analysis
+import tracktable.analysis.assemble_trajectories
+
+import tracktable.data_generators
+import tracktable.data_generators.point
+
+import tracktable.feature
+import tracktable.feature.interleave_points
+import tracktable.feature.interpolated_points
+
+# This just stops the source line from printing with the warning
+def format_warning(message, category, filename, lineno, file=None, line=None):
+    return '%s:%s: %s:%s\n' % (filename, lineno, category.__name__, message)
+
+warnings.formatwarning = format_warning
+
+# Allow the PendingDeprecationWarning through since it's disabled by default
+warnings.simplefilter("always", category=PendingDeprecationWarning)
+
+# This will display a PendingDeprecationWarning when the source modules are imported
+warnings.warn(" \nThe tracktable.source submodules have been relocated to more appropriate locations listed below and tracktable.source will be fully removed in release 1.6.\n"
+        "\ttracktable.source.combine            -> tracktable.feature.interleave_points\n"
+        "\ttracktable.source.path_point_source  -> tracktable.feature.interpolated_points\n"
+        "\ttracktable.source.point              -> tracktable.data_generators.point\n"
+        "\ttracktable.source.trajectory         -> tracktable.analysis.assemble_trajectories\n", category=PendingDeprecationWarning)
+
+# Aliases to smooth the transition of relocation of tracktable.source modules
+sys.modules['tracktable.source.combine'] = tracktable.feature.interleave_points
+sys.modules['tracktable.source.path_point_source'] = tracktable.feature.interpolated_points
+sys.modules['tracktable.source.point'] = tracktable.data_generators.point
+sys.modules['tracktable.source.trajectory'] = tracktable.analysis.assemble_trajectories

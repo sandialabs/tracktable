@@ -9,6 +9,7 @@ Submodules
 .. toctree::
    :maxdepth: 2
 
+   tracktable.analysis.assemble_trajectories.rst
    tracktable.analysis.distance_geometry.rst
    tracktable.analysis.dbscan.rst
    tracktable.analysis.rtree.rst

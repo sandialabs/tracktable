@@ -2,8 +2,7 @@
 tracktable.rw module
 ====================
 
-tracktable.rw is identical to tracktable.io. tracktable.io is slated to be fully deprecated
-in Tracktable 1.6.
+.. important:: ``tracktable.rw`` is identical to ``tracktable.io``. All functionality found in ``tracktable.io`` is preserved here.
 
 ----------
 Submodules
