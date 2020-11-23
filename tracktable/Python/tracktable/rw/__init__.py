@@ -26,7 +26,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""tracktable.rw- Read/Write for Tracktable points and trajectories. Formerly called tracktable.io
+"""tracktable.rw- Read/Write for Tracktable points and trajectories.
 
 This module contains code to read and write trajectories in different formats
 """
