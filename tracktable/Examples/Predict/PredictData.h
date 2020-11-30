@@ -27,23 +27,63 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef BuildFeatures_h
-#define BuildFeatures_h
 
-#include "PredictData.h"
+#ifndef PredictData_h
+#define PredictData_h
 
+#include <tracktable/Analysis/GuardedBoostGeometryRTreeHeader.h>
 #include <tracktable/Domain/Terrestrial.h>
 
-#include <vector>
+#include <boost/geometry/geometries/adapted/std_array.hpp>
+
+#include <array>
+#include <memory>
 
 using TrajectoryT = tracktable::domain::terrestrial::trajectory_type;
-using TrajectoryVectorT = std::vector<std::shared_ptr<TrajectoryT>>;
-using DataVectorT = std::vector<PredictData>;
+// TODO: Make TrajectoryT a template param
 
-DataVectorT BuildFeatures(const TrajectoryVectorT &_trajectories, double _fraction);
-DataVectorT BuildManyEvenFeatures(const TrajectoryVectorT &_trajectories);
-DataVectorT BuildManyRandomFeatures(const TrajectoryVectorT &_trajectories);
-DataVectorT BuildRandomFeatures(const TrajectoryVectorT &_trajectories, double _lower, double _upper);
-PredictData BuildFeature(std::shared_ptr<TrajectoryT> _trajectory, double _fraction);
+class PredictData {
+   public:
+    // Have to use boost array instead of standard because rtree can't handle std::array
+    using FeatureT = std::array<double, 10>;
+    FeatureT feature;
+    size_t Id;
+    std::shared_ptr<TrajectoryT> index;
+
+    PredictData() = delete;
+    PredictData(FeatureT const& _f, size_t id, std::shared_ptr<TrajectoryT> idx)
+        : feature(_f), Id(id), index(idx) {}
+    ~PredictData() = default;
+
+    PredictData(PredictData const& _other) {
+        feature = _other.feature;
+        Id = _other.Id;
+        index = _other.index;
+    }
+
+    PredictData& operator=(PredictData const& _other) {
+        feature = _other.feature;
+        Id = _other.Id;
+        index = _other.index;
+        return *this;
+    }
+};
+
+BOOST_GEOMETRY_REGISTER_STD_ARRAY_CS(cs::cartesian)
+
+namespace boost {
+namespace geometry {
+namespace index {
+
+template <>
+struct indexable<PredictData*> {
+    using result_type = PredictData::FeatureT const&;  // required by boost
+    result_type const& operator()(PredictData* const& v) const { return v->feature; }
+};
+
+}  // namespace index
+}  // namespace geometry
+}  // namespace boost
+using PredictRtreeT = boost::geometry::index::rtree<PredictData*, boost::geometry::index::quadratic<16>>;
 
 #endif

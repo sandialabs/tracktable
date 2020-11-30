@@ -81,7 +81,9 @@ class TRACKTABLE_RW_EXPORT kml {
 
  public:
   using TrajectoryT = tracktable::domain::terrestrial::trajectory_type;
-  using VectorT = std::vector<TrajectoryT>;
+  using TrajectoryVectorT = std::vector<TrajectoryT>;
+  using PointerT = std::shared_ptr<TrajectoryT>;
+  using PointerVectorT = std::vector<PointerT>;
   using PointT = TrajectoryT::point_type;
   /** Helper struct that allows for for
     * out << linestring(t)
@@ -118,7 +120,9 @@ class TRACKTABLE_RW_EXPORT kml {
 
  public:
   kml(const TrajectoryT &_t) : trajectoryPtr(&_t) {}
-  kml(const VectorT &_v) : trajectoryListPtr(&_v) {}
+  kml(const TrajectoryVectorT &_v) : trajectoryListPtr(&_v) {}
+  kml(const PointerT & _p) : trajectoryPtr(_p.get()) {}
+  kml(const PointerVectorT &_vp) : trajectorySmartListPtr(&_vp) {}
   /** This will start a kml file off */
   static constexpr char header[] =
       "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -135,7 +139,8 @@ class TRACKTABLE_RW_EXPORT kml {
   friend std::ostream &(::operator<<)(std::ostream &_o, const tracktable::kml &_kml);
   friend std::ofstream &(::operator<<)(std::ofstream &_o, const tracktable::kml &_kml);
   const TrajectoryT *trajectoryPtr = nullptr;
-  const VectorT *trajectoryListPtr = nullptr;
+  const TrajectoryVectorT *trajectoryListPtr = nullptr;
+  const PointerVectorT *trajectorySmartListPtr = nullptr;
 
  public:
   static std::string generateColorString();
@@ -145,8 +150,9 @@ class TRACKTABLE_RW_EXPORT kml {
    * if a file is specified, the header and footer are automatically written
    * if a stream is specified, the header and footer are NOT automatically written
    * write can be called with either a single trajectory or a vector */
-  static void write(const std::string &_filename, const VectorT &_trajectories);
-  static void write(std::ostream &_o, const VectorT &_trajectories);
+  static void write(const std::string &_filename, const TrajectoryVectorT &_trajectories);
+  static void write(std::ostream &_o, const TrajectoryVectorT &_trajectories);
+  static void write(std::ostream &_o, const PointerVectorT &_trajectories);
   static void write(const std::string &_filename, const TrajectoryT &_trajectory);
   static void write(const std::string &_filename, const TrajectoryT &_trajectory, const std::string &_color,
                     const double &_width);
@@ -181,7 +187,7 @@ class TRACKTABLE_RW_EXPORT kml {
   static void writeCoords(std::ostream &_o, const PointT &_point);
   /** This simplifies writing individual files for a set of trajectories
    * The directory to write the files is specified instead of a filename */
-  static void writeToSeparateKmls(const VectorT &_trajectories, const std::string &_output_dir);
+  static void writeToSeparateKmls(const TrajectoryVectorT &_trajectories, const std::string &_output_dir);
 };
 
 }  // namespace tracktable
