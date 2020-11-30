@@ -28,13 +28,45 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _AssignHeadings_h_
-#define _AssignHeadings_h_
+#ifndef AssignHeadings_h
+#define AssignHeadings_h
 
-#include "Common.h"
+#include <tracktable/Core/detail/algorithm_signatures/Bearing.h>
+#include <tracktable/Core/detail/algorithm_signatures/TurnAngle.h>
 
-void AssignTrajectoriesHeadings(std::vector<trajectory_type> &trajectories);
-void AssignTrajectoryHeadings(trajectory_type &trajectory);
-double TotalCurvature(trajectory_type const& trajectory);
+#include <algorithm>
+#include <vector>
+
+template <typename TrajectoryT>
+void AssignTrajectoryHeadings(TrajectoryT &trajectory) {
+    if (trajectory.size() == 0) return;
+    if (trajectory.size() == 1) {
+        trajectory[0].set_property("heading", 0.0);
+        return;
+    }
+    for (unsigned int i = 0; i < trajectory.size() - 1; ++i) {
+        trajectory[i].set_property("heading", tracktable::bearing(trajectory[i], trajectory[i + 1]));
+    }
+    trajectory[trajectory.size() - 1].set_property(
+        "heading", trajectory[trajectory.size() - 2].real_property("heading"));
+}
+// overload for vector type
+template <typename TrajectoryT>
+void AssignTrajectoryHeadings(std::vector<TrajectoryT> &trajectories) {
+    // use static cast to specify which overload
+    std::for_each(trajectories.begin(), trajectories.end(),
+                  static_cast<void (*)(TrajectoryT &)>(AssignTrajectoryHeadings<TrajectoryT>));
+}
+
+template <typename TrajectoryT>
+double TotalCurvature(TrajectoryT const &trajectory) {
+    if (trajectory.size() < 3) {
+        return 0.0;
+    }
+    auto curvature = 0.0;
+    for (auto i = 1u; i < trajectory.size() - 1; ++i)
+        curvature += signed_turn_angle(trajectory[i - 1], trajectory[i], trajectory[i + 1]);
+    return curvature;
+}
 
 #endif
