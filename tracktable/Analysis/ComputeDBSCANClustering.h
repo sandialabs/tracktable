@@ -212,6 +212,7 @@ int build_cluster_membership_lists(
       membership_lists[cluster_id] = vertex_id_vector_type();
       }
     membership_lists[cluster_id].push_back(vertex_id);
+    ++label_begin;
     }
 
   // Since std::map keeps its contents sorted by the key (in this case
