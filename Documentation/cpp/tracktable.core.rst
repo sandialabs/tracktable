@@ -27,6 +27,7 @@ Submodules
    tracktable.core.PropertyConverter.rst
    tracktable.core.PropertyMap.rst
    tracktable.core.PropertyValue.rst
+   tracktable.core.SimplifyLinestring.rst
    tracktable.core.Timestamp.rst
    tracktable.core.TimestampConverter.rst
    tracktable.core.TracktableCommon.rst
