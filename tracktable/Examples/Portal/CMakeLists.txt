@@ -27,7 +27,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# This is tracktable/Examples/Reduce/CMakeLists.txt
+# This is tracktable/Examples/Portal/CMakeLists.txt
 
 include_directories(
   ${Tracktable_SOURCE_DIR}
@@ -45,15 +45,14 @@ link_directories(
   )
 
 add_executable( portal
-  TwoPortals.cpp
-  ParseCommandLine.cpp
+  main.cpp
   Portal.cpp
-  Initial.cpp
-  KmlOut.cpp
+  PortalPair.cpp
   )
 
 target_link_libraries( portal
   TracktableCore
   TracktableDomain
+  TracktableRW
   ${Boost_LIBRARIES}
   )
