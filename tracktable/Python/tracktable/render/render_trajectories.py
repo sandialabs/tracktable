@@ -784,8 +784,8 @@ def render_trajectories_folium(trajectories,
                                             map_canvas)
 
     if map_bbox:
-        map_canvas.fit_bounds([(map_bbox[2], map_bbox[0]),
-                      (map_bbox[3], map_bbox[1])])
+        map_canvas.fit_bounds([(map_bbox[1], map_bbox[0]),
+                      (map_bbox[3], map_bbox[2])])
     else:
         map_canvas.fit_bounds(bounding_box_for_folium(trajectories))
     if save:  #saves as .html document
@@ -1139,11 +1139,11 @@ def render_trajectories_ipyleaflet(trajectories,
                                             map_canvas)
 
     if map_bbox:
-    #    map.fit_bounds([(map_bbox[2], map_bbox[0]),
-    #                  (map_bbox[3], map_bbox[1])])
+    #    map.fit_bounds([(map_bbox[1], map_bbox[0]),
+    #                  (map_bbox[3], map_bbox[2])])
         #todo make a centroid function, unify with else code below
-        center_lon = map_bbox[0]+((map_bbox[1]-map_bbox[0])/2.0) #added
-        center_lat = map_bbox[2]+((map_bbox[3]-map_bbox[2])/2.0) #added
+        center_lon = map_bbox[0]+((map_bbox[2]-map_bbox[0])/2.0) #added
+        center_lat = map_bbox[1]+((map_bbox[3]-map_bbox[1])/2.0) #added
         map.center = (center_lat, center_lon)#added
         map.zoom=4 #get_bounds_zoom(map, map_bbox)-1 #hack #todo fix
     else:
