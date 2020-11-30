@@ -42,7 +42,7 @@ namespace tracktable {
 using ::operator<<;
 
 using TrajectoryT = kml::TrajectoryT;
-using VectorT = kml::VectorT;
+using TrajectoryVectorT = kml::TrajectoryVectorT;
 using PointT = kml::PointT;
 
 std::string kml::generateColorString() {
@@ -55,7 +55,7 @@ std::string kml::generateColorString() {
   return ss.str();
 }
 
-void kml::write(const std::string &_filename, const VectorT &_trajectories) {
+void kml::write(const std::string &_filename, const TrajectoryVectorT &_trajectories) {
   std::ofstream out(_filename);
   if (!out.is_open()) {
     throw std::runtime_error("Could not open output file:" + _filename);
@@ -66,14 +66,21 @@ void kml::write(const std::string &_filename, const VectorT &_trajectories) {
   out.close();
 }
 
-void kml::write(std::ostream &_o, const VectorT &_trajectories) {
+void kml::write(std::ostream &_o, const TrajectoryVectorT &_trajectories) {
   constexpr auto width = 3.0;
   for (auto &t : _trajectories) {
     write(_o, t, generateColorString(), width);
   }
 }
 
-void kml::writeToSeparateKmls(const VectorT &_trajectories, const std::string &_output_dir) {
+void kml::write(std::ostream &_o, const PointerVectorT &_trajectories) {
+  constexpr auto width = 3.0;
+  for (auto &t : _trajectories) {
+    write(_o, *t, generateColorString(), width);
+  }
+}
+
+void kml::writeToSeparateKmls(const TrajectoryVectorT &_trajectories, const std::string &_output_dir) {
   for (auto &t : _trajectories) {
     // Assumes one track per day with some id
     auto filename = _output_dir + t.object_id() + "-" +
@@ -177,9 +184,13 @@ std::ostream &operator<<(std::ostream &_o, const tracktable::kml &_k) {
   constexpr auto WIDTH = 3.0;
   if (nullptr != _k.trajectoryPtr) {
     tracktable::kml::write(_o, *_k.trajectoryPtr, GREEN, WIDTH);
-  } else {
+  } else if (nullptr != _k.trajectoryListPtr) {
     tracktable::kml::write(_o, *_k.trajectoryListPtr);
+  } else
+  {
+    tracktable::kml::write(_o, *_k.trajectorySmartListPtr);
   }
+
   return _o;
 }
 
