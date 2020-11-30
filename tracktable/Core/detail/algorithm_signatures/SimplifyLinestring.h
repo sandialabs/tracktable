@@ -28,7 +28,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-/*
+/**
  * SimplifyLinestring: Translate a call to tracktable::simplify into a
  * call to boost::geometry::simplify
  *
@@ -70,6 +70,25 @@ struct simplify_linestring
 
 namespace tracktable {
 
+/** Geometric simplification for trajectory
+ *
+ * This function reduces the number of points in a trajectory without
+ * introducing positional error greater than the supplied tolerance.
+ * Under the hood it uses Douglas-Peucker simplification.
+ *
+ * NOTE: The points in the output are copies of the points in the
+ * input. Changing the input after a call to simplify() will have no
+ * effect on previous results.
+ *
+ * NOTE: This function only cares about geometric error in the
+ * trajectory. It does not account for error in the attributes
+ * attached to each point.
+ *
+ * @param [in] input Trajectory to simplify
+ * @param [in] tolerance Error tolerance measured in the trajectory's native distance
+ *
+ * @return Simplified version of trajectory
+ */
 template<typename linestring_type>
 linestring_type simplify(linestring_type const& input, double tolerance)
 {
