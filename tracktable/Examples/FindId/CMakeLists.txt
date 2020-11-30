@@ -27,28 +27,34 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-
-#
-# This is tracktable/Examples/CMakeLists.txt.
-#
-# This second check undoes the previous find and looks for all necessary components
-unset(Boost_FOUND)
-message(STATUS "Looking for Boost components needed for C++ examples")
-find_package(Boost
-  ${BOOST_MINIMUM_VERSION_REQUIRED}
-  REQUIRED
-  COMPONENTS
-    ${BOOST_CORE_COMPONENTS_NEEDED} timer
-    ${BOOST_EXAMPLE_COMPONENTS}
+include_directories(
+  ${Tracktable_SOURCE_DIR}
+  ${Tracktable_BINARY_DIR}
+  BEFORE
+  )
+include_directories(
+  ${Boost_INCLUDE_DIR}
+  AFTER
   )
 
+link_directories(
+  ${Boost_LIBRARY_DIRS}
+  )
 
-add_subdirectory(FindId)
-add_subdirectory(Assemble)
-add_subdirectory(Classify)
-add_subdirectory(Cluster)
-add_subdirectory(FilterTime)
-# add_subdirectory(Portal)
-add_subdirectory(Predict)
-add_subdirectory(Reduce)
-add_subdirectory(Serialization)
+add_executable( findid
+  Main.cpp
+  )
+
+target_link_libraries( findid
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+  )
+
+#TODO address example data files
+add_custom_command(
+  TARGET findid POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_CURRENT_SOURCE_DIR}/mapping_ids.txt
+    ${Tracktable_BINARY_DIR}/bin)
+
