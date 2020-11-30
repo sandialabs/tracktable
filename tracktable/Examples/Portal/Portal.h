@@ -3,115 +3,90 @@
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef Portal_h
+#define Portal_h
 
-//
-// Portal
-//
-// A simple definition of a portal
-//
-//
-// Created by Danny Rintoul
-//
+#include <tracktable/Domain/Terrestrial.h>
 
-#ifndef __Portal
-#define __Portal
-
-#include <set>
-#include <string>
-#include <list>
-#include <boost/shared_ptr.hpp>
 #include <boost/geometry/geometries/box.hpp>
 #include <boost/geometry/geometries/register/box.hpp>
-#include "Common.h"
-#include "my_pq.h"
 
-class Portal : public boost::geometry::model::box<trajectory_point_type>
-{
-public:
-  Portal() {};
-  Portal(const boost::geometry::model::box<trajectory_point_type>& b) :
-   boost::geometry::model::box<trajectory_point_type>(b) {};
+#include <list>
+#include <memory>
+#include <set>
 
-  unsigned int level;
-  std::set<trajectory_type*> trajectories;
-  std::list<boost::shared_ptr<Portal> > children;
-  bool operator < (const Portal &p)
-   const {return (trajectories.size() < p.trajectories.size());}
+using TrajectoryT = tracktable::domain::terrestrial::trajectory_type;
+using PointT = typename TrajectoryT::point_type;
+using BoxT = boost::geometry::model::box<PointT>;
+using TrajectoryPtrT = std::shared_ptr<TrajectoryT>;
+
+/**
+ * @brief A portal is simply a box defined by two points
+ * A portal has a set of trajectories that intersect it and the potentail to have a set of 'children' which
+ * are fully contained subdivisions
+ */
+class Portal : public BoxT {
+   public:
+    Portal() = delete;
+    Portal(const BoxT &b) : BoxT(b){};
+
+    /// Sort Portals basic on how many trajectories they contain
+    bool operator<(const Portal &p) const { return (trajectories.size() < p.trajectories.size()); }
+    /** @brief Divides portal into x*y children portals and assign trajectories accordingly
+     * @param _xDivision number of divisions in the x(longitude) direction
+     * @param _yDivisions number of divisions in the y(latitude) direction */
+    void divide(size_t _xDivision, size_t _yDivisions);
+    /** @brief Adds a list of trajectories to the portal
+     * @param _addList */
+    void add_trajectories(std::vector<TrajectoryPtrT> &_addList);
+    /** @brief Will assign the trajectory to this portal (does not check intersection) then adds the
+     * trajectory to all children (based on intersection)
+     * @note if the trajectory does not intersect the top level, it will still be added while not existing
+     * in any of the children (impact unknown)
+     * @param _t The trajectory to add */
+    void add_trajectory(const TrajectoryPtrT &_t);
+    /** @brief Removes a list of trajectories from the portal
+     * @param _removeList */
+    void remove_trajectories(const std::vector<TrajectoryPtrT> &_removeList);
+    /** @brief Removes a specific trajectory from portal and all children
+     * @param _t trajectory to remove */
+    void remove_trajectory(const TrajectoryPtrT &_t);
+
+   public:
+    size_t level;                                  ///< The level this portal is at
+    std::set<TrajectoryPtrT> trajectories;         ///< Trajectories that intersect this portal
+    std::list<std::shared_ptr<Portal> > children;  ///< Children portals (if any)
 };
 
-BOOST_GEOMETRY_REGISTER_BOX(Portal, trajectory_point_type, min_corner(), max_corner());
+/// How we pass portal references around
+using PortalPtrT = std::shared_ptr<Portal>;
+/// Overide default sorting for PortalPtrT
+bool operator<(const PortalPtrT &p1, const PortalPtrT &p2);
 
-typedef std::set<trajectory_type*>::iterator fp_itr;
-typedef boost::shared_ptr<Portal> PP;
-typedef std::list<PP>::iterator pp_itr;
+BOOST_GEOMETRY_REGISTER_BOX(Portal, PointT, min_corner(), max_corner());
 
-struct PPCompare {
-  bool operator() (const PP& p1, const PP& p2) const {
-   return p1->trajectories.size() < p2->trajectories.size();}
-};
-
-std::ostream& operator<< (std::ostream &out, Portal &p);
-
-double PortalDist(const PP &p1, const PP &p2);
-
-class Portal_pair
-{
-public:
-  PP p1;
-  PP p2;
-  unsigned int val;
-  double sep;
-//  bool operator < (const Portal_pair &p) const {return (val < p.val);}
-//  bool operator < (const Portal_pair &p) const {return (sep < p.sep);}
-  bool operator < (const Portal_pair &p) const {return (val*sep < p.val*p.sep);}
-};
-
-class Pair_heap : public my_pq<Portal_pair>
-{
-public:
-  double min_sep;
-  unsigned int min_val;
-};
-
-void SubDividePortal(PP &parent, unsigned int interval_x = 2,
- unsigned int inverval_y = 2);
-int RefinePairs(Pair_heap &pairs,
- const unsigned int depth, const unsigned int interval_x = 2,
- const unsigned int interval_y = 2);
-void RefineTopPair(Pair_heap &pairs,
- const unsigned int depth, const unsigned int interval_x = 2,
- const unsigned int interval_y = 2);
-void MakeNewPair(Pair_heap &pairs, PP &p1, PP &p2);
-void RemoveTopPair(Pair_heap &pairs, PP &US);
-void RemoveTopPair(Pair_heap &pairs,
- Trajectories &trajectories, PP &US);
-void RemoveTrajectories(PP &US, Trajectories &trajectories,
- std::vector<trajectory_type*> &to_remove);
-void RemoveClippedTrajectories(PP &portal, Trajectories &trajectories,
- std::vector<trajectory_type*> &to_remove, const Portal_pair &pp);
-void UpdatePairVal(Portal_pair &pp);
-void UpdatePairSep(Portal_pair &pp);
-int RefineSingles(my_pq<PP,std::vector<PP>,PPCompare> &portals,
- const unsigned int depth, const unsigned int interval_x = 2,
- const unsigned int interval_y = 2);
-void RefineTopSingle(my_pq<PP,std::vector<PP>,PPCompare> &portals,
- const unsigned int depth, const unsigned int interval_x = 2,
- const unsigned int interval_y = 2);
-void RemoveTopPortal(my_pq<PP,std::vector<PP>,PPCompare> &portals, PP &US);
-bool FPIntersects(const trajectory_type* fp, const PP &pp);
-std::vector<trajectory_point_type> FPIntersection(const trajectory_type* fp, const PP &pp);
-//void GetTwoBoxLS(const Portal_pair &pp, trajectory_type *trajectory,
-// Ls &trajectory_portion);
-bool WithinPortalEllipse(const Portal_pair &pp, trajectory_type *trajectory,
- const double &ecc);
-void RemoveTopPairClipped(Pair_heap &pairs,
- Trajectories &trajectories, PP &US);
-void ClipTrajectory(PP &portal, Trajectories &trajectories,
- trajectory_type *trajectory, T_itr &first_pt, T_itr &last_pt);
-void AddTrajectory(PP &portal, trajectory_type *to_add);
-void GetTwoPortalSegment(const Portal_pair &pp, trajectory_type *trajectory,
-T_itr &first_pt, T_itr &last_pt);
-void PortalRemoveTrajectory(PP &portal, trajectory_type *to_remove);
-void ListRemoveTrajectory(Trajectories &trajectories, trajectory_type *t);
-#endif
+#endif  // portal_h
