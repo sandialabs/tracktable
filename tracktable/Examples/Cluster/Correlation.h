@@ -28,49 +28,55 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <vector>
-#include <iostream>
+#ifndef Correlation_h
+#define Correlation_h
+
 #include <tracktable/Domain/FeatureVectors.h>
 
-typedef tracktable::domain::feature_vectors::FeatureVector<10> feature_vector;
+#include <sstream>
+#include <string>
+#include <vector>
 
-void Correlation(std::vector<feature_vector>& features)
-{
-  double mean[10];
-  double sq_mean[10];
-  double cov[10][10];
+/** Calculates and prints the covariance matrix for a set of features.
+ * @Tparam N size of individual feature vector
+ * @param feature Vector of feature vectors to display covariance matrix of
+ */
+template <size_t N>
+std::string Correlation(std::vector<tracktable::domain::feature_vectors::FeatureVector<N>>& features) {
+    double mean[N] = {0.0};
+    double sq_mean[N] = {0.0};
+    double cov[N][N] = {0.0};
 
-  for (unsigned int i = 0; i < 10; ++i) {
-    for (unsigned int j = 0; j < 10; ++j)
-      cov[i][j] = 0.0;
-    mean[i] = 0.0;
-    sq_mean[i] = 0.0;
-  }
-
-  double N = static_cast<double>(features.size());
-
-  for (unsigned int i = 0; i < features.size(); ++i)
-    for (unsigned int j = 0; j < 10; ++j) {
-      mean[j] += features[i][j]/N;
+    for (auto i = 0u; i < features.size(); ++i) {
+        for (auto j = 0u; j < N; ++j) {
+            mean[j] += features[i][j] / static_cast<double>(N);
+        }
     }
 
-  for (unsigned int i = 0; i < features.size(); ++i)
-    for (unsigned int j = 0; j < 10; ++j) {
-      sq_mean[j] += (features[i][j] - mean[j]) * (features[i][j] - mean[j]);
+    for (unsigned int i = 0; i < features.size(); ++i) {
+        for (auto j = 0u; j < N; ++j) {
+            auto e = features[i][j] - mean[j];
+            sq_mean[j] += e * e;
+        }
+    }
+    for (auto k = 0; k < features.size(); ++k) {
+        auto& feature = features[k];
+        for (auto i = 0u; i < N; ++i) {
+            for (auto j = 0u; j <= i; ++j) {
+                cov[i][j] +=
+                    ((feature[i] - mean[i]) * (feature[j] - mean[j])) / (sqrt(sq_mean[i] * sq_mean[j]));
+            }
+        }
     }
 
-  for (unsigned int i = 0; i < 10; ++i)
-    for (unsigned int j = 0; j <= i; ++j)
-      for (unsigned int k = 0; k < features.size(); ++k)
-        cov[i][j] += ((features[k][i]-mean[i]) * (features[k][j]-mean[j]))
-         /(sqrt(sq_mean[i]*sq_mean[j]));
-
-
-  for (unsigned int i = 0; i < 10; ++i) {
-    for (unsigned int j = 0; j <= i; ++j)
-      std::cout << cov[i][j] << "\t";
-    std::cout << std::endl;
-  }
-
-  return;
+    std::stringstream result;
+    for (auto& row : cov) {
+        for (auto& col : row) {
+            result << std::setw(8) << col << "\t";
+        }
+        result << "\b\n";
+    }
+    return result.str();
 }
+
+#endif

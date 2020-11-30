@@ -27,7 +27,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# This is tracktable/Examples/Reduce/CMakeLists.txt
+# This is tracktable/Examples/Cluster/CMakeLists.txt
 
 include_directories(
   ${Tracktable_SOURCE_DIR}
@@ -46,9 +46,6 @@ link_directories(
 
 add_executable( cluster
   Main.cpp
-  ParseCommandLine.cpp
-  KmlOut.cpp
-  Correlation.cpp
   )
 
 target_link_libraries( cluster
