@@ -47,7 +47,8 @@ from tracktable.core.geomath import compute_bounding_box, distance
 from tracktable.core.geomath import length, point_at_length_fraction
 import itertools
 import random
-import cartopy.crs as ccrs
+import cartopy
+import cartopy.crs
 import matplotlib
 import matplotlib.pyplot as plt
 from tracktable.render.mapmaker import mapmaker
@@ -1261,7 +1262,7 @@ def render_trajectories_cartopy(trajectories,
 
                                 #cartopy specific arguments
                                 map_projection = None,
-                                transform = None,
+                                transform = cartopy.crs.PlateCarree(),
                                 **kwargs):
     """Render a list of trajectories using the cartopy backend
     This function renders a list of trajectories to a cartopy map.
@@ -1332,7 +1333,8 @@ def render_trajectories_cartopy(trajectories,
                        show_points = show_points,
                        point_size = point_size*15,
                        point_color=point_color,
-                       show_lines=show_lines)
+                       show_lines=show_lines,
+                       transform=transform)
     #Don't support: label_objects, label_generator, label_kwargs, axes, zorder
 
     if not in_notebook() or save:
