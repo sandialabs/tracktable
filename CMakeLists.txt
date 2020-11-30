@@ -382,7 +382,7 @@ set(Boost_NO_BOOST_CMAKE ON)
 
 # Core: date_time log serialization
 # IO: regex
-set(BOOST_CORE_COMPONENTS_NEEDED date_time log regex serialization)
+set(BOOST_CORE_COMPONENTS_NEEDED date_time log regex serialization timer)
 
 # These are the components, in addition to core components that are needed to
 # build examples.
