@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2017 National Technology and Engineering
+ * Copyright (c) 2015-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -28,54 +28,118 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <boost/bind.hpp>
-#include <boost/geometry/geometries/linestring.hpp>
+#include <tracktable/CommandLineFactories/AssemblerFromCommandLine.h>
+#include <tracktable/CommandLineFactories/PointReaderFromCommandLine.h>
+#include <tracktable/Domain/Terrestrial.h>
+#include <tracktable/RW/TrajectoryWriter.h>
 
-#include "Common.h"
-#include "BuildTrajectories.h"
-#include "CommandLineOptions.h"
-#include "KmlOut.h"
-#include "ParseCommandLine.h"
+using TrajectoryT = tracktable::domain::terrestrial::trajectory_type;
+using PointT = typename TrajectoryT::point_type;
+using PointReaderT = tracktable::PointReader<PointT>;
+using PointReaderIteratorT = typename PointReaderT::iterator;
+using AssemblerT = tracktable::AssembleTrajectories<TrajectoryT, PointReaderIteratorT>;
 
-int main(int argc, char* argv[])
-{
+static constexpr auto helpmsg = R"(
+--------------------------------------------------------------------------------
+The reduce example demonstrates:
+    - Using command line factories to read points and assemble trajectories
+    - using tracktable::simplify to remove unnecessary points
+    - Writing trajectories to file for later use
 
-  CommandLineOptions options = ParseCommandLine(argc, argv);
+Typical use:
+    ./reduce --tolerance=0.00001 --input=/data/flights.tsv --output=/data/reduced.traj
 
-  // Example: read in trajectories
-  std::vector<trajectory_type> trajectories;
-  BuildTrajectories<trajectory_type>(options,trajectories);
-  std::cout << "trajectories.size() = " << trajectories.size() << std::endl;
+Defaults assume a tab separated file formatted as :
 
-  // Example: remove trajectories < 500 km
-  trajectories.erase(std::remove_if(trajectories.begin(),trajectories.end(),
-   boost::bind(&tracktable::end_to_end_distance<trajectory_type>,_1) < 500.0),
-   trajectories.end());
-  std::cout << "trajectories.size() = " << trajectories.size() << std::endl;
+OBJECTID TIMESTAMP LON LAT
 
-  // Example: remove trajectories that have a ratio of end_to_end_distance
-  // to total distance less than 0.5
-  trajectories.erase(std::remove_if(trajectories.begin(),trajectories.end(),
-   boost::bind(std::divides<double>(),
-   boost::bind(&tracktable::end_to_end_distance<trajectory_type>,_1),
-   boost::bind(&tracktable::length<trajectory_type>,_1)) < 0.5),
-   trajectories.end());
-  std::cout << "trajectories.size() = " << trajectories.size() << std::endl;
+Default output is standard out
+--------------------------------------------------------------------------------)";
 
-  // Example: get distance from point to trajectory (not built in)
-  trajectory_point_type abq;
-  abq.set_latitude(35.1107);
-  abq.set_longitude(-106.6100);
+int main(int _argc, char* _argv[]) {
+    // Set log level to reduce unecessary output
+    tracktable::set_log_level(tracktable::log::info);
+    // Create a basic command line option with boost
+    boost::program_options::options_description commandLineOptions("Options");
+    double tolerance = 0.00001;
+    // clang-format off
+  commandLineOptions.add_options()
+    ("help", "Print help")
+  ;
+    // clang-format on
+    // Create command line factories
+    tracktable::PointReaderFromCommandLine<PointT> readerFactory;
+    tracktable::AssemblerFromCommandLine<TrajectoryT> assemblerFactory;
+    // Add options from the factories
+    readerFactory.addOptions(commandLineOptions);
+    assemblerFactory.addOptions(commandLineOptions);
 
-  std::cout << tracktable::conversions::radians_to_km(
-   boost::geometry::distance<trajectory_type,trajectory_point_type>(trajectories.front(),abq)) << std::endl;;
+    // And a command line option for output
+    // clang-format off
+    commandLineOptions.add_options()
+      ("output", bpo::value<std::string>()->default_value("-"),
+      "file to write to (use '-' for stdout)")
+      ("tolerance", bpo::value<double>(&tolerance)->default_value(0.00001),
+      "Tolerance for the simplify routine");
+    // clang-format on
 
-  // Example: get a point that is, time-wise, halfway between the start and
-  // end time
-  tracktable::point_at_time(trajectories.front(),
-   tracktable::interpolate(
-    trajectories.front().start_time(),
-    trajectories.front().end_time(),0.5));
+    /** Boost program options using a variable map to tie everything together.
+     * one parse will have a single variable map. We need to let the factories know
+     * about this variable map so they can pull information out of it */
+    auto vm = std::make_shared<boost::program_options::variables_map>();
+    readerFactory.setVariables(vm);
+    assemblerFactory.setVariables(vm);
 
-  return 0;
+    // Parse the command lines, don't forget the 'notify' after
+    try {
+        // We use this try/catch to automatically display help when an unknown option is used
+        boost::program_options::store(
+            boost::program_options::command_line_parser(_argc, _argv).options(commandLineOptions).run(), *vm);
+        boost::program_options::notify(*vm);
+    } catch (boost::program_options::error e) {
+        std::cerr << e.what();
+        std::cerr << helpmsg << "\n\n";
+        std::cerr << commandLineOptions << std::endl;
+        return 1;
+    }
+    /** Parsing will give an error of an incorrect option is used, but it won't
+     * display the help unless we tell it too */
+    if (vm->count("help") != 0) {
+        std::cerr << helpmsg << "\n\n";
+        std::cerr << commandLineOptions << std::endl;
+        return 1;
+    }
+
+    // Create Point Reader and assembler
+    auto pointReader = readerFactory.createPointReader();
+    auto assembler = assemblerFactory.createAssembler(pointReader);
+
+    // We default to standard out
+    std::ostream* o = &std::cout;
+    auto filename = (*vm)["output"].as<std::string>();
+    std::cerr << "Writing to ";
+    if ("-" != filename) {
+        // we swap in a file if a filename is specified
+        std::cerr << filename << std::endl;
+        o = new std::ofstream(filename);
+    } else {
+        std::cerr << "standard out" << std::endl;
+    }
+
+    // trajectory writer with default options
+    tracktable::TrajectoryWriter writer(*o);
+
+    auto count = 0u;
+    std::cerr << std::right;
+    // We don't need to bother storing trajectories, we can just write them
+    auto sum = 0u;
+    for (auto t = assembler->begin(); t != assembler->end(); ++t) {
+        auto s = tracktable::simplify(*t, tolerance);
+        sum += (*t).size() - s.size();
+        writer.write(s);
+        std::cerr << "\b\b\b\b\b\b\b\b\b\b" << std::setw(10)  // Using backspaces for in place counter
+                  << count++;
+    }
+    std::cerr << "\nRemoved " << sum << " points" << std::endl;
+    return 0;
 }
