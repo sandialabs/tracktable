@@ -49,7 +49,7 @@ SCENARIO("KML Tripwire") {
         out << kml(abqTrajectory);
         out << kml::footer;
         THEN("written Size matches known size") {
-          REQUIRE(out.str().size() == 6902);
+          REQUIRE(out.str().size() == 7068);
           //std::cout << out.str(); //Can uncomment to copy and paste for render check
           //TODO: Automated render check
         }
