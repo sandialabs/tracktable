@@ -65,12 +65,18 @@
 # identifies a Python interpreter: 'cp37' for C-Python version 3.7 and
 # so forth.
 
+# Great.  First the wheel package drops the pep425tags module.  Then
+# pip drops it too.  Now the packaging package has removed the functions
+# in its tags() module that we used as a fallback.  
+#
+# I don't think I have much choice but to hard-code cpXY here.  This will
+# cause problems when we go to support other interpreters.
 function(_get_python_version_tag _python_interpreter _output_var)
   execute_process(
     COMMAND
       ${_python_interpreter}
       "-c"
-      "from __future__ import print_function; from packaging import tags; import sys;  print('{interpreter}{version}'.format(interpreter=tags.interpreter_name(), version=tags.interpreter_version()))"
+      "from __future__ import print_function; import sys;  print('cp{major}{minor}'.format(major=sys.version_info.major, minor=sys.version_info.minor))"
     RESULT_VARIABLE _interpreter_result
     OUTPUT_VARIABLE _python_tag
     )
