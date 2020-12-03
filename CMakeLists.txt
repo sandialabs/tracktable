@@ -293,6 +293,7 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
         string( REPLACE ";" "\\;" ESCAPED_PYTHONPATH "$ENV{PYTHONPATH}" )
         add_custom_target( doc_python ALL
             COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python\\;${ESCAPED_PYTHONPATH} PATH=${Tracktable_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH}
+            SOURCE_DIR=${Tracktable_SOURCE_DIR} BINARY_DIR=${Tracktable_BINARY_DIR}
             ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
             -b html
             -d "${Sphinx_BUILD_DIR}/doctrees"
@@ -308,6 +309,7 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
         # Trust the compiler to set RPATH so that the libraries in bin/ are accessible
         add_custom_target( doc_python ALL
             COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python:${Tracktable_BINARY_DIR}/lib:$ENV{PYTHONPATH}
+            SOURCE_DIR=${Tracktable_SOURCE_DIR} BINARY_DIR=${Tracktable_BINARY_DIR}
             ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
             -b html
             -d "${Sphinx_BUILD_DIR}/doctrees"
