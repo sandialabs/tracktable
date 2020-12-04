@@ -62,6 +62,12 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/core
 )
 
+file(GLOB data_generator_files "data_generators/*.py")
+install(
+  FILES ${data_generator_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/data_generators
+)
+
 file(GLOB domain_files "domain/*.py")
 install(
   FILES ${domain_files}
