@@ -35,6 +35,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(tracktable_src, 'tracktable', 'P
 
 print("sys.argv: {}".format(' '.join(sys.argv)))
 print("sys.path: {}".format(pprint.pformat(sys.path)))
+print("os.getcwd(): {}".format(os.getcwd()))
 
 # The autodoc Sphinx extension doesn't need to care about our Python
 # extension modules.  This list contains symbols that it should
