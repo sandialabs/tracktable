@@ -86,7 +86,7 @@ function(_get_python_version_tag _python_interpreter _output_var)
       ${_python_interpreter}
       "-c"
       "from __future__ import print_function; import sysconfig; import packaging.tags; long_name = sysconfig.get_config_var('SOABI'); interpreter_only = long_name.split('-')[0]; short_name = packaging.tags.INTERPRETER_SHORT_NAMES[interpreter_only]; print('{}{}'.format(short_name, sysconfig.get_config_var('py_version_nodot')))"
-      SULT_VARIABLE _interpreter_result
+    RESULT_VARIABLE _interpreter_result
     OUTPUT_VARIABLE _python_tag
     )
   if (NOT ${_interpreter_result} EQUAL 0)
