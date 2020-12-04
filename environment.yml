@@ -4,16 +4,19 @@ channels:
   - defaults
 dependencies:
   - python=3.7
-  - pip
-  - numpy
-  - pytz
   - cartopy
-  - pyshp
   - ipykernel
+  - matplotlib
+  - numpy
   - pandoc
+  - pip
+  - pykdtree
+  - pyshp
+  - pytz
+  - scipy
   - sphinx
   - pip:
-    - tracktable
     - breathe
     - nbsphinx
     - nbsphinx-link
+    - tracktable
