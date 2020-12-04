@@ -1,7 +1,17 @@
-# -*- coding: utf-8 -*-
-#
-# Tracktable documentation build configuration file, created by
-# sphinx-quickstart on Sat Aug 30 12:10:57 2014.
+### IMPORTANT
+# This is the ReadTheDocs specific conf.py file if you want the
+# CMake variant it is located here: tracktable/Documentation/cmake_build
+
+# The RTD build system doesn't have support for the Sphinx '-c'
+# flag which we use to handle our separate CMake and ReadTheDocs conf.py files.
+# Because of this we have to place our ReadTheDocs specific conf.py file
+# in the same directory as our documentation source.
+
+# Relevant ReadTheDocs issue: https://github.com/readthedocs/readthedocs.org/issues/1543
+### IMPORTANT
+
+# Tracktable ReadTheDocs specific documentation build configuration file,
+# created by sphinx-quickstart on Sat Aug 30 12:10:57 2014.
 #
 # This file is execfile()d with the current directory set to its
 # containing dir.
@@ -19,12 +29,11 @@ import subprocess
 import sys
 import os
 
-tracktable_src = '../../'
-tracktable_build = None
+tracktable_src = '../'
 
 # We have to run these manually on readthedocs since we aren't
 # driving the build with CMake.
-subprocess.call(['doxygen', '../readthedocs/Doxyfile-readthedocs'])
+subprocess.call(['doxygen', 'readthedocs/Doxyfile-readthedocs'])
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -139,7 +148,7 @@ pygments_style = 'sphinx'
 #keep_warnings = False
 
 # -- Options for Breathe Doxygen <-> Sphinx bridge ------------------------
-breathe_projects = {'tracktable_cpp': '../readthedocs_build/doxygen/doxyxml'}
+breathe_projects = {'tracktable_cpp': 'readthedocs/doxygen/doxyxml'}
 
 breathe_default_project = "tracktable_cpp"
 
@@ -186,7 +195,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['../css']
+html_static_path = ['css']
 html_style = "tracktable.css"
 
 # Add any extra paths that contain custom files (such as robots.txt or
