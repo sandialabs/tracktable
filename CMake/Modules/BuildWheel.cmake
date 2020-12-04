@@ -69,15 +69,24 @@
 # pip drops it too.  Now the packaging package has removed the functions
 # in its tags() module that we used as a fallback.  
 #
-# I don't think I have much choice but to hard-code cpXY here.  This will
-# cause problems when we go to support other interpreters.
+# Let's see if this helps...
+#
+# The very long line here is the equivalent of
+#
+# from __future__ import print_function
+# import sysconfig
+# import packaging.tags
+# long_name = sysconfig.get_config_var('SOABI') # returns something like 'cpython-38-darwin'
+# short_name = packaging.tags.INTERPRETER_SHORT_NAMES[long_name] # returns 'cp' for 'cpython'
+# print('{}{}'.format(short_name, sysconfig.get_config_var('py_version_nodot'))) # finally prints 'cp38'
+
 function(_get_python_version_tag _python_interpreter _output_var)
   execute_process(
     COMMAND
       ${_python_interpreter}
       "-c"
-      "from __future__ import print_function; import sys;  print('cp{major}{minor}'.format(major=sys.version_info.major, minor=sys.version_info.minor))"
-    RESULT_VARIABLE _interpreter_result
+      "from __future__ import print_function; import sysconfig; import packaging.tags; long_name = sysconfig.get_config_var('SOABI'); interpreter_only = long_name.split('-')[0]; short_name = packaging.tags.INTERPRETER_SHORT_NAMES[interpreter_only]; print('{}{}'.format(short_name, sysconfig.get_config_var('py_version_nodot')))"
+      SULT_VARIABLE _interpreter_result
     OUTPUT_VARIABLE _python_tag
     )
   if (NOT ${_interpreter_result} EQUAL 0)
@@ -117,26 +126,10 @@ endfunction(_get_python_platform_tag)
 
 # ----------------------------------------------------------------------
 
-# This function retrieves the ABI tag from a Python interpreter.  This
-# is usually 'm' for pymalloc.
+# We do not depend on any particular ABI tag.
 
 function(_get_python_abi_tag _python_interpreter _output_var)
-  execute_process(
-    COMMAND
-      ${_python_interpreter}
-      "-c"
-      "from __future__ import print_function; from wheel import pep425tags; print(pep425tags.get_abi_tag())"
-    RESULT_VARIABLE _interpreter_result
-    OUTPUT_VARIABLE _abi_tag
-    )
-  if (NOT ${_interpreter_result} EQUAL 0)
-    message("WARNING: Error while invoking Python interpreter to retrieve ABI tag: ${_interpreter_result}")
-    set(${_output_var} "none" PARENT_SCOPE)
-  else ()
-    string(STRIP ${_abi_tag} _abi_tag)
-    message(STATUS "Python ABI tag: ${_abi_tag}")
-    set(${_output_var} ${_abi_tag} PARENT_SCOPE)
-  endif()
+  set(${_output_var} "none" PARENT_SCOPE)
 endfunction(_get_python_abi_tag)
 
 # ----------------------------------------------------------------------
