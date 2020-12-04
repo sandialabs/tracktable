@@ -14,6 +14,7 @@
 
 from __future__ import print_function
 
+import pprint
 import subprocess
 import sys
 import os
@@ -30,6 +31,10 @@ subprocess.call(['doxygen', '../readthedocs/Doxyfile-readthedocs'])
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 sys.path.insert(0, os.path.abspath(os.path.join(tracktable_src, 'tracktable', 'Python')))
+
+
+print("sys.argv: {}".format(' '.join(sys.argv)))
+print("sys.path: {}".format(pprint.pformat(sys.path)))
 
 # The autodoc Sphinx extension doesn't need to care about our Python
 # extension modules.  This list contains symbols that it should
