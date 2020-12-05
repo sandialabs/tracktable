@@ -81,14 +81,28 @@
 # print('{}{}'.format(short_name, sysconfig.get_config_var('py_version_nodot'))) # finally prints 'cp38'
 
 function(_get_python_version_tag _python_interpreter _output_var)
-  execute_process(
-    COMMAND
-      ${_python_interpreter}
-      "-c"
-      "from __future__ import print_function; import sysconfig; import packaging.tags; long_name = sysconfig.get_config_var('SOABI'); interpreter_only = long_name.split('-')[0]; short_name = packaging.tags.INTERPRETER_SHORT_NAMES[interpreter_only]; print('{}{}'.format(short_name, sysconfig.get_config_var('py_version_nodot')))"
-    RESULT_VARIABLE _interpreter_result
-    OUTPUT_VARIABLE _python_tag
+  if (WIN32)
+    # The above approach doesn't work on Windows -- sysconfig config vars
+    # are much sparser.  I give up.  On Windows we're just going to 
+    # assume that this is CPython.
+    execute_process(
+      COMMAND
+        ${_python_interpreter}
+        "-c"
+        "from __future__ import print_function; import sys; print('cp{}{}'.format(sys.version_info.major, sys.version_info.minor))"
+      RESULT_VARIABLE _interpreter_result
+      OUTPUT_VARIABLE _python_tag
     )
+  else (WIN32)
+    execute_process(
+      COMMAND
+        ${_python_interpreter}
+        "-c"
+        "from __future__ import print_function; import sysconfig; import packaging.tags; long_name = sysconfig.get_config_var('SOABI'); interpreter_only = long_name.split('-')[0]; short_name = packaging.tags.INTERPRETER_SHORT_NAMES[interpreter_only]; print('{}{}'.format(short_name, sysconfig.get_config_var('py_version_nodot')))"
+      RESULT_VARIABLE _interpreter_result
+      OUTPUT_VARIABLE _python_tag
+      )
+  endif (WIN32)
   if (NOT ${_interpreter_result} EQUAL 0)
     message(ERROR "Error while invoking Python interpreter to retrieve version tag: ${_interpreter_result}")
   else ()
