@@ -105,12 +105,12 @@ private:
 public:
   // These should never be called but Boost insists on being able to
   // instantiate them.
-  PythonAwareTrajectoryReader(PythonAwareTrajectoryReader const& other)
+  PythonAwareTrajectoryReader(PythonAwareTrajectoryReader const& /*other*/)
     {
       assert(1==0);
     }
 
-  PythonAwareTrajectoryReader& operator=(PythonAwareTrajectoryReader const& other)
+  PythonAwareTrajectoryReader& operator=(PythonAwareTrajectoryReader const& /*other*/)
     {
       assert(1==0);
     }

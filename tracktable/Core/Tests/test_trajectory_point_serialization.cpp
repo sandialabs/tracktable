@@ -97,7 +97,7 @@ test_trajectory_point_lonlat_serialization()
 
 
 int
-main(int argc, char *argv[])
+main(int , char **)
 {
   int num_errors = 0;
 

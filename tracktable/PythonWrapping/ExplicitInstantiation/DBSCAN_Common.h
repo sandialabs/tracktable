@@ -81,7 +81,7 @@ dbscan_learn_cluster_ids(boost::python::object points,
     {
     result.append(*iter);
     }
-  return result;
+  return std::move(result);
 }
 
 

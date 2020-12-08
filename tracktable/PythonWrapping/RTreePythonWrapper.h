@@ -91,7 +91,7 @@ public:
         point_indices.append(iter->second);
         }
 
-      return point_indices;
+      return std::move(point_indices);
     }
 
   // ----------------------------------------------------------------------
@@ -113,7 +113,7 @@ public:
         {
         result.append(neighbor_iter->second);
         }
-      return result;
+      return std::move(result);
     }
 
 private:

@@ -78,7 +78,7 @@ int test_feature_vector_to_string()
 
 
 int 
-main(int argc, char* argv[])
+main(int , char**)
 {
   int error_count = 0;
   error_count += test_feature_vector_to_string<1>();

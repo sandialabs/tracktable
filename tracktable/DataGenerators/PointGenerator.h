@@ -41,6 +41,8 @@ class PointGenerator {
   PointGenerator(const PointT& _position, const DurationT& _interval)
       : interval(_interval), position(_position) {}
 
+  virtual ~PointGenerator(){}
+
   /** Updates position and returns a point
    *
    * @return new point
@@ -453,7 +455,7 @@ class MultipleGeneratorCollator {
    *
    * @return The numbers of generators
    */
-  const size_t getGeneratorCount() const { return generators.size(); }
+  size_t getGeneratorCount() const { return generators.size(); }
 
     /** Updates position and returns a point
    *

@@ -112,7 +112,7 @@ int test_memory_use()
 }
 
 
-int main(int argc, char* argv[])
+int main(int , char**)
 {
   int error_count = 0;
 
