@@ -39,7 +39,7 @@ class PointGenerator {
    * @param [in] _interval Interval to increase timestamp by
    */
   PointGenerator(const PointT& _position, const DurationT& _interval)
-      : position(_position), interval(_interval) {}
+      : interval(_interval), position(_position) {}
 
   /** Updates position and returns a point
    *
@@ -204,8 +204,6 @@ class ConstantSpeedPointGenerator
   PointT next() override {
     BaseType::next();
     if (count > 1) {
-      auto d = speed * double(interval.total_seconds());
-      // position = reckon(position, d, heading);
       position = reckon2(position, speed, heading, interval);
     }
     return position;
@@ -391,7 +389,7 @@ class GridPointGenerator : public ConstantSpeedPointGenerator {
     BaseType::next();
     if (count > 1) {
       auto l = lengths[current];
-      if (++gridCount == std::abs(l)) {
+      if (++gridCount == static_cast<std::make_unsigned<decltype(l)>::type>(std::abs(l))) {
         auto h = getHeading();
         h += ((l > 0) ? 90 : -90);  // if negative, turn left, otherwise right
         if (h >= 360.0) {
@@ -462,7 +460,6 @@ class MultipleGeneratorCollator {
    * @return new point
    */
   PointT next() {
-    static size_t index = 0;
     if (0 == points.size()) {
       throw std::runtime_error("No generated points");
     }

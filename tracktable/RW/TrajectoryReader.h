@@ -472,7 +472,9 @@ private:
       while (point_range_begin != token_end)
         {
         token_iter_type point_range_end = point_range_begin;
-        if (std::distance(point_range_end, token_end) < num_tokens_in_point_record)
+        auto d = std::distance(point_range_end, token_end);
+        assert(d>=0);//TODO: consider a nother warning in the event of too many tokens?
+        if (static_cast<std::make_unsigned<decltype(d)>::type>(std::abs(d)) < num_tokens_in_point_record)
           {
           TRACKTABLE_LOG(log::warning)
              << "Trajectory reader fell off the end of tokens for points. "

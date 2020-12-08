@@ -107,7 +107,6 @@ create_cartesian2d_trajectory_point(
 int test_cartesian2d_dg_by_time()
 {
   int error_count = 0;
-  typedef tracktable::domain::cartesian2d::trajectory_point_type Cartesian2dTrajectoryPoint;
 
   double cartesian_coordinates[][2] = {
     {0, 0}, 

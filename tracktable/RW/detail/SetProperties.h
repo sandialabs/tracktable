@@ -85,7 +85,6 @@ struct set_properties<PointT, true>
         {
         std::string field_name((*iter).first);
         std::size_t column((*iter).second.column);
-        if (column == -1) continue;
 
         tracktable::PropertyUnderlyingType type((*iter).second.type);
 
@@ -120,7 +119,9 @@ struct set_object_id
     std::size_t ObjectIdColumn
     )
     {
-      if (ObjectIdColumn != -1)
+      /*TODO:: The is the 'HasProperties' == false implementation, do we need to bother checking
+      if the column, which is already checked in the calling function */
+      if (ObjectIdColumn != std::numeric_limits<decltype(ObjectIdColumn)>::max())
         {
         TRACKTABLE_LOG(log::warning)
                   << "WARNING: You are attempting to set "
@@ -162,7 +163,9 @@ struct set_timestamp
     TimestampConverter* /*converter*/
     )
     {
-      if (TimestampColumn != -1)
+      /*TODO:: The is the 'HasProperties' == false implementation, do we need to bother checking
+      if the timestamp column, which is already checked in the calling function */
+      if (TimestampColumn != std::numeric_limits<decltype(TimestampColumn)>::max())
         {
         TRACKTABLE_LOG(log::warning)
                   << "WARNING: You are attempting to set "
