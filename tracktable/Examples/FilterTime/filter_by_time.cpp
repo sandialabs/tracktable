@@ -153,7 +153,6 @@ int main(int _argc, char* _argv[]) {
 
   // Check the output file argument, if it is default '-', then use std::cout, otherwise try to open a file
   auto filename = (*vm)["output"].as<std::string>();
-  std::cerr;
   if ("-" != filename) {
     out = new std::ofstream(filename);
     if (!out->good()) {
