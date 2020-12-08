@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -66,7 +66,7 @@ typedef boost::uuids::uuid uuid_type;
  *
  * This class is necessary because the boost random uuid generators do not
  * have any common hierarchy. This class provides a common hierarchy around
- * the generate() method.
+ * the `generate()` method.
  *
  * This base class also provides a basic mutex to allow threadsafe generation.
  */
@@ -76,6 +76,7 @@ public:
   /** A convenience typedef for a smart pointer to a generator */
   typedef boost::shared_ptr<UUIDGenerator> pointer;
 
+  /// Instantiate an uninitialized UUID generator
   UUIDGenerator() {
     #ifdef TT_WINDOWS
       this->mutex = new boost::mutex();
@@ -86,6 +87,7 @@ public:
     #endif // ifdef TT_WINDOWS
   }
 
+  /// Destructor for the UUID Generator
   virtual ~UUIDGenerator() {
     #ifdef TT_WINDOWS
       delete this->mutex;
@@ -97,6 +99,7 @@ public:
 
 protected:
 
+  /// Lock the mutex for generator
   inline void lock_mutex() {
     #ifdef TT_WINDOWS
     this->mutex->lock();
@@ -106,6 +109,7 @@ protected:
     #endif // ifdef TT_WINDOWS
   }
 
+  /// Unlock the mutex for generator
   inline void unlock_mutex() {
     #ifdef TT_WINDOWS
     this->mutex->unlock();
@@ -116,7 +120,7 @@ protected:
   }
 
 private:
-  /** Mutexes used to ensure generate_uuid() is threadsafe */
+  /** Mutexes used to ensure `generate_uuid()` is threadsafe */
   #ifdef TT_WINDOWS
     boost::mutex* mutex;
   #else // not defined TT_WINDOWS
@@ -134,26 +138,32 @@ private:
  * However, any random number generator suitable for the boost classes can
  * be used with this thin wrapper template.
  *
- * To create an instance of this class, use the various static create() methods
+ * To create an instance of this class, use the various static `create()` methods
  * that mimic the available boost random generator constructors.
  */
 template <typename UniformRandomNumberGenerator=boost::random::mt19937>
 class TRACKTABLE_CORE_EXPORT BoostRandomUUIDGenerator : public UUIDGenerator
 {
 private:
-  /** Use BoostRandomUUIDGenerator<URNG type>::create() */
+  /** Instantiate a Boost random UUID generator
+   * Use BoostRandomUUIDGenerator<URNG type>::create()
+   */
   BoostRandomUUIDGenerator()
   {
     this->_generator = new random_generator_type();
   }
 
-  /** Use BoostRandomUUIDGenerator<URNG type>::create(URNG type &) */
+  /** Instantiate a Boost random UUID generator
+   *  Use BoostRandomUUIDGenerator<URNG type>::create(URNG type &)
+   */
   BoostRandomUUIDGenerator ( UniformRandomNumberGenerator& gen )
   {
     this->_generator = new random_generator_type(gen);
   }
 
-  /** Use BoostRandomUUIDGenerator<URNG type>::create(URNG type *) */
+  /** Instantiate a Boost random UUID generator
+   * Use BoostRandomUUIDGenerator<URNG type>::create(URNG type *)
+   */
   BoostRandomUUIDGenerator ( UniformRandomNumberGenerator* pGen )
   {
     this->_generator = new random_generator_type(pGen);
@@ -162,6 +172,7 @@ private:
 public:
   typedef boost::uuids::basic_random_generator<UniformRandomNumberGenerator> random_generator_type;
 
+  /// Destructor for the Boost Random UUID Generator
   virtual ~BoostRandomUUIDGenerator() {
     delete _generator;
   }
@@ -169,25 +180,39 @@ public:
   /** Static method to create an instance using the default uniform random number generator type
    *
    * Example setting a new default uuid generator with mt19937:
+   *
    * @code
+   *
    * ::tracktable::set_automatic_uuid_generator(::tracktable::BoostRandomUUIDGenerator<boost::random::mt19937>::create());
+   *
    * @endcode
    *
+   * @return Pointer to the new Boost random UUID generator
    */
   static UUIDGenerator::pointer create() {
     return UUIDGenerator::pointer(new BoostRandomUUIDGenerator());
   }
 
-  /** Static method to create an instance using a supplied uniform random number generator type */
+  /** Static method to create an instance using a supplied uniform random number generator type
+   *
+   * @return Pointer to the new Boost random UUID generator
+  */
   static UUIDGenerator::pointer create( UniformRandomNumberGenerator& gen ) {
     return UUIDGenerator::pointer(new BoostRandomUUIDGenerator(gen));
   }
 
-  /** Static method to create an instance using a supplied uniform random number generator type */
+  /** Static method to create an instance using a supplied uniform random number generator type
+   *
+   * @return Pointer to the new Boost random UUID generator
+  */
   static UUIDGenerator::pointer create( UniformRandomNumberGenerator* pGen ) {
     return UUIDGenerator::pointer(new BoostRandomUUIDGenerator(pGen));
   }
 
+  /** Generate a UUID for the given generator
+   *
+   * @return The generated UUID
+   */
   inline
   uuid_type generate_uuid()
   {
@@ -211,6 +236,8 @@ private:
 class TRACKTABLE_CORE_EXPORT BoostRandomUUIDGeneratorPure : public UUIDGenerator
 {
 private:
+  /** Instantiate a boost random uuid pure generator
+   */
   BoostRandomUUIDGeneratorPure() {
     _generator = new random_generator_type();
   }
@@ -221,19 +248,28 @@ public:
   /** Static method to create an instance using the default uniform random number generator type
    *
    * Example setting a new default uuid generator:
+   *
    * @code
+   *
    * ::tracktable::set_automatic_uuid_generator(::tracktable::BoostRandomUUIDGeneratorPure::create());
+   *
    * @endcode
    *
+   * @return Pointer to the new pure Boost random UUID generator
    */
   static UUIDGenerator::pointer create() {
     return UUIDGenerator::pointer(new BoostRandomUUIDGeneratorPure());
   }
 
+  /// Destructor for the UUID Generator
   virtual ~BoostRandomUUIDGeneratorPure() {
     delete _generator;
   }
 
+  /** Generate a UUID for the given generator
+   *
+   * @return The generated UUID
+   */
   inline
   uuid_type generate_uuid()
   {
@@ -261,12 +297,12 @@ TRACKTABLE_CORE_EXPORT UUIDGenerator::pointer automatic_uuid_generator();
 /** Set the global automatic uuid generator
  *
  * Allows the global uuid generator to be changed from the default generator
- * to any generator implementing the generate() method of UUIDGenerator.
+ * to any generator implementing the `generate()` method of `UUIDGenerator`.
  *
  * The default generator is a boost random uuid generator using mt19937 for
  * random number generation.
  *
- * The BoostRandomUUIDGenerator template can be used to quickly create
+ * The `BoostRandomUUIDGenerator` template can be used to quickly create
  * generators employing other random number generation approaches.
  */
 TRACKTABLE_CORE_EXPORT void set_automatic_uuid_generator ( UUIDGenerator::pointer new_random_generator );

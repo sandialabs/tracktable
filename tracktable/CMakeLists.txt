@@ -35,10 +35,12 @@
 
 add_subdirectory(Core)
 add_subdirectory(Domain)
-add_subdirectory(IO)
+add_subdirectory(RW)
 add_subdirectory(Analysis)
+add_subdirectory(CommandLineFactories)
 add_subdirectory(ThirdParty)
 add_subdirectory(DataGenerators)
+
 
 if (BUILD_EXAMPLES)
 add_subdirectory(Examples)

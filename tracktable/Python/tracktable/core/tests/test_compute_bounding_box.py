@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2018 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -57,7 +57,7 @@ def verify_result(expected, actual, test_name):
     return 0
 
 def test_compute_bounding_box():
-    
+
     error_count = 0
 
     bbox_type = TerrestrialTrajectoryPoint.domain_classes['BoundingBox']
@@ -67,7 +67,7 @@ def test_compute_bounding_box():
     albuquerque = TerrestrialTrajectoryPoint(-106.6504, 35.0844)
     san_francisco = TerrestrialTrajectoryPoint( -122.4194, 37.7749)
     tokyo = TerrestrialTrajectoryPoint(-221.6917, 35.6895)
-    
+
     small_traj = TrajectoryPointSource()
     small_traj.start_point = albuquerque
     small_traj.end_point = san_francisco
@@ -183,14 +183,14 @@ def test_compute_bounding_box():
             ('ERROR: Expected ValueError from compute_bounding_box '
              'with buffer tuple length 3 but got {}.').format(other_exception))
         error_count += 1
-    
+
     return error_count
 
 # ----------------------------------------------------------------------
 
 def main():
     return test_compute_bounding_box()
-    
+
 # ----------------------------------------------------------------------
 
 if __name__ == '__main__':

@@ -47,7 +47,8 @@ from tracktable.core.geomath import compute_bounding_box, distance
 from tracktable.core.geomath import length, point_at_length_fraction
 import itertools
 import random
-import cartopy.crs as ccrs
+import cartopy
+import cartopy.crs
 import matplotlib
 import matplotlib.pyplot as plt
 from tracktable.render.mapmaker import mapmaker
@@ -109,7 +110,7 @@ def render_trajectories(trajectories, backend='', **kwargs):
         obj_ids (str or list of str): only display trajecteories
             whose object id matches the given string or a string from
             the given list of strings.
-        map_bbox ([minLon, maxLon, minLat, maxLat]): bounding box for
+        map_bbox ([minLon, minLat, maxLon, maxLat]): bounding box for
             custom map extent. By default automatically set to
             make all trajectories visible.
         show_lines (bool): whether or not to show the line segments
@@ -661,7 +662,7 @@ def render_trajectories_folium(trajectories,
                                #common arguments
                                map_canvas = None,
                                obj_ids = [],
-                               #\/format [minLon, maxLon, minLat, maxLat]
+                               #\/format [minLon, minLat, maxLon, maxLat]
                                map_bbox = None,
                                show_lines = True,
                                gradient_hue = None,
@@ -784,8 +785,8 @@ def render_trajectories_folium(trajectories,
                                             map_canvas)
 
     if map_bbox:
-        map_canvas.fit_bounds([(map_bbox[2], map_bbox[0]),
-                      (map_bbox[3], map_bbox[1])])
+        map_canvas.fit_bounds([(map_bbox[1], map_bbox[0]),
+                      (map_bbox[3], map_bbox[2])])
     else:
         map_canvas.fit_bounds(bounding_box_for_folium(trajectories))
     if save:  #saves as .html document
@@ -961,7 +962,7 @@ def render_trajectories_ipyleaflet(trajectories,
                                #common arguments
                                map_canvas = None,
                                obj_ids = [],
-                               #\/format [minLon, maxLon, minLat, maxLat]
+                               #\/format [minLon, minLat, maxLon, maxLat]
                                map_bbox = None,
                                show_lines = True,
                                gradient_hue = None,
@@ -1139,11 +1140,11 @@ def render_trajectories_ipyleaflet(trajectories,
                                             map_canvas)
 
     if map_bbox:
-    #    map.fit_bounds([(map_bbox[2], map_bbox[0]),
-    #                  (map_bbox[3], map_bbox[1])])
+    #    map.fit_bounds([(map_bbox[1], map_bbox[0]),
+    #                  (map_bbox[3], map_bbox[2])])
         #todo make a centroid function, unify with else code below
-        center_lon = map_bbox[0]+((map_bbox[1]-map_bbox[0])/2.0) #added
-        center_lat = map_bbox[2]+((map_bbox[3]-map_bbox[2])/2.0) #added
+        center_lon = map_bbox[0]+((map_bbox[2]-map_bbox[0])/2.0) #added
+        center_lat = map_bbox[1]+((map_bbox[3]-map_bbox[1])/2.0) #added
         map.center = (center_lat, center_lon)#added
         map.zoom=4 #get_bounds_zoom(map, map_bbox)-1 #hack #todo fix
     else:
@@ -1261,7 +1262,7 @@ def render_trajectories_cartopy(trajectories,
 
                                 #cartopy specific arguments
                                 map_projection = None,
-                                transform = None,
+                                transform = cartopy.crs.PlateCarree(),
                                 **kwargs):
     """Render a list of trajectories using the cartopy backend
     This function renders a list of trajectories to a cartopy map.
@@ -1332,7 +1333,8 @@ def render_trajectories_cartopy(trajectories,
                        show_points = show_points,
                        point_size = point_size*15,
                        point_color=point_color,
-                       show_lines=show_lines)
+                       show_lines=show_lines,
+                       transform=transform)
     #Don't support: label_objects, label_generator, label_kwargs, axes, zorder
 
     if not in_notebook() or save:

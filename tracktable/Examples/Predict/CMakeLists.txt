@@ -27,7 +27,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# This is tracktable/Examples/Reduce/CMakeLists.txt
+# This is tracktable/Examples/Predict/CMakeLists.txt
 
 include_directories(
   ${Tracktable_SOURCE_DIR}
@@ -46,20 +46,13 @@ link_directories(
 
 add_executable( predict
   Main.cpp
-  ProgramOptions.cpp
-  Nearby.cpp
-  KmlOut.cpp
-  ConvexHull.cpp
   BuildFeatures.cpp
-  Interpolate.cpp
   Predict.cpp
-  LLPredict.cpp
-  DistanceFeatures.cpp
-  ParseCommandLine.cpp
   )
 
 target_link_libraries( predict
   TracktableCore
   TracktableDomain
+  TracktableRW
   ${Boost_LIBRARIES}
   )

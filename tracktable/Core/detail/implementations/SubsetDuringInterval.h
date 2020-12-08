@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -49,8 +49,8 @@ struct generic_subset_during_interval
    * in the trajectory, new points will be interpolated that fall
    * exactly at those boundaries.
    *
-   * @param[in] _start_time    Beginning of time window
-   * @param[in] _end_time      End of time window
+   * @param [in] _start_time    Beginning of time window
+   * @param [in] _end_time      End of time window
    */
 
   template<class TrajectoryT, class TimestampT>
@@ -72,7 +72,7 @@ struct generic_subset_during_interval
 
       if (start_time > end_time)
         {
-        TRACKTABLE_LOG(log::warning) 
+        TRACKTABLE_LOG(log::warning)
           << "Trajectory::subset_in_window: start_time ("
           << start_time << ") is after end_time (" << end_time
           << ").  We'll pretend you meant it the other way around.";

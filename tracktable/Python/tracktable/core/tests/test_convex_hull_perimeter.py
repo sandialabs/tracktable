@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -61,7 +61,7 @@ def verify_result(expected, actual, test):
     if (abs(actual - expected) > .1):
         sys.stderr.write('ERROR: {} does not match. Expected perimeter {}, but returned {}.\n'.format(test,expected,actual))
         return 1
-  
+
     return 0
 
 
@@ -70,7 +70,7 @@ def test_convex_hull_perimeter():
     print("Testing Convex Hull Perimeter")
 
     error_count = 0;
-    
+
     albuquerque = create_point(35.0844, -106.6504, "short_flight")
     denver = create_point(39.7392, -104.9903, "short_flight")
     el_paso = create_point(31.7619, -106.4850, "short_flight")
@@ -84,7 +84,7 @@ def test_convex_hull_perimeter():
     point4 = create_cart2_point(1,0, "2d cartesian trajectory")
 
     short_trajectory = TerrestrialTrajectory.from_position_list([el_paso, albuquerque, denver])
-    
+
     #Short trajectorty should have small perimeter
     expected_short_perimeter = 1804.9
 
@@ -118,7 +118,7 @@ def test_convex_hull_perimeter():
     expected_one_point_perimeter = 0.0
 
     one_point = TerrestrialTrajectory.from_position_list([el_paso])
-    
+
     one_point_perimeter = geomath.convex_hull_perimeter(one_point)
     error_count += verify_result(expected_one_point_perimeter, one_point_perimeter, "One point flight")
 
@@ -126,7 +126,7 @@ def test_convex_hull_perimeter():
     expected_cartesian2d_perimeter = 4
 
     cart_trajectory = Cartesian2dTrajectory.from_position_list([point1, point2, point3, point4])
-    
+
     cart2d_perimeter = geomath.convex_hull_perimeter(cart_trajectory)
     error_count += verify_result(expected_cartesian2d_perimeter, cart2d_perimeter, "Four points cartesian")
 

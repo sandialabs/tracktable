@@ -29,6 +29,8 @@
 
 """trajectory_map_from_csv.py - Render trajectories on a map
 
+NOTE: Cartopy v0.18.0 is required to successfully render maps and pass
+our internal tests.
 
 This is both an example of how to use the library and a convenient
 script that you can use to get started quickly.  You must provide as
@@ -262,53 +264,6 @@ def initialize_canvas(resolution,
 
 # ----------------------------------------------------------------------
 
-
-def map_extent_as_bounding_box(axes, domain='terrestrial'):
-    """Return a Tracktable bounding box for axes' drawable extent
-
-    This is a convenience function to grab the bounding box for
-    a set of Matplotlib axes and transform it to a Tracktable bounding
-    box that can be used for intersection calculations.
-
-    Note that this returns the extent of the drawable area itself without
-    including the part of the canvas (if any) that containins decorations
-    such as axis lines, ticks, and tick labels.
-
-    Arguments:
-        axes {Matplotlib axes}: Map for which you want the bounding box
-
-    Keyword arguments:
-        domain {string}: Coordinate domain for bounding box (default:
-            'terrestrial')
-
-    Returns:
-        Tracktable bounding box from appropriate point domain
-
-    Raises:
-        KeyError: 'domain' must be one of 'cartesian2d' or 'terrestrial'
-    """
-
-    if domain not in ['terrestrial', 'cartesian2d']:
-        raise KeyError(('map_extent_as_bounding_box: Domain must be '
-                        'either "cartesian2d" or "terrestrial".  You '
-                        'supplied "{}".').format(domain))
-
-    # We use get_xlim() and get_ylim() instead of get_extent()
-    # in order to get coordinates in data space instead of projected space.
-    x_limits = axes.get_xlim()
-    x_min = min(x_limits)
-    x_max = max(x_limits)
-
-    y_limits = axes.get_ylim()
-    y_min = min(y_limits)
-    y_max = max(y_limits)
-
-    bbox_type = tracktable.domain.domain_class(domain, 'BoundingBox')
-
-    return bbox_type((x_min, y_min), (x_max, y_max))
-
-# ----------------------------------------------------------------------
-
 # Note: There is more work to do here to expose options for the
 # linewidths, line colors, Z-order and background color for the map.
 # That work will happen once we get this script up and running in the
@@ -356,6 +311,14 @@ def parse_args():
         args.resolution = [800, 600]
     if args.delimiter == 'tab':
         args.delimiter = '\t'
+    if args.object_id_column is None:
+        args.object_id_column = 0
+    if args.timestamp_column is None:
+        args.timestamp_column = 1
+    if args.coordinate0 is None:
+      args.coordinate0 = 2
+    if args.coordinate1 is None:
+      args.coordinate1 = 3
 
     return args
 
@@ -375,6 +338,7 @@ def render_annotated_trajectories(trajectories,
                                   scalar_min=0,
                                   scalar_max=1,
                                   zorder=10):
+
     """Render decorated trajectories (with scalars) onto a map.
 
     Given a map instance and an iterable containing trajectories,
@@ -478,7 +442,7 @@ def render_annotated_trajectories(trajectories,
 
         return result
 
-    return paths.draw_traffic(
+    return paths.draw_traffic( # Axes is used for map and `axes` keyword arg is set to None? Why?
               axes,
               trajectories,
               color_map=color_map,
@@ -614,7 +578,7 @@ def trajectory_points_from_file(
     >>> all_points = list(points_from_file(infile, 2, 3))
 
     Note: The function 'extract_field_assignments_from_arguments' will help
-        you pull out rela_fields, string_fields, and time_fields from a
+        you pull out real_fields, string_fields, and time_fields from a
         set of parsed arguments.
 
     Arguments:
@@ -686,11 +650,6 @@ def _make_tapered_linewidth_generator(initial_linewidth,
     Returns:
        A function that takes in a trajectory as an argument and
        returns an array of linewidths
-
-    TODO: There might be an off-by-one error in here: we generate
-    len(trajectory) scalars but the geometry has len(trajectory)-1
-    segments.  Check to see if draw_traffic in paths.py corrects for
-    this.
     """
 
     def linewidth_generator(trajectory):
@@ -713,11 +672,6 @@ def _make_constant_linewidth_generator(linewidth):
     Returns:
        A function that takes in a trajectory as an argument and
        returns an array of linewidths
-
-    TODO: There might be an off-by-one error in here: we generate
-    len(trajectory) scalars but the geometry has len(trajectory)-1
-    segments.  Check to see if draw_traffic in paths.py corrects for
-    this.
     """
 
     def linewidth_generator(trajectory):
@@ -794,7 +748,7 @@ def main():
     # call instead of using extract_arguments("trajectory_rendering")
     # here.
 
-    # Step 1: Load all the trajectories into memory.
+    # Load all the trajectories into memory.
     point_filename = args.point_data_file[0]
     field_assignments = extract_field_assignments(vars(args))
 
@@ -832,8 +786,7 @@ def main():
             itertools.chain(*trajectories)
             )
 
-    #
-    # Step 3: Set up the map.
+    # Set up the map.
     #
     # There are a lot of keyword arguments for the map -- see
     # tracktable.script_helpers.argument_groups.mapmaker --
@@ -859,7 +812,6 @@ def main():
     # this, but right now it's broken.  Not all of the parameters in the
     # trajectory rendering argument group are supported and some of the names
     # have changed.
-    #
     trajectory_rendering_kwargs = {
         'decorate_head': args.decorate_trajectory_head,
         'head_color': args.trajectory_head_color,
@@ -879,11 +831,8 @@ def main():
       **trajectory_rendering_kwargs
       )
 
-    print("STATUS: Saving figure to file")
     pyplot.savefig(args.image_file[0],
                    facecolor=figure.get_facecolor(),
-                   figsize=compute_figure_dimensions(
-                       args.resolution, args.dpi),
                    dpi=args.dpi)
 
     pyplot.close()

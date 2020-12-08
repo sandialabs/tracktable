@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -182,7 +182,7 @@ def trajectory_point_generator(start_airport, end_airport, start_time, object_id
             interpolant = i * interpolant_increment
             point_list.append(geomath.interpolate(start_position, end_position, interpolant))
         point_list.append(end_position)
-    
+
     return point_list
 
 # ----------------------------------------------------------------------
@@ -218,10 +218,10 @@ def all_path_point_generators(airports, num_paths, desired_speed=800, speed_jitt
         print("INFO: generating sample trajectory for {} - {}".format(start_airport.iata_code,
                                                                        end_airport.iata_code))
 
-        generator = trajectory_point_generator(start_airport, end_airport, 
-                                               start_time=datetime.datetime.now(), 
-                                               object_id=full_flight_id, 
-                                               desired_speed=desired_speed, 
+        generator = trajectory_point_generator(start_airport, end_airport,
+                                               start_time=datetime.datetime.now(),
+                                               object_id=full_flight_id,
+                                               desired_speed=desired_speed,
                                                seconds_between_points=seconds_between_points)
 
         start_airport = end_airport
@@ -259,7 +259,7 @@ def main():
                                                 seconds_between_points=args.spacing)
 
     print("DEBUG: Acquired {} point iterables.".format(len(point_iterables)))
-    
+
     single_point_list = combine.interleave_points_by_timestamp(*point_iterables)
 
     with open(args.output[0], 'wb') as outfile:

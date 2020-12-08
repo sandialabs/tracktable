@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2018 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -81,7 +81,7 @@ def test_point_type():
     print("Testing point type")
 
     error_count = 0
-    
+
     point1 = TerrestrialBasePoint(45, 45)
     point2 = TerrestrialBasePoint(135, 45)
 
@@ -93,12 +93,12 @@ def test_point_type():
     print("Testing terrestrial base point interpolate, 0.3")
     result = geomath.interpolate(point1, point2, 0.3)
     expected = TerrestrialBasePoint(69.7884, 53.0018)
-    error_count += verify_base_point(expected, result, "Terrestrial Base Point Interpolate 0.3")   
-    
+    error_count += verify_base_point(expected, result, "Terrestrial Base Point Interpolate 0.3")
+
     print("Testing terrestrial base point interpolate, 1")
     result = geomath.interpolate(point1, point2, 1)
     error_count += verify_base_point(point2, result, "Terrestrial Base Point Interpolate 1")
-    
+
     print("Testing terrestrial base point extrapolate, 2")
     result = geomath.extrapolate(point1, point2, 2)
     expected = TerrestrialBasePoint(180, 0)
@@ -147,7 +147,7 @@ def test_point_type():
     result = geomath.extrapolate(point5, point6, 1.5)
     expected = Cartesian3DBasePoint(15,15,15)
     error_count += verify_base_point(expected, result, "Cartesian3D Base Point Extrapolate 1.5")
- 
+
     point7 = TerrestrialTrajectoryPoint(10, 30)
     point7.timestamp = datetime.strptime("2020-12-01 00:00:00", "%Y-%m-%d %H:%M:%S")
     point7.object_id = 'FOO'

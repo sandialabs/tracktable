@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -50,13 +50,15 @@ namespace tracktable { namespace arithmetic {
 /** L1 multivariate median for all point types.
  *
  * The L1 multivariate median generalizes the concept of the familiar
- * 1-dimensional median.  Given a set of points x_i, the median y =
+ * 1-dimensional median. Given a set of points x_i, the median y =
  * M(x_i) is the point that minimizes the sum of the distances to the
  * points x_i.
  *
  * There is no closed-form expression for the L1 median so we compute
  * it with an iterative algorithm.
  *
+ * @param [in] input_begin Start point for median calculation
+ * @param [in] input_end End point for median calculation
  */
 
 template<typename forward_iterator_type>
@@ -154,7 +156,7 @@ geometric_median(
       }
 
 
-    // No.  Compute a better estimate for the median.
+    // No. Compute a better estimate for the median.
     if (num_zeros == 0)
       {
       new_median = median_estimate;

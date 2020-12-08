@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -84,7 +84,7 @@ CONVENIENCE_MAPS = {
     # if min_corner and max_corner are equal mod 360, so we're excluding
     # a tiny sliver of the world.
     'world': {
-        'min_corner': (-180, -90),
+        'min_corner': (-179.999, -90),
         'max_corner': (179.999, 90)
     }
 }

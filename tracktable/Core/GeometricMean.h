@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -44,10 +44,15 @@
 
 namespace tracktable { namespace arithmetic {
 
-/**
- * NOTE: This function requires a ForwardIterator as its argument.  A
- * ForwardIterator is one that can be traversed and dereferenced more
- * than once.
+/** Calculate the mean for the un-weighted input points
+ *
+ * @note
+ *    This function requires a ForwardIterator as its argument. A
+ *    ForwardIterator is one that can be traversed and dereferenced more
+ *    than once.
+ *
+ * @param [in] input_begin Start point for mean calculation
+ * @param [in] input_end End point for mean calculation
  */
 
 template<typename forward_iterator_type>
@@ -83,11 +88,17 @@ geometric_mean(
 
 /** Weighted sum of points
  *
- * You are responsible for ensuring that
- * point_iterator_type::value_type is a Tracktable point and that
- * weight_iterator_type::value_type is a scalar.  Also,
- * point_iterator_type and weight_iterator_type must both be
- * ForwardIterators.
+ * @note
+ *    You are responsible for ensuring that
+ *    `point_iterator_type::value_type` is a Tracktable point and that
+ *    `weight_iterator_type::value_type` is a scalar. Also,
+ *    `point_iterator_type` and `weight_iterator_type` must both be
+ *    ForwardIterators.
+ *
+ * @param [in] point_begin Start point for sum calculation
+ * @param [in] point_end End point for sum calculation
+ * @param [in] weight_begin Start of the point weights
+ * @param [in] weight_end End of the point weights
  */
 
 template<typename point_iterator_type, typename weight_iterator_type>

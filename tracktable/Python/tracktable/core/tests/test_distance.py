@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2018 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -70,7 +70,7 @@ def test_cartesian2d_distance():
     expected = 1.414
     actual = geomath.distance(point00, traj2)
     error_count += verify_result(actual, expected, "Cartesian2dTrajectoryPoint to Cartesian2dTrajectory")
-    
+
     actual = geomath.distance(traj2, point00)
     error_count += verify_result(actual, expected, "Cartesian2dTrajectory to Cartesian2dTrajectoryPoint")
 
@@ -116,7 +116,7 @@ def test_cartesian3d_distance():
 #--------------------------------------------------------------------------
 
 def test_terrestrial_distance():
-    
+
     error_count = 0
 
     albuquerque = TerrestrialTrajectoryPoint(-106.6504, 35.0844)
@@ -124,7 +124,7 @@ def test_terrestrial_distance():
     el_paso = TerrestrialTrajectoryPoint(-106.4850, 31.7619)
     san_antonio = TerrestrialTrajectoryPoint(-98.6544, 29.4813)
     houston = TerrestrialTrajectoryPoint(-74.0060, 29.8168)
-    
+
     ep_to_dal = TerrestrialTrajectory.from_position_list([el_paso, dallas])
     sa_to_hou = TerrestrialTrajectory.from_position_list([san_antonio, houston])
     sa_to_abq = TerrestrialTrajectory.from_position_list([san_antonio, albuquerque])
@@ -146,10 +146,10 @@ def test_terrestrial_distance():
     expected = 975.674
     actual = geomath.distance(albuquerque, sa_to_hou)
     error_count += verify_result(actual, expected, "TerrestrialTrajectoryPoint to TerrestrialTrajectory")
-   
+
     actual = geomath.distance(sa_to_hou, albuquerque)
     error_count += verify_result(actual, expected, "TerrestrialTrajectory to TerrestrialTrajectoryPoint")
-    
+
     return error_count
 
 # ----------------------------------------------------------------------
@@ -161,7 +161,7 @@ def main():
     error_count += test_cartesian3d_distance()
 
     return error_count
-    
+
 # ----------------------------------------------------------------------
 
 if __name__ == '__main__':

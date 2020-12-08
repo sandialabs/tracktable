@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -36,20 +36,12 @@
 # we don't yet have the ability to verify the content of an image.
 
 include(PythonTest)
+include(FindPythonModule)
 
-execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
-      "import re; import cartopy; print(re.compile('/__init__.py.*').sub('',cartopy.__file__))"
-      RESULT_VARIABLE CARTOPY_MODULE_STATUS
-      OUTPUT_VARIABLE CARTOPY_MODULE_LOCATION
-      ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
-#message("CARTOPY_MODULE_STATUS ${CARTOPY_MODULE_STATUS}")
-#message("CARTOPY_MODULE_LOCATION ${CARTOPY_MODULE_LOCATION}")
-if(NOT CARTOPY_MODULE_STATUS)
-      set(PY_CARTOPY_MODULE ${CARTOPY_MODULE_LOCATION} CACHE STRING
-          "Location of Python module cartopy")
-endif(NOT CARTOPY_MODULE_STATUS)
+find_python_module(cartopy CARTOPY_MODULE_STATUS CARTOPY_MODULE_LOCATION)
+
 find_package_handle_standard_args(PY_cartopy_module DEFAULT_MSG PY_CARTOPY_MODULE)
-#message("PY_CARTOPY_MODULE ${PY_CARTOPY_MODULE}")
+# message("PY_CARTOPY_MODULE ${PY_CARTOPY_MODULE}")
 
 if (PY_CARTOPY_MODULE)
   #add_python_test(P_Mapmaker_Airport
@@ -75,11 +67,11 @@ if (PY_CARTOPY_MODULE)
   add_python_test(P_Mapmaker_Europe
     tracktable.render.tests.test_mapmaker_europe "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
   )
-  
+
   add_python_test(P_Render_Trajectories
     tracktable.render.tests.test_render_trajectories "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/" "${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable/examples/data/"
   )
-  
+
 else (PY_CARTOPY_MODULE)
   message(STATUS "Cartopy module not found. Rendering tests will not be executed and rendering module will not execute with current python implementation.")
   message(STATUS "Rendering modules will be installed, but you must add cartopy to your current environment or change to a python environment with cartopy for rendering to work.")

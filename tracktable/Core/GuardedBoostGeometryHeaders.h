@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -30,8 +30,8 @@
 
 /*
  * Some of the Boost headers generate distressing quantities of
- * compile warnings.  As far as I can tell, they're harmless, but they
- * sure do clutter up the compiler output.  This file disables certain
+ * compile warnings. As far as I can tell, they're harmless, but they
+ * sure do clutter up the compiler output. This file disables certain
  * warnings from those headers to keep from cluttering up the rest of the source code.
  */
 

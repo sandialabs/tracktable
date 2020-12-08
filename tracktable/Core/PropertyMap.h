@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -51,94 +51,136 @@
 
 namespace tracktable {
 
-/*! \brief Name -> property map
+/*! @brief Name -> property map
  *
  * We will use this as our container for named properties.
  *
- * \note A std::unordered_map (hashtable) would have slightly faster
+ * @note A `std::unordered_map` (hashtable) would have slightly faster
  *       asymptotic performance but we will probably never have enough
  *       entries in a single property map for it to even be noticeable,
  *       let alone significant.
  */
 typedef std::map<std::string, PropertyValueT> PropertyMap;
 
-/*! \brief Check to see whether a given property is present.
+/*! @brief Check to see whether a given property is present.
  *
- * Check the map to see if it contains the given property.  This
+ * Check the map to see if it contains the given property. This
  * function will not modify the map in any way.
+ *
+ * @param [in] properties Property map
+ * @param [in] name Property to search for in the map
  */
 TRACKTABLE_CORE_EXPORT bool has_property(PropertyMap const& properties, string_type const& name);
 
 
-/*! \brief Retrieve a property from a map whatever its type.
+/*! @brief Retrieve a property from a map whatever its type.
  *
  * This function will give you back the named property as a
- * PropertyValueT (a Boost variant) if it is present in the map.  If
+ * `PropertyValueT` (a Boost variant) if it is present in the map. If
  * not, you'll get back an uninitialized PropertyValueT and the bool
  * pointed at by is_present will be set to 'false'.
  *
- * On success, returns the requested property and sets *is_present to
- * true.  On failure, returns an uninitialized property and sets
- * *is_present to false.
+ * @param [in] properties Property map
+ * @param [in] name Property to search for in the map
+ * @param [out] is_present Flag indicating if the property is present
+ *
+ * @return
+ *    On success, returns the requested property and sets `*is_present` to
+ *    `true`. On failure, returns an uninitialized property and sets
+ *    `*is_present` to `false`.
  */
 TRACKTABLE_CORE_EXPORT PropertyValueT property(PropertyMap const& properties, string_type const& name, bool* is_present=0);
 
-/*! \brief Retrieve a string-valued property from the map.
+/*! @brief Retrieve a string-valued property from the map.
  *
  * This function will give you back the named property as a
- * string_type if it is present and that is its proper type.  It will
- * not attempt to cast other types to string_type.
+ * `string_type` if it is present and that is its proper type. It will
+ * not attempt to cast other types to `string_type`.
  *
- * On success, returns the requested property as a string_type and
- * sets *is_present to true.  On failure, returns an uninitialized
- * string_type and sets *is_present to false.
+ * @param [in] properties Property map
+ * @param [in] name Property to search for in the map
+ * @param [out] is_present Flag indicating if the property is present
+ *
+ * @return
+ *    On success, returns the requested property as a `string_type` and
+ *    sets `*is_present` to `true`. On failure, returns an uninitialized
+ *    `string_type` and sets `*is_present` to `false`.
  */
 
 TRACKTABLE_CORE_EXPORT string_type string_property(PropertyMap const& properties, string_type const& name, bool* is_present=0);
 
-/*! \brief Retrieve a real-valued property from the map.
+/*! @brief Retrieve a real-valued property from the map.
  *
  * This function will give you back the named property as a
  * double-precision floating point number if it is present and that is
- * its proper type.  It will not attempt to cast other types to
+ * its proper type. It will not attempt to cast other types to
  * double.
  *
- * On success, returns the requested property as a double and sets
- * *is_present to true.  On failure, returns 0 and sets *is_present to
- * false.
+ * @param [in] properties Property map
+ * @param [in] name Property to search for in the map
+ * @param [out] is_present Flag indicating if the property is present
+ *
+ * @return
+ *    On success, returns the requested property as a `double` and sets
+ *    `*is_present` to `true`. On failure, returns `0` and sets `*is_present` to
+ *    `false`.
  */
 
 TRACKTABLE_CORE_EXPORT double real_property(PropertyMap const& properties, string_type const& name, bool* is_present=0);
 
-/*! \brief Retrieve a timestamp-valued property from the map.
+/*! @brief Retrieve a timestamp-valued property from the map.
  *
  * This function will give you back the named property as a Timestamp
- * if it is present and that is its proper type.  It will not attempt
+ * if it is present and that is its proper type. It will not attempt
  * to cast other types to Timestamp.
  *
- * On success, returns the requested property as a Timestamp and sets
- * *is_present to true.  On failure, returns an uninitialized
- * timestamp and sets *is_present to false.
+ * @param [in] properties Property map
+ * @param [in] name Property to search for in the map
+ * @param [out] is_present Flag indicating if the property is present
+ *
+ * @return
+ *    On success, returns the requested property as a `Timestamp` and sets
+ *    `*is_present` to `true`. On failure, returns an `uninitialized
+ *    timestamp` and sets `*is_present` to `false`.
  */
 
 TRACKTABLE_CORE_EXPORT Timestamp timestamp_property(PropertyMap const& properties,  string_type const& name, bool* is_present=0);
 
-/*! \brief Add a value to the map.
+/*! @brief Add a value to the map.
  *
- * These functions will all add a single value to the map.  If the
+ * @fn tracktable::void set_property(PropertyMap& properties, string_type const& name, double value)
+ *
+ * This function will all add a single value to the map. If the
  * value is already present it will be silently overwritten.
+ *
+ * @param [in] properties Property map
+ * @param [in] name Property to search for in the map
+ * @param [out] value Value to set the property to
  */
-
 TRACKTABLE_CORE_EXPORT void set_property(PropertyMap& properties, string_type const& name, double value);
+
+/**
+ * @overload tracktable::void set_property(PropertyMap& properties, string_type const& name, string_type const& value)
+ */
 TRACKTABLE_CORE_EXPORT void set_property(PropertyMap& properties, string_type const& name, string_type const& value);
+
+/**
+ * @overload tracktable::void set_property(PropertyMap& properties, string_type const& name, Timestamp const& value)
+ */
 TRACKTABLE_CORE_EXPORT void set_property(PropertyMap& properties, string_type const& name, Timestamp const& value);
+
+/**
+ * @overload tracktable::void set_property(PropertyMap& properties, string_type const& name, int64_t value)
+ */
 TRACKTABLE_CORE_EXPORT void set_property(PropertyMap& properties, string_type const& name, int64_t value);
+
+/**
+ * @overload tracktable::void set_property(PropertyMap& properties, string_type const& name, PropertyValueT const& value)
+ */
 TRACKTABLE_CORE_EXPORT void set_property(PropertyMap& properties, string_type const& name, PropertyValueT const& value);
 
-/*! \brief Retrieve a property value or a default if it's not there.
- *
+/*! @brief Retrieve a property value or a default if it's not there.
  */
-
 TRACKTABLE_CORE_EXPORT PropertyValueT property_with_default(PropertyMap const& properties, string_type const& name, PropertyValueT const& default_value);
 TRACKTABLE_CORE_EXPORT double real_property_with_default(PropertyMap const& properties, string_type const& name, double default_value);
 TRACKTABLE_CORE_EXPORT string_type string_property_with_default(PropertyMap const& properties, string_type const& name, string_type const& default_value);
@@ -148,8 +190,8 @@ TRACKTABLE_CORE_EXPORT string_type property_map_to_string(PropertyMap const& pro
 
 /** Provides an overloaded equality operator that that accounts for floating point epsilon differences
  *
- * Except for the call to compare(const PropertyValueT&, const PropertyValueT&, double, bool)
- * this function is identical to the default std::map comparator.
+ * Except for the call to `compare(const PropertyValueT&, const PropertyValueT&, double, bool)`
+ * this function is identical to the default `std::map` comparator.
  */
 TRACKTABLE_CORE_EXPORT bool operator==(const PropertyMap& pm1, const PropertyMap& pm2);
 
@@ -157,11 +199,11 @@ TRACKTABLE_CORE_EXPORT bool operator==(const PropertyMap& pm1, const PropertyMap
 
 namespace tracktable { namespace algorithms {
 
-/*! \brief Interpolate between two property maps.
+/*! @brief Interpolate between two property maps.
  *
- * Interpolation is well-defined for numbers and for timestamps.  For
- * strings, we choose the first string for t <= 0.5 and the second
- * string for t > 0.5.
+ * Interpolation is well-defined for numbers and for timestamps. For
+ * strings, we choose the first string for `t <= 0.5` and the second
+ * string for `t > 0.5`.
  */
 template<>
 struct interpolate<PropertyMap>

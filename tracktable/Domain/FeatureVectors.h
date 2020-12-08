@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -44,7 +44,7 @@
 #include <tracktable/Core/PointCartesian.h>
 #include <tracktable/Domain/DomainMacros.h>
 #include <tracktable/Domain/TracktableDomainWindowsHeader.h>
-#include <tracktable/IO/PointReader.h>
+#include <tracktable/RW/PointReader.h>
 
 #include <vector>
 #include <string>
@@ -57,14 +57,14 @@ namespace tracktable { namespace domain { namespace feature_vectors {
 /** Point type for feature vectors
  *
  * A feature vector is a list of numbers that collectively describe
- * properties of some entity, generally a trajectory.  We typically
+ * properties of some entity, generally a trajectory. We typically
  * treat feature vectors as a kind of fingerprint: we don't want to
  * modify them or do arithmetic with them, but instead look at the
  * structure of a larger collection of feature vectors.
  *
- * In Tracktable we use the FeatureVector template for such things.
- * You can specify any dimension you want from 1 on up.  Algorithms
- * such as DBSCAN and the R-tree are templated on point type so that
+ * In Tracktable we use the `FeatureVector` template for such things.
+ * You can specify any dimension you want from 1 on up. Algorithms
+ * such as `DBSCAN` and the `R-tree` are templated on point type so that
  * you can use them with any kind of feature vector you want.
  */
 
@@ -73,14 +73,26 @@ class FeatureVector : public PointCartesian<dim>
 {
 public:
   typedef PointCartesian<dim> Superclass;
-  
+
+  /// Create an uninitialized vector
   FeatureVector() { }
+
+  /// Empty destructor - nothing to do here
   virtual ~FeatureVector() { }
+
+  /** Instantiate coordinates from the given feature vector
+   *
+   * @param [in] other Feature vector to use for initialization
+   */
   FeatureVector(FeatureVector const& other)
     {
       detail::assign_coordinates<dim>::apply(*this, other);
     }
-  
+
+  /** Instantiate coordinates from the given coordinate list
+   *
+   * @param [in] other Coordinates to use for initialization
+   */
   FeatureVector(const double* coords)
     {
       tracktable::detail::assign_coordinates_from_array<dim>(*this, coords);
@@ -92,6 +104,11 @@ public:
       return *this;
     }
 
+  /** Serialize the points to an archive
+   *
+   * @param [in] ar Archive to serialize to
+   * @param [in] version Version of the archive
+   */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
     {
@@ -99,6 +116,10 @@ public:
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
     }
 
+  /** Convert point coordinates to a string
+   *
+   * @return Coordinates string
+   */
   string_type to_string() const
     {
     std::ostringstream outbuf;
@@ -110,10 +131,12 @@ public:
 
 /** Write a feature vector to a stream as a string
  *
- * This supports the idiom "stream << my_point".  This function
- * is also the implementatino for FeatureVector<dim>::to_string().
+ * This supports the idiom "stream << my_point". This function
+ * is also the implementation for `FeatureVector<dim>::to_string()`.
  *
  * Example:
+ *
+ * @code
  *
  * FeatureVector<3> my_vector;
  * my_vector[0] = 1;
@@ -121,13 +144,14 @@ public:
  * my_vector[2] = 3;
  * std::cout << my_vector << std::endl;
  *
+ * @endcode
+ *
  * Output:
  *
  * "(1, 2, 3)"
  *
- * Parameters:
- *   out:  Stream to write to
- *   pt:   Point to write to string
+ * @param [in] out Stream to write to
+ * @param [in] pt Point to write to string
  */
 
 template<std::size_t dim>

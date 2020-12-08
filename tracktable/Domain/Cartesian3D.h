@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -48,8 +48,8 @@
 #include <tracktable/Core/Trajectory.h>
 #include <tracktable/Domain/DomainMacros.h>
 #include <tracktable/Domain/TracktableDomainWindowsHeader.h>
-#include <tracktable/IO/PointReader.h>
-#include <tracktable/IO/TrajectoryReader.h>
+#include <tracktable/RW/PointReader.h>
+#include <tracktable/RW/TrajectoryReader.h>
 #include <boost/geometry/algorithms/length.hpp>
 
 #include <vector>
@@ -58,11 +58,11 @@ namespace tracktable { namespace domain { namespace cartesian3d {
 
 /** Bare point in flat 3D space
  *
- * This class defines a point in 3D Euclidean space.  Units have no
+ * This class defines a point in 3D Euclidean space. Units have no
  * real-world interpretation and (unlike the surface of the globe)
  * space is isotropic.
  *
- * Use this class instead of instantiating the PointCartesian template
+ * Use this class instead of instantiating the `PointCartesian` template
  * yourself.
  */
 
@@ -81,6 +81,10 @@ public:
   /** Initialize a point with x, y, z coordinates
    *
    * The coordinates will be initialized to whatever values you specify.
+   *
+   * @param [in] x X value to use for the point
+   * @param [in] y Y value to use for the point
+   * @param [in] z Z value to use for the point
    */
   CartesianPoint3D(double x, double y, double z)
     {
@@ -91,6 +95,7 @@ public:
 
   /** Copy constructor: make this point like another
    *
+   * @param [in] other Point to make a copy of
    */
   CartesianPoint3D(CartesianPoint3D const& other)
     : Superclass(other)
@@ -98,9 +103,11 @@ public:
 
   /** Initialize this point from its superclass
    *
-   * If you happen to have PointCartesian<3> instances sitting around,
-   * this is where you use them.  This is more for the compiler's
+   * If you happen to have `PointCartesian<3>` instances sitting around,
+   * this is where you use them. This is more for the compiler's
    * benefit than the user's.
+   *
+   * @param [in] other Superclass to use as if it were a CartesianPoint3D
    */
   CartesianPoint3D(Superclass const& other)
     : Superclass(other)
@@ -108,7 +115,7 @@ public:
 
   /** Empty destructor
    *
-   * All of our resources are on the stack.  We don't have any real
+   * All of our resources are on the stack. We don't have any real
    * work to do here.
    */
   virtual ~CartesianPoint3D() { }
@@ -138,21 +145,21 @@ public:
 // ----------------------------------------------------------------------
 
 // If you write libraries for Microsoft platforms you will have to
-// care about this warning sooner or later.  Warning #4251 says
+// care about this warning sooner or later. Warning #4251 says
 // "This type must have a DLL interface in order to be used by
-// clients of <class>".  After you dig through the layers, this
+// clients of <class>". After you dig through the layers, this
 // ends up meaning "You cannot use STL classes in the interface of a
 // method or function if you expect your library to work with any
 // compiler other than the one you're using right now."
 //
-// This is a symptom of a bigger problem.  Since the STL does not have
+// This is a symptom of a bigger problem. Since the STL does not have
 // a single standard implementation (for good reason) you cannot assume
-// that my std::map is the same on the inside as your std::map.  Idioms
+// that my std::map is the same on the inside as your std::map. Idioms
 // such as PIMPL are one approach to minimizing the impact.
 //
 // The bottom line is that yea, verily, you cannot use STL classes as
 // arguments or return values in your library's interface unless it will
-// only ever be used by the same compiler that built it.  We are going to
+// only ever be used by the same compiler that built it. We are going to
 // proclaim that this is the case for Tracktable and put great big warnings
 // in the developer documentation to that effect.
 //
@@ -168,11 +175,11 @@ public:
 /** Trajectory point in flat 3D space
  *
  * This class defines a point in 3D Euclidean space along with an
- * object ID, timestamp and named properties.  Units have no
+ * object ID, timestamp and named properties. Units have no
  * real-world interpretation and (unlike the surface of the globe)
  * space is isotropic.
  *
- * Use this class instead of instantiating the TrajectoryPoint template
+ * Use this class instead of instantiating the `TrajectoryPoint` template
  * yourself.
  */
 
@@ -184,7 +191,7 @@ public:
   /** Create an uninitialized point
    *
    * Assume that the coordinates will be initialized to garbage values
-   * when you use this constructor.  The object ID, timestamp and
+   * when you use this constructor. The object ID, timestamp and
    * properties will all be empty.
    */
   CartesianTrajectoryPoint3D() { }
@@ -192,6 +199,10 @@ public:
   /** Initialize a point with x, y, z coordinates
    *
    * The coordinates will be initialized to whatever values you specify.
+   *
+   * @param [in] x X value to use for the point
+   * @param [in] y Y value to use for the point
+   * @param [in] z Z value to use for the point
    */
   CartesianTrajectoryPoint3D(double x, double y, double z)
     {
@@ -202,6 +213,7 @@ public:
 
   /** Copy constructor: make this point like another
    *
+   * @param [in] other Point to make a copy of
    */
   CartesianTrajectoryPoint3D(CartesianTrajectoryPoint3D const& other)
     : Superclass(other)
@@ -209,9 +221,11 @@ public:
 
   /** Initialize this point from its superclass
    *
-   * If you happen to have TrajectoryPoint<PointCartesian<3>>
-   * instances sitting around, this is where you use them.  This is
+   * If you happen to have `TrajectoryPoint<PointCartesian<3>>`
+   * instances sitting around, this is where you use them. This is
    * more for the compiler's benefit than the user's.
+   *
+   * @param [in] other Superclass to use as if it were a CartesianTrajectoryPoint3D
    */
   CartesianTrajectoryPoint3D(Superclass const& other)
     : Superclass(other)
@@ -219,7 +233,7 @@ public:
 
   /** Empty destructor
    *
-   * All of our resources are on the stack.  We don't have any real
+   * All of our resources are on the stack. We don't have any real
    * work to do here.
    */
   virtual ~CartesianTrajectoryPoint3D() { }
@@ -236,12 +250,17 @@ public:
     }
 
 public:
+  /** Serialize the points to an archive
+   *
+   * @param [in] ar Archive to serialize to
+   * @param [in] version Version of the archive
+   */
   template<class Archive>
   void serialize(Archive& ar, const unsigned int version)
   {
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
   }
-  
+
   // Everything else -- operator==, operator!=, operator<< --
   // delegated to the superclass
 };
@@ -280,7 +299,7 @@ namespace tracktable { namespace traits {
 namespace domains {
   struct cartesian3d { };
 }
-    
+
 template<>
 struct point_domain_name<tracktable::domain::cartesian3d::CartesianPoint3D>
 {
@@ -352,7 +371,7 @@ struct distance<traits::domains::cartesian3d>
   }
 };
 
-    
+
 template<>
 struct unsigned_turn_angle<domain::cartesian3d::base_point_type>
 {

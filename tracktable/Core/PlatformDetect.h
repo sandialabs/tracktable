@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -33,7 +33,7 @@
  *
  * In order to provide platform-dependent features like a check on
  * memory usage, we need to determine what platform (operating system)
- * we're on.  The cleanest way to do that at compile time is to look
+ * we're on. The cleanest way to do that at compile time is to look
  * at the different symbols defined by the preprocessor.
  *
  * The checks in this header file were written with reference to the

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -36,7 +36,7 @@ from tracktable.domain import cartesian3d
 def test_make_bounding_box():
     min_corner_base = cartesian3d.BasePoint(12, 34, 56)
     max_corner_base = cartesian3d.BasePoint(78, 90, 12)
-    
+
     min_corner_trajectory = cartesian3d.TrajectoryPoint(12, 34, 56)
     max_corner_trajectory = cartesian3d.TrajectoryPoint(78, 90, 12)
 

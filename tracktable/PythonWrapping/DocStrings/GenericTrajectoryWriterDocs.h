@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -44,7 +44,7 @@ const char* GenericTrajectoryWriterDocString =
     "the user asks for the correct class. \n"
     "\n"
     "Attributes: \n"
-    "   write_header (bool): Flag to write a header. The header string describes the contents of a point: coordinate\n"
+    "   write_header (bool): Flag to write a header. The header string describes the contents of a point: coordinate"
     "       system, properties (if any), number of coordinates.  By default it will be written at the beginning of a sequence of points.\n "
     "   output (object): Python object to write to\n"
     "   field_delimiter (str): Designated character for delimiting fields (Default: whitespace) \n"

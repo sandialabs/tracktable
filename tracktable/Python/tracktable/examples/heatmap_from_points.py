@@ -30,6 +30,8 @@
 """heatmap_from_csv.py - Render a 2D geographic heatmap using points in a
 delimited text file
 
+NOTE: Cartopy v0.18.0 is required to successfully render maps and pass
+our internal tests.
 
 This is both an example of how to use the library and a convenient
 script that you can use to get started quickly.  You must provide as
@@ -42,8 +44,8 @@ You can control the following aspects of the rendering:
 
 - Which part of the world is displayed in the map.  This defaults to
   the whole world but can be changed with the --map argument.  Your
-  options are 'world', 'conus' (continental US), 'north_america' and
-  'europe'.
+  options are 'europe','australia', 'south_america', 'conus' (continental US),
+  'world' (default map), and 'north_america'.
 
 - Which colormap is used to render the colors.  This defaults to the
   'gist_heat' thermal scale built into matplotlib.  You may specify
@@ -151,6 +153,10 @@ def parse_args():
         args.resolution = [800, 600]
     if args.delimiter == 'tab':
         args.delimiter = '\t'
+    if args.coordinate0 is None:
+      args.coordinate0 = 2
+    if args.coordinate1 is None:
+      args.coordinate1 = 3
 
     return args
 
@@ -302,7 +308,7 @@ def main():
                 data_bbox = geomath.compute_bounding_box(point_source)
             else:
                 # The bounding box on the command line is
-                # [x_min, y_min, x_max, y_max]
+                # [minLon, minLat, maxLon, maxLat]
                 data_bbox = cartesian2d.BoundingBox(
                     (args.map_bbox[0], args.map_bbox[1]),
                     (args.map_bbox[2], args.map_bbox[3])
@@ -312,7 +318,7 @@ def main():
             data_bbox = None
             if args.map_bbox is not None:
                 # The bounding box on the command line is
-                # [x_min, y_min, x_max, y_max]
+                # [minLon, minLat, maxLon, maxLat]
                 data_bbox = terrestrial.BoundingBox(
                     (args.map_bbox[0], args.map_bbox[1]),
                     (args.map_bbox[2], args.map_bbox[3])
@@ -343,12 +349,8 @@ def main():
         figure.suptitle(args.title, color='white')
 
     logger.info("STATUS: Saving figure to file")
-    savefig_kwargs = {'figsize': figure_dimensions,
-                      'dpi': dpi,
-                      'facecolor': args.bgcolor
-                      }
-    pyplot.savefig(args.image_file[0],
-                   **savefig_kwargs)
+    savefig_kwargs = {'dpi': dpi, 'facecolor': args.bgcolor}
+    pyplot.savefig(args.image_file[0], **savefig_kwargs)
 
     pyplot.close()
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -361,14 +361,11 @@ def draw_traffic(traffic_map,
     True if the trajectory lines (piecewise-linear path) should be rendered
 
     """
+
     if transform is None:
         transform = cartopy.crs.Geodetic()
-
     if axes is None:
         axes = matplotlib.pyplot.gca()
-
-    if isinstance(axes, matplotlib.axes._axes.Axes): # if not GeoAxes
-        transform = None
 
     logger = logging.getLogger(__name__)
     all_artists = []

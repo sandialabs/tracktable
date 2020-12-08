@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -49,7 +49,7 @@ template<typename thing_type>
 thing_type serialized_copy(thing_type const& input_thing)
 {
   thing_type restored_thing;
-  
+
   std::ostringstream temp_out;
   boost::archive::text_oarchive archive_out(temp_out);
   archive_out << input_thing;
@@ -81,7 +81,7 @@ test_trajectory_serialization()
   initial_point.set_property("test_string_property", "Frodo lives!");
   initial_point.set_property("test_timestamp_property", tracktable::time_from_string("2000-01-02 03:04:05"));
   initial_point.set_timestamp(tracktable::time_from_string("2001-02-03 04:05:06"));
-    
+
   for (int i = 0; i < 10; ++i)
     {
     trajectory_point_type my_point(initial_point);
@@ -119,7 +119,7 @@ test_trajectory_serialization()
 // ----------------------------------------------------------------------
 
 
-  
+
 int
 main(int argc, char *argv[])
 {

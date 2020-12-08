@@ -1,0 +1,23 @@
+name: tracktable
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.7
+  - cartopy
+  - folium
+  - ipykernel
+  - matplotlib
+  - numpy
+  - pandoc
+  - pip
+  - pykdtree
+  - pyshp
+  - pytz
+  - scipy
+  - sphinx
+  - pip:
+    - breathe
+    - nbsphinx
+    - nbsphinx-link
+    - tracktable

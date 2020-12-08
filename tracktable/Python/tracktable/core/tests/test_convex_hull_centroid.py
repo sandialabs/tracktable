@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -60,7 +60,7 @@ def verify_result(expected, actual, test):
     if (geomath.distance(actual, expected) > .1):
         sys.stderr.write('ERROR: {} does not match. Expected centroid {}, but returned {}.\n'.format(test,expected,actual))
         return 1
-  
+
     return 0
 
 
@@ -69,7 +69,7 @@ def test_convex_hull_centroid():
     print("Testing Convex Hull Centroid")
 
     error_count = 0;
-    
+
     albuquerque = create_point(35.0844, -106.6504, "short_flight")
     denver = create_point(39.7392, -104.9903, "short_flight")
     el_paso = create_point(31.7619, -106.4850, "short_flight")
@@ -83,7 +83,7 @@ def test_convex_hull_centroid():
     point4 = create_cart2_point(1,0, "2d cartesian trajectory")
 
     short_trajectory = TerrestrialTrajectory.from_position_list([el_paso, albuquerque, denver])
-    
+
     #Short trajectorty should have centroid around albuquerque
     expected_short_centroid = create_point(35.5314, -106.069, "short_flight_centroid")
 
@@ -117,7 +117,7 @@ def test_convex_hull_centroid():
     expected_one_point_centroid = create_point(0.0, 0.0, "one_point_centroid")
 
     one_point = TerrestrialTrajectory.from_position_list([create_point(0.0, 0.0, "one_point_centroid")])
-    
+
     one_point_centroid = geomath.convex_hull_centroid(one_point)
     error_count += verify_result(expected_one_point_centroid, one_point_centroid, "One point flight")
 
@@ -125,7 +125,7 @@ def test_convex_hull_centroid():
     expected_cartesian2d_centroid = create_cart2_point(0.5, 0.5, "four_point_centroid")
 
     cart_trajectory = Cartesian2dTrajectory.from_position_list([point1, point2, point3, point4])
-    
+
     cart2d_centroid = geomath.convex_hull_centroid(cart_trajectory)
     error_count += verify_result(expected_cartesian2d_centroid, cart2d_centroid, "Four points cartesian")
 

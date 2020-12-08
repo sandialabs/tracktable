@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -36,7 +36,7 @@ from tracktable.domain import terrestrial
 def test_make_bounding_box():
     min_corner_base = terrestrial.BasePoint(12, 34)
     max_corner_base = terrestrial.BasePoint(56, 78)
-    
+
     min_corner_trajectory = terrestrial.TrajectoryPoint(12, 34)
     max_corner_trajectory = terrestrial.TrajectoryPoint(56, 78)
 

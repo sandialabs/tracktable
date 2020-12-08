@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2019 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -58,13 +58,13 @@ template<class native_object_t>
 class GenericSerializablePickleSuite : public boost::python::pickle_suite
 {
 public:
-  
+
   static boost::python::tuple getstate(boost::python::object object_to_pickle)
   {
     std::ostringstream outbuf;
     boost::archive::binary_oarchive archive(outbuf);
     native_object_t const& native_object = boost::python::extract<native_object_t const&>(object_to_pickle);
-    
+
     archive << native_object;
     // Because Boost.Python doesn't provide a way to create a Python
     // bytes object we have to drop through to the C API.
@@ -73,16 +73,16 @@ public:
         PyBytes_FromStringAndSize(outbuf.str().c_str(), outbuf.str().size())
       )
     );
-    
+
     return boost::python::make_tuple(archive_bytes,
                                      object_to_pickle.attr("__dict__"));
-  }                                        
+  }
 
   static void setstate(boost::python::object& object_to_restore, boost::python::tuple state)
   {
     using boost::python::dict;
     using boost::python::extract;
-    
+
     check_tuple_size(state, 2);
     check_for_bytes(state[0]);
     check_for_dict(state[1]);
@@ -99,30 +99,30 @@ public:
     std::string archive_data(bytes_as_c_string, PyBytes_Size(bytes));
     std::istringstream inbuf(archive_data);
     boost::archive::binary_iarchive archive(inbuf);
-    
+
     dict object_dict = extract<dict>(object_to_restore.attr("__dict__"));
     object_dict.update(state[1]);
-    
+
     native_object_t& native_object = extract<native_object_t&>(object_to_restore);
     archive >> native_object;
   }
-  
+
   static bool getstate_manages_dict() { return true; }
 
   // ----------------------------------------------------------------------
   // Utility functions below here
   // ----------------------------------------------------------------------
-  
+
   // Does this tuple conform to our expectations?
   static void check_tuple_size(boost::python::object tuple,
                                int expected_size)
   {
     using boost::python::len;
-    
+
     if (len(tuple) != expected_size)
       {
       PyErr_SetObject(PyExc_ValueError,
-                      ("Expected %s-item tuple; got %s" % 
+                      ("Expected %s-item tuple; got %s" %
                        boost::python::make_tuple(len(tuple), expected_size)).ptr());
       boost::python::throw_error_already_set();
       }
@@ -137,12 +137,12 @@ public:
       boost::python::throw_error_already_set();
       }
   }
-  
+
   static void check_for_dict(boost::python::object maybe_dict)
   {
     using boost::python::dict;
     using boost::python::extract;
-    
+
     extract<dict> dict_check(maybe_dict);
     if (! dict_check.check())
       {
@@ -156,12 +156,12 @@ public:
   {
     using boost::python::dict;
     using boost::python::extract;
-    
+
     PyObject* bytes = maybe_bytes.ptr();
     if (!PyBytes_Check(bytes))
       {
       PyErr_SetObject(PyExc_ValueError,
-                      ("Expected bytes() object in call to __setstate__; got %s" % 
+                      ("Expected bytes() object in call to __setstate__; got %s" %
                        maybe_bytes).ptr());
       boost::python::throw_error_already_set();
       }

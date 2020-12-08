@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -42,7 +42,7 @@
 #include <sstream>
 
 
-namespace tracktable { namespace python_wrapping { 
+namespace tracktable { namespace python_wrapping {
 
 template<std::size_t dim>
 void wrap_feature_vector_point()

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -69,7 +69,6 @@ def install_group():
                           description="Parameters for image size and resolution")
 
     add_argument("image", [ '--dpi' ],
-                 nargs=1,
                  type=int,
                  default=72,
                  help='Dots per inch (DPI) for image. This determines font height and line width.')

@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC . Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -68,7 +68,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Begin RELEASE VARIABLES
 #-------------------------------------------------------------------------
 
-set(TRACKTABLE_VERSION 1.4.0)
+set(TRACKTABLE_VERSION 1.4.1)
 set(RPM_RELEASE 6)
 
 project(Tracktable LANGUAGES CXX VERSION ${TRACKTABLE_VERSION})
@@ -79,7 +79,7 @@ include(GNUInstallDirs)
 #
 # A libtool version number C.R.A has three components:
 #
-# C - current library interface ID (abbreviated CURRENT), an integer.  
+# C - current library interface ID (abbreviated CURRENT), an integer.
 # Any release that makes user-visible changes to the interface must
 # increment CURRENT.
 #
@@ -88,24 +88,24 @@ include(GNUInstallDirs)
 # break existing code should increment REVISION.  Reset REVISION
 # to zero whenever CURRENT changes.
 #
-# A - "age" of this release (abbreviated AGE).  (CURRENT - AGE) is the 
+# A - "age" of this release (abbreviated AGE).  (CURRENT - AGE) is the
 # oldest interface version supported by a release.  If a new release breaks
-# existing code, AGE must be reset to 0.  If a new release adds new features 
-# and does not break existing code, AGE should be incremented by 1.  
+# existing code, AGE must be reset to 0.  If a new release adds new features
+# and does not break existing code, AGE should be incremented by 1.
 #
-# NOTE: This version information is often referred to as the 
-# "compatibility version".  It is not the same as the version number 
+# NOTE: This version information is often referred to as the
+# "compatibility version".  It is not the same as the version number
 # that is often attached to the software release as a whole.
-#                                      
+#
 # Quick reference:
 # CURRENT : REVISION : AGE
 # +1 :  ? : +1 == new interface that does not break old one
 # +1 :  ? :  0 == new interface that breaks old one
 #  ? :  ? :  0 == no new interfaces, but breaks apps
 #  ? : +1 :  ? == just some internal changes, nothing breaks but might work better
-set(UNIX_SO_VERSION_CURRENT  4)
+set(UNIX_SO_VERSION_CURRENT  5)
 set(UNIX_SO_VERSION_REVISION 0)
-set(UNIX_SO_VERSION_AGE      3)
+set(UNIX_SO_VERSION_AGE      0)
 
 #-------------------------------------------------------------------------
 # End RELEASE VARIABLES
@@ -269,6 +269,8 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
       DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}/cpp_reference
     )
 
+    include(FindPythonModule)
+
     # We have found Sphinx, but that isn't the end of it. We need to make sure the sphinx_rtd_theme is accessible
     if(NOT BUILD_DOCUMENTATION_CXX_ONLY)
       unset(Sphinx_FOUND)
@@ -278,71 +280,48 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
         message(ERROR ": Please provide the path to the Sphinx executable.")
       endif (NOT Sphinx_FOUND)
 
-      execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
-        "import re; import sphinx; print(re.compile('/__init__.py.*').sub('',sphinx.__file__))"
-        RESULT_VARIABLE SPHINX_MODULE_STATUS
-        OUTPUT_VARIABLE SPHINX_MODULE_LOCATION
-        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-      #message("SPHINX_MODULE_STATUS ${SPHINX_MODULE_STATUS}")
-      #message("SPHINX_MODULE_LOCATION ${SPHINX_MODULE_LOCATION}")
-      # The status is empty if everything went ok, but if it has anything in it there was an error
-      if(SPHINX_MODULE_STATUS)
-        message(ERROR ": Python module 'sphinx' is required to build Python documentation. Install the sphinx module or enable BUILD_DOCUMENTATION_CXX_ONLY.  If you are certain that Sphinx is already installed, make sure Python3_EXECUTABLE is correct.")
-      endif(SPHINX_MODULE_STATUS)
+      find_python_module(sphinx SPHINX_MODULE_STATUS SPHINX_MODULE_LOCATION)
 
-      execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
-        "import re; import sphinx_rtd_theme; print(re.compile('/__init__.py.*').sub('',sphinx_rtd_theme.__file__))"
-        RESULT_VARIABLE SPHINX_RTD_THEME_STATUS
-        OUTPUT_VARIABLE SPHINX_RTD_THEME_LOCATION
-        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-      #message("SPHINX_RTD_THEME_STATUS ${SPHINX_RTD_THEME_STATUS}")
-      #message("SPHINX_RTD_THEME_LOCATION ${SPHINX_RTD_THEME_LOCATION}")
-      # The status is empty if everything went ok, but if it has anything in it there was an error
-      if(SPHINX_RTD_THEME_STATUS)
-        message(ERROR ": Python module 'sphinx_rtd_theme' is required to build Python documentation. Install the sphinx_rtd_theme module or enable BUILD_DOCUMENTATION_CXX_ONLY.  If you are certain that sphinx_rtd_theme is already installed, make sure Python3_EXECUTABLE is correct.")
-      endif(SPHINX_RTD_THEME_STATUS)
+      find_python_module(sphinx_rtd_theme SPHINX_RTD_THEME_MODULE_STATUS SPHINX_RTD_THEME_MODULE_LOCATION)
 
-      execute_process(COMMAND "${Python3_EXECUTABLE}" "-c"
-        "import re; import breathe; print(re.compile('/__init__.py.*').sub('',breathe.__file__))"
-        RESULT_VARIABLE BREATHE_STATUS
-        OUTPUT_VARIABLE BREATHE_LOCATION
-        ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE
-        )
-      # The status is empty if everything went ok, but if it has anything in it there was an error
-      if(BREATHE_STATUS)
-        message(ERROR ": Python module 'breathe' is required to build Python documentation. Install the breathe module or enable BUILD_DOCUMENTATION_CXX_ONLY.  If you are certain that breathe is already installed, make sure Python3_EXECUTABLE is correct.")
-      endif(BREATHE_STATUS)
-      
-      # Yes, I'm writing a file into the source tree.  Sphinx requires
-      # that its configuration file (conf.py) exist in the source tree
-      # even though it can put all of its generated files elsewhere.
-      configure_file(
-        ${DOC_SOURCE_DIR}/conf.py.in
-        ${DOC_SOURCE_DIR}/conf.py
-        @ONLY
-        )
+      find_python_module(breathe BREATHE_MODULE_STATUS BREATHE_MODULE_LOCATION)
 
       set(Sphinx_BUILD_DIR "${DOC_BINARY_DIR}/_build")
 
-
-      # NOTE: This approach to setting PYTHONPATH will only work on
-      # Unix-like systems.  In CMake 3.1 we will get the '-E env'
-      # capability which is what we really need here.  Since requiring the
-      # bleeding-edge version of CMake isn't a terribly friendly thing to
-      # do, I will probably end up faking it with batch files.
-
-      add_custom_target( doc_python ALL
-          ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
-          -b html
-          -d "${Sphinx_BUILD_DIR}/doctrees"
-          ${DOC_SOURCE_DIR}
-          ${DOC_BINARY_DIR}/html
-        COMMENT "Generating Python documentation"
-        DEPENDS doc_cxx
-        WORKING_DIRECTORY ${DOC_SOURCE_DIR}
-        )
+      if (MINGW OR MSVC)
+        string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )
+        string( REPLACE ";" "\\;" ESCAPED_PYTHONPATH "$ENV{PYTHONPATH}" )
+        add_custom_target( doc_python ALL
+            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python\\;${ESCAPED_PYTHONPATH} PATH=${Tracktable_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH}
+            SOURCE_DIR=${Tracktable_SOURCE_DIR} BINARY_DIR=${Tracktable_BINARY_DIR}
+            ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
+            -b html
+            -d "${Sphinx_BUILD_DIR}/doctrees"
+            -c "cmake_build"
+            ${DOC_SOURCE_DIR}
+            ${DOC_BINARY_DIR}/html
+          COMMENT "Generating Python documentation"
+          DEPENDS doc_cxx
+          WORKING_DIRECTORY ${DOC_SOURCE_DIR}
+          VERBATIM
+          )
+      else (MINGW OR MSVC)
+        # Trust the compiler to set RPATH so that the libraries in bin/ are accessible
+        add_custom_target( doc_python ALL
+            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python:${Tracktable_BINARY_DIR}/lib:$ENV{PYTHONPATH}
+            SOURCE_DIR=${Tracktable_SOURCE_DIR} BINARY_DIR=${Tracktable_BINARY_DIR}
+            ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
+            -b html
+            -d "${Sphinx_BUILD_DIR}/doctrees"
+            -c "cmake_build"
+            ${DOC_SOURCE_DIR}
+            ${DOC_BINARY_DIR}/html
+          COMMENT "Generating Python documentation"
+          DEPENDS doc_cxx
+          WORKING_DIRECTORY ${DOC_SOURCE_DIR}
+          VERBATIM
+          )
+      endif (MINGW OR MSVC)
 
       install(
         DIRECTORY ${DOC_BINARY_DIR}/html
@@ -398,14 +377,14 @@ message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")
 #=========================================================================
 # Begin FindBoost
 #-------------------------------------------------------------------------
-set(BOOST_MINIMUM_VERSION_REQUIRED 1.61)
+set(BOOST_MINIMUM_VERSION_REQUIRED 1.67)
 
 # Do not use Boost's CMake modules yet.
 set(Boost_NO_BOOST_CMAKE ON)
 
 # Core: date_time log serialization
 # IO: regex
-set(BOOST_CORE_COMPONENTS_NEEDED date_time log regex serialization)
+set(BOOST_CORE_COMPONENTS_NEEDED date_time log regex serialization timer)
 
 # These are the components, in addition to core components that are needed to
 # build examples.

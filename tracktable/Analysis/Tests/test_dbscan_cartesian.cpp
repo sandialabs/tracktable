@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -85,7 +85,7 @@ double random_gaussian(double mean=0, double stddev=1)
   // y2 = sqrt(-2 log u) * sin(2 \pi v)
   //
   // y1 and y2 will be independent and normally distributed.
-  
+
   return mean + stddev * (sqrt(-2 * log(u)) * sin(2*PI*v));
 }
 
@@ -97,7 +97,7 @@ tracktable::PointCartesian<dim> random_point_in_sphere(double sphere_radius=1)
   typedef tracktable::PointCartesian<dim> point_t;
 
   point_t result((tracktable::arithmetic::zero<point_t>()));
-  
+
   double squared_magnitude = 0;
   for (int i = 0; i < dim; ++i)
     {
@@ -179,7 +179,7 @@ void test_dbscan()
   std::vector<point_type> hd_points;
   std::vector<int> labels;
   std::vector<cluster_label_type> dbscan_results;
-  
+
   std::cout << "test_dbscan: Generating point clouds at vertices of "
             << dimension << "-dimensional hypercube\n";
   point_cloud_at_hypercube_vertices<dimension>(100, 0.1, hd_points, labels);
@@ -190,7 +190,7 @@ void test_dbscan()
     {
     std::cout << "point: " << *iter << "\n";
     }
-  
+
   point_type epsilon_halfspan;
 
   for (int d = 0; d < dimension; ++d)

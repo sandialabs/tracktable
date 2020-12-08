@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -41,7 +41,7 @@
 #define __tracktable_PythonAwareTrajectoryReader_h
 
 #include <tracktable/Core/TracktableCommon.h>
-#include <tracktable/IO/TrajectoryReader.h>
+#include <tracktable/RW/TrajectoryReader.h>
 #include <tracktable/PythonWrapping/PythonFileLikeObjectStreams.h>
 #include <boost/iostreams/stream.hpp>
 #include <boost/shared_ptr.hpp>
@@ -69,7 +69,7 @@ public:
     {
       this->set_input_from_python_object(obj);
     }
-  
+
   virtual ~PythonAwareTrajectoryReader()
     {
     }

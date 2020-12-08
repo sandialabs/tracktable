@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC . Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -65,15 +65,44 @@
 # identifies a Python interpreter: 'cp37' for C-Python version 3.7 and
 # so forth.
 
+# Great.  First the wheel package drops the pep425tags module.  Then
+# pip drops it too.  Now the packaging package has removed the functions
+# in its tags() module that we used as a fallback.  
+#
+# Let's see if this helps...
+#
+# The very long line here is the equivalent of
+#
+# from __future__ import print_function
+# import sysconfig
+# import packaging.tags
+# long_name = sysconfig.get_config_var('SOABI') # returns something like 'cpython-38-darwin'
+# short_name = packaging.tags.INTERPRETER_SHORT_NAMES[long_name] # returns 'cp' for 'cpython'
+# print('{}{}'.format(short_name, sysconfig.get_config_var('py_version_nodot'))) # finally prints 'cp38'
+
 function(_get_python_version_tag _python_interpreter _output_var)
-  execute_process(
-    COMMAND
-      ${_python_interpreter}
-      "-c"
-      "from __future__ import print_function; from packaging import tags; import sys;  print('{interpreter}{version}'.format(interpreter=tags.interpreter_name(), version=tags.interpreter_version()))"
-    RESULT_VARIABLE _interpreter_result
-    OUTPUT_VARIABLE _python_tag
+  if (WIN32)
+    # The above approach doesn't work on Windows -- sysconfig config vars
+    # are much sparser.  I give up.  On Windows we're just going to 
+    # assume that this is CPython.
+    execute_process(
+      COMMAND
+        ${_python_interpreter}
+        "-c"
+        "from __future__ import print_function; import sys; print('cp{}{}'.format(sys.version_info.major, sys.version_info.minor))"
+      RESULT_VARIABLE _interpreter_result
+      OUTPUT_VARIABLE _python_tag
     )
+  else (WIN32)
+    execute_process(
+      COMMAND
+        ${_python_interpreter}
+        "-c"
+        "from __future__ import print_function; import sysconfig; import packaging.tags; long_name = sysconfig.get_config_var('SOABI'); interpreter_only = long_name.split('-')[0]; short_name = packaging.tags.INTERPRETER_SHORT_NAMES[interpreter_only]; print('{}{}'.format(short_name, sysconfig.get_config_var('py_version_nodot')))"
+      RESULT_VARIABLE _interpreter_result
+      OUTPUT_VARIABLE _python_tag
+      )
+  endif (WIN32)
   if (NOT ${_interpreter_result} EQUAL 0)
     message(ERROR "Error while invoking Python interpreter to retrieve version tag: ${_interpreter_result}")
   else ()
@@ -111,26 +140,10 @@ endfunction(_get_python_platform_tag)
 
 # ----------------------------------------------------------------------
 
-# This function retrieves the ABI tag from a Python interpreter.  This
-# is usually 'm' for pymalloc.
+# We do not depend on any particular ABI tag.
 
 function(_get_python_abi_tag _python_interpreter _output_var)
-  execute_process(
-    COMMAND
-      ${_python_interpreter}
-      "-c"
-      "from __future__ import print_function; from wheel import pep425tags; print(pep425tags.get_abi_tag())"
-    RESULT_VARIABLE _interpreter_result
-    OUTPUT_VARIABLE _abi_tag
-    )
-  if (NOT ${_interpreter_result} EQUAL 0)
-    message("WARNING: Error while invoking Python interpreter to retrieve ABI tag: ${_interpreter_result}")
-    set(${_output_var} "none" PARENT_SCOPE)
-  else ()
-    string(STRIP ${_abi_tag} _abi_tag)
-    message(STATUS "Python ABI tag: ${_abi_tag}")
-    set(${_output_var} ${_abi_tag} PARENT_SCOPE)
-  endif()
+  set(${_output_var} "none" PARENT_SCOPE)
 endfunction(_get_python_abi_tag)
 
 # ----------------------------------------------------------------------
@@ -173,7 +186,7 @@ function(build_wheel _build_directory _base_directory _output_directory _setup_p
       WORKING_DIRECTORY ${_base_directory}
       )
   endif()
-  
+
   if (NOT ${_wheel_build_result} EQUAL 0)
     message(ERROR "Error while building wheel: ${_wheel_build_result}")
   elseif (NOT WIN32)
@@ -188,8 +201,8 @@ function(build_wheel _build_directory _base_directory _output_directory _setup_p
     ${_output_directory}/tracktable-*-${_implementation_version}-none-${_platform}.whl
     LIST_DIRECTORIES false
     )
-    
- 
+
+
 
   # We don't know what the exact filename is going to be.  It depends
   # on information scattered in several different locations.  Let's
@@ -247,8 +260,8 @@ function(build_wheel _build_directory _base_directory _output_directory _setup_p
       return()
     endif ()
   endforeach ()
-    
- 
+
+
 endfunction(build_wheel)
 
 
@@ -276,7 +289,7 @@ message(STATUS "INFO: Wheel fixer is ${FIX_WHEEL_EXECUTABLE}")
 message(STATUS "DEBUG: CMake ARGC is ${CMAKE_ARGC} (we use up to ARGV8 by default; CMake itself gets an extra three directories)")
 
 # YOU ARE HERE
-# 
+#
 # Pass the Boost library directory as one of the arguments to BuildWheel.cmake in PythonWrapping/CMakeLists.txt.
 #
 # Grab any arguments after CMAKE_ARGV8 as extra search paths.  Pass those to the build_wheel function.
@@ -293,10 +306,10 @@ endif()
 
 build_wheel(
   ${BUILD_TREE_ROOT}
-  ${INSTALL_TREE_ROOT} 
-  ${OUTPUT_DIRECTORY} 
-  ${SETUP_SCRIPT} 
-  ${PYTHON_INTERPRETER} 
+  ${INSTALL_TREE_ROOT}
+  ${OUTPUT_DIRECTORY}
+  ${SETUP_SCRIPT}
+  ${PYTHON_INTERPRETER}
   ${FIX_WHEEL_EXECUTABLE}
   ${EXTRA_SEARCH_PATHS}
   )

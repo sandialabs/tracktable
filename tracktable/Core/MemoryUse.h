@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -36,7 +36,7 @@
  * it.
  *
  * NOTE: While NTESS holds the copyright for this file,
- * MemoryUsage.cpp has a different owner and a different license.  See
+ * MemoryUsage.cpp has a different owner and a different license. See
  * the file MemoryUsage.cpp for details.
  *
  */
@@ -54,11 +54,7 @@ namespace tracktable {
  * Returns the peak (maximum so far) resident set size (physical
  * memory use) measured in bytes.
  *
- * Args:
- *   none
- *
- * Return value:
- *   Maximum memory use in bytes or zero if the value
+ * @return Maximum memory use in bytes or zero if the value
  *   cannot be determined on this OS.
  */
 
@@ -68,11 +64,7 @@ TRACKTABLE_CORE_EXPORT std::size_t peak_memory_use();
  * Returns the current resident set size (physical memory use)
  * measured in bytes.
  *
- * Args:
- *   none
- *
- * Return value:
- *   Current memory use in bytes or zero if the value
+ * @return Current memory use in bytes or zero if the value
  *   cannot be determined on this OS.
  */
 
