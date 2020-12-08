@@ -155,13 +155,13 @@ SCENARIO("Creating Point Reader", "[PointReaderFromCommandLine]") {
 
 void checkColumnValue(std::shared_ptr<ReaderT> _reader, FieldID _id, size_t _val) {
   if (0 != (FieldID::OBJECTIDCOLUMN & _id)) {
-    REQUIRE(_reader->object_id_column() == _val);
+    REQUIRE(static_cast<size_t>(_reader->object_id_column()) == _val);
   } else if (0 != (FieldID::TIMESTAMPCOLUMN & _id)) {
-    REQUIRE(_reader->timestamp_column() == _val);
+    REQUIRE(static_cast<size_t>(_reader->timestamp_column()) == _val);
   } else if (0 != (FieldID::XCOLUMN & _id)) {
-    REQUIRE(_reader->x_column() == _val);
+    REQUIRE(static_cast<size_t>(_reader->x_column()) == _val);
   } else if (0 != (FieldID::YCOLUMN & _id)) {
-    REQUIRE(_reader->y_column() == _val);
+    REQUIRE(static_cast<size_t>(_reader->y_column()) == _val);
   }
 }
 

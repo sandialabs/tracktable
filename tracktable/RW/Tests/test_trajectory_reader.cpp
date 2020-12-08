@@ -123,7 +123,7 @@ tracktable::Trajectory<
   tracktable::TrajectoryPoint<
     point_type
     > >
-generate_trajectory(int num_points,
+generate_trajectory(size_t num_points,
                     int num_point_properties,
                     int num_trajectory_properties)
 {
@@ -134,7 +134,7 @@ generate_trajectory(int num_points,
 
   generate_arbitrary_properties(num_trajectory_properties, trajectory);
 
-  for (std::size_t i = 0; i < num_points; ++i)
+  for (auto i = 0u; i < num_points; ++i)
     {
     tracktable::ostringstream_type id_buf, timestamp_buf;
     trajectory_point_type next_point;

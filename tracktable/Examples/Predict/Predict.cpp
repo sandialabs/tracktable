@@ -119,9 +119,10 @@ void Predict(const TrajectoryVectorT &_trajectories, const size_t _numSamples) {
         // then the find_if returned sorted.end() and the value was
         // not found.
 
-        auto pos = std::find_if(sorted.begin(), sorted.end(),
-                                [&dest](WeightPairT &_wp) { return _wp.first == dest; }) -
-                   sorted.begin();
+        // size_t cast safe because gauranteed >= 0
+        auto pos = size_t(std::find_if(sorted.begin(), sorted.end(),
+                                       [&dest](WeightPairT &_wp) { return _wp.first == dest; }) -
+                          sorted.begin());
         ++bins[pos == sorted.size() ? 0 : pos + 1];
 
         if ((pos != sorted.size()) && (pos == 3) && (total_weight > 400)) {

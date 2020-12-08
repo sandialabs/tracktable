@@ -66,7 +66,7 @@ public:
 
   /// Instantiate an empty line reader
   LineReader()
-    : Stream(0)
+    : Stream(nullptr)
     {
     }
 
@@ -166,15 +166,16 @@ protected:
 
     /// Instantiate an empty reader iterator
     LineReaderIterator()
-      : Stream(0),
+      : Stream(nullptr),
+        Value(""),
         Counter(0)
       { }
 
     /// Copy contructor, create a line reader iterator with a copy of a `std::basic_istream`
     LineReaderIterator(istream_type* stream)
       : Stream(stream),
-        Counter(0),
-        Value("")
+        Value(""),
+        Counter(0)
       {
         // When first constructed, the stream has not been read at
         // all. This corresponds to an iterator state before the
@@ -189,8 +190,8 @@ protected:
     /// Copy contructor, create a line reader iterator with a copy of another
     LineReaderIterator(LineReaderIterator const& other)
       : Stream(other.Stream),
-        Counter(other.Counter),
-        Value(other.Value)
+        Value(other.Value),
+        Counter(other.Counter)
       {
       }
 
@@ -207,6 +208,7 @@ protected:
       {
         this->Stream = other.Stream;
         this->Value = other.Value;
+        this->Counter = other.Counter;
         return *this;
       }
 
@@ -291,7 +293,7 @@ protected:
     */
     value_type get_value() const 
     {
-        if (this->Stream == NULL) return "";
+        if (this->Stream == nullptr) return "";
         return this->Value;
     }
 

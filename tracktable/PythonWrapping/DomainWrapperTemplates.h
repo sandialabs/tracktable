@@ -48,8 +48,8 @@ boost::shared_ptr<point_type>
 make_point_from_sequence(boost::python::object& coordinates)
 {
   boost::shared_ptr<point_type> point(new point_type);
-
-  if (boost::python::len(coordinates) <
+  assert(boost::python::len(coordinates) >=0 );
+  if (size_t(boost::python::len(coordinates)) <
       tracktable::traits::dimension<point_type>::value)
     {
     throw std::runtime_error("make_point_from_sequence: Boost sequence does not have enough coordinates for point");

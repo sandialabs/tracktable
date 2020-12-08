@@ -84,7 +84,7 @@ SCENARIO("Creating Pointer Reader and Assembler", "[PointReaderFromCommandLine][
     PointReaderFromCommandLine<PointT> readerFactory;
     WHEN("Stdin contains onepoint.txt") {
       std::ifstream in("onepoint.txt");
-      std::streambuf* cinbuf = std::cin.rdbuf();  // save old buf
+      auto* cinbuf = std::cin.rdbuf();  // save old buf
       std::cin.rdbuf(in.rdbuf());                 // redirect std::cin to in.txt!
       AND_WHEN("Options are combined") {
         auto combinedOptions = std::make_shared<bpo::options_description>("Available Options");
@@ -153,6 +153,7 @@ SCENARIO("Creating Pointer Reader and Assembler", "[PointReaderFromCommandLine][
           }
         }
       }
+      std::cin.rdbuf(cinbuf);
       in.close();
     }
   }
