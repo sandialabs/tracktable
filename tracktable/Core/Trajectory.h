@@ -819,7 +819,7 @@ protected:
 
 private:
   template<class Archive>
-  void serialize(Archive& ar, const unsigned int version)
+  void serialize(Archive& ar, const unsigned int /*version*/)
   {
     ar & BOOST_SERIALIZATION_NVP(Points);
     ar & BOOST_SERIALIZATION_NVP(Properties);

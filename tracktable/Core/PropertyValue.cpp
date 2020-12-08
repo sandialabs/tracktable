@@ -306,7 +306,7 @@ public:
     }
 
     // All null values are equal
-    int operator()(const NullValue& v1, const NullValue& v2) const {
+    int operator()(const NullValue& /*v1*/, const NullValue& /*v2*/) const {
         return 0;
     }
 

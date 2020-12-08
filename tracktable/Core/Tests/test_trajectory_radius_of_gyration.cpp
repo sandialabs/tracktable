@@ -188,7 +188,7 @@ int run_test()
   return error_count;
 }
 
-int main(int, char *argv[])
+int main(int, char **)
 {
     return run_test();
 }

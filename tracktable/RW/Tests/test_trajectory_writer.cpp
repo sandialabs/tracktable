@@ -124,7 +124,7 @@ tracktable::Trajectory<
   tracktable::TrajectoryPoint<
     point_type
     > >
-generate_trajectory(int trajectory_index,
+generate_trajectory(int /*trajectory_index*/,
                     size_t num_points,
                     int num_point_properties,
                     int num_trajectory_properties)
@@ -164,7 +164,7 @@ generate_trajectory(int trajectory_index,
 // ----------------------------------------------------------------------
 
 template<typename point_type>
-void test_trajectory_writer(std::size_t howmany)
+void test_trajectory_writer(std::size_t /*howmany*/)
 {
   typedef tracktable::TrajectoryPoint<point_type> trajectory_point_type;
   typedef tracktable::Trajectory<trajectory_point_type> trajectory_type;
@@ -184,7 +184,7 @@ void test_trajectory_writer(std::size_t howmany)
 }
 
 int
-main(int argc, char* argv[])
+main(int , char**)
 {
   test_trajectory_writer<tracktable::PointLonLat>(1);
   return 0;

@@ -168,7 +168,7 @@ TrajectoryT build_trajectory(int _numPoints /* = 100*/) {
     PointT initialPoint;
     TrajectoryT trajectory;
 
-    initialPoint.set_object_id("MyPoint" + seed);
+    initialPoint.set_object_id("MyPoint" + std::to_string(seed));
     initialPoint[0] = (seed)-10;
     initialPoint[1] = (seed) + 20;
     initialPoint.set_timestamp(tracktable::time_from_string("2001-02-03 04:05:06") + tracktable::days(seed));
