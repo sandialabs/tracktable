@@ -133,7 +133,7 @@ public:
 
 public:
   template<class Archive>
-  void serialize(Archive& ar, const unsigned int version)
+  void serialize(Archive& ar, const unsigned int /*version*/)
   {
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
   }
@@ -256,7 +256,7 @@ public:
    * @param [in] version Version of the archive
    */
   template<class Archive>
-  void serialize(Archive& ar, const unsigned int version)
+  void serialize(Archive& ar, const unsigned int /*version*/)
   {
     ar & BOOST_SERIALIZATION_BASE_OBJECT_NVP(Superclass);
   }

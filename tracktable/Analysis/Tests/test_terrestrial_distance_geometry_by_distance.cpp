@@ -160,7 +160,7 @@ int test_terrestrial_dg_by_distance()
 
 // --------------------------------------------------------------------
 int
-main(int argc, char* argv[])
+main(int , char**)
 {
   int error_count = 0;
 

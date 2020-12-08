@@ -83,6 +83,7 @@ TerrestrialTrajectoryPoint create_terrestrial_point(double lat, double lon, std:
     TerrestrialTrajectoryPoint point;
     point.set_longitude(lon);
     point.set_latitude(lat);
+    point.set_object_id(id);
 
     return point;
 }
@@ -165,7 +166,7 @@ int run_test()
     return error_count;
 }
 
-int main(int, char *argv[])
+int main(int, char **)
 {
     return run_test();
 }

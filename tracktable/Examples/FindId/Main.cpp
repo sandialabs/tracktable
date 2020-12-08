@@ -94,13 +94,13 @@ int main(int _argc, char* _argv[]) {
             boost::program_options::command_line_parser(_argc, _argv).options(commandLineOptions).run(), *vm);
         boost::program_options::notify(*vm);
     } catch (boost::program_options::error& e) {
-        std::cerr << "\n\n" << e.what() << "\n\n" << commandLineOptions << std::endl;
+        std::cerr << helpmsg << "\n\n" << e.what() << "\n\n" << commandLineOptions << std::endl;
         return 1;
     }
     /** Parsing will give an error of an incorrect option is used, but it won't
      * display the help unless we tell it too */
     if (vm->count("help") != 0) {
-        std::cerr << commandLineOptions << std::endl;
+        std::cerr << helpmsg << commandLineOptions << std::endl;
         return 1;
     }
 
