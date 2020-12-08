@@ -72,6 +72,7 @@ using tracktable::domain::terrestrial::trajectory_point_reader_type;
 using tracktable::domain::terrestrial::trajectory_reader_type;
 using tracktable::domain::terrestrial::box_type;
 
+/* TODO: Remove Dead Code
 namespace {
 
 // ----------------------------------------------------------------------
@@ -103,6 +104,7 @@ base_point_type max_corner(box_type const& box)
 }
 
 }
+*/
 
 std::ostream&
 operator<<(std::ostream& out, box_type const& box)
