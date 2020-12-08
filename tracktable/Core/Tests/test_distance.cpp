@@ -83,7 +83,7 @@ int verify_result(double actual, double expected, const char* description, doubl
     return 0;
 }
 
-TerrestrialPoint create_terrestrial_point(double lat, double lon, std::string const& id=std::string())
+TerrestrialPoint create_terrestrial_point(double lat, double lon)
 {
     TerrestrialPoint point;
     point.set_longitude(lon);
@@ -112,16 +112,15 @@ TrajectoryPointLonLat create_trajectory_point(double lat, double lon, std::strin
     return point;
 }
 
-LonLatPoint create_point(double lat, double lon, std::string const& id=std::string())
+LonLatPoint create_point(double lat, double lon)
 {
     LonLatPoint point;
     point.set_longitude(lon);
     point.set_latitude(lat);
-
     return point;
 }
 
-TrajectoryCartesian2dPoint create_cartesian2d_point(double x, double y, std::string const& id=std::string())
+TrajectoryCartesian2dPoint create_cartesian2d_point(double x, double y)
 {
     TrajectoryCartesian2dPoint point;
     point[0] = x;
@@ -130,7 +129,7 @@ TrajectoryCartesian2dPoint create_cartesian2d_point(double x, double y, std::str
     return point;
 }
 
-TrajectoryCartesian3dPoint create_cartesian3d_point(double x, double y, double z, std::string const& id=std::string())
+TrajectoryCartesian3dPoint create_cartesian3d_point(double x, double y, double z)
 {
     TrajectoryCartesian3dPoint point;
     point[0] = x;
@@ -292,7 +291,7 @@ int run_test()
     return error_count;
 }
 
-int main(int, char *argv[])
+int main(int, char **)
 {
     return run_test();
 }

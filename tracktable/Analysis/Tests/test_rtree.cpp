@@ -804,7 +804,7 @@ int test_find_nearest_neighbors_all_value_types()
 // ----------------------------------------------------------------------
 
 int
-main(int argc, char* argv[])
+main(int , char**)
 {
   int error_count = 0;
 

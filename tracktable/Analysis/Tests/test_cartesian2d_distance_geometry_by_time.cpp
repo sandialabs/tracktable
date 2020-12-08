@@ -166,7 +166,7 @@ int test_cartesian2d_dg_by_time()
 
 // --------------------------------------------------------------------
 int
-main(int argc, char* argv[])
+main(int , char**)
 {
   int error_count = 0;
 

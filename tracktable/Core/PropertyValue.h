@@ -146,7 +146,7 @@ private:
    * @param [in] version Version of the archive
    */
   template<typename Archive>
-  void serialize(Archive& ar, const unsigned int version)
+  void serialize(Archive& ar, const unsigned int /*version*/)
   {
     ar & BOOST_SERIALIZATION_NVP(this->ExpectedType);
   }
@@ -298,13 +298,13 @@ TRACKTABLE_CORE_EXPORT PropertyValue extrapolate_property(PropertyValue const& l
 namespace boost { namespace serialization {
 
 template<typename Archive>
-void save(Archive& ar, tracktable::PropertyUnderlyingType const& value, const unsigned int version)
+void save(Archive& ar, tracktable::PropertyUnderlyingType const& value, const unsigned int /*version*/)
 {
   ar & static_cast<int>(value);
 }
 
 template<typename Archive>
-void load(Archive& ar, tracktable::PropertyUnderlyingType& value, const unsigned int version)
+void load(Archive& ar, tracktable::PropertyUnderlyingType& value, const unsigned int /*version*/)
 {
   int value_as_int;
   ar & value_as_int;

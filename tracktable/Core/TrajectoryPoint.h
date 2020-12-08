@@ -494,7 +494,7 @@ private:
    * @param [in] version Version of the archive
    */
   template<typename archive_t>
-  void serialize(archive_t& archive, const unsigned int version)
+  void serialize(archive_t& archive, const unsigned int /*version*/)
   {
 /*
     archive & boost::serialization::make_nvp("Superclass",
