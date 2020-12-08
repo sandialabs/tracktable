@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -36,17 +36,17 @@ from six.moves import range
 
 from tracktable.domain.tests import create_points_and_trajectories as tt_generator
 from tracktable.domain import terrestrial, cartesian2d, cartesian3d
-from tracktable.core import geomath 
+from tracktable.core import geomath
 
 def main():
 
     random.seed(0)
     error_count = 0
-    
+
     for trajectory_proto in [terrestrial.Trajectory,
       cartesian2d.Trajectory, cartesian3d.Trajectory]:
 
-        traj = tt_generator.generate_random_trajectory(trajectory_proto, 
+        traj = tt_generator.generate_random_trajectory(trajectory_proto,
               3,0)
         traj.properties["number"] = 123
         traj.properties["pilot"] = "Andy"

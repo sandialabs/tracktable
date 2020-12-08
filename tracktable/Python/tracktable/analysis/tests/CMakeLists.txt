@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -40,3 +40,4 @@ add_python_test(P_RTree_Nearest_Neighbors ${ANALYSIS}.test_rtree_nearest_neighbo
 add_python_test(P_RTree_Points_In_Box ${ANALYSIS}.test_rtree_points_in_box)
 add_python_test(P_DistanceGeometry_Distance ${ANALYSIS}.test_distance_geometry_by_distance)
 add_python_test(P_DistanceGeometry_Time ${ANALYSIS}.test_distance_geometry_by_time)
+add_python_test(P_TrajectoryAssembly ${ANALYSIS}.test_trajectory_assembly)

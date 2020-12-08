@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -38,17 +38,17 @@ find_package(Boost
   ${BOOST_MINIMUM_VERSION_REQUIRED}
   REQUIRED
   COMPONENTS
-    ${BOOST_CORE_COMPONENTS_NEEDED}
+    ${BOOST_CORE_COMPONENTS_NEEDED} timer
     ${BOOST_EXAMPLE_COMPONENTS}
   )
 
 
+add_subdirectory(FindId)
 add_subdirectory(Assemble)
 add_subdirectory(Classify)
 add_subdirectory(Cluster)
-add_subdirectory(Filter)
-add_subdirectory(Length)
-# add_subdirectory(Portal)
+add_subdirectory(FilterTime)
+add_subdirectory(Portal)
 add_subdirectory(Predict)
 add_subdirectory(Reduce)
 add_subdirectory(Serialization)

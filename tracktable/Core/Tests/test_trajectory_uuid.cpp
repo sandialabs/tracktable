@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -45,21 +45,21 @@ int test_trajectory_uuid()
   int error_count = 0;
 
   trajectory_type path1;
-  
+
   ::tracktable::uuid_type null_uuid = tracktable::uuid_type();
-  
+
   if (path1.uuid() == null_uuid) {
     std::cerr << "ERROR: Expected non-null trajectory UUID\n";
     ++error_count;
   }
-  
+
   trajectory_type path2(path1);
-  
+
   if (path1.uuid() != path2.uuid()) {
     std::cerr << "ERROR: Expected copy constructor to create equivalent UUIDs for trajectories\n";
     ++error_count;
   }
-  
+
   path2.set_uuid();
 
   if (path1.uuid() == path2.uuid()) {
@@ -69,7 +69,7 @@ int test_trajectory_uuid()
 
   trajectory_type path3;
   path3 = path1;
-  
+
   if (path1.uuid() != path3.uuid()) {
     std::cerr << "ERROR: Expected assignment operator to create equivalent UUIDs for trajectories\n";
     ++error_count;
@@ -84,14 +84,14 @@ int test_trajectory_uuid()
   }
 
   trajectory_type path4(false);
-  
+
   if (path4.uuid() != null_uuid) {
     std::cerr << "ERROR: Expected null trajectory UUID with automatic generation disabled\n";
     ++error_count;
   }
-  
+
   trajectory_type path5;
-  
+
   if (path5.uuid() == null_uuid) {
     std::cerr << "ERROR: Expected non-null trajectory UUID with automatic generation re-enabled\n";
     ++error_count;

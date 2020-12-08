@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -50,8 +50,8 @@ def test_europe_map(ground_truth_dir,
         map_name='region:europe',
         lonlat_linewidth=0.25,
         lonlat_color='#4040A0',
-        state_border_color='#806060',
-        country_border_color='#408040',
+        state_color='#806060',
+        country_color='#408040',
         draw_coastlines=True,
         draw_countries=True,
         draw_states=True,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -42,12 +42,13 @@ namespace tracktable {
 
 /** Axis-aligned bounding box
  *
- * This class is a thin wrapper around boost::geometry::model::box
+ * This class is a thin wrapper around `boost::geometry::model::box`
  * that holds two points representing opposite corners.
  *
- * Don't instantiate this class directly.  Instead, use
- * \c "tracktable::domain::<name>::box_type" so that you get the correct
- * distance functions.
+ * @warning
+ *    Don't instantiate this class directly. Instead, use
+ *    \c "tracktable::domain::<name>::box_type" so that you get the correct
+ *    distance functions.
  *
  */
 template<typename point_type>
@@ -56,9 +57,16 @@ class Box : public boost::geometry::model::box<point_type>
 public:
   typedef boost::geometry::model::box<point_type> Superclass;
 
+  /** Construct the bounding box using `boost::geometry::model::box`
+   *
+   * @param [in] low_corner Minimum corner to use for creation of the box
+   * @param [in] high_corner Maximum corner to use for creation of the box
+   */
   Box(point_type const& low_corner, point_type const& high_corner)
     : Superclass(low_corner, high_corner)
     { }
+
+  /// Destructor
   ~Box() { }
 };
 
@@ -78,6 +86,11 @@ struct indexed_access< tracktable::Box<point_type>, index, Dimension> : indexed_
 } } } // close boost::geometry::traits
 
 
+/** Write a box corners to a stream as a string
+ *
+ * @param [in] os Stream to write to
+ * @param [in] box Box to write to string
+ */
 template<class PointType>
 std::ostream& operator<< (std::ostream& os, tracktable::Box<PointType> const& box)
 {
@@ -87,6 +100,11 @@ std::ostream& operator<< (std::ostream& os, tracktable::Box<PointType> const& bo
   return os;
 }
 
+/** Write a box corners to a stream as a string
+ *
+ * @param [in] os Stream to write to
+ * @param [in] box Box to write to string
+ */
 template<class PointType>
 std::ostream& operator<< (std::ostream& os, boost::geometry::model::box<PointType> const& box)
 {

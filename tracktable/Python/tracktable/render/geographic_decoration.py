@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -135,8 +135,7 @@ def draw_cities_larger_than(map_axes,
                        label_size=label_size,
                        dot_size=dot_size,
                        label_color=label_color,
-                       dot_color=dot_color,
-                       axes=axes)
+                       dot_color=dot_color)
 
 # ----------------------------------------------------------------------
 
@@ -148,7 +147,7 @@ def draw_cities(map_axes,
                 label_color='white',
                 dot_color='white',
                 zorder=10,
-                transform = None):
+                transform=None):
     """Decorate a map with specified number of cities
 
     Args:
@@ -168,8 +167,11 @@ def draw_cities(map_axes,
 
     """
 
+    # TODO: Transform is kwarg here but doesn't exist in the params
+    # for draw_cities_larger_than() and draw_largest_cities() which
+    # call this function
     if transform is None:
-        transform = cartopy.crs.Geodetic()
+        transform = cartopy.crs.PlateCarree()
 
     artists = []
     if cities_to_draw and len(cities_to_draw) > 0:
@@ -194,7 +196,7 @@ def draw_cities(map_axes,
                 xy=(longitude, latitude),
                 xytext=(6, 0),
                 textcoords="offset points",
-                s=city.name,
+                text=city.name,
                 fontsize=label_size,
                 color=label_color,
                 ha="left",

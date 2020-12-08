@@ -30,6 +30,9 @@
 """movie_from_points.py - Example of how to render a movie of
 trajectories built from points in a CSV file
 
+NOTE: Cartopy v0.18.0 is required to successfully render maps and pass
+our internal tests.
+
 """
 
 import tracktable.domain
@@ -47,11 +50,19 @@ import numpy
 import shlex
 import sys
 
+import cartopy
+import cartopy.crs
+
 import matplotlib
 from matplotlib import pyplot
 import matplotlib.animation
 matplotlib.use('Agg')
 
+try:
+    from tqdm import trange, tqdm
+    tqdm_installed = True
+except ImportError as e:
+    tqdm_installed = False
 
 # ----------------------------------------------------------------------
 
@@ -335,6 +346,14 @@ def parse_args():
         args.resolution = [800, 600]
     if args.delimiter == 'tab':
         args.delimiter = '\t'
+    if args.object_id_column is None:
+        args.object_id_column = 0
+    if args.timestamp_column is None:
+        args.timestamp_column = 1
+    if args.coordinate0 is None:
+      args.coordinate0 = 2
+    if args.coordinate1 is None:
+      args.coordinate1 = 3
 
     return args
 
@@ -464,7 +483,8 @@ def render_annotated_trajectories(trajectories,
                               zorder=zorder,
                               color_scale=matplotlib.colors.Normalize(vmin=scalar_min, vmax=scalar_max),
                               dot_size=head_size,
-                              dot_color=head_color)
+                              dot_color=head_color,
+                              transform=cartopy.crs.PlateCarree())
 
 # ---------------------------------------------------------------------
 
@@ -532,38 +552,63 @@ def render_trajectory_movie(movie_writer,
     if figure is None:
         figure = pyplot.gcf()
 
+
     with movie_writer.saving(figure, filename, dpi):
-        for i in range(0, num_frames):
-            current_time = frame_time(i)
-            trail_start_time = frame_time(i) - trail_duration
+        if(tqdm_installed):
+            for i in tqdm(range(int(num_frames)), desc="Rendering Frames", unit='frame'):
+                current_time = frame_time(i)
+                trail_start_time = frame_time(i) - trail_duration
 
-            logger.info(
-                ('Rendering frame {}: current_time {}, '
-                 'trail_start_time {}').format(
-                    i,
-                    current_time.strftime("%Y-%m-%d %H:%M:%S"),
-                    trail_start_time.strftime("%Y-%m-%d %H:%M:%S")))
+                frame_trajectories = clip_trajectories_to_interval(
+                    trajectories_on_map,
+                    start_time=trail_start_time,
+                    end_time=current_time
+                    )
 
-            frame_trajectories = clip_trajectories_to_interval(
-                trajectories_on_map,
-                start_time=trail_start_time,
-                end_time=current_time
-                )
+                # TODO: Add in scalar accessor
+                trajectory_artists = render_annotated_trajectories(
+                    frame_trajectories,
+                    axes,
+                    **trajectory_rendering_kwargs
+                    )
 
-            # TODO: Add in scalar accessor
-            trajectory_artists = render_annotated_trajectories(
-                frame_trajectories,
-                axes,
-                **trajectory_rendering_kwargs
-                )
+                # TODO: here we could also render the clock
+                movie_writer.grab_frame(**savefig_kwargs)
 
-            # TODO: here we could also render the clock
-            #
-            movie_writer.grab_frame(**savefig_kwargs)
+                # Clean up the figure for the next time around
+                for artist in trajectory_artists:
+                    artist.remove()
+        else:
+            for i in range(0, num_frames):
+                current_time = frame_time(i)
+                trail_start_time = frame_time(i) - trail_duration
 
-            # Clean up the figure for the next time around
-            for artist in trajectory_artists:
-                artist.remove()
+                logger.info(
+                    ('Rendering frame {}: current_time {}, '
+                     'trail_start_time {}').format(
+                        i,
+                        current_time.strftime("%Y-%m-%d %H:%M:%S"),
+                        trail_start_time.strftime("%Y-%m-%d %H:%M:%S")))
+
+                frame_trajectories = clip_trajectories_to_interval(
+                    trajectories_on_map,
+                    start_time=trail_start_time,
+                    end_time=current_time
+                    )
+
+                # TODO: Add in scalar accessor
+                trajectory_artists = render_annotated_trajectories(
+                    frame_trajectories,
+                    axes,
+                    **trajectory_rendering_kwargs
+                    )
+
+                # TODO: here we could also render the clock
+                movie_writer.grab_frame(**savefig_kwargs)
+
+                # Clean up the figure for the next time around
+                for artist in trajectory_artists:
+                    artist.remove()
 
 
 # ----------------------------------------------------------------------
@@ -928,11 +973,6 @@ def _make_tapered_linewidth_generator(initial_linewidth,
     Returns:
        A function that takes in a trajectory as an argument and
        returns an array of linewidths
-
-    TODO: There might be an off-by-one error in here: we generate
-    len(trajectory) scalars but the geometry has len(trajectory)-1
-    segments.  Check to see if draw_traffic in paths.py corrects for
-    this.
     """
 
     def linewidth_generator(trajectory):
@@ -953,11 +993,6 @@ def _make_constant_linewidth_generator(linewidth):
     Returns:
        A function that takes in a trajectory as an argument and
        returns an array of linewidths
-
-    TODO: There might be an off-by-one error in here: we generate
-    len(trajectory) scalars but the geometry has len(trajectory)-1
-    segments.  Check to see if draw_traffic in paths.py corrects for
-    this.
     """
 
     def linewidth_generator(trajectory):
@@ -1097,10 +1132,7 @@ def main():
     # This set of arguments will be passed to the savefig() call that
     # grabs the latest movie frame.  This is the place to put things
     # like background color, tight layout and friends.
-    savefig_kwargs = {'facecolor': figure.get_facecolor(),
-                      'figsize': compute_figure_dimensions(args.resolution,
-                                                           args.dpi),
-                      'frameon': False}
+    savefig_kwargs = {'facecolor': figure.get_facecolor()}
 
     #
     # Lights! Camera! Action!

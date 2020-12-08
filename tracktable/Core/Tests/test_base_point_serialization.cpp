@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2018 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -43,7 +43,7 @@ template<typename point_type>
 point_type serialized_copy(point_type const& input_point)
 {
   point_type restored_point;
-  
+
   std::ostringstream temp_out;
   boost::archive::text_oarchive archive_out(temp_out);
   archive_out << input_point;
@@ -142,7 +142,7 @@ test_point_cartesian3d_serialization()
   point[0] = 3.14;
   point[1] = 6.28;
   point[2] = 2.71828;
-  
+
   point_copy = serialized_copy(point);
   if (point != point_copy)
     {
@@ -163,7 +163,7 @@ test_point_cartesian3d_serialization()
 // ----------------------------------------------------------------------
 
 
-  
+
 int
 main(int argc, char *argv[])
 {

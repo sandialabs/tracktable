@@ -15,8 +15,7 @@ Module Contents
 .. doxygentypedef:: PropertyValue
 .. doxygentypedef:: PropertyValueT
 .. doxygenfunction:: tracktable::make_null
-.. doxygenfunction:: tracktable::compare (const PropertyValue&, const PropertyValue&, double, bool)
-   :project: tracktable_cpp
+.. doxygenfunction:: tracktable::compare
 .. doxygenfunction:: tracktable::is_property_null
 .. doxygenfunction:: tracktable::property_underlying_type
 .. doxygenfunction:: tracktable::string_to_property_type

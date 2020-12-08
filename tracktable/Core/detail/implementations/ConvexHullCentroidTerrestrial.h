@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -111,7 +111,7 @@ struct compute_convex_hull_centroid<
               *previous_point, *this_point, center_of_mass_cartesian
               ));
 
-          TRACKTABLE_LOG(log::trace) 
+          TRACKTABLE_LOG(log::trace)
              << "centroid: latest area is " << area << ", center of mass is "
              << spherical_math::to_terrestrial<point_type>(center_of_mass).to_string();
 

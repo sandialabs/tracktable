@@ -41,8 +41,8 @@
 #include <tracktable/Domain/Terrestrial.h>
 #include <tracktable/Core/Box.h>
 #include <tracktable/Core/Timestamp.h>
-#include <tracktable/IO/PointWriter.h>
-#include <tracktable/IO/TrajectoryWriter.h>
+#include <tracktable/RW/PointWriter.h>
+#include <tracktable/RW/TrajectoryWriter.h>
 
 #include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 #include <tracktable/PythonWrapping/BasePointToString.h>
@@ -292,6 +292,9 @@ void install_terrestrial_domain_wrappers()
 
 BOOST_PYTHON_MODULE(_terrestrial)
 {
+  // Set docstrings to display user-defined only
+  boost::python::docstring_options doc_options(true, false, false);
+
   using namespace boost::python;
   install_terrestrial_domain_wrappers();
 #if 0

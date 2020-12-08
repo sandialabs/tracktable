@@ -15,12 +15,15 @@ Albuquerque, New Mexico:
 * Ben Newton
 * Phil Baxley
 * Kat Ward
+* Rick Vinyard
+* Michael Scoggin
+* Michael Fadem
 
 
 We gratefully acknowledge contributions from our collaborators:
 
 * Paul Schrum
-  
+
 
 Sandia Corporation is a multi-program laboratory managed and operated
 by National Technology and Engineering Solutions of Sandia, LLC, for
@@ -32,8 +35,8 @@ Third-Party Software
 --------------------
 
 We include databases of cities (from `MaxMind
-<http://www.maxmind.com>`_), time zone boundaries (from Eric Muller)
-and airports (from `partow.net <http://www.partow.net/miscellaneous/airportdatabase>`_) in Tracktable.
+<http://www.maxmind.com>`_), time zone boundaries (from `Eric Muller <http://efele.net/maps/tz/world/>`_)
+and airports (from `Arash Partow <http://www.partow.net/miscellaneous/airportdatabase>`_) in Tracktable.
 
 Their licenses are reproduced in full in the file ``LICENSE.html`` in
 the root directory of the Tracktable distribution.  In this section we

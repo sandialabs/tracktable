@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -29,16 +29,6 @@
  */
 
 
-/*
- * TimestampConverter - timestamp to/from string
- *
- * We need to be able to convert strings to tracktable::Timestamp
- * instances and the reverse while using custom time input/output
- * facets.  There are enough differences in the way locales are
- * implemented across platforms that I insist on encapsulating it in
- * this class.  We will use this in readers and writers.
- */
-
 #ifndef __tracktable_TimestampConverter_h
 #define __tracktable_TimestampConverter_h
 
@@ -54,6 +44,15 @@ namespace tracktable {
 # pragma warning( disable : 4251 )
 #endif
 
+/**
+ * TimestampConverter - timestamp to/from string
+ *
+ * We need to be able to convert strings to `tracktable::Timestamp`
+ * instances and the reverse while using custom time input/output
+ * facets. There are enough differences in the way locales are
+ * implemented across platforms that I insist on encapsulating it in
+ * this class. We will use this in readers and writers.
+ */
 class TRACKTABLE_CORE_EXPORT TimestampConverter
 {
  public:
@@ -68,12 +67,12 @@ class TRACKTABLE_CORE_EXPORT TimestampConverter
   /** Set format string for parsing timestamps
    *
    * This format string must adhere to the guidelines in the
-   * documentation for Boost's date/time input format.  See the
+   * documentation for Boost's date/time input format. See the
    * following page:
    *
    * http://www.boost.org/doc/libs/master/doc/html/date_time/date_time_io.html
    *
-   * @param[in] format Format string for timestamp parsing
+   * @param [in] format Format string for timestamp parsing
    */
   void set_input_format(string_type const& format);
 
@@ -87,12 +86,12 @@ class TRACKTABLE_CORE_EXPORT TimestampConverter
  /** Set format string for writing timestamps to strings
    *
    * This format string must adhere to the guidelines in the
-   * documentation for Boost's date/time input format.  See the
+   * documentation for Boost's date/time input format. See the
    * following page:
    *
    * http://www.boost.org/doc/libs/master/doc/html/date_time/date_time_io.html
    *
-   * @param[in] format Format string for timestamp output
+   * @param [in] format Format string for timestamp output
    */
 
   void set_output_format(string_type const& format);
@@ -109,7 +108,7 @@ class TRACKTABLE_CORE_EXPORT TimestampConverter
    * Convert a timestamp to a string according to the current output
    * format.
    *
-   * @param[in] timestamp  Timestamp to write
+   * @param [in] timestamp  Timestamp to write
    * @return String representation of timestamp
    */
   string_type timestamp_to_string(Timestamp const& timestamp) const;
@@ -119,7 +118,7 @@ class TRACKTABLE_CORE_EXPORT TimestampConverter
    * Parse a string to create a timestamp according to the current
    * input format.
    *
-   * @param[in] time_string  Timestamp represented as string
+   * @param [in] time_string  Timestamp represented as string
    * @return Timestamp parsed from string
    */
   Timestamp timestamp_from_string(string_type const& time_string) const;

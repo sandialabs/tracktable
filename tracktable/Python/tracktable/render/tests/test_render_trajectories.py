@@ -112,7 +112,7 @@ def test_render_trajectories(ground_truth_path, test_output_path,
 
     filename = "Bbox.html"
     render_trajectories(few_trajs,
-                        map_bbox=[-108.081, -104.811, 39.3078, 41.27],
+                        map_bbox=[-108.081, 39.3078, -104.811, 41.27],
                         backend='folium', show=False,save=True,
                         filename=os.path.join(test_output_path,
                                               filename))

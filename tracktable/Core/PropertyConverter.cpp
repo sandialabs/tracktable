@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -153,7 +153,7 @@ PropertyValueT PropertyConverter::property_from_string(
       case TYPE_UNKNOWN:
       case TYPE_NULL:
         {
-        TRACKTABLE_LOG(log::error) 
+        TRACKTABLE_LOG(log::error)
 	         << "ERROR: property_from_string: Don't know what to do with value '"
 	         << prop_value << " and desired type " << desired_type << ".";
 	      return PropertyValueT();

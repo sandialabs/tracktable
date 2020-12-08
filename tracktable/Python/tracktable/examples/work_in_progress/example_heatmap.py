@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2019 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -113,17 +113,17 @@ from matplotlib import pyplot
 def example_heatmap_rendering():
 
     #Sample code to render heatmap of points
-    
+
     # In this example, data points are filtered and only a set number of cities are represented.
     num_cities = 40
     num_points_per_city = 1000
     cities = gen_sample.n_largest_cities(num_cities)
-        
+
     all_sources = [ gen_sample.points_near_city(city, num_points_per_city)
                    for city in cities ]
     all_points = list(itertools.chain(*all_sources))
 
-    #The type of map, colors, scaling can be customised depending the on the desired look and feel of the finished map. 
+    #The type of map, colors, scaling can be customised depending the on the desired look and feel of the finished map.
     (figure, axes) = initialize_matplotlib_figure([20, 15])
     (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
                                             map_name='region:world')
@@ -134,14 +134,12 @@ def example_heatmap_rendering():
         bin_size=0.25,
         color_map='gist_heat',
         scale_type='logarithmic')
-    
+
     print("STATUS: Saving figure to file")
-    savefig_kwargs = { 
+    savefig_kwargs = {
                        }
     pyplot.savefig('Example_Heatmap_Rendering.png',
-        figsize=[800,600],
         dpi=72,
-        frameon=False,
         facecolor='black'
         )
 

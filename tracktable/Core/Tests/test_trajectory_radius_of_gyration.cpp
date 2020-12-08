@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2014-2018 National Technology and Engineering
+* Copyright (c) 2014-2020 National Technology and Engineering
 * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 * with National Technology and Engineering Solutions of Sandia, LLC,
 * the U.S. Government retains certain rights in this software.
@@ -81,7 +81,7 @@ int verify_result(double expected, double actual, std::string const& test)
   if (!tracktable::almost_equal(actual, expected))
     {
     std::cout << "ERROR: " << test << " failed. "
-              << "Expected radius of gyration of about " << expected 
+              << "Expected radius of gyration of about " << expected
               << " but actual value was " << actual
               << "(difference " << (actual - expected) << ")"
               << std::endl;
@@ -112,18 +112,18 @@ int run_test()
   short_trajectory.push_back(el_paso);
   short_trajectory.push_back(albuquerque);
   short_trajectory.push_back(denver);
-  
+
   //Short trajectorty should have small radius
   double expected_short_radius = 0.05805;
 
   short_flight_radius = tracktable::radius_of_gyration(short_trajectory);
   error_count += verify_result(expected_short_radius, short_flight_radius, std::string("Short flight"));
-  
+
   TrajectoryLonLat long_trajectory;
   long_trajectory.push_back(san_francisco);
   long_trajectory.push_back(new_york);
   long_trajectory.push_back(london);
-  
+
   //Longer flight should have larger radius
   double expected_long_radius = 0.581498;
 
@@ -137,16 +137,16 @@ int run_test()
   combined_trajectory.push_back(san_francisco);
   combined_trajectory.push_back(new_york);
   combined_trajectory.push_back(london);
-  
+
   //Combined flight should have smaller radius since there are more points relatively clustered together
   double expected_combined_radius = 0.523586;
-  
+
   combined_radius = tracktable::radius_of_gyration(combined_trajectory);
   error_count += verify_result(expected_combined_radius, combined_radius, std::string("Combined flight"));
-  
+
   //No points in a trajectory should return 0
   double expected_no_point_radius = 0.0;
-    
+
   TrajectoryLonLat no_points;
   no_point_radius = tracktable::radius_of_gyration(no_points);
   error_count += verify_result(

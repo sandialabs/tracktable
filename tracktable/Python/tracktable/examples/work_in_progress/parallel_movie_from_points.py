@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -251,9 +251,7 @@ def setup_matplotlib_figure(args, renderer):
     renderer.dpi = dpi
     renderer.figure = figure
     renderer.axes = axes
-    renderer.savefig_kwargs = { 'facecolor': figure.get_facecolor(),
-                                'figsize': figure_dimensions,
-                                'frameon': False }
+    renderer.savefig_kwargs = { 'facecolor': figure.get_facecolor() }
 
 
 # ----------------------------------------------------------------------

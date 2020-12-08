@@ -48,7 +48,7 @@ constexpr double METERS_PER_FOOT = 0.3048; //exact
 
 /** Convert radians to degrees.
  *
- * @param[in] _rad Angle to convert
+ * @param [in] _rad Angle to convert
  * @return Angle measured in degrees
  */
 
@@ -59,7 +59,7 @@ inline double degrees(double _rad)
 
 /** Convert degrees to radians.
  *
- * @param[in] _deg Angle to convert
+ * @param [in] _deg Angle to convert
  * @return Angle measured in radians
  */
 
@@ -68,35 +68,77 @@ inline double radians(double _deg)
   return _deg * constants::RADIANS_PER_DEGREE;
 }
 
+/** Convert hours to seconds.
+ *
+ * @param [in] _hrs Hours to convert
+ * @return Time measured in seconds
+ */
+
 inline double hours_to_seconds(double _hrs)
 {
   return _hrs * constants::SECONDS_PER_HOUR;
 }
+
+/** Convert seconds to hours.
+ *
+ * @param [in] _secs Seconds to convert
+ * @return Time measured in hours
+ */
 
 inline double seconds_to_hours(double _secs)
 {
   return _secs * constants::HOURS_PER_SECOND;
 }
 
+/** Convert steradians to kilometers squared.
+ *
+ * @param [in] _sr Steradians to convert
+ * @return Distance measured in kilometers squared
+ */
+
 inline double steradians_to_km2(double _sr)
 {
   return _sr * constants::EARTH_RADIUS_IN_KM * constants::EARTH_RADIUS_IN_KM;
 }
+
+/** Convert kilometers squared to steradians.
+ *
+ * @param [in] _km2 kilometers squared to convert
+ * @return Distance measured in steradians squared
+ */
 
 inline double km2_to_steradians(double _km2)
 {
   return _km2 / (constants::EARTH_RADIUS_IN_KM * constants::EARTH_RADIUS_IN_KM);
 }
 
+/** Convert radians to kilometer.
+ *
+ * @param [in] _rad Angle to convert
+ * @return Angle measured in kilometers
+ */
+
 inline double radians_to_km(double _rad)
 {
   return _rad * constants::EARTH_RADIUS_IN_KM;
 }
 
+/** Convert kilometers to radians.
+ *
+ * @param [in] _km Angle to convert
+ * @return Angle measured in radians
+ */
+
 inline double km_to_radians(double _km)
 {
   return _km / constants::EARTH_RADIUS_IN_KM;
 }
+
+/** Convert feet to meters.
+ *
+ * @param [in] _feet Feet to convert
+ * @return Distance measured in meters
+ */
 
 inline double feet_to_meters(double _feet)
 {

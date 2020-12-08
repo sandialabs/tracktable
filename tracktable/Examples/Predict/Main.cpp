@@ -1,91 +1,157 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-//
-//   Main
-//   
-// This code will do prediction!
-//
-// Created by Danny Rintoul
-//
-
-#include "Common.h"
-#include "ProgramOptions.h"
-#include "Nearby.h"
-#include "ConvexHull.h"
-#include "BuildFeatures.h"
-#include "DistanceFeatures.h"
 #include "Predict.h"
-#include "KmlOut.h"
-#include "BuildTrajectories.h"
-#include "ParseCommandLine.h"
-#include <boost/bind.hpp>
-#include <boost/array.hpp>
-#include <boost/geometry/geometries/adapted/boost_array.hpp>
+
+#include <tracktable/CommandLineFactories/AssemblerFromCommandLine.h>
+#include <tracktable/CommandLineFactories/PointReaderFromCommandLine.h>
+#include <tracktable/Domain/Terrestrial.h>
+
+#include <boost/timer/timer.hpp>
+
 #include <string>
 #include <vector>
 
-BOOST_GEOMETRY_REGISTER_BOOST_ARRAY_CS(cs::cartesian)
+using TrajectoryT = tracktable::domain::terrestrial::trajectory_type;
+using PointT = typename TrajectoryT::point_type;
+using PointReaderT = tracktable::PointReader<PointT>;
+using PointReaderIteratorT = typename PointReaderT::iterator;
+using AssemblerT = tracktable::AssembleTrajectories<TrajectoryT, PointReaderIteratorT>;
 
-bool IsTailNumber(trajectory_type &trajectory);
-bool HasConsistentDestination(trajectory_type &trajectory);
+bool has_tail_number(const TrajectoryT &_trajectory);
+bool has_destination(const TrajectoryT &_trajectory);
 
-int main(int argc, char *argv[])
-{
-  srand(time(0));
-  CommandLineOptions options = ParseCommandLine(argc, argv);
+static constexpr auto helpmsg = R"(
+--------------------------------------------------------------------------------
+This example demonstrates using feature vectors to measure similarities between
+trajectories via an Rtree
 
-  Trajectories trajectories;
-  BuildTrajectories<trajectory_type>(options,trajectories);
-  std::size_t num_samples = options.NumSamples;
+The predict example demonstrates:
+    - Using command line factories to read points and assemble trajectories
+    - Using boost program options to take parameters from command lines(in addition to the factories)
+    - Conditioning trajectories based on length and objectid
+    - Using boost rtree to locate similar trajectories based on cartesion distance in feature space
 
-  std::cout << "trajectories.size() = " << trajectories.size() << std::endl;
+Typical use: '--string-field=dest x' is required
 
-  // Remove "tail number" flights
-  trajectories.erase(std::remove_if(trajectories.begin(),trajectories.end(),
-   boost::bind(IsTailNumber,_1)),trajectories.end());
-  std::cout << "trajectories.size() = " << trajectories.size() << std::endl;
+    ./predict --input=/data/SampleASDI.csv --delimiter=, --string-field=dest 30 --num-samples=10
 
-  std::vector<my_data> features, to_be_predicted;
+--------------------------------------------------------------------------------)";
+int main(int _argc, char *_argv[]) {
+    auto numSamples = 10u;
 
-  // This routine builds a feature database from specific intervals
-  BuildManyEvenFeatures(trajectories,features);
+    // Set log level to reduce unecessary output
+    tracktable::set_log_level(tracktable::log::info);
+    // Create a basic command line option with boost
+    bpo::options_description commandLineOptions("Options");
+    // clang-format off
+    commandLineOptions.add_options()
+      ("help", "Print help")
+      ("num-samples", bpo::value(&numSamples)->default_value(10),
+        "Number of samples")
+    ;
+    // clang-format on
 
-  // This routine builds a feature database from randome intervals
-//  BuildManyRandomFeatures(trajectories,features);
+    // Create command line factories
+    tracktable::PointReaderFromCommandLine<PointT> readerFactory;
+    tracktable::AssemblerFromCommandLine<TrajectoryT> assemblerFactory;
+    // Add options from the factories
+    readerFactory.addOptions(commandLineOptions);
+    assemblerFactory.addOptions(commandLineOptions);
 
+    /** Boost program options using a variable map to tie everything together.
+     * one parse will have a single variable map. We need to let the factories know
+     * about this variable map so they can pull information out of it */
+    auto vm = std::make_shared<boost::program_options::variables_map>();
+    readerFactory.setVariables(vm);
+    assemblerFactory.setVariables(vm);
 
-  // It's confusing, but this routine takes intial fractions from the flights
-  // as test flights.
-  BuildRandomFeatures(trajectories,to_be_predicted,0.2,0.8);
+    // Parse the command lines, don't forget the 'notify' after
+    try {
+        // We use this try/catch to automatically display help when an unknown option is used
+        boost::program_options::store(
+            boost::program_options::command_line_parser(_argc, _argv).options(commandLineOptions).run(), *vm);
+        boost::program_options::notify(*vm);
+    } catch (boost::program_options::error e) {
+        std::cerr << e.what();
+        std::cerr << helpmsg << "\n\n";
+        std::cerr << commandLineOptions << std::endl;
+        return 1;
+    }
+    /** Parsing will give an error of an incorrect option is used, but it won't
+     * display the help unless we tell it too */
+    if (vm->count("help") != 0) {
+        std::cerr << helpmsg << "\n\n";
+        std::cerr << commandLineOptions << std::endl;
+        return 1;
+    }
 
-  // This routine does a lat/lon predict.
-//  LLPredict(trajectories,features,to_be_predicted,num_samples);
+    // Create Point Reader and assembler
+    auto pointReader = readerFactory.createPointReader();
+    auto assembler = assemblerFactory.createAssembler(pointReader);
 
-  // This routine does a prediction based on destination airport
-  Predict(trajectories,features,to_be_predicted,boost::numeric_cast<int>(num_samples));
+    std::vector<std::shared_ptr<TrajectoryT>> trajectories = {};
+    // This block exists for easy timing of trajectory assembling using the boost auto timer
+    // Note that all feedback to the user is done on std::cerr, this allows us to only
+    // put desired results into std::cout, this make processing output easier.
+    {
+        std::cerr << "Assemble Trajectories" << std::endl;
+        boost::timer::auto_cpu_timer timer3(std::cerr);
+        auto count = 0u;
+        std::cerr << std::right;
+        for (auto tIter = assembler->begin(); tIter != assembler->end(); ++tIter) {
+            if (has_tail_number(*tIter)) {  // Skip tail number flights
+                continue;
+            }
+            if (!has_destination(*tIter)) {  // Skip flights without destination or errors
+                continue;
+            }
+            std::cerr << "\b\b\b\b\b\b\b\b\b\b" << std::setw(10)  // Using backspaces for in place counter
+                      << count++;
+            trajectories.push_back(std::make_shared<TrajectoryT>(*tIter));
+        }
+        std::cerr << std::left << "\nStarting with " << trajectories.size() << " trajectories" << std::endl;
+    }
 
-  return 0;
+    // This routine does a prediction based on destination airport
+    Predict(trajectories, numSamples);
+
+    return 0;
 }
 
-bool IsTailNumber(trajectory_type &trajectory)
-{
-  std::string s = trajectory.object_id();
-  if ((s[0] != 'N') || (s[1] < '0') || (s[1] > '9'))
-    return false;
-
-  return true;
+bool has_tail_number(const TrajectoryT &_trajectory) {
+    auto s = _trajectory.object_id();
+    return !((s[0] != 'N') || (s[1] < '0') || (s[1] > '9'));
 }
 
-bool HasConsistentDestination(trajectory_type &trajectory)
-{
-  return !trajectory.front().string_property("dest").empty() &&
-   !trajectory.back().string_property("dest").empty() &&
-   (trajectory.front().string_property("dest") ==
-   trajectory.back().string_property("dest"));
+bool has_destination(const TrajectoryT &_trajectory) {
+    return !_trajectory.front().string_property("dest").empty() &&
+           (_trajectory.front().string_property("dest") == _trajectory.back().string_property("dest"));
 }
-

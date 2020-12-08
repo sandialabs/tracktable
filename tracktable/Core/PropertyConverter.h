@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -28,17 +28,6 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-/*
- * PropertyConverter - PropertyValueT to/from string
- *
- * We need to be able to convert strings to PropertyValueT instances
- * and the reverse while using custom settings for decimal precision
- * and time format.  There are enough differences in the way locales
- * are implemented across platforms that I insist on encapsulating it
- * in this class.  We will use this in readers and writers.
- */
-
 #ifndef __tracktable_PropertyConverter_h
 #define __tracktable_PropertyConverter_h
 
@@ -56,27 +45,62 @@ namespace tracktable {
 # pragma warning( disable : 4251 )
 #endif
 
+/** PropertyConverter - PropertyValueT to/from string
+ *
+ * We need to be able to convert strings to PropertyValueT instances
+ * and the reverse while using custom settings for decimal precision
+ * and time format. There are enough differences in the way locales
+ * are implemented across platforms that I insist on encapsulating it
+ * in this class. We will use this in readers and writers.
+ */
 class TRACKTABLE_CORE_EXPORT PropertyConverter
 {
  public:
 
+  ///Instantiate an default PropertyConverter
   PropertyConverter();
+
+  /** Copy contructor, create a PropertyConverter with a copy of another
+   *
+   * @param [in] other PropertyConverter to copy from
+   */
+  PropertyConverter(PropertyConverter const& other);
+
+  /// Destructor
   virtual ~PropertyConverter();
 
-  PropertyConverter(PropertyConverter const& other);
+  /** Assign a PropertyConverter to the value of another.
+   *
+   * @param [in] other PropertyConverter to assign value of
+   * @return PropertyConverter with the new assigned value
+   */
   PropertyConverter& operator=(PropertyConverter const& other);
+
+  /** Check whether one PropertyConverter is equal to another by comparing the properties.
+   *
+   * Two items are equal if all of their properties are equal.
+   *
+   * @param [in] other PropertyConverter for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator==(PropertyConverter const& other) const;
+
+  /** Check whether two PropertyConverter are unequal.
+   *
+   * @param [in] other PropertyConverter for comparison
+   * @return Boolean indicating equivalency
+   */
   bool operator!=(PropertyConverter const& other) const;
 
   /** Set format string for parsing timestamps
    *
    * This format string must adhere to the guidelines in the
-   * documentation for Boost's date/time input format.  See the
+   * documentation for Boost's date/time input format. See the
    * following page:
    *
    * http://www.boost.org/doc/libs/master/doc/html/date_time/date_time_io.html
    *
-   * @param[in] format Format string for timestamp parsing
+   * @param [in] format Format string for timestamp parsing
    */
   void set_timestamp_input_format(string_type const& format);
 
@@ -90,12 +114,12 @@ class TRACKTABLE_CORE_EXPORT PropertyConverter
  /** Set format string for writing timestamps to strings
    *
    * This format string must adhere to the guidelines in the
-   * documentation for Boost's date/time input format.  See the
+   * documentation for Boost's date/time input format. See the
    * following page:
    *
    * http://www.boost.org/doc/libs/master/doc/html/date_time/date_time_io.html
    *
-   * @param[in] format Format string for timestamp output
+   * @param [in] format Format string for timestamp output
    */
 
   void set_timestamp_output_format(string_type const& format);
@@ -109,7 +133,7 @@ class TRACKTABLE_CORE_EXPORT PropertyConverter
 
   /** Set string that represents null values
    *
-   * @param[in] null_value String to stand in for nulls
+   * @param [in] null_value String to stand in for nulls
    */
 
   void set_null_value(string_type const& null_value);
@@ -123,7 +147,7 @@ class TRACKTABLE_CORE_EXPORT PropertyConverter
 
   /** Set number of digits of precision for writing real numbers
    *
-   * @param[in] digits Number of digits to use
+   * @param [in] digits Number of digits to use
    */
 
   void set_decimal_precision(std::size_t digits);
@@ -141,7 +165,7 @@ class TRACKTABLE_CORE_EXPORT PropertyConverter
    * Convert a property to a string according to the current output
    * format.
    *
-   * @param[in] property  Value to write
+   * @param [in] property  Value to write
    * @return String representation of timestamp
    */
   string_type property_to_string(PropertyValueT const& property);
@@ -151,14 +175,16 @@ class TRACKTABLE_CORE_EXPORT PropertyConverter
    * Parse a string to create a property value according to the
    * current input formats and the requested output type.
    *
-   * @param[in] prop_string  Property represented as string
-   * @param[in] prop_type    Property type (see tracktable::PropertyUnderlyingType)
+   * @param [in] prop_string  Property represented as string
+   * @param [in] prop_type    Property type (see tracktable::PropertyUnderlyingType)
    * @return Property parsed from string
    */
   PropertyValueT property_from_string(string_type const& prop_string,
 				      PropertyUnderlyingType prop_type);
 
 
+  /** Convert a timestamp to read/write
+   */
   TimestampConverter* timestamp_converter();
 
  private:

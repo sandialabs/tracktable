@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -110,8 +110,8 @@ struct access< NEW_POINT, dim > : access< DELEGATE_POINT, dim > { };
 #define TRACKTABLE_DELEGATE_POINT_DOMAIN_NAME_TRAIT(DOMAIN_NS) \
   namespace tracktable { namespace traits {                                 \
     template<> struct point_domain_name<DOMAIN_NS::box_type> : point_domain_name<DOMAIN_NS::base_point_type> {};       \
-  } } 
+  } }
 
-  
+
 
 #endif

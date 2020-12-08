@@ -27,12 +27,14 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# This is tracktable/Examples/Reduce/CMakeLists.txt
-
 include_directories(
   ${Tracktable_SOURCE_DIR}
   ${Tracktable_BINARY_DIR}
+  BEFORE
+  )
+include_directories(
   ${Boost_INCLUDE_DIR}
+  AFTER
   )
 
 link_directories(
@@ -41,16 +43,14 @@ link_directories(
 
 add_executable( classify
   Main.cpp
-  ParseCommandLine.cpp
-  KmlOut.cpp
-  GetMappers.cpp
-  ConvexHull.cpp
-  AssignHeadings.cpp
   Mapping.cpp
   )
 
 target_link_libraries( classify
   TracktableCore
   TracktableDomain
+  TracktableRW
   ${Boost_LIBRARIES}
   )
+
+

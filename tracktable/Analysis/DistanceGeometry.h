@@ -43,7 +43,7 @@ namespace tracktable {
  * Create distance geometry signature with samples by distance
  *
  * This function computes the multilevel distance geometry
- * for a given trajectory.  Each level *d* approximates the
+ * for a given trajectory. Each level *d* approximates the
  * input trajectory with *d* equal-length line segments.
  * The distance geometry values for that level are the lengths
  * of all *d* line segments, normalized to lie between 0 and 1.
@@ -53,16 +53,13 @@ namespace tracktable {
  *
  * This implementation creates the endpoints of the line segments
  * by sampling the trajectory at fractions of total distance
- * traveled.  To sample by total duration, use
+ * traveled. To sample by total duration, use
  * distance_geometry_by_time().
  *
- * Arguments:
- *     trajectory {Tracktable trajectory}: Input curve to analyze
- *     depth {unsigned int}: How many levels to compute.  Must
+ * @param [in] trajectory input curve to analyze
+ * @param [in] depth How many levels to compute. Must
  *         be greater than zero.
- *
- * Returns:
- *     std::vector<double> containing the distance geometry values
+ * @return std::vector<double> containing the distance geometry values
  *         laid out consecutively by increasing depth.
  */
 
@@ -81,7 +78,7 @@ distance_geometry_by_distance(
  * Create distance geometry signature with samples by time
  *
  * This function computes the multilevel distance geometry
- * for a given trajectory.  Each level *d* approximates the
+ * for a given trajectory. Each level *d* approximates the
  * input trajectory with *d* equal-length line segments.
  * The distance geometry values for that level are the lengths
  * of all *d* line segments, normalized to lie between 0 and 1.
@@ -91,16 +88,13 @@ distance_geometry_by_distance(
  *
  * This implementation creates the endpoints of the line segments
  * by sampling the trajectory at fractions of total duration
- * traveled.  To sample by total travel distance, use
+ * traveled. To sample by total travel distance, use
  * distance_geometry_by_distance().
  *
- * Arguments:
- *     trajectory {Tracktable trajectory}: Input curve to analyze
- *     depth {unsigned int}: How many levels to compute.  Must
+ * @param [in] trajectory  input curve to analyze
+ * @param [in] depth How many levels to compute. Must
  *         be greater than zero.
- *
- * Returns:
- *     std::vector<double> containing the distance geometry values
+ * @return std::vector<double> containing the distance geometry values
  *         laid out consecutively by increasing depth.
  */
 
@@ -115,23 +109,22 @@ distance_geometry_by_time(
 }
 
 
-// Internal method: do the actual computation for distance geometry
-//
-// See distance_geometry_by_distance and distance_geometry_by_time
-// for documentation on what this is for.
-//
-// Arguments:
-//     trajectory {Tracktable trajectory}: Input curve to analyze
-//     depth {unsigned int}: How many levels to compute.  Must
-//         be greater than zero.
-//     sample_by_distance {boolean, optional}: Whether to place the
-//         control points that define the line segments according to
-//         fraction of distance traveled versus fraction of time
-//         elapsed.  Defaults to 'true', meaning sample by distance.
-//
-// Returns:
-//     std::vector<double> containing the distance geometry values
-//         laid out consecutively by increasing depth.
+/** @internal Do the actual computation for distance geometry
+ *
+ * See distance_geometry_by_distance and distance_geometry_by_time
+ * for documentation on what this is for.
+ *
+ * @param [in] trajectory Input curve to analyze
+ * @param [in] depth How many levels to compute. Must
+ *         be greater than zero.
+ * @param [in] sample_by_distance Whether to place the
+ *         control points that define the line segments according to
+ *         fraction of distance traveled versus fraction of time
+ *         elapsed. Defaults to 'true', meaning sample by distance.
+ *
+ * @return `std::vector<double>` containing the distance geometry values
+ *         laid out consecutively by increasing depth.
+ */
 
 template<typename trajectory_type>
 std::vector<double>
@@ -150,7 +143,7 @@ _distance_geometry(
   const std::size_t result_size = (depth * (depth+1)) / 2;
 
   // If a trajectory has overall length zero, all of the distance geometry
-  // distances will be zero.  Given the choice between returning a vector
+  // distances will be zero. Given the choice between returning a vector
   // of all zeros or a vector of all ones, we opt to return all ones for
   // cleanliness -- you won't get division-by-zero errors that way.
   //
@@ -201,13 +194,23 @@ _distance_geometry(
 }
 
 
-// Internal function.
-//
-// Sample the input trajectory at (depth+1) locations evenly spaced
-// along the trajectory by distance traveled or by time elapsed.
-//
-// Results are returned via the 'output' parameter.
-//
+/** @internal
+ *
+ *  Sample the input trajectory at (depth+1) locations evenly spaced
+ *  along the trajectory by distance traveled or by time elapsed.
+ *
+ *  Results are returned via the 'output' parameter.
+ *
+ * @param [in] depth How many levels to compute. Must
+ *         be greater than zero.
+ * @param [in] trajectory Input curve to analyze
+ * @param [in] sample_by_distance Whether to place the
+ *         control points that define the line segments according to
+ *         fraction of distance traveled versus fraction of time
+ *         elapsed. Defaults to 'true', meaning sample by distance.
+ * @param [out] output The output of the creation of the control points
+ */
+
 template<typename trajectory_type, typename point_type>
 void _create_control_points(unsigned int depth,
                            trajectory_type const& trajectory,

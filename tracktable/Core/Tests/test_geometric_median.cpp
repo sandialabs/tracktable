@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -45,7 +45,7 @@ template<class point_type>
 void test_geometric_median_2d(std::string const& type_name)
 {
   std::size_t NUM_TEST_POINTS = 6;
-  
+
   double sample_points[][2] = {
     { 10, 3 },
     { 12, 44 },

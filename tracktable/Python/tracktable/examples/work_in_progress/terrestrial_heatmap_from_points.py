@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2017 National Technology and Engineering
+# Copyright (c) 2014-2020 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -296,10 +296,7 @@ def main():
                      args.scale)
 
     print("STATUS: Saving figure to file")
-    pyplot.savefig(args.image_file[0],
-                   figsize=figure_dimensions,
-                   dpi=dpi,
-                   frameon=False)
+    pyplot.savefig(args.image_file[0], dpi=dpi)
 
     pyplot.close()
 

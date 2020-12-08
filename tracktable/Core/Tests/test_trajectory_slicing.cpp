@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2017 National Technology and Engineering
+ * Copyright (c) 2014-2020 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -47,7 +47,7 @@ typedef tracktable::Trajectory<TrajectoryPointLonLat> TrajectoryLonLat;
  * We need to test the following cases:
  *
  * Slicing a trajectory results in the correct points
- * 
+ *
  * Slicing a trajectory keeps the original trajectory's properties
  */
 
@@ -134,7 +134,7 @@ int test_slicing()
   TrajectoryLonLat trajectory = make_test_surface_trajectory();
 
   // This causes a compile error on Windows
-  TrajectoryLonLat subset = TrajectoryLonLat(trajectory.begin()+4, trajectory.begin()+18, trajectory);  
+  TrajectoryLonLat subset = TrajectoryLonLat(trajectory.begin()+4, trajectory.begin()+18, trajectory);
 
   if (subset.size() != 14){
      std::cout << "ERROR: test_slicing: Expected 14 points but got " << subset.size() << " points";
@@ -156,10 +156,10 @@ int test_property_number()
      std::cout << "ERROR: test_property_number: Subset expected to have property number but does not";
      return 1;
   }
-  
+
   if (subset.real_property("number")!= trajectory.real_property("number"))
   {
-    std::cout << "ERROR: test_property_number: Subset expected to have number 123 but got " << subset.real_property("number") << " instead"; 
+    std::cout << "ERROR: test_property_number: Subset expected to have number 123 but got " << subset.real_property("number") << " instead";
     return 1;
   }
   return 0;
@@ -170,7 +170,7 @@ int test_property_number()
 int test_property_pilot()
 {
   TrajectoryLonLat trajectory = make_test_surface_trajectory();
-  
+
   TrajectoryLonLat subset = TrajectoryLonLat(trajectory.begin()+6, trajectory.begin()+14, trajectory);
 
   if (!subset.has_property("pilot"))
@@ -178,7 +178,7 @@ int test_property_pilot()
     std::cout << "ERROR: test_property_pilot: Subset expected to have property pilot but does not";
     return 1;
   }
-  
+
   if (subset.string_property("pilot") != trajectory.string_property("pilot"))
   {
     std::cout << "ERROR: test_property_pilot: Subset expected to have pilot Melissa but got " << subset.string_property("pilot") << " instead";
@@ -203,7 +203,7 @@ int run_test()
   std::cout << "TEST: Testing slicing maintains original trajectory properties\n";
   total_error_count += test_property_number();
   total_error_count += test_property_pilot();
-  
+
   return total_error_count;
 }
 
