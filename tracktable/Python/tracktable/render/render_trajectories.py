@@ -105,7 +105,7 @@ def render_trajectories(trajectories, backend='', **kwargs):
         backend (str): Which back end to use.  This can be 'folium' to force
             Folium interactive rendering or 'cartopy' to force static images.
             Defaults to None, which lets the renderer select automatically.
-        map (map object for given backend): rather than create a new
+        map_canvas (map object for given backend): rather than create a new
             map, append to this given map
         obj_ids (str or list of str): only display trajecteories
             whose object id matches the given string or a string from
