@@ -34,77 +34,86 @@
 #include <tracktable/Domain/Cartesian3D.h>
 #include <tracktable/Domain/Terrestrial.h>
 
-using TrajectoryT = tracktable::domain::terrestrial::trajectory_type;
-using TrajectoryPointT = typename TrajectoryT::point_type;
-
-using Point3dT = tracktable::domain::cartesian3d::base_point_type;
-
+/**
+ * @brief An exception thrown when a trajectory has too few points
+ */
 class TooFewPoints : public std::runtime_error {
  public:
   TooFewPoints() : std::runtime_error("Trajectory contains too few points") {}
 };
 
+/**
+ * @brief An exception thrown when two trying to take a cross product of a point with itself
+ */
 class IdenticalPositions : public std::runtime_error {
  public:
   IdenticalPositions() : std::runtime_error("Cannot cross a vector with itself") {}
 };
 
+/**
+ * @brief An exceptions thrown when trying to pass a zero point for plane normal
+ */
 class ZeroNorm : public std::runtime_error {
  public:
   ZeroNorm() : std::runtime_error("Cannot define a plane with a normal of 0") {}
 };
 
 namespace tracktable {
-namespace domain {
-namespace terrestrial {
 
 /** @brief Find the best fit plane and project onto it
- *   The purpose is to do a linear fit on a globe.
+ *   The purpose is to do a linear fit on a globe. Thus it only works with terrestrial trajectories
  * @note in place version is a destructive the process, the trajectory is modified.
  * @param _trajectory The trajectory to be 'linearized'
- * @param _altitudeString Label of point property that contains altitude
+ * @param _altitude_string Label of point property that contains altitude
  * @param _unit Units of the altitude property
  */
 TRACKTABLE_ANALYSIS_EXPORT
-void great_circle_fit_and_project_in_place(TrajectoryT &_trajectory, std::string _altitudeString = "altitude",
-                                           AltitudeUnits _unit = AltitudeUnits::FEET);
+void great_circle_fit_and_project_in_place(tracktable::domain::terrestrial::trajectory_type &_trajectory,
+                                           std::string _altitude_string = "altitude",
+                                           tracktable::domain::terrestrial::AltitudeUnits _unit =
+                                               tracktable::domain::terrestrial::AltitudeUnits::FEET);
 
 /** @brief Find the best fit plane and project onto it
- *   The purpose is to do a linear fit on a globe.
+ *   The purpose is to do a linear fit on a globe. Thus it only works with terrestrial trajectories
  * @note non destructive version.
  * @param _trajectory The trajectory to be 'linearized'
- * @param _altitudeString Label of point property that contains altitude
+ * @param _altitude_string Label of point property that contains altitude
  * @param _unit Units of the altitude property
  */
-TRACKTABLE_ANALYSIS_EXPORT TrajectoryT
-great_circle_fit_and_project(TrajectoryT const &_trajectory, std::string _altitudeString = "altitude",
-                             AltitudeUnits _unit = AltitudeUnits::FEET);
+TRACKTABLE_ANALYSIS_EXPORT tracktable::domain::terrestrial::trajectory_type great_circle_fit_and_project(
+    tracktable::domain::terrestrial::trajectory_type const &_trajectory,
+    std::string _altitude_string = "altitude",
+    tracktable::domain::terrestrial::AltitudeUnits _unit =
+        tracktable::domain::terrestrial::AltitudeUnits::FEET);
 
 /** @brief We find the vector representing the normal to the plane where the
  * total squared distance of points in the trajectory to that plane is minimized.
  * @param _trajectory The trajectory to fit
  * @return The normal (in ECEF space) representing the best fit plane.
- * @param _altitudeString Label of point property that contains altitude
+ * @param _altitude_string Label of point property that contains altitude
  * @param _unit Units of the altitude property
  */
 TRACKTABLE_ANALYSIS_EXPORT
-Point3dT find_best_fit_plane(const TrajectoryT &_trajectory, std::string _altitudeString = "altitude",
-                             AltitudeUnits _unit = AltitudeUnits::FEET);
+tracktable::domain::cartesian3d::base_point_type find_best_fit_plane(
+    const tracktable::domain::terrestrial::trajectory_type &_trajectory,
+    std::string _altitude_string = "altitude",
+    tracktable::domain::terrestrial::AltitudeUnits _unit =
+        tracktable::domain::terrestrial::AltitudeUnits::FEET);
 
 /** @brief Project a trajectory onto a plane defined by it's normal in ECEF space
  *
  * @param _trajectory the trajectory to project
  * @param _normal The normal that defines the plane to project on to
- * @param _altitudeString Label of point property that contains altitude
+ * @param _altitude_string Label of point property that contains altitude
  * @param _unit Units of the altitude property
  */
 TRACKTABLE_ANALYSIS_EXPORT
-void project_trajectory_onto_plane(TrajectoryT &_trajectory, const Point3dT &_normal,
-                                   std::string _altitudeString = "altitude",
-                                   AltitudeUnits _unit = AltitudeUnits::FEET);
+void project_trajectory_onto_plane(tracktable::domain::terrestrial::trajectory_type &_trajectory,
+                                   const tracktable::domain::cartesian3d::base_point_type &_normal,
+                                   std::string _altitude_string = "altitude",
+                                   tracktable::domain::terrestrial::AltitudeUnits _unit =
+                                       tracktable::domain::terrestrial::AltitudeUnits::FEET);
 
-}  // namespace terrestrial
-}  // namespace domain
 }  // namespace tracktable
 
 #endif

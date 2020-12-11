@@ -167,7 +167,7 @@ CheckOptions:
   #- { key: readability-identifier-naming.VirtualMethodSuffix, value: }
   ######### Parameters
   ## Parameter does not fallback
-  - { key: readability-identifier-naming.ParameterCase, value: camelBack }
+  - { key: readability-identifier-naming.ParameterCase, value: lower_case }
   - { key: readability-identifier-naming.ParameterPrefix, value: _ }
   #- { key: readability-identifier-naming.ParameterSuffix, value: }
   ## ConstantParameter falls back to Parameter

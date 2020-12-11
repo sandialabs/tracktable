@@ -27,15 +27,17 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #include <tracktable/Analysis/GreatCircleFit.h>
+#include <tracktable/Core/PointArithmetic.h>
 #include <tracktable/DataGenerators/PointGenerator.h>
 #include <tracktable/Domain/Terrestrial.h>
 #include <tracktable/ThirdParty/TracktableCatch2.h>
 
 using TrajectoryT = tracktable::domain::terrestrial::trajectory_type;
 using PointT = TrajectoryT::point_type;
+using Point3dT = tracktable::domain::cartesian3d::base_point_type;
 
-const Point3dT g_north(0.0, 0.0, 1.0);
-const Point3dT g_west(0.0, -1.0, 0.0);
+const Point3dT NORTH(0.0, 0.0, 1.0);
+const Point3dT WEST(0.0, -1.0, 0.0);
 
 constexpr auto NUM_POINTS = 100u;
 constexpr auto HEADING_EAST = 90.0;
@@ -53,7 +55,7 @@ SCENARIO("Best fit plane Degenerate Case") {
     TrajectoryT noPoints;
     WHEN("You try to find a best fit plane") {
       THEN("An TooFewPoints exception is thrown") {
-        REQUIRE_THROWS_AS(tracktable::domain::terrestrial::find_best_fit_plane(noPoints), TooFewPoints);
+        REQUIRE_THROWS_AS(tracktable::find_best_fit_plane(noPoints), TooFewPoints);
       }
     }
   }
@@ -65,8 +67,7 @@ SCENARIO("Best fit plane Degenerate Case") {
     samePoints.push_back(p);
     WHEN("You try to find the best fit plane") {
       THEN("An IdenticalPoints exception is thrown") {
-        REQUIRE_THROWS_AS(tracktable::domain::terrestrial::find_best_fit_plane(samePoints),
-                          IdenticalPositions);
+        REQUIRE_THROWS_AS(tracktable::find_best_fit_plane(samePoints), IdenticalPositions);
       }
     }
   }
@@ -81,9 +82,9 @@ SCENARIO("Best Fit Plane Minimal Case") {
     p.set_longitude(10);
     twoPointEast.push_back(p);
     WHEN("You find a best fit plane") {
-      auto normal = tracktable::domain::terrestrial::find_best_fit_plane(twoPointEast);
+      auto normal = tracktable::find_best_fit_plane(twoPointEast);
       THEN("It's normal points straight north") {
-        REQUIRE(1.0 == tracktable::arithmetic::dot(normal, g_north));
+        REQUIRE(1.0 == tracktable::arithmetic::dot(normal, NORTH));
       }
     }
   }
@@ -95,8 +96,8 @@ SCENARIO("Best Fit Plane Minimal Case") {
     p.set_latitude(10);
     twoPointNorth.push_back(p);
     WHEN("You find a best fit plane") {
-      auto normal = tracktable::domain::terrestrial::find_best_fit_plane(twoPointNorth);
-      THEN("It's normal points straight west") { REQUIRE(1.0 == tracktable::arithmetic::dot(normal, g_west)); }
+      auto normal = tracktable::find_best_fit_plane(twoPointNorth);
+      THEN("It's normal points straight west") { REQUIRE(1.0 == tracktable::arithmetic::dot(normal, WEST)); }
     }
   }
 }
@@ -112,9 +113,9 @@ SCENARIO("More complicated") {
       hundredPointEast.push_back(generatorEast.next());
     }
     WHEN("You find a best fit plane") {
-      auto normal = tracktable::domain::terrestrial::find_best_fit_plane(hundredPointEast);
+      auto normal = tracktable::find_best_fit_plane(hundredPointEast);
       THEN("It's normal points straight north") {
-        REQUIRE(1.0 == tracktable::arithmetic::dot(normal, g_north));
+        REQUIRE(1.0 == tracktable::arithmetic::dot(normal, NORTH));
       }
     }
     AND_GIVEN("Those points are zigzagged") {
@@ -123,9 +124,9 @@ SCENARIO("More complicated") {
         hundredPointEast[i].set_latitude(hundredPointEast[i].latitude() + ((i % 2) != 0 ? ZIG : ZAG));
       }
       WHEN("You find a best fit plane") {
-        auto normal = tracktable::domain::terrestrial::find_best_fit_plane(hundredPointEast);
+        auto normal = tracktable::find_best_fit_plane(hundredPointEast);
         THEN("It's normal points straight north") {
-          REQUIRE(Approx(1.0).margin(NORMAL_TOLERANCE) == tracktable::arithmetic::dot(normal, g_north));
+          REQUIRE(Approx(1.0).margin(NORMAL_TOLERANCE) == tracktable::arithmetic::dot(normal, NORTH));
         }
       }
     }
@@ -140,8 +141,8 @@ SCENARIO("More complicated") {
       hundredPointNorth.push_back(generatorNorth.next());
     }
     WHEN("You find a best fit plane") {
-      auto normal = tracktable::domain::terrestrial::find_best_fit_plane(hundredPointNorth);
-      THEN("It's normal points straight west") { REQUIRE(1.0 == tracktable::arithmetic::dot(normal, g_west)); }
+      auto normal = tracktable::find_best_fit_plane(hundredPointNorth);
+      THEN("It's normal points straight west") { REQUIRE(1.0 == tracktable::arithmetic::dot(normal, WEST)); }
     }
     AND_GIVEN("Those points are zigzagged") {
       // Move half the points up and half the points down a degree
@@ -149,9 +150,9 @@ SCENARIO("More complicated") {
         hundredPointNorth[i].set_longitude(hundredPointNorth[i].longitude() + ((i % 2) != 0 ? ZIG : ZAG));
       }
       WHEN("You find a best fit plane") {
-        auto normal = tracktable::domain::terrestrial::find_best_fit_plane(hundredPointNorth);
+        auto normal = tracktable::find_best_fit_plane(hundredPointNorth);
         THEN("It's normal points straight west") {
-          REQUIRE(Approx(1.0).margin(NORMAL_TOLERANCE) == tracktable::arithmetic::dot(normal, g_west));
+          REQUIRE(Approx(1.0).margin(NORMAL_TOLERANCE) == tracktable::arithmetic::dot(normal, WEST));
         }
       }
     }
@@ -160,14 +161,12 @@ SCENARIO("More complicated") {
 ///////////////////////////////PROJECT////////////////////////////
 SCENARIO("Project onto best fit plane degenerate case") {
   GIVEN("A normal pointed north") {
-    auto& normal = g_north;
+    const auto& normal = NORTH;
     AND_GIVEN("A trajectory with no points") {
       TrajectoryT trajectory;
       WHEN("You try to project") {
         THEN("An exception is thrown") {
-          REQUIRE_THROWS_AS(
-              tracktable::domain::terrestrial::project_trajectory_onto_plane(trajectory, normal),
-              TooFewPoints);
+          REQUIRE_THROWS_AS(tracktable::project_trajectory_onto_plane(trajectory, normal), TooFewPoints);
         }
       }
     }
@@ -179,8 +178,7 @@ SCENARIO("Project onto best fit plane degenerate case") {
       trajectory.push_back(PointT());
       WHEN("You try to project") {
         THEN("An exception is thrown") {
-          REQUIRE_THROWS_AS(
-              tracktable::domain::terrestrial::project_trajectory_onto_plane(trajectory, normal), ZeroNorm);
+          REQUIRE_THROWS_AS(tracktable::project_trajectory_onto_plane(trajectory, normal), ZeroNorm);
         }
       }
     }
@@ -200,10 +198,10 @@ SCENARIO("Project onto best fit plane") {
       hundredPointEast.push_back(pp);
     }
     AND_GIVEN("A normal pointing north") {
-      auto& normal = g_north;
+      const auto& normal = NORTH;
       WHEN("You project the trajectory onto the plane") {
         auto result = hundredPointEast;
-        tracktable::domain::terrestrial::project_trajectory_onto_plane(result, normal);
+        tracktable::project_trajectory_onto_plane(result, normal);
         AND_THEN("The length will decrease") {
           auto l1 = tracktable::length(hundredPointEast);
           auto l2 = tracktable::length(result);
@@ -229,7 +227,7 @@ SCENARIO("Project onto best fit plane") {
 /////////////////////////////////SANITY/////////////////////////////////////////
 SCENARIO("TOP DOWN SANITY") {
   GIVEN("A normal") {
-    auto& normal = g_north;
+    const auto& normal = NORTH;
     WHEN("You generate points along the suface defined by that normal") {
       auto random1 = Point3dT(1, 2, 3);
       auto u1 = tracktable::arithmetic::cross_product(normal, random1);
@@ -254,11 +252,11 @@ SCENARIO("TOP DOWN SANITY") {
       hundredPointEast.push_back(pp);
     }
     WHEN("You find a best fit plane") {
-      auto n1 = tracktable::domain::terrestrial::find_best_fit_plane(hundredPointEast);
+      auto n1 = tracktable::find_best_fit_plane(hundredPointEast);
       AND_WHEN("You project a trajectory on to that plane") {
-        tracktable::domain::terrestrial::project_trajectory_onto_plane(hundredPointEast, n1);
+        tracktable::project_trajectory_onto_plane(hundredPointEast, n1);
         AND_WHEN("You find a best fit plane for the projected trajectory") {
-          auto n2 = tracktable::domain::terrestrial::find_best_fit_plane(hundredPointEast);
+          auto n2 = tracktable::find_best_fit_plane(hundredPointEast);
           THEN("That plane should align with the original fit") {
             for (auto u = 0u; u < Point3dT::size(); ++u) {
               CHECK(n1[u] == Approx(n2[u]));
