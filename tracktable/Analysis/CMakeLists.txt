@@ -31,13 +31,17 @@
 
 # Tracktable C++ Analysis Library
 
-# So far this is a header-only implementation.  The lack of libraries
-# being built is not an error.
+include(GenerateExportHeader)
 
 include_directories(
   ${Tracktable_SOURCE_DIR}
+  ${PROJECT_BINARY_DIR}
   ${Boost_INCLUDE_DIR}
 )
+
+set(Analysis_SOURCES
+  GreatCircleFit.cpp
+  )
 
 set( Analysis_HEADERS
   AssembleTrajectories.h
@@ -47,7 +51,7 @@ set( Analysis_HEADERS
   GuardedBoostGeometryRTreeHeader.h
 )
 
-set( Detail_HEADERS
+set( Analysis_Detail_HEADERS
   detail/dbscan_points.h
   detail/point_converter.h
   detail/AssembleTrajectoriesIterator.h
@@ -60,18 +64,53 @@ set( Detail_HEADERS
 
 #this adds the project to Visual Studio on Windows so the files are
 # visible without creating a build command
-add_custom_target( TracktableAnalysis
-  SOURCES
+add_library( TracktableAnalysis
+  ${Analysis_SOURCES}
   ${Analysis_HEADERS}
-  ${Detail_HEADERS}
+  ${Analysis_Detail_HEADERS}
 )
 
+target_link_libraries(TracktableAnalysis
+  TracktableDomain
+  TracktableCore
+)
+
+set_property(
+  TARGET TracktableAnalysis
+  PROPERTY SOVERSION ${SO_VERSION}
+  )
+
+set_property(
+  TARGET TracktableAnalysis
+  PROPERTY VERSION ${TRACKTABLE_VERSION}
+  )
+
 #This puts the header files under a separate folder in Visual Studio
-source_group ("Header Files\\Detail" FILES ${Detail_HEADERS})
+source_group ("Header Files\\Detail" FILES ${Analysis_Detail_HEADERS})
+
+
+generate_export_header( TracktableAnalysis
+   BASE_NAME TRACKTABLE_ANALYSIS
+   EXPORT_MACRO_NAME TRACKTABLE_ANALYSIS_EXPORT
+   STATIC_DEFINE TRACKTABLE_ANALYSIS_STATIC_LIBRARY
+   EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/tracktable/Analysis/TracktableAnalysisWindowsHeader.h
+   )
+
+if (APPLE)
+    set(CMAKE_INSTALL_BINDIR bin)
+    set(CMAKE_INSTALL_LIBDIR lib)
+endif ()
 
 if (BUILD_TESTING)
   add_subdirectory(Tests)
 endif (BUILD_TESTING)
+
+install(
+  TARGETS TracktableAnalysis
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
 
 install(
   FILES ${Analysis_HEADERS}
@@ -79,6 +118,6 @@ install(
 )
 
 install(
-  FILES ${Detail_HEADERS}
+  FILES ${Analysis_Detail_HEADERS}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Analysis/detail
 )
