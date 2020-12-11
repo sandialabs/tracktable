@@ -33,9 +33,12 @@
 #define __tracktable_BasicPointMath_h
 
 #include <tracktable/Core/TracktableCommon.h>
+
 #include <boost/geometry/arithmetic/arithmetic.hpp>
+#include <boost/geometry/arithmetic/cross_product.hpp>
 #include <boost/geometry/arithmetic/dot_product.hpp>
 #include <boost/type_traits/is_base_of.hpp>
+
 #include <cmath>
 
 namespace tracktable {
@@ -249,6 +252,19 @@ double dot(PointT const& left, PointT const& right)
   return boost::geometry::dot_product(left, right);
 }
 
+/** Compute Cross Product
+ *
+ * @param [in] left Point to cross
+ * @param [in] right Point to cross
+ *
+ * @return cross product
+ */
+//TODO: python binding
+template <class PointT>
+PointT cross_product(PointT const& left, PointT const& right) {
+  return boost::geometry::cross_product(left, right);
+}
+
 /** Square the given point
  *
  * @param [in] left Point to square
@@ -275,7 +291,32 @@ double norm(PointT const& left)
   return sqrt(norm_squared(left));
 }
 
-/** Zeroize the point
+/** Normalize a point
+ *
+ * @param [in] _p point to normalize
+ *
+ * @return Normalized point
+ */
+//TODO: Python binding
+template <class PointT>
+PointT normalize_in_place(PointT& _p) {
+  return divide_scalar_in_place(_p, norm(_p));
+}
+
+/** Normalize a point
+ *
+ * @param [in] _p point to normalize
+ *
+ * @return Normalized point
+ */
+//TODO: Python binding
+template <class PointT>
+PointT normalize(PointT const& _p) {
+  PointT result(_p);
+  return normalize_in_place(result);
+}
+
+/** Get a Zeroized point
  *
  * @return Zeroized point
  */
@@ -291,6 +332,15 @@ PointT zero()
   return result;
 }
 
+/** zeroize a point
+ */
+
+template <class PointT>
+void zeroize(PointT& _p) {
+  for (std::size_t i = 0; i < _p.size(); ++i) {
+    _p[i] = 0;
+  }
+}
 } }
 
 #endif

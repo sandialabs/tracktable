@@ -231,7 +231,7 @@ public:
    * @return The number of dimensions in this point
    */
 
-  std::size_t size() const
+  static constexpr std::size_t size()
     {
       return Dimension;
     }

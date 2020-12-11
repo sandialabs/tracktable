@@ -51,6 +51,12 @@ include_directories(
   ${Boost_INCLUDE_DIRS}
 )
 
+add_executable(test_great_circle_fit
+  test_great_circle_fit.cpp
+  )
+
+set_property(TARGET test_great_circle_fit PROPERTY FOLDER "Tests")
+
 add_executable(test_dbscan_cartesian
   test_dbscan_cartesian.cpp
 )
@@ -110,9 +116,16 @@ set_property(
 add_executable(test_cartesian2d_distance_geometry_by_time
   test_cartesian2d_distance_geometry_by_time.cpp
   )
+
 set_property(
   TARGET test_cartesian2d_distance_geometry_by_time
   PROPERTY FOLDER "Tests"
+  )
+
+target_link_libraries(test_great_circle_fit
+  TracktableDomain
+  TracktableTestSupport
+  TracktableAnalysis
   )
 
 target_link_libraries(test_dbscan_cartesian
@@ -168,6 +181,11 @@ target_link_libraries(test_cartesian2d_distance_geometry_by_time
   TracktableDomain
   ${Boost_LIBRARIES}
   )
+
+add_test(
+  NAME C_GREAT_CIRCLE_FIT
+  COMMAND test_great_circle_fit
+)
 
 add_test(
   NAME C_DBSCAN_Cartesian
