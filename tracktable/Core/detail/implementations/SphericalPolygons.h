@@ -122,18 +122,6 @@ inline double compute_spherical_triangle_area(Point3D const& point1,
   return compute_spherical_triangle_area(angles);
 }
 
-// ----------------------------------------------------------------------
-
-// Compute the cross product of two 3D vectors.
-
-inline Point3D cross_product(Point3D const& a, Point3D const& b)
-{
-  Point3D result;
-  result.set<0>(a[1]*b[2] - a[2]*b[1]);
-  result.set<1>(a[2]*b[0] - a[0]*b[2]);
-  result.set<2>(a[0]*b[1] - a[1]*b[0]);
-  return result;
-}
 
 // ----------------------------------------------------------------------
 
