@@ -42,6 +42,11 @@ include_directories(
   ${Tracktable_SOURCE_DIR}
 )
 
+add_executable(test_point_arithmetic
+test_point_arithmetic.cpp
+)
+set_property(TARGET test_point_arithmetic PROPERTY FOLDER "Tests")
+
 add_executable(test_distance
   test_distance.cpp
   )
@@ -200,7 +205,10 @@ add_executable(test_trajectory_slicing
 set_property(TARGET test_trajectory_slicing             PROPERTY FOLDER "Tests")
 
 # ----------------------------------------------------------------------
-
+target_link_libraries(test_point_arithmetic
+  TracktableCore
+  TracktableDomain
+  )
 target_link_libraries(test_distance
   TracktableCore
   ${Boost_LIBRARIES}
@@ -357,6 +365,11 @@ target_link_libraries(test_trajectory_slicing
   )
 
 # ----------------------------------------------------------------------
+
+add_test(
+  NAME C_PointArithmetic
+  COMMAND test_point_arithmetic
+)
 
 add_test(
  NAME C_Distance

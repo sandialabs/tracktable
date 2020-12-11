@@ -126,7 +126,7 @@ int run_test()
     expected[2] = 6356.75231;
     error_count += verify_result(actual, expected, "NorthPole",1e-4);
 
-    actual = northpole2.ECEF();
+    actual = northpole2.ECEF("altitude");
     expected[0] = 0.0;
     expected[1] = 0.0;
     expected[2] = 6456.75231;
@@ -141,9 +141,19 @@ int run_test()
     std::cout << "Testing exception throw" << std::endl;
     bool thrown = false;
     try {
-        actual = albuquerque.ECEF_from_feet();
+        albuquerque.ECEF_from_feet();
+
     } catch(tracktable::domain::terrestrial::PropertyDoesNotExist &e) {
         thrown = true;
+    }
+    if (!thrown) {
+      std::cout << "Failed to throw exception when attribute not present" << std::endl;
+      ++error_count;
+    }
+    try {
+      albuquerque.ECEF("altitude");
+    } catch (tracktable::domain::terrestrial::PropertyDoesNotExist &e) {
+      thrown = true;
     }
     if (!thrown) {
       std::cout << "Failed to throw exception when attribute not present" << std::endl;
