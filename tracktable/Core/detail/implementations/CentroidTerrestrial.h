@@ -124,19 +124,6 @@ inline double compute_spherical_triangle_area(double a, double b, double c)
 
 // ----------------------------------------------------------------------
 
-// Compute the cross product of two 3D vectors.
-
-inline Point3D cross_product(Point3D const& a, Point3D const& b)
-{
-  Point3D result;
-  result.set<0>(a[1]*b[2] - a[2]*b[1]);
-  result.set<1>(a[2]*b[0] - a[0]*b[2]);
-  result.set<2>(a[0]*b[1] - a[1]*b[0]);
-  return result;
-}
-
-// ----------------------------------------------------------------------
-
 // Compute the center of mass of a spherical triangle given its
 // central angles and the three unit vectors toward the vertices.
 
@@ -146,20 +133,20 @@ inline Point3D compute_spherical_triangle_center_of_mass(double central_angles[3
   Point3D result;
 
   result = tracktable::arithmetic::multiply_scalar(
-    cross_product(unit_vectors[0], unit_vectors[1]),
+    tracktable::arithmetic::cross_product(unit_vectors[0], unit_vectors[1]),
     central_angles[2]);
 
   tracktable::arithmetic::add_in_place(
     result,
     tracktable::arithmetic::multiply_scalar(
-      cross_product(unit_vectors[1], unit_vectors[2]),
+      tracktable::arithmetic::cross_product(unit_vectors[1], unit_vectors[2]),
       central_angles[0]
       ));
 
   tracktable::arithmetic::add_in_place(
     result,
     tracktable::arithmetic::multiply_scalar(
-      cross_product(unit_vectors[2], unit_vectors[0]),
+      tracktable::arithmetic::cross_product(unit_vectors[2], unit_vectors[0]),
       central_angles[1]
       ));
 
