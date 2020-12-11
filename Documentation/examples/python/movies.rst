@@ -82,3 +82,33 @@ As with geographic data, we can also make movies from data in flat Cartesian spa
    beginning. If you would like to see them bright and vivid right from
    the start, add an argument like ``--trajectory-colormap prism`` (or
    any other Matplotib colormap you like).
+   
+   
+Using Parallel Processing
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Where available, we can make use of multiple processes simultaneously for
+the rendering of movies. In this example, the result will be the same as
+Cartesian example above.
+
+.. code-block:: console
+
+    $ python -m "tracktable.examples.parallel_movie_from_points" \
+      --processors 8 \
+      --domain cartesian2d \
+      --object-id-column 0 \
+      --timestamp-column 1 \
+      --x-column 2 \
+      --y-column 3 \
+      --delimiter , \
+      --map-bbox -100 -100 100 100 \
+      --trajectory-linewidth taper \
+      --trajectory-initial-linewidth 4 \
+      --trajectory-final-linewidth 1 \
+      TRACKTABLE/examples/data/SamplePointsCartesian.csv \
+      MovieExample4.mp4
+
+.. note:: The efficiency of this method is greatly dependent on the 
+   underlying operating system and the complexity of the movie being
+   rendered. For example, on Windows, this method is likely to be
+   slower than using the single threaded version. 
