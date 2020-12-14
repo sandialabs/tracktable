@@ -100,7 +100,6 @@ create_cartesian2d_trajectory_point(double x, double y, std::string const& id=st
 int test_cartesian2d_dg_by_distance()
 {
   int error_count = 0;
-  typedef tracktable::domain::cartesian2d::trajectory_point_type Cartesian2dTrajectoryPoint;
 
   double cartesian_coordinates[][2] = {
     {0, 0}, 
@@ -150,7 +149,7 @@ int test_cartesian2d_dg_by_distance()
 
 // --------------------------------------------------------------------
 int
-main(int argc, char* argv[])
+main(int , char**)
 {
   int error_count = 0;
 

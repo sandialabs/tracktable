@@ -106,7 +106,7 @@ double StraightFraction(TrajectoryT const& trajectory) {
             ++itr2;
         }
 
-        if ((itr2 - itr1) >= min_straight_size) {
+        if (size_t(itr2 - itr1) >= min_straight_size) {
             sum += (itr2 - itr1);
         }
 

@@ -43,8 +43,6 @@ read_and_get_timestamp(const std::string filename, const std::string format)
 {
     std::ifstream infile;
     infile.open(filename);
-    int num_points = 0;
-    int error_count = 0;
 
     typedef tracktable::TrajectoryPoint< tracktable::PointLonLat > point_type;
     typedef tracktable::LineReader<> line_reader_type;

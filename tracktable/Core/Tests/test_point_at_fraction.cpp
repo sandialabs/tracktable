@@ -90,7 +90,7 @@ int test_point_at_time_fraction()
   return error_count;
 }
 
-int main(int, char *argv[])
+int main(int, char **)
 {
   return test_point_at_time_fraction();
 }

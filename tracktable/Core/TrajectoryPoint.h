@@ -72,7 +72,7 @@ namespace tracktable {
  * This class will add trajectory properties (a timestamp, an object
  * ID and storage for named properties) to any point class.
  *
- * Timestamp is a t`racktable::Timestamp` which (under the hood) is a
+ * Timestamp is a `tracktable::Timestamp` which (under the hood) is a
  * `boost::posix_time::ptime`. Object ID is stored as a string.
 
  * We also include an interface to set, get and enumerate arbitrary
@@ -494,7 +494,7 @@ private:
    * @param [in] version Version of the archive
    */
   template<typename archive_t>
-  void serialize(archive_t& archive, const unsigned int version)
+  void serialize(archive_t& archive, const unsigned int /*version*/)
   {
 /*
     archive & boost::serialization::make_nvp("Superclass",

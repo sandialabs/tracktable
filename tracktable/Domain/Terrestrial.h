@@ -37,6 +37,7 @@
  * trajectory types in the Terrestrial domain adhere to these
  * standards.
  *
+ * TODO: The following statement implies that altitude is included whiich not accurate?
  * We also provide the 'altitude' trait for terrestrial trajectory
  * points. We recommend that you use altitude values measured in
  * meters wherever possible. However, we acknowledge that the
@@ -85,6 +86,12 @@ typedef tracktable::domain::cartesian3d::CartesianPoint3D CartesianPoint3D;
 // ----------------------------------------------------------------------
 
 namespace tracktable { namespace domain { namespace terrestrial {
+
+enum class AltitudeUnits {
+  FEET,
+  METERS,
+  KILOMETERS,
+};
 
 /** An exception to be used when a property cannot be found */
 class PropertyDoesNotExist : public std::runtime_error {
@@ -281,13 +288,20 @@ public:
    *
    * @note this expects an altitude in km (not ft or m).
    *
+   * @param _altitudeString The label of the property that contains altitude
+   * @param _unit The units the altitude contains
    * @return 3D Earth Centered, Earth Fixed point in km
    */
-  CartesianPoint3D ECEF() const {
-    double altitude = this->real_property("altitude");
-    coord_type longitude = conversions::radians(this->get<0>());
-    coord_type latitude = conversions::radians(this->get<1>());
-    return TerrestrialPoint::ECEF_from_km(longitude, latitude, altitude);
+  //TODO: redo python binding
+  CartesianPoint3D ECEF(const std::string& _altitudeString = "",
+                        const AltitudeUnits _unit = AltitudeUnits::KILOMETERS) const {
+    if (AltitudeUnits::KILOMETERS == _unit) {
+      return ECEF_from_kilometers(_altitudeString);
+    }
+    if (AltitudeUnits::METERS == _unit) {
+      return ECEF_from_meters(_altitudeString);
+    }
+    return ECEF_from_feet(_altitudeString);
   }
 
   /** Returns ECEF values for lon/lat points. Uses a km convention.
@@ -348,6 +362,21 @@ public:
   CartesianPoint3D ECEF_from_meters(const std::string& _altitudeString = "altitude") const {
     constexpr auto metersToKilometers = 1.0 / 1000.0;
     return ECEF(metersToKilometers, _altitudeString);
+  }
+
+  /** Returns ECEF values for lon/lat points. Uses a km convention.
+   *
+   * @note this expects an altitude in kilometers.
+   *
+   * @param [in] _altitudeString The label of the property that contains altitude
+   *
+   * @return 3D Earth Centered, Earth Fixed point in km
+   *
+   * @throw PropertyDoesNotExist if we can't find altitude
+   */
+  //TODO: python binding
+  CartesianPoint3D ECEF_from_kilometers(const std::string& _altitudeString = "altitude") const {
+    return ECEF(1.0, _altitudeString);
   }
   /// @}
 

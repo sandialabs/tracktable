@@ -124,8 +124,8 @@ tracktable::Trajectory<
   tracktable::TrajectoryPoint<
     point_type
     > >
-generate_trajectory(int trajectory_index,
-                    int num_points,
+generate_trajectory(int /*trajectory_index*/,
+                    size_t num_points,
                     int num_point_properties,
                     int num_trajectory_properties)
 {
@@ -136,7 +136,7 @@ generate_trajectory(int trajectory_index,
 
   generate_arbitrary_properties(num_trajectory_properties, trajectory);
 
-  for (std::size_t i = 0; i < num_points; ++i)
+  for (auto i = 0u; i < num_points; ++i)
     {
     tracktable::ostringstream_type id_buf, timestamp_buf;
     trajectory_point_type next_point;
@@ -164,7 +164,7 @@ generate_trajectory(int trajectory_index,
 // ----------------------------------------------------------------------
 
 template<typename point_type>
-void test_trajectory_writer(std::size_t howmany)
+void test_trajectory_writer(std::size_t /*howmany*/)
 {
   typedef tracktable::TrajectoryPoint<point_type> trajectory_point_type;
   typedef tracktable::Trajectory<trajectory_point_type> trajectory_type;
@@ -184,7 +184,7 @@ void test_trajectory_writer(std::size_t howmany)
 }
 
 int
-main(int argc, char* argv[])
+main(int , char**)
 {
   test_trajectory_writer<tracktable::PointLonLat>(1);
   return 0;

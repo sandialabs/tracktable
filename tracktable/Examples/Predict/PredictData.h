@@ -78,7 +78,7 @@ namespace index {
 template <>
 struct indexable<PredictData*> {
     using result_type = PredictData::FeatureT const&;  // required by boost
-    result_type const& operator()(PredictData* const& v) const { return v->feature; }
+    result_type& operator()(PredictData* const& v) const { return v->feature; }
 };
 
 }  // namespace index

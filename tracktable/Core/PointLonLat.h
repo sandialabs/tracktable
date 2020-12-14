@@ -174,7 +174,7 @@ private:
    * @param [in] version Version of the archive
    */
   template<class Archive>
-  void serialize(Archive& ar, const unsigned int version)
+  void serialize(Archive& ar, const unsigned int /*version*/)
   {
     ar & boost::serialization::make_nvp("Coordinates", this->Coordinates);
   }

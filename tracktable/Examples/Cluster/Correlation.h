@@ -45,7 +45,7 @@ template <size_t N>
 std::string Correlation(std::vector<tracktable::domain::feature_vectors::FeatureVector<N>>& features) {
     double mean[N] = {0.0};
     double sq_mean[N] = {0.0};
-    double cov[N][N] = {0.0};
+    double cov[N][N] = {{0.0}};
 
     for (auto i = 0u; i < features.size(); ++i) {
         for (auto j = 0u; j < N; ++j) {
@@ -53,13 +53,13 @@ std::string Correlation(std::vector<tracktable::domain::feature_vectors::Feature
         }
     }
 
-    for (unsigned int i = 0; i < features.size(); ++i) {
+    for (auto i = 0u; i < features.size(); ++i) {
         for (auto j = 0u; j < N; ++j) {
             auto e = features[i][j] - mean[j];
             sq_mean[j] += e * e;
         }
     }
-    for (auto k = 0; k < features.size(); ++k) {
+    for (auto k = 0u; k < features.size(); ++k) {
         auto& feature = features[k];
         for (auto i = 0u; i < N; ++i) {
             for (auto j = 0u; j <= i; ++j) {

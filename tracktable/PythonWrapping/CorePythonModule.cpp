@@ -47,7 +47,7 @@
 #include <boost/python/module.hpp>
 #include <Python.h>
 
-void trigger_args_exception(int foo)
+void trigger_args_exception(int /*foo*/)
 {
   return;
 }

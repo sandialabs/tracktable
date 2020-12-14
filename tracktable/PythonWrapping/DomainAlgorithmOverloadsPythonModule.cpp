@@ -50,7 +50,7 @@
 template<
     typename point_type
 >
-point_type wrap_geometric_median(point_type const& first_point, boost::python::object points)
+point_type wrap_geometric_median(point_type const& /*first_point*/, boost::python::object points)
 {
     // Since a Python iterable might be a one-time-only sequence we have
     // to make a temporary copy of the points.
@@ -67,7 +67,7 @@ point_type wrap_geometric_median(point_type const& first_point, boost::python::o
 template<
     typename point_type
 >
-point_type wrap_geometric_mean(point_type const& first_point, boost::python::object points)
+point_type wrap_geometric_mean(point_type const& /*first_point*/, boost::python::object points)
 {
     boost::python::stl_input_iterator<point_type> begin(points), end;
 
