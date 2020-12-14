@@ -7,7 +7,9 @@ Tracktable Data Generator Module
 Module Contents
 ---------------
 
-.. todo:: Describe this module at a high-level
+This module provides the ability to generate data on a grid
+such as points, boxes, snakes or any other type of data
+based on the generator parameters used.
 
 ----------
 Submodules
