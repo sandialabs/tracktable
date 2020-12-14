@@ -1,75 +1,8 @@
-.. _Tracktable_Installation:
 
-=======================
-Tracktable Installation
-=======================
+Installing Tracktable From Source
+=================================
 
-Installing Pre-Built Packages
-=============================
-
-As of Version 1.2, Tracktable is available on the Python Package Index
-(PyPI, https://pypi.org) and can be installed with ``pip`` as long as
-you're running Python 3.5 or newer.  Use the following command:
-
-``pip install tracktable``
-
-If this fails, look carefully at the error message.  It is most
-likely an error while trying to install `Cartopy
-<https://scitools.org.uk/cartopy/docs/latest/>`_, a map rendering
-toolkit that Tracktable uses to render images.  This will show up as a
-complaint about a ``GEOS`` version or a request for ``Proj 4.9.0``.
-
-The solution is to install Cartopy yourself before you try to install
-Tracktable.  If you are using `Anaconda
-<https://www.anaconda.com/distribution/>`_, the command ``conda install
-cartopy`` should do it.
-
-After you have installed Cartopy, retry ``pip install tracktable``.
-
-Anaconda Virtual Environment
-----------------------------
-If Anaconda is installed then the Anaconda virtual environment command
-below will create and configure a virtual environment that is ready to use Tracktable.
-Enter the following commands in a command/terminal/Anaconda prompt.
-
-- Create the Anaconda virtual environment
-
-  * ::
-
-      conda create --name tracktable --channel defaults --channel conda-forge --yes python pip folium pyshp pytz cartopy pip[tracktable]
-- Verify that the ``tracktable`` virtual environment was created
-
-  * ``conda env list``
-- Activate the virtual environment
-
-  * ``conda activate tracktable``
-- Deactivate the virtual environment
-
-  * ``conda deactivate``
-- If the virtual environment is no longer needed then it can be removed
-
-  * ``conda remove --name tracktable --all``
-
-_`Note for Windows Users`
--------------------------
-
-If you are using Tracktable under Windows, you might also need to install
-the C++ runtime library.  This is a necessary component for any program
-compiled with Microsoft's Visual C++ suite.  You can get it from the following
-URL:
-
-https://aka.ms/vs/16/release/vc_redist.x64.exe
-
-The most common indication that you're missing this library is an import
-error referring to the "_core_types" library when you try to import Tracktable
-in a Python interpreter.
-
--------------
-
-Installing from Source
-======================
-
-There are a few cases where you might want to build from source.  For
+There are a few cases where you might want to build from source. For
 example:
 
 - You might need access to features on the development branch.
@@ -85,7 +18,7 @@ Step 0: Audience
 
 We assume that you are familiar with downloading, compiling and
 installing software from source as well as with your operating
-system's package manager (if any).  You will need to know how to set
+system's package manager (if any). You will need to know how to set
 or modify environment variables, run the compiler and find libraries
 or header files on your system.
 
@@ -144,14 +77,14 @@ C++
 
   - With respect to C++11: if you want to call Tracktable from code
     built with C++11 turned on, you must also build Tracktable with
-    C++11 turned on.  The implementation of ``boost::variant`` (which we
+    C++11 turned on. The implementation of ``boost::variant`` (which we
     use for ``tracktable::PropertyValueT``) is entirely different between the two
-    language versions.  This causes link errors if you try to mix
+    language versions. This causes link errors if you try to mix
     versions.
 
   - We do not yet use any C++11 features in Tracktable in order to
     maintain compatibility with a few environments that are still
-    stranded in the age of C++03.  We look forward to their arrival in
+    stranded in the age of C++03. We look forward to their arrival in
     the modern age.
 
 
@@ -180,8 +113,8 @@ If you want to render movies you will need FFMPEG:
 * FFMPEG - https://www.ffmpeg.org
 
   - If you build from source please be sure to include the MPEG4 and
-    FFV1 codecs.  Both of these are included with the standard FFMPEG
-    download.  Tracktable can use other codecs but does not require
+    FFV1 codecs. Both of these are included with the standard FFMPEG
+    download. Tracktable can use other codecs but does not require
     them.
 
   .. tip:: Windows users can obtain the ffmpeg executable by installing
@@ -204,8 +137,8 @@ Building Boost
 
 We need several of Boost's compiled libraries including ``chrono``,
 ``date_time``, ``iostreams``, ``log``, ``random``, ``timer`` and
-especially ``Boost.Python``.  As with other dependencies, check your
-operating system's package manager first.  It's possible that you can
+especially ``Boost.Python``. As with other dependencies, check your
+operating system's package manager first. It's possible that you can
 install Boost with all its optional components from there.
 
 If you already have a recent Boost installation you can check for
@@ -216,19 +149,19 @@ Unix-like systems and (suffix) is ``.so`` on Unix systems, ``.so`` or
 
 If you really do have to build Boost from source -- for example, if
 you had to build your own Python installation -- then make sure to
-configure it to use the proper Python installation.  Information about
+configure it to use the proper Python installation. Information about
 how to do this can be found in the ``Boost.Python`` documentation at
 https://www.boost.org/doc/libs/1_67_0/libs/python/doc/html/building/
 
 One final note: We know that it's a pain to try to keep up with recent
-versions of a library as big as Boost.  We will not require a newer
+versions of a library as big as Boost. We will not require a newer
 version unless absolutely necessary.
 
 Building FFMPEG
 ***************
 
 For up-to-date instructions on building FFMPEG please refer to
-https://trac.ffmpeg.org/wiki/CompilationGuide and choose your OS.  We
+https://trac.ffmpeg.org/wiki/CompilationGuide and choose your OS. We
 recommend that you compile in support for H264 video (via ``libx264``).
 While this is not required, it is widely supported by current devices
 such as iPads, iPhones and Android systems.
@@ -238,11 +171,13 @@ Step 2: Configuration
 ---------------------
 
 CMake enforces what we call "out-of-source" builds: that is, you
-cannot build object files alongside source code files.  This makes it
-much easier to manage multiple build configurations.  It also means
-that the first thing you must do is create a build directory.  In the
-rest of this section we will use ``TRACKTABLE_HOME`` to refer to the
-directory where you unpacked the Tracktable source.
+cannot build object files alongside source code files. This makes it
+much easier to manage multiple build configurations. It also means
+that the first thing you must do is create a build directory.
+
+.. important:: In the rest of this guide we will use
+   ``TRACKTABLE_HOME`` to refer to the
+   directory where you unpacked the Tracktable source.
 
 .. code-block:: console
 
@@ -294,12 +229,12 @@ Once CMake starts you will see a mostly empty screen with the message ``EMPTY CA
 
   * Press ``c`` or click the ``Configure`` button again to incorporate your choices.
 
-Now you need to set options that are normally hidden.  Press ``t`` or
+Now you need to set options that are normally hidden. Press ``t`` or
 select the ``Show Advanced Options`` checkbox.
 
 Here are the variables you need to check:
 
-1.  ``Boost_INCLUDE_DIR`` and ``Boost_LIBRARY_DIR``.
+1. ``Boost_INCLUDE_DIR`` and ``Boost_LIBRARY_DIR``.
 
     These should point to your Boost install with Boost.Python.
     Filenames for the ``boost_date_time`` and ``boost_python``
@@ -308,7 +243,7 @@ Here are the variables you need to check:
     If you change either of these directories in CMake, press ``c`` or
     click ``Configure`` to make your changes take effect.
 
-_`2`.  ``Python3_EXECUTABLE``, ``Python3_LIBRARIES``, ``Python3_INCLUDE_DIRS``
+_`2`. ``Python3_EXECUTABLE``, ``Python3_LIBRARIES``, ``Python3_INCLUDE_DIRS``
 
     Make sure that all three of these point to the same installation. If you change any
     of these variables, press ``c`` or click ``Configure`` to make your changes take effect.
@@ -321,12 +256,12 @@ _`2`.  ``Python3_EXECUTABLE``, ``Python3_LIBRARIES``, ``Python3_INCLUDE_DIRS``
     .. note:: On Mac OSX with MacPorts in particular, CMake has a habit of using
       whatever Python executable is first in your path, the include
       directory from ``/System/Library/Frameworks/Python.framework`` and
-      the library from ``/usr/lib/``.  MacPorts installs its Python
+      the library from ``/usr/lib/``. MacPorts installs its Python
       library in
       ``/opt/local/Library/Frameworks/Python.framework/Versions/3.7``
       with headers in ``Headers/`` and the Python library in
-      ``lib/libpython3.7.dylib``.  Substitute whatever version you have
-      installed in place of 3.7.  If you have installed your own Python
+      ``lib/libpython3.7.dylib``. Substitute whatever version you have
+      installed in place of 3.7. If you have installed your own Python
       interpreter then use whatever path you chose for its installation.
 
 
@@ -335,9 +270,9 @@ generate Makefiles, Visual Studio project files or your chosen
 equivalent.
 
 .. note:: Some older CMake installations have an odd bug that shows up with
-  certain Linux installations.  You may see ``Boost_DIR`` set to
+  certain Linux installations. You may see ``Boost_DIR`` set to
   something like ``/usr/lib64`` no matter what value you try to set for
-  ``Boost_INCLUDE_DIR`` and ``Boost_LIBRARY_DIR``.  If you experience
+  ``Boost_INCLUDE_DIR`` and ``Boost_LIBRARY_DIR``. If you experience
   this, try adding the line
 
   .. code-block:: cmake
@@ -353,13 +288,13 @@ Boost Import Targets Not Found
 ******************************
 
 This happens when your installed version of CMake is too old for your
-installed version of Boost.  Please upgrade CMake to at least 3.12.
+installed version of Boost. Please upgrade CMake to at least 3.12.
 
 Anaconda Does Not Install ccmake
 ********************************
 
 This is a known bug that has been fixed in ``conda-forge`` but has not
-yet propagated to the main distribution.  Install ``cmake`` from the
+yet propagated to the main distribution. Install ``cmake`` from the
 ``conda-forge`` channel as follows:
 
 ``$ conda install -c conda-forge cmake``
@@ -367,7 +302,7 @@ yet propagated to the main distribution.  Install ``cmake`` from the
 Python3 Boost Library Not Found but I'm Using Python2
 ******************************************************
 
-Check your Python CMake variables as listed in `2`_. above.  They are
+Check your Python CMake variables as listed in `2`_. above. They are
 probably pointing to a Python 3 interpreter.
 
 Old Version of Boost Found in /usr/lib or /usr/lib64
@@ -381,7 +316,16 @@ the next time you press ``c`` or ``Configure``.
 Windows Users: Import Error Referring To The "_core_types" Library
 ******************************************************************
 
-Reference the `Note for Windows Users`_ above.
+If you are using Tracktable under Windows, you might also need to install
+the C++ runtime library. This is a necessary component for any program
+compiled with Microsoft's Visual C++ suite. You can get it from the following
+URL:
+
+https://aka.ms/vs/16/release/vc_redist.x64.exe
+
+The most common indication that you're missing this library is an import
+error referring to the "_core_types" library when you try to import Tracktable
+in a Python interpreter.
 
 
 Step 3: Build and Test
@@ -400,9 +344,9 @@ Once the build process has finished go to your build directory and run
   just a fancy wrapper for ctest in this case.
 
 If you have multiple cores or processors and your build system
-supports it, by all means build in parallel.  GNU Make will do this
+supports it, by all means build in parallel. GNU Make will do this
 when you say ``make -j <n>`` where ``<n>`` is the number of compilers
-you're willing to run.  A bare ``make -j`` will cause it to run as
+you're willing to run. A bare ``make -j`` will cause it to run as
 many compiler instances as it believes you have cores or processors.
 Windows users using msbuild, can use the ``/m:<n>`` option from the
 command line.
@@ -411,7 +355,7 @@ command line.
 
    The Python wrappers, especially the wrappers for DBSCAN, feature
    vectors and the R-tree, take between 1GB and 1.5GB of memory to
-   compile.  Keep this in mind when you run parallel builds.  A good
+   compile. Keep this in mind when you run parallel builds. A good
    rule of thumb is to run no more than 1 process for every 1.5-2GB of
    main memory in your computer.
 
@@ -422,15 +366,15 @@ CMake Error: "cannot find numpy"
 ********************************
 
 This usually arises when CMake detects a different Python
-installation than the one you actually use.  Take a look at the
-``Python3_EXECUTABLE`` field in CMake.  If it says something like
+installation than the one you actually use. Take a look at the
+``Python3_EXECUTABLE`` field in CMake. If it says something like
 ``/usr/bin/python`` and you use a Python distribution like
 Anaconda or Enthought's Canopy, that's the problem.
 
 To fix, change ``Python3_EXECUTABLE`` to point to the Python
-interpreter in your environment.  For Anaconda under Linux and OS
+interpreter in your environment. For Anaconda under Linux and OS
 X, this is usually either ``~/anaconda3/bin/python`` or
-``~/anaconda3/envs/<environment name>/bin/python``.  Remember to
+``~/anaconda3/envs/<environment name>/bin/python``. Remember to
 also change ``Python3_LIBRARIES`` and ``Python3_INCLUDE_DIRS`` to the
 files inside your Anaconda (or Enthought) directory.
 
@@ -439,7 +383,7 @@ Python Tests Crashing
 
 If the tests whose names begin with ``P_`` crash, you probably
 have a mismatch between ``Python3_EXECUTABLE`` and
-``Python3_LIBRARIES``.  Check their values in ``ccmake`` / CMake GUI.
+``Python3_LIBRARIES``. Check their values in ``ccmake`` / CMake GUI.
 If your Python executable is in (for example)
 ``/usr/local/python/bin/python`` then its corresponding library
 will usually be in ``/usr/local/python/lib/libpython3.6.so``
@@ -474,8 +418,8 @@ Step 4: Install
 ---------------
 
 You can use Tracktable as-is from its build directory or install it
-elsewhere on your system.  To install it, type ``make install`` in the
-build directory (or, again, your IDE's equivalent).  You can choose
+elsewhere on your system. To install it, type ``make install`` in the
+build directory (or, again, your IDE's equivalent). You can choose
 the install destination by changing the ``CMAKE_INSTALL_PREFIX``
 variable in CMake.
 
@@ -493,9 +437,14 @@ path, usually stored in an environment variable named ``PYTHONPATH``.
 Finally, you will need to tell your system where to find the
 Tracktable C++ libraries.
 
-* If you are running from your build tree (common during development) then the libraries will be in ``BUILD/lib`` and ``BUILD/bin``
+.. hint:: On Windows, unless modified any tracktable DLLs generated by Visual Studio
+   will be located in ``tracktable\out\build\<build config>\bin``. When installing
+   Tracktable from Visual Studio on Windows the DLLs located in
+   ``tracktable/out/install/<build config>/bin/TracktableCore.dll`` will be used for
+   installation. ``build config`` is referring to the selected build configuration
+   in Visual Studio i.e. x64-Release, x64-Debug, etc.
 
-.. todo:: Check where Windows puts its DLLs.
+* If you are running from your build tree (common during development) then the libraries will be in ``BUILD/lib`` and ``BUILD/bin``
 
 * If you are running from an installed location the libraries will be in ``INSTALL_DIR/lib`` and ``INSTALL_DIR/bin``.
 
@@ -504,5 +453,5 @@ Tracktable C++ libraries.
 * On Mac OSX, add the library directory to your ``DYLD_LIBRARY_PATH`` variable.
 
 On Unix-like systems you can also add the library directory to your
-system-wide ``ld.so.conf`` file.  You will need root permissions in order
-to do so.  That is beyond the scope of this document.
+system-wide ``ld.so.conf`` file. You will need root permissions in order
+to do so. That is beyond the scope of this document.

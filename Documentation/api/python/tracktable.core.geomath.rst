@@ -1,3 +1,5 @@
+.. _python_geomath_reference:
+
 ===============================
 tracktable.core.geomath module
 ===============================

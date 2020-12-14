@@ -39,7 +39,7 @@ We include databases of cities (from `MaxMind
 and airports (from `Arash Partow <http://www.partow.net/miscellaneous/airportdatabase>`_) in Tracktable.
 
 Their licenses are reproduced in full in the file ``LICENSE.html`` in
-the root directory of the Tracktable distribution.  In this section we
+the root directory of the Tracktable distribution. In this section we
 reproduce those parts of the licenses that are required to be present
 in documentation.
 
@@ -48,5 +48,5 @@ MaxMind City Database
 ^^^^^^^^^^^^^^^^^^^^^
 
 This product includes data created by MaxMind, available from
-`http://www.maxmind.com/`.
+http://www.maxmind.com/.
 
