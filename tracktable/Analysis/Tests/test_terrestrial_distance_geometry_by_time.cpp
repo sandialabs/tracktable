@@ -108,7 +108,6 @@ create_terrestrial_trajectory_point(double longitude,
 int test_terrestrial_dg_by_distance()
 {
   int error_count = 0;
-  typedef tracktable::domain::terrestrial::trajectory_point_type TerrestrialTrajectoryPoint;
 
   double terrestrial_coordinates[][2] = {
     {0, 80}, 
@@ -167,7 +166,7 @@ int test_terrestrial_dg_by_distance()
 
 // --------------------------------------------------------------------
 int
-main(int argc, char* argv[])
+main(int , char**)
 {
   int error_count = 0;
 

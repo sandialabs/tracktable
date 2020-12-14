@@ -29,9 +29,9 @@ if debugging:
     subprocess.call(['doxygen', 'readthedocs/Doxyfile-readthedocs'])
 else:
     # If we're building all of Tracktable, we're operating in
-    # the build directory instead of the source directory.  These
-    # variables will be filled in by CMake.
-
+    # the build directory instead of the source directory. These
+    # variables are set by CMake when executing the Sphinx build
+    # command (see the `doc_python` target in /tracktable/CMakeLists.txt).
     tracktable_src = os.environ['SOURCE_DIR']
     tracktable_build = os.environ['BINARY_DIR']
 

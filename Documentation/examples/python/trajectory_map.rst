@@ -96,8 +96,8 @@ continents, countries and states (US/Canada only at present). You can
 filter and draw city locations by population (given some minimum
 threshold) or by ranking. You can change the line style, appearance
 and color map for the rendered trajectories. All of this is explained
-in the :ref:`Tracktable_User_Guide` and the
-:ref:`API Reference Documentation <tracktable_reference_label>`.
+in the :ref:`Tracktable_Python_User_Guide` and the
+:ref:`API Reference Documentation <tracktable_api_label>`.
 
 Cartesian Trajectory Map
 ------------------------

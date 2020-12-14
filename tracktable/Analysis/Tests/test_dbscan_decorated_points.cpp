@@ -222,7 +222,7 @@ void test_dbscan()
 // ----------------------------------------------------------------------
 
 int
-main(int argc, char* argv[])
+main(int , char**)
 {
   test_dbscan<3>();
 }

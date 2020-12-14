@@ -1,16 +1,14 @@
-===================
-TracktableRW module
-===================
+====================
+Tracktable RW Module
+====================
 
 
 ---------------
 Module contents
 ---------------
 
-This module contains clsases that read and write points and
-trajectories.  In Tracktable 0.9 we provide PointReader, a C++ class
-templated on point type that can handle points with arbitrary
-dimension and named properties.
+This module contains classes that reads and writes points and
+trajectories.
 
 ----------
 Submodules

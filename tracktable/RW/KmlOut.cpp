@@ -134,7 +134,7 @@ void write_styleid(std::ostream &_o) {
 
 void writeStyle(std::ostream &_o) {
     static size_t seed = 1u;
-    std::string id = "generated" + seed;
+    std::string id = "generated" + std::to_string(seed);
     kml::writeStyle(_o, id, kml::_color, kml::_width);
     _o << kml::style_id(id);
 }

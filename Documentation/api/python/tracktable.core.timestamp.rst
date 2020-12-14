@@ -1,3 +1,5 @@
+.. _python_timestamp_reference:
+
 ================================
 tracktable.core.timestamp module
 ================================

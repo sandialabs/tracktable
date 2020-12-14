@@ -11,7 +11,6 @@ void Portal::divide(size_t _xDivisions, size_t _yDivisions) {
     boost::geometry::subtract_point(delta, this->min_corner());
     boost::geometry::divide_point(delta,PointT(_xDivisions,_yDivisions));
 
-    double temp[2] = {0, 0};
     for (auto i = 0u; i < _xDivisions; ++i) {
         for (auto j = 0u; j < _yDivisions; ++j) {
             auto ll = this->min_corner();

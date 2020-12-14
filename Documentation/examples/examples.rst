@@ -10,8 +10,8 @@ on. C++ examples are in the source code distribution in the directory
 ``tracktable/Examples``. Python examples are available as scripts you
 can execute as well as Jupyter_ notebooks.
 
-Example Data
-------------
+Data Generation Examples
+------------------------
 
 .. toctree::
    :maxdepth: 2
@@ -21,7 +21,7 @@ Example Data
 C++ Examples
 ------------
 
-This section will be filled out in patch releases for 1.3 and 1.4.
+.. todo:: Add the the C++ examples
 
 Python Examples
 ---------------
@@ -53,8 +53,9 @@ Each Jupyter notebook page listed above is an actual Jupyter notebook, including
 
 There are two ways to get the notebooks if you wish to modify them or run them locally:
 
- 1.  Download from `<https://tracktable.sandia.gov/downloads/source_code.html>`_ (starting with 1.3).
- 2.  The function ``tracktable.examples.copy_example_notebooks``
+ 1. Download from `<https://tracktable.sandia.gov/downloads/source_code.html>`_ (starting with 1.3).
+ 2. The function ``tracktable.examples.copy_example_notebooks``
+
       - Detailed information about ``copy_example_notebooks`` can be found here: :ref:`python_examples_module_label`
 
 .. _Jupyter: https://jupyter.org
