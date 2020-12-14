@@ -295,9 +295,12 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
       if (MINGW OR MSVC)
         string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )
         string( REPLACE ";" "\\;" ESCAPED_PYTHONPATH "$ENV{PYTHONPATH}" )
+        string( REPLACE "/" "\\;" ESCAPED_SOURCE_DIR "${Tracktable_SOURCE_DIR}" )
+        string( REPLACE "/" "\\;" ESCAPED_BINARY_DIR "${Tracktable_BINARY_DIR}" )
+
         add_custom_target( doc_python ALL
-            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python\\;${ESCAPED_PYTHONPATH} PATH=${Tracktable_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH}
-            SOURCE_DIR=${Tracktable_SOURCE_DIR} BINARY_DIR=${Tracktable_BINARY_DIR}
+            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${ESCAPED_SOURCE_DIR}\\tracktable\\Python\\;${ESCAPED_PYTHONPATH} PATH=${ESCAPED_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH}
+            SOURCE_DIR=${ESCAPED_SOURCE_DIR} BINARY_DIR=${ESCAPED_BINARY_DIR}
             ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
             -b html
             -d "${Sphinx_BUILD_DIR}/doctrees"
