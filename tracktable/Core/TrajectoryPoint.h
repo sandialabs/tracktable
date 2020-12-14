@@ -72,7 +72,7 @@ namespace tracktable {
  * This class will add trajectory properties (a timestamp, an object
  * ID and storage for named properties) to any point class.
  *
- * Timestamp is a t`racktable::Timestamp` which (under the hood) is a
+ * Timestamp is a `tracktable::Timestamp` which (under the hood) is a
  * `boost::posix_time::ptime`. Object ID is stored as a string.
 
  * We also include an interface to set, get and enumerate arbitrary

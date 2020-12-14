@@ -12,8 +12,9 @@ become fully deprecated in Tracktable 1.6.
 * ``tracktable.source.trajectory`` -> ``tracktable.analysis.assemble_trajectories``
 
 .. important:: ``tracktable.source`` submodules are still importable and usable in Tracktable 1.5.
-   They *need* to be of the format ``from tracktable.source.<submodule> import <function/class>``. For example,
-   to import ``AssembleTrajectoryFromPoints`` you would do ``from tracktable.source.trajectory import AssembleTrajectoryFromPoints``
+   However, they *need* to be of the format ``from tracktable.source.<submodule> import <function/class>``. For example,
+   to import ``AssembleTrajectoryFromPoints`` you would do
+   ``from tracktable.source.trajectory import AssembleTrajectoryFromPoints``
 
 ----------
 Submodules

@@ -1,4 +1,4 @@
-.. _tracktable_reference_label:
+.. _tracktable_api_label:
 
 API Reference Documentation
 ===========================
@@ -13,7 +13,7 @@ ease, speed and malleability, then choose certain components to re-implement
 in C++ based on speed, memory usage and algorithmic needs.
 However, there does exist C++ modules that have been Python wrapped so they can be
 utilized directly in the Python interface to achieve the maximum performance out of the given algorithms.
-These Python wrapped C++ algorithms are further described under the *tracktable.lib module* documentation.
+These Python wrapped C++ algorithms are further described under the ``tracktable.lib module`` documentation.
 
 
 Python API
@@ -31,7 +31,7 @@ points and tracjectories can be found in the modules listed below.
 .. toctree::
    :maxdepth: 5
 
-   python/tracktable.analysis
+   python/tracktable.analysis.rst
    python/tracktable.core.rst
    python/tracktable.data_generators.rst
    python/tracktable.domain.rst
