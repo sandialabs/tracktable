@@ -44,37 +44,42 @@ double constexpr sqrt_recursion(double _x, double _curr, double _prev) {
  */
 double constexpr constsqrt(double _x) {
   return _x >= 0 && _x < std::numeric_limits<double>::infinity() ? sqrt_recursion(_x, _x, 0)
-                                                               : std::numeric_limits<double>::quiet_NaN();
+                                                                 : std::numeric_limits<double>::quiet_NaN();
 }
 
 /* optimization function */
-double opt_fun(const Point3dT &_p, const TrajectoryT &_trajectory, std::string _altitudeString,
-               tracktable::domain::terrestrial::AltitudeUnits _unit);
-Point3dT add_scaled_vector(const Point3dT &_v0, const Point3dT &_v1, double _fac);
-void project_point_onto_plane_in_place(TrajectoryPointT &_tPoint, const Point3dT &_normal,
-                                       std::string _altitudeString,
+double opt_fun(const tracktable::domain::cartesian3d::base_point_type &_p,
+               const tracktable::domain::terrestrial::trajectory_type &_trajectory,
+               std::string _altitude_string, tracktable::domain::terrestrial::AltitudeUnits _unit);
+tracktable::domain::cartesian3d::base_point_type add_scaled_vector(
+    const tracktable::domain::cartesian3d::base_point_type &_v0,
+    const tracktable::domain::cartesian3d::base_point_type &_v1, double _fac);
+void project_point_onto_plane_in_place(tracktable::domain::terrestrial::trajectory_point_type &_t_point,
+                                       const tracktable::domain::cartesian3d::base_point_type &_normal,
+                                       std::string _altitude_string,
                                        tracktable::domain::terrestrial::AltitudeUnits _unit);
 
 namespace tracktable {
-namespace domain {
-namespace terrestrial {
 
-void great_circle_fit_and_project_in_place(TrajectoryT &_trajectory, std::string _altitudeString,
-                                           AltitudeUnits _unit) {
-  Point3dT normal = find_best_fit_plane(_trajectory);
-  project_trajectory_onto_plane(_trajectory, normal, _altitudeString, _unit);
+void great_circle_fit_and_project_in_place(tracktable::domain::terrestrial::trajectory_type &_trajectory,
+                                           std::string _altitude_string,
+                                           tracktable::domain::terrestrial::AltitudeUnits _unit) {
+  tracktable::domain::cartesian3d::base_point_type normal = find_best_fit_plane(_trajectory);
+  project_trajectory_onto_plane(_trajectory, normal, _altitude_string, _unit);
 }
 
-TrajectoryT great_circle_fit_and_project(TrajectoryT const &_trajectory, std::string _altitudeString,
-                                         AltitudeUnits _unit) {
-  TrajectoryT result(_trajectory);
-  great_circle_fit_and_project_in_place(result, _altitudeString, _unit);
+tracktable::domain::terrestrial::trajectory_type great_circle_fit_and_project(
+    tracktable::domain::terrestrial::trajectory_type const &_trajectory, std::string _altitude_string,
+    tracktable::domain::terrestrial::AltitudeUnits _unit) {
+  tracktable::domain::terrestrial::trajectory_type result(_trajectory);
+  great_circle_fit_and_project_in_place(result, _altitude_string, _unit);
   return result;
 }
 
 // TODO: Does not work well with trajectories with poor aspect ratio, should work direction of travel into it
-Point3dT find_best_fit_plane(const TrajectoryT &_trajectory, std::string _altitudeString,
-                             AltitudeUnits _unit) {
+tracktable::domain::cartesian3d::base_point_type find_best_fit_plane(
+    const tracktable::domain::terrestrial::trajectory_type &_trajectory, std::string _altitude_string,
+    tracktable::domain::terrestrial::AltitudeUnits _unit) {
   if (_trajectory.size() < 2) {
     throw TooFewPoints();
   }
@@ -82,10 +87,10 @@ Point3dT find_best_fit_plane(const TrajectoryT &_trajectory, std::string _altitu
   // ways to do this, but this is the easiest.
   // First, we need to ensure we have two different points
   auto p = _trajectory.begin();
-  auto v2 = _trajectory.back().ECEF(_altitudeString, _unit);
-  auto v1 = (*p).ECEF(_altitudeString, _unit);
+  auto v2 = _trajectory.back().ECEF(_altitude_string, _unit);
+  auto v1 = (*p).ECEF(_altitude_string, _unit);
   while (std::next(p) != _trajectory.end() && v1 == v2) {
-    v1 = (*(++p)).ECEF(_altitudeString, _unit);
+    v1 = (*(++p)).ECEF(_altitude_string, _unit);
   }
   if (v1 == v2) {
     throw IdenticalPositions();
@@ -96,7 +101,7 @@ Point3dT find_best_fit_plane(const TrajectoryT &_trajectory, std::string _altitu
 
   // Using our initial guess, see our optimization value.  We are trying
   // to minimize this.
-  double minSum = opt_fun(normal, _trajectory, _altitudeString, _unit);
+  double minSum = opt_fun(normal, _trajectory, _altitude_string, _unit);
 
   // Tools for our optimization routine.  The first two give us a way to
   // find a neighborhood of points, the second is or control over how
@@ -104,14 +109,14 @@ Point3dT find_best_fit_plane(const TrajectoryT &_trajectory, std::string _altitu
 
   constexpr auto sqrt2 = constsqrt(2.0);
   constexpr auto numDirections = 8u;
-  constexpr std::array<double,8> cyc= {0.0, sqrt2, 1.0, sqrt2, 0.0, -sqrt2, -1.0, -sqrt2};
+  constexpr std::array<double, 8> cyc = {0.0, sqrt2, 1.0, sqrt2, 0.0, -sqrt2, -1.0, -sqrt2};
   constexpr double eps = 5.0e-8;
   // TODO: implement acceleration/deceleration of epsilon
 
   auto changed = false;
   do {
     changed = false;
-    Point3dT curPoint = normal;
+    tracktable::domain::cartesian3d::base_point_type curPoint = normal;
 
     // Get some perpendiculars to our point on the sphere so we can walk
     // around it in a systematic way.
@@ -126,7 +131,7 @@ Point3dT find_best_fit_plane(const TrajectoryT &_trajectory, std::string _altitu
       temp = add_scaled_vector(temp, v1, eps * cyc.at(i));
       temp = add_scaled_vector(temp, v2, eps * cyc.at((i + 2u) % numDirections));
       tracktable::arithmetic::normalize_in_place(temp);
-      auto sum = opt_fun(temp, _trajectory, _altitudeString, _unit);
+      auto sum = opt_fun(temp, _trajectory, _altitude_string, _unit);
       if (sum < minSum) {
         normal = temp;
         minSum = sum;
@@ -137,8 +142,10 @@ Point3dT find_best_fit_plane(const TrajectoryT &_trajectory, std::string _altitu
   return normal;
 }
 
-void project_trajectory_onto_plane(TrajectoryT &_trajectory, const Point3dT &_normal,
-                                   std::string _altitudeString, AltitudeUnits _unit) {
+void project_trajectory_onto_plane(tracktable::domain::terrestrial::trajectory_type &_trajectory,
+                                   const tracktable::domain::cartesian3d::base_point_type &_normal,
+                                   std::string _altitude_string,
+                                   tracktable::domain::terrestrial::AltitudeUnits _unit) {
   if (_trajectory.empty()) {
     throw TooFewPoints();
   }
@@ -146,33 +153,35 @@ void project_trajectory_onto_plane(TrajectoryT &_trajectory, const Point3dT &_no
     throw ZeroNorm();
   }
   for (auto &p : _trajectory) {
-    project_point_onto_plane_in_place(p, _normal, _altitudeString, _unit);
+    project_point_onto_plane_in_place(p, _normal, _altitude_string, _unit);
   }
 }
 
-}  // namespace terrestrial
-}  // namespace domain
 }  // namespace tracktable
 
-double opt_fun(const Point3dT &_p, const TrajectoryT &_trajectory, std::string _altitudeString,
-               tracktable::domain::terrestrial::AltitudeUnits _unit) {
+double opt_fun(const tracktable::domain::cartesian3d::base_point_type &_p,
+               const tracktable::domain::terrestrial::trajectory_type &_trajectory,
+               std::string _altitude_string, tracktable::domain::terrestrial::AltitudeUnits _unit) {
   auto sum = 0.0;
   for (const auto &p : _trajectory) {
     auto val =
-        tracktable::arithmetic::dot(_p, tracktable::arithmetic::normalize(p.ECEF(_altitudeString, _unit)));
+        tracktable::arithmetic::dot(_p, tracktable::arithmetic::normalize(p.ECEF(_altitude_string, _unit)));
     // val += val * val * val / 6.0;  // TODO: Ask Rintoul to confirm the +=
     sum += std::abs(val);  // * val;
   }
   return sum;
 }
 
-Point3dT add_scaled_vector(const Point3dT &_v0, const Point3dT &_v1, double _fac) {
+tracktable::domain::cartesian3d::base_point_type add_scaled_vector(
+    const tracktable::domain::cartesian3d::base_point_type &_v0,
+    const tracktable::domain::cartesian3d::base_point_type &_v1, double _fac) {
   return tracktable::arithmetic::add(_v0, tracktable::arithmetic::multiply_scalar(_v1, _fac));
 }
 
 // TODO: create a fromECEF() function or Trajectory point constructor that does the conversion
-void project_point_onto_plane_in_place(TrajectoryPointT &_tPoint, const Point3dT &_normal,
-                                       std::string _altitudeString,
+void project_point_onto_plane_in_place(tracktable::domain::terrestrial::trajectory_point_type &_t_point,
+                                       const tracktable::domain::cartesian3d::base_point_type &_normal,
+                                       std::string _altitude_string,
                                        tracktable::domain::terrestrial::AltitudeUnits _unit) {
   // An elegant way to project points.  Basically, most of these points
   // are very close to the plane.  So if you find the dot product between
@@ -188,7 +197,7 @@ void project_point_onto_plane_in_place(TrajectoryPointT &_tPoint, const Point3dT
   constexpr double b = constsqrt(b2);
   constexpr double ep2 = (a2 - b2) / b2;
 
-  auto pt = _tPoint.ECEF(_altitudeString, _unit);
+  auto pt = _t_point.ECEF(_altitude_string, _unit);
   pt = add_scaled_vector(pt, _normal, -1.0 * tracktable::arithmetic::dot(pt, _normal));
 
   auto p = std::sqrt(pt[0] * pt[0] + pt[1] * pt[1]);
@@ -199,8 +208,8 @@ void project_point_onto_plane_in_place(TrajectoryPointT &_tPoint, const Point3dT
   auto lon = atan2(pt[1], pt[0]);
   auto lat = atan2(pt[2] + ep2 * b * sinTh * sinTh * sinTh, p - e2 * a * cosTh * cosTh * cosTh);
 
-  _tPoint.set_longitude(tracktable::conversions::degrees(lon));
-  _tPoint.set_latitude(tracktable::conversions::degrees(lat));
+  _t_point.set_longitude(tracktable::conversions::degrees(lon));
+  _t_point.set_latitude(tracktable::conversions::degrees(lat));
 
   // auto sin_lat = std::sin(lat);
   // auto N = a / std::sqrt(1.0 - e2 * sin_lat * sin_lat);
