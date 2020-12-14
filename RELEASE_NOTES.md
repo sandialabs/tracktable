@@ -1,5 +1,52 @@
 # Tracktable Release Notes
 
+## VERSION 1.4.1, 1 December 2020
+
+This is a bugfix release with a few features that will be rolled out officially in Tracktable 1.5.0, due early in 2021.
+
+### BUGS FIXED SINCE 1.4.0
+
+A regression arose in an interaction between Cartopy, Jupyter, and Shapely that caused static map rendering to error out in Jupyter notebooks.  
+
+Specific issues:
+
+- #252: Allow users to skip undelimited headers in point input files
+- #254: Fix segfault when file not terminated by newline
+- #255: Log line numbers when reporting errors from point reader
+- #282: `tracktable::subtract_in_place` did not return its results properly.
+- #308: Missing `math` import in `tracktable.core.geomath`
+- #309: Incorrect parameter order in documentation for `render_trajectories()`
+- #314: `render_trajectories()` for Folium updated to take bounding box components in the right order
+
+### FEATURES IN PROGRESS
+
+These features will show up if you look at the source code but are not ready for production use yet.
+
+- Data generators in C++
+- Command-line factories in C++ (helpers for command-line options)
+- KML output for trajectories
+- C++ example source code cleaned up
+- Lots of documentation additions and improvements
+
+### INCOMPATIBLE API CHANGES
+
+- C++ header files previously found under `tracktable/IO/` are now under `tracktable/RW/`.  This parallels a change in the Python module structure.
+- The Python module formerly known as `tracktable.io` is now `tracktable.rw`.  The old bindings are still in place and will issue a deprecation warning.  
+- The Python trajectory assembler is now in the `tracktable.analysis.assemble_trajectories` module instead of `tracktable.source.trajectory`.  The old bindings are still in place and will issue a deprecation warning.
+
+(Note: Yes, it is poor practice to introduce a breaking API change in a point release.  We apologize for the mess.)
+
+### KNOWN ISSUES IN 1.4.1
+
+Forcing the PlateCarree projection when rendering maps using Cartopy may cause data drawn on top of a map to be slightly offset from its true location.  This is most likely to occur if you choose a projection other than PlateCarree.
+
+
+
+
+
+
+
+
 ## VERSION 1.4.0, 14 October 2020
 
 This is a feature release.
