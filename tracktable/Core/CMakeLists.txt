@@ -113,7 +113,6 @@ set( Core_Detail_AlgorithmSignatures_HEADERS
 
 set( Core_Detail_Implementations_HEADERS
   detail/implementations/CentroidCartesian.h
-  detail/implementations/CentroidTerrestrial.h
   detail/implementations/ConvexHullAreaCartesian.h
   detail/implementations/ConvexHullAreaTerrestrial.h
   detail/implementations/ConvexHullCartesian.h
