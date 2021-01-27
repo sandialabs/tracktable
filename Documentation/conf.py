@@ -29,6 +29,10 @@ import subprocess
 import sys
 import os
 
+# Due to Sphinx parsing restrictions the python wrapped modules
+# need to be imported before we start building the documentation
+import tracktable.lib
+
 tracktable_src = '../'
 
 # We have to run these manually on readthedocs since we aren't
@@ -40,11 +44,6 @@ subprocess.call(['doxygen', 'readthedocs/Doxyfile-readthedocs'])
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 
 sys.path.insert(0, os.path.abspath(os.path.join(tracktable_src, 'tracktable', 'Python')))
-
-
-print("sys.argv: {}".format(' '.join(sys.argv)))
-print("sys.path: {}".format(pprint.pformat(sys.path)))
-print("os.getcwd(): {}".format(os.getcwd()))
 
 # The autodoc Sphinx extension doesn't need to care about our Python
 # extension modules.  This list contains symbols that it should
@@ -146,6 +145,18 @@ pygments_style = 'sphinx'
 
 # If true, keep warnings as "system message" paragraphs in the built documents.
 #keep_warnings = False
+
+# ----- Options for nbsphinx -----
+
+nbsphinx_allow_errors = False # If True, the build process is continued even if an exception occurs.
+nbsphinx_execute = 'auto' # Whether to execute notebooks before conversion or not. Possible values: 'always', 'never', 'auto' (default).
+nbsphinx_timeout = -1 # Controls when a cell will time out. The timeout is given in seconds. Given -1, cells will never time out.
+nbsphinx_execute_arguments = [ # Kernel arguments used when executing notebooks.
+    "--InlineBackend.figure_formats={'svg', 'pdf'}",
+    "--InlineBackend.rc={'figure.dpi': 96}",
+]
+nbsphinx_input_prompt = 'In [%s]:' # Input prompt for code cells. %s is replaced by the execution count.
+nbsphinx_output_prompt = 'Out[%s]:' # Output prompt for code cells. %s is replaced by the execution count.
 
 # -- Options for Breathe Doxygen <-> Sphinx bridge ------------------------
 breathe_projects = {'tracktable_cpp': 'readthedocs/doxygen/doxyxml'}
