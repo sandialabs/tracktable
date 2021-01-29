@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -58,11 +58,11 @@ compare_vectors(
     std::cout << "ERROR: compare_vectors ("
               << description
               << "): Vectors differ in size.  Expected "
-              << expected.size() 
+              << expected.size()
               << " but got "
               << actual.size()
               << ".\n";
-    return 1; 
+    return 1;
   }
 
   for (std::size_t i = 0; i < expected.size(); ++i)
@@ -75,7 +75,7 @@ compare_vectors(
       std::cout << "ERROR: compare_vectors ("
                 << description
                 << "): Element "
-                << i 
+                << i
                 << " does not match expected value. "
                 << "Expected " << expected[i]
                 << ", got " << actual[i]
@@ -87,9 +87,9 @@ compare_vectors(
 
 //----------------------------------------------------
 
-TerrestrialTrajectoryPoint 
-create_terrestrial_trajectory_point(double longitude, 
-                                    double latitude, 
+TerrestrialTrajectoryPoint
+create_terrestrial_trajectory_point(double longitude,
+                                    double latitude,
                                     std::string const& id=std::string())
 {
     TerrestrialTrajectoryPoint point;
@@ -107,17 +107,17 @@ int test_terrestrial_dg_by_distance()
   int error_count = 0;
 
   double terrestrial_coordinates[][2] = {
-    {0, 80}, 
+    {0, 80},
     {90, 80},
     {180, 80},
     {-90, 80},
     {0, 80},
     {-1000, -1000}
   };
-  
+
   TerrestrialTrajectory trajectory;
   int i = 0;
-  while (terrestrial_coordinates[i][0] > -1000) 
+  while (terrestrial_coordinates[i][0] > -1000)
   {
     trajectory.push_back(
       create_terrestrial_trajectory_point(
@@ -129,7 +129,7 @@ int test_terrestrial_dg_by_distance()
   }
 
   std::vector<double> terrestrial_dg = tracktable::distance_geometry_by_distance(trajectory, 4);
-  
+
   // As counterintuitive as it may appear, these values are actually correct.
   // The sample trajectory is a circle around the North Pole at latitude 80N.
   // When we compute distances on the sphere, we do so with great-circle arcs.
@@ -137,11 +137,11 @@ int test_terrestrial_dg_by_distance()
   // the "horizontal" (constant-latitude) segments that humans will naturally
   // draw for the trajectory.
   std::vector<double> expected_dg_values = {
-    0.0, 
-    0.708916, 
-    0.708916, 
-    0.793393, 
-    0.710916, 
+    0.0,
+    0.708916,
+    0.708916,
+    0.793393,
+    0.710916,
     0.793393,
     0.999999,
     0.999999,

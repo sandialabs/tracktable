@@ -16,8 +16,8 @@ page](https://tracktable.sandia.gov).
 # Getting Tracktable
 
 Our main Git repository is at <https://github.com/sandialabs/tracktable.git>.
-We also upload Python wheels to [PyPI](https://pypi.org) so you can 
-'pip install tracktable' on most recent distributions.  
+We also upload Python wheels to [PyPI](https://pypi.org) so you can
+'pip install tracktable' on most recent distributions.
 
 If you choose to build from source, installation instructions are in
 the Git repository as part of the documentation.
@@ -34,14 +34,14 @@ in Python as well as Pyshp for shapefile read/write support.
 
 # Using Tracktable
 
-Our documentation is hosted at <https://tracktable.readthedocs.org>.  
-We distribute Tracktable under a 3-clause BSD license whose text is 
-included in the source distribution as well as on 
+Our documentation is hosted at <https://tracktable.readthedocs.org>.
+We distribute Tracktable under a 3-clause BSD license whose text is
+included in the source distribution as well as on
 [our web site](https://tracktable.sandia.gov/license.html "Tracktable License").
 
 ### Copyright Notice
 
-Copyright (c) 2014-2020 National Technology and Engineering
+Copyright (c) 2014-2021 National Technology and Engineering
 Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 with National Technology and Engineering Solutions of Sandia, LLC,
 the U.S. Government retains certain rights in this software.

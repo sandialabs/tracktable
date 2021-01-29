@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -67,7 +67,7 @@ int check_for_log_message(
 		if (did_print)
 		{
 			std::cerr << "ERROR: check_for_log_message: Log message at level "
-					  << probe_level << " printed unexpectedly.\n";					
+					  << probe_level << " printed unexpectedly.\n";
 		}
 		else
 		{
@@ -96,14 +96,14 @@ int test_log_level(tracktable::log::severity_level level,
  	num_errors += check_for_log_message(tl::warning, (tl::warning >= level), outbuf);
  	num_errors += check_for_log_message(tl::error, (tl::error >= level), outbuf);
  	num_errors += check_for_log_message(tl::fatal, (tl::fatal >= level), outbuf);
- 		
+
  	return num_errors;
 }
 
 
 int main(int /*argc*/, char** /*argv*/)
 {
-	// We want Boost to write log messages to a std::ostringstream so that we 
+	// We want Boost to write log messages to a std::ostringstream so that we
 	// can examine what's been written.
 	namespace sinks = boost::log::sinks;
 	typedef sinks::synchronous_sink< sinks::text_ostream_backend > text_sink;
@@ -112,7 +112,7 @@ int main(int /*argc*/, char** /*argv*/)
 	std::ostringstream outbuf;
  	ostringstream_ptr outbuf_ptr(&outbuf, boost::null_deleter());
 	sink->locked_backend()->add_stream(outbuf_ptr);
-	
+
 	int num_errors = 0;
 
 	num_errors += test_log_level(tracktable::log::trace, outbuf_ptr);

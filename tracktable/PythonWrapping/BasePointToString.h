@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -30,7 +30,7 @@
 
 /*
  * BasePointToString - Methods usable by Boost.Python to convert
- * a base_point_type (in whatever domain) to a string, both 
+ * a base_point_type (in whatever domain) to a string, both
  * human-readable and Python repr() versions.
  */
 
@@ -59,8 +59,8 @@ namespace tracktable { namespace python_wrapping {
  * implement both of those.  You do have to initialize it with
  * the Python name you want to use in repr().  See the class
  * base_point_to_string_methods for an example of how to do that
- * and the function install_base_point_wrappers() in 
- * tracktable/PythonWrapping/TerrestrialDomainModule.cpp 
+ * and the function install_base_point_wrappers() in
+ * tracktable/PythonWrapping/TerrestrialDomainModule.cpp
  * to see how it's called at runtime.
  */
 

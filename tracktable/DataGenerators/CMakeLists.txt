@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2020 National Technology and Engineering Solutions of
+# Copyright (c) 2014-2021 National Technology and Engineering Solutions of
 # Sandia, LLC. Under the terms of Contract DE-NA0003525 with National Technology
 # and Engineering Solutions of Sandia, LLC, the U.S. Government retains certain
 # rights in this software.
@@ -49,7 +49,7 @@ add_custom_target( TracktableDataGenerators
     )
 
 # And this puts those files in their own folder in Visual Studio.
-source_group( "Header Files" 
+source_group( "Header Files"
     ${DataGenerators_HEADERS}
     )
 
