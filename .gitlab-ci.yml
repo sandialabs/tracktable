@@ -8,12 +8,9 @@ compile-win:
   script:
     - xcopy * C:\Git\tracktable /E /H /Y
     - cd C:\TrackTable
-    - set HTTP_PROXY=http://proxy.sandia.gov:80
-    - set HTTPS_PROXY=http://proxy.sandia.gov:80
-     - set NO_PROXY=*.sandia.gov,127.0.0.1,localhost
     - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" ALL_BUILD.vcxproj /t:Rebuild /p:Configuration=Release /m:8'
     - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process --output-on-failure -C Release'
-  retry: 2
+  retry: 1
 
 compile-macos:
   stage: build
@@ -24,4 +21,4 @@ compile-macos:
     - make -j8
     - cmake .
     - ctest . --output-on-failure
-  retry: 2
+  retry: 1
