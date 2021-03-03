@@ -171,6 +171,10 @@ def render_trajectories(trajectories, backend='', **kwargs):
         filename (str): Path and filename to save the results to, if
             save is set to True. If no filename is given, a default
             filename including the timestamp is used.
+        tiles (str): Map tiles to use during image generation, the name
+            or server url can be used. Options include OpenStreetMaps,
+            StamenTerrain, StamenToner, StamenWatercolor, CartoDBPositron
+            CartoDBDark_Matter.
 
     """
 

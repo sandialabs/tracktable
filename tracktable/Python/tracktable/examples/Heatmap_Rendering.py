@@ -26,37 +26,27 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# # Example: Rendering a heat map
-#
-# Purpose: Sample code to render heatmap of points
+"""
+Heat Map Rendering Example
 
-# Imports
+Purpose: Sample code to render heatmap of points
+"""
+
 from tracktable.domain.terrestrial import TrajectoryPointReader
 from tracktable.render import mapmaker
 from tracktable.render.histogram2d import render_histogram
 from tracktable.render import maps
 from tracktable.core import data_directory
+
 from matplotlib import pyplot
 import os.path
+import sys
 
-
-# First we set up our point source by reading points from a file. Then we dump the points to a list.
-# We do not care about extra data in this example, so we leave all the column fields as default.
-points = []
-data_filename = os.path.join(data_directory(), 'SampleHeatmapPoints.csv')
-with open(data_filename, 'r') as inFile:
-    reader = TrajectoryPointReader()
-    reader.input = inFile
-    reader.comment_character = '#'
-    reader.field_delimiter = ','
-    for point in reader:
-        points.append(point)
-
-
-# Now we generate a map and create a heatmap from the points we generated.
+# Generate a map and create a heatmap from the points we generated.
+# The type of map, colors, scaling can be customised depending the
+# on the desired look and feel of the finished map.
 # Set up the canvas and map projection
-
-# Set up a bounding box based off of a default
+# Grab default bounding box
 def get_bbox(area, domain):
     coords = []
     location = maps.CONVENIENCE_MAPS[area]
@@ -66,14 +56,32 @@ def get_bbox(area, domain):
     coords.append(location['max_corner'][1])
     return mapmaker._make_bounding_box(coords, domain)
 
-# 100 DPI * (8,6) gives an 800X600 pixel image
-figure = pyplot.figure(dpi=100, figsize=(8,6))
-(mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
-                                        map_name='region:conus')
+def main():
+    # First we set up our point source by reading points from a file.
+    # Then we dump the points to a list. We do not care about extra data in this example,
+    # so we leave all the column fields as default.
+    # The data file we use here is bundled with Tracktable.
+    points = []
+    data_filename = os.path.join(data_directory(), 'SampleHeatmapPoints.csv')
+    with open(data_filename, 'r') as inFile:
+        reader = TrajectoryPointReader()
+        reader.input = inFile
+        reader.comment_character = '#'
+        reader.field_delimiter = ','
+        for point in reader:
+            points.append(point)
 
-bbox = get_bbox('conus', 'terrestrial')
-heatmap.render_histogram(mymap,
-                         point_source=points,       # Our list of points we created above
-                         bounding_box = bbox,       # Bounding box is generated from mymap
-                         bin_size=0.25,
-                         color_map='gist_heat')
+    # 100 DPI * (8, 6) gives an 800x600-pixel image
+    figure = pyplot.figure(dpi=100, figsize=(8, 6))
+    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
+                                            map_name='region:conus')
+    bbox = get_bbox('conus', 'terrestrial')
+    render_histogram(map_projection=mymap,
+                    point_source=points,       # Our list of points we created above
+                    bounding_box = bbox,       # Bounding box is generated from mymap
+                    bin_size=0.25,
+                    colormap='gist_heat')
+    pyplot.show()
+
+if __name__ == '__main__':
+    sys.exit(main())
