@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -330,7 +330,7 @@ def test_render_trajectories(ground_truth_path, test_output_path,
                                                      ground_truth_path,
                                                      test_output_path,
                                                      ignore_uuids=True)
-    return num_errors 
+    return num_errors
 
 # ----------------------------------------------------------------------
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -34,7 +34,7 @@
 
 // This function should match what's in operator<<(ostream, FeatureVector).
 template<std::size_t dim>
-std::string 
+std::string
 expected_string_representation(
   tracktable::domain::feature_vectors::FeatureVector<dim> const& my_feature_vector
   )
@@ -65,7 +65,7 @@ int test_feature_vector_to_string()
 
   std::ostringstream outbuf;
   outbuf << my_feature_vector;
-  if (outbuf.str() != expected_string_representation(my_feature_vector)) 
+  if (outbuf.str() != expected_string_representation(my_feature_vector))
   {
     std::cerr << "ERROR: Expected FeatureVector operator<< to return '"
               << expected_string_representation(my_feature_vector)
@@ -77,7 +77,7 @@ int test_feature_vector_to_string()
 }
 
 
-int 
+int
 main(int , char**)
 {
   int error_count = 0;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -38,9 +38,9 @@
  * C 44,33
  *
  * Since the start and end points are the same, the convex hull lies
- * entirely on top of the line segment from A to B.  
+ * entirely on top of the line segment from A to B.
  *
- * Strictly speaking, the aspect ratio is indeed undefined.  The aspect 
+ * Strictly speaking, the aspect ratio is indeed undefined.  The aspect
  * ratio of a polygon, or indeed a general 2D point cloud, is the ratio
  * between its maximum and minimum eigenvalues.
  *
@@ -58,17 +58,17 @@
 #include <iostream>
 
 
-bool close_enough(double actual, double expected) 
+bool close_enough(double actual, double expected)
 {
   double residual = actual - expected;
   if (tracktable::almost_zero(expected))
   {
     return tracktable::almost_zero(residual);
-  } 
+  }
   else
   {
     std::cout << "close_enough: residual / expected is " << residual / expected << "\n";
-    std::cout << "almost_zero result is " 
+    std::cout << "almost_zero result is "
               << tracktable::almost_zero(residual / expected, 1e-5)
               << "\n";
     return tracktable::almost_zero(residual/expected, 1e-5);
@@ -80,7 +80,7 @@ int main(int /*argc*/, char* /*argv*/[])
   typedef tracktable::TrajectoryPoint<tracktable::PointLonLat> trajectory_point_type;
   typedef tracktable::Trajectory<trajectory_point_type> trajectory_type;
 
-  double corners[3][2] = { 
+  double corners[3][2] = {
       { 44, 33 },
       { 44.0769, 32.5862 },
       { 44, 33 }
@@ -96,7 +96,7 @@ int main(int /*argc*/, char* /*argv*/[])
   double perimeter = tracktable::convex_hull_perimeter(linestring);
 
   int error_count = 0;
-  if (!close_enough(aspect, 0)) 
+  if (!close_enough(aspect, 0))
   {
     ++error_count;
     std::cout << "ERROR: Aspect ratio: Expected 0, got " << aspect << "\n";
@@ -109,7 +109,7 @@ int main(int /*argc*/, char* /*argv*/[])
     ++error_count;
     std::cout << "ERROR: Perimeter: Expected 93.1411, got " << perimeter << "\n";
   }
-  
+
   return error_count;
 }
 

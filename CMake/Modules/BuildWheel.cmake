@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC . Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -67,7 +67,7 @@
 
 # Great.  First the wheel package drops the pep425tags module.  Then
 # pip drops it too.  Now the packaging package has removed the functions
-# in its tags() module that we used as a fallback.  
+# in its tags() module that we used as a fallback.
 #
 # Let's see if this helps...
 #
@@ -83,7 +83,7 @@
 function(_get_python_version_tag _python_interpreter _output_var)
   if (WIN32)
     # The above approach doesn't work on Windows -- sysconfig config vars
-    # are much sparser.  I give up.  On Windows we're just going to 
+    # are much sparser.  I give up.  On Windows we're just going to
     # assume that this is CPython.
     execute_process(
       COMMAND

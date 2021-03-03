@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -147,7 +147,7 @@ if (TEST_MOVIES)
   #  ${EXAMPLES}/data/SamplePointsCartesian.csv
   #  ${Tracktable_BINARY_DIR}/TestOutput/test_parallel_cartesian_trajectory_movie.m4v
   #  )
-    
+
   #add_python_test(
   #  P_TerrestrialTrajectoryMovieExample_Points
   #  ${EXAMPLE_MODULE}.movie_from_points

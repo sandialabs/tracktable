@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -33,9 +33,9 @@
 //
 // Boost.Python code to expose std::vector<float> and std::vector<double>
 // with interfaces that look like Python lists
-// 
+//
 // Based on Boost.Python documentation and code at the following web page:
-// 
+//
 // https://riptutorial.com/boost/example/25280/wrapping-std--vector-in-boost-python
 
 #include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>

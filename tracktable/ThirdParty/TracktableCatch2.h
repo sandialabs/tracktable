@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -30,8 +30,8 @@
 
 
 // Catch2 is a header-only test framework that we are starting to use for
-// test cases.  
-// 
+// test cases.
+//
 // Include this file at the top of your test case.  Mike S. is going to
 // teach us soon how to write test cases using Catch2.
 

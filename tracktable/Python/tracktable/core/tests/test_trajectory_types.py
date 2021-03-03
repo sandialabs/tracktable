@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -91,7 +91,7 @@ def test_trajectory():
     round_trip = [ boston, miami, san_francisco, boston_return ]
 
     my_trajectory = TerrestrialTrajectory.from_position_list(round_trip)
-    
+
     print("Testing insert")
     my_trajectory.insert(3, seattle)
     test_point = my_trajectory[3]
@@ -100,7 +100,7 @@ def test_trajectory():
         sys.stderr.write(str(seattle))
         sys.stderr.write('\n')
         sys.stderr.write(str(my_trajectory[0]))
-        sys.stderr.write('\n')    
+        sys.stderr.write('\n')
 
         print("Testing clone")
     copied_trajectory = my_trajectory.clone()
@@ -109,8 +109,8 @@ def test_trajectory():
     copied_trajectory[0][0] = 0.0
     if my_trajectory[0][0] == 0.0:
         sys.stderr.write('ERROR: Cloned trajectory not a deep copy')
-        error_count += 1        
-    
+        error_count += 1
+
     print("Testing from_position_list")
     if len(my_trajectory) != 5:
         sys.stderr.write('ERROR: Expected length of trajectory to be 5 points but it was {}\n'.format(len(my_trajectory)))
@@ -143,7 +143,7 @@ def test_trajectory():
     delta = my_trajectory[-1].timestamp - right_now
     expected_first_quarter_time = right_now + (delta // 4)
     error_count += verify_time(expected_first_quarter_time, first_quarter_time, "Time at fraction 0.25")
-        
+
     print("Testing time_at_fraction, 0.75")
     last_quarter_time = geomath.time_at_fraction(my_trajectory, 0.75)
     delta = my_trajectory[-1].timestamp - right_now
@@ -196,7 +196,7 @@ def test_trajectory():
     expected_third_quarter_point = TerrestrialTrajectoryPoint(-122.3331, 47.6097)
     expected_third_quarter_point.timestamp = right_now + datetime.timedelta(hours = 12)
     error_count += verify_point(expected_third_quarter_point,third_quarter_point, "Point at fraction 0.75")
-        
+
     print("Testing point_at_time_fraction, 0.5")
     mid_point =  geomath.point_at_time_fraction(my_trajectory, 0.5)
     expected_mid_point = TerrestrialTrajectoryPoint(-122.4167, 37.7833)
@@ -207,36 +207,36 @@ def test_trajectory():
     start_point =  geomath.point_at_time_fraction(my_trajectory, 0.0)
     expected_start_point = TerrestrialTrajectoryPoint(-71.0636, 42.3581)
     expected_start_point.timestamp = right_now
-    error_count += verify_point(expected_start_point,start_point, "Point at fraction 0.0")  
+    error_count += verify_point(expected_start_point,start_point, "Point at fraction 0.0")
 
     print("Testing point_at_time_fraction, 1.0")
     end_point =  geomath.point_at_time_fraction(my_trajectory, 1.0)
     expected_end_point = TerrestrialTrajectoryPoint(-71.0636, 42.3581)
     expected_end_point.timestamp = right_now + datetime.timedelta(hours = 16)
-    error_count += verify_point(expected_end_point,end_point, "Point at fraction 1.0")  
-        
+    error_count += verify_point(expected_end_point,end_point, "Point at fraction 1.0")
+
     print("Testing point_at_time_fraction, -0.5")
     before_point =  geomath.point_at_time_fraction(my_trajectory, -0.5)
     expected_before_point = TerrestrialTrajectoryPoint(-71.0636, 42.3581)
     expected_before_point.timestamp = right_now
-    error_count += verify_point(expected_before_point,before_point, "Point at fraction -0.5")    
+    error_count += verify_point(expected_before_point,before_point, "Point at fraction -0.5")
 
     print("Testing point_at_time_fraction, 1.5")
     after_point =  geomath.point_at_time_fraction(my_trajectory, 1.5)
     expected_after_point = TerrestrialTrajectoryPoint(-71.0636, 42.3581)
     expected_after_point.timestamp = right_now + datetime.timedelta(hours = 16)
-    error_count += verify_point(expected_after_point,after_point, "Point at fraction 1.5")  
-        
+    error_count += verify_point(expected_after_point,after_point, "Point at fraction 1.5")
+
     print("Testing point_at_time_fraction, 0.33")
     first_third_point =  geomath.point_at_time_fraction(my_trajectory, 1.0/3.0)
     expected_first_third_point = TerrestrialTrajectoryPoint(-92.9849, 31.3181)
     expected_first_third_point.timestamp = (right_now + (my_trajectory[-1].timestamp - right_now)//3)
-    error_count += verify_point(expected_first_third_point,first_third_point, "Point at fraction 0.33")  
+    error_count += verify_point(expected_first_third_point,first_third_point, "Point at fraction 0.33")
 
     print("Testing point_at_time_fraction, No Points")
     no_point = geomath.point_at_time_fraction(empty_trajectory, 0.5)
     empty_point = TerrestrialTrajectoryPoint.zero()
-    error_count += verify_point(no_point,empty_point, "Point at fraction (no points)")  
+    error_count += verify_point(no_point,empty_point, "Point at fraction (no points)")
 
     print("Testing point_at_length_fraction, 0.25")
     first_quarter_point =  geomath.point_at_length_fraction(my_trajectory, 0.25)
@@ -249,7 +249,7 @@ def test_trajectory():
     expected_third_quarter_point = TerrestrialTrajectoryPoint(-106.489, 48.5709)
     expected_third_quarter_point.timestamp = third_quarter_point.timestamp
     error_count += verify_point(expected_third_quarter_point,third_quarter_point, "Point at length fraction 0.75")
-        
+
     print("Testing point_at_length_fraction, 0.5")
     mid_point =  geomath.point_at_length_fraction(my_trajectory, 0.5)
     expected_mid_point = TerrestrialTrajectoryPoint(-116.267, 37.0967)
@@ -260,58 +260,58 @@ def test_trajectory():
     start_point =  geomath.point_at_length_fraction(my_trajectory, 0.0)
     expected_start_point = TerrestrialTrajectoryPoint(-71.0636, 42.3581)
     expected_start_point.timestamp = right_now
-    error_count += verify_point(expected_start_point,start_point, "Point at length fraction 0.0")  
+    error_count += verify_point(expected_start_point,start_point, "Point at length fraction 0.0")
 
     print("Testing point_at_length_fraction, 1.0")
     end_point =  geomath.point_at_length_fraction(my_trajectory, 1.0)
     expected_end_point = TerrestrialTrajectoryPoint(-71.0636, 42.3581)
     expected_end_point.timestamp = right_now + datetime.timedelta(hours = 16)
-    error_count += verify_point(expected_end_point,end_point, "Point at length fraction 1.0")  
-        
+    error_count += verify_point(expected_end_point,end_point, "Point at length fraction 1.0")
+
     print("Testing point_at_length_fraction, -0.5")
     before_point =  geomath.point_at_length_fraction(my_trajectory, -0.5)
     expected_before_point = TerrestrialTrajectoryPoint(-71.0636, 42.3581)
     expected_before_point.timestamp = right_now
-    error_count += verify_point(expected_before_point,before_point, "Point at length fraction -0.5")    
+    error_count += verify_point(expected_before_point,before_point, "Point at length fraction -0.5")
 
     print("Testing point_at_length_fraction, 1.5")
     after_point =  geomath.point_at_length_fraction(my_trajectory, 1.5)
     expected_after_point = TerrestrialTrajectoryPoint(-71.0636, 42.3581)
     expected_after_point.timestamp = right_now + datetime.timedelta(hours = 16)
-    error_count += verify_point(expected_after_point,after_point, "Point at length fraction 1.5")  
-        
+    error_count += verify_point(expected_after_point,after_point, "Point at length fraction 1.5")
+
     print("Testing point_at_length_fraction, 0.33")
     first_third_point =  geomath.point_at_length_fraction(my_trajectory, 1.0/3.0)
     expected_first_third_point = TerrestrialTrajectoryPoint(-96.4035, 32.5023)
     expected_first_third_point.timestamp = first_third_point.timestamp
-    error_count += verify_point(expected_first_third_point,first_third_point, "Point at length fraction 0.33")  
+    error_count += verify_point(expected_first_third_point,first_third_point, "Point at length fraction 0.33")
 
     print("Testing point_at_length_fraction, No Points")
     no_point = geomath.point_at_length_fraction(empty_trajectory, 0.5)
     empty_point = TerrestrialTrajectoryPoint.zero()
-    error_count += verify_point(no_point,empty_point, "Point at length fraction (no points)")   
-    
+    error_count += verify_point(no_point,empty_point, "Point at length fraction (no points)")
+
     print("Testing interpolation at timestamp before trajectory")
     before_time = right_now - datetime.timedelta(hours = 4)
     before_point = geomath.point_at_time(my_trajectory, before_time);
-    error_count += verify_point(boston,before_point, "Point at time (-4 hours)")  
+    error_count += verify_point(boston,before_point, "Point at time (-4 hours)")
 
     print("Testing interpolation at start timestamp of trajectory")
     start_time = right_now
     start_point = geomath.point_at_time(my_trajectory, start_time);
-    error_count += verify_point(boston,start_point, "Point at time (0 hours)")  
+    error_count += verify_point(boston,start_point, "Point at time (0 hours)")
 
     print("Testing interpolation at first third timestamp of trajectory")
     first_third_time = right_now + datetime.timedelta(hours = 16.0/3.0)
     first_third_point = geomath.point_at_time(my_trajectory, first_third_time);
     expected_first_third_point = TerrestrialTrajectoryPoint(-92.9849, 31.3181)
     expected_first_third_point.timestamp = right_now + datetime.timedelta(hours = 16.0/3.0)
-    error_count += verify_point(expected_first_third_point,first_third_point, "Point at time (+5.33 hours)") 
+    error_count += verify_point(expected_first_third_point,first_third_point, "Point at time (+5.33 hours)")
 
     print("Testing interpolation at mid timestamp of trajectory")
     mid_time = right_now + datetime.timedelta(hours = 8)
     mid_point = geomath.point_at_time(my_trajectory, mid_time);
-    error_count += verify_point(san_francisco,mid_point, "Point at time (+8 hours)") 
+    error_count += verify_point(san_francisco,mid_point, "Point at time (+8 hours)")
 
     print("Testing interpolation at end timestamp of trajectory")
     end_time = right_now + datetime.timedelta(hours = 16)
@@ -322,7 +322,7 @@ def test_trajectory():
     after_time = right_now + datetime.timedelta(hours = 20)
     after_point = geomath.point_at_time(my_trajectory, after_time);
     error_count += verify_point(boston_return,after_point, "Point at time (+20 hours)")
-    
+
     print("Testing interpolation at timestamp with no points trajectory")
     no_point = geomath.point_at_time(empty_trajectory, right_now + datetime.timedelta(hours = 8))
     empty_point = TerrestrialTrajectoryPoint.zero()
