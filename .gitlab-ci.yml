@@ -21,4 +21,4 @@ compile-macos:
     - make -j8
     - cmake .
     - ctest . --output-on-failure
-  retry: 2
+  retry: 1
