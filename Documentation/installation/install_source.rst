@@ -37,7 +37,7 @@ Tracktable has the following required dependencies:
 Python
 ^^^^^^
 
-* Python 3.5, 3.6, or 3.7 - https://www.python.org/
+* Python 3.5 or newer - https://www.python.org/
 
   .. note:: Tracktable 1.1 was the last version to officially support Python 2.7.
 * NumPy 1.7+ - https://numpy.org/
@@ -60,13 +60,14 @@ Python
 C++
 ^^^
 
-* Compiler Options
+Tracktable requires a C++14-capable compiler as of release 1.5.
 
-  * GCC 4.4.7 or newer (https://gcc.gnu.org/),
-  * clang 3.5 or newer (http://clang.llvm.org)
-  * Visual Studio 14 2015 or newer (https://visualstudio.microsoft.com)
+* Compiler Options  
+  * GCC 5.2 or newer (https://gcc.gnu.org/),
+  * Clang 3.5 or newer (http://clang.llvm.org)
+  * Visual Studio (15) 2017 or newer (https://visualstudio.microsoft.com)
 * GEOS library - https://trac.osgeo.org/geos
-* Boost 1.67 or newer - https://www.boost.org/
+* Boost 1.74 or newer - https://www.boost.org/
 
   .. tip:: Windows users can find pre-built Boost binaries at https://sourceforge.net/projects/boost/files/boost-binaries/
   .. hint:: Windows users should remember to add the path of the Boost installation
@@ -123,7 +124,7 @@ If you want to render movies you will need FFMPEG:
 Other
 ^^^^^
 
-* CMake 3.12+ - https://cmake.org/
+* CMake 3.19.5 or newer - https://cmake.org/
 * TQDM (Optional for movie rendering examples) - https://tqdm.github.io/
 
 Build Notes for Dependencies Built from Source
@@ -151,7 +152,7 @@ If you really do have to build Boost from source -- for example, if
 you had to build your own Python installation -- then make sure to
 configure it to use the proper Python installation. Information about
 how to do this can be found in the ``Boost.Python`` documentation at
-https://www.boost.org/doc/libs/1_67_0/libs/python/doc/html/building/
+https://www.boost.org/doc/libs/1_74_0/libs/python/doc/html/building/
 
 One final note: We know that it's a pain to try to keep up with recent
 versions of a library as big as Boost. We will not require a newer
