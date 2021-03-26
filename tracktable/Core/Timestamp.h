@@ -50,7 +50,9 @@
 #include <tracktable/Core/WarningGuards/PushWarningState.h>
 #include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
 #include <boost/date_time.hpp>
+#include <boost/serialization/split_free.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/gregorian/greg_serialize.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/time_serialize.hpp>
