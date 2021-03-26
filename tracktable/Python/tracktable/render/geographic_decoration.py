@@ -348,9 +348,6 @@ def fill_land(map_axes,
     Returns:
        A list of Matplotlib artists added to the map.
 
-    TODO:
-      Is this the method that mapmaker actually uses?
-
     """
 
     landmass = cartopy.feature.NaturalEarthFeature(

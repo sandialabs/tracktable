@@ -182,11 +182,12 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 include(CMakeDependentOption)
 option(BUILD_SHARED_LIBS "Build shared libraries.  Required for Python wrapping." ON)
 CMAKE_DEPENDENT_OPTION(
-  TRACKTABLE_PYTHON "Build and install tracktable's python bindings." ON
+  TRACKTABLE_PYTHON "Build and install Tracktable's Python bindings." ON
   "BUILD_SHARED_LIBS" OFF)
-option(BUILD_EXAMPLES "Build tracktable example programs" ON)
+option(BUILD_EXAMPLES "Build Tracktable example programs" ON)
 option(BUILD_DOCUMENTATION "Build Python and C++ documentation for Tracktable." OFF)
 option(BUILD_DOCUMENTATION_CXX_ONLY "Build only C++ documentation for Tracktable." OFF)
+
 set(PYTHON_INSTALL_PREFIX "Python/tracktable" CACHE PATH "Install directory for python modules" )
 set(Python3_EXECUTABLE "" CACHE FILEPATH "Python executable for running tests and compiling modules")
 set(Python3_ROOT_DIR "" CACHE PATH "Location of python installation for running tests and compiling modules")
@@ -200,7 +201,7 @@ set(Python3_ROOT_DIR "" CACHE PATH "Location of python installation for running 
 # Look for python early if we're going to build the wrappers
 # These symbols are also used to look for Sphinx
 if (TRACKTABLE_PYTHON)
-  message(STATUS "Building and installing python bindings")
+  message(STATUS "Building and installing Python bindings")
   if (UNIX AND APPLE)
     find_package(Python3 COMPONENTS Interpreter Development)
   else (UNIX AND APPLE)
@@ -281,13 +282,9 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
       endif (NOT Sphinx_FOUND)
 
       find_python_module(sphinx SPHINX_MODULE_STATUS SPHINX_MODULE_LOCATION)
-
       find_python_module(sphinx_rtd_theme SPHINX_RTD_THEME_MODULE_STATUS SPHINX_RTD_THEME_MODULE_LOCATION)
-
       find_python_module(nbsphinx NBSPHINX_MODULE_STATUS NBSPHINX_MODULE_LOCATION)
-
       find_python_module(nbsphinx_link NBSPHINX_LINK_MODULE_STATUS NBSPHINX_LINK_MODULE_LOCATION)
-
       find_python_module(breathe BREATHE_MODULE_STATUS BREATHE_MODULE_LOCATION)
 
       set(Sphinx_BUILD_DIR "${DOC_BINARY_DIR}/_build")

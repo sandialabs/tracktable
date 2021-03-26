@@ -52,9 +52,10 @@ class RTree(object):
     def points(self):
         """Return the points currently held in the r-tree
 
-        NOTE: this will return the points as originally supplied by
-        the user, not the feature vectors that actually populate the
-        tree.
+        Note:
+            This will return the points as originally supplied by
+            the user, not the feature vectors that actually populate the
+            tree.
 
         Returns: Sequence of points originally supplied
         """
@@ -69,8 +70,9 @@ class RTree(object):
         with dimension between 1 and 30. A new R-tree will be
         initialized with copies of those points.
 
-        NOTE: This version of the code does indeed copy the points. A
-        future version might get around that.
+        Note:
+            This version of the code does indeed copy the points. A
+            future version might get around that.
 
         Args:
            new_points (list): List of points to use
@@ -96,8 +98,10 @@ class RTree(object):
         """Find points near a search point
 
         Finds the K nearest neighbors to a search point.
-        Note that if the search point is already present in the R-tree
-        then it will be one of the results returned.
+
+        Note:
+            That if the search point is already present in the R-tree
+            then it will be one of the results returned.
 
         Args:
            seed_point (Tracktable point): Point whose neighbors you want to find

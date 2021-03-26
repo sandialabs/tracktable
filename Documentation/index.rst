@@ -5,36 +5,31 @@ Tracktable: Trajectory Analysis and Rendering
 =============================================
 
 Hello! Welcome to the Tracktable documentation. Here you will find
-information and examples pretaining to the installation and usage of
+information and examples pertaining to the installation and usage of
 the Tracktable library.
 
 Tracktable's Purpose
 ====================
 
 Tracktable's purpose is to load, assemble, analyze and render the
-paths traced out by moving objects. We combine the best tools and
-techniques we can find from both Python and C++ with the intent of
-making all of our capabilities easily accessible from both languages.
-Our goal is to make it easy to...
+paths traced out by moving objects, which we call _trajectories_. 
+We combine the best tools and techniques we can find from both Python and C++ with the intent of making all of our capabilities easily accessible from both languages. Our goal is to make it easy to...
 
-* Render trajectories as histograms (heatmaps), track
-  plots and movies.
-* Run heavy-duty analysis in C++ and manipulate the results quickly in
-  Python.
+* Render trajectories as histograms (heatmaps), track plots and movies.  In Tracktable 1.5.0, histograms are available as still images, track plots are available as still images and interactive maps, and movies can be written in any format supported by FFMPEG supports.
+* Run heavy-duty analysis in C++ and manipulate the results quickly in Python, including Jupyter notebooks.  Our core data structures and algorithms are implemented in C++ for speed.  
 * Couple algorithms from top to bottom:
 
-  - Databases to store raw data
+  - Easy I/O to and from delimited text files
 
   - Perform filtering and cleaning techniques to assemble points into
     trajectories
 
-  - Perform computational geometry to characterize trajectories
+  - Characterize trajectories using features derived from computational geometry 
 
-  - Clustering and spatial data structures to find groups
+  - Find clusters and similar trajectories 
 
-  - Visualization to help communicate findings
+  - Communicate findings with visualization
 
-* Have fun!
 
 Tracktable's Target Audience
 ============================
@@ -46,30 +41,39 @@ by a variety of moving objects such as ships, airplanes and cars.
 Tracktable's Capabilities
 =========================
 
-Tracktable's core capabilities consist of the following functionality:
+Tracktable's core capabilities include these features:
 
 * DBSCAN Clustering
-* Multilevel Distance Geometry
-* Data Generation
-* Mathematic Conversions
-* Trajectory Assembly
-* Trajectory Filtering
-* Trajectory Predictions (RTree)
-* Point & Trajectory Domains
 
-  * Terrestrial (Longitude, Latitude)
-  * Cartesian
-  * Feature Vectors
+* Multilevel Distance Geometry
+
+* Data Generation
+
+* Conversions Between Units
+
+* Trajectory Assembly
+
+* Trajectory Filtering
+
+* Trajectory Prediction
+
+* Geographic and Cartesian Coordinate Systems
+
 * Point & Trajectory IO
 
-  * CSV
-  * TSV
-  * Keyhole Markup Language (Output Only)
+  * Delimited text files (most commonly comma- and tab-separated values)
+
+  * Keyhole Markup Language (KML) (Output Only)
+
 * Visualization
 
   * Histograms (Heatmaps)
+
   * Track Plots
+
   * Movies
+
+.. _tracktable_contacts:
 
 Tracktable Contacts
 ===================
@@ -77,11 +81,8 @@ Tracktable Contacts
 If you come across problems, please tell us about them so that we can
 improve Tracktable in the future!
 
-For questions, bug reports or contributions contact:
+To reach us with questions, bug reports, suggestions and contributions, please use the `Contact Us <https://tracktable.sandia.gov/contact-us.html>`_ page on Tracktable's `web site <https://tracktable.sandia.gov>`_.  For more detailed discussion, consider joining one of our mailing lists:
 
-* **Andrew T. Wilson** | atwilso@sandia.gov
-
-We maintain the following mailing lists for Tracktable:
 
 .. csv-table::
    :header: "Mailing List", "Join Address", "Post Address", "Purpose", "Traffic"
@@ -104,7 +105,9 @@ Documentation
    /user_guides/user_guides.rst
    /examples/examples.rst
    /api/api.rst
+   common_errors.rst
    credits.rst
+   changelog.rst
    todo.rst
 
 Indices & Tables

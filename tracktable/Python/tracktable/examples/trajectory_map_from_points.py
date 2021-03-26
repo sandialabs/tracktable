@@ -29,8 +29,9 @@
 
 """trajectory_map_from_csv.py - Render trajectories on a map
 
-NOTE: Cartopy v0.18.0 is required to successfully render maps and pass
-our internal tests.
+Note:
+    Cartopy v0.18.0 is required to successfully render maps and pass
+    our internal tests.
 
 This is both an example of how to use the library and a convenient
 script that you can use to get started quickly.  You must provide as
@@ -140,7 +141,8 @@ def assemble_trajectories(point_source,
     minimum number of points a trajectory must have in order to
     be worthy of consideration.
 
-    Note: This function does not actually build the trajectories.  It
+    Note:
+        This function does not actually build the trajectories.  It
         only sets up the pipeline to generate them.  Assembly does
         not happen until you start to pull elements from the iterable
         that gets returned.
@@ -408,7 +410,8 @@ def render_annotated_trajectories(trajectories,
         KeyError: The desired scalar is not present
         ValueError: linewidth_style is neither 'constant' nor 'taper'
 
-    NOTE: A gallery of Matplotlib colormaps can be found at
+    Note:
+        A gallery of Matplotlib colormaps can be found at
           https://matplotlib.org/3.1.1/gallery/color/colormap_reference.html
     """
 
@@ -572,12 +575,14 @@ def trajectory_points_from_file(
     Use tracktable.domain.<domain>.BasePointReader to read points from a file.
     Results are returned as an iterable.
 
-    Note: You can only iterate over the resulting point sequence once.  If you
-    need to do more than that, save the points in a list:
+    Note:
+        You can only iterate over the resulting point sequence once.  If you
+        need to do more than that, save the points in a list:
 
     >>> all_points = list(points_from_file(infile, 2, 3))
 
-    Note: The function 'extract_field_assignments_from_arguments' will help
+    Note:
+        The function 'extract_field_assignments_from_arguments' will help
         you pull out real_fields, string_fields, and time_fields from a
         set of parsed arguments.
 
@@ -713,7 +718,8 @@ def _extract_typed_field_assignments(arguments,
     Raises:
         ValueError: invalid field type
 
-    NOTE: Don't call this function directly unless you need the field
+    Note:
+        Don't call this function directly unless you need the field
         assignments for one specific data type.  Instead, call
         `extract_field_assignments`.
     """

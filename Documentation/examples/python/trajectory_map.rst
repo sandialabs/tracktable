@@ -1,4 +1,4 @@
-.. _Trajectory_Map_Example:
+.. _Python_Trajectory_Map_Example:
 
 ===========================================
 Rendering Trajectories from Points on a Map
@@ -8,7 +8,7 @@ Rendering Trajectories from Points on a Map
    is required to successfully render maps and pass our internal tests.
 
 .. note:: The images generated from the below commands will have a
-   large border around the rendered map, this is expected and correct.
+   large border around the rendered map; this is expected and correct.
 
 Terrestrial Trajectory Map
 --------------------------
@@ -17,14 +17,13 @@ As soon as we add timestamps to our (longitude, latitude) points we
 can sensibly assemble sequences of points into trajectories.
 Trajectories lend themselves to being plotted as lines on a map.
 We have provided a sample data set of fictitious trajectories between
-many of the world's busiest airports for you to use. All references to
-``TRACKTABLE`` in the commands below is refering to the
-directory where you unpacked/installed Tracktable.
+many of the world's busiest airports for you to use. In the examples below,
+``TRACKTABLE_HOME`` refers to the directory where you unpacked/installed Tracktable.
 
 .. code-block:: console
 
    $ python -m "tracktable.examples.trajectory_map_from_points" \
-       TRACKTABLE/examples/data/SampleTrajectories.csv \
+       TRACKTABLE_HOME/examples/data/SampleTrajectories.csv \
        TrajectoryMapExample1.png
 
 .. image:: /images/TrajectoryMapExample1.png
@@ -41,7 +40,7 @@ wider and change the color map.
    $ python -m "tracktable.examples.trajectory_map_from_points" \
        --trajectory-linewidth 2 \
        --trajectory-colormap winter \
-       TRACKTABLE/examples/data/SampleTrajectories.csv \
+       TRACKTABLE_HOME/examples/data/SampleTrajectories.csv \
        TrajectoryMapExample2.png
 
 .. image:: /images/TrajectoryMapExample2.png
@@ -62,7 +61,7 @@ population over half a million people.
        --map custom \
        --map-bbox -90 24 -60 50 \
        --draw-cities-larger-than 500000 \
-       TRACKTABLE/examples/data/SampleTrajectories.csv \
+       TRACKTABLE_HOME/examples/data/SampleTrajectories.csv \
        TrajectoryMapExample3.png
 
 .. image:: /images/TrajectoryMapExample3.png
@@ -83,7 +82,7 @@ overwhelmed. Don't forget the backslash (``\``) in front of ``--state-color`` va
        --map custom \
        --map-bbox -90 24 -60 50 \
        --draw-cities-larger-than 500000 \
-       TRACKTABLE/examples/data/SampleTrajectories.csv \
+       TRACKTABLE_HOME/examples/data/SampleTrajectories.csv \
        TrajectoryMapExample4.png
 
 .. image:: /images/TrajectoryMapExample4.png
@@ -96,7 +95,7 @@ continents, countries and states (US/Canada only at present). You can
 filter and draw city locations by population (given some minimum
 threshold) or by ranking. You can change the line style, appearance
 and color map for the rendered trajectories. All of this is explained
-in the :ref:`Tracktable_Python_User_Guide` and the
+in the :ref:`Tracktable_Python_User_Guide <tracktable_python_user_guide>` and the
 :ref:`API Reference Documentation <tracktable_api_label>`.
 
 Cartesian Trajectory Map
@@ -105,16 +104,16 @@ Cartesian Trajectory Map
 Since the addition of point domains we can use the
 same rendering code that draws on maps of the world to draw data in
 flat 2D Cartesian space. You need to specify ``--domain cartesian2d``
-and ``--map-bbox x y X Y``. All references to
-``TRACKTABLE`` in the command below is refering to the
-directory where you unpacked/installed Tracktable.
+and ``--map-bbox x y X Y``. In the example below,
+``TRACKTABLE_HOME`` refers to the directory where you
+unpacked/installed Tracktable.
 
 .. code-block:: console
 
     $ python -m "tracktable.examples.trajectory_map_from_points" \
          --map-bbox -100 -100 100 100 \
          --domain cartesian2d \
-         TRACKTABLE/examples/data/SamplePointsCartesian.csv \
+         TRACKTABLE_HOME/examples/data/SamplePointsCartesian.csv \
 	      trajectory_map_cartesian.png
 
 .. image:: /images/trajectory_map_cartesian.png

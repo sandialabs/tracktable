@@ -57,7 +57,7 @@ The predict example demonstrates:
     - Using command line factories to read points and assemble trajectories
     - Using boost program options to take parameters from command lines(in addition to the factories)
     - Conditioning trajectories based on length and objectid
-    - Using boost rtree to locate similar trajectories based on cartesion distance in feature space
+    - Using boost rtree to locate similar trajectories based on cartesian distance in feature space
 
 Typical use: '--string-field=dest x' is required
 

@@ -532,11 +532,13 @@ def resolve_dependencies_for_wheel(wheel_path,
 
     Returns: dict of {wheel_file: dependency_files}
 
-    Note: Before you copy files into the wheel, make sure to
+    Note:
+        Before you copy files into the wheel, make sure to
         remove anything that's already in the current directory
         of the file being examined.
 
-    Note: Windows also searches the registry key
+    Note:
+        Windows also searches the registry key
         HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\
         SessionManager\KnownDLLs.  We do not yet include those.
 

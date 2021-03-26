@@ -1,3 +1,5 @@
+.. _cpp_timestamp_reference:
+
 ====================
 Timestamp Module
 ====================

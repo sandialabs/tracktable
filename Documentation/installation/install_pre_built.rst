@@ -1,59 +1,94 @@
+.. _installing_pre_built_guide:
+
 Installing Pre-Built Tracktable
 ===============================
+
+.. attention:: For all installation issues and errors encountered
+   in the steps below refer to the
+   :ref:`Common Issues & Errors <common_issues_errors_installation>` Page.
+
+.. attention:: We **highly recommend** using Anaconda
+   to install and manage tracktable and it's dependencies.
 
 Pip
 ---
 
 As of Version 1.2, Tracktable is available on the Python Package Index
 (PyPI, https://pypi.org) and can be installed with ``pip`` as long as
-you're running Python 3.5 or newer. Use the following command:
+you're running Python 3.5 to Python 3.9. Use the following command:
 
-``pip install tracktable``
+.. code-block:: console
 
-.. note:: If this fails, look carefully at the error message. It is most
-    likely an error while trying to install `Cartopy
-    <https://scitools.org.uk/cartopy/docs/latest/>`_, a map rendering
-    toolkit that Tracktable uses to render images. This will show up as a
-    complaint about a ``GEOS`` version or a request for ``Proj 4.9.0``.
-
-    The solution is to install Cartopy yourself before you try to install
-    Tracktable.
-
-      * If you're using Anaconda,
-        the command ``conda install -c conda-forge cartopy`` should do it.
-      * If you're using pip and the Cartopy `required dependencies
-        <https://scitools.org.uk/cartopy/docs/latest/installing.html#required-dependencies>`_ have been
-        installed then the command ``pip install cartopy`` should do it.
-      * If neither of the aboved worked then please refer to the `Cartopy installation instructions
-        <https://scitools.org.uk/cartopy/docs/latest/installing.html#installing-cartopy>`_
-        for additional ways to install Cartopy.
-
-    After you have installed Cartopy, retry ``pip install tracktable``.
+    pip install tracktable
 
 Anaconda Virtual Environment
 ----------------------------
+
+.. _create_conda_environment:
+
 If you have `Anaconda <https://www.anaconda.com/distribution/>`_
-installed then the Anaconda virtual environment command
-below will create and configure a virtual environment that is ready to use Tracktable.
-Enter the following commands in a command/terminal/Anaconda prompt.
+installed then the Anaconda virtual environment commands
+below will create and configure a virtual environment that is ready to use 
+Tracktable.  Enter the following commands in a command/terminal/Anaconda prompt.
 
-- Create the Anaconda virtual environment
+#. Create the Anaconda virtual environment
 
-  * .. code-block:: console
+   There are two ways to create an ``tracktable`` anaconda virtual environment:
 
-      conda create --name tracktable --channel defaults --channel conda-forge --yes python pip folium pyshp pytz cartopy pip[tracktable]
-- Verify that the ``tracktable`` virtual environment was created
+   * **Creating a virtual environment from an conda environment.yml file**
 
-  * ``conda env list``
-- Activate the virtual environment
+     We include a YML configuration file 
+     (:download:`tracktable_environment.yml <../../tracktable_environment.yml>`) 
+     that can be used to create an Anaconda virtual environment named 
+     ``tracktable``. This file will create the environment in one shot and doesn't 
+     require any additional package installation after the environment is activated.
 
-  * ``conda activate tracktable``
-- Deactivate the virtual environment
+     .. code-block:: console
 
-  * ``conda deactivate``
-- If the virtual environment is no longer needed then it can be removed
+        conda env create -f /path/to/tracktable_environment.yml
 
-  * ``conda remove --name tracktable --all``
+     .. important:: Be sure to substitute the location where you saved environment.yaml in the command above.
+
+   * **Creating a virtual environment from listed packages**
+
+     .. important:: This approach creates the environment but doesn't install Tracktable.  You must also follow the "Install Tracktable in the Anaconda virtual environment" step.
+
+
+     .. code-block:: console
+
+        conda create --name tracktable --channel conda-forge cartopy folium jupyter pip pyshp pytz
+
+#. Verify that the ``tracktable`` virtual environment was created
+
+   .. code-block:: console
+
+      conda env list
+
+#. Activate the virtual environment
+
+   .. code-block:: console
+
+      conda activate tracktable
+
+#. Install Tracktable in the Anaconda virtual environment
+
+   .. note:: This step is only necessary if you created your Anaconda virtual environment by specifying packages.  If you used the YML file, Tracktable was installed when the environment was created.
+
+   .. code-block:: console
+
+      pip install tracktable
+
+#. Deactivate the virtual environment (optional)
+
+   .. code-block:: console
+
+      conda deactivate
+
+#. Delete the virtual environment when it is no longer needed
+
+  .. code-block:: console
+
+      conda env remove --name tracktable --all
 
 Note for Windows Users
 ----------------------

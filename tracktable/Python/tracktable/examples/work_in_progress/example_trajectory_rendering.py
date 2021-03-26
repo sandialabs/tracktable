@@ -208,9 +208,10 @@ def render_trajectories(basemap,
        A list of the artists added to the basemap
 
 
-    NOTE: This function is an adapter between the trajectory_rendering
-    argument group and the draw_traffic() function in the
-    tracktable.render.paths module.
+    Note:
+        This function is an adapter between the trajectory_rendering
+        argument group and the draw_traffic() function in the
+        tracktable.render.paths module.
     """
 
     trajectories_to_render = None
@@ -305,9 +306,10 @@ def render_annotated_trajectories(basemap,
        A list of the artists added to the basemap
 
 
-    NOTE: This function is an adapter between the trajectory_rendering
-    argument group and the draw_traffic() function in the
-    tracktable.render.paths module.
+    Note:
+        This function is an adapter between the trajectory_rendering
+        argument group and the draw_traffic() function in the
+        tracktable.render.paths module.
 
     """
 
@@ -359,10 +361,11 @@ def _make_tapered_linewidth_generator(initial_linewidth,
        A function that takes in a trajectory as an argument and
        returns an array of linewidths
 
-    NOTE: There might be an off-by-one error in here: we generate
-    len(trajectory) scalars but the geometry has len(trajectory)-1
-    segments.  Check to see if draw_traffic in paths.py corrects for
-    this.
+    Note:
+        There might be an off-by-one error in here: we generate
+        len(trajectory) scalars but the geometry has len(trajectory)-1
+        segments.  Check to see if draw_traffic in paths.py corrects for
+        this.
     """
 
     def linewidth_generator(trajectory):
@@ -383,10 +386,11 @@ def _make_constant_linewidth_generator(linewidth):
        A function that takes in a trajectory as an argument and
        returns an array of linewidths
 
-    NOTE: There might be an off-by-one error in here: we generate
-    len(trajectory) scalars but the geometry has len(trajectory)-1
-    segments.  Check to see if draw_traffic in paths.py corrects for
-    this.
+    Note:
+        There might be an off-by-one error in here: we generate
+        len(trajectory) scalars but the geometry has len(trajectory)-1
+        segments.  Check to see if draw_traffic in paths.py corrects for
+        this.
     """
 
     def linewidth_generator(trajectory):

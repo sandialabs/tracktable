@@ -64,14 +64,17 @@ def trajectory_point_reader(
 
     A trajectory point must have all of the following elements:
 
-    1. An object ID. We use the object ID to group points into
+    1.
+        An object ID. We use the object ID to group points into
         trajectories.
-    2. A timestamp. For the purposes of this function, that timestamp
+    2.
+        A timestamp. For the purposes of this function, that timestamp
         must be in the format 'YYYY-mm-dd HH:MM:SS' where YYYY is the
         4-digit year, mm is the 2-digit month, dd is the 2-digit day of
         the month, and HH:MM:SS are the 2-digit hours, minutes, and
         seconds within the day, respectively.
-    3. Coordinates. For the terrestrial domain, these coordinates are
+    3.
+        Coordinates. For the terrestrial domain, these coordinates are
         longitude and latitude. For the cartesian2d domain, these are
         x and y. The cartesian3d domain adds z.
 
@@ -193,11 +196,10 @@ def base_point_reader(
     or `cartesian3d`. This is a convenience function to set
     one up.
 
-    A base (undecorated) point must have all of the following elements:
-
-    1. Coordinates. For the terrestrial domain, these coordinates are
-        longitude and latitude. For the cartesian2d domain, these are
-        x and y. The cartesian3d domain adds z.
+    A base (undecorated) point must have Coordinates.
+    For the terrestrial domain, these coordinates are
+    longitude and latitude. For the cartesian2d domain, these are
+    x and y. The cartesian3d domain adds z.
 
     By default, we expect longitude (or x) in column 2, latitude (or y)
     in column 3, and the Z coordinate in column 4. We only pay attention

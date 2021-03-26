@@ -177,8 +177,9 @@ class ArgumentParser(standard_argparse.ArgumentParser):
         look for strings that indicate response files. Load those
         response files and repeat the process with their contents.
 
-        NOTE: This function is not smart enough to guard against
-        self-referencing response files.
+        NOTE:
+            This function is not smart enough to guard against
+            self-referencing response files.
 
         Args:
            arg_strings (list): List of argument strings to examine

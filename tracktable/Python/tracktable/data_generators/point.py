@@ -81,9 +81,10 @@ def random_circle_linear_falloff(seed_point,
     Point density falls off linearly with distance from the seed
     point.
 
-    NOTE: Right now this function is specialized for terrestrial
-          coordinates. That will be fixed in an upcoming point
-          release.
+    Note:
+        Right now this function is specialized for terrestrial
+        coordinates. That will be fixed in an upcoming point
+        release.
 
     Args:
        seed_point (tracktable.domain.terrestrial.BasePoint): Center of
