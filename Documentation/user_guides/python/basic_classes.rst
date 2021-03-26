@@ -6,9 +6,9 @@ Basic Classes
 
 .. _user-guide-python-domain:
 
--------
+----------------------------
 Domains (Coordinate Systems)
--------
+----------------------------
 
 Tracktable operates on points, timestamps and trajectories. Since
 points and trajectories are meaningless without a coordinate system,
@@ -152,7 +152,7 @@ The following code shows how to initialize a trajectory point:
    my_point.object_id = 'FlightId'
    my_point.timestamp = Timestamp.from_any('2014-04-05 13:25:00')
 
-You may want to associate other data with a point as well. For example, 
+You may want to associate other data with a point as well. For example,
 aircraft trajectories often have altitude and information about the
 flight's origin and destination:
 
@@ -198,14 +198,14 @@ Trajectories
 ------------
 
 We provide :py:class:`Trajectory` for ordered sequences of points.
-:py:class:`Trajectory` has its own ID (``trajectory_id``) as well as 
-its own properties array.  You do not need to supply a trajectory ID:
+:py:class:`Trajectory` has its own ID (``trajectory_id``) as well as
+its own properties array. You do not need to supply a trajectory ID:
 it is computed automatically from the object ID, start time, and end time.
 
 As with the point classes above, each domain in Tracktable defines a
 trajectory class. Trajectories can be treated like Python lists:
 indexing, slicing, insertion and removal all work as they do with
-an ordinary Python ``list``.  
+an ordinary Python ``list``.
 
 .. code-block:: python
    :caption: Example: Assemble Trajectory from Points
@@ -235,14 +235,14 @@ an ordinary Python ``list``.
    from tracktable.domain.terrestrial import Trajectory
 
    # Assume that 'mypoints' is a list of TrajectoryPoints that you
-   # have populated somewhere else in your code.  You can create
+   # have populated somewhere else in your code. You can create
    # a Trajectory from that list in one call:
 
    traj = Trajectory.from_position_list(mypoints)
 
 
-.. note:: Tracktable expects that all points in a given trajectory 
-   will have the same object ID. Timestamps must not decrease from one 
+.. note:: Tracktable expects that all points in a given trajectory
+   will have the same object ID. Timestamps must not decrease from one
    point to the next.
 
 There are several free functions defined on trajectories that do

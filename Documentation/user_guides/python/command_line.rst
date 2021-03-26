@@ -21,7 +21,8 @@ We introduce two facilities to help tame this morass:
    arguments that all pertain to a single capability. For example,
    the argument group for trajectory assembly has entries for the
    maximum separation distance, maximum separation time and minimum
-   length as described above in :ref:`python-trajectory-assembly`.
+   length as described in the :ref:`Trajectory Assembly <python-trajectory-assembly>`
+   section.
 
 2. **Response Files**: A response file is a way to package up
    arbitrarily many command-line arguments in a file and pass them to

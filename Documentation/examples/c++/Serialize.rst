@@ -9,12 +9,12 @@ We have three ways to save trajectories:
 
     1. ``tracktable::TrajectoryWriter``  (C++, Python)
 
-        This uses our own home-grown delimited text format.  It is rather
+        This uses our own home-grown delimited text format. It is rather
         verbose.
 
     2. ``tracktable.rw.read_write_json`` (Python)
 
-        Write to JSON.  This is also rather verbose and has trouble with
+        Write to JSON. This is also rather verbose and has trouble with
         incremental loads.
 
     3. ``boost::serialization`` (C++)

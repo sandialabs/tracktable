@@ -3,6 +3,10 @@
 Installing Tracktable From Source
 =================================
 
+.. attention:: For all build/installation issues and errors encountered
+   in the steps below refer to the
+   :ref:`Common Issues & Errors <common_issues_errors_installation>` Page.
+
 There are a few cases where you might want to build from source. For
 example:
 
@@ -27,11 +31,30 @@ or header files on your system.
 Step 1: Dependencies
 --------------------
 
-If you can possibly help it, install all the dependencies using
-package managers like ``conda`` (Anaconda's built-in package manager),
-``pip`` (comes with Python), ``yum``, ``apt-get`` (both of these are
-common in Linux environments), MacPorts (https://www.macports.org/) or
-Homebrew (https://brew.sh/).
+Wherever possible, install the dependencies using
+package managers such as
+
+  - Windows, Mac, Linux:
+
+    - ``conda`` (Anaconda's built-in package manager),
+    - ``pip`` (comes with Python),
+
+  - Windows:
+
+    While Windows specific package managers are available the Tracktable
+    team cannot guarantee they have the required dependencies needed to
+    build tracktable from source
+
+  - Linux:
+
+    - ``yum``
+    - ``apt-get``
+
+  - Mac:
+
+    - MacPorts (https://www.macports.org/)
+    - Homebrew (https://brew.sh/)
+
 
 Tracktable has the following required dependencies:
 
@@ -42,25 +65,18 @@ Python
 
   .. note:: Tracktable 1.1 was the last version to officially support Python 2.7.
 
-* NumPy 1.7+ - https://numpy.org/
-
-* Matplotlib 3.0+ - https://matplotlib.org/
-
-* Cartopy - https://scitools.org.uk/cartopy/docs/latest/
+* NumPy 1.7 or newer - https://numpy.org/
+* Matplotlib 3.0 or newer - https://matplotlib.org/
+* Cartopy 0.18.0 or newer - https://scitools.org.uk/cartopy/docs/latest/
 
   .. important:: On Linux, ``libproj-dev`` and ``proj-bin`` need to be installed prior to installing Cartopy
-
-* PyTZ - https://pypi.python.org/pypi/pytz/
-
-* Shapely - https://pypi.python.org/pypi/Shapely
+* PyTZ 2020.1 or newer - https://pypi.python.org/pypi/pytz/
+* Shapely 1.7.1 or newer - https://pypi.python.org/pypi/Shapely
 
   .. note:: When installing on Linux, Shapely needs to be installed with no binaries i.e. ``pip install --no-binary shapely shapely``
-
-* PyProj - https://pypi.org/project/pyproj/
-
-* Folium - https://pypi.org/project/folium/
-
-* SciPy - https://pypi.org/project/scipy/
+* PyProj 2.6.1 or newer - https://pypi.org/project/pyproj/
+* Folium 0.11.0 or newer - https://pypi.org/project/folium/
+* Scipy 1.5.2 or newer - https://pypi.org/project/scipy/
 
   .. note:: This package only needs to be installed manually on Linux
 
@@ -69,21 +85,38 @@ C++
 
 Tracktable requires a C++14-capable compiler as of release 1.5.
 
-* Compiler Options  
-  * GCC 5.2 or newer (https://gcc.gnu.org/),
+* Compiler Options
+
+  * GCC 5.2 or newer (https://gcc.gnu.org/)
   * Clang 3.5 or newer (http://clang.llvm.org)
   * Visual Studio (15) 2017 or newer (https://visualstudio.microsoft.com)
-* GEOS library - https://trac.osgeo.org/geos
+* GEOS library 3.8.1 or newer - https://trac.osgeo.org/geos
 * Boost 1.74 or newer - https://www.boost.org/
 
   .. tip:: Windows users can find pre-built Boost binaries at https://sourceforge.net/projects/boost/files/boost-binaries/
   .. hint:: Windows users should remember to add the path of the Boost installation
      to the systems ``PATH`` environment variable.
 
+  - We need several of Boost's compiled libraries including ``chrono``,
+    ``date_time``, ``iostreams``, ``log``, ``random``, ``timer`` and
+    especially ``Boost.Python``. As with other dependencies, check your
+    operating system's package manager first. It's possible that you can
+    install Boost with all its optional components from there.
+
+    - If you already have a recent Boost installation you can check for
+      ``Boost.Python`` by looking for files named
+      ``(prefix)boost_python.(suffix)`` where (prefix) is ``lib`` on
+      Unix-like systems and (suffix) is ``.so`` on Unix systems, ``.so`` or
+      ``.dylib`` on Mac OSX and ``.dll`` (and ``.lib``) on Windows.
+
   - You must build Boost with Boost.Python enabled using the headers
     from the same Python installation you will use to run Tracktable.
 
   - Tracktable requires a C++14-capable compiler as of version 1.5.
+
+  .. note:: We know that it is inconvenient to try to keep up with recent
+     versions of a library as big as Boost. We only change the required version
+     when absolutely necessary.
 
 
 Documentation
@@ -91,31 +124,21 @@ Documentation
 
 If you want to build documentation you will also need the following packages:
 
-* Sphinx - https://www.sphinx-doc.org/en/master/
-
-* Sphinx Read the Docs theme - https://sphinx-rtd-theme.readthedocs.io/en/latest
-
-* nbsphinx - https://nbsphinx.readthedocs.io/en/latest/index.html
-
-* nbsphinx-link - https://nbsphinx-link.readthedocs.io/en/latest/index.html
-
-* Pandoc - https://pandoc.org/index.html
-
-* Breathe - https://breathe.readthedocs.io/en/latest/
-
-* Doxygen - https://www.doxygen.nl/index.html
-
-* Graphviz (for dot executable)- https://www.graphviz.org/
-
-  .. note:: All of these except Breathe are available through Anaconda's ``conda``
-     installer.
+* Sphinx 3.4.3 or newer - https://www.sphinx-doc.org/en/master/
+* Sphinx Read the Docs theme 0.5.0 or newer - https://sphinx-rtd-theme.readthedocs.io/en/latest
+* nbsphinx 0.7.1 or newer - https://nbsphinx.readthedocs.io/en/latest/index.html
+* nbsphinx-link 1.3.0 or newer - https://nbsphinx-link.readthedocs.io/en/latest/index.html
+* Pandoc 2.5 or newer - https://pandoc.org/index.html
+* Breathe 4.26.1 or newer - https://breathe.readthedocs.io/en/latest/
+* Doxygen 1.8.17 or newer - https://www.doxygen.nl/index.html
+* Graphviz (for dot executable) 2.42.2 or newer - https://www.graphviz.org/
 
 Movies
 ^^^^^^
 
 If you want to render movies you will need FFMPEG:
 
-* FFMPEG - https://www.ffmpeg.org
+* FFMPEG 4.2.4 or newer - https://www.ffmpeg.org
 
   - If you build from source please be sure to include the MPEG4 and
     FFV1 codecs. Both of these are included with the standard FFMPEG
@@ -125,51 +148,38 @@ If you want to render movies you will need FFMPEG:
   .. tip:: Windows users can obtain the ffmpeg executable by installing
     Image Magick (https://www.imagemagick.org)
 
+
 Other
 ^^^^^
 
 * CMake 3.19.5 or newer - https://cmake.org/
-* TQDM (Optional for movie rendering examples) - https://tqdm.github.io/
+* TQDM (Optional for enabling progress bars in Python) 4.51.0 or newer - https://tqdm.github.io/
 
 Build Notes for Dependencies Built from Source
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The notes in this section are for cases when you have no
+The notes in this section are for cases when you have *absolutely* no
 choice but to build external packages from source.
 
 Building Boost
 **************
 
-We need several of Boost's compiled libraries including ``chrono``,
-``date_time``, ``iostreams``, ``log``, ``random``, ``timer`` and
-especially ``Boost.Python``. As with other dependencies, check your
-operating system's package manager first. In some cases you may be able
-to install Boost with all its optional components from there.
+.. tip:: You must build Boost with Boost.Python enabled using the headers
+   from the same Python installation you will use to run Tracktable.
 
-If you already have a recent Boost installation you can check for
-``Boost.Python`` by looking for files named
-``(prefix)boost_python.(suffix)`` where (prefix) is ``lib`` on
-Unix-like systems and (suffix) is ``.so`` on Unix systems, ``.so`` or
-``.dylib`` on Mac OSX and ``.dll`` (and ``.lib``) on Windows.
+The instructions to build Boost from source can be found at
+https://www.boost.org/doc/libs/1_75_0/more/getting_started/index.html
 
-If you really do have to build Boost from source -- for example, if
-you had to build your own Python installation -- then make sure to
-configure it to use the proper Python installation. Information about
-how to do this can be found in the ``Boost.Python`` documentation at
-https://www.boost.org/doc/libs/1_74_0/libs/python/doc/html/building/
+The specific instructions for building ``Boost.Python`` can be found at
+https://www.boost.org/doc/libs/1_75_0/libs/python/doc/html/building/
 
-One final note: We know that it is inconvenient to try to keep up with recent
-versions of a library as big as Boost. We only change the required version
-when absolutely necessary.
 
 Building FFMPEG
 ***************
 
 For up-to-date instructions on building FFMPEG please refer to
-https://trac.ffmpeg.org/wiki/CompilationGuide and choose your OS. We
-recommend that you compile in support for H264 video (via ``libx264``).
-While this is not required, it is widely supported by current devices
-such as iPads, iPhones and Android systems.
+https://trac.ffmpeg.org/wiki/CompilationGuide and choose your OS.
+We recommend that you compile in support for H264 video (via ``libx264``).
 
 
 Step 2: Configuration
@@ -192,8 +202,8 @@ that the first thing you must do is create a build directory.
 
 .. tip:: You can also put your build directory anywhere else you please.
 
-Next, use CMake's configuration utility ``ccmake`` (or its GUI tool if
-you prefer) to configure compile settings.
+Next, use CMake's configuration utility ``ccmake`` (or it’s command line
+version ‘cmake’ if you prefer) to configure compile settings.
 
 If you made your build directory inside the source directory
 
@@ -201,7 +211,7 @@ If you made your build directory inside the source directory
 
     $ ccmake ..
 
-If you made it someplace else
+Or, if you made the build directory elsewhere
 
 .. code-block:: console
 
@@ -340,14 +350,14 @@ Step 3: Build and Test
 * For Visual Studio, run ``nmake``, run ``msbuild`` on
   a project file, or open up the project files in your IDE (as appropriate).
   ``msbuild ALL_BUILD.vcxproj /t:Rebuild /p:Configuration=Release``
-  
+
 Once the build process has finished go to your build directory and run
 ``ctest`` (part of CMake) to run all the tests. They should all succeed.
 
 .. note:: Some of the later Python tests such as P_Mapmaker may take a minute or two.
 
 .. tip::  Windows users who chose Visual Studio project files during configuration
-   can run the "test" project to run all the tests.  This is a thin wrapper that 
+   can run the "test" project to run all the tests. This is a thin wrapper that
    calls CTest.
 
 If you have multiple cores or processors and your build system
@@ -393,8 +403,8 @@ have a mismatch between ``Python3_EXECUTABLE`` and
 ``Python3_LIBRARIES``. Check their values in ``ccmake`` / CMake GUI.
 If your Python executable is in (for example)
 ``/usr/local/python/bin/python`` then its corresponding library
-will usually be somewhere in ``/usr/local/python`` -- for example, 
-``/usr/local/python/lib/libpython3.6.so`` -- instead of in some directory 
+will usually be somewhere in ``/usr/local/python`` -- for example,
+``/usr/local/python/lib/libpython3.6.so`` -- instead of in some directory
 outside ``/usr/local/python``.
 
 Python tests running but failing
@@ -420,11 +430,11 @@ Python tests running but failing
 Windows VS/MSBuild Debug Build Fails
 ************************************
 
-When creating a debug build in a Visual Studio based environment, 
-it maybe necessary to add the the ``\bigobj`` flag to the 
+When creating a debug build in a Visual Studio based environment,
+it maybe necessary to add the the ``\bigobj`` flag to the
 ``CMAKE_CXX_FLAGS_DEBUG`` field.
-  
-  
+
+
 Nearby Stars Go Nova
 ********************
 We're afraid you're on your own if this happens.
