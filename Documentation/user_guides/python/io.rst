@@ -164,7 +164,7 @@ Tracktable has a flexible trajectory reader for delimited text files. Each
 point domain provides a trajectory reader. The trajectory reader functionality
 is the same across all point domains. Trajectories can be loaded from standard
 CSV and TSV delimited files as well as tracktable's own TRAJ file type.
-Refer to the :ref:`Tracktable Data <tracktable_data>` page for more
+Refer to the :ref:`Tracktable Data <tracktable-data>` page for more
 information about the TRAJ format.
 
 .. code-block:: python

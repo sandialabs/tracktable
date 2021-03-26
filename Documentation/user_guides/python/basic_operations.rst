@@ -9,27 +9,27 @@ Basic Operations
 Operations On Points
 ====================
 
-You will most commonly operate on points (singly or in small sets) 
-in order to construct trajectories or while manipulating 
+You will most commonly operate on points (singly or in small sets)
+in order to construct trajectories or while manipulating
 trajectories to construct more trajectories.
 
-The second most common use case for operations on points is to 
+The second most common use case for operations on points is to
 to compute point-to-point quantities like speed, bearing, distance,
-and turn angle.  These can be used as features in analysis or as
+and turn angle. These can be used as features in analysis or as
 annotations to decorate trajectories during rendering.
 
-All of our mathematical operations on trajectory points are in the 
-module :py:mod:`tracktable.core.geomath`.  These include concepts 
-like distance or speed between two points, the bearing from one point 
-to another, the turn angle at a point, and the geometric mean or 
-median of set of points.   Please refer to the ``geomath`` module
+All of our mathematical operations on trajectory points are in the
+module :py:mod:`tracktable.core.geomath`. These include concepts
+like distance or speed between two points, the bearing from one point
+to another, the turn angle at a point, and the geometric mean or
+median of set of points. Please refer to the ``geomath`` module
 for details.
 
 
 Examples of Per-Point Features
 ------------------------------
 
-.. todo:: 
+.. todo::
    Write this section
 
 
@@ -45,15 +45,15 @@ might want to use acceleration, deceleration and rates of turning to
 help classify moving objects.
 
 In order to accomplish this, we add features to the per-point properties
-of ``TrajectoryPoint`` objects as *annotations*.  The 
-:py:mod:`tracktable.feature.annotations` module contains functions for 
+of ``TrajectoryPoint`` objects as *annotations*. The
+:py:mod:`tracktable.feature.annotations` module contains functions for
 this: *calculators* to compute a feature and *accessors* to retrieve the
-feature later for analysis and rendering.  Calculators and accessors
-are deliberately simple to make it easier for you to add your own.  There
+feature later for analysis and rendering. Calculators and accessors
+are deliberately simple to make it easier for you to add your own. There
 is no limit to the number of features you can add to each point.
 
-The simplest feature is *progress*.  This has a value of zero at the
-beginning of the trajectory and one at the end.  It is useful for color-
+The simplest feature is *progress*. This has a value of zero at the
+beginning of the trajectory and one at the end. It is useful for color-
 coding trajectories for visualization so that their beginnings and ends
 are easy to distinguish.
 
@@ -68,7 +68,7 @@ Annotations Example
    from tracktable.feature import annotations
 
    # Suppose that my_trajectories is a list of already-
-   # compiled trajectories.  We want to add the "progress"
+   # compiled trajectories. We want to add the "progress"
    # annotation to all the points in each trajectory.
 
    annotated_trajectories = [
@@ -97,16 +97,16 @@ Annotations Example
 .. todo::
    This second code snippet is confusing.
 
+.. _python-trajectory-assembly:
+
 
 Assembling Trajectories from Points
 -----------------------------------
 
-.. python-trajectory-assembly:
-
-Creating trajectories from a set of points is at heart a simple 
-operation.  Sort a set of input points by non-decreasing timestamp, 
-then group them by object ID.  Each different group can then be viewed
-as the vertices of a polyline (connected series of line segments).  
+Creating trajectories from a set of points is at heart a simple
+operation. Sort a set of input points by non-decreasing timestamp,
+then group them by object ID. Each different group can then be viewed
+as the vertices of a polyline (connected series of line segments).
 This is our representation for a trajectory.
 
 The task becomes more nuanced when we consider the following question:
@@ -114,50 +114,50 @@ The task becomes more nuanced when we consider the following question:
     If a trajectory contains a large gap in either time or distance
     between two successive points, is it still a single trajectory?
 
-The answer to this question changes for every different data set.  The
+The answer to this question changes for every different data set. The
 trajectory assembler in Tracktable allows you to specify your own
-values for the distance and time separation thresholds.  Here are the details.
+values for the distance and time separation thresholds. Here are the details.
 
 
 Tracktable includes a filter,
 :py:class:`tracktable.analysis.assemble_trajectories.AssembleTrajectoryFromPoints`,
-to create a sequence of trajectories from a sequence of trajectory 
-points sorted by increasing timestamp.  The caller is responsible
+to create a sequence of trajectories from a sequence of trajectory
+points sorted by increasing timestamp. The caller is responsible
 for ensuring that the points are sorted.
 
-This filter is present in both C++ and Python.  In Python, the input 
-point sequence only needs to be an *iterable* and will only be traversed 
-once.  The output (sequence of trajectories) is also an iterable and can 
-only be traversed once.  In practice, we almost always save the assembled
- trajectories in a list for later use.
+This filter is present in both C++ and Python. In Python, the input
+point sequence only needs to be an *iterable* and will only be traversed
+once. The output (sequence of trajectories) is also an iterable and can
+only be traversed once. In practice, we almost always save the assembled
+trajectories in a list for later use.
 
 ``AssembleTrajectoryFromPoints`` has three parameters in addition to
 the point sequence:
 
-#. ``separation_time`` (:py:class:`datetime.timedelta`) If the 
+#. ``separation_time`` (:py:class:`datetime.timedelta`) If the
    timestamps of two successive points with the same object ID
    differ by more than this amount, the points before the gap will
-   be packaged up as a finished trajectory. A new trajectory will 
-   begin with the first point after the gap.  The default separation
+   be packaged up as a finished trajectory. A new trajectory will
+   begin with the first point after the gap. The default separation
    time is 30 minutes.
 
 #. ``separation_distance`` (float): If two successive points with
    the same object ID are more than this distance apart, the points
-   before the gap will be packaged up as a finished trajectory.  
-   A new trajectory will begin with the first point after the gap. 
+   before the gap will be packaged up as a finished trajectory.
+   A new trajectory will begin with the first point after the gap.
    The units of measurement for the separation distance depend on
    the point domain: kilometers for Terrestrial, no units for 2D
-   and 3D Cartesian points.  The default separation distance is 
+   and 3D Cartesian points. The default separation distance is
    infinite; that is, as long as two points are close enough together
-   in time, the trajectory will continue.  
+   in time, the trajectory will continue.
 
 #. ``minimum_length`` (integer): Finished trajectories will be discarded
-   unless they contain at least this many points.  The default is 2 
-   points.  
+   unless they contain at least this many points. The default is 2
+   points.
 
 .. note::
    The name "minimum_length" is confusing because *length* can refer to
-   distance as well as number of points.  We will provide a better name
+   distance as well as number of points. We will provide a better name
    in Tracktable 1.6, deprecate the existing name, and remove it in some
    future release.
 
@@ -206,16 +206,16 @@ Operations On Trajectories
 
 Some common use cases for operating on trajectories:
 
-#.  Interpolate between points to find an approximate position at a 
+#. Interpolate between points to find an approximate position at a
     specified time or distance traveled
 
-#.  Extract a subset of the trajectory with endpoints specified by
+#. Extract a subset of the trajectory with endpoints specified by
     time or distance traveled
 
-#.  Compute a scalar feature that describes some aspect of the entire
+#. Compute a scalar feature that describes some aspect of the entire
     trajectory
 
-#.  Compute a vector of distance geometry values that collectively describe 
+#. Compute a vector of distance geometry values that collectively describe
     the trajectory's shape
 
 
@@ -223,70 +223,71 @@ Some common use cases for operating on trajectories:
 Interpolation and Subsets
 -------------------------
 
-The module :py:module:`tracktable.core.geomath` contains several
-functions for interpolation along trajectories and extracting 
-subsets between interpolated points.  The first two will produce a 
-TrajectoryPoint at some specified fraction along the trajectory, 
+The module :py:mod:`tracktable.core.geomath` contains several
+functions for interpolation along trajectories and extracting
+subsets between interpolated points. The first two will produce a
+TrajectoryPoint at some specified fraction along the trajectory,
 parameterized between 0 and 1 by time elapsed or by distance
 traveled.
 
-#.  :py:func:`tracktable.core.geomath.point_at_time_fraction`
+#. :py:func:`tracktable.core.geomath.point_at_time_fraction`
 
-#.  :py:func:`tracktable.core.geomath.point_at_length_fraction`
+#. :py:func:`tracktable.core.geomath.point_at_length_fraction`
 
 These functions interpolate coordinates, timestamps, and all of the
-additional features present at points.  We provide two separate 
-parameterizations because indexing by time can lead to division by 
+additional features present at points. We provide two separate
+parameterizations because indexing by time can lead to division by
 zero in later algorithms when a trajectory includes a stretch where
-the underlying vehicle stopped.  Indexing by distance avoids this
+the underlying vehicle stopped. Indexing by distance avoids this
 problem by ignoring veloity.
 
 To extract a subset of trajectory instead of individual points, use
-:py:func:`subset_during_interval`.  This function takes its endpoints
-as fractions between 0 and 1 (parameterized by time).  We will add
-analogous functions to extract a subset by distance traveled, 
+:py:func:`subset_during_interval`. This function takes its endpoints
+as fractions between 0 and 1 (parameterized by time). We will add
+analogous functions to extract a subset by distance traveled,
 time fraction, and distance fraction for Tracktable 1.6.
 
 
 Computing Scalar-Valued Trajectory Features
 -------------------------------------------
 
-A scalar-valued trajectory feature is a single number that describes 
-some aspect of the trajectory.  A collection of these features can 
-characterize a trajectory well enough to establish similarity and 
+A scalar-valued trajectory feature is a single number that describes
+some aspect of the trajectory. A collection of these features can
+characterize a trajectory well enough to establish similarity and
 difference in a collection.
 
-Here are a few examples along with code snippets to compute them.  There
+Here are a few examples along with code snippets to compute them. There
 are many other possible features.
 
-.. code-block: python::
+.. code-block:: python
+    :linenos:
 
-import tracktable.core.geomath
+    import tracktable.core.geomath
 
-def total_travel_distance(trajectory):
-    return trajectory[-1].current_length
+    def total_travel_distance(trajectory):
+        return trajectory[-1].current_length
 
-def end_to_end_distance(trajectory):
-    return tracktable.core.geomath.distance(
-        trajectory[0], trajectory[-1]
+    def end_to_end_distance(trajectory):
+        return tracktable.core.geomath.distance(
+            trajectory[0], trajectory[-1]
         )
 
-def straightness_ratio(trajectory):
-    return end_to_end_distance(trajectory) / total_travel_distance(trajectory)
+    def straightness_ratio(trajectory):
+        return end_to_end_distance(trajectory) / total_travel_distance(trajectory)
 
-def total_winding(trajectory):
-    t = trajectory
-    return sum([
-      tracktable.core.geomath.signed_turn_angle(t[i], t[i+1], t[i+2])
-      for i in range(0, len(trajectory) - 3)
-      ])
+    def total_winding(trajectory):
+        t = trajectory
+        return sum([
+            tracktable.core.geomath.signed_turn_angle(t[i], t[i+1], t[i+2])
+            for i in range(0, len(trajectory) - 3)
+        ])
 
-def total_turning(trajectory):
-    t = trajectory
-    return sum([
-      tracktable.core.geomath.unsigned_turn_angle(t[i], t[i+1], t[i+2])
-      for i in range(0, len(trajectory) - 3)
-      ])
+    def total_turning(trajectory):
+        t = trajectory
+        return sum([
+        tracktable.core.geomath.unsigned_turn_angle(t[i], t[i+1], t[i+2])
+        for i in range(0, len(trajectory) - 3)
+        ])
 
 
 
@@ -295,18 +296,18 @@ Computing Distance Geometry Features
 
 .. _python-distance-geometry:
 
-`Distance geometry <https://en.wikipedia.org/wiki/Distance_geometry>`_ is 
-a family of methods for analyzing sets of points based only on the distances 
-between pairs of members.  In Tracktable, we use distance geometry to compute
-a multiscale description (called a *signature*) of a trajectory's shape that 
-can be used to search for similar trajectories independent of translation, 
+`Distance geometry <https://en.wikipedia.org/wiki/Distance_geometry>`_ is
+a family of methods for analyzing sets of points based only on the distances
+between pairs of members. In Tracktable, we use distance geometry to compute
+a multiscale description (called a *signature*) of a trajectory's shape that
+can be used to search for similar trajectories independent of translation,
 uniform scale, rotation, or reflection.
 
 
-The :py:mod:`tracktable.analysis.distance_geometry` module is responsible 
-for computing the multilevel distance geometry signature of a given 
-trajectory.   As with extracting points and subsets, we provide functions
-to compute this signature with points sampled by length or time.  If your
+The :py:mod:`tracktable.analysis.distance_geometry` module is responsible
+for computing the multilevel distance geometry signature of a given
+trajectory. As with extracting points and subsets, we provide functions
+to compute this signature with points sampled by length or time. If your
 data includes trajectories of objects that stop in one place, we recommend
 that you use the parameterization over length to avoid division by zero.
 
@@ -317,17 +318,17 @@ How Distance Geometry Works
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 When computing the distance geometry feature values
-for a trajectory, we first choose a depth *d*.  For each level 
-``L = 1 ... d``, we place ``L+1`` points along the trajectory, equally spaced 
-in either distance or time.  Then, for that level, we compute the straightness
+for a trajectory, we first choose a depth *d*. For each level
+``L = 1 ... d``, we place ``L+1`` points along the trajectory, equally spaced
+in either distance or time. Then, for that level, we compute the straightness
 of the ``L`` line segments that connect those points from beginning to end.
 A straightness value of 1 means that the trajectory is perfectly straight between
-two sample points.  A straightness value of 0 means that the trajectory ends 
+two sample points. A straightness value of 0 means that the trajectory ends
 at the same point it began for a given segment regardless of its meandering
 along the way.
 
 We collect these straightness values for all *d* levels to assemble a signature,
-which can be used as a feature vector.  A distance geometry signature with depth
+which can be used as a feature vector. A distance geometry signature with depth
 *d* will have ``(d * (d+1)) / 2`` values.
 
 
@@ -370,7 +371,7 @@ Distance Geometry Example
         distance_geometry_time_values = distance_geometry_by_time(trajectory_assembler.trajectories(), 4)
 
 
-.. note:: 
+.. note::
    Refer to "Clustering with Distance Geometry" example
    Mention what we could do with these distance geometry values after computing them
 
@@ -383,8 +384,8 @@ Analyzing Trajectories Using Feature Vectors
 .. _user-guide-python-analysis:
 
 The goal of feature creation is to represent each data point (in this
-case, each trajectory) with a feature vector.  then to use those feature
-vectors as the inputs for further analysis.  
+case, each trajectory) with a feature vector. then to use those feature
+vectors as the inputs for further analysis.
 
 In this section we will show you how to create a feature vector from
 a collection of features and how to feed those features to DBSCAN
@@ -396,8 +397,8 @@ Creating Feature Vectors
 
 
 Tracktable has a specific point domain for feature vectors just as it has
-domains for geographic and Cartesian coordinates.  In our current release we 
-support feature vectors with 1 to 30 components.  The function
+domains for geographic and Cartesian coordinates. In our current release we
+support feature vectors with 1 to 30 components. The function
 :py:func:`tracktable.domain.feature_vectors.convert_to_feature_vector` will
 convert a list or array of values into a feature vector:
 
@@ -412,8 +413,8 @@ convert a list or array of values into a feature vector:
 
     my_feature_vector = convert_to_feature_vector(my_feature_values)
 
-Like other Tracktable point types, the caller can read and write the 
-individual values in a feature vector using the ``[]`` operator.  In
+Like other Tracktable point types, the caller can read and write the
+individual values in a feature vector using the ``[]`` operator. In
 other words, just treat it like an ordinary list or array.
 
 
@@ -436,47 +437,47 @@ DBSCAN Clustering
 
 `DBSCAN <https://en.wikipedia.org/wiki/DBSCAN>`_ is a density-based
 clustering method that does not need to know the number of clusters
-in advance.  It operates instead on a notion of when two points are
-close together.  You must supply two parameters:
+in advance. It operates instead on a notion of when two points are
+close together. You must supply two parameters:
 
-#.  **Closeness:** How close must two points be along each axis
+#. **Closeness:** How close must two points be along each axis
     in order to belong to the same cluster?
 
-#.  **Minimum cluster size:** How many points must be close to one another
+#. **Minimum cluster size:** How many points must be close to one another
     in order to be considered a cluster instead of coincidence?
 
 As originally described, DBSCAN uses a single value to define "closeness".
-This value is used as the radius of a sphere.  For any given point, all 
+This value is used as the radius of a sphere. For any given point, all
 other points within that sphere are close by.
 
 In Tracktable, we specify closeness as a list of values, one per feature.
 This allows different values of closeness depending on the properties
-of each feature.  
+of each feature.
 
 Suppose that you have maximum altitude and maximum speed as two of your
-features.  In clustering, you might want to identify trajectories that have
-similar combinations of altitude and speed.  In this situation you need
-a neighborhood defined with a box and a sphere because of the ranges of the 
-variables involved.  Maximum altitude is measured in feet above sea level and ranges
-from 0 to around 40,000.  Maximum speed is measured in kilometers per hour and ranges
-from 0 to around 1000.  Since these ranges are so different, any value that encompasses
+features. In clustering, you might want to identify trajectories that have
+similar combinations of altitude and speed. In this situation you need
+a neighborhood defined with a box and a sphere because of the ranges of the
+variables involved. Maximum altitude is measured in feet above sea level and ranges
+from 0 to around 40,000. Maximum speed is measured in kilometers per hour and ranges
+from 0 to around 1000. Since these ranges are so different, any value that encompasses
 "close enough" for altitude will be too large to distinguish different classes
-of speeds.  Conversely, any value that can divide speeds into different classes
+of speeds. Conversely, any value that can divide speeds into different classes
 will be too small to group altitudes together.
 
 Mathematically, a single radius is equivalent to clustering on the L2 norm.
 A vector of distances is conceptually equivalent to the L-infinity norm.
 
-.. note:: 
+.. note::
    An upcoming release of Tracktable will add back in the ability to specify
-   a single radius.  We also hope to extend DBSCAN to arbitrary metrics.
+   a single radius. We also hope to extend DBSCAN to arbitrary metrics.
 
 .. todo::
-   Modify this example to use max altitude / max speed as our features.  Run
+   Modify this example to use max altitude / max speed as our features. Run
    on an example data set that has a mix of different classes of aircraft.
 
-Our implementation of DBSCAN is in the :py:mod:`tracktable.analysis.dbscan` 
-module.  Here is an example of how to invoke it.
+Our implementation of DBSCAN is in the :py:mod:`tracktable.analysis.dbscan`
+module. Here is an example of how to invoke it.
 
 
 .. code-block:: python
@@ -527,19 +528,19 @@ module.  Here is an example of how to invoke it.
 R-Tree
 ------
 
-The R-tree is a data structure that provides a fast way to find all 
-points near a given search position.  We use it to find all feature
+The R-tree is a data structure that provides a fast way to find all
+points near a given search position. We use it to find all feature
 vectors within some specified distance of a sample feature vector.
-This, in turn, allows us to identify trajectories that have similar 
+This, in turn, allows us to identify trajectories that have similar
 features.
 
-.. note:: 
-   This may sound very familiar to the description of how DBSCAN 
-   identifies points that are close together.  DBSCAN uses an 
+.. note::
+   This may sound very familiar to the description of how DBSCAN
+   identifies points that are close together. DBSCAN uses an
    R-tree internally.
 
 As in our last example, we will use end-to-end distance and total
-travel distance as our two features.  
+travel distance as our two features.
 
 
 
@@ -573,7 +574,7 @@ travel distance as our two features.
 
    # Suppose that we have an interesting trajectory whose end-to-end distance
    # is 1000 km but traveled a total of 2000 km -- that is, there was some
-   # significant wandering involved.  We want to find similar trajectories.
+   # significant wandering involved. We want to find similar trajectories.
 
    interesting_feature_vector = convert_to_feature_vector([1000, 2000])
 
@@ -594,8 +595,8 @@ travel distance as our two features.
                                     )
 
    # The contents of nearest_neighbor_indices and similar_indices are
-   # indices into the list of feature vectors.  Because the feature
-   # vectors are stored in the same order as the list of input 
+   # indices into the list of feature vectors. Because the feature
+   # vectors are stored in the same order as the list of input
    # trajectories, we can also use them as indices back into the
-   # list of trajectories.  
+   # list of trajectories.
 

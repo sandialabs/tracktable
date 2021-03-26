@@ -12,11 +12,16 @@ Tracktable's Purpose
 ====================
 
 Tracktable's purpose is to load, assemble, analyze and render the
-paths traced out by moving objects, which we call _trajectories_. 
-We combine the best tools and techniques we can find from both Python and C++ with the intent of making all of our capabilities easily accessible from both languages. Our goal is to make it easy to...
+paths traced out by moving objects, which we call _trajectories_.
+We combine the best tools and techniques we can find from both Python and C++ with
+the intent of making all of our capabilities easily accessible from both languages.
+Our goal is to make it easy to...
 
-* Render trajectories as histograms (heatmaps), track plots and movies.  In Tracktable 1.5.0, histograms are available as still images, track plots are available as still images and interactive maps, and movies can be written in any format supported by FFMPEG supports.
-* Run heavy-duty analysis in C++ and manipulate the results quickly in Python, including Jupyter notebooks.  Our core data structures and algorithms are implemented in C++ for speed.  
+* Render trajectories as histograms (heatmaps), track plots and movies. In Tracktable 1.5.0, histograms
+  are available as still images, track plots are available as still images and interactive maps, and movies
+  can be written in any format supported by FFMPEG supports.
+* Run heavy-duty analysis in C++ and manipulate the results quickly in Python, including Jupyter notebooks.
+  Our core data structures and algorithms are implemented in C++ for speed.
 * Couple algorithms from top to bottom:
 
   - Easy I/O to and from delimited text files
@@ -24,9 +29,9 @@ We combine the best tools and techniques we can find from both Python and C++ wi
   - Perform filtering and cleaning techniques to assemble points into
     trajectories
 
-  - Characterize trajectories using features derived from computational geometry 
+  - Characterize trajectories using features derived from computational geometry
 
-  - Find clusters and similar trajectories 
+  - Find clusters and similar trajectories
 
   - Communicate findings with visualization
 
@@ -81,7 +86,7 @@ Tracktable Contacts
 If you come across problems, please tell us about them so that we can
 improve Tracktable in the future!
 
-To reach us with questions, bug reports, suggestions and contributions, please use the `Contact Us <https://tracktable.sandia.gov/contact-us.html>`_ page on Tracktable's `web site <https://tracktable.sandia.gov>`_.  For more detailed discussion, consider joining one of our mailing lists:
+To reach us with questions, bug reports, suggestions and contributions, please use the `Contact Us <https://tracktable.sandia.gov/contact-us.html>`_ page on Tracktable's `web site <https://tracktable.sandia.gov>`_. For more detailed discussion, consider joining one of our mailing lists:
 
 
 .. csv-table::

@@ -28,8 +28,8 @@ Anaconda Virtual Environment
 
 If you have `Anaconda <https://www.anaconda.com/distribution/>`_
 installed then the Anaconda virtual environment commands
-below will create and configure a virtual environment that is ready to use 
-Tracktable.  Enter the following commands in a command/terminal/Anaconda prompt.
+below will create and configure a virtual environment that is ready to use
+Tracktable. Enter the following commands in a command/terminal/Anaconda prompt.
 
 #. Create the Anaconda virtual environment
 
@@ -37,22 +37,22 @@ Tracktable.  Enter the following commands in a command/terminal/Anaconda prompt.
 
    * **Creating a virtual environment from an conda environment.yml file**
 
-     We include a YML configuration file 
-     (:download:`tracktable_environment.yml <../../tracktable_environment.yml>`) 
-     that can be used to create an Anaconda virtual environment named 
-     ``tracktable``. This file will create the environment in one shot and doesn't 
+     We include a YML configuration file
+     (:download:`tracktable_environment.yml <../../tracktable_environment.yml>`)
+     that can be used to create an Anaconda virtual environment named
+     ``tracktable``. This file will create the environment in one shot and doesn't
      require any additional package installation after the environment is activated.
 
      .. code-block:: console
 
         conda env create -f /path/to/tracktable_environment.yml
 
-     .. important:: Be sure to substitute the location where you saved environment.yaml in the command above.
+     .. important:: Be sure to substitute the location where you saved tracktable_environment.yml in the command above.
 
    * **Creating a virtual environment from listed packages**
 
-     .. important:: This approach creates the environment but doesn't install Tracktable.  You must also follow the "Install Tracktable in the Anaconda virtual environment" step.
-
+     .. important:: This approach creates the environment but doesn't install Tracktable.
+        You must also follow the "Install Tracktable in the Anaconda virtual environment" step.
 
      .. code-block:: console
 
@@ -72,7 +72,8 @@ Tracktable.  Enter the following commands in a command/terminal/Anaconda prompt.
 
 #. Install Tracktable in the Anaconda virtual environment
 
-   .. note:: This step is only necessary if you created your Anaconda virtual environment by specifying packages.  If you used the YML file, Tracktable was installed when the environment was created.
+   .. note:: This step is only necessary if you created your Anaconda virtual environment by specifying packages.
+      If you used the tracktable_environment.yml file, Tracktable was installed when the environment was created.
 
    .. code-block:: console
 
@@ -88,7 +89,7 @@ Tracktable.  Enter the following commands in a command/terminal/Anaconda prompt.
 
   .. code-block:: console
 
-      conda env remove --name tracktable --all
+      conda remove --name tracktable --all
 
 Note for Windows Users
 ----------------------
