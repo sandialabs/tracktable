@@ -48,9 +48,10 @@ def set_log_level(level):
     C++ and Python code. This function will set the log level
     on both of them at once.
 
-    NOTE: There is not yet a way to redirect log messages generated
-    in C++ to any sink other than standard error. Expect this
-    to be fixed by release 1.4.
+    Note:
+        There is not yet a way to redirect log messages generated
+        in C++ to any sink other than standard error. Expect this
+        to be fixed by release 1.4.
 
     Arguments:
         level (int): desired minimum log level. This will

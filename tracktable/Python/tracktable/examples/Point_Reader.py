@@ -42,7 +42,7 @@ import sys
 def main():
     # To create a point, we create a generic TrajectoryPointReader object and give it the following:
     #  - input file - File stream connected to a data file
-    #  - delimiter - The character separating fields in the fileie, a csv will have ',' as a delimiter)
+    #  - delimiter - The character separating fields in the file, i.e. a csv will have ',' as a delimiter
     #  - comment character - The character marking comments in the file and will be ignored by the point reader
     # The domain will default to terrestrial, which is what we typically use for real data.
 

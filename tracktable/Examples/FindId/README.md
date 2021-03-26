@@ -4,7 +4,7 @@ The findid example demonstrates:
     - Searching trajectories for specific object ids
 
 Typical use:
-    ./assemble --input=/data/flights.tsv --idfile=/data/mapping_ids.txt
+    ./findid --input=/data/flights.tsv --idfile=/data/mapping_ids.txt
 
 Defaults assume a tab separated points file formatted as :
 

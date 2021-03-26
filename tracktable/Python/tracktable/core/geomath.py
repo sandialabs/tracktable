@@ -846,9 +846,10 @@ def geometric_mean(points):
     This is the regular mean: just the component-wise average of the
     coordinates.
 
-    NOTE: This does not yet do the right thing with terrestrial
-    points. It should normalize their coordinates to make sure they
-    do not fall across the limb of the map before taking the average.
+    Note:
+      This does not yet do the right thing with terrestrial
+      points. It should normalize their coordinates to make sure they
+      do not fall across the limb of the map before taking the average.
 
     Args:
        points (BasePoint or TrajectoryPoint iterable): Points for which you want a mean
@@ -872,13 +873,15 @@ def simplify(trajectory, tolerance):
     introducing positional error greater than the supplied tolerance.
     Under the hood it uses Douglas-Peucker simplification.
 
-    NOTE: The points in the output are copies of the points in the
-    input. Changing the input after a call to simplify() will have no
-    effect on previous results.
+    Note:
+      The points in the output are copies of the points in the
+      input. Changing the input after a call to simplify() will have no
+      effect on previous results.
 
-    NOTE: This function only cares about geometric error in the
-    trajectory. It does not account for error in the attributes
-    attached to each point.
+    Note:
+      This function only cares about geometric error in the
+      trajectory. It does not account for error in the attributes
+      attached to each point.
 
     Args:
        trajectory (Trajectory): Trajectory to simplify

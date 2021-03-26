@@ -49,6 +49,8 @@
 
 #include <tracktable/Core/WarningGuards/PushWarningState.h>
 #include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/split_free.hpp>
 #include <boost/date_time.hpp>
 #include <boost/serialization/split_free.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>

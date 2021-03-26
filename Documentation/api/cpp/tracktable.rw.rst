@@ -18,6 +18,7 @@ Submodules
    :maxdepth: 2
 
    tracktable.rw.GenericReader.rst
+   tracktable.rw.KmlOut.rst
    tracktable.rw.LineReader.rst
    tracktable.rw.ParseExceptions.rst
    tracktable.rw.PointFromTokensReader.rst

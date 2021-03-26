@@ -58,8 +58,9 @@ class ClipToTimeWindow(object):
     def trajectories(self):
         """Return sub-trajectories within window.
 
-        Note: Since this is a generator, you can only traverse the sequence
-          once unless you collect it in a list yourself.
+        Note:
+            Since this is a generator, you can only traverse the sequence
+            once unless you collect it in a list yourself.
 
         Yields:
            Trajectories derived from input trajectories. Each trajectory

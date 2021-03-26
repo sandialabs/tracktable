@@ -49,7 +49,7 @@ function(find_python_module modulename modulestatus modulelocation)
   else(modulename STREQUAL "cartopy")
     if(modulestatus)
       # The status is empty if everything went ok, but if it has anything in it there was an error
-      message(ERROR ": Python module '${modulestatus}' is required to build Python documentation. Install the ${modulestatus} module or enable BUILD_DOCUMENTATION_CXX_ONLY.  If you are certain that ${modulestatus} is already installed, make sure Python3_EXECUTABLE is correct.")
+      message(ERROR ": Python module '${modulename}' is required to build Python documentation. Install the ${modulename} module or enable BUILD_DOCUMENTATION_CXX_ONLY.  If you are certain that ${modulename} is already installed, make sure Python3_EXECUTABLE is correct.")
     endif(modulestatus)
   endif(modulename STREQUAL "cartopy")
 

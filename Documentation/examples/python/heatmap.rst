@@ -1,4 +1,4 @@
-.. _Heatmap_Example:
+.. _Python_Heatmap_Example:
 
 ================================
 Rendering a Heat Map from Points
@@ -7,23 +7,22 @@ Rendering a Heat Map from Points
 .. important:: `Cartopy <https://scitools.org.uk/cartopy/docs/latest/>`_ 0.18.0
    is required to successfully render maps and pass our internal tests.
 
-.. note:: The images generated from the below commands will have a
-   large border around the rendered map, this is expected and correct.
+.. note:: The images generated from the commands below will have a
+   large border around the rendered map; this is expected and correct.
 
 The simplest display type that Tracktable supports is the
 2-dimensional histogram or `heatmap
 <http://en.wikipedia.org/wiki/Heat_map>`_. It requires points that
 contain longitude/latitude coordinates. The points can contain any
-number of other attributes but they will be ignored. All references to
-``TRACKTABLE`` in the commands below is refering to the
-directory where you unpacked/installed Tracktable.
+number of other attributes but they will be ignored. In the examples below,
+``TRACKTABLE_HOME`` refers to the directory where you unpacked/installed Tracktable.
 
-Run the example as follows
+Run the example as follows:
 
 .. code-block:: console
 
    $ python -m "tracktable.examples.heatmap_from_points" \
-      TRACKTABLE/examples/data/SampleHeatmapPoints.csv \
+      TRACKTABLE_HOME/examples/data/SampleHeatmapPoints.csv \
       HeatmapExample1.png
 
 Open the resulting image (``HeatmapExample1.png``) in your favorite
@@ -42,7 +41,7 @@ the histogram resolution with the ``--histogram-bin-size`` argument.
 
    $ python -m "tracktable.examples.heatmap_from_points" \
       --histogram-bin-size 5 \
-      TRACKTABLE/examples/data/SampleHeatmapPoints.csv \
+      TRACKTABLE_HOME/examples/data/SampleHeatmapPoints.csv \
       HeatmapExample2.png
 
 .. image:: /images/HeatmapExample2.png
@@ -57,7 +56,7 @@ linear one you might get more detail.
 
    $ python -m "tracktable.examples.heatmap_from_points" \
       --scale logarithmic \
-      TRACKTABLE/examples/data/SampleHeatmapPoints.csv \
+      TRACKTABLE_HOME/examples/data/SampleHeatmapPoints.csv \
       HeatmapExample3.png
 
 .. image:: /images/HeatmapExample3.png
@@ -72,7 +71,7 @@ bins smaller?
       --scale logarithmic \
       --map region:europe \
       --histogram-bin-size 0.5 \
-      TRACKTABLE/examples/data/SampleHeatmapPoints.csv \
+      TRACKTABLE_HOME/examples/data/SampleHeatmapPoints.csv \
       HeatmapExample4.png
 
 .. image:: /images/HeatmapExample4.png

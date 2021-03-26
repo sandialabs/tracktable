@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Sandia Corporation.  All rights
+ * Copyright (c) 2014-2021, Sandia Corporation.  All rights
  * reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@ int main(int argc, char* argv[])
 {
 
   typedef tracktable::domain::cartesian2d::CartesianPoint2D MyPointType;
-  
+
   MyPointType point1(10, 10);
   MyPointType point2(20, 20);
   MyPointType point3;

@@ -31,10 +31,10 @@ Interactive Rendering Trajectories Example
 
 Tutorial showing many of the options available for rendering trajectories.
 
-NOTE:
-This python script implementation doesn't allow for html output. The notebook implentation
-defaults to a folium backend for interactive rendering, the python implementation only allows
-for non-interactive rendering with cartopy.
+Note:
+    This python script implementation doesn't allow for html output. The notebook implentation
+    defaults to a folium backend for interactive rendering, the python implementation only allows
+    for non-interactive rendering with cartopy.
 """
 
 from tracktable.domain.terrestrial import TrajectoryPointReader

@@ -2,14 +2,17 @@
 Data Used By Tracktable
 =======================
 
-Tracktable operates on CSV (comma-separated values) and TSV (tab-separated values) files.
-The data contained in the CSV and TSV can be either for points or trajectories and both
-file types abide by the same formatting and rules for comments and skippable headers.
-Below are a few examples of the various types of data and formatting that can be used
-by Tracktable.
+Tracktable loads and saves points in delimited text format, most 
+commonly CSV (comma-separated values) and TSV (tab-separated values) 
+files.  This page describes how the point reader and writer classes
+deal with comments, headers, and metadata columns.
 
-.. note:: Examples are provided for CSV and TSV for convenience, however, the only
-   difference between the examples is the delimiter used, the data is identical.
+Support for storing and loading trajectories using 
+`GeoJSON <https://geojson.org>`_ files is slated for release no later
+than Tracktable 1.7.
+
+.. note:: The only difference in the examples for CSV and TSV files
+   is the delimiter.  The data sets are identical.
 
 CSV Data
 ========
@@ -65,24 +68,9 @@ Point Data With Skippable Headers
     #
     KKK011,2004-12-07 11:42:18,-82.1967,27.1978,10300,193,303,-1
 
-Trajectory Data
----------------
-
-.. tip:: Trajectory data also allows for comments and skippable headers.
-
-.. code-block::
-
-    # object_id timestamp longitude latitude
-    TSTISTPHX0,2014-07-01 15:45:43-0000,28.814605999999998,40.976922
-    TSTORDDEL0,2014-07-01 15:45:43-0000,-87.904842,41.97860299999999
-    TSTYYZDEN0,2014-07-01 15:45:43-0000,-79.63055600000001,43.677223
-    TSTSEACGK0,2014-07-01 15:45:43-0000,-122.309306,47.449
-    TSTORDMCO0,2014-07-01 15:45:43-0000,-87.90484200000002,41.978602999999985
-    TSTSZXAMS0,2014-07-01 15:45:43-0000,113.81066399999999,22.639257999999995
-    TSTMSPATL0,2014-07-01 15:45:43-0000,-93.22176699999999,44.881955999999995
-    TSTPEKKUL0,2014-07-01 15:45:43-0000,116.58455599999999,40.080111
-    TSTFCOATL0,2014-07-01 15:45:43-0000,12.250797000000004,41.804475
-    TSTPHXPVG0,2014-07-01 15:45:43-0000,-112.01158300000002,33.43427799999999
+.. note:: Headers are not skipped by default. Comment delimiters and hard
+    values for number of lines to skip are passed in as parameters when
+    configuring your point and trajectory readers.
 
 TSV Data
 ========
@@ -136,22 +124,3 @@ Point Data With Skippable Headers
     #
     #
     KKK011	2004-12-07 11:42:18	-82.1967	27.1978	10300	193	303	-1
-
-Trajectory Data
----------------
-
-.. tip:: Trajectory data also allows for comments and skippable headers.
-
-.. code-block::
-
-    # object_id timestamp longitude latitude
-    TSTISTPHX0	2014-07-01 15:45:43-0000	28.814605999999998	40.976922
-    TSTORDDEL0	2014-07-01 15:45:43-0000	-87.904842	41.97860299999999
-    TSTYYZDEN0	2014-07-01 15:45:43-0000	-79.63055600000001	43.677223
-    TSTSEACGK0	2014-07-01 15:45:43-0000	-122.309306	47.449
-    TSTORDMCO0	2014-07-01 15:45:43-0000	-87.90484200000002	41.978602999999985
-    TSTSZXAMS0	2014-07-01 15:45:43-0000	113.81066399999999	22.639257999999995
-    TSTMSPATL0	2014-07-01 15:45:43-0000	-93.22176699999999	44.881955999999995
-    TSTPEKKUL0	2014-07-01 15:45:43-0000	116.58455599999999	40.080111
-    TSTFCOATL0	2014-07-01 15:45:43-0000	12.250797000000004	41.804475
-    TSTPHXPVG0	2014-07-01 15:45:43-0000	-112.01158300000002	33.43427799999999

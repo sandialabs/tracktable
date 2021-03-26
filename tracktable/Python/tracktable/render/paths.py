@@ -230,7 +230,7 @@ def draw_traffic(traffic_map,
        label_objects (bool):                                        Whether to draw object_id at latest point of each trajectory (Default: False)
        label_generator (TrajectoryPoint function):                  Function to generate label for a trajectory  (Default: None)
        label_kwargs (dict):                                         Dictionary of arguments to be passed to labeler (FIXME) (Default: dict())
-       axes (Matplotlib axes):                                      Which trajectories will be rendered (Default: None)
+       axes (Matplotlib axes):                                      The axis frame that will hold the Matplotlib artists that will render the trajectories (Default: None)
        zorder (int):                                                Layer into which trajectories will be drawn (Default: 8)
        transform (cartopy.crs.CRS):                                 The input projection (Default: cartopy.crs.Geodetic())
        show_points (bool):                                          Whether or not to show the points along the trajectory (Default: False)
