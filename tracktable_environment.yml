@@ -2,11 +2,11 @@ name: tracktable
 channels:
   - conda-forge
 dependencies:
-  - python=3.8
+  - python>=3.5, <=3.9
   - pip
-  - folium
-  - pyshp
-  - pytz
-  - cartopy
+  - cartopy>=0.18.0
+  - folium>=0.11.0
+  - pyshp>=2.1.3
+  - pytz>=2020.1
   - pip:
     - tracktable
