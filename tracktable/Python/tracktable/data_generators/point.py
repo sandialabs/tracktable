@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -81,9 +81,10 @@ def random_circle_linear_falloff(seed_point,
     Point density falls off linearly with distance from the seed
     point.
 
-    NOTE: Right now this function is specialized for terrestrial
-          coordinates. That will be fixed in an upcoming point
-          release.
+    Note:
+        Right now this function is specialized for terrestrial
+        coordinates. That will be fixed in an upcoming point
+        release.
 
     Args:
        seed_point (tracktable.domain.terrestrial.BasePoint): Center of

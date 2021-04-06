@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -33,7 +33,7 @@
 //
 // DistanceGeometryModule - Python bindings for C++ distance geometry
 // functions
-// 
+//
 
 #include <tracktable/Analysis/DistanceGeometry.h>
 #include <tracktable/Domain/Terrestrial.h>
@@ -53,22 +53,22 @@ BOOST_PYTHON_MODULE(_distance_geometry) {
 
   using boost::python::def;
 
-  def("_distance_geometry_by_distance", 
+  def("_distance_geometry_by_distance",
       &tracktable::distance_geometry_by_distance<terrestrial_trajectory_type>);
 
-  def("_distance_geometry_by_distance", 
+  def("_distance_geometry_by_distance",
       &tracktable::distance_geometry_by_distance<cartesian2d_trajectory_type>);
 
-  def("_distance_geometry_by_distance", 
+  def("_distance_geometry_by_distance",
       &tracktable::distance_geometry_by_distance<cartesian3d_trajectory_type>);
 
-  def("_distance_geometry_by_time", 
+  def("_distance_geometry_by_time",
       &tracktable::distance_geometry_by_time<terrestrial_trajectory_type>);
 
-  def("_distance_geometry_by_time", 
+  def("_distance_geometry_by_time",
       &tracktable::distance_geometry_by_time<cartesian2d_trajectory_type>);
 
-  def("_distance_geometry_by_time", 
+  def("_distance_geometry_by_time",
       &tracktable::distance_geometry_by_time<cartesian3d_trajectory_type>);
 }
 

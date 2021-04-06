@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -49,11 +49,11 @@ def verify_result(expected, actual, test_name):
         return 1
     return 0
 
-def run_test():      
+def run_test():
 
     print("Testing ECEF function")
     error_count = 0
-    
+
     lonlatzero = TerrestrialTrajectoryPoint(0.0, 0.0)
     equatorpoint = TerrestrialTrajectoryPoint(90.0, 0.0)
     northpole = TerrestrialTrajectoryPoint(0.0, 90.0)
@@ -64,35 +64,35 @@ def run_test():
     expected = CartesianPoint3D(6378.137, 0.0, 0.0)
     actual = geomath.ECEF(lonlatzero);
     error_count += verify_result(actual, expected, "LonLatZero");
-   
+
     expected = CartesianPoint3D(0.0, 6378.137, 0.0)
     actual = geomath.ECEF(equatorpoint);
     error_count += verify_result(actual, expected, "EquatorPoint");
-        
+
     expected = CartesianPoint3D(0.0, 0.0, 6356.75231)
     actual = geomath.ECEF(northpole);
     error_count += verify_result(actual, expected, "NorthPole");
-        
-    expected = CartesianPoint3D(0.0, 0.0, 6456.75231)    
+
+    expected = CartesianPoint3D(0.0, 0.0, 6456.75231)
     actual = geomath.ECEF(northpole2, 1, "altitude");
     error_count += verify_result(actual, expected, "NorthPole2");
-        
-    expected = CartesianPoint3D(-1497.14022, -5005.96887, 3645.53304)  
+
+    expected = CartesianPoint3D(-1497.14022, -5005.96887, 3645.53304)
     actual = geomath.ECEF(albuquerque);
-    error_count += verify_result(actual, expected, "Albuquerque");   
-   
+    error_count += verify_result(actual, expected, "Albuquerque");
+
     print("Testing ECEF_from_meters")
 
     albuquerque.set_property("altitude", 1000);
     actual = geomath.ECEF_from_meters(albuquerque)
-    expected = CartesianPoint3D(-1497.375, -5006.753, 3646.108)    
+    expected = CartesianPoint3D(-1497.375, -5006.753, 3646.108)
     error_count += verify_result(actual, expected, "AlbuquerqueMetters")
 
     albuquerque.set_property("height", 1000)
     actual = geomath.ECEF_from_feet(albuquerque, "height")
-    expected = CartesianPoint3D(-1497.212, -5006.208, 3645.708)    
-    error_count += verify_result(actual, expected, "AlbuquerqueFeet");   
-   
+    expected = CartesianPoint3D(-1497.212, -5006.208, 3645.708)
+    error_count += verify_result(actual, expected, "AlbuquerqueFeet");
+
     if error_count == 0:
         print("Trajectory ECEF passed all tests.")
 

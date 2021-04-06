@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -48,9 +48,10 @@ def set_log_level(level):
     C++ and Python code. This function will set the log level
     on both of them at once.
 
-    NOTE: There is not yet a way to redirect log messages generated
-    in C++ to any sink other than standard error. Expect this
-    to be fixed by release 1.4.
+    Note:
+        There is not yet a way to redirect log messages generated
+        in C++ to any sink other than standard error. Expect this
+        to be fixed by release 1.4.
 
     Arguments:
         level (int): desired minimum log level. This will

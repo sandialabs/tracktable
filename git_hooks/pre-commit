@@ -1,0 +1,383 @@
+#!/usr/bin/env python
+#
+# Pre-commit hook for Tracktable
+#
+# To add a new test, write a function that takes two arguments: a diff
+# object and a repo object, both from GitPython.  Your test should
+# take the form of an assertion.  See check_ascii_filename() for an
+# example.
+#
+# Once you've written the function to implement your test, add it to
+# the run_all_tests() function.
+#
+# Be sure to include a complete docstring for your test.
+#
+# NOTE: For any given commit, this script can only catch the first error
+# found.  For particularly messy situations you may have to re-try your
+# commit multiple times.
+
+import os
+import os.path
+import re
+import sys
+
+try:
+    import git
+except ImportError:
+    print(("ERROR: Please install GitPython ('pip install gitpython' or "
+           "'conda install gitpython') in order to run pre-commit hooks."),
+          file=sys.stderr)
+    sys.exit(2)
+
+
+# ---------------------------------------------------------------------
+#
+# HELPFUL UTILITY FUNCTIONS
+#
+# These map GitPython properties to more comprehensible function names.
+
+def print_stderr(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
+def diff_filename(diff):
+    # The b-side of the diff is the 'after' part.  This is valid unless
+    # the file has been deleted.
+    return diff.b_path
+
+
+def blob(diff):
+    return diff.a_blob
+
+
+def blob_size(diff):
+    blob_ptr = blob(diff)
+    assert blob_ptr is not None, "ERROR: Blob size is undefined for deleted file"
+    return blob(diff).size
+
+
+# We cache the results of contents() because GitPython only lets us read
+# the stream once.
+
+CACHED_BLOB_CONTENTS = {}
+
+
+def contents(diff):
+    global CACHED_BLOB_CONTENTS
+    _filename = diff_filename(diff)
+    if _filename not in CACHED_BLOB_CONTENTS:
+        CACHED_BLOB_CONTENTS[_filename] = blob(diff).data_stream.read()
+
+    return CACHED_BLOB_CONTENTS[_filename]
+
+
+# ---------------------------------------------------------------------
+
+
+def check_ascii_filename(diff, repo):
+    """Make sure filename meets repo requirements for ASCII
+
+    Git lets you choose whether or not to permit files with
+    non-ASCII characters on a per-repository basis.  This
+    test retrieves the repository's config setting and checks
+    the filename in the supplied diff accordingly.
+
+    The value in question is in the setting 'hooks.nonascii'.
+
+    Arguments:
+        diff {GitPython diff}: Commit to test
+        repo {GitPython Repo pointer}: Repository (for config information)
+
+    Returns:
+        No return value.
+
+    Raises:
+        AssertionError: file is non-ASCII but repository requires ASCII
+    """
+
+    with repo.config_reader() as config:
+        allow_non_ascii = config.get_value('hooks', 'allownonascii',
+                                           default=False)
+        filename = diff_filename(diff)
+        if not allow_non_ascii:
+            assert filename.isascii(), (
+                "Filename {} contains non-ASCII characters."
+                ).format(filename)
+
+
+# ---------------------------------------------------------------------
+
+
+def check_file_size(diff, repo, max_size=1048576):
+    """Ensure that a file being committed is below a size limit
+
+    Arguments:
+        diff {GitPython diff}: Single change to test
+        repo {GitPython repo}: Repository object for config
+
+    Keyword Arguments:
+        max_size {int}: Maximum file size in bytes
+
+    Returns:
+        No return value.
+
+    Raises:
+        AssertionError if file is too large.
+    """
+
+    file_size = blob_size(diff)
+    assert file_size < max_size, (
+        "File {} is too large: {} bytes, limit is {}".format(
+            diff_filename(diff), file_size, max_size
+        ))
+
+# ---------------------------------------------------------------------
+
+
+def check_spaces_in_filename(diff, repo):
+    """Ensure that a file being committed has no spaces in its pathname
+
+    Arguments:
+        diff {GitPython diff}: Single change to test
+        repo {GitPython repo}: Repository object for config
+
+    Returns:
+        No return value.
+
+    Raises:
+        AssertionError if spaces are present in filename or pathname
+    """
+
+    filename = diff_filename(diff)
+    assert ' ' not in filename, (
+        "File '{}' has spaces in its filename or path name".format(
+            filename
+            ))
+
+# ---------------------------------------------------------------------
+
+
+def check_for_forbidden_string(diff, repo, shibboleth):
+    """Ensure that a file being committed does not contain a given string
+
+    The string can actually be a full regexp if you need that.
+
+    NOTE: Your search string must have type 'bytes'.
+
+    Arguments:
+        diff {GitPython diff}: Single change to test
+        repo {GitPython repo}: Repository object for config
+        shibboleth {bytes}: String that must not be present
+
+    Returns:
+        No return value.
+
+    Raises:
+        AssertionError if the forbidden string is found
+    """
+
+    assert re.search(shibboleth, contents(diff)) is None, (
+        "Forbidden string '{}' found in file {}".format(
+            shibboleth.decode('utf-8'),
+            diff_filename(diff)))
+
+# ---------------------------------------------------------------------
+
+
+def check_jupyter_notebook_for_output(diff, repo):
+    """Ensure that a Jupyter notebook does not contain output cells
+
+    The biggest way to bloat a Jupyter notebook is to try to commit
+    it while it has populated output cells, especially images.
+
+    This test will look inside files with the extension 'ipynb' to
+    see if they have output cells.  The magic string that indicates
+    this is '"output_type"' (the double quotes are part of the string).
+
+    Arguments:
+        diff {GitPython diff}: Single change to test
+        repo {GitPython repo}: Repository object for config
+
+    Returns:
+        No return value.
+
+    Raises:
+        AssertionError if notebook has output
+    """
+
+    re_string = b'"output_type":'
+
+    filename = diff_filename(diff)
+    if ".ipynb" in filename:
+        assert re.search(re_string, contents(diff)) is None, (
+            "Jupyter notebook {} contains output cells.  Please clear "
+            "these cells before committing."
+            ).format(filename)
+
+# ---------------------------------------------------------------------
+
+
+def check_for_build_artifact(diff, repo):
+    """Check to see whether the file in a diff looks like a build artifact
+
+    Look for files with names that end in .o, .exe, .obj, .lib, .so, .a,
+    .dll, and other names that indicate build artifacts from CMake or
+    various compilers.
+
+    Arguments:
+        diff {GitPython diff}: Single change to test
+        repo {GitPython repo}: Repository object for config
+
+    Returns:
+        No return value.
+
+    Raises:
+        AssertionError if file appears to be a build artifact
+    """
+
+    build_artifact_extensions = [
+        'o', 'exe', 'obj', 'lib', 'dll', 'a', 'so',
+        'includecache'
+        ]
+
+    cmake_generated_files = [
+        'CMakeCache.txt',
+        'CMakeDirectoryInformation.h',
+        'CMakeDoxyfile.in',
+        'CMakeDoxygenDefaults.cmake',
+        'CPackConfig.cmake',
+        'CPackSourceConfig.cmake',
+        'CTestTestfile.cmake',
+        'cmake_install.cmake',
+        'DartConfiguration.tcl',
+        'progress.marks',
+        'DependInfo.cmake',
+        'build.make',
+        'cmake_clean.cmake',
+        'depend.internal',
+        'depend.make',
+        'flags.make',
+        'link.txt',
+        'progress.make'
+        ]
+
+    _filepath = diff_filename(diff)
+    (filename, extension) = os.path.splitext(_filepath)
+    basename = os.path.basename(_filepath)
+
+    assert extension not in build_artifact_extensions, (
+        'File {} appears to be a binary artifact from a compiler.'.format(
+            _filepath
+            ))
+
+    assert basename not in cmake_generated_files, (
+        'File {} appears to be part of a CMake build tree.'.format(
+            _filepath
+            ))
+
+
+# ---------------------------------------------------------------------
+
+
+def run_all_tests(diff, repo):
+    """Test a single file for problems
+
+    This function bundles up all the pre-commit tests we want
+    to run in our repository.  When you write a new test,
+    all you need to do is call it inside the 'if file_was_modified' block.
+    If your test is only meaningful for some specific type of operation
+    (added, deleted, renamed, type changed), put it under the appropriate
+    clause in 'if condition:'.  This will be rare.
+
+    Most tests should go under the comment
+    "Tests that should always run go here".
+
+    Arguments:
+        diff {GitPython diff}: Single commit to test
+        repo {GitPython Repo}: Repository object (for config checks)
+    Returns:
+        True if all tests pass; False otherwise
+    """
+
+    try:
+        file_was_added = (diff.change_type == 'A')
+        file_was_deleted = (diff.change_type == 'D')
+        file_was_renamed = (diff.renamed_file is True)
+        file_mode_changed = (diff.change_type == 'T')
+
+        if file_was_added:
+            check_ascii_filename(diff, repo)
+            check_spaces_in_filename(diff, repo)
+            check_for_build_artifact(diff, repo)
+
+        elif file_was_deleted:
+            pass
+
+        elif file_was_renamed:
+            check_ascii_filename(diff, repo)
+            check_spaces_in_filename(diff, repo)
+
+        elif file_mode_changed:
+            pass
+
+        else:
+            # Tests that should always run go here.  We can be sure that
+            # the file does indeed exist.
+            check_file_size(diff, repo)
+            check_jupyter_notebook_for_output(diff, repo)
+
+    except AssertionError as e:
+        print_stderr('ERROR: {}'.format(e))
+        return False
+
+    return True
+
+# ---------------------------------------------------------------------
+
+# This function is just for debugging
+
+def print_diff_info(diff):
+    print_stderr("Diff info:")
+    print_stderr("Change type: {}".format(diff.change_type))
+    print_stderr("Renamed file: {}".format(diff.renamed_file))
+
+    print_stderr("A (left) half:")
+    print_stderr("\tPath: {}".format(diff.a_path))
+    print_stderr("\tBlob: {}".format(diff.a_blob))
+    print_stderr("\tMode: {}".format(diff.a_mode))
+
+    print_stderr("B (right) half:")
+    print_stderr("\tPath: {}".format(diff.b_path))
+    print_stderr("\tBlob: {}".format(diff.b_blob))
+    print_stderr("\tMode: {}".format(diff.b_mode))
+
+
+# You do not need to modify this function.  It's just housekeeping and
+# the driver loop.  If you're looking for instructions for how to add
+# your own tests, look up at the top of the file.
+
+def main():
+    # We need string.isascii(), which is only available in Python 3.7 or
+    # newer
+    if sys.version_info.major == 3 and sys.version_info.minor < 7:
+        print_stderr("ERROR: Pre-commit testing requires Python 3.7 or newer.")
+        sys.exit(3)
+
+    repo = git.Repo(os.getcwd())
+    everything_ok = True
+
+    # the 'R=True' is to invert the diff so the 'before' state is the head and
+    # 'after' is the index
+    for diff in repo.index.diff(repo.head.commit, R=True):
+        this_diff_ok = run_all_tests(diff, repo)
+        if not this_diff_ok:
+            everything_ok = False
+
+    if everything_ok:
+        return 0
+    else:
+        return 1
+
+
+if __name__ == '__main__':
+    sys.exit(main())

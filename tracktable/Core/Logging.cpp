@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -51,18 +51,18 @@ void set_log_level(::tracktable::log::severity_level new_level)
 	using boost::log::trivial::severity_level;
 
 	// The filter expression here is actually a boost::phoenix lambda
-	// expression.  There is magic going on here.  The filter function 
+	// expression.  There is magic going on here.  The filter function
 	// gets a set of named arguments.  The symbol 'boost::log::trivial::
 	// severity' refers to one of them; the symbol 'boost_level' is the
 	// local variable we define here.
-	// 
+	//
 	// The expression below gets turned into a functor that knows how to
 	// extract named arguments from the arguments to its operator().
-	// 
+	//
 	// See the documentation for boost::phoenix and the filter capability
 	// in boost::log for more information.  The critical header file
 	// is <boost/log/expressions.hpp>.
-	
+
 	current_log_level = new_level;
 	severity_level boost_level = static_cast<severity_level>(new_level);
 	boost::log::core::get()->set_filter(

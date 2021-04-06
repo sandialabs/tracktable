@@ -42,3 +42,6 @@ Maritime Traffic
 Vehicle Traffic
 ---------------
 - `New York City Taxi Data <https://www1.nyc.gov/site/tlc/about/tlc-trip-record-data.page>`_
+
+.. tip:: Tracktable also includes a random trajectory generator! Take a look at the 
+    Python Data Generation Example.

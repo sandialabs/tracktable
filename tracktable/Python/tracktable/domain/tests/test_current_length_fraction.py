@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -58,15 +58,15 @@ def test_cartesian2d_current_length_fraction():
     expected = 0.25
     actual = geomath.current_length_fraction(traj[1])
     error_count += verify_result(actual, expected, "Cartesian2dTrajectoryPoint 1")
-    
+
     expected = 0.75
     actual = geomath.current_length_fraction(traj[2])
     error_count += verify_result(actual, expected, "Cartesian2dTrajectoryPoint 2")
-    
+
     expected = 1.0
     actual = geomath.current_length_fraction(traj[3])
     error_count += verify_result(actual, expected, "Cartesian2dTrajectoryPoint 3")
-    
+
     return error_count
 
 #--------------------------------------------------------------------------
@@ -89,15 +89,15 @@ def test_terrestrial_current_length_fraction():
     expected = 0.25
     actual = geomath.current_length_fraction(traj[1])
     error_count += verify_result(actual, expected, "TerrestrialTrajectoryPoint 1")
-    
+
     expected = 0.75
     actual = geomath.current_length_fraction(traj[2])
     error_count += verify_result(actual, expected, "TerrestrialTrajectoryPoint 2")
-    
+
     expected = 1.0
     actual = geomath.current_length_fraction(traj[3])
     error_count += verify_result(actual, expected, "TerrestrialTrajectoryPoint 3")
-    
+
     return error_count
 
 # ----------------------------------------------------------------------
@@ -108,7 +108,7 @@ def main():
     error_count += test_cartesian2d_current_length_fraction()
 
     return error_count
-    
+
 # ----------------------------------------------------------------------
 
 if __name__ == '__main__':

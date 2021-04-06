@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -347,9 +347,6 @@ def fill_land(map_axes,
 
     Returns:
        A list of Matplotlib artists added to the map.
-
-    TODO:
-      Is this the method that mapmaker actually uses?
 
     """
 

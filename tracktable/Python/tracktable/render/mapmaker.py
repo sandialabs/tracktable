@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -194,7 +194,7 @@ def terrestrial_map(map_name,
       city_zorder (int):                            Color name or hex string for city names (Default: 6)
       border_resolution (str):                      Detail of borders (Default: '110m')
       map_bbox ([minLon, minLat, maxLon, maxLat]):  Bounding box for custom map extent (Default: None)
-      map_projection (Basemap):                     Cartopy CRS projection object (optional) (Default: None)
+      map_projection (Cartopy CRS):                Cartopy CRS projection object (optional) (Default: None)
       map_scale_length (float):                     Length of map scale indicator (in km) (Default: None)
       region_size (float):                          Size of region depicted around an airport (km width x km height) (Default: None)
       axes (GeoAxes):                               Matplotlib axes to render into (Default: None)
@@ -204,7 +204,7 @@ def terrestrial_map(map_name,
       KeyError: unknown map name
 
     Returns:
-      (basemap, artist_list): Basemap instance and a list of Matplotlib artists that were rendered
+      (GeoAxes, artist_list): Basemap instance and a list of Matplotlib artists that were rendered
     """
 
     if map_name == "custom":

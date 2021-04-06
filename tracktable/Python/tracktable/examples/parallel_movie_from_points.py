@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -166,8 +166,8 @@ class MovieChunkRenderer(object):
                                 savefig_kwargs=self.savefig_kwargs,
                                 trajectory_rendering_kwargs=self.trajectory_rendering_kwargs,
                                 domain=self.domain)
-        
-        
+
+
         # hand off to the movie renderer to draw them
         #render_trajectory_movie(chunk_writer,
         #                                                self.basemap,
@@ -211,7 +211,8 @@ def assemble_trajectories(point_source,
     minimum number of points a trajectory must have in order to
     be worthy of consideration.
 
-    Note: This function does not actually build the trajectories.  It
+    Note:
+        This function does not actually build the trajectories.  It
         only sets up the pipeline to generate them.  Assembly does
         not happen until you start to pull elements from the iterable
         that gets returned.
@@ -357,7 +358,7 @@ def extract_field_assignments(arg_dict):
 # ----------------------------------------------------------------------
 
 
-def initialize_canvas(renderer, 
+def initialize_canvas(renderer,
                       resolution,
                       dpi=72,
                       facecolor='black'
@@ -398,7 +399,7 @@ def initialize_canvas(renderer,
     renderer.figure = figure
     renderer.axes = axes
     renderer.savefig_kwargs = { 'facecolor': figure.get_facecolor() }
-    
+
     #return (figure, axes)
 
 # ----------------------------------------------------------------------
@@ -494,8 +495,8 @@ def parse_args():
                         help=('How many processors to use for multiprocessing'),
                         type=int,
                         default=0)
-                        
-                        
+
+
     parser.add_argument('point_data_file',
                         nargs=1,
                         help='Delimited text file containing point data')
@@ -607,7 +608,8 @@ def render_annotated_trajectories(trajectories,
         KeyError: The desired scalar is not present
         ValueError: linewidth_style is neither 'constant' nor 'taper'
 
-    NOTE: A gallery of Matplotlib colormaps can be found at
+    Note:
+        A gallery of Matplotlib colormaps can be found at
           https://matplotlib.org/3.1.1/gallery/color/colormap_reference.html
     """
 
@@ -708,13 +710,13 @@ def render_trajectory_movie(movie_writer,
         movie_start_time.strftime("%Y-%m-%d %H:%M:%S"),
         movie_end_time.strftime("%Y-%m-%d %H:%M:%S")))
 
-        
+
     if num_frames_overall is None:
         num_frames_overall = num_frames
 
     frame_duration_seconds = (movie_end_time - movie_start_time).total_seconds() / num_frames_overall
-    frame_duration = datetime.timedelta(seconds=frame_duration_seconds)        
-        
+    frame_duration = datetime.timedelta(seconds=frame_duration_seconds)
+
     first_frame_time = movie_start_time + trail_duration
 
     def frame_time(which_frame):
@@ -751,7 +753,7 @@ def render_trajectory_movie(movie_writer,
             # TODO: here we could also render the clock
             #
             movie_writer.grab_frame(**savefig_kwargs)
-            
+
             # Clean up the figure for the next time around
             for artist in trajectory_artists:
                 artist.remove()
@@ -1005,12 +1007,14 @@ def trajectory_points_from_file(
     Use tracktable.domain.<domain>.BasePointReader to read points from a file.
     Results are returned as an iterable.
 
-    Note: You can only iterate over the resulting point sequence once.  If you
-    need to do more than that, save the points in a list:
+    Note:
+        You can only iterate over the resulting point sequence once.  If you
+        need to do more than that, save the points in a list:
 
     >>> all_points = list(points_from_file(infile, 2, 3))
 
-    Note: The function 'extract_field_assignments_from_arguments' will help
+    Note:
+        The function 'extract_field_assignments_from_arguments' will help
         you pull out rela_fields, string_fields, and time_fields from a
         set of parsed arguments.
 
@@ -1182,7 +1186,8 @@ def _extract_typed_field_assignments(arguments,
     Raises:
         ValueError: invalid field type
 
-    NOTE: Don't call this function directly unless you need the field
+    Note:
+        Don't call this function directly unless you need the field
         assignments for one specific data type.  Instead, call
         `extract_field_assignments`.
     """
@@ -1221,7 +1226,7 @@ def setup_mapmaker(renderer, args):
 
     mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
     (mymap, base_artists) = mapmaker.mapmaker(**mapmaker_kwargs)
-    renderer.basemap = mymap    
+    renderer.basemap = mymap
 
 # ----------------------------------------------------------------------
 
@@ -1248,7 +1253,7 @@ def collect_trajectories(args):
     field_assignments = extract_field_assignments(vars(args))
 
     with open(point_filename, 'r') as infile:
-       
+
         trajectories = list(
             trajectories_from_point_file(
                 infile,
@@ -1270,7 +1275,7 @@ def collect_trajectories(args):
         # we have some way to color them
         trajectories = [annotations.progress(t) for t in trajectories]
     return trajectories
-    
+
 # --------------------------------------------------------------------
 
 def setup_chunk_renderer(args):
@@ -1311,7 +1316,7 @@ def setup_chunk_renderer(args):
 
     movie_kwargs = argument_groups.extract_arguments("movie_rendering", args)
     #trajectory_kwargs = argument_groups.extract_arguments("trajectory_rendering", args)
-    
+
     #
     # Lights! Camera! Action!
     #
@@ -1336,8 +1341,8 @@ def setup_chunk_renderer(args):
         'linewidth': linewidth,
         'final_linewidth': final_linewidth
     }
-    
-    
+
+
     renderer.trajectory_rendering_kwargs = trajectory_kwargs
     renderer.movie_kwargs = movie_kwargs
     renderer.trail_duration = datetime.timedelta(seconds=args.trail_duration)
@@ -1350,7 +1355,7 @@ def setup_chunk_renderer(args):
     if args.timezone_label:
         renderer.timezone_label = args.timezone_label
     renderer.domain = args.domain
-        
+
 # ----------------------------------------------------------------------
 
 def render_frame_batch(batch):
@@ -1367,7 +1372,7 @@ def render_frame_batch(batch):
     """
 
     global CHUNK_RENDERER
-    return CHUNK_RENDERER.render_frame_batch(batch)        
+    return CHUNK_RENDERER.render_frame_batch(batch)
 
 # ----------------------------------------------------------------------
 
@@ -1468,7 +1473,7 @@ def remove_tmpdir(pathname):
       pathname (string): Directory to remove
     """
     os.rmdir(pathname)
-    
+
 # --------------------------------------------------------------------
 
 def main():

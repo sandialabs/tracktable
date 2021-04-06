@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -136,9 +136,9 @@ def map_extent_as_bounding_box(axes, domain='terrestrial'):
 
     bbox_type = tracktable.domain.domain_class(domain, 'BoundingBox')
 
-    return bbox_type((x_min, y_min), (x_max, y_max))    
-    
-    
+    return bbox_type((x_min, y_min), (x_max, y_max))
+
+
 # ---------------------------------------------------------------------
 
 def render_trajectory_movie(movie_writer,
@@ -400,7 +400,7 @@ def main():
     pyplot.close()
 
     logger.info("Movie render complete. File saved to {}".format(args.movie_file[0]))
-    
+
     return 0
 
 # ----------------------------------------------------------------------

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -33,7 +33,7 @@
 #
 # This module will open up a wheel file, inspect it for binary
 # artifacts (presumably compiled extension modules), and try to
-# locate any library dependencies for those artifacts.  
+# locate any library dependencies for those artifacts.
 #
 # You must have dumpbin.exe on your PATH.  This is packaged with
 # Microsoft Visual Studio.  If you use the Developer Tools Command
@@ -61,7 +61,10 @@ EXCLUSIONS = {
     'windows': [
         r'kernel32\.dll',
         r'api-ms-win-.*\.dll',
-        r'bcrypt.dll'
+        r'bcrypt.dll',
+        r'advapi32.dll',
+        r'ws2_32.dll',
+        r'secur32.dll'
         ],
     'msvc_runtime': [
         r'msvcp\d{3}\.dll',
@@ -69,7 +72,7 @@ EXCLUSIONS = {
         r'concrt\d{3}\.dll'
         ],
     'libpython': [
-        r'python\d{2}\.dll'
+        r'^python\d{2}\.dll'
         ],
     'directories': [
         r'c:\\windows',
@@ -80,16 +83,16 @@ EXCLUSIONS = {
 def _my_run(arg_list, timeout=None, **kwargs):
     """Internal function: Simulate subprocess.run()
 
-    When we call subprocess.run(), we want to use 
-    `capture_output=True` for debugging.  Python 3.5 appears to 
+    When we call subprocess.run(), we want to use
+    `capture_output=True` for debugging.  Python 3.5 appears to
     lack this option.  This function fakes it.
 
-    All keyword arguments will be passed unmodified to 
+    All keyword arguments will be passed unmodified to
     `subprocess.Popen()`.
 
     Arguments:
         arg_list {list of str}: Command to run and arguments
-        
+
     Returns:
         Dict with 'returncode' set to the process's return code (-1
             if it was killed), 'stdout' set to the process's standard
@@ -108,9 +111,9 @@ def _my_run(arg_list, timeout=None, **kwargs):
         raise KeyError('stdout and stderr are used internally by _my_run; do not override')
 
     process = subprocess.Popen(
-        arg_list, 
-        stdout=subprocess.PIPE, 
-        stderr=subprocess.PIPE, 
+        arg_list,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
         **kwargs
         )
     try:
@@ -185,7 +188,7 @@ def find_dll_dependencies(filename):
     dll_line_regex = re.compile(b'^    (\S+\.(dll|DLL))$')
     matches = [dll_line_regex.match(line) for line in lines]
     dll_names = [m.group(1) for m in matches if m is not None]
-    # Convert to strings so that we can do case-insensitive 
+    # Convert to strings so that we can do case-insensitive
     # processing
     return [name.decode('utf-8').lower() for name in dll_names]
 
@@ -228,6 +231,7 @@ def is_excluded(filename, exclusions):
     for (category, regex_list) in exclusions.items():
         for regex in regex_list:
             if regex.search(filename):
+                logging.getLogger(__name__).debug('DLL {} is excluded: matches pattern {} from category {}'.format(filename, regex, category))
                 return True
     assert('api-ms-win' not in filename)
     assert('vcruntime' not in filename)
@@ -236,7 +240,7 @@ def is_excluded(filename, exclusions):
 
 # ---------------------------------------------------------------
 
-    
+
 def compile_exclusion_regexes(exclusion_lists):
     """Build regexes for exclusions.
 
@@ -247,7 +251,7 @@ def compile_exclusion_regexes(exclusion_lists):
     expressions that identify libraries to exclude.
 
     Since we will be using these lists a bunch of times,
-    it's polite to compile them to regular expression 
+    it's polite to compile them to regular expression
     objects.
 
     Arguments:
@@ -283,7 +287,7 @@ def files_in_directory(dirname):
         List of filenames with paths.  If dirname is of type str,
         the filenames will be strings.  If it is of type
         bytes, the filenames will be bytes.
-    
+
     Raises:
         PermissionError: Couldn't open the directory
     """
@@ -334,7 +338,7 @@ def build_file_db(search_directories, extensions=None):
 
     You can ask for certain types of files by supplying a list
     of extensions for the 'extensions' keyword argument.  Anything
-    you supply will be compiled into a regular expression.  
+    you supply will be compiled into a regular expression.
 
     Arguments:
         search_directories {list of str}: Paths to search
@@ -358,7 +362,7 @@ def build_file_db(search_directories, extensions=None):
         extension_re = None
 
     logger = logging.getLogger(__name__)
-    
+
     unique_directories = set(sd.lower() for sd in search_directories)
     all_files = []
     for dirname in unique_directories:
@@ -377,13 +381,19 @@ def build_file_db(search_directories, extensions=None):
             continue
         # This is the doorway to DLL Hell.
         #
-        # The same DLL can be present in many different places on the 
-        # filesystem.  We have no way of knowing which one is correct.  
+        # The same DLL can be present in many different places on the
+        # filesystem.  We have no way of knowing which one is correct.
         if base_filename not in file_dict:
             file_dict[base_filename] = filename
 
+#    logger.debug('Found {} files in {} search directories with extension filter {}: {}'.format(
+#        len(file_dict), len(unique_directories), extensions, file_dict))
+
     logger.debug('Found {} files in {} search directories with extension filter {}'.format(
         len(file_dict), len(unique_directories), extensions))
+
+    if len(file_dict) < 15:
+        pprint.pprint(file_dict)
 
     return file_dict
 
@@ -394,11 +404,11 @@ def find_file_on_path(filename, file_dict):
     """Check for a given file in a big list
 
     Suppose that we have a list of all the files on the
-    user's PATH including their full pathnames.  We want 
-    to know if a particular file is in there.  
+    user's PATH including their full pathnames.  We want
+    to know if a particular file is in there.
 
     This function will traverse the whole smash and look to see
-    if it's there.  
+    if it's there.
 
     Arguments:
         filename {str}: Filename to search for
@@ -436,7 +446,7 @@ def files_in_subtree(root_dir, extensions=None):
 
 # ------------------------------------------------------------
 
-def resolve_dependencies_transitive(filename, 
+def resolve_dependencies_transitive(filename,
                                     file_db,
                                     exclusions=None):
     """Find all dependent DLLs for the specified file
@@ -468,7 +478,12 @@ def resolve_dependencies_transitive(filename,
     resolved = set()
     while len(dependency_queue) != 0:
         dll_name = dependency_queue.pop(0)
-        logger.debug('** Resolving dependencies for {}'.format(dll_name))
+        if not is_excluded(dll_name, exclusions):
+            logger.debug('****** Resolving dependencies for {}'.format(dll_name))
+        else:
+            logger.debug('Skipping excluded DLL {}'.format(dll_name))
+            continue
+
         if dll_name in resolved:
             continue
         else:
@@ -481,12 +496,12 @@ def resolve_dependencies_transitive(filename,
                 full_name = file_db[dll_name]
                 if not is_excluded(full_name, exclusions):
                     new_dependencies = find_dll_dependencies(full_name)
-                    logging.debug('** Adding {} new dependencies for file {}.'.format(len(new_dependencies), dll_name))
+                    logging.debug('Adding {} new dependencies for file {}: {}.'.format(len(new_dependencies), dll_name, new_dependencies))
                     dependency_queue.extend(new_dependencies)
 
     return remove_excluded_files([
         file_db[dll_name] for dll_name in resolved
-        ], 
+        ],
         exclusions)
 
 # -------------------------------------------------------------
@@ -509,7 +524,7 @@ def directories_in_subtree(basedir):
 
 # --------------------------------------------------------------
 
-def resolve_dependencies_for_wheel(wheel_path, 
+def resolve_dependencies_for_wheel(wheel_path,
                                    search_paths=None,
                                    exclusions=None,
                                    extensions=None):
@@ -522,7 +537,7 @@ def resolve_dependencies_for_wheel(wheel_path,
     Keyword arguments:
         search_paths {list of str}: Directories to search
             for dependencies.  Defaults to directories
-            on the PATH environment variable plus 
+            on the PATH environment variable plus
             C:\Windows.
         exclusions {dict of regexes}: Regular expressions
             indicating files and directories to be excluded
@@ -532,11 +547,13 @@ def resolve_dependencies_for_wheel(wheel_path,
 
     Returns: dict of {wheel_file: dependency_files}
 
-    Note: Before you copy files into the wheel, make sure to
+    Note:
+        Before you copy files into the wheel, make sure to
         remove anything that's already in the current directory
         of the file being examined.
 
-    Note: Windows also searches the registry key
+    Note:
+        Windows also searches the registry key
         HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\
         SessionManager\KnownDLLs.  We do not yet include those.
 
@@ -561,13 +578,22 @@ def resolve_dependencies_for_wheel(wheel_path,
     logger.info('Locating binary artifacts in wheel.  Root directory is {}.'.format(wheel_path))
     files_to_check = files_in_subtree(wheel_path, extensions)
 
+    directories_already_checked = set(search_paths)
     all_dependencies = {}
 
+    full_file_db = dict(main_file_db)
+
     for filename in files_to_check:
+        if is_excluded(filename, exclusions):
+            continue
+
         logger.info('Resolving dependencies for {}.'.format(filename))
-        file_db_this_directory = build_file_db([os.path.dirname(filename)], extensions)
-        full_file_db = dict(main_file_db)
-        full_file_db.update(file_db_this_directory)
+        this_directory = os.path.dirname(filename)
+        if this_directory not in directories_already_checked:
+            logger.info('Adding DLLs in directory containing {}.'.format(filename))
+            file_db_this_directory = build_file_db([os.path.dirname(filename)], extensions)
+            full_file_db.update(file_db_this_directory)
+            directories_already_checked.add(this_directory)
 
         try:
             all_dependencies[filename] = resolve_dependencies_transitive(filename,
@@ -584,13 +610,13 @@ def add_dependencies_to_wheel(dependency_results,
                               wheel_path):
     """Add dependency results to an unpacked wheel
 
-    Given the dict that comes from 
+    Given the dict that comes from
     resolve_dependencies_for_wheel, copy any missing
     files into appropriate locations in the unpacked
-    wheel.  
+    wheel.
 
     This function will add dependencies alongside the
-    library that loads them so that they will be found 
+    library that loads them so that they will be found
     first in the DLL search process.  It will not
     overwrite files that are already there.
 
@@ -617,16 +643,20 @@ def add_dependencies_to_wheel(dependency_results,
         original_file_path = os.path.dirname(original_file).lower()
         if original_file_path not in files_added_by_directory:
             files_added_by_directory[original_file_path] = set()
-        logger.debug('Files already in directory: {}'.format(pprint.pformat(files_added_by_directory[original_file_path])))
-       
         
+        if len(files_added_by_directory) > 0:
+            logger.debug('Files already in directory: {}'.format(pprint.pformat(files_added_by_directory[original_file_path])))
+
+
         for dependency in dependencies:
             dependency_basename = os.path.basename(dependency).lower()
             dependency_path = os.path.dirname(dependency).lower()
-            # We don't need to add files that are already in that 
+            logger.debug('--- Considering dependent library: {}'.format(dependency_basename))
+            # We don't need to add files that are already in that
             # directory -- the current directory is always on the
             # DLL search path.
             if dependency_path == original_file_path:
+                logger.debug('    Same directory.  Recursive search not needed.')
                 continue
             # Don't add files that we've already added
             if dependency_basename in files_added_by_directory[original_file_path]:
@@ -635,7 +665,7 @@ def add_dependencies_to_wheel(dependency_results,
             else:
                 # OK, add this one!
                 logger.debug('Adding file {} to {} for {}'.format(
-                    dependency_basename, original_file_path, os.path.basename(original_file)))                
+                    dependency_basename, original_file_path, os.path.basename(original_file)))
                 shutil.copy(
                     dependency,
                     os.path.join(original_file_path, os.path.basename(dependency))
@@ -651,7 +681,7 @@ def unpack_wheel(wheel_filename, root_dir):
     """Unpack wheel into desired directory
 
     Arguments:
-        wheel_filename {str or bytes}: Filename of wheel to 
+        wheel_filename {str or bytes}: Filename of wheel to
             unpack with any necessary path
         root_dir {str, bytes, or Path}: Directory into which
             wheel should be unpacked
@@ -729,11 +759,11 @@ def repack_wheel(root_dir, destination_dir):
     """Re-pack wheel from specified directory into specified destination
 
     Arguments:
-        root_dir {str or path}: Top-level directory of wheel.  
-            This is the directory for the wheel itself (e.g. 
-            mypackage-1.2), not the directory into which the 
+        root_dir {str or path}: Top-level directory of wheel.
+            This is the directory for the wheel itself (e.g.
+            mypackage-1.2), not the directory into which the
             wheel was unpacked.
-        destination_dir {str or path}: Directory into which 
+        destination_dir {str or path}: Directory into which
             the new wheel should be placed
 
     Returns:
@@ -759,7 +789,7 @@ def repack_wheel(root_dir, destination_dir):
     if result['returncode'] != 0:
         raise subprocess.CalledProcessError((
             'Return code from "wheel pack" was {}.').format(result['returncode']))
-    
+
 # --------------------------------------------------------------
 
 def dumpbin_available():

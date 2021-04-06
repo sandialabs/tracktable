@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -42,6 +42,9 @@ from tracktable.lib._terrestrial import BoundingBoxTerrestrial as BoundingBox
 from tracktable.lib._terrestrial import BasePointWriterTerrestrial as BasePointWriter
 from tracktable.lib._terrestrial import TrajectoryPointWriterTerrestrial as TrajectoryPointWriter
 from tracktable.lib._terrestrial import TrajectoryWriterTerrestrial
+
+# We need this in order to get the converters for ECEF coordinates
+import tracktable.domain.cartesian3d
 
 DIMENSION = 2
 

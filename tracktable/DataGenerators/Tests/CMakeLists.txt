@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2020 National Technology and Engineering Solutions of
+# Copyright (c) 2014-2021 National Technology and Engineering Solutions of
 # Sandia, LLC. Under the terms of Contract DE-NA0003525 with National Technology
 # and Engineering Solutions of Sandia, LLC, the U.S. Government retains certain
 # rights in this software.
@@ -55,7 +55,7 @@ target_link_libraries( PointGenerator_TEST
     ${Boost_LIBRARIES}
     )
 
-add_test( 
+add_test(
     NAME C_PointGenerator
     COMMAND PointGenerator_TEST
     WORKING_DIRECTORY ${Tracktable_BINARY_DIR}
@@ -63,6 +63,6 @@ add_test(
 
 # Keep the test cases in a separate folder in Visual Studio
 set_property(
-    TARGET PointGenerator_TEST 
+    TARGET PointGenerator_TEST
     PROPERTY FOLDER "Tests"
     )

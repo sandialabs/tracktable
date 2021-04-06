@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -72,8 +72,8 @@ public:
   typedef typename value_type::value_type       char_type;
 
   /// Instantiate a default SkipCommentsReader
-  SkipCommentsReader() 
-    : CommentCharacter("#"), 
+  SkipCommentsReader()
+    : CommentCharacter("#"),
       NumLinesToSkip(0)
     {
     }
@@ -152,7 +152,7 @@ public:
   /** Specify number of header lines to skip
   *
   * In the case where headers are not delimited with a comment
-  * character we allow the user to specify how many lines are 
+  * character we allow the user to specify how many lines are
   * skipped at the beginning of a file.
   *
   * @param [in] skips Number of lines to skip
@@ -323,7 +323,7 @@ protected:
     SkipCommentsIterator& operator++()
       {
         assert(this->InnerIterator != this->InnerEnd);
-       
+
         ++ (this->InnerIterator);
 
         this->_advance_to_valid_string();
@@ -337,7 +337,7 @@ protected:
     SkipCommentsIterator& operator++(int)
       {
         SkipCommentsIterator prev(*this);
-        
+
         this->operator++();
         return prev;
       }
@@ -380,7 +380,7 @@ protected:
         while (this->_string_is_comment(next_string) &&
                this->InnerIterator != this->InnerEnd)
           {
-          
+
           ++(this->InnerIterator);
           next_string = this->operator*();
           }

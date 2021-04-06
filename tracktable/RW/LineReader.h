@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -240,7 +240,7 @@ protected:
           {
             this->Stream = NULL;
           }
-        else 
+        else
           {
             TRACKTABLE_LOG(tracktable::log::debug) << "Read Line #" << ++(this->Counter);
           }
@@ -285,13 +285,13 @@ protected:
     *
     * This is to handle the case where the stream is NULL
     * but there wasn't a new line at the end of the file.
-    * In that case we return an empty value so that 
+    * In that case we return an empty value so that
     * comparisons evaluate properly.
     *
     * @return Value unless the Stream is Null,
     * in which case we return an empty value
     */
-    value_type get_value() const 
+    value_type get_value() const
     {
         if (this->Stream == nullptr) return "";
         return this->Value;

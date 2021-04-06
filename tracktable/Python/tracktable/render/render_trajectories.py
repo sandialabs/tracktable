@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -171,6 +171,10 @@ def render_trajectories(trajectories, backend='', **kwargs):
         filename (str): Path and filename to save the results to, if
             save is set to True. If no filename is given, a default
             filename including the timestamp is used.
+        tiles (str): Map tiles to use during image generation, the name
+            or server url can be used. Options include OpenStreetMaps,
+            StamenTerrain, StamenToner, StamenWatercolor, CartoDBPositron
+            CartoDBDark_Matter.
 
     """
 

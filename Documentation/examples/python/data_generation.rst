@@ -1,8 +1,8 @@
-.. _Example_Data:
+.. _Python_Data_Generation_Example:
 
-**********************
-Python Data Generation
-**********************
+***************
+Data Generation
+***************
 
 When real or quality trajectory data is not available, it is possible
 to generate data sets given some constraints. Current methods for
@@ -26,8 +26,7 @@ and the minimum number of points that make up the trajectory.
 Generate Single Trajectory Between Airports
 -------------------------------------------
 
-This example shows how to retrieve airport data using airport codes and creating a single
-trajectory.
+This example shows how to retrieve airport data using airport codes and create a single trajectory.
 
 .. code-block:: python
    :linenos:
@@ -99,7 +98,7 @@ of trajectory generation. Points within the bounding boxes are randomly generate
 and used as the endpoints.
 
 The constraints for creating these trajectories are identical to the ones used in the
-airport examples.
+airport examples above.
 
 This example shows one method for creating the bounding boxes and using them as input to
 generate a list of 5 new trajectories.

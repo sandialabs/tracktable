@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -115,6 +115,7 @@ public:
     , StringTokenizer(other.StringTokenizer)
     , TimestampFormat(other.TimestampFormat)
     , WarningsEnabled(other.WarningsEnabled)
+    , TrajectoriesRead(other.TrajectoriesRead)
     {
     }
 
@@ -136,6 +137,7 @@ public:
       this->StringTokenizer    = other.StringTokenizer;
       this->TimestampFormat    = other.TimestampFormat;
       this->WarningsEnabled    = other.WarningsEnabled;
+      this->TrajectoriesRead   = other.TrajectoriesRead;
       return *this;
     }
 
@@ -154,6 +156,7 @@ public:
         && this->StringTokenizer    == other.StringTokenizer
 	&& this->TimestampFormat    == other.TimestampFormat
         && this->WarningsEnabled    == other.WarningsEnabled
+        && this->TrajectoriesRead   == other.TrajectoriesRead
         );
     }
 
@@ -188,6 +191,7 @@ public:
       this->set_comment_character("#");
       this->set_warnings_enabled(true);
       this->set_timestamp_format("%Y-%m-%d %H:%M:%S");
+      this->PointReader.set_point_count_log_enabled(false);
     }
 
 
@@ -255,6 +259,7 @@ public:
       this->TokenizedInputEnd   = this->StringTokenizer.end();
 
       this->ParseTrajectoryHeader.set_timestamp_input_format(this->TimestampFormat);
+      this->TrajectoriesRead = 0;
     }
 
   /** Retrieve the current input stream.
@@ -353,6 +358,7 @@ private:
   string_tokenizer_type::iterator TokenizedInputBegin;
   string_tokenizer_type::iterator TokenizedInputEnd;
   bool WarningsEnabled;
+  int TrajectoriesRead;
   rw::detail::TrajectoryHeader ParseTrajectoryHeader;
 
   /** Increment the iterator the next item to be read in
@@ -374,11 +380,26 @@ private:
           if (NextTrajectory)
             {
             ++ this->TokenizedInputBegin;
+            ++ this->TrajectoriesRead;
             return NextTrajectory;
             }
           }
         ++ this->TokenizedInputBegin;
         }
+
+
+      auto plural_trajectory = [](int discriminator) {
+        if (discriminator == 1) {
+          return std::string("trajectory");
+        } else {
+          return std::string("trajectories");
+        }
+      };
+
+      TRACKTABLE_LOG(log::info) << "Read a total of "
+          << this->TrajectoriesRead << " "
+          << plural_trajectory(this->TrajectoriesRead)
+          << ".";
 
       return trajectory_shared_ptr_type();
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -53,12 +53,17 @@
 #include <fstream>
 #include <iomanip>
 
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <boost/mpl/assert.hpp>
 #include <boost/tuple/tuple.hpp>
 
 #include <tracktable/Core/WarningGuards/PushWarningState.h>
 #include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
+
+// We need this in order to pull in boost/geometry/strategies/strategies.hpp --
+// consider investigating what we can trim down
+#include <boost/geometry/geometry.hpp>
+
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry/geometries/register/point.hpp>
 #include <boost/geometry/geometries/adapted/boost_tuple.hpp>
@@ -448,6 +453,8 @@ protected:
                       rtree_type& rtree,
                       bool L2)
     {
+      using namespace boost::placeholders;
+
       std::list<rtree_value_type> seed_point_queue;
       seed_point_queue.push_back(seed_point);
       bool core_point_found = false;
@@ -581,6 +588,8 @@ protected:
   // epsilon_box_half_span, to get the relative contributions of the
   // directions to figure out if it is in the ellipsoid.  Then, take the norm,
   // and it should be less than 1.  Erase all offending elements.
+      using namespace boost::placeholders;
+      
       points.erase(
        std::remove_if(points.begin(),points.end(),
         boost::bind(&tracktable::arithmetic::norm_squared<point_type>,

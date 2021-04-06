@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -32,7 +32,7 @@
 // Tracktable Trajectory Library
 //
 // Boost.Python wrappers for C++ logging
-// 
+//
 
 #include <tracktable/Core/Logging.h>
 #include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
@@ -42,7 +42,7 @@ int log_level_cpp_to_python(tracktable::log::severity_level cpp_level)
 	switch (cpp_level)
 	{
 		case tracktable::log::trace:
-			return 5; 
+			return 5;
 		case tracktable::log::debug:
 			return 10;
 		case tracktable::log::info:
@@ -54,8 +54,8 @@ int log_level_cpp_to_python(tracktable::log::severity_level cpp_level)
 		case tracktable::log::fatal:
 			return 50;
 		default:
-			TRACKTABLE_LOG(tracktable::log::warning) 
-				<< "Impossible log level " 
+			TRACKTABLE_LOG(tracktable::log::warning)
+				<< "Impossible log level "
 				<< static_cast<int>(cpp_level)
 				<< " encountered in log_level_cpp_to_python.  Assuming 'error'.";
 			return 40;
@@ -108,7 +108,7 @@ int cpp_log_level_for_python()
 BOOST_PYTHON_MODULE(_logging)
 {
 	using namespace boost::python;
-	
+
 	def("set_cpp_log_level", set_cpp_log_level);
 	def("cpp_log_level", cpp_log_level_for_python);
 }

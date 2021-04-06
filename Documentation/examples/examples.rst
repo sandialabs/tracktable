@@ -5,23 +5,28 @@ Examples
 ========
 
 To help you get started using Tracktable we have included demonstrations of
-its various capabilities, Python and C++ alike, and sample data to try it
-on. C++ examples are in the source code distribution in the directory
-``tracktable/Examples``. Python examples are available as scripts you
-can execute as well as Jupyter_ notebooks.
-
-Data Generation Examples
-------------------------
-
-.. toctree::
-   :maxdepth: 2
-
-   /examples/python/data_generation.rst
+its various capabilities, Python and C++ alike, and sample data to experiment with.
+C++ examples are in the source code distribution in the directory
+``tracktable/Examples``. Python examples are available, from the Pip package
+and source code distribution in the directory ``tracktable/Python/tracktable/examples``,
+as standalone Python scripts as well as Jupyter_ notebooks.
 
 C++ Examples
 ------------
 
-.. todo:: Add the the C++ examples
+.. toctree::
+   :maxdepth: 2
+
+   /examples/c++/Assemble.rst
+   /examples/c++/Classify.rst
+   /examples/c++/Cluster.rst
+   /examples/c++/Filter.rst
+   /examples/c++/Find_ID.rst
+   /examples/c++/Portal.rst
+   /examples/c++/Predict.rst
+   /examples/c++/Reduce.rst
+   /examples/c++/Sample_Project.rst
+   /examples/c++/Serialize.rst
 
 Python Examples
 ---------------
@@ -29,6 +34,7 @@ Python Examples
 .. toctree::
    :maxdepth: 2
 
+   /examples/python/data_generation.rst
    /examples/python/heatmap.rst
    /examples/python/trajectory_map.rst
    /examples/python/movies.rst

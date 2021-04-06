@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -56,7 +56,8 @@ def draw_analog_clock_on_map(time,
                              label_kwargs=dict()):
     """Draw an analog clock on a Matplotlib figure.
 
-    NOTE: THIS INTERFACE IS SUBJECT TO CHANGE.  LOTS OF CHANGE.
+    Note:
+        THIS INTERFACE IS SUBJECT TO CHANGE.  LOTS OF CHANGE.
 
     Args:
       time (datetime.datetime): Time to display
@@ -265,8 +266,9 @@ def digital_clock(time,
                   **kwargs):
     """Add a digital clock (a string representation of time) to the image at a user-specified location
 
-    NOTE: This function may go away since it doesn't provide any useful
-    enhancement over just adding a text actor ourselves.
+    Note:
+        This function may go away since it doesn't provide any useful
+        enhancement over just adding a text actor ourselves.
 
     Args:
         time (datetime.datetime): Current timestamp to display

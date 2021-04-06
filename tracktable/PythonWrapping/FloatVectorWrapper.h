@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -30,7 +30,7 @@
 
 
 // Boost.Python code to wrap std::vector<float> and std::vector<double>.
-// 
+//
 // This is a convenience: it lets us wrap functions that return
 // vectors of floats and doubles and have them Just Work in Python as if
 // they were reutrning lists.
