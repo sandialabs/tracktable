@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -56,11 +56,11 @@ compare_vectors(
     std::cout << "ERROR: compare_vectors ("
               << description
               << "): Vectors differ in size.  Expected "
-              << expected.size() 
+              << expected.size()
               << " but got "
               << actual.size()
               << ".\n";
-    return 1; 
+    return 1;
   }
 
   for (std::size_t i = 0; i < expected.size(); ++i)
@@ -73,7 +73,7 @@ compare_vectors(
       std::cout << "ERROR: compare_vectors ("
                 << description
                 << "): Element "
-                << i 
+                << i
                 << " does not match expected value. "
                 << "Expected " << expected[i]
                 << ", got " << actual[i]
@@ -85,7 +85,7 @@ compare_vectors(
 
 //----------------------------------------------------
 
-Cartesian2dTrajectoryPoint 
+Cartesian2dTrajectoryPoint
 create_cartesian2d_trajectory_point(double x, double y, std::string const& id=std::string())
 {
     Cartesian2dTrajectoryPoint point;
@@ -102,17 +102,17 @@ int test_cartesian2d_dg_by_distance()
   int error_count = 0;
 
   double cartesian_coordinates[][2] = {
-    {0, 0}, 
+    {0, 0},
     {100, 0},
     {100, 100},
     {0, 100},
     {0, 0},
     {-1000, -1000}
   };
-  
+
   Cartesian2dTrajectory trajectory;
   int i = 0;
-  while (cartesian_coordinates[i][0] > -1000) 
+  while (cartesian_coordinates[i][0] > -1000)
   {
     trajectory.push_back(
       create_cartesian2d_trajectory_point(
@@ -124,13 +124,13 @@ int test_cartesian2d_dg_by_distance()
   }
 
   std::vector<double> cartesian2d_dg = tracktable::distance_geometry_by_distance(trajectory, 4);
-  
+
   std::vector<double> expected_dg_values = {
-    0.0, 
-    0.707107, 
-    0.707107, 
-    0.790569, 
-    0.707107, 
+    0.0,
+    0.707107,
+    0.707107,
+    0.790569,
+    0.707107,
     0.790569,
     1.0,
     1.0,

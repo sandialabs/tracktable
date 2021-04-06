@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -49,8 +49,12 @@
 
 #include <tracktable/Core/WarningGuards/PushWarningState.h>
 #include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
+#include <boost/serialization/serialization.hpp>
+#include <boost/serialization/split_free.hpp>
 #include <boost/date_time.hpp>
+#include <boost/serialization/split_free.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/gregorian/greg_serialize.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/posix_time/time_serialize.hpp>

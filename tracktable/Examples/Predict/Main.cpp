@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -57,7 +57,7 @@ The predict example demonstrates:
     - Using command line factories to read points and assemble trajectories
     - Using boost program options to take parameters from command lines(in addition to the factories)
     - Conditioning trajectories based on length and objectid
-    - Using boost rtree to locate similar trajectories based on cartesion distance in feature space
+    - Using boost rtree to locate similar trajectories based on cartesian distance in feature space
 
 Typical use: '--string-field=dest x' is required
 

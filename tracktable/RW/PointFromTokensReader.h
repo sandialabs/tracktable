@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -86,6 +86,7 @@ public:
     , TimestampColumn(-1)
     , IgnoreHeader(false)
     , WarningsEnabled(true)
+    , PointCountLogEnabled(true)
     , NumPoints(0)
     , NumParseErrors(0)
     {
@@ -104,6 +105,7 @@ public:
     , TimestampColumn(other.TimestampColumn)
     , IgnoreHeader(other.IgnoreHeader)
     , WarningsEnabled(true)
+    , PointCountLogEnabled(other.PointLogEnabled)
     , NumPoints(other.NumPoints)
     , NumParseErrors(other.NumParseErrors)
     { }
@@ -121,6 +123,7 @@ public:
     , TimestampColumn(-1)
     , IgnoreHeader(false)
     , WarningsEnabled(true)
+    , PointCountLogEnabled(true)
     , NumPoints(0)
     , NumParseErrors(0)
     { }
@@ -145,9 +148,11 @@ public:
       this->TimestampColumn = other.TimestampColumn;
       this->IgnoreHeader    = other.IgnoreHeader;
       this->WarningsEnabled = other.WarningsEnabled;
+      this->PointCountLogEnabled = other.PointCountLogEnabled;
       this->PropertyReadWrite = other.PropertyReadWrite;
       this->NumPoints       = other.NumPoints;
       this->NumParseErrors = other.NumParseErrors;
+
       return *this;
     }
 
@@ -169,6 +174,7 @@ public:
         && this->TimestampColumn == other.TimestampColumn
         && this->IgnoreHeader    == other.IgnoreHeader
         && this->WarningsEnabled == other.WarningsEnabled
+        && this->PointCountLogEnabled == other.PointCountLogEnabled
 	      && this->PropertyReadWrite == other.PropertyReadWrite
         );
     }
@@ -606,6 +612,39 @@ public:
       this->CoordinateMap = cmap;
     }
 
+  /** Enable/disable logging of point count on read
+   * 
+   * When set to true (the default), the point reader will print out
+   * the number of points successfully read and the number of errors
+   * to the info log channel when the end of the input is reached.
+   * 
+   * This function is provided because there are cases like the
+   * trajectory reader where this results in thousands of lines of
+   * spam because the reader is invoked for every trajectory
+   * separately.
+   *
+   * @param [in] onoff Boolean flag: 'true' means 'yes, log statistics'
+   */
+
+  void set_point_count_log_enabled(bool onoff) 
+  {
+    this->PointCountLogEnabled = onoff;
+  }
+
+  /** Get the status of the point count log
+   *
+   * Retrieve PointCountLogEnabled.  When set to true, this flag will
+   * print out how many points are read successfully and how many are
+   * lost due to error.
+   *
+   * @return Whether or not point count logging is enabled
+   */
+
+  bool point_count_log_enabled() const 
+  {
+    return this->PointCountLogEnabled;
+  }
+
 protected:
   typedef rw::detail::PropertyAssignmentMap PropertyAssignmentMap;
   typedef std::vector<settings::string_type> string_vector_type;
@@ -621,6 +660,7 @@ protected:
 
   bool                  IgnoreHeader;
   bool                  WarningsEnabled;
+  bool                  PointCountLogEnabled;
 
   PropertyConverter     PropertyReadWrite;
 
@@ -741,7 +781,7 @@ protected:
           ++(this->NumParseErrors);
           }
         }
-      if (NextPoint == 0)
+      if (NextPoint == 0 && this->PointCountLogEnabled)
         {
           TRACKTABLE_LOG(log::info) << "Done reading points. "
                                     << "Generated " << this->NumPoints << " points correctly and "

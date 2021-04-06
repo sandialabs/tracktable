@@ -1,14 +1,14 @@
-.. _userguide-python-basic-classes:
+.. _user-guide-python-basic-classes:
 
 =============
 Basic Classes
 =============
 
-.. _userguide-python-domain:
+.. _user-guide-python-domain:
 
--------
-Domains
--------
+----------------------------
+Domains (Coordinate Systems)
+----------------------------
 
 Tracktable operates on points, timestamps and trajectories. Since
 points and trajectories are meaningless without a coordinate system,
@@ -28,7 +28,7 @@ Tracktable includes the following domains:
    "tracktable.domain.terrestrial", "Points in longitude/latitude space"
    "tracktable.domain.cartesian2d", "Points in flat 2D space"
    "tracktable.domain.cartesian3d", "Points in flat 3D space"
-   "tracktable.domain.feature_vectors", "Collection of points in cartesian space with 2 to 30 dimensions"
+   "tracktable.domain.feature_vectors", "Collection of points in Cartesian space with 2 to 30 dimensions"
 
 Each domain defines several data types:
 
@@ -37,7 +37,7 @@ Each domain defines several data types:
    :widths: 10, 40
 
    "BasePoint", "Bare point - just coordinates."
-   "TrajectoryPoint", "Point with coordinates, object ID, timestamp and used-defined properties."
+   "TrajectoryPoint", "Point with coordinates, object ID, timestamp and user-defined properties."
    "Trajectory", "Vector of trajectory points. Trajectories have their own user-defined properties."
    "LineString", "Vector of un-decorated points (base points)."
    "Box", "Axis-aligned bounding box."
@@ -54,7 +54,7 @@ and trajectories is still an open issue. Given the limited support
 for 3D data in Matplotlib we may delegate this job to another library.
 Exactly which library we might choose is open for discussion.
 
-.. _userguide-python-timestamp:
+.. _user-guide-python-timestamp:
 
 ---------
 Timestamp
@@ -80,7 +80,7 @@ We use the following ones most frequently.
   allow us to change the output format and include a timezone
   indicator.
 
-.. _userguide-python-point-classes:
+.. _user-guide-python-point-classes:
 
 -------------
 Point Classes
@@ -96,112 +96,154 @@ in that we use square brackets, ``[]``, to set and get coordinates. For example:
 .. code-block:: python
    :linenos:
 
-    from tracktable.domain.terrestrial import BasePoint
+   from tracktable.domain.terrestrial import BasePoint
 
-    my_point = BasePoint()
-    my_point[0] = my_longitude
-    my_point[1] = my_latitude
+   my_point = BasePoint()
+   my_point[0] = my_longitude
+   my_point[1] = my_latitude
 
-    longitude = my_point[0]
-    latitude = my_point[1]
+   # You could also assign the coordinates in the constructor:
+   # my_point = BasePoint(my_longitude, my_latitude)
+
+   longitude = my_point[0]
+   latitude = my_point[1]
 
 Longitude is always coordinate 0 and latitude is always coordinate 1.
 We choose this ordering for consistency with the 2D Cartesian domain
 where the X coordinate is always at position 0 and the Y coordinate is
 at position 1.
 
-.. _userguide-python-trajectory-point:
+.. _user-guide-python-trajectory-point:
 
 Trajectory Points
 -----------------
 
 For assembling trajectories in a given domain, Tracktable uses
 the :py:class:`TrajectoryPoint` class to store the (lon, lat)
-coordinates as well as additional point information such as the ``timestamp`` and ``object_id``
+coordinates as well as additional point information such as the
+``timestamp`` and ``object_id``.
 
-These are the main differences between :py:class:`BasePoint` and :py:class:`TrajectoryPoint`.
 
-  1. Its coordinates, reference BasePoint above.
-  2. An identifier for the moving object.
-  3. A timestamp recording when the object was observed.
+Each :py:class:`TrajectoryPoint` has the following properties:
 
-To generate and initialize a trajectory point you would do something like the code below:
+  1. Coordinates (inherited from BasePoint)
+  2. An identifier for the moving object
+  3. A timestamp for this observation of the object's position
 
-.. code-block:: python
-   :linenos:
-
-    from tracktable.domain.terrestrial import TrajectoryPoint
-    from tracktable.core import Timestamp
-
-    my_point = TrajectoryPoint()
-    longitude = 50
-    latitude = 40
-    my_point[0] = longitude
-    my_point[1] = latitude
-
-    my_point.object_id = 'FlightId'
-    my_point.timestamp = Timestamp.from_any('2014-04-05 13:25:00')
-
-.. note:: The ``timestamp`` and ``object_id`` properties are specific to trajectory points.
-
-You may want to associate other data with a point as well. For example:
+The following code shows how to initialize a trajectory point:
 
 .. code-block:: python
    :linenos:
 
-    my_point.properties['altitude'] = 13400
-    my_point.properties['origin'] = 'ORD'
-    my_point.properties['destination'] = 'LAX'
-    my_point.properties['departure_time'] = Timestamp.from_any('2015-02-01 18:00:00')
+   from tracktable.domain.terrestrial import TrajectoryPoint
+   from tracktable.core import Timestamp
+
+   longitude = 50
+   latitude = 40
+
+   my_point = TrajectoryPoint()
+   my_point[0] = longitude
+   my_point[1] = latitude
+
+   # As with BasePoint, you can also set coordinates in the
+   # constructor:
+   # my_point = TrajectoryPoint(longitude, latitude)
+
+   my_point.object_id = 'FlightId'
+   my_point.timestamp = Timestamp.from_any('2014-04-05 13:25:00')
+
+You may want to associate other data with a point as well. For example,
+aircraft trajectories often have altitude and information about the
+flight's origin and destination:
+
+.. code-block:: python
+   :linenos:
+
+   my_point.properties['altitude'] = 13400
+   my_point.properties['origin'] = 'ORD'
+   my_point.properties['destination'] = 'LAX'
+   my_point.properties['departure_time'] = Timestamp.from_any('2015-02-01 18:00:00')
 
 For the most part you can treat the properties array like a Python
-:py:class:`dict`. However, it can only hold values that are of ``numeric``, ``string`` or
+:py:class:`dict`. However, it can only hold values that are of ``float``, ``string`` or
 ``Timestamp`` type.
 
-.. _userguide-python-linestrings:
+.. _user-guide-python-linestrings:
 
 -----------
 LineStrings
 -----------
 
 We include :py:class:`LineString` for ordered sequences of
-points. :py:class:`LineString` is analogous to :py:class:`BasePoint` in that it has no
-decoration at all. It is just a sequence of points.
+points. :py:class:`LineString` is analogous to :py:class:`BasePoint` in
+that it has no decoration (as in no additional data that is unrelated
+to the points longitude and latitude) at all. It is just a sequence of points.
 
-.. todo:: Code example here
+.. code-block:: python
+   :linenos:
 
-.. _userguide-python-trajectories:
+    from tracktable.domain.terrestrial import BasePoint
+
+    point_one = BasePoint(50, 40)
+    point_two = BasePoint(60, 40)
+
+    linestring = []
+    linestring.append(point_one)
+    linestring.append(point_two)
+
+.. _user-guide-python-trajectories:
 
 ------------
 Trajectories
 ------------
 
-We include :py:class:`Trajectory` for ordered sequences of points.
-:py:class:`Trajectory` has its own ID (``trajectory_id``) as well as its own properties
-array.
+We provide :py:class:`Trajectory` for ordered sequences of points.
+:py:class:`Trajectory` has its own ID (``trajectory_id``) as well as
+its own properties array. You do not need to supply a trajectory ID:
+it is computed automatically from the object ID, start time, and end time.
 
 As with the point classes above, each domain in Tracktable defines a
-trajectory class. A trajectory is just a vector of points with a few
-extra properties attached. A trajectory is an iterable just like
-any other point sequence. Here is an example of creating a trajectory.
+trajectory class. Trajectories can be treated like Python lists:
+indexing, slicing, insertion and removal all work as they do with
+an ordinary Python ``list``.
 
 .. code-block:: python
+   :caption: Example: Assemble Trajectory from Points
    :linenos:
 
-    # Populate a trajectory from scratch
-    from tracktable.domain.terrestrial import Trajectory
+   # Populate a trajectory from scratch
+   from tracktable.domain.terrestrial import Trajectory, TrajectoryPoint
+   import datetime
 
-    traj = Trajectory()
-    for point in mypoints:
-        traj.append(mypoint)
+   point1 = TrajectoryPoint(50, 40)
+   point1.object_id = "A"
+   point1.timestamp = datetime.datetime.now()
 
-    # Alternate approach in case you already have points in a list:
-    traj = Trajectory.from_position_list(my_point_list)
+   point2 = TrajectoryPoint(60, 30)
+   point2.object_id = "A"
+   point2.timestamp = point1.timestamp + datetime.timedelta(hours=3)
+
+   traj = Trajectory()
+   traj.append(point1)
+   traj.append(point2)
 
 
-.. note:: Tracktable expects that all points in a given trajectory will have the
-   same object ID. Timestamps must not decrease from one point to the
-   next.
+.. code-block:: python
+   :caption: Assemble Trajectory from List of Points
+   :linenos:
+
+   from tracktable.domain.terrestrial import Trajectory
+
+   # Assume that 'mypoints' is a list of TrajectoryPoints that you
+   # have populated somewhere else in your code. You can create
+   # a Trajectory from that list in one call:
+
+   traj = Trajectory.from_position_list(mypoints)
+
+
+.. note:: Tracktable expects that all points in a given trajectory
+   will have the same object ID. Timestamps must not decrease from one
+   point to the next.
 
 There are several free functions defined on trajectories that do
 useful things. We expect that the following will be used most often:

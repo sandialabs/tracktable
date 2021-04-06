@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -177,8 +177,9 @@ class ArgumentParser(standard_argparse.ArgumentParser):
         look for strings that indicate response files. Load those
         response files and repeat the process with their contents.
 
-        NOTE: This function is not smart enough to guard against
-        self-referencing response files.
+        NOTE:
+            This function is not smart enough to guard against
+            self-referencing response files.
 
         Args:
            arg_strings (list): List of argument strings to examine

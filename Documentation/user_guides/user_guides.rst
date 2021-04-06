@@ -14,7 +14,8 @@ C++ User Guide
 
    c++/introduction.rst
    c++/basic_classes.rst
-   c++/input.rst
+   c++/basic_operations.rst
+   c++/io.rst
    c++/command_line.rst
 
 

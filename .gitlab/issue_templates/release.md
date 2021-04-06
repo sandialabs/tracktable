@@ -1,4 +1,3 @@
-
 <!--
 
 This template is for creating a Tracktable release that will go out to the world.  
@@ -52,6 +51,7 @@ This template is for creating a Tracktable release that will go out to the world
 - [ ] Release Notes
     * [ ] Compile from issues since previous version
     * [ ] Note known issues
+    * [ ] Add release notes to RTD changelog (remember it's in reST)
     * [ ] Check into release branch
 - [ ] Documentation
     * [ ] Build

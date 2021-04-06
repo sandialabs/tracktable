@@ -1,6 +1,6 @@
 # -*- Mode: cmake; -*-
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -113,7 +113,6 @@ set( Core_Detail_AlgorithmSignatures_HEADERS
 
 set( Core_Detail_Implementations_HEADERS
   detail/implementations/CentroidCartesian.h
-  detail/implementations/CentroidTerrestrial.h
   detail/implementations/ConvexHullAreaCartesian.h
   detail/implementations/ConvexHullAreaTerrestrial.h
   detail/implementations/ConvexHullCartesian.h

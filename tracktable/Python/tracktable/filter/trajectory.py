@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -58,8 +58,9 @@ class ClipToTimeWindow(object):
     def trajectories(self):
         """Return sub-trajectories within window.
 
-        Note: Since this is a generator, you can only traverse the sequence
-          once unless you collect it in a list yourself.
+        Note:
+            Since this is a generator, you can only traverse the sequence
+            once unless you collect it in a list yourself.
 
         Yields:
            Trajectories derived from input trajectories. Each trajectory

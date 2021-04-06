@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2020 National Technology and Engineering
+ * Copyright (c) 2014-2021 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -120,7 +120,7 @@ make_box_2d_from_objects(boost::python::object& min_corner, boost::python::objec
   box_min_corner[1] = extract<coordinate_type>(min_corner[1]);
   box_max_corner[0] = extract<coordinate_type>(max_corner[0]);
   box_max_corner[1] = extract<coordinate_type>(max_corner[1]);
-  
+
   return box;
 }
 
@@ -341,7 +341,7 @@ public:
     {
       std::ostringstream outbuf;
       outbuf << "BoundingBox(" << thing.min_corner()
-             << " - " 
+             << " - "
              << thing.max_corner()
              << ")";
       return outbuf.str();
@@ -362,7 +362,7 @@ template<typename ClassT> std::string bbox_to_string<ClassT>::_name;
 
 
 // ---------------------------------------------------------------------
-// 
+//
 class bbox_to_string_methods : public boost::python::def_visitor<bbox_to_string_methods>
 {
   friend class boost::python::def_visitor_access;

@@ -36,10 +36,10 @@ Third-Party Software
 
 We include databases of cities (from `MaxMind
 <http://www.maxmind.com>`_), time zone boundaries (from `Eric Muller <http://efele.net/maps/tz/world/>`_)
-and airports (from `Arash Partow <http://www.partow.net/miscellaneous/airportdatabase>`_) in Tracktable.
+and airports (from `Arash Partow <http://www.partow.net/miscellaneous/airportdatabase>`_) in tracktable.
 
 Their licenses are reproduced in full in the file ``LICENSE.html`` in
-the root directory of the Tracktable distribution. In this section we
+the root directory of the tracktable distribution. In this section we
 reproduce those parts of the licenses that are required to be present
 in documentation.
 

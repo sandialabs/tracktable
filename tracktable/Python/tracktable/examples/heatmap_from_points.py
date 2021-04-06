@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2020 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -30,8 +30,9 @@
 """heatmap_from_csv.py - Render a 2D geographic heatmap using points in a
 delimited text file
 
-NOTE: Cartopy v0.18.0 is required to successfully render maps and pass
-our internal tests.
+Note:
+  Cartopy v0.18.0 is required to successfully render maps and pass
+  our internal tests.
 
 This is both an example of how to use the library and a convenient
 script that you can use to get started quickly.  You must provide as

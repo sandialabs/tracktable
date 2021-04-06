@@ -9,8 +9,8 @@ Conventions & Principles
    Instead of using these, we encourage users to use the classes in
    tracktable/Domain. Each domain shall provide classes named
    ``base_point_type``, ``trajectory_point_type``, ``trajectory_type``,
-   ``box_type``, ``linestring_type``, ``base_point_reader_type`` and
-   ``trajectory_point_reader_type``.
+   ``linestring_type``, ``box_type``, ``base_point_reader_type``,
+   ``trajectory_reader_type`` and ``trajectory_point_reader_type``.
 
    To create a variable that is a trajectory in the Terrestrial
    domain in C++, use code like the following:
@@ -18,7 +18,7 @@ Conventions & Principles
    .. code-block:: c++
       :linenos:
 
-      #include <tracktable/Domain/terrestrial.h>
+      #include <tracktable/Domain/Terrestrial.h>
 
       tracktable::domain::terrestrial::trajectory_type my_trajectory;
 
@@ -29,6 +29,7 @@ Conventions & Principles
    speeds in kilometers per hour. Positions shall be measured in
    degrees of latitude and longitude. Speaking of which...
 
+   
 3. Positions on the Earth shall be measured in **degrees of longitude and latitude**.
 
    This one is simpler. The only real question is whether latitude or
@@ -37,11 +38,13 @@ Conventions & Principles
    The canonical globe will have longitudes from -180 to 180 and
    latitudes from -90 to 90.
 
+   
 4. Bearings shall be measured in degrees. A bearing of 0 is due north
    and 90 degrees is due east.
 
    This has been navigational convention for a very, very long time.
 
+   
 5. All default **color maps shall be accessible** to people with red-green color blindness.
 
    At a minimum , a color map should be usable when converted to black
@@ -54,6 +57,7 @@ Conventions & Principles
    read `How the Rainbow Color Map Deceives <http://eagereyes.org/basics/rainbow-color-map>`_
    and `Rainbow Color Map (Still) Considered Harmful <http://people.renci.org/~borland/pdfs/RainbowColorMap_VisViewpoints.pdf>`_.
 
+   
 6. External software dependencies should be minimized.
 
    We have all had the experience of trying to install a software

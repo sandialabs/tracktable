@@ -1,9 +1,12 @@
-
-.. _userguide-python-command-line:
+.. _user-guide-python-command-line:
 
 ============
 Command Line
 ============
+
+.. note:: While the information below is referencing Tracktable's
+   rendering facilities, the command line functionality presented
+   can be applied to other tracktable scripts.
 
 Tracktable's various rendering facilities have a lot of options.
 Python makes it easy for us to expose these as command-line options
@@ -18,7 +21,8 @@ We introduce two facilities to help tame this morass:
    arguments that all pertain to a single capability. For example,
    the argument group for trajectory assembly has entries for the
    maximum separation distance, maximum separation time and minimum
-   length as described above in :ref:`python-trajectory-assembly`.
+   length as described in the :ref:`Trajectory Assembly <python-trajectory-assembly>`
+   section.
 
 2. **Response Files**: A response file is a way to package up
    arbitrarily many command-line arguments in a file and pass them to
@@ -29,7 +33,7 @@ We introduce two facilities to help tame this morass:
    for response files containing comments and response files that load
    other response files.
 
-.. _userguide-python-argument-groups:
+.. _user-guide-python-argument-groups:
 
 ---------------
 Argument Groups
@@ -62,13 +66,16 @@ have been parsed, we (as the programmers) can extract values for each
 argument group that you used. All of these functions are in the
 :py:mod:`tracktable.script_helpers.argument_groups.utilities` module.
 
+.. _create-arg-group-python:
+
 Creating an Argument Group
 --------------------------
 
 We create an argument group first by declaring it with
 :py:func:`create_argument_group() <tracktable.script_helpers.utilities.create_argument_group>`
 and then populating it with calls to
-:py:func:`add_argument() <tracktable.script_helpers.utilities.add_argument>`. Here is an example from the ``movie_rendering`` group:
+:py:func:`add_argument() <tracktable.script_helpers.utilities.add_argument>`.
+Here is an example from the ``movie_rendering`` group:
 
 .. code-block:: python
    :linenos:
@@ -97,6 +104,8 @@ at ``__init__.py`` in that directory for an example of how to add one
 to the registry. You can register your own groups anywhere in your
 code that you choose.
 
+.. _apply-arg-group-python:
+
 Applying Argument Groups
 ------------------------
 
@@ -124,6 +133,7 @@ We recommend reading the code for
 if you need to do especially complex things with ``argparse`` such
 as mutually exclusive sets of options.
 
+.. _use-parsed-arg-vals-python:
 
 Using Parsed Argument Values
 ----------------------------
@@ -152,13 +162,13 @@ in a group so that we can write code like the following:
        return source.trajectories()
 
 Since we are not required to refer to the individual arguments
-directly the user can take advantage of new capabilities added to the
+directly, the user can take advantage of new capabilities added to the
 underlying modules whether or not we know about them when we write our
 script.
 
 .. todo:: Add tracktable.script_helpers.argument_groups to the documentation
 
-.. _userguide-python-response-files:
+.. _user-guide-python-response-files:
 
 --------------
 Response Files

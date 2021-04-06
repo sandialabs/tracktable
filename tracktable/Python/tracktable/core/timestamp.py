@@ -1,4 +1,4 @@
-# Copyright (c) 2014, Sandia Corporation.  All rights
+# Copyright (c) 2014-2021, Sandia Corporation.  All rights
 # reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -61,8 +61,9 @@ def localize_timestamp(naive_ts, utc_offset=0):
     awkward.  Thie routine will assign a time zone to a datetime (UTC
     by default) for consistency throughout Tracktable.
 
-    Note: You can change the default timezone by setting the
-    module-level variable DEFAULT_TIMEZONE.  This is not recommended.
+    Note:
+      You can change the default timezone by setting the
+      module-level variable DEFAULT_TIMEZONE.  This is not recommended.
 
     Args:
       naive_ts (datetime): Timestamp to localize
@@ -142,8 +143,9 @@ class Timestamp(object):
         to parse a time zone declaration -- for example, '2017-06-01
         12:34:56-0500' is June 5, 2017 in UTC-5, aka the US east coast.
 
-        Note: Python 2.7 does not have the %z directive.  You must use
-        Python 3.4 or newer to get that.
+        Note:
+          Python 2.7 does not have the %z directive.  You must use
+          Python 3.4 or newer to get that.
 
         Args:
           timestring (str): String containing your timestamp
