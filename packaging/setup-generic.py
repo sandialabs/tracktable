@@ -30,7 +30,6 @@
 # setup-generic.py -- build Tracktable wheels for Linux, Windows, and
 # Mac OS X
 
-import argparse
 import codecs
 import glob
 import os
@@ -42,16 +41,19 @@ import sys
 from setuptools import setup, find_packages
 from setuptools.dist import Distribution
 
+
 class BinaryDistribution(Distribution):
     def is_pure(self):
         return False
 
 # ----------------------------------------------------------------------
 
+
 def files_from_components(*components):
     return glob.glob(os.path.join(*components))
 
 # ----------------------------------------------------------------------
+
 
 def read(filename):
     """
@@ -62,6 +64,7 @@ def read(filename):
         return f.read()
 
 # ----------------------------------------------------------------------
+
 
 def find_metadata_property(text, property_name):
     """Extract a named property from a Python file.
@@ -77,7 +80,9 @@ def find_metadata_property(text, property_name):
 
     """
 
-    property_regex = r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=property_name)
+    property_regex = r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(
+        meta=property_name
+        )
 
     meta_match = re.search(property_regex, text, re.M)
 
@@ -85,10 +90,12 @@ def find_metadata_property(text, property_name):
         return meta_match.group(1)
     else:
         raise RuntimeError(
-            "Unable to find __{meta}__ string in text.".format(meta=property_name)
-            )
+            "Unable to find __{meta}__ string in text.".format(
+                meta=property_name
+            ))
 
 # --------------------------------------------------------------------
+
 
 def main():
     here = os.getcwd()
@@ -96,9 +103,10 @@ def main():
     init_filename = os.path.join(tracktable_home, '__init__.py')
 
     if not (os.path.exists(init_filename) and os.path.isfile(init_filename)):
-        raise RuntimeError(('This script must be run from the root of a '
-                            'Tracktable install tree.  Specifically, the file '
-                            '<here>/Python/tracktable/__init__.py must exist.'))
+        raise RuntimeError(
+            ('This script must be run from the root of a '
+             'Tracktable install tree.  Specifically, the file '
+             '<here>/Python/tracktable/__init__.py must exist.'))
 
     init_file_text = read(init_filename)
     # Parse the following properties out of the top-level __init__.py
@@ -111,14 +119,13 @@ def main():
     for key in properties_in_init:
         metadata_from_init[key] = find_metadata_property(init_file_text, key)
 
-
     # --------------------
 
     # Computed properties here
 
     here = os.getcwd()
     directory_containing_tracktable = os.path.join(here, 'Python')
-    package_directory = { '': directory_containing_tracktable }
+    package_directory = {'': directory_containing_tracktable}
     tracktable_contents = find_packages(where=directory_containing_tracktable)
 
     system = platform.system()
@@ -165,10 +172,13 @@ def main():
         files_from_components(example_data_directory, '*.traj')
         )
 
-    notebook_example_directory = os.path.join(tracktable_home, 'examples', 'notebook_examples')
-    notebook_example_files = files_from_components(notebook_example_directory, '*.ipynb')
+    notebook_example_directory = os.path.join(tracktable_home,
+                                              'examples',
+                                              'notebook_examples')
+    notebook_example_files = files_from_components(notebook_example_directory,
+                                                   ' *.ipynb')
 
-    license_files = [ os.path.join(tracktable_home, 'LICENSE.txt') ]
+    license_files = [os.path.join(tracktable_home, 'LICENSE.txt')]
 
     # --------------------
 
@@ -177,7 +187,6 @@ def main():
     keywords = [
         'trajectory', 'analysis', 'visualization'
         ]
-
 
     classifiers = [
         "Development Status :: 5 - Production/Stable",
@@ -241,6 +250,7 @@ def main():
     )
 
 # ----------------------------------------------------------------------
+
 
 if __name__ == '__main__':
     sys.exit(main())

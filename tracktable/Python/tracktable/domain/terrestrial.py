@@ -43,6 +43,9 @@ from tracktable.lib._terrestrial import BasePointWriterTerrestrial as BasePointW
 from tracktable.lib._terrestrial import TrajectoryPointWriterTerrestrial as TrajectoryPointWriter
 from tracktable.lib._terrestrial import TrajectoryWriterTerrestrial
 
+# We need this in order to get the converters for ECEF coordinates
+import tracktable.domain.cartesian3d
+
 DIMENSION = 2
 
 domain_classes = {

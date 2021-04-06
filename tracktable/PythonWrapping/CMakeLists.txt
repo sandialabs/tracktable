@@ -88,16 +88,18 @@ endif()
 set(Boost_PYTHON_LIBRARY_SUFFIX "")
 
 if (TRACKTABLE_PYTHON AND Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
-  #message(STATUS "Boost_VERSION ${Boost_VERSION}")
-  if (Boost_VERSION VERSION_LESS 106700)
+  message(STATUS "Boost_VERSION ${Boost_VERSION}")
+  if (Boost_VERSION VERSION_LESS 1.67.0)
+    #message(STATUS "This version of Boost uses libpython3.so.")
     # This version of Boost generates libboost_python[3].so.
     set(Boost_PYTHON_LIBRARY_SUFFIX "3")
-  else (Boost_VERSION VERSION_LESS 106700)
+  else (Boost_VERSION VERSION_LESS 1.67.0)
     #message(STATUS "Python3_VERSION_MAJOR ${Python3_VERSION_MAJOR}")
     #message(STATUS "Python3_VERSION_MINOR ${Python3_VERSION_MINOR}")
+    #message(STATUS "This version of Boost needs a versioned Python library.")
     # This version of Boost needs a versioned library.
     set(Boost_PYTHON_LIBRARY_SUFFIX "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}")
-  endif (Boost_VERSION VERSION_LESS 106700)
+  endif (Boost_VERSION VERSION_LESS 1.67.0)
 
   #message(STATUS "Boost_PYTHON_LIBRARY_SUFFIX ${Boost_PYTHON_LIBRARY_SUFFIX}")
   set(BOOST_PYTHON_COMPONENTS python${Boost_PYTHON_LIBRARY_SUFFIX})
@@ -281,9 +283,17 @@ add_library(_feature_vector_points MODULE
   ExplicitInstantiation/FeatureVectorWrapper_Extra.cpp
   )
 
-If(MSVC)
+# These modules end up containing so much code due to template 
+# instantiation that Microsoft Visual C++ needs to use a slightly
+# different object format.
+
+if(MSVC)
   set_property(SOURCE FeatureVectorModule.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " /bigobj ")
-Endif(MSVC)
+  set_property(SOURCE TerrestrialDomainModule.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " /bigobj")
+  set_property(SOURCE Cartesian2DDomainModule.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " /bigobj")
+  set_property(SOURCE Cartesian3DDomainModule.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " /bigobj")
+  set_property(SOURCE DomainAlgorithmOverloads.cpp APPEND_STRING PROPERTY COMPILE_FLAGS " /bigobj")
+endif(MSVC)
 set_property(TARGET _feature_vector_points PROPERTY FOLDER "Python")
 
 target_link_libraries(_feature_vector_points

@@ -61,7 +61,10 @@ EXCLUSIONS = {
     'windows': [
         r'kernel32\.dll',
         r'api-ms-win-.*\.dll',
-        r'bcrypt.dll'
+        r'bcrypt.dll',
+        r'advapi32.dll',
+        r'ws2_32.dll',
+        r'secur32.dll'
         ],
     'msvc_runtime': [
         r'msvcp\d{3}\.dll',
@@ -69,7 +72,7 @@ EXCLUSIONS = {
         r'concrt\d{3}\.dll'
         ],
     'libpython': [
-        r'python\d{2}\.dll'
+        r'^python\d{2}\.dll'
         ],
     'directories': [
         r'c:\\windows',
@@ -228,6 +231,7 @@ def is_excluded(filename, exclusions):
     for (category, regex_list) in exclusions.items():
         for regex in regex_list:
             if regex.search(filename):
+                logging.getLogger(__name__).debug('DLL {} is excluded: matches pattern {} from category {}'.format(filename, regex, category))
                 return True
     assert('api-ms-win' not in filename)
     assert('vcruntime' not in filename)
@@ -382,8 +386,14 @@ def build_file_db(search_directories, extensions=None):
         if base_filename not in file_dict:
             file_dict[base_filename] = filename
 
+#    logger.debug('Found {} files in {} search directories with extension filter {}: {}'.format(
+#        len(file_dict), len(unique_directories), extensions, file_dict))
+
     logger.debug('Found {} files in {} search directories with extension filter {}'.format(
         len(file_dict), len(unique_directories), extensions))
+
+    if len(file_dict) < 15:
+        pprint.pprint(file_dict)
 
     return file_dict
 
@@ -468,7 +478,12 @@ def resolve_dependencies_transitive(filename,
     resolved = set()
     while len(dependency_queue) != 0:
         dll_name = dependency_queue.pop(0)
-        logger.debug('** Resolving dependencies for {}'.format(dll_name))
+        if not is_excluded(dll_name, exclusions):
+            logger.debug('****** Resolving dependencies for {}'.format(dll_name))
+        else:
+            logger.debug('Skipping excluded DLL {}'.format(dll_name))
+            continue
+
         if dll_name in resolved:
             continue
         else:
@@ -481,7 +496,7 @@ def resolve_dependencies_transitive(filename,
                 full_name = file_db[dll_name]
                 if not is_excluded(full_name, exclusions):
                     new_dependencies = find_dll_dependencies(full_name)
-                    logging.debug('** Adding {} new dependencies for file {}.'.format(len(new_dependencies), dll_name))
+                    logging.debug('Adding {} new dependencies for file {}: {}.'.format(len(new_dependencies), dll_name, new_dependencies))
                     dependency_queue.extend(new_dependencies)
 
     return remove_excluded_files([
@@ -563,13 +578,22 @@ def resolve_dependencies_for_wheel(wheel_path,
     logger.info('Locating binary artifacts in wheel.  Root directory is {}.'.format(wheel_path))
     files_to_check = files_in_subtree(wheel_path, extensions)
 
+    directories_already_checked = set(search_paths)
     all_dependencies = {}
 
+    full_file_db = dict(main_file_db)
+
     for filename in files_to_check:
+        if is_excluded(filename, exclusions):
+            continue
+
         logger.info('Resolving dependencies for {}.'.format(filename))
-        file_db_this_directory = build_file_db([os.path.dirname(filename)], extensions)
-        full_file_db = dict(main_file_db)
-        full_file_db.update(file_db_this_directory)
+        this_directory = os.path.dirname(filename)
+        if this_directory not in directories_already_checked:
+            logger.info('Adding DLLs in directory containing {}.'.format(filename))
+            file_db_this_directory = build_file_db([os.path.dirname(filename)], extensions)
+            full_file_db.update(file_db_this_directory)
+            directories_already_checked.add(this_directory)
 
         try:
             all_dependencies[filename] = resolve_dependencies_transitive(filename,
@@ -619,16 +643,20 @@ def add_dependencies_to_wheel(dependency_results,
         original_file_path = os.path.dirname(original_file).lower()
         if original_file_path not in files_added_by_directory:
             files_added_by_directory[original_file_path] = set()
-        logger.debug('Files already in directory: {}'.format(pprint.pformat(files_added_by_directory[original_file_path])))
+        
+        if len(files_added_by_directory) > 0:
+            logger.debug('Files already in directory: {}'.format(pprint.pformat(files_added_by_directory[original_file_path])))
 
 
         for dependency in dependencies:
             dependency_basename = os.path.basename(dependency).lower()
             dependency_path = os.path.dirname(dependency).lower()
+            logger.debug('--- Considering dependent library: {}'.format(dependency_basename))
             # We don't need to add files that are already in that
             # directory -- the current directory is always on the
             # DLL search path.
             if dependency_path == original_file_path:
+                logger.debug('    Same directory.  Recursive search not needed.')
                 continue
             # Don't add files that we've already added
             if dependency_basename in files_added_by_directory[original_file_path]:

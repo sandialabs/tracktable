@@ -29,7 +29,7 @@
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.19)
 message(STATUS "Building with CMake version ${CMAKE_VERSION}")
 
 if (POLICY CMP0042)
@@ -68,7 +68,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Begin RELEASE VARIABLES
 #-------------------------------------------------------------------------
 
-set(TRACKTABLE_VERSION 1.4.1)
+set(TRACKTABLE_VERSION 1.5.0)
 set(RPM_RELEASE 6)
 
 project(Tracktable LANGUAGES CXX VERSION ${TRACKTABLE_VERSION})
@@ -105,7 +105,7 @@ include(GNUInstallDirs)
 #  ? : +1 :  ? == just some internal changes, nothing breaks but might work better
 set(UNIX_SO_VERSION_CURRENT  5)
 set(UNIX_SO_VERSION_REVISION 0)
-set(UNIX_SO_VERSION_AGE      0)
+set(UNIX_SO_VERSION_AGE      1)
 
 #-------------------------------------------------------------------------
 # End RELEASE VARIABLES

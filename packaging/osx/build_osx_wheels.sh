@@ -429,6 +429,7 @@ function create_conda_environment () {
 		folium \
 		graphviz \
 		jupyter \
+		numpy \
 		pip \
 		pytz \
 		sphinx \
@@ -564,7 +565,9 @@ function element_in () {
 function enable_anaconda () {
 	msg_info "Enabling Anaconda commands."
 	export PS1=
+	disable_debug;
 	eval "$(command conda 'shell.bash' 'hook' 2>/dev/null)"
+	enable_debug;
 }
 
 
@@ -858,6 +861,10 @@ function main () {
 			msg_debug "Defaulting to TMPDIR: ${TMPDIR}"
 			WORKDIR_LOCATION=${TMPDIR}
 		fi
+	else
+		# Make sure we have an absolute path for the work directory
+		ABS_PATH=$(cd "${WORKDIR_LOCATION}" && pwd)
+		WORKDIR_LOCATION=${ABS_PATH}
 	fi
 
 	# By default, don't keep build trees

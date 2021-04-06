@@ -4,6 +4,84 @@
 Changelog
 =========
 
+VERSION 1.5.0, 3 April 2021
+---------------------------
+
+This release includes major updates to the documentation. The Python and
+C++ user guides have been overhauled. Example Jupyter notebooks are now
+included in the documentation.
+
+We are also building wheels for Python 3.9 as of this release.
+Tracktable 1.6, due in summer 2021, will be the last version to support
+Python 3.5. (Python 3.5 has reached the end of its support window. See
+https://www.python.org/downloads/release/python-3510/ for details.)
+
+DEPENDENCY UPDATES
+~~~~~~~~~~~~~~~~~~
+
+Tracktable now requires a compiler that supports C++14. This means GCC
+5, Clang 3.4, Microsoft Visual C++ 19 (2015), and Intel C++ 17.
+
+We now require CMake 19 in order to support Python 3.9.
+
+Advance warning: we will be moving our required Boost version to 1.75 as
+of Tracktable 1.7, due in Q3 2021.
+
+BUGS FIXED SINCE 1.4.1
+~~~~~~~~~~~~~~~~~~~~~~
+
+TrajectoryReader was printing excessive debug output.
+
+ECEF (Earth Centered / Earth Fixed) coordinate conversion would fail if
+``tracktable.domain.cartesian3d`` had not already been imported.
+
+Specific issues:
+
+-  #322 - Update conf.py file to handle auto pathing
+-  #314 - render_trajectories for Folium needs to be updated to match
+   changes in bbox parameter ordering
+-  #309 - Incorrect parameter order specified in documentation for
+   render_trajectories
+-  #308 - degrees function missing math import
+-  #306 - Relocate files in tracktable.source to more appropriate
+   locations
+-  #304 - Document tracktable::simplify
+-  #303 - Params for Clustering Example Notebook
+-  #301 - Jupyter example notebooks failing to render maps
+-  #262 - Move object ID out of Classify into its own example
+-  #218 - Clean up C++ Classify example
+-  #217 - Clean up C++ Filter Example
+-  #215 - Clean up C++ Reduce example
+-  #214 - Clean up C++ Cluster example
+-  #132 - Clean up C++ Predict example
+-  #116 - Clean up C++ Serialization example
+-  #1 - Basemap deprecation warnings
+
+Specific merge requests not addressed above:
+
+-  !210: Docs Warning Fix & Missing Changes
+-  !208: Pull in Boost compatibility fixes that arose with 1.74
+-  !204: Make example_\* scripts in tracktable.examples conform to
+   Python style
+-  !203: CI YAML updates
+-  !202: Update all code copyrights to 2021
+-  !200: Resolve “Revamp User Guide”
+-  !199: Verify all documentation updates build on ReadTheDocs prior to
+   release
+-  !197: Missing API documentation
+-  !194: Remove unused file CentroidTerrestrial.h
+
+UPCOMING FEATURES
+~~~~~~~~~~~~~~~~~
+
+In 1.6 and 1.7 we expect to add:
+
+-  Python bindings for C++ data generators
+-  Python bindings for KML output
+-  Readers and writers for trajectories in GeoJSON
+-  API cleanup for render_trajectories
+-  More documentation updates and example notebooks
+
 VERSION 1.4.1, 1 December 2020
 ==============================
 
