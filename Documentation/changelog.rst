@@ -1,11 +1,11 @@
-.. _changelog:
+.. _changelog_page:
 
 =========
 Changelog
 =========
 
 VERSION 1.5.0, 3 April 2021
----------------------------
+==============================
 
 This release includes major updates to the documentation. The Python and
 C++ user guides have been overhauled. Example Jupyter notebooks are now
@@ -17,7 +17,7 @@ Python 3.5. (Python 3.5 has reached the end of its support window. See
 https://www.python.org/downloads/release/python-3510/ for details.)
 
 DEPENDENCY UPDATES
-~~~~~~~~~~~~~~~~~~
+------------------
 
 Tracktable now requires a compiler that supports C++14. This means GCC
 5, Clang 3.4, Microsoft Visual C++ 19 (2015), and Intel C++ 17.
@@ -28,7 +28,7 @@ Advance warning: we will be moving our required Boost version to 1.75 as
 of Tracktable 1.7, due in Q3 2021.
 
 BUGS FIXED SINCE 1.4.1
-~~~~~~~~~~~~~~~~~~~~~~
+----------------------
 
 TrajectoryReader was printing excessive debug output.
 
@@ -61,7 +61,7 @@ Specific merge requests not addressed above:
 
 -  !210: Docs Warning Fix & Missing Changes
 -  !208: Pull in Boost compatibility fixes that arose with 1.74
--  !204: Make example_\* scripts in tracktable.examples conform to
+-  !204: Make ``example_\*`` scripts in tracktable.examples conform to
    Python style
 -  !203: CI YAML updates
 -  !202: Update all code copyrights to 2021
@@ -72,7 +72,7 @@ Specific merge requests not addressed above:
 -  !194: Remove unused file CentroidTerrestrial.h
 
 UPCOMING FEATURES
-~~~~~~~~~~~~~~~~~
+-----------------
 
 In 1.6 and 1.7 we expect to add:
 
@@ -81,6 +81,8 @@ In 1.6 and 1.7 we expect to add:
 -  Readers and writers for trajectories in GeoJSON
 -  API cleanup for render_trajectories
 -  More documentation updates and example notebooks
+
+---------------------------------------------------------------------------------------------
 
 VERSION 1.4.1, 1 December 2020
 ==============================

@@ -55,6 +55,8 @@ package managers such as
     - MacPorts (https://www.macports.org/)
     - Homebrew (https://brew.sh/)
 
+Instructions on using Anaconda to configure a fully functional development environment are located in
+the :ref:`Anaconda Virtual Environment <create_conda_environment_source>` section below.
 
 Tracktable has the following required dependencies:
 
@@ -181,6 +183,62 @@ For up-to-date instructions on building FFMPEG please refer to
 https://trac.ffmpeg.org/wiki/CompilationGuide and choose your OS.
 We recommend that you compile in support for H264 video (via ``libx264``).
 
+
+.. _create_conda_environment_source:
+
+Anaconda Virtual Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. attention:: The tracktable development anaconda environment that is created in this section
+    is plug and play on Linux and MacOS and will build the Tracktable source code with no additional
+    configuration. For Windows, there are additional steps required to configure cmake and an IDE
+    to recognize the anaconda environment. These additional steps are dependent on the existing
+    Windows environment, compiler and IDE being used and are outside the scope of the troubleshooting
+    provided in this documentation.
+
+If you have `Anaconda <https://www.anaconda.com/distribution/>`_
+installed then the Anaconda virtual environment commands
+below will create and configure a virtual environment that is ready to use
+to build Tracktable from source. Enter the following commands in a command/terminal/Anaconda prompt.
+
+
+#. Create the Anaconda virtual environment
+
+    We include a YML configuration file
+    (:download:`tracktable_dev_environment.yml <../../tracktable_dev_environment.yml>`)
+    that can be used to create an Anaconda virtual environment named
+    ``tracktable-dev``. This file will create the environment in one shot and doesn't
+    require any additional package installation after the environment is activated.
+
+    .. code-block:: console
+
+      conda env create -f /path/to/tracktable_dev_environment.yml
+
+    .. important:: Be sure to substitute the location where you saved tracktable_dev_environment.yml in the command above.
+
+#. Verify that the ``tracktable-dev`` virtual environment was created
+
+    .. code-block:: console
+
+      conda env list
+
+#. Activate the virtual environment
+
+    .. code-block:: console
+
+      conda activate tracktable-dev
+
+#. Deactivate the virtual environment (optional)
+
+    .. code-block:: console
+
+      conda deactivate
+
+#. Delete the virtual environment when it is no longer needed
+
+  .. code-block:: console
+
+      conda remove --name tracktable-dev --all
 
 Step 2: Configuration
 ---------------------

@@ -1,8 +1,9 @@
+# Tracktable Runtime Anaconda Environment
 name: tracktable
 channels:
   - conda-forge
 dependencies:
-  - python=3.8
+  - python>=3.6, <=3.9
   - pip
   - folium
   - pyshp
