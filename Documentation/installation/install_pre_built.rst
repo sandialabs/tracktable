@@ -21,10 +21,10 @@ you're running Python 3.5 to Python 3.9. Use the following command:
 
     pip install tracktable
 
+.. _create_conda_environment:
+
 Anaconda Virtual Environment
 ----------------------------
-
-.. _create_conda_environment:
 
 If you have `Anaconda <https://www.anaconda.com/distribution/>`_
 installed then the Anaconda virtual environment commands
