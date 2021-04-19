@@ -1,0 +1,11 @@
+compile-macos:
+  stage: build
+  tags: 
+    - macos
+  script:
+    - cmake .
+    - make -j8
+    - cmake .
+    - ctest . --output-on-failure
+  retry: 1
+
