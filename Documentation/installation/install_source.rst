@@ -181,6 +181,41 @@ For up-to-date instructions on building FFMPEG please refer to
 https://trac.ffmpeg.org/wiki/CompilationGuide and choose your OS.
 We recommend that you compile in support for H264 video (via ``libx264``).
 
+    We include a YML configuration file
+    (:download:`tracktable_dev_environment.yml <../../tracktable_dev_environment.yml>`)
+    that can be used to create an Anaconda virtual environment named
+    ``tracktable-dev``. This file will create the environment in one shot and doesn't
+    require any additional package installation after the environment is activated.
+
+    .. code-block:: console
+
+      conda env create -f /path/to/tracktable_dev_environment.yml
+
+    .. important:: Be sure to substitute the location where you saved tracktable_dev_environment.yml in the command above.
+
+#. Verify that the ``tracktable-dev`` virtual environment was created
+
+    .. code-block:: console
+
+      conda env list
+
+#. Activate the virtual environment
+
+    .. code-block:: console
+
+      conda activate tracktable-dev
+
+#. Deactivate the virtual environment (optional)
+
+    .. code-block:: console
+
+      conda deactivate
+
+#. Delete the virtual environment when it is no longer needed
+
+  .. code-block:: console
+
+      conda remove --name tracktable-dev --all
 
 Step 2: Configuration
 ---------------------

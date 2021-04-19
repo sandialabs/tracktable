@@ -32,6 +32,10 @@
 #define __tracktable_PythonWrapping_RTree_Common_h
 
 #include <tracktable/Core/TracktableCommon.h>
+
+// Fix regression in Boost 1.74 with missing header file
+#include <boost/geometry/geometry.hpp>
+
 #include <tracktable/Analysis/RTree.h>
 #include <tracktable/Domain/FeatureVectors.h>
 

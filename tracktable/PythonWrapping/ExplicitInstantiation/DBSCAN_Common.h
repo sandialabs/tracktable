@@ -32,8 +32,13 @@
 #define __tracktable_PythonWrapping_DBSCAN_h
 
 #include <tracktable/Core/TracktableCommon.h>
+
+// Fix regression in Boost 1.74 with missing header file
+#include <boost/geometry/geometry.hpp>
+
 #include <tracktable/Analysis/ComputeDBSCANClustering.h>
 #include <tracktable/Domain/FeatureVectors.h>
+
 
 #include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 
