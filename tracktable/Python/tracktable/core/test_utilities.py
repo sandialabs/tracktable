@@ -84,9 +84,9 @@ def image_mse(imageA, imageB):
     difference between the two images
 
     Args:
-      imageA (str): Filename for image A
+      imageA (Image): PIL Image A
 
-      imageB (str): Filename for image B
+      imageB (Image): PIL Image B
 
     Returns:
       the MSE, the lower the error, the more "similar" the two images are
@@ -100,6 +100,78 @@ def image_mse(imageA, imageB):
     err /= float(imageA.shape[0] * imageA.shape[1])
 
     return err
+
+# ----------------------------------------------------------------------
+
+def image_shifter(imageA, imageB):
+    """ create a resized truth, and shifted, resized results.
+
+    Args:
+      imageA (Image): PIL image A
+
+      imageB (Image): PIL image B
+
+    Returns:
+      a 9 x rows-2 x cols-2 x channels numpy array
+
+    """
+    npImgA = np.array(imageA)
+    npImgB = np.array(imageB)
+    
+    num_rows, num_cols, num_chan = npImgA.shape
+    r_mat = np.zeros((9, num_rows-2, num_cols-2, num_chan), dtype=float)
+    
+    #affine translation matrices:
+    xform = np.zeros((8, 2, 3), dtype=np.float32)
+    xform[0] = np.array([ [1,0,0], [0,1,1] ])   # up
+    xform[1] = np.array([ [1,0,-1], [0,1,1] ])  # right up
+    xform[2] = np.array([ [1,0,-1], [0,1,0] ])  # right
+    xform[3] = np.array([ [1,0,-1], [0,1,-1] ]) # right down
+    xform[4] = np.array([ [1,0,0], [0,1,-1] ])  # down
+    xform[5] = np.array([ [1,0,1], [0,1,-1] ])  # left down
+    xform[6] = np.array([ [1,0,1], [0,1,0] ])   # left
+    xform[7] = np.array([ [1,0,1], [0,1,1] ])   # left up
+
+    # Image translations
+    img_x = np.zeros((8, num_rows, num_cols, num_chan), dtype=np.uint8)  
+    for i in range(8):
+        tmpImg = imageB
+        img_x[i] = np.array(tmpImg.transform((num_cols, num_rows),
+                                             Image.AFFINE,
+                                             data=xform[i].flatten()[:6]))
+
+    # truth image (downsampled at the edges)
+    r_mat[0] = (np.array(imageA))[1:num_rows-1, 1:num_cols-1]
+    # shifted images
+    for i in range(8):
+        r_mat[i+1] = img_x[i, 1:num_rows-1, 1:num_cols-1]
+
+    return r_mat
+        
+# ----------------------------------------------------------------------
+
+def image_pCorr(imageA, imageB):
+    """ Compute the Pearson correlation coefficient between two images
+
+    Args:
+      imageA: Pil Image A
+
+      imageB: Pil Image B
+
+    Returns:
+      the maximum Pearson correlation between image A (truth), and all 1-pixel shifts possible
+      of image B.
+    """
+    shifted = image_shifter(imageA, imageB)
+
+    corr = np.zeros((8, 1), dtype=np.float32)
+    for i in range(8):
+        img_truth = shifted[0]
+        img_test = shifted[i+1]
+        corrMat = np.corrcoef(img_truth.flat, img_test.flat)
+        corr[i] = corrMat[0, 1]
+
+    return np.max(corr)
 
 # ----------------------------------------------------------------------
 
@@ -129,6 +201,12 @@ def compare_images(expected, actual, tolerance=1):
     else:
         expected_image = Image.open(expected)
         actual_image = Image.open(actual)
+
+        computed_correlation = image_pCorr(expected_image, actual_image)
+
+        if computed_correlation == 1.0:
+            return True
+        # else
 
         computed_mse = image_mse(expected_image, actual_image)
         if computed_mse >= tolerance:
