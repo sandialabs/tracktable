@@ -1,0 +1,10 @@
+# Ananconda Environment For Building Windows Conda Packages
+name: win_conda_builder
+channels:
+  - conda-forge
+dependencies:
+  # Conda-Build Dependencies
+  - conda-build
+  - conda-verify
+  - anaconda-client
+  - m2-patch
