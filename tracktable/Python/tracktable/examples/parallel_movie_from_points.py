@@ -38,7 +38,7 @@ from tracktable.feature import annotations
 from tracktable.core import geomath
 from tracktable.render import mapmaker, paths
 from tracktable.script_helpers import argument_groups, argparse, n_at_a_time
-from tracktable.source.trajectory import AssembleTrajectoryFromPoints
+from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
 
 import multiprocessing
 import datetime
@@ -201,8 +201,8 @@ def assemble_trajectories(point_source,
                           minimum_length=2):
     """Assemble a sequence of points into trajectories
 
-    This function will instantiate and configure a `tracktable.source.
-    trajectory.AssembleTrajectoryFromPoints` to convert a sequence
+    This function will instantiate and configure a `tracktable.analysis.
+    assemble_trajectories.AssembleTrajectoryFromPoints` to convert a sequence
     of points into a sequence of trajectories.
 
     You must specify an iterable of points.  You can also specify

@@ -53,7 +53,7 @@
 
 import tracktable.core
 import tracktable.domain.terrestrial
-from tracktable.source.trajectory import AssembleTrajectoryFromPoints
+from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
 
 import datetime
 import os.path

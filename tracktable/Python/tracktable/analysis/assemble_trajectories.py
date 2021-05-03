@@ -28,7 +28,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-tracktable.source.trajectory - Sources that turn a sequence of points into a sequence of trajectories
+tracktable.analysis.assemble_trajectories - Sources that turn a sequence of points into a sequence of trajectories
 """
 
 import datetime

@@ -32,8 +32,8 @@ from datetime import datetime, timedelta
 import itertools
 import sys
 
-from tracktable.source.path_point_source import TrajectoryPointSource
-from tracktable.source.trajectory import AssembleTrajectoryFromPoints
+from tracktable.feature.interpolated_points import TrajectoryPointSource
+from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
 
 from tracktable.core import Timestamp, geomath
 

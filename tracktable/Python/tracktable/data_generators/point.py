@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 """
-tracktable.source.point - Ways to generate points around a seed point
+tracktable.data_generators.point - Ways to generate points around a seed point
 """
 
 from __future__ import division, print_function, absolute_import
