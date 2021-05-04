@@ -51,12 +51,9 @@ Tracktable. Enter the following commands in a command/terminal/Anaconda prompt.
 
    * **Creating a virtual environment from listed packages**
 
-     .. important:: This approach creates the environment but doesn't install Tracktable.
-        You must also follow the "Install Tracktable in the Anaconda virtual environment" step.
-
      .. code-block:: console
 
-        conda create --name tracktable --channel conda-forge cartopy folium jupyter pip pyshp pytz
+        conda create --name tracktable --channel conda-forge python tracktable
 
 #. Verify that the ``tracktable`` virtual environment was created
 
@@ -69,15 +66,6 @@ Tracktable. Enter the following commands in a command/terminal/Anaconda prompt.
    .. code-block:: console
 
       conda activate tracktable
-
-#. Install Tracktable in the Anaconda virtual environment
-
-   .. note:: This step is only necessary if you created your Anaconda virtual environment by specifying packages.
-      If you used the tracktable_environment.yml file, Tracktable was installed when the environment was created.
-
-   .. code-block:: console
-
-      pip install tracktable
 
 #. Deactivate the virtual environment (optional)
 

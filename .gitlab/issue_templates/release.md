@@ -1,6 +1,6 @@
 <!--
 
-This template is for creating a Tracktable release that will go out to the world.  
+This template is for creating a Tracktable release that will go out to the world.
 
 -->
 
@@ -8,7 +8,7 @@ This template is for creating a Tracktable release that will go out to the world
 
 ### Version Number
 
-<!-- 
+<!--
     Example: 1.3.1
 -->
 
@@ -26,7 +26,7 @@ This template is for creating a Tracktable release that will go out to the world
 
 ### Major bug fixes in this release
 
-<!-- 
+<!--
     Example: Python interpreter crashes on import
 -->
 
@@ -48,10 +48,18 @@ This template is for creating a Tracktable release that will go out to the world
     * [ ] Generate GPG signatures
     * [ ] Upload wheels to PyPI
     * [ ] Upload wheels to Cascade
+- [ ] Anaconda Package (Do these steps in a fork of `conda-forge/tracktable-feedstock` after the code is released on github)
+    * [ ] Create release branch
+    * [ ] Update version number
+    * [ ] (Optional) Update build number if subsequent build of the same version
+    * [ ] Update sha256 value
+        - Command is: curl -sL {tarball url} | openssl sha256
+    * [ ] Push changes to branch
+    * [ ] Open PR to merge into upstream master
 - [ ] Release Notes
     * [ ] Compile from issues since previous version
     * [ ] Note known issues
-    * [ ] Add release notes to RTD changelog (remember it's in reST)
+    * [ ] Add release notes to RTD changelog (remember it's in reST format and title underlines *must* match)
     * [ ] Check into release branch
 - [ ] Documentation
     * [ ] Build
@@ -73,10 +81,11 @@ This template is for creating a Tracktable release that will go out to the world
     * [ ] Upload to Cascade
 - [ ] Web Site
     * [ ] Announcement on front page
-    * [ ] Release Notes 
+    * [ ] Release Notes
     * [ ] Links to new documentation
     * [ ] Links to new example notebooks
     * [ ] Links to wheels
+    * [ ] Links to Anaconda package
     * [ ] Links to source code
 - [ ] Announcement
     * [ ] Send to tracktable-develop
