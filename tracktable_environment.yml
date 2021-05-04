@@ -4,10 +4,4 @@ channels:
   - conda-forge
 dependencies:
   - python>=3.6, <=3.9
-  - pip
-  - folium
-  - pyshp
-  - pytz
-  - cartopy
-  - pip:
-    - tracktable
+  - tracktable
