@@ -3,7 +3,7 @@
 
 #Generate Ground Truth html files
 from tracktable.domain.terrestrial import TrajectoryPointReader
-from tracktable.source.trajectory import AssembleTrajectoryFromPoints
+from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
 from tracktable.render.render_trajectories import render_trajectories
 
 #Load sample data for rendering exmples

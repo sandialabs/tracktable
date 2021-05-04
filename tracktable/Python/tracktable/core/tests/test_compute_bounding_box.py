@@ -37,7 +37,7 @@ import sys
 import os
 import traceback
 from tracktable.core import geomath
-from tracktable.source.path_point_source import TrajectoryPointSource
+from tracktable.feature.interpolated_points import TrajectoryPointSource
 from tracktable.domain.terrestrial import Trajectory as TerrestrialTrajectory
 from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
 from tracktable.domain.cartesian2d import Trajectory as Cartesian2dTrajectory
