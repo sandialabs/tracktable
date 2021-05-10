@@ -53,9 +53,11 @@ void wrap_rtree()
 
   class_< rtree_type >(namebuf.str().c_str())
     .def(init<>())
-    .add_property("points", &rtree_type::points, &rtree_type::set_points)
+    .def("insert_point", &rtree_type::insert_point)
+    .def("insert_points", &rtree_type::insert_points)
     .def("find_points_in_box", &rtree_type::find_points_in_box)
     .def("find_nearest_neighbors", &rtree_type::find_nearest_neighbors)
+    .def("__len__", &rtree_type::size)
     ;
 }
 
