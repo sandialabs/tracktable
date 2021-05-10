@@ -184,6 +184,18 @@ public:
       this->_RTree.insert(value);
     }
 
+  /** Insert multiple elements into an RTRee
+   * 
+   * @param [in] range_begin   Iterator pointing to beginning of input points 
+   * @param [in] range_end     Iterator pointing past end of input points
+   */
+  template<typename value_iterator_type>
+  void insert(value_iterator_type range_begin, 
+              value_iterator_type range_end)
+    {
+      this->_RTree.insert(range_begin, range_end);
+    }
+         
   /** Remove a single element from the RTree
    *
    * @param [in] value  Element to remove

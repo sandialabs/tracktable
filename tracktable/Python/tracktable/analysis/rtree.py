@@ -35,18 +35,16 @@ from tracktable.lib import _rtree
 
 from tracktable.domain.feature_vectors import convert_to_feature_vector
 
+
 class RTree(object):
 
     def __init__(self, points=None):
         self._tree = None
         self._original_points = None
+        self._feature_vector_length = None
 
         if points is not None:
-            self._original_points = points
-            self._feature_vectors = [ convert_to_feature_vector(p) for p in points ]
-            self._setup_tree()
-
-    # ----------------------------------------------------------------------
+            self.insert_points(points)
 
     @property
     def points(self):
@@ -79,20 +77,94 @@ class RTree(object):
         """
 
         if new_points != self._original_points:
-            self._original_points = list(new_points)
-            self._feature_vectors = [ convert_to_feature_vector(p) for p in self._original_points ]
-            self._setup_tree()
+            self._tree = None
+            self._feature_vector_length = None
+            self._original_points = None
+            self._feature_vectors = None
+            self.insert_points(new_points)
 
     # ----------------------------------------------------------------------
 
     def _setup_tree(self):
-        point_size = len(self._feature_vectors[0])
-        rtree_class_name = 'rtree_{}'.format(point_size)
+        rtree_class_name = 'rtree_{}'.format(self._feature_vector_length)
         tree_class = getattr(_rtree, rtree_class_name)
         self._tree = tree_class()
-        self._tree.points = self._feature_vectors
 
     # ----------------------------------------------------------------------
+
+    def insert_point(self, point):
+        """Add a single point to the R-tree.
+
+        Arguments:
+            point (array-like or FeatureVector): Point to add.  If this is
+                not the first point added, it must have the same dimension
+                as all previous points.
+
+        Returns:
+            No return value.
+
+        Raises:
+            ValueError: The point you have supplied has a different number
+                of components than the points already in the tree.
+        """
+
+        if self._tree is None:
+            self._feature_vector_length = len(point)
+            self._original_points = []
+            self._feature_vectors = []
+            self._setup_tree()
+        else:
+            if len(point) != self._feature_vector_length:
+                raise ValueError((
+                    'New point with {} components cannot be added to an '
+                    'R-tree whose points all have {} components.'
+                    ).format(
+                        len(point),
+                        self._feature_vector_length
+                    ))
+
+        self._original_points.append(point)
+        self._feature_vectors.append(convert_to_feature_vector(point))
+        self._tree.insert_point(self._feature_vectors[-1])
+
+    # --------------------------------------------------------------------
+
+    def insert_points(self, points):
+        """Add many points to the R-tree
+
+        Arguments:
+            points (sequence of points): Points to insert into the
+                R-tree.
+        """
+
+        if self._tree is None:
+            # Since the input sequence might be a generator or other 
+            # traverse-once-only sequence, we pick the first point and use 
+            # that to configure the tree, then insert the others as a batch.
+
+            point_iter = iter(points) 
+            try:
+                first_point = next(point_iter)
+                self.insert_point(first_point)
+            except StopIteration:
+                # If we're here, the sequence was empty and there are
+                # no points to insert.
+                return
+
+            # At this point the tree definitely exists and has one point
+            # in it.  Insert the rest of the points as a batch.
+            self.insert_points(point_iter)
+
+        else:
+            # The tree already exists and has at least one point in it.
+            # Add the rest of the points as a batch.
+            new_points = list(points)
+            new_fv = [convert_to_feature_vector(p) for p in new_points]
+            self._original_points.extend(new_points)
+            self._feature_vectors.extend(new_fv)
+            self._tree.insert_points(new_fv)
+
+    # --------------------------------------------------------------------
 
     def find_nearest_neighbors(self, seed_point, num_neighbors):
         """Find points near a search point
@@ -130,3 +202,17 @@ class RTree(object):
             convert_to_feature_vector(min_corner),
             convert_to_feature_vector(max_corner)
             )
+
+    def __len__(self):
+        """Return the number of points in the tree
+
+        No arguments.
+
+        Returns:
+            Number of points that have been added to the Rtree.
+        """
+        
+        if self._tree is None:
+            return 0
+        else:
+            return len(self._tree)

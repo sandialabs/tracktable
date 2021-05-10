@@ -34,7 +34,17 @@ from six.moves import range
 from tracktable.analysis.rtree import RTree
 from tracktable.domain import feature_vectors as fv
 
-def test_points_in_box(point_type):
+
+import enum
+
+
+class CreationMethod(enum.Enum):
+    CONSTRUCTOR = 1
+    ONE_POINT_AT_A_TIME = 2
+    ALL_POINTS_AT_ONCE = 3
+
+
+def test_points_in_box(point_type, rtree_creation=CreationMethod.CONSTRUCTOR):
     points = []
 
     for i in range(10):
@@ -50,7 +60,17 @@ def test_points_in_box(point_type):
         box_min[d] = 2.5
         box_max[d] = 6.5
 
-    tree = RTree(points)
+    if rtree_creation == CreationMethod.CONSTRUCTOR:
+        tree = RTree(points)
+    elif rtree_creation == CreationMethod.ALL_POINTS_AT_ONCE:
+        tree = RTree()
+        tree.insert_points(points)
+    elif rtree_creation == CreationMethod.ONE_POINT_AT_A_TIME:
+        tree = RTree()
+        for point in points:
+            tree.insert_point(point)
+    else:
+        raise ValueError('Unknown RTree construction type {}'.format(rtree_creation))
 
     points_in_box = tree.find_points_in_box(box_min, box_max)
 
@@ -60,6 +80,7 @@ def test_points_in_box(point_type):
         return 1
     else:
         return 0
+
 
 def main():
     error_count = 0
