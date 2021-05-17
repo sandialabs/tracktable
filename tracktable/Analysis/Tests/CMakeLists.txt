@@ -30,6 +30,8 @@
 # We need this because heavily templated classes like DBSCAN create
 # object files too big for the Visual C++ linker to handle normally.
 
+include(CplusplusTest)
+
 if (MSVC)
   set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj" )
 endif (MSVC)
@@ -182,9 +184,9 @@ target_link_libraries(test_cartesian2d_distance_geometry_by_time
   ${Boost_LIBRARIES}
   )
 
-add_test(
-  NAME C_GREAT_CIRCLE_FIT
-  COMMAND test_great_circle_fit
+add_catch2_test(
+  C_GREAT_CIRCLE_FIT
+  test_great_circle_fit
 )
 
 add_test(
