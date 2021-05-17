@@ -203,6 +203,25 @@ class RTree(object):
             convert_to_feature_vector(max_corner)
             )
 
+    # ----------------------------------------------------------------------
+
+    def intersects(self, min_corner, max_corner):
+        """Find points/objects that intersect a box
+
+        Finds all of the points/objects that intersect a box between minimum
+        and maximum corner points.
+
+        Args:
+           min_corner (Tracktable point): Minimum corner to bound the box
+           max_corner (Tracktable point): Maximum corner to bound the box
+
+        Returns: Sequence of points originally supplied
+        """
+        return self._tree.intersects(
+            convert_to_feature_vector(min_corner),
+            convert_to_feature_vector(max_corner)
+            )
+
     def __len__(self):
         """Return the number of points in the tree
 
@@ -216,3 +235,4 @@ class RTree(object):
             return 0
         else:
             return len(self._tree)
+
