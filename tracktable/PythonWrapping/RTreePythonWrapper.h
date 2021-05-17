@@ -126,6 +126,31 @@ public:
 
   // ----------------------------------------------------------------------
 
+  boost::python::object intersects(boost::python::object const& min_corner,
+                                   boost::python::object const& max_corner)
+    {
+      std::vector<indexed_point_type> points_in_box;
+      point_type _min_corner((boost::python::extract<point_type>(min_corner)));
+      point_type _max_corner((boost::python::extract<point_type>(max_corner)));
+
+      this->Tree.intersects(
+        _min_corner, _max_corner,
+        std::back_inserter(points_in_box)
+        );
+
+      boost::python::list point_indices;
+      for (typename std::vector<indexed_point_type>::const_iterator iter = points_in_box.begin();
+           iter != points_in_box.end();
+           ++iter)
+        {
+        point_indices.append(iter->second);
+        }
+
+      return std::move(point_indices);
+    }
+
+  // ----------------------------------------------------------------------
+
   boost::python::object find_nearest_neighbors(boost::python::object const& search_point,
                                                std::size_t num_neighbors)
     {
