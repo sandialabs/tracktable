@@ -47,6 +47,8 @@
 #include <tracktable/Domain/Cartesian3D.h>
 #include <tracktable/Domain/Terrestrial.h>
 
+#include <tracktable/ThirdParty/TracktableCatch2.h>
+
 typedef tracktable::PointLonLat LonLatPoint;
 typedef tracktable::TrajectoryPoint<tracktable::PointLonLat> TrajectoryPointLonLat;
 typedef tracktable::Trajectory<TrajectoryPointLonLat> TrajectoryLonLat;
@@ -63,183 +65,152 @@ typedef tracktable::domain::terrestrial::TerrestrialPoint TerrestrialPoint;
 typedef tracktable::domain::terrestrial::TerrestrialTrajectoryPoint TerrestrialTrajectoryPoint;
 typedef tracktable::Trajectory<TerrestrialTrajectoryPoint> TerrestrialTrajectory;
 
+using namespace tracktable;
 //----------------------------------------------------
 
-int verify_result(double actual, double expected, const char* description, double tolerance_fraction=1e-4)
-{
-    std::ostringstream errbuf;
+template< typename T >
+struct CityPointsAndTrajectories {
 
-    if (!tracktable::almost_equal(actual, expected, tolerance_fraction))
-    {
-        std::cout << "ERROR: "
-                  << description << " distance "
-                  << "expected to be " << expected << " units "
-                  << "but actual distance is " << actual << " units. "
-                  << "The difference is " << fabs(actual - expected)
-                  << std::endl;
-        return 1;
+    CityPointsAndTrajectories() {
+        
+        albuquerque = T(abq_coords);
+        el_paso = T(ep_coords);
+        houston = T(hou_coords);
+        san_antonio = T(sa_coords);
+
+        sa_to_hou.push_back(san_antonio);
+        sa_to_hou.push_back(houston);
+    };
+
+    double abq_coords[2] = { -106.6504, 35.0844 };
+    double ep_coords[2] = { -106.4850, 31.7619 };
+    double hou_coords[2] = { -74.0060, 29.8168 };
+    double sa_coords[2] = { -98.6544, 29.4813 };
+
+    T albuquerque;
+    T el_paso;
+    T houston;
+    T san_antonio;
+
+    TrajectoryLonLat sa_to_hou;
+
+};
+
+TEMPLATE_TEST_CASE_METHOD(CityPointsAndTrajectories, "Testing LatLon Based Point Distance", "[latlon point]", LonLatPoint, TrajectoryPointLonLat) {
+
+    SECTION("albuquerque to el_paso ") {
+        CHECK(conversions::radians_to_km(distance(CityPointsAndTrajectories<TestType>::albuquerque, 
+                                                    CityPointsAndTrajectories<TestType>::el_paso)) == Approx(369.764));
     }
 
-    return 0;
+    SECTION("albuquerque to houston ") {
+        CHECK(conversions::radians_to_km(distance(CityPointsAndTrajectories<TestType>::albuquerque, 
+                                                    CityPointsAndTrajectories<TestType>::houston)) == Approx(3104.256));
+    }
 }
 
-TerrestrialPoint create_terrestrial_point(double lat, double lon)
-{
-    TerrestrialPoint point;
-    point.set_longitude(lon);
-    point.set_latitude(lat);
+TEMPLATE_TEST_CASE_METHOD(CityPointsAndTrajectories, "Testing Terrestrial Based Point Distance", "[terrestrial point]", TerrestrialPoint, TerrestrialTrajectoryPoint) {
 
-    return point;
+    SECTION("albuquerque to el_paso ") {
+        CHECK(distance(CityPointsAndTrajectories<TestType>::albuquerque, CityPointsAndTrajectories<TestType>::el_paso) == Approx(369.764));
+    }
+
+    SECTION("albuquerque to houston ") {
+        CHECK(distance(CityPointsAndTrajectories<TestType>::albuquerque, CityPointsAndTrajectories<TestType>::houston) == Approx(3104.256));
+    }
 }
 
-TerrestrialTrajectoryPoint create_terrestrial_trajectory_point(double lat, double lon, std::string const& id=std::string())
-{
-    TerrestrialTrajectoryPoint point;
-    point.set_object_id(id);
-    point.set_longitude(lon);
-    point.set_latitude(lat);
+TEMPLATE_TEST_CASE_METHOD(CityPointsAndTrajectories, "Testing LatLon Based Point to Trajectory Distance", "[latlon point trajectory]", LonLatPoint, TrajectoryPointLonLat) {
+ 
+    SECTION("point to trajectory ") {
+        CHECK(conversions::radians_to_km(distance(CityPointsAndTrajectories<TestType>::albuquerque, CityPointsAndTrajectories<TestType>::sa_to_hou)) == Approx(975.674));
+    }
 
-    return point;
+    SECTION("trajectory to point ") {
+        CHECK(conversions::radians_to_km(distance(CityPointsAndTrajectories<TestType>::sa_to_hou, CityPointsAndTrajectories<TestType>::albuquerque)) == Approx(975.674));
+    }
 }
 
-TrajectoryPointLonLat create_trajectory_point(double lat, double lon, std::string const& id=std::string())
-{
-    TrajectoryPointLonLat point;
-    point.set_object_id(id);
-    point.set_longitude(lon);
-    point.set_latitude(lat);
+TEMPLATE_TEST_CASE("Testing Terrestrial Based Point to Trajectory Distance", "[terrestrial point trajectory]", TerrestrialPoint, TerrestrialTrajectoryPoint) {
+    double abq_coords[2] = { -106.6504, 35.0844 };
+    TestType albuquerque(abq_coords);
+    TerrestrialTrajectoryPoint houston({ -74.0060, 29.8168 });
+    TerrestrialTrajectoryPoint san_antonio({ -98.6544, 29.4813 });
 
-    return point;
+    TerrestrialTrajectory sa_to_hou;
+    sa_to_hou.push_back(san_antonio);
+    sa_to_hou.push_back(houston);
+
+    SECTION("point to trajectory ") {
+        CHECK(distance(albuquerque, sa_to_hou) == Approx(975.674));
+    }
+
+    SECTION("trajectory to point ") {
+        CHECK(distance(sa_to_hou, albuquerque) == Approx(975.674));
+    }
 }
 
-LonLatPoint create_point(double lat, double lon)
-{
-    LonLatPoint point;
-    point.set_longitude(lon);
-    point.set_latitude(lat);
-    return point;
-}
-
-TrajectoryCartesian2dPoint create_cartesian2d_point(double x, double y)
-{
-    TrajectoryCartesian2dPoint point;
-    point[0] = x;
-    point[1] = y;
-
-    return point;
-}
-
-TrajectoryCartesian3dPoint create_cartesian3d_point(double x, double y, double z)
-{
-    TrajectoryCartesian3dPoint point;
-    point[0] = x;
-    point[1] = y;
-    point[2] = z;
-
-    return point;
-}
-
-// ----------------------------------------------------------------------
-
-
-
-int run_test()
-{
-    using namespace tracktable;
-
-    int error_count = 0;
-    double actual, expected;
-
-    std::cout << "Testing Terrestrial Distance" << std::endl;
-
-    TrajectoryPointLonLat albuquerque = create_trajectory_point(35.0844, -106.6504);
-    TerrestrialTrajectoryPoint albuquerque2 = create_terrestrial_trajectory_point(35.0844, -106.6504);
-    LonLatPoint albuquerque3 = create_point(35.0844, -106.6504);
-    TerrestrialPoint albuquerque4 = create_terrestrial_point(35.0844, -106.6504);
-
-    TrajectoryPointLonLat dallas = create_trajectory_point(32.8205, -96.8716);
-    TerrestrialTrajectoryPoint dallas2 = create_terrestrial_trajectory_point(32.8205, -96.8716);
-    LonLatPoint dallas3 = create_point(32.8205, -96.8716);
-    TerrestrialPoint dallas4 = create_terrestrial_point(32.8205, -96.8716);
-
-    TrajectoryPointLonLat el_paso = create_trajectory_point(31.7619, -106.4850);
-    TerrestrialTrajectoryPoint el_paso2 = create_terrestrial_trajectory_point(31.7619, -106.4850);
-    LonLatPoint el_paso3 = create_point(31.7619, -106.4850);
-    TerrestrialPoint el_paso4 = create_terrestrial_point(31.7619, -106.4850);
-
-    TrajectoryPointLonLat san_antonio = create_trajectory_point(29.4813, -98.6544);
-    TerrestrialTrajectoryPoint san_antonio2 = create_terrestrial_trajectory_point(29.4813, -98.6544);
-    LonLatPoint san_antonio3 = create_point(29.4813, -98.6544);
-    TerrestrialPoint san_antonio4 = create_terrestrial_point(29.4813, -98.6544);
-
-    TrajectoryPointLonLat houston = create_trajectory_point(29.8168, -74.0060);
-    TerrestrialTrajectoryPoint houston2 = create_terrestrial_trajectory_point(29.8168, -74.0060);
-    LonLatPoint houston3 = create_point(29.8168, -74.0060);
-    TerrestrialPoint houston4 = create_terrestrial_point(29.8168, -74.0060);
-
-    TrajectoryLonLat ep_to_dal;
-    ep_to_dal.push_back(el_paso);
-    ep_to_dal.push_back(dallas);
-
-    TerrestrialTrajectory ep_to_dal2;
-    ep_to_dal2.push_back(el_paso2);
-    ep_to_dal2.push_back(dallas2);
+TEST_CASE("Testing LatLon Trajectory Distance", "[latlon  trajectory]") {
+    TrajectoryPointLonLat albuquerque({ -106.6504, 35.0844 });
+    TrajectoryPointLonLat houston({ -74.0060, 29.8168 });
+    TrajectoryPointLonLat san_antonio({ -98.6544, 29.4813 });
+    TrajectoryPointLonLat dallas({ -96.8716, 32.820 });
+    TrajectoryPointLonLat el_paso({ -106.4850, 31.7619 });
 
     TrajectoryLonLat sa_to_hou;
     sa_to_hou.push_back(san_antonio);
     sa_to_hou.push_back(houston);
 
-    TerrestrialTrajectory sa_to_hou2;
-    sa_to_hou2.push_back(san_antonio2);
-    sa_to_hou2.push_back(houston2);
+    TrajectoryLonLat ep_to_dal;
+    ep_to_dal.push_back(el_paso);
+    ep_to_dal.push_back(dallas);
 
     TrajectoryLonLat sa_to_abq;
     sa_to_abq.push_back(san_antonio);
     sa_to_abq.push_back(albuquerque);
 
-    expected = 369.764;
-    actual = conversions::radians_to_km(distance(albuquerque, el_paso));
-    error_count += verify_result(actual, expected, "TrajectoryPointLonLat to TrajectoryPointLonLat");
+    SECTION("trajectory to trajectory ") {
+        CHECK(conversions::radians_to_km(distance(ep_to_dal, sa_to_hou)) == Approx(349.221));
+    }
 
-    actual = distance(albuquerque2, el_paso2);
-    error_count += verify_result(actual, expected, "TerrestrialTrajectoryPoint to TerrestrialTrajectoryPoint");
+    SECTION("intersecting trajectory ") {
+        CHECK(conversions::radians_to_km(distance(ep_to_dal, sa_to_abq)) == Approx(0.0));
+    }
+}
 
-    actual = conversions::radians_to_km(distance(albuquerque3, el_paso3));
-    error_count += verify_result(actual, expected, "LonLatPoint to LonLatPoint");
+TEST_CASE("Testing Terrestrial Trajectory Distance", "[terrestrial  trajectory]") {
+    TerrestrialTrajectoryPoint albuquerque({ -106.6504, 35.0844 });
+    TerrestrialTrajectoryPoint houston({ -74.0060, 29.8168 });
+    TerrestrialTrajectoryPoint san_antonio({ -98.6544, 29.4813 });
+    TerrestrialTrajectoryPoint dallas({ -96.8716, 32.820 });
+    TerrestrialTrajectoryPoint el_paso({ -106.4850, 31.7619 });
 
-    actual = distance(albuquerque4, el_paso4);
-    error_count += verify_result(actual, expected, "TerrestrialPoint to TerrestrialPoint");
+    TerrestrialTrajectory sa_to_hou;
+    sa_to_hou.push_back(san_antonio);
+    sa_to_hou.push_back(houston);
 
-    expected = 975.674;
-    actual = conversions::radians_to_km(distance(albuquerque, sa_to_hou));
-    error_count += verify_result(actual, expected, "TrajectoryPointLonLat to TrajectoryLonLat");
+    TerrestrialTrajectory ep_to_dal;
+    ep_to_dal.push_back(el_paso);
+    ep_to_dal.push_back(dallas);
 
-    actual = distance(albuquerque2, sa_to_hou2);
-    error_count += verify_result(actual, expected, "TerrestrialTrajectoryPoint to TerrestrialTrajectory");
+    TerrestrialTrajectory sa_to_abq;
+    sa_to_abq.push_back(san_antonio);
+    sa_to_abq.push_back(albuquerque);
 
-    actual = distance(sa_to_hou2, albuquerque2);
-    error_count += verify_result(actual, expected, "TerrestrialTrajectory to TerrestrialTrajectoryPoint");
+    SECTION("trajectory to trajectory ") {
+        CHECK(distance(ep_to_dal, sa_to_hou) == Approx(349.221));
+    }
 
-    actual = distance(albuquerque4, sa_to_hou2);
-    error_count += verify_result(actual, expected, "TerrestrialPoint to TerrestrialTrajectory");
+    SECTION("intersecting trajectory ") {
+        CHECK(distance(ep_to_dal, sa_to_abq) == Approx(0.0));
+    }
+}
 
-    expected = 349.276;
-    actual = conversions::radians_to_km(distance(ep_to_dal, sa_to_hou));
-    error_count += verify_result(actual, expected, "TrajectoryLonLat to TrajectoryLonLat");
-
-    actual = distance(ep_to_dal2, sa_to_hou2);
-    error_count += verify_result(actual, expected, "TerrestrialTrajectory to TerrestrialTrajectory");
-
-    expected = 0.0;
-    actual = distance(ep_to_dal, sa_to_abq);
-    error_count += verify_result(actual, expected, "TerrestrialTrajectory to TerrestrialTrajectory Intersecting");
-
-    std::cout << "Testing Cartesian 2D Distance" << std::endl;
-
-    TrajectoryCartesian2dPoint point00 = create_cartesian2d_point(0,0);
-    TrajectoryCartesian2dPoint point01 = create_cartesian2d_point(0,1);
-    TrajectoryCartesian2dPoint point11 = create_cartesian2d_point(1,1);
-    TrajectoryCartesian2dPoint point22 = create_cartesian2d_point(2,2);
+TEST_CASE("Testing Cartesian2D Distance", "[cartesian2D]") {
+    TrajectoryCartesian2dPoint point00(0, 0);
+    TrajectoryCartesian2dPoint point01(0, 1);
+    TrajectoryCartesian2dPoint point11(1, 1);
+    TrajectoryCartesian2dPoint point22(2, 2);
 
     TrajectoryCartesian2d traj1;
     traj1.push_back(point00);
@@ -249,50 +220,76 @@ int run_test()
     traj2.push_back(point11);
     traj2.push_back(point22);
 
-    expected = 1.0;
-    actual = distance(point00, point01);
-    error_count += verify_result(actual, expected, "TrajectoryCartesian2dPoint to TrajectoryCartesian2dPoint");
+    SECTION("horizontal point to point " ) {
+        CHECK(distance(point00, point01) == 1.0);
+    }
 
-    actual = distance(traj1, traj2);
-    error_count += verify_result(actual, expected, "TrajectoryCartesian2d to TrajectoryCartesian2d");
+    SECTION("vertical point to point ") {
+        CHECK(distance(point01, point11) == 1.0);
+    }
 
-    expected = 1.414;
-    actual = distance(point00, traj2);
-    error_count += verify_result(actual, expected, "TrajectoryCartesian2dPoint to TrajectoryCartesian2d");
+    SECTION("diagonal point to point ") {
+        CHECK(distance(point00, point11) == Approx(1.414).epsilon(0.001));
+    }
 
-    std::cout << "Testing Cartesian 3D Distance" << std::endl;
+    SECTION("trajectory to trajectory ") {
+        CHECK(distance(traj1, traj2) == 1.0);
+    }
 
-    TrajectoryCartesian3dPoint point000 = create_cartesian3d_point(0,0,0);
-    TrajectoryCartesian3dPoint point001 = create_cartesian3d_point(0,0,1);
-    TrajectoryCartesian3dPoint point111 = create_cartesian3d_point(1,1,1);
-    TrajectoryCartesian3dPoint point222 = create_cartesian3d_point(2,2,2);
+    SECTION("trajectory to point ") {
+        CHECK(distance(traj2, point00) == Approx(1.414).epsilon(0.001));
+    }
 
-    TrajectoryCartesian3d traj3;
-    traj3.push_back(point000);
-    traj3.push_back(point001);
+    SECTION("point to trajectory ") {
+        CHECK(distance(point00, traj2) == Approx(1.414).epsilon(0.001));
+    }
+}
 
-    TrajectoryCartesian3d traj4;
-    traj4.push_back(point111);
-    traj4.push_back(point222);
+TEST_CASE("Testing Cartesian3D Distance", "[cartesian3D]") {
+    TrajectoryCartesian3dPoint point000(0, 0, 0);
+    TrajectoryCartesian3dPoint point001(0, 0, 1);
+    TrajectoryCartesian3dPoint point010(0, 1, 0);
+    TrajectoryCartesian3dPoint point100(1, 0, 0);
+    TrajectoryCartesian3dPoint point111(1, 1, 1);
+    TrajectoryCartesian3dPoint point222(2, 2, 2);
 
-    expected = 1.0;
-    actual = distance(point000, point001);
-    error_count += verify_result(actual, expected, "TrajectoryCartesian3dPoint to TrajectoryCartesian3dPoint");
+    TrajectoryCartesian3d traj1;
+    traj1.push_back(point000);
+    traj1.push_back(point001);
+
+    TrajectoryCartesian3d traj2;
+    traj2.push_back(point111);
+    traj2.push_back(point222);
+
+    SECTION("x axis point to point ") {
+        CHECK(distance(point000, point100) == 1.0);
+    }
+
+    SECTION("y axis point to point ") {
+        CHECK(distance(point000, point010) == 1.0);
+    }
+
+    SECTION("z axis point to point ") {
+        CHECK(distance(point000, point001) == 1.0);
+    }
+
+    SECTION("diagonal point to point ") {
+        CHECK(distance(point000, point111) == Approx(1.732).epsilon(0.001));
+    }
 
     // This doesnt work because boost::geometry::disjoint is not implemented for dimenstions > 2
-    //expected = 1.414;
-    //actual = distance(traj3, traj4);
-    //actual = boost::geometry::distance(traj3, traj4);
-    //error_count += verify_result(actual, expected, "TrajectoryCartesian3d to TrajectoryCartesian3d");
+    //SECTION("trajectory to trajectory ") {
+    //    CHECK(distance(traj1, traj2) == 1.0);
+    //}
 
-    expected = 1.732;
-    actual = distance(point000, traj4);
-    error_count += verify_result(actual, expected, "TrajectoryCartesian3dPoint to TrajectoryCartesian3d");
-    return error_count;
+    SECTION("trajectory to point ") {
+        CHECK(distance(traj2, point000) == Approx(1.732).epsilon(0.001));
+    }
+
+    SECTION("point to trajectory ") {
+        CHECK(distance(point000, traj2) == Approx(1.732).epsilon(0.001));
+    }
 }
 
-int main(int, char **)
-{
-    return run_test();
-}
+
 

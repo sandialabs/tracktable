@@ -24,6 +24,7 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+include(CplusplusTest)
 
 # We search for Boost anew in test directories because the test cases may
 # need Boost components that the library code does not.
@@ -55,10 +56,10 @@ target_link_libraries( PointGenerator_TEST
     ${Boost_LIBRARIES}
     )
 
-add_test(
-    NAME C_PointGenerator
-    COMMAND PointGenerator_TEST
-    WORKING_DIRECTORY ${Tracktable_BINARY_DIR}
+add_catch2_test(
+    C_PointGenerator
+    PointGenerator_TEST
+    ${Tracktable_BINARY_DIR}
     )
 
 # Keep the test cases in a separate folder in Visual Studio
