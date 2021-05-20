@@ -45,6 +45,7 @@ including allowing users to explicitly specify the rendering backend.
 import folium as fol
 from tracktable.core.geomath import compute_bounding_box, distance
 from tracktable.core.geomath import length, point_at_length_fraction
+import tracktable.domain.terrestrial as domain
 import itertools
 import random
 import cartopy
@@ -89,6 +90,54 @@ def render_trajectories_separate(trajectories, backend='', **kwargs):
 
 # ----------------------------------------------------------------------
 
+def render_trajectories_for_print(trajectories, filename, land_fill_color='white',
+                                  water_fill_color='#EEEEEE', color_map='viridis',
+                                  dot_color='grey', linewidth=1.5,
+                                  figsize=(6,4), save=True, **kwargs):
+    """Render a list of trajectories with print-friendly defaults
+
+    This function will render a list of trajectories using Cartopy
+    in a way this is more appropriate for use in printed media.
+    """
+
+    if not 'gradient_hue' in kwargs:
+        kwargs['color_map']=color_map  #make this the default, but let it be supersceded by gradient_hue
+    
+    render_trajectories_cartopy(trajectories, land_fill_color=land_fill_color,
+                                water_fill_color=water_fill_color, dot_color=dot_color,
+                                linewidth=linewidth, figsize=figsize, save=save,
+                                filename=filename, **kwargs)
+
+# ----------------------------------------------------------------------
+
+def render_trajectories_for_print_using_tiles(trajectories, filename,
+                                              color_map='viridis',
+                                              dot_color='grey', linewidth=1.5,
+                                              figsize=(6,4),
+                                              save=True,
+                                              tiles='https://basemaps.cartocdn.com/rastertiles/light_all/{z}/{x}/{y}.png',
+                                              fill_land=False,
+                                              fill_water=False,
+                                              draw_coastlines=False,
+                                              draw_countries=False,
+                                              draw_states=False,
+                                              **kwargs):
+    """Render a list of trajectories with print-friendly defaults
+       but using tiles as the basemap.
+
+    This function will render a list of trajectories using Cartopy
+    in a way this is more appropriate for use in printed media.
+    """
+
+    if not 'gradient_hue' in kwargs:
+        kwargs['color_map']=color_map  #make this the default, but let it be supersceded by gradient_hue
+
+    render_trajectories_cartopy(trajectories, dot_color=dot_color, linewidth=linewidth,
+                                figsize=figsize, save=save, filename=filename,
+                                tiles=tiles, fill_land=fill_land, fill_water=fill_water,
+                                draw_coastlines=draw_coastlines, draw_countries=draw_countries,
+                                draw_states=draw_states, **kwargs)
+# ----------------------------------------------------------------------
 
 def render_trajectories(trajectories, backend='', **kwargs):
     """Render a list of trajectories interactively or as a static image
@@ -512,8 +561,23 @@ def render_point_folium(current_point,
 # ----------------------------------------------------------------------
 
 
-def render_distance_geometry_folium(distance_geometry_depth,
-                                    traj, map_canvas):
+def render_line_folium(map_canvas, line_coords, control_color, weight, tooltip):
+    fol.PolyLine(line_coords, color=control_color, weight=weight,
+                 tooltip=tooltip).add_to(map_canvas)
+
+# ----------------------------------------------------------------------
+
+def render_line_cartopy(map_canvas, line_coords, control_color, weight, tooltip):
+    coords = list(zip(*line_coords))
+    map_canvas.plot(coords[1], coords[0], color=control_color,
+                    linewidth=weight, marker='o', ms=1, fillstyle='none',
+                    transform=cartopy.crs.Geodetic())
+
+# ----------------------------------------------------------------------
+
+
+def render_distance_geometry(backend, distance_geometry_depth,
+                             traj, map_canvas):
     """Renders the distance geometry calculations to the folium map
 
     Args:
@@ -543,18 +607,20 @@ def render_distance_geometry_folium(distance_geometry_depth,
                                (round(cps[j+1][1],7), round(cps[j+1][0],7))]
                 val = round(distance(cps[j], cps[j+1]) / normalization_term, 4)
                 tooltip = str(j+1)+'/'+str(len(cps)-1)+' = '+str(val)
-                fol.PolyLine(line_coords, color=control_color, weight=1,
-                             tooltip=tooltip).add_to(map_canvas)
+                if backend == 'cartopy':
+                    render_line_cartopy(map_canvas, line_coords, control_color, .5, tooltip)
+                else:
+                    render_line_folium(map_canvas, line_coords, control_color, 1, tooltip)
             popup=str(traj[0].object_id)+'<br>'+ \
                 traj[i].timestamp.strftime("%H:%M:%S")+'<br>Latitude='+ \
                 str(round(traj[i][1],7))+'<br>Longitude='+str(round(traj[i][0],7))
-            fol.CircleMarker(cp_coord, radius=4, fill=True,
-                             color=control_color,
-                             tooltip=round(cp_fractions[i], 7),
-                             popup=popup).add_to(map_canvas)
+            if backend != 'cartopy': #cartopy renders markers with lines
+                fol.CircleMarker(cp_coord, radius=4, fill=True,
+                                 color=control_color,
+                                 tooltip=round(cp_fractions[i], 7),
+                                 popup=popup).add_to(map_canvas)
 
 # ----------------------------------------------------------------------
-
 
 def hash_short_md5(string):
     """Given any string, returns a number between 0 and 1. The same
@@ -651,6 +717,39 @@ def common_processing(trajectories, obj_ids, line_color, color_map,
 
 # ----------------------------------------------------------------------
 
+def sub_trajs_from_frac(trajectories, zoom_frac):
+    #eventually replace with common method to do this, for now manually create sub-traj from given frac
+    sub_trajs = []
+    for traj in trajectories:
+        #make start and end points
+        seg_start = point_at_length_fraction(traj, zoom_frac[0])
+        seg_end = point_at_length_fraction(traj, zoom_frac[1])
+
+        #must be a better way to do this!
+        first_in_mid = 0
+        for j, point in enumerate(traj):
+            if point.timestamp >= seg_start.timestamp:
+                first_in_mid = j
+                break
+
+        last_in_mid = len(traj)
+        for j, point in reversed(list(enumerate(traj))):
+            if point.timestamp <= seg_end.timestamp:
+                last_in_mid = j
+                break
+
+        points = [seg_start]
+        for point in traj[first_in_mid:last_in_mid+1]:
+            points.append(point)
+        points.append(seg_end)
+
+        traj_mid = domain.Trajectory.from_position_list(points)
+        #traj_mid.set_property("id",
+        sub_trajs.append(traj_mid)
+    return sub_trajs
+
+# ----------------------------------------------------------------------
+
 
 # later can add multiple layers and switch between with:
 #folium.TileLayer('cartodbdark_matter', attr='.').add_to(map)
@@ -685,14 +784,15 @@ def render_trajectories_folium(trajectories,
                                show = False,
                                save=False,
                                filename='',
+                               show_distance_geometry = False,
+                               distance_geometry_depth = 4,
+                               zoom_frac = [0,1], #undocumented feature, for now
 
                                #folium specific
                                tiles='cartodbdark_matter',
                                attr=".",
                                crs="EPSG3857",
                                point_popup_properties = [],
-                               show_distance_geometry = False,
-                               distance_geometry_depth = 4,
                                show_scale = True,
                                max_zoom = 22,
                                fast=False,
@@ -784,15 +884,18 @@ def render_trajectories_folium(trajectories,
                                 dot_color, map_canvas)
 
         if show_distance_geometry:
-            render_distance_geometry_folium(distance_geometry_depth,
-                                            trajectory,
-                                            map_canvas)
+            render_distance_geometry('folium', distance_geometry_depth,
+                                     trajectory, map_canvas)
 
     if map_bbox:
         map_canvas.fit_bounds([(map_bbox[1], map_bbox[0]),
                       (map_bbox[3], map_bbox[2])])
     else:
-        map_canvas.fit_bounds(bounding_box_for_folium(trajectories))
+        if zoom_frac != [0,1]:
+            sub_trajs = sub_trajs_from_frac(trajectories, zoom_frac)
+            map_canvas.fit_bounds(bounding_box_for_folium(sub_trajs))
+        else:
+            map_canvas.fit_bounds(bounding_box_for_folium(trajectories))
     if save:  #saves as .html document
         #iframe = map._repr_html_()
         #html="<html><body>"+iframe+"</body></html>"
@@ -1139,9 +1242,8 @@ def render_trajectories_ipyleaflet(trajectories,
                                     dot_color, map_canvas)
 
         if show_distance_geometry:
-            render_distance_geometry_folium(distance_geometry_depth,
-                                            trajectory,
-                                            map_canvas)
+            render_distance_geometry('folium', distance_geometry_depth,
+                                     trajectory, map_canvas)
 
     if map_bbox:
     #    map.fit_bounds([(map_bbox[1], map_bbox[0]),
@@ -1250,12 +1352,12 @@ def render_trajectories_cartopy(trajectories,
                                 gradient_hue = None,
                                 color_map = '',
                                 line_color = '',
-                                linewidth=2.4,
+                                linewidth=0.8,
                                 show_points=False,
-                                point_size = 0.6,
+                                point_size = 0.2,
                                 point_color='',
                                 show_dot = True,
-                                dot_size = 0.7,
+                                dot_size = 0.23,
                                 dot_color = 'white',
                                 trajectory_scalar_generator = path_length_fraction_generator,
                                 trajectory_linewidth_generator = None,
@@ -1263,16 +1365,38 @@ def render_trajectories_cartopy(trajectories,
                                 show = True,
                                 save=False,
                                 filename='',
+                                tiles=None,
+                                show_distance_geometry = False,
+                                distance_geometry_depth = 4,
+                                zoom_frac = [0,1], #undocumented feature, for now
 
                                 #cartopy specific arguments
+                                draw_lonlat=False,
+                                fill_land=True,
+                                fill_water=True,
+                                draw_coastlines=True,
+                                draw_countries=True,
+                                draw_states=True,
                                 map_projection = None,
                                 transform = cartopy.crs.PlateCarree(),
-                                **kwargs):
+                                figsize=(4,2.25),
+                                dpi=300,
+                                bbox_buffer=(.3,.3),
+                                **kwargs): #kwargs are for mapmaker
     """Render a list of trajectories using the cartopy backend
     This function renders a list of trajectories to a cartopy map.
 
     For documentation on the parameters, please see render_trajectories
     """
+
+    #tiles override cartopy map features
+    if tiles != None:
+        fill_land=False
+        fill_water=False
+        draw_coastlines=False
+        draw_countries=False
+        draw_states=False
+
     trajectories, line_color, color_map, gradient_hue = \
         common_processing(trajectories, obj_ids, line_color, color_map,
                           gradient_hue)
@@ -1288,10 +1412,15 @@ def render_trajectories_cartopy(trajectories,
             get_ipython().magic("matplotlib inline")   #TODO may casue issues may want to remove
             #TODO figure out how to get matplotlib not to show after
             #     executing code a second time.
-    figure = plt.figure(dpi=100, figsize=(12,6.75))
+    figure = plt.figure(dpi=dpi, figsize=figsize)
     if not map_bbox: #if it's empty
-        map_bbox = compute_bounding_box(itertools.chain(*trajectories),
-                                        buffer=(.1, .1))
+        if zoom_frac != [0,1]:
+            sub_trajs = sub_trajs_from_frac(trajectories, zoom_frac)
+            map_bbox = compute_bounding_box(itertools.chain(*sub_trajs),
+                                            buffer=bbox_buffer)
+        else:
+            map_bbox = compute_bounding_box(itertools.chain(*trajectories),
+                                            buffer=bbox_buffer)
     if not show_lines:
         linewidth=0
 
@@ -1319,9 +1448,17 @@ def render_trajectories_cartopy(trajectories,
 
     if map_canvas == None:
         (map_canvas, map_actors) = mapmaker(domain='terrestrial',
-                                     map_name='custom',
-                                     map_bbox=map_bbox,
-                                     map_projection = map_projection)
+                                            map_name='custom',
+                                            map_bbox=map_bbox,
+                                            map_projection = map_projection,
+                                            draw_lonlat=draw_lonlat,
+                                            draw_coastlines=draw_coastlines,
+                                            draw_countries=draw_countries,
+                                            draw_states=draw_states,
+                                            fill_land=fill_land,
+                                            fill_water=fill_water,
+                                            tiles=tiles,
+                                            **kwargs)
 
     #color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1)
     #15 and .8 below accounts for differeing units in folium and cartopy
@@ -1341,11 +1478,17 @@ def render_trajectories_cartopy(trajectories,
                        transform=transform)
     #Don't support: label_objects, label_generator, label_kwargs, axes, zorder
 
+    if show_distance_geometry:
+        render_distance_geometry('cartopy', distance_geometry_depth,
+                                 trajectory, map_canvas)
+
     if not in_notebook() or save:
         if filename:
+            #plt.tight_layout()  #was giving warnings
             plt.savefig(filename)
         else:
             datetime_str = datetime.now().strftime("%Y-%m-%dT%H%M%S-%f")
+            #plt.tight_layout()
             plt.savefig("trajs-"+datetime_str+".png")
     return map_canvas
 

@@ -33,6 +33,7 @@
 from __future__ import print_function, absolute_import, division
 
 import cartopy
+from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
 cities = None
 
 
@@ -316,6 +317,7 @@ def draw_coastlines(map_axes,
         scale=resolution,
         edgecolor=edgecolor,
         facecolor='none',
+        linewidth=linewidth,
         zorder=zorder)
 
     map_axes.add_feature(coastlines)
@@ -440,6 +442,7 @@ def fill_lakes(map_axes,
 def draw_lonlat(map_axes,
                 spacing=10,
                 zorder=5,
+                draw_labels=False,
                 linewidth=0.25,
                 color='#C0C0C0'):
     """Fill in lonlat
@@ -462,10 +465,15 @@ def draw_lonlat(map_axes,
     """
 
     artist = map_axes.gridlines(
+        draw_labels=draw_labels,
         color=color,
         linewidth=linewidth,
         zorder=zorder
         )
+
+    if draw_labels:
+        artist.xformatter = LONGITUDE_FORMATTER
+        artist.yformatter = LATITUDE_FORMATTER
 
     return [artist]
 

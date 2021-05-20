@@ -52,6 +52,7 @@ Jupyter Notebook Examples
    Static_Image_Trajectory_Rendering
    Trajectory_Builder
    Trajectory_Reader
+   Trajectory_Rendering_For_Print
 
 We include several Jupyter_ notebooks as examples of how to do various common tasks with Tracktable.
 Each Jupyter notebook page listed above is an actual Jupyter notebook, including output, embedded directly in the documention.

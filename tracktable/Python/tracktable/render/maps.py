@@ -217,6 +217,41 @@ def airport_map(airport_id,
 # ----------------------------------------------------------------------
 
 
+def _instantiate_map_common(projection=None):
+    """ Instantiates axes with the given projection, default = Miller
+    """
+    if projection is None:
+        projection = cartopy.crs.Miller
+    elif isinstance(projection, str):
+        projection = getattr(cartopy.crs, projection)
+
+    axes = plt.axes(projection=projection())
+    return axes
+# ----------------------------------------------------------------------
+
+
+def instantiate_map_global(projection=None):
+    """Draw a map with custom projection gloabl extent.
+
+    Keyword Args:
+      projection (Matplotlib axes): a projection from cartopy.crs (Default: None)
+
+    Returns:
+      Matplotlib Axes instance
+
+    """
+    axes = _instantiate_map_common(projection=projection)
+    axes.set_global()
+
+    logger = logging.getLogger(__name__)
+    logger.debug(("instantiate_map: Map successfully instantiated. "
+                  "Axes: {}").format(axes))
+    axes.tracktable_projection = projection
+    return axes
+
+# ----------------------------------------------------------------------
+
+
 def instantiate_map(min_corner,
                     max_corner,
                     projection=None):
@@ -241,12 +276,8 @@ def instantiate_map(min_corner,
 
     """
 
-    if projection is None:
-        projection = cartopy.crs.Miller
-    elif isinstance(projection, str):
-        projection = getattr(cartopy.crs, projection)
+    axes = _instantiate_map_common(projection=projection)
 
-    axes = plt.axes(projection=projection())
     if min_corner is not None and max_corner is not None:
         axes.set_extent(
             [min_corner[0],

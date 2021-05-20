@@ -140,7 +140,8 @@ borders since we're zoomed in fairly far.
    passing the map name ``airport:BOS`` to Mapmaker.
 
 .. note:: The resolution of the borders in the generated image can be increased or
-   decreased by setting the ``border_resolution`` parameter.
+   decreased by setting the ``country_resolution``, ``state_resolution``, ``coastline_resolution``,
+   ``land_resolution``, ``ocean_resolution`` and ``lake_resolution`` parameters.
 
 .. _user-guide-python-city-map:
 

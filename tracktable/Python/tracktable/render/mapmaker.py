@@ -107,6 +107,27 @@ def cartesian_map(map_bbox=None,
 
 # ----------------------------------------------------------------------
 
+from cartopy.io.img_tiles import GoogleWTS
+class Tiles(GoogleWTS):
+    def __init__(self, url):
+        """
+        Set up a new instance to retrieve tiles from a map tiles URL.
+
+        Parameters
+        ----------
+        url
+            url template with locations for z (zoom), x, and y identified
+
+        """
+        self.url = url
+        super(Tiles, self).__init__()
+
+    def _image_url(self, tile):
+        x, y, z = tile
+        return self.url.format(z=z, y=y, x=x)
+
+# ----------------------------------------------------------------------
+
 def terrestrial_map(map_name,
                     draw_coastlines=True,
                     draw_countries=True,
@@ -122,6 +143,7 @@ def terrestrial_map(map_name,
                     lonlat_color='#A0A0A0',
                     lonlat_linewidth=0.2,
                     lonlat_zorder=6,
+                    lonlat_labels=False,
                     coastline_color='#808080',
                     coastline_linewidth=1,
                     coastline_zorder=5,
@@ -140,12 +162,20 @@ def terrestrial_map(map_name,
                     city_dot_color='white',
                     city_label_color='white',
                     city_zorder=6,
-                    border_resolution='110m',
+                    country_resolution='10m',
+                    state_resolution='10m',
+                    coastline_resolution='50m',
+                    land_resolution='110m',
+                    ocean_resolution='110m',
+                    lake_resolution='110m',
                     map_bbox=None,
+                    map_global=False,
                     map_projection=None,
                     map_scale_length=None,
                     region_size=None,
                     axes=None,
+                    tiles=None,
+                    tiles_zoom_level=8,
                     **kwargs):
 
     """Create and decorate a terrestrial map
@@ -174,6 +204,7 @@ def terrestrial_map(map_name,
       lonlat_color (str):                           Color name or hex string for longitude/latitude lines (Default: '#A0A0A0')
       lonlat_linewidth (float):                     Width (in point) for lon/lat lines (Default: 0.2)
       lonlat_zorder (int):                          Image layer for coastlines (Default: 6)
+      lonlat_labels (bool):                         If True, draw lon/lat values at edges. (only for PlateCarree and Mercator)
       coastline_color (str):                        Color name or hex string for coastlines (Default: '#808080')
       coastline_linewidth (float):                  Width (in points) of coastlines (Default: 1)
       coastline_zorder (int):                       Image layer for coastlines (Default: 5)
@@ -192,8 +223,14 @@ def terrestrial_map(map_name,
       city_dot_color (str):                         Color name or hex string for city markers (Default: 'white')
       city_label_color (str):                       Color name or hex string for city names (Default: 'white')
       city_zorder (int):                            Color name or hex string for city names (Default: 6)
-      border_resolution (str):                      Detail of borders (Default: '110m')
+      country_resolution (str):                     Detail of country borders (Default: '10m')
+      state_resolution (str):                       Detail of state borders (Default: '10m')
+      coastline_resolution (str):                   Detail of coastlines (Default: '500m')
+      land_resolution (str):                        Detail of land (Default: '110m')
+      ocean_resolution (str):                       Detail of oceans (Default: '110m')
+      lake_resolution (str):                        Detail of lakes (Default: '110m')
       map_bbox ([minLon, minLat, maxLon, maxLat]):  Bounding box for custom map extent (Default: None)
+      map_global (bool):                            If True overrides map_bbox and uses the limits of the projection
       map_projection (Cartopy CRS):                Cartopy CRS projection object (optional) (Default: None)
       map_scale_length (float):                     Length of map scale indicator (in km) (Default: None)
       region_size (float):                          Size of region depicted around an airport (km width x km height) (Default: None)
@@ -207,13 +244,17 @@ def terrestrial_map(map_name,
       (GeoAxes, artist_list): Basemap instance and a list of Matplotlib artists that were rendered
     """
 
-    if map_name == "custom":
+    if map_global:
+        map_axes = maps.instantiate_map_global(
+            projection=map_projection
+            )
+
+    elif map_name == "custom":
         map_axes = maps.instantiate_map(
             min_corner=map_bbox.min_corner,
             max_corner=map_bbox.max_corner,
             projection=map_projection
             )
-        artists = []
 
     else:
         map_axes = maps.predefined_map(
@@ -221,13 +262,19 @@ def terrestrial_map(map_name,
             region_size=region_size,
             projection=map_projection
             )
-        artists = []
+    artists = []
+
+    if tiles != None:
+        tiler = Tiles(tiles)
+        map_axes.add_image(tiler, tiles_zoom_level)
 
     if draw_coastlines:
         artists.extend(
             decoration.draw_coastlines(
                 map_axes,
                 edgecolor=coastline_color,
+                resolution=coastline_resolution,
+                linewidth=coastline_linewidth,
                 zorder=coastline_zorder
             ))
 
@@ -236,6 +283,7 @@ def terrestrial_map(map_name,
             decoration.fill_land(
                 map_axes,
                 facecolor=land_fill_color,
+                resolution=land_resolution,
                 zorder=land_zorder
                 ))
 
@@ -243,11 +291,13 @@ def terrestrial_map(map_name,
         water_actors = decoration.fill_oceans(
             map_axes,
             facecolor=water_fill_color,
+            resolution=ocean_resolution,
             zorder=water_zorder
             )
         lake_actors = decoration.fill_lakes(
             map_axes,
             facecolor=water_fill_color,
+            resolution=lake_resolution,
             zorder=water_zorder
             )
         artists.extend(water_actors)
@@ -257,16 +307,18 @@ def terrestrial_map(map_name,
         artists.extend(
             decoration.draw_countries(
                 map_axes,
-                edgecolor=country_color,
-                facecolor=country_fill_color,
                 linewidth=country_linewidth,
-                zorder=country_zorder
+                zorder=country_zorder,
+                edgecolor=country_color,
+                resolution=country_resolution,
+                facecolor=country_fill_color #TODO this doesn't appear to be used. (set to none)
                 ))
 
     if draw_states:
         artists.extend(
             decoration.draw_states(
                 map_axes,
+                resolution=state_resolution,
                 edgecolor=state_color,
                 facecolor=state_fill_color,
                 linewidth=state_linewidth,
@@ -278,6 +330,7 @@ def terrestrial_map(map_name,
             decoration.draw_lonlat(
                 map_axes,
                 color=lonlat_color,
+                draw_labels=lonlat_labels,
                 linewidth=lonlat_linewidth,
                 zorder=lonlat_zorder
                 ))
