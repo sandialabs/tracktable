@@ -4,6 +4,13 @@ stages:
   - build
   - test
 
+variables:
+  # This is a regular expression that identifies tests that CTest
+  # should skip.  We use this for problematic tests that fail for
+  # reasons unrelated to problems with the code -- that is, tests
+  # that themselves are buggy.
+    EXCLUDED_TESTS: "C_MemoryUse|C_GREAT_CIRCLE_FIT|P_Render_Trajectories"
+    
 include: '.gitlab-ci-windows.yml'
 include: '.gitlab-ci-macos.yml'
 include: '.gitlab-ci-ubuntu2004.yml'

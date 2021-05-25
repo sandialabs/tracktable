@@ -16,3 +16,4 @@ __pycache__
 /_build/
 /doxygen/
 /build_ubuntu2004/
+/build_macos/
