@@ -613,11 +613,11 @@ public:
     }
 
   /** Enable/disable logging of point count on read
-   * 
+   *
    * When set to true (the default), the point reader will print out
    * the number of points successfully read and the number of errors
    * to the info log channel when the end of the input is reached.
-   * 
+   *
    * This function is provided because there are cases like the
    * trajectory reader where this results in thousands of lines of
    * spam because the reader is invoked for every trajectory
@@ -626,7 +626,7 @@ public:
    * @param [in] onoff Boolean flag: 'true' means 'yes, log statistics'
    */
 
-  void set_point_count_log_enabled(bool onoff) 
+  void set_point_count_log_enabled(bool onoff)
   {
     this->PointCountLogEnabled = onoff;
   }
@@ -640,7 +640,7 @@ public:
    * @return Whether or not point count logging is enabled
    */
 
-  bool point_count_log_enabled() const 
+  bool point_count_log_enabled() const
   {
     return this->PointCountLogEnabled;
   }
@@ -932,7 +932,7 @@ protected:
           settings::point_coordinate_type value(boost::lexical_cast<settings::point_coordinate_type>(tokens.at(column)));
           (*point)[coord] = value;
           }
-        catch (boost::bad_lexical_cast e)
+        catch (const boost::bad_lexical_cast& e)
           {
           std::ostringstream fieldbuf;
           fieldbuf << "coordinate " << coord;

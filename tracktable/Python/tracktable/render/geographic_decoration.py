@@ -30,12 +30,16 @@
 
 """Render cities, coastlines, etc onto maps"""
 
-from __future__ import print_function, absolute_import, division
-
 import cartopy
-from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
-cities = None
+import cartopy.crs
+import matplotlib
+import matplotlib.collections
+import matplotlib.colors
+from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
+from matplotlib import pyplot
+from tracktable.core.geomath import longitude_degree_size
 
+cities = None
 
 def _ensure_cities_loaded():
     global cities
@@ -480,17 +484,28 @@ def draw_lonlat(map_axes,
 # ----------------------------------------------------------------------
 
 def draw_scale(mymap,
-               length_in_km,
-               label_color,
-               label_size,
+               length_in_km=10,
+               label_color='#C0C0C0',
+               label_size=10,
                linewidth=1,
                zorder=20):
-    """ draw_scale has not been implemented yet
-    """
+    """ Fill in map scale
 
-    raise NotImplementedError(
-      ("tracktable.render.geographic_decoration.draw_scale has not "
-       "been ported to Cartopy"))
+    Given a GeoAxes instance, fill in a scale on a map.
+
+    Args:
+      map_axes (GeoAxes): Map instance to render onto
+
+    Keyword Args:
+      length_in_km (int): Scale's representative length (Default: 10)
+      label_color (str): Color (name or hex string) for scale (Default: '#C0C0C0')
+      label_size (str): Size of the scale label (Default: 10)
+      linewidth (float): Width of the scale (Default: 1)
+      zorder (int): Image layer (z-order) for scale (Default: 20)
+
+    Returns:
+       A list of Matplotlib artists added to the map.
+    """
 
     artists = []
 
@@ -516,19 +531,21 @@ def draw_scale(mymap,
 # ----------------------------------------------------------------------
 
 def _find_map_scale_endpoints(mymap, scale_length_in_km):
-    longitude_span = mymap.urcrnrlon - mymap.llcrnrlon
-    latitude_span = mymap.urcrnrlat - mymap.llcrnrlat
+    min_lon, max_lon, min_lat, max_lat = mymap.get_extent()
+
+    longitude_span = max_lon - min_lon
+    latitude_span = max_lat - min_lat
 
     # Position the scale 5% up from the bottom of the figure
-    scale_latitude = mymap.llcrnrlat + 0.05 * latitude_span
+    scale_latitude = min_lat + 0.05 * latitude_span
 
-    scale_length_in_degrees = scale_length_in_km / _longitude_degree_width(scale_latitude)
+    scale_length_in_degrees = scale_length_in_km / longitude_degree_size(scale_latitude)
 
     if scale_length_in_degrees > 0.9 * longitude_span:
-        raise RuntimeError("draw_scale: Requested map scale size ({} km) is too large to fit on map ({} km near bottom).".format(length_in_km, longitude_span * _longitude_degree_width(scale_latitude)))
+        raise RuntimeError("draw_scale: Requested map scale size ({} km) is too large to fit on map ({} km near bottom).".format(scale_length_in_km, longitude_span * longitude_degree_size(scale_latitude)))
 
     # Position the scale 5% in from the left edge of the map
-    scale_longitude_start = mymap.llcrnrlon + 0.05 * longitude_span
+    scale_longitude_start = min_lon + 0.05 * longitude_span
     scale_longitude_end = scale_longitude_start + scale_length_in_degrees
 
     return [ (scale_longitude_start, scale_latitude), (scale_longitude_end, scale_latitude) ]
@@ -536,8 +553,9 @@ def _find_map_scale_endpoints(mymap, scale_length_in_km):
 # ----------------------------------------------------------------------
 
 def _find_map_scale_tick_endpoints(mymap, scale_length_in_km):
-    longitude_span = mymap.urcrnrlon - mymap.llcrnrlon
-    latitude_span = mymap.urcrnrlat - mymap.llcrnrlat
+    min_lon, max_lon, min_lat, max_lat = mymap.get_extent()
+
+    latitude_span = max_lat - min_lat
 
     scale_endpoints = _find_map_scale_endpoints(mymap, scale_length_in_km)
 
@@ -561,24 +579,17 @@ def _draw_map_scale_line(mymap,
     if axes is None:
         axes = pyplot.gca()
 
-    longitude_span = mymap.urcrnrlon - mymap.llcrnrlon
-    latitude_span = mymap.urcrnrlat - mymap.llcrnrlat
-
     world_scale_endpoints = _find_map_scale_endpoints(mymap, scale_length_in_km)
     world_tick_endpoints = _find_map_scale_tick_endpoints(mymap, scale_length_in_km)
 
-    screen_scale_endpoints = [ mymap(*world_scale_endpoints[0]),
-                               mymap(*world_scale_endpoints[1]) ]
-    screen_tick_endpoints = [ (mymap(*world_tick_endpoints[0][0]), mymap(*world_tick_endpoints[0][1])),
-                              (mymap(*world_tick_endpoints[1][0]), mymap(*world_tick_endpoints[1][1])) ]
+    screen_scale_endpoints = [ world_scale_endpoints[0], world_scale_endpoints[1] ]
+    screen_tick_endpoints = [ (world_tick_endpoints[0][0], world_tick_endpoints[0][1]),
+                              (world_tick_endpoints[1][0], world_tick_endpoints[1][1]) ]
 
     # Assemble line segments
     # We could also use paths.points_to_segments to do this
-    segments = [
-        screen_tick_endpoints[0],
-        ( screen_scale_endpoints[0], screen_scale_endpoints[1] ),
-        screen_tick_endpoints[1]
-        ]
+    segments = [ screen_tick_endpoints[0], (screen_scale_endpoints[0], screen_scale_endpoints[1]),
+        screen_tick_endpoints[1] ]
 
     linewidths = [ linewidth ] * len(segments)
     colors = [ color ] * len(segments)
@@ -604,15 +615,17 @@ def _draw_map_scale_label(mymap,
     if axes is None:
         axes = pyplot.gca()
 
-    longitude_span = mymap.urcrnrlon - mymap.llcrnrlon
-    latitude_span = mymap.urcrnrlat - mymap.llcrnrlat
+    min_lon, max_lon, min_lat, max_lat = mymap.get_extent()
+
+    longitude_span = max_lon - min_lon
+    latitude_span = max_lat - min_lat
 
     world_scale_endpoints = _find_map_scale_endpoints(mymap, scale_length_in_km)
 
     longitude_center = 0.5 * (world_scale_endpoints[0][0] + world_scale_endpoints[1][0])
 
     text_centerpoint_world = ( longitude_center, world_scale_endpoints[0][1] + 0.01 * latitude_span )
-    text_centerpoint_screen = mymap(*text_centerpoint_world)
+    text_centerpoint_screen = text_centerpoint_world
 
     text_artist = pyplot.text(
         text_centerpoint_screen[0], text_centerpoint_screen[1],
