@@ -174,10 +174,10 @@ def __airport_random_path_point_generators(start_airport_list,
     end_airport = None
 
     if start_airport_list is None or len(start_airport_list) == 0:
-        start_airport_list = list(airports.all_airports());
+        start_airport_list = list(airports.all_airports())
 
     if end_airport_list is None or len(end_airport_list) == 0:
-        end_airport_list = list(airports.all_airports());
+        end_airport_list = list(airports.all_airports())
 
     for i in range(num_paths):
         while start_airport == end_airport:

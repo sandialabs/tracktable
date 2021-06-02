@@ -121,7 +121,7 @@ class FilterByBoundingBox(object):
         for trajectory in self.input:
             if self.box is None:
                 yield(trajectory)
-            elif geomath.intersects(box, trajectory):
+            elif geomath.intersects(self.box, trajectory):
                 yield(trajectory)
 
 
