@@ -257,7 +257,7 @@ def test_render_trajectories(ground_truth_path, test_output_path,
                                                      ignore_uuids=True)
 
     filename = "CustomLinewidth.html"
-    from tracktable.render.render_trajectories import progress_linewidth_generator
+    from tracktable.render.common_processing import progress_linewidth_generator
     render_trajectories(trajs[28], line_color='green',
                         trajectory_linewidth_generator=progress_linewidth_generator,
                         backend='folium', show=False, save=True,

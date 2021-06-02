@@ -32,15 +32,15 @@ Heat Map Rendering Example
 Purpose: Sample code to render heatmap of points
 """
 
-from tracktable.domain.terrestrial import TrajectoryPointReader
-from tracktable.render import mapmaker
-from tracktable.render.histogram2d import render_histogram
-from tracktable.render import maps
-from tracktable.core import data_directory
-
-from matplotlib import pyplot
 import os.path
 import sys
+
+from matplotlib import pyplot
+from tracktable.core import data_directory
+from tracktable.domain.terrestrial import TrajectoryPointReader
+from tracktable.render import mapmaker, maps
+from tracktable.render.histogram2d import render_histogram
+
 
 # Generate a map and create a heatmap from the points we generated.
 # The type of map, colors, scaling can be customised depending the

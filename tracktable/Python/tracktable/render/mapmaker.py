@@ -30,15 +30,13 @@
 """Convenience wrappers for geographic map creation and decoration
 """
 
-from __future__ import print_function
-
-from matplotlib import pyplot
+import logging
 
 import cartopy
 import cartopy.crs
-import logging
-from tracktable.render import maps
+from matplotlib import pyplot
 from tracktable.render import geographic_decoration as decoration
+from tracktable.render import maps
 
 
 def mapmaker(domain='terrestrial', *args, **kwargs):
@@ -133,6 +131,7 @@ def terrestrial_map(map_name,
                     draw_countries=True,
                     draw_states=True,
                     draw_lonlat=True,
+                    draw_scale=True,
                     fill_land=True,
                     fill_water=True,
                     land_fill_color='#101010',
@@ -143,6 +142,11 @@ def terrestrial_map(map_name,
                     lonlat_color='#A0A0A0',
                     lonlat_linewidth=0.2,
                     lonlat_zorder=6,
+                    scale_length_in_km=20,
+                    scale_label_color='white',
+                    scale_label_size=10,
+                    scale_linewidth=1,
+                    scale_zorder=6,
                     lonlat_labels=False,
                     coastline_color='#808080',
                     coastline_linewidth=1,
@@ -171,13 +175,11 @@ def terrestrial_map(map_name,
                     map_bbox=None,
                     map_global=False,
                     map_projection=None,
-                    map_scale_length=None,
                     region_size=None,
                     axes=None,
                     tiles=None,
                     tiles_zoom_level=8,
                     **kwargs):
-
     """Create and decorate a terrestrial map
 
     Call the Cartopy toolkit to create a map of some predefined area,
@@ -194,6 +196,7 @@ def terrestrial_map(map_name,
       draw_countries (bool):                        Whether or not to draw country borders on the map (Default: True)
       draw_states (bool):                           Whether or not to draw US/Canada state borders (Default: True)
       draw_lonlat (bool):                           Whether or not to draw longitude/latitude lines (Default: True)
+      draw_scale (bool):                            Whether or not to draw scale (Default: True)
       fill_land (bool):                             Whether or not to fill in the land areas (Default: True)
       fill_water (bool):                            Whether or not to fill in the land areas (Default: True)
       land_fill_color (str):                        Color name or hex string for land area (Default: '#101010')
@@ -204,6 +207,11 @@ def terrestrial_map(map_name,
       lonlat_color (str):                           Color name or hex string for longitude/latitude lines (Default: '#A0A0A0')
       lonlat_linewidth (float):                     Width (in point) for lon/lat lines (Default: 0.2)
       lonlat_zorder (int):                          Image layer for coastlines (Default: 6)
+      scale_length_in_km (int)                      Scale's representative length (Default: 10)
+      scale_label_color (str):                      Color (name or hex string) for scale (Default: '#C0C0C0')
+      scale_label_size (int):                       Size of the scale label (Default: 10)
+      scale_linewidth (int):                        Width of the scale (Default: 1)
+      scale_zorder (int):                           Image layer (z-order) for scale (Default: 20)
       lonlat_labels (bool):                         If True, draw lon/lat values at edges. (only for PlateCarree and Mercator)
       coastline_color (str):                        Color name or hex string for coastlines (Default: '#808080')
       coastline_linewidth (float):                  Width (in points) of coastlines (Default: 1)
@@ -230,8 +238,8 @@ def terrestrial_map(map_name,
       ocean_resolution (str):                       Detail of oceans (Default: '110m')
       lake_resolution (str):                        Detail of lakes (Default: '110m')
       map_bbox ([minLon, minLat, maxLon, maxLat]):  Bounding box for custom map extent (Default: None)
+      map_projection (Cartopy CRS):                 Cartopy CRS projection object (optional) (Default: None)
       map_global (bool):                            If True overrides map_bbox and uses the limits of the projection
-      map_projection (Cartopy CRS):                Cartopy CRS projection object (optional) (Default: None)
       map_scale_length (float):                     Length of map scale indicator (in km) (Default: None)
       region_size (float):                          Size of region depicted around an airport (km width x km height) (Default: None)
       axes (GeoAxes):                               Matplotlib axes to render into (Default: None)
@@ -241,7 +249,7 @@ def terrestrial_map(map_name,
       KeyError: unknown map name
 
     Returns:
-      (GeoAxes, artist_list): Basemap instance and a list of Matplotlib artists that were rendered
+      (GeoAxes, artist_list): Cartopy instance and a list of Matplotlib artists that were rendered
     """
 
     if map_global:
@@ -357,13 +365,15 @@ def terrestrial_map(map_name,
                 label_size=city_label_size
             ))
 
-    if map_scale_length is not None:
+    if draw_scale:
         artists.extend(
             decoration.draw_scale(
                 map_axes,
-                map_scale_length,
-                label_color=city_label_color,
-                label_size=city_label_size
+                length_in_km=scale_length_in_km,
+                label_color=scale_label_color,
+                label_size=scale_label_size,
+                linewidth=scale_linewidth,
+                zorder=scale_zorder
             ))
 
     return (map_axes, artists)
@@ -375,12 +385,14 @@ def _make_bounding_box(bbox_args, domain):
     # Case 1: Is it a list of coordinates from the command line?
     if type(bbox_args) is list and len(bbox_args) == 4:
         if domain == 'terrestrial':
-            from tracktable.domain.terrestrial import BoundingBox as TerrestrialBoundingBox
+            from tracktable.domain.terrestrial import \
+                BoundingBox as TerrestrialBoundingBox
             min_corner = (bbox_args[0], bbox_args[1])
             max_corner = (bbox_args[2], bbox_args[3])
             return TerrestrialBoundingBox(min_corner, max_corner)
         elif domain == 'cartesian2d':
-            from tracktable.domain.cartesian2d import BoundingBox as Cartesian2DBoundingBox
+            from tracktable.domain.cartesian2d import \
+                BoundingBox as Cartesian2DBoundingBox
             min_corner = (bbox_args[0], bbox_args[1])
             max_corner = (bbox_args[2], bbox_args[3])
             return Cartesian2DBoundingBox(min_corner, max_corner)
