@@ -40,7 +40,6 @@ from tracktable.core import data_directory
 from tracktable.domain.terrestrial import TrajectoryPointReader
 from tracktable.render import mapmaker, maps
 from tracktable.render.histogram2d import render_histogram
-from tracktable.render.render_heatmaps import interactive_heatmap
 
 
 # Generate a map and create a heatmap from the points we generated.
@@ -83,8 +82,6 @@ def main():
                     bin_size=0.25,
                     colormap='gist_heat')
     pyplot.show()
-
-    heatmap = interactive_heatmap(points)
 
 if __name__ == '__main__':
     sys.exit(main())
