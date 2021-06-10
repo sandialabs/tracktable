@@ -38,113 +38,46 @@ running as an interactive map inside of a notebook or from the command
 line and saved as a static image to a file.
 """
 
-from datetime import datetime
+import logging
 
-import folium as fol
-import matplotlib
-import numpy as np
-from folium.plugins import HeatMap
-from tracktable.render import render_trajectories
+from tracktable.core.geomath import simplify
+from tracktable.render.backends import cartopy_backend, folium_backend
+from tracktable.render.map_processing import common_processing
 
-# ----------------------------------------------------------------------
-
-def matplotlib_cmap_to_dict(colormap_name,
-                            num_colors=16):
-    """Convert a Matplotlib colormap into a dict for Folium
-
-    Folium expects its color maps as a dictionary whose keys
-    are floats between zero and one and whose values are the
-    color to which that value should be mapped.
-
-    Arguments:
-        colormap_name (string): Name of one of Matplotlib's built-in
-            color maps.
-
-    Keyword Arguments:
-        num_colors (int): How many entries to put into the output.
-            Defaults to 16.
-
-    Returns:
-        Colormap in dictionary format
-
-    Raises:
-        ValueError: no such color map exists
-
-    Note:
-        It would be easy to extend this function to fit the
-        color map to a range other than [0, 1] or to make it use a
-        logarithmic scale (or any other scale) instead of linear.
-        Ask, or just do it, if you'd like this.
-    """
-
-    mpl_cmap = matplotlib.pyplot.get_cmap(colormap_name)
-    sample_points = np.linspace(0, 1, num_colors)
-    output = dict()
-    for sample_value in sample_points:
-        output[sample_value] = matplotlib.colors.to_hex(
-            mpl_cmap(sample_value)
-        )
-    return output
+logger = logging.getLogger(__name__)
 
 # ----------------------------------------------------------------------
 
+def render_heatmaps(points, backend='', trajectories=None, simplify_traj=False, simplify_tol=0.0001, **kwargs):
+    render_function = folium_backend.render_heatmaps
 
-def interactive_heatmap(points,
-                        trajectories=None,
-                        weights=None,
-                        color_map='viridis',
-                        tiles='cartodbdark_matter',
-                        attr='.',
-                        crs="EPSG3857",
-                        show = False,
-                        save = False,
-                        filename = ''):
-    """Creates an interactive heatmap vizulization
-
-    Args:
-        points (list): list of points
-
-    Keyword Arguments:
-        trajectories: (Trajectoies) list of trajectories corresponding to the points,
-            render trajectories if provided (Default: None)
-        weights: (list) list of weights associated with each point (Default: None)
-        color_map: (str) name of matplotlib colormap to use for the heatmap (Default: 'viridis')
-        tiles (str): name of map tiling to use (Default: 'cartodbdark_matter')
-        attr (str): folium specific parameter (Default: '.')
-        crs (str): folium specific parameter (Default: "EPSG3857")
-        show (bool): whether or not to show the result (if possible)
-            (default True) if saving to a file, might not want to view.
-        save (bool): whether or not to save the result to a file.
-            For folium the results can be saved to an html file. For
-            cartopy the results can be saved as an image. If no filename
-            is given, a default filename including the timestamp is used.
-            (default False)
-        filename (str): Path and filename to save the results to, if
-            save is set to True. If no filename is given, a default
-            filename including the timestamp is used.
-
-    Returns: an interactive heatmap
-    """
-
-    # lat, long, (optional weight) of points to render
-    if weights is None:
-        display_points = [[point[1], point[0]] for point in points]
+    if backend == 'folium':
+        render_function = folium_backend.render_heatmaps
+    elif backend == 'cartopy':
+        render_function = cartopy_backend.render_heatmaps
+    elif backend == 'ipyleaflet': # currently not implemented
+        raise NotImplementedError("ipyleaflet rendering backend for heatmaps is currently unavailable.")
+    elif backend == 'bokeh':  # currently not implemented
+        raise NotImplementedError("Bokeh rendering backend for heatmaps is currently unavailable.")
     else:
-        display_points = [[point[1], point[0], weight] for point, weight in zip(points, weights)]
+        if backend != '':
+            logger.error("Error: Invalid backend specified in",
+                  "render_heatmaps.",
+                  "Valid backends include: folium, and cartopy")
+        if common_processing.in_notebook():
+            if type(trajectories) is not list or len(trajectories) <= 10000:
+                render_function = folium_backend.render_heatmaps
+            else:
+                logger.warn("Too many trajectories to plot with folium. Reverting to non-interactive backend. Override with backend='folium'")
+                render_function = cartopy_backend.render_heatmaps
+        else:
+            render_function = cartopy_backend.render_heatmaps
 
-    # create the heat map
-    heat_map = fol.Map(tiles=tiles, zoom_start=4)
-    gradient = matplotlib_cmap_to_dict(color_map)
-    if trajectories is not None:
-        heat_map = render_trajectories(trajectories, map=heat_map, backend='folium',
-                                       line_color='grey', linewidth=0.5,
-                                       tiles=tiles, attr=attr, crs=crs)
-    HeatMap(display_points, gradient=gradient).add_to(heat_map)
-    if save:  # saves as .html document
-        if not filename:
-            datetime_str = datetime.now().strftime("%Y-%m-%dT%H%M%S-%f")
-            filename = "heatmap-"+datetime_str+'.html'
-        heat_map.save(filename)
-    if show:
-        display(heat_map)
-    return heat_map
+    if simplify_traj:
+        if type(trajectories) is not list:
+            trajectories = simplify(trajectories, simplify_tol)
+        else:
+            for index, traj in enumerate(trajectories):
+                trajectories[index] = simplify(traj, simplify_tol)
+
+    return render_function(trajectories, **kwargs)

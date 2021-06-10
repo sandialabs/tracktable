@@ -39,6 +39,9 @@ import cartopy
 import cartopy.crs
 import folium as fol
 import matplotlib
+import matplotlib.colors
+import matplotlib.pyplot
+import numpy
 import tracktable.domain.terrestrial as domain
 from tracktable.core.geomath import distance, length, point_at_length_fraction
 from tracktable.render import coloring
@@ -361,3 +364,106 @@ def sub_trajs_from_frac(trajectories, zoom_frac):
         #traj_mid.set_property("id",
         sub_trajs.append(traj_mid)
     return sub_trajs
+
+# ----------------------------------------------------------------------
+
+def save_density_array(density, outfile):
+    """Save and output the density array to a file.
+
+    Args:
+       density (tuple): Density to be saved to file
+       outfile (str): Filename to save output
+
+    Returns:
+       No return value.
+
+    """
+    outfile.write('{} {}\n'.format(density.shape[0], density.shape[1]))
+    rows = density.shape[0]
+    columns = density.shape[1]
+
+    for row in range(rows):
+        for col in range(columns):
+            outfile.write("{} ".format(density[row, col]))
+        outfile.write("\n")
+
+# ----------------------------------------------------------------------
+
+def load_density_array(infile):
+    """Load the density array from a file.
+
+    Args:
+       infile (str): Filename for input
+
+    Returns:
+       The density array in the file.
+
+    """
+
+    first_line = infile.readline()
+    words = first_line.strip().split(' ')
+    dims = [ int(word) for word in words ]
+
+    density = numpy.zeros(shape=(dims[0], dims[1]), dtype=numpy.int32)
+
+    rows = dims[0]
+    columns = dims[1]
+
+    for row in range(rows):
+        line = infile.readline()
+        words = line.strip().split(' ')
+        nums = [ int(word) for word in words ]
+        for col in range(columns):
+            density[row, col] = nums[col]
+
+    return density
+
+# ----------------------------------------------------------------------
+
+def draw_density_array(density,
+                       map_projection,
+                       bounding_box,
+                       colormap=None,
+                       colorscale=None,
+                       zorder=10,
+                       axes=None):
+    """Render a histogram for the given map projection.
+
+    Args:
+       density (iterable): Density array that will be drawn onto the map
+       map_projection (Basemap): Map to render onto
+       bounding_box (point2d): Bounding box of area to gdraw the
+
+    Keyword Args:
+       colormap (str or Colormap): Colors to use for histogram (Default: None)
+       colorscale (matplotlib.colors.Normalize or subclass): Mapping from bin counts to color. Useful values are matplotlib.colors.Normalize() and matplotlib.colors.LogNorm(). (Default: None)
+       zorder (int): Image priority for rendering. Higher values will be rendered on top of actors with lower z-order. (Default: 10)
+       axes (matplotlib.axes.Axes): Axes to render into. Defaults to "current axes" as defined by Matplotlib. (Default:None)
+
+    Returns:
+       The density rendered onto the map.
+
+    """
+
+    # Yes, it looks like we've got the indices backwards on
+    # density.shape[]. Recall that the X coordinate refers to
+    # columns, typically dimension 1, while the Y coordinate refers to
+    # rows, typically dimension 0.
+    x_bins = numpy.linspace(bounding_box.min_corner[0],
+                            bounding_box.max_corner[0],
+                            density.shape[1] + 1)
+
+    y_bins = numpy.linspace(bounding_box.min_corner[1],
+                            bounding_box.max_corner[1],
+                            density.shape[0] + 1)
+
+    x_bins_mesh, y_bins_mesh = numpy.meshgrid(x_bins, y_bins)
+
+    # And finally render it onto the map.
+    return [ matplotlib.pyplot.pcolormesh(x_bins_mesh,
+                                          y_bins_mesh,
+                                          density,
+                                          cmap=colormap,
+                                          norm=colorscale,
+                                          zorder=zorder,
+                                          axes=axes) ]

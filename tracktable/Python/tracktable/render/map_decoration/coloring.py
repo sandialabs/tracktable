@@ -201,3 +201,43 @@ def random_color():
     """
     r = lambda: random.randint(0,255)
     return '#{:02x}{:02x}{:02x}'.format(r(), r(), r())
+
+# ----------------------------------------------------------------------
+
+def matplotlib_cmap_to_dict(colormap_name,
+                            num_colors=16):
+    """Convert a Matplotlib colormap into a dict for Folium
+
+    Folium expects its color maps as a dictionary whose keys
+    are floats between zero and one and whose values are the
+    color to which that value should be mapped.
+
+    Arguments:
+        colormap_name (string): Name of one of Matplotlib's built-in
+            color maps.
+
+    Keyword Arguments:
+        num_colors (int): How many entries to put into the output.
+            Defaults to 16.
+
+    Returns:
+        Colormap in dictionary format
+
+    Raises:
+        ValueError: no such color map exists
+
+    Note:
+        It would be easy to extend this function to fit the
+        color map to a range other than [0, 1] or to make it use a
+        logarithmic scale (or any other scale) instead of linear.
+        Ask, or just do it, if you'd like this.
+    """
+
+    mpl_cmap = matplotlib.pyplot.get_cmap(colormap_name)
+    sample_points = np.linspace(0, 1, num_colors)
+    output = dict()
+    for sample_value in sample_points:
+        output[sample_value] = matplotlib.colors.to_hex(
+            mpl_cmap(sample_value)
+        )
+    return output

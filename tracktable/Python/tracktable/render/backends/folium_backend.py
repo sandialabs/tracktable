@@ -36,9 +36,11 @@ from datetime import datetime
 
 import folium as fol
 import matplotlib
+from folium.plugins import HeatMap
 from matplotlib.colors import ListedColormap, hsv_to_rgb, rgb2hex
 from tracktable.core.geomath import compute_bounding_box
-from tracktable.render import coloring, common_processing
+from tracktable.render.map_decoration import coloring
+from tracktable.render.map_processing import common_processing
 
 
 # later can add multiple layers and switch between with:
@@ -197,6 +199,68 @@ def render_trajectories_folium(trajectories,
 
 # ----------------------------------------------------------------------
 
+def render_heatmaps(points,
+                    trajectories=None,
+                    weights=None,
+                    color_map='viridis',
+                    tiles='cartodbdark_matter',
+                    attr='.',
+                    crs="EPSG3857",
+                    show = False,
+                    save = False,
+                    filename = ''):
+    """Creates an interactive heatmap visualization
+
+    Args:
+        points (list): list of points
+
+    Keyword Arguments:
+        trajectories: (Trajectoies) list of trajectories corresponding to the points,
+            render trajectories if provided (Default: None)
+        weights: (list) list of weights associated with each point (Default: None)
+        color_map: (str) name of matplotlib colormap to use for the heatmap (Default: 'viridis')
+        tiles (str): name of map tiling to use (Default: 'cartodbdark_matter')
+        attr (str): folium specific parameter (Default: '.')
+        crs (str): folium specific parameter (Default: "EPSG3857")
+        show (bool): whether or not to show the result (if possible)
+            (default True) if saving to a file, might not want to view.
+        save (bool): whether or not to save the result to a file.
+            For folium the results can be saved to an html file. For
+            cartopy the results can be saved as an image. If no filename
+            is given, a default filename including the timestamp is used.
+            (default False)
+        filename (str): Path and filename to save the results to, if
+            save is set to True. If no filename is given, a default
+            filename including the timestamp is used.
+
+    Returns: an interactive heatmap
+    """
+
+    # lat, long, (optional weight) of points to render
+    if weights is None:
+        display_points = [[point[1], point[0]] for point in points]
+    else:
+        display_points = [[point[1], point[0], weight] for point, weight in zip(points, weights)]
+
+    # create the heat map
+    heat_map = fol.Map(tiles=tiles, zoom_start=4)
+    gradient = coloring.matplotlib_cmap_to_dict(color_map)
+    if trajectories is not None:
+        heat_map = render_trajectories_folium(trajectories, map=heat_map,
+                                       line_color='grey', linewidth=0.5,
+                                       tiles=tiles, attr=attr, crs=crs)
+    HeatMap(display_points, gradient=gradient).add_to(heat_map)
+    if save:  # saves as .html document
+        if not filename:
+            datetime_str = datetime.now().strftime("%Y-%m-%dT%H%M%S-%f")
+            filename = "heatmap-"+datetime_str+'.html'
+        heat_map.save(filename)
+    if show:
+        display(heat_map)
+    return heat_map
+
+# ----------------------------------------------------------------------
+
 def render_point_folium(current_point,
                         point_popup_properties, coord, point_radius,
                         point_color, map_canvas):
@@ -225,6 +289,7 @@ def render_point_folium(current_point,
                      color=point_color,
                      tooltip=tooltip_str_point,
                      popup=popup_point).add_to(map_canvas)
+
 # ----------------------------------------------------------------------
 
 def bounding_box_for_folium(trajectories):
@@ -236,3 +301,5 @@ def bounding_box_for_folium(trajectories):
     box_for_folium = [(raw_bbox.min_corner[1], raw_bbox.min_corner[0]),
                       (raw_bbox.max_corner[1], raw_bbox.max_corner[0])]
     return box_for_folium
+
+

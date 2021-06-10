@@ -44,9 +44,8 @@ including allowing users to explicitly specify the rendering backend.
 import logging
 
 from tracktable.core.geomath import simplify
-from tracktable.render import (common_processing, render_bokeh,
-                               render_cartopy, render_folium,
-                               render_ipyleaflet)
+from tracktable.render.backends import bokeh_backend, cartopy_backend, folium_backend, ipyleaflet_backend
+from tracktable.render.map_processing import common_processing
 
 logger = logging.getLogger(__name__)
 
@@ -157,34 +156,34 @@ def render_trajectories(trajectories, backend='', simplify_traj=False, simplify_
 
     """
 
-    render_function = render_folium.render_trajectories_folium
+    render_function = folium_backend.render_trajectories_folium
 
     if backend == 'folium':
-        render_function = render_folium.render_trajectories_folium
+        render_function = folium_backend.render_trajectories_folium
     elif backend == 'cartopy':
-        render_function = render_cartopy.render_trajectories_cartopy
+        render_function = cartopy_backend.render_trajectories_cartopy
     elif backend == 'ipyleaflet': # currently experimental
         logger.warn("ipyleaflet rendering backend is currently experimental, proceed with caution.")
-        render_function = render_ipyleaflet.render_trajectories_ipyleaflet
+        render_function = ipyleaflet_backend.render_trajectories_ipyleaflet
     elif backend == 'bokeh':  # currently experimental
         logger.warn("Bokeh rendering backend is currently experimental, proceed with caution.")
-        render_function = render_bokeh.render_trajectories_bokeh
+        render_function = bokeh_backend.render_trajectories_bokeh
     else:
         if backend != '':
-            print("Error: Invalid backend specified in",
+            logger.error("Error: Invalid backend specified in",
                   "render_trajectories.",
                   "Valid backends include: folium, and cartopy")
         if common_processing.in_notebook():
             if type(trajectories) is not list or len(trajectories) <= 10000:
-                render_function = render_folium.render_trajectories_folium
+                render_function = folium_backend.render_trajectories_folium
             else:
-                print("Too many trajectories to plot with folium. Reverting to non-interactive backend. Override with backend='folium'")
-                render_function = render_cartopy.render_trajectories_cartopy
+                logger.warn("Too many trajectories to plot with folium. Reverting to non-interactive backend. Override with backend='folium'")
+                render_function = cartopy_backend.render_trajectories_cartopy
         else:
-            render_function = render_cartopy.render_trajectories_cartopy
+            render_function = cartopy_backend.render_trajectories_cartopy
 
     if simplify_traj:
-        if type(trajectories) != list:
+        if type(trajectories) is not list:
             trajectories = simplify(trajectories, simplify_tol)
         else:
             for index, traj in enumerate(trajectories):
