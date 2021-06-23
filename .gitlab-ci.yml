@@ -10,8 +10,12 @@ variables:
   # reasons unrelated to problems with the code -- that is, tests
   # that themselves are buggy.
     EXCLUDED_TESTS: "C_MemoryUse|C_GREAT_CIRCLE_FIT|P_Render_Trajectories"
-    
+  # This is a switch for determining whether or not to run the
+  # code coverage pipeline.  Combined with a schedule on "develop", this
+  # should allow us to do code coverage once a week at an innocuous time
+    DO_COVERAGE: "true"
+
 include: '.gitlab-ci-windows.yml'
 include: '.gitlab-ci-macos.yml'
 include: '.gitlab-ci-ubuntu2004.yml'
-
+include: '.gitlab-ci-coverage.yml'
