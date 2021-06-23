@@ -28,30 +28,17 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-# generate_heatmap_sample_data - Generate the data file points_near_big_cities.tsv
-#
-
-# Our heatmap sample data file contains points sampled randomly in the
-# vicinity of large cities.  If you want to generate a similar file
-# with different parameters or just want to know how it works, use and
-# modify this script.
-#
-# The example data in tracktable/Examples/Data/HeatmapSamplePoints.tsv
-# was generated with the following command line:
-#
-# python generate_heatmap_sample_data.py 500 100 HeatmapSamplePoints.tsv
-#
-
+"""
+This file contains functions for generating heatmap points.
+"""
 import csv
-import itertools
-import math
-import random
-import sys
+import datetime
 
-from tracktable.core import geomath
-from tracktable.info import cities
-from tracktable.source import scatter
+from tracktable.data_generators import point
 from tracktable.domain import terrestrial
+from tracktable.feature import interleave_points
+from tracktable.info import cities
+
 
 def n_largest_cities(howmany):
     """
@@ -81,11 +68,10 @@ def point_radius_for_city(city):
 
 def write_points_to_file(point_source, outfile):
     outfile.write('# object_id timestamp longitude latitude\n')
-    writer = csv.writer(outfile, delimiter='\t')
+    writer = csv.writer(outfile, delimiter=',')
 
     for point in point_source:
-        point.object_id = 'ANON'
-        row = [ point.object_id, '2014-01-01 00:00:00', point.longitude, point.latitude ]
+        row = [ point.object_id, '2014-01-01 00:00:00', point[0], point[1] ]
         writer.writerow(row)
 
 # ----------------------------------------------------------------------
@@ -94,36 +80,20 @@ def points_near_city(city, num_points):
     center = terrestrial.BasePoint()
     center[0] = city.longitude
     center[1] = city.latitude
+    center.timestamp = datetime.datetime.now()
+    center.object_id = 'ANON'
 
     max_radius = point_radius_for_city(city)
 
-    return scatter.linear_falloff_scattered_points(center,
-                                                   num_points,
-                                                   max_radius)
+    return point.random_circle_linear_falloff(center, num_points, max_radius)
 
 # ----------------------------------------------------------------------
 
-def main():
-    argv = sys.argv
-    if len(argv) != 4:
-        sys.stderr.write('usage: {} num_cities num_points_per_city outfile.tsv\n'.format(argv[0]))
-        return 1
-
-    num_cities = int(argv[1])
-    num_points_per_city = int(argv[2])
-    outfilename = argv[3]
-
-    print("INFO: Generating {} points around each of the {} largest cities in the world.".format(num_points_per_city, num_cities))
-
-    all_sources = [ points_near_city(city, num_points_per_city) for city in n_largest_cities(num_cities) ]
-    combined_point_source = combine.concatenate_sources(*all_sources)
-
-    with open(outfilename, 'wb') as outfile:
-        write_points_to_file(combined_point_source, outfile)
-
-    return 0
-
-# ----------------------------------------------------------------------
-
-if __name__ == '__main__':
-    sys.exit(main())
+def generate_heatmap_points(**kwargs):
+    print("INFO: Generating {} points around each of the {} largest cities in the world.".format(kwargs['num_points_per_city'], kwargs['num_cities']))
+    heatmap_points = [ points_near_city(city, kwargs['num_points_per_city']) for city in n_largest_cities(kwargs['num_cities']) ]
+    combined_point_source = interleave_points.interleave_points_by_timestamp(*heatmap_points)
+    if kwargs['write_file']:
+        with open(kwargs ['outfilename'], 'w') as outfile:
+            write_points_to_file(combined_point_source, outfile)
+    return heatmap_points
