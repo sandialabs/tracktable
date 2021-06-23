@@ -1,0 +1,64 @@
+############################################################
+# Code Coverage pipeline: uses ubuntu Focal Fossa
+############################################################
+coverage-setup:
+  image: cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu:FocalFossa
+  stage: setup
+  only:
+    variables:
+      - $DO_COVERAGE == "true"
+  tags:
+    - ubuntu
+    - docker
+  script:
+    - mkdir build_coverage
+  artifacts:
+    paths:
+      - build_coverage
+    expire_in: 2 hours
+
+coverage-configure:
+  image: cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu:FocalFossa
+  stage: configure
+  only:
+    variables:
+      - $DO_COVERAGE == "true"
+  tags:
+    - ubuntu
+    - docker
+  dependencies:
+    - coverage-setup
+  script:
+    - apt-get update
+    - apt-get -y install lcov
+    - cd build_coverage
+    - cmake -DCMAKE_BUILD_TYPE=Coverage ..
+  artifacts:
+    paths:
+      - build_coverage
+    expire_in: 2 hours
+
+coverage-build:
+  image: cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu:FocalFossa
+  stage: build
+  only:
+    variables:
+      - $DO_COVERAGE == "true"
+  tags:
+    - ubuntu
+    - docker
+  dependencies:
+    - coverage-configure
+  script:
+    - apt-get update
+    - apt-get -y install lcov
+    - cd build_coverage
+    - make
+    - make cov_init
+    - ctest --output-on-failure --exclude-regex 'C_MemoryUse|C_GREAT_CIRCLE_FIT|P_Render_Trajectories|C_TrajectoryAssemblyDomain'
+    - make cov_capture
+    - make cov_genhtml
+  artifacts:
+    paths:
+      - build_coverage
+    expire_in: 1 week

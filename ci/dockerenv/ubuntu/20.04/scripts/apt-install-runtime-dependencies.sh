@@ -17,6 +17,7 @@ apt-add-repository 'deb https://apt.kitware.com/ubuntu/ focal main'
 apt-get update
 
 apt-get -y install \
+    gcc \
     libboost-all-dev \
     build-essential \
     libssl-dev \

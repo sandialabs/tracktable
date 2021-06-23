@@ -16,6 +16,7 @@ apt-get -y install \
     libtool \
     pkgconf \
     libproj-dev \
+    lcov \
     python3-breathe \
     python3-certifi \
     python3-matplotlib \
