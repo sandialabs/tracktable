@@ -34,13 +34,15 @@ Purpose: Sample code to render heatmap of points
 
 import os.path
 import sys
+import cartopy
+import cartopy.crs
 
 from matplotlib import pyplot
 from tracktable.core import data_directory
 from tracktable.domain.terrestrial import TrajectoryPointReader
-from tracktable.render import mapmaker, maps
-from tracktable.render.histogram2d import render_histogram
-from tracktable.render.render_heatmaps import interactive_heatmap
+from tracktable.render.map_processing import mapmaker, maps
+from tracktable.render.render_heatmap import render_heatmap
+from tracktable.render import render_map
 
 
 # Generate a map and create a heatmap from the points we generated.
@@ -74,17 +76,20 @@ def main():
 
     # 100 DPI * (8, 6) gives an 800x600-pixel image
     figure = pyplot.figure(dpi=100, figsize=(8, 6))
-    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
+    (mymap, map_actors) = render_map.render_map(domain='terrestrial',
                                             map_name='region:conus')
     bbox = get_bbox('conus', 'terrestrial')
-    render_histogram(map_projection=mymap,
-                    point_source=points,       # Our list of points we created above
-                    bounding_box = bbox,       # Bounding box is generated from mymap
+
+    render_heatmap(points, # Our list of points we created above
+                    backend='cartopy',
+                    map_canvas=mymap,
+                    bounding_box=bbox,       # Bounding box is generated from mymap
                     bin_size=0.25,
                     colormap='gist_heat')
+
     pyplot.show()
 
-    heatmap = interactive_heatmap(points)
+    heatmap = render_heatmap(points, backend='folium')
 
 if __name__ == '__main__':
     sys.exit(main())

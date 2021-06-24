@@ -37,7 +37,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import ListedColormap, hsv_to_rgb, rgb_to_hsv, to_rgb
-from tracktable.render import common_processing
+from tracktable.render.map_processing import common_processing
 
 
 def get_constant_color_cmap(color):

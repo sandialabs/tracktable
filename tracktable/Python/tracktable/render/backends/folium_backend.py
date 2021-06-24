@@ -53,7 +53,7 @@ from tracktable.render.map_processing import common_processing
 # TODO what if color map but no generator or vice versa
 # TODO add point_color_map?
 # TODO could customize choice of mapping hues to trajs
-def render_trajectories_folium(trajectories,
+def render_trajectories(trajectories,
 
                                #common arguments
                                map_canvas = None,
@@ -165,12 +165,12 @@ def render_trajectories_folium(trajectories,
                     current_point_color = \
                         rgb2hex(point_mapper.to_rgba(scalars[i]))
 
-                render_point_folium(trajectory[i],
+                render_point(trajectory[i],
                                     point_popup_properties, c,
                                     point_radius,
                                     current_point_color, map_canvas)
         if show_dot:
-            render_point_folium(trajectory[-1],
+            render_point(trajectory[-1],
                                 point_popup_properties,
                                 coordinates[-1], dot_size,
                                 dot_color, map_canvas)
@@ -199,7 +199,7 @@ def render_trajectories_folium(trajectories,
 
 # ----------------------------------------------------------------------
 
-def render_heatmaps(points,
+def render_heatmap(points,
                     trajectories=None,
                     weights=None,
                     color_map='viridis',
@@ -246,7 +246,7 @@ def render_heatmaps(points,
     heat_map = fol.Map(tiles=tiles, zoom_start=4)
     gradient = coloring.matplotlib_cmap_to_dict(color_map)
     if trajectories is not None:
-        heat_map = render_trajectories_folium(trajectories, map=heat_map,
+        heat_map = render_trajectories(trajectories, map=heat_map,
                                        line_color='grey', linewidth=0.5,
                                        tiles=tiles, attr=attr, crs=crs)
     HeatMap(display_points, gradient=gradient).add_to(heat_map)
@@ -261,7 +261,7 @@ def render_heatmaps(points,
 
 # ----------------------------------------------------------------------
 
-def render_point_folium(current_point,
+def render_point(current_point,
                         point_popup_properties, coord, point_radius,
                         point_color, map_canvas):
     """Renders a point to the folium map

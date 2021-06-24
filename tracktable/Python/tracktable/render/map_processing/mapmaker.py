@@ -35,8 +35,8 @@ import logging
 import cartopy
 import cartopy.crs
 from matplotlib import pyplot
-from tracktable.render import geographic_decoration as decoration
-from tracktable.render import maps
+from tracktable.render.map_decoration import geographic_decoration as decoration
+from tracktable.render.map_processing import maps
 
 
 def mapmaker(domain='terrestrial', *args, **kwargs):

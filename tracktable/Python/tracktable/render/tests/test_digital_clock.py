@@ -38,7 +38,8 @@ import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot
 
-from tracktable.render import maps, clock
+from tracktable.render.map_processing import maps
+from tracktable.render.map_decoration import clock
 from tracktable.core import Timestamp
 
 def run_test():

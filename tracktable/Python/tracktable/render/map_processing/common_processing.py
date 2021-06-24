@@ -44,7 +44,7 @@ import matplotlib.pyplot
 import numpy
 import tracktable.domain.terrestrial as domain
 from tracktable.core.geomath import distance, length, point_at_length_fraction
-from tracktable.render import coloring
+from tracktable.render.map_decoration import coloring
 
 logger = logging.getLogger(__name__)
 

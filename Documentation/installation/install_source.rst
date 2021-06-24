@@ -412,7 +412,7 @@ Step 3: Build and Test
 Once the build process has finished go to your build directory and run
 ``ctest`` (part of CMake) to run all the tests. They should all succeed.
 
-.. note:: Some of the later Python tests such as P_Mapmaker may take a minute or two.
+.. note:: Some of the later Python tests such as ``P_Mapmaker`` may take a minute or two.
 
 .. tip::  Windows users who chose Visual Studio project files during configuration
    can run the "test" project to run all the tests. This is a thin wrapper that

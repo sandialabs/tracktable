@@ -45,54 +45,54 @@ from tracktable.core.geomath import compute_bounding_box
 from tracktable.domain.cartesian2d import BasePoint as Point2D
 from tracktable.domain.cartesian2d import BoundingBox as BoundingBox2D
 from tracktable.domain.cartesian2d import identity_projection
+from tracktable.render import render_map
 from tracktable.render.map_decoration import coloring
 from tracktable.render.map_processing import common_processing, paths
-from tracktable.render.map_processing.mapmaker import mapmaker
 
 # from IPython import get_ipython
 
 
-def render_trajectories_cartopy(trajectories,
+def render_trajectories(trajectories,
 
-                                #common arguments
-                                map_canvas = None,
-                                obj_ids = [],
-                                map_bbox = [],
-                                show_lines = True,
-                                gradient_hue = None,
-                                color_map = '',
-                                line_color = '',
-                                linewidth = 0.8,
-                                show_points = False,
-                                point_size = 0.2,
-                                point_color = '',
-                                show_dot = True,
-                                dot_size = 0.23,
-                                dot_color = 'white',
-                                trajectory_scalar_generator = common_processing.path_length_fraction_generator,
-                                trajectory_linewidth_generator = None,
-                                color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1),
-                                show = True,
-                                save = False,
-                                filename = '',
-                                tiles=None,
-                                show_distance_geometry = False,
-                                distance_geometry_depth = 4,
-                                zoom_frac = [0,1], #undocumented feature, for now
+                        #common arguments
+                        map_canvas = None,
+                        obj_ids = [],
+                        map_bbox = [],
+                        show_lines = True,
+                        gradient_hue = None,
+                        color_map = '',
+                        line_color = '',
+                        linewidth = 0.8,
+                        show_points = False,
+                        point_size = 0.2,
+                        point_color = '',
+                        show_dot = True,
+                        dot_size = 0.23,
+                        dot_color = 'white',
+                        trajectory_scalar_generator = common_processing.path_length_fraction_generator,
+                        trajectory_linewidth_generator = None,
+                        color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1),
+                        show = True,
+                        save = False,
+                        filename = '',
+                        tiles=None,
+                        show_distance_geometry = False,
+                        distance_geometry_depth = 4,
+                        zoom_frac = [0,1], #undocumented feature, for now
 
-                                #cartopy specific arguments
-                                draw_lonlat=True,
-                                fill_land=True,
-                                fill_water=True,
-                                draw_coastlines=True,
-                                draw_countries=True,
-                                draw_states=True,
-                                map_projection = None,
-                                transform = cartopy.crs.PlateCarree(),
-                                figsize=(4,2.25),
-                                dpi=300,
-                                bbox_buffer=(.3,.3),
-                                **kwargs): #kwargs are for mapmaker
+                        #cartopy specific arguments
+                        draw_lonlat=True,
+                        fill_land=True,
+                        fill_water=True,
+                        draw_coastlines=True,
+                        draw_countries=True,
+                        draw_states=True,
+                        map_projection = None,
+                        transform = cartopy.crs.PlateCarree(),
+                        figsize=(4,2.25),
+                        dpi=300,
+                        bbox_buffer=(.3,.3),
+                        **kwargs): #kwargs are for mapmaker
     """Render a list of trajectories using the cartopy backend
 
         For documentation on the parameters, please see render_trajectories
@@ -154,7 +154,7 @@ def render_trajectories_cartopy(trajectories,
            color_maps.append(coloring.hue_gradient_cmap(common_processing.hash_short_md5(trajectory[0].object_id)))
 
     if map_canvas == None:
-        (map_canvas, map_actors) = mapmaker(domain='terrestrial',
+        (map_canvas, map_actors) = render_map.render_map(domain='terrestrial',
                                             map_name='custom',
                                             map_bbox=map_bbox,
                                             map_projection = map_projection,
@@ -200,36 +200,61 @@ def render_trajectories_cartopy(trajectories,
 
 # ----------------------------------------------------------------------
 
-def render_heatmaps(map_projection,
-                     point_source,
-                     bounding_box,
-                     bin_size=1,
-                     colormap='gist_heat',
-                     colorscale=matplotlib.colors.Normalize(),
-                     zorder=10):
+def render_heatmap(points,
+                   map_canvas = None,
+                   map_bbox=[],
+                   bin_size=1,
+                   colormap='gist_heat',
+                   colorscale=matplotlib.colors.Normalize(),
+                   zorder=10,
+                   draw_lonlat=True,
+                   fill_land=True,
+                   fill_water=True,
+                   draw_coastlines=True,
+                   draw_countries=True,
+                   draw_states=True,
+                   map_projection = None,
+                   transform = cartopy.crs.PlateCarree(),
+                   figsize=(4,2.25),
+                   dpi=300,
+                   bbox_buffer=(.3,.3),
+                   tiles=None,
+                   **kwargs):
     """Render a histogram for the given map projection.
 
-    Args:
-       map_projection (Basemap): Map to render onto
-       point_source (iterable): Sequence of 2D points. This will
-          be traversed only once.
-       bounding_box (point2d): Bounding box of area to generate histogram
-
-    Keyword Args:
-       bin_size (int): Boundary size for bins (Default: 1)
-       colormap (str or Colormap): Colors to use for histogram (Default: 'gist_heat')
-       colorscale (matplotlib.colors.Normalize or subclass): Mapping from bin counts to color. Useful values are matplotlib.colors.Normalize() and matplotlib.colors.LogNorm(). (Default: matplotlib.colors.Normalize())
-       zorder (int): Image priority for rendering. Higher values will be rendered on top of actors with lower z-order. (Default: 10)
-
-    Returns:
-       A rendered histogram onto the map.
-
+       For documentation on the parameters, please see render_trajectories
     """
+    #tiles override cartopy map features
+    if tiles != None:
+        fill_land=False
+        fill_water=False
+        draw_coastlines=False
+        draw_countries=False
+        draw_states=False
 
-    bounding_box = BoundingBox2D(Point2D(bounding_box[0],
-                                             bounding_box[1]),
-                                     Point2D(bounding_box[2],
-                                             bounding_box[3]))
+    if not map_bbox: #if it's empty
+        # bounding_box = compute_bounding_box(itertools.chain(*points),
+        bounding_box = compute_bounding_box(points,
+                                            buffer=bbox_buffer)
+    else:
+        bounding_box = BoundingBox2D(Point2D(map_bbox[0],
+                                             map_bbox[1]),
+                                     Point2D(map_bbox[2],
+                                             map_bbox[3]))
+
+    if map_canvas == None:
+        (map_canvas, map_actors) = render_map.render_map(domain='terrestrial',
+                                            map_name='custom',
+                                            map_bbox=bounding_box,
+                                            map_projection = map_projection,
+                                            draw_lonlat=draw_lonlat,
+                                            draw_coastlines=draw_coastlines,
+                                            draw_countries=draw_countries,
+                                            draw_states=draw_states,
+                                            fill_land=fill_land,
+                                            fill_water=fill_water,
+                                            tiles=tiles,
+                                            **kwargs)
 
     x_bin_boundaries = []
     y_bin_boundaries = []
@@ -260,8 +285,7 @@ def render_heatmaps(map_projection,
 
         return (x_bucket, y_bucket)
 
-
-    for point in point_source:
+    for point in points:
         try:
             (x, y) = point_to_bin(point)
             if (x >= 0 and x < len(x_bin_boundaries)-1 and
@@ -274,11 +298,11 @@ def render_heatmaps(map_projection,
 
     # And finally render it onto the map.
     return common_processing.draw_density_array(masked_density,
-                              map_projection,
-                              bounding_box,
-                              colormap=colormap,
-                              colorscale=colorscale,
-                              zorder=zorder)
+                                                map_canvas,
+                                                bounding_box,
+                                                colormap=colormap,
+                                                colorscale=colorscale,
+                                                zorder=zorder)
 
 # ----------------------------------------------------------------------
 

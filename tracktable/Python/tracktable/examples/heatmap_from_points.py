@@ -95,7 +95,8 @@ import sys
 
 from tracktable.core import geomath
 from tracktable.script_helpers import argparse, argument_groups
-from tracktable.render import histogram2d, mapmaker
+from tracktable.render.render_heatmap import render_heatmap
+from tracktable.render import render_map
 from tracktable.domain import domain_module_from_name
 from tracktable.domain import terrestrial, cartesian2d
 
@@ -198,7 +199,7 @@ def render_histogram(mymap,
             terrestrial.BasePoint(extent[0], extent[2]),
             terrestrial.BasePoint(extent[1], extent[3]))
 
-    return histogram2d.render_histogram(map_projection=mymap,
+    return render_heatmap.render_histogram(map_projection=mymap,
                                         point_source=point_source,
                                         bounding_box=bounding_box,
                                         bin_size=bin_size,
@@ -332,7 +333,7 @@ def main():
         # the point reader we extract the whole dict using
         # tracktable.script_helpers.argument_groups.extract_arguments().
         mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
-        (mymap, artists) = mapmaker.mapmaker(**mapmaker_kwargs)
+        (mymap, artists) = render_map.render_map(**mapmaker_kwargs)
 
         logger.info("Rendering histogram.")
         render_histogram(mymap,

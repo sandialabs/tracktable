@@ -108,7 +108,8 @@ import numpy
 import tracktable.domain
 from tracktable.core import geomath
 from tracktable.feature import annotations
-from tracktable.render import mapmaker, paths
+from tracktable.render.map_processing import paths
+from tracktable.render import render_map
 from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
 from tracktable.script_helpers import argument_groups, argparse, n_at_a_time
 
@@ -803,7 +804,7 @@ def main():
     logger.info('Initializing map canvas for rendering.')
     (figure, axes) = initialize_canvas(args.resolution,
                                        args.dpi)
-    (mymap, map_artists) = mapmaker.mapmaker(**mapmaker_kwargs)
+    (mymap, map_artists) = render_map.render_map(**mapmaker_kwargs)
 
     if args.trajectory_linewidth == 'taper':
         linewidth_style = 'taper'

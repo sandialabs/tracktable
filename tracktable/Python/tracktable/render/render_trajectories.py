@@ -156,18 +156,18 @@ def render_trajectories(trajectories, backend='', simplify_traj=False, simplify_
 
     """
 
-    render_function = folium_backend.render_trajectories_folium
+    render_function = folium_backend.render_trajectories
 
     if backend == 'folium':
-        render_function = folium_backend.render_trajectories_folium
+        render_function = folium_backend.render_trajectories
     elif backend == 'cartopy':
-        render_function = cartopy_backend.render_trajectories_cartopy
+        render_function = cartopy_backend.render_trajectories
     elif backend == 'ipyleaflet': # currently experimental
         logger.warn("ipyleaflet rendering backend is currently experimental, proceed with caution.")
-        render_function = ipyleaflet_backend.render_trajectories_ipyleaflet
+        render_function = ipyleaflet_backend.render_trajectories
     elif backend == 'bokeh':  # currently experimental
         logger.warn("Bokeh rendering backend is currently experimental, proceed with caution.")
-        render_function = bokeh_backend.render_trajectories_bokeh
+        render_function = bokeh_backend.render_trajectories
     else:
         if backend != '':
             logger.error("Error: Invalid backend specified in",
@@ -175,12 +175,12 @@ def render_trajectories(trajectories, backend='', simplify_traj=False, simplify_
                   "Valid backends include: folium, and cartopy")
         if common_processing.in_notebook():
             if type(trajectories) is not list or len(trajectories) <= 10000:
-                render_function = folium_backend.render_trajectories_folium
+                render_function = folium_backend.render_trajectories
             else:
                 logger.warn("Too many trajectories to plot with folium. Reverting to non-interactive backend. Override with backend='folium'")
-                render_function = cartopy_backend.render_trajectories_cartopy
+                render_function = cartopy_backend.render_trajectories
         else:
-            render_function = cartopy_backend.render_trajectories_cartopy
+            render_function = cartopy_backend.render_trajectories
 
     if simplify_traj:
         if type(trajectories) is not list:

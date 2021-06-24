@@ -2,27 +2,35 @@
 tracktable.render module
 ========================
 
-----------
-Submodules
-----------
+--------------------------
+User Accessible Submodules
+--------------------------
 
 .. toctree::
    :maxdepth: 2
 
-   tracktable.render.clock.rst
-   tracktable.render.coloring.rst
-   tracktable.render.colormaps.rst
-   tracktable.render.common_processing.rst
-   tracktable.render.geographic_decoration.rst
-   tracktable.render.histogram2d.rst
-   tracktable.render.mapmaker.rst
-   tracktable.render.maps.rst
-   tracktable.render.paths.rst
-   tracktable.render.render_bokeh.rst
-   tracktable.render.render_cartopy.rst
-   tracktable.render.render_folium.rst
-   tracktable.render.render_ipyleaflet.rst
+   tracktable.render.render_heatmap.rst
+   tracktable.render.render_map.rst
    tracktable.render.render_trajectories.rst
+
+------------------------------
+Non-User Accessible Submodules
+------------------------------
+.. toctree::
+   :maxdepth: 2
+
+   tracktable.render.backends.bokeh_backend.rst
+   tracktable.render.backends.cartopy_backend.rst
+   tracktable.render.backends.folium_backend.rst
+   tracktable.render.backends.ipyleaflet_backend.rst
+   tracktable.render.map_decoration.clock.rst
+   tracktable.render.map_decoration.coloring.rst
+   tracktable.render.map_decoration.colormaps.rst
+   tracktable.render.map_decoration.geographic_decoration.rst
+   tracktable.render.map_processing.common_processing.rst
+   tracktable.render.map_processing.mapmaker.rst
+   tracktable.render.map_processing.maps.rst
+   tracktable.render.map_processing.paths.rst
 
 ---------------
 Module contents
