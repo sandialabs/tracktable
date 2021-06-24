@@ -199,13 +199,12 @@ def render_histogram(mymap,
             terrestrial.BasePoint(extent[0], extent[2]),
             terrestrial.BasePoint(extent[1], extent[3]))
 
-    return render_heatmap.render_histogram(map_projection=mymap,
-                                        point_source=point_source,
-                                        bounding_box=bounding_box,
-                                        bin_size=bin_size,
-                                        colormap=color_map,
-                                        colorscale=scale,
-                                        zorder=zorder)
+    render_heatmap(point_source, # Our list of points we created above
+                    backend='cartopy',
+                    map_canvas=mymap,
+                    bounding_box=bounding_box,       # Bounding box is generated from mymap
+                    bin_size=bin_size,
+                    colormap=color_map)
 
 # ----------------------------------------------------------------------
 
