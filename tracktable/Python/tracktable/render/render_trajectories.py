@@ -163,16 +163,17 @@ def render_trajectories(trajectories, backend='', simplify_traj=False, simplify_
     elif backend == 'cartopy':
         render_function = cartopy_backend.render_trajectories
     elif backend == 'ipyleaflet': # currently experimental
-        logger.warn("ipyleaflet rendering backend is currently experimental, proceed with caution.")
+        logger.warn("ipyleaflet trajectory rendering backend is currently experimental, proceed with caution.")
         render_function = ipyleaflet_backend.render_trajectories
     elif backend == 'bokeh':  # currently experimental
-        logger.warn("Bokeh rendering backend is currently experimental, proceed with caution.")
+        logger.warn("Bokeh trajectory rendering backend is currently experimental, proceed with caution.")
         render_function = bokeh_backend.render_trajectories
     else:
         if backend != '':
             logger.error("Error: Invalid backend specified in",
                   "render_trajectories.",
-                  "Valid backends include: folium, and cartopy")
+                  "Valid backends include: folium, and cartopy",
+                  "Defauting to folium backend")
         if common_processing.in_notebook():
             if type(trajectories) is not list or len(trajectories) <= 10000:
                 render_function = folium_backend.render_trajectories
@@ -239,10 +240,15 @@ def render_trajectory(trajectory, backend='', **kwargs):
 
 # ----------------------------------------------------------------------
 
-def render_trajectories_for_print(trajectories, filename, land_fill_color='white',
-                                  water_fill_color='#EEEEEE', color_map='viridis',
-                                  dot_color='grey', linewidth=1.5,
-                                  figsize=(6,4), save=True, **kwargs):
+def render_trajectories_for_print(trajectories, filename,
+                                  land_fill_color='white',
+                                  water_fill_color='#EEEEEE',
+                                  color_map='viridis',
+                                  dot_color='grey',
+                                  linewidth=1.5,
+                                  figsize=(6,4),
+                                  save=True,
+                                  **kwargs):
     """Render a list of trajectories with print-friendly defaults
 
     This function will render a list of trajectories using Cartopy

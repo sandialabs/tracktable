@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 
 # ----------------------------------------------------------------------
 
-def render_heatmap(points, backend='', trajectories=None, simplify_traj=False, simplify_tol=0.0001, **kwargs):
+def render_heatmap(points, backend='', trajectories=None, **kwargs):
     """Render a list of trajectories interactively or as a static image
 
     This function will render a list of trajectories using Folium (for
@@ -101,14 +101,15 @@ def render_heatmap(points, backend='', trajectories=None, simplify_traj=False, s
     elif backend == 'cartopy':
         render_function = cartopy_backend.render_heatmap
     elif backend == 'ipyleaflet': # currently not implemented
-        raise NotImplementedError("ipyleaflet rendering backend for heatmaps is currently unavailable.")
+        raise NotImplementedError("ipyleaflet heatmap rendering backend is currently unavailable.")
     elif backend == 'bokeh':  # currently not implemented
-        raise NotImplementedError("Bokeh rendering backend for heatmaps is currently unavailable.")
+        raise NotImplementedError("Bokeh heatmap rendering backend is currently unavailable.")
     else:
         if backend != '':
             logger.error("Error: Invalid backend specified in",
                   "render_heatmap.",
-                  "Valid backends include: folium, and cartopy")
+                  "Valid backends include: folium, and cartopy.",
+                  "Defauting to folium backend")
         if common_processing.in_notebook():
             if type(trajectories) is not list or len(trajectories) <= 10000:
                 render_function = folium_backend.render_heatmap
@@ -117,12 +118,5 @@ def render_heatmap(points, backend='', trajectories=None, simplify_traj=False, s
                 render_function = cartopy_backend.render_heatmap
         else:
             render_function = cartopy_backend.render_heatmap
-
-    if trajectories is not None and simplify_traj:
-        if type(trajectories) is not list:
-            trajectories = simplify(trajectories, simplify_tol)
-        else:
-            for index, traj in enumerate(trajectories):
-                trajectories[index] = simplify(traj, simplify_tol)
 
     return render_function(points, **kwargs)

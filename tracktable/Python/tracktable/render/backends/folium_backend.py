@@ -55,40 +55,40 @@ from tracktable.render.map_processing import common_processing
 # TODO could customize choice of mapping hues to trajs
 def render_trajectories(trajectories,
 
-                               #common arguments
-                               map_canvas = None,
-                               obj_ids = [],
-                               map_bbox = None,
-                               show_lines = True,
-                               gradient_hue = None,
-                               color_map = '',
-                               line_color = '',
-                               linewidth = 2.4,
-                               show_points = False,
-                               point_size = 0.6,
-                               point_color = '',
-                               show_dot = True,
-                               dot_size = 0.7,
-                               dot_color = 'white',
-                               trajectory_scalar_generator = common_processing.path_length_fraction_generator,
-                               trajectory_linewidth_generator = None,
-                               color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1),
-                               show = False,
-                               save = False,
-                               filename = '',
+                        #common arguments
+                        map_canvas = None,
+                        obj_ids = [],
+                        map_bbox = None,
+                        show_lines = True,
+                        gradient_hue = None,
+                        color_map = '',
+                        line_color = '',
+                        linewidth = 2.4,
+                        show_points = False,
+                        point_size = 0.6,
+                        point_color = '',
+                        show_dot = True,
+                        dot_size = 0.7,
+                        dot_color = 'white',
+                        trajectory_scalar_generator = common_processing.path_length_fraction_generator,
+                        trajectory_linewidth_generator = None,
+                        color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1),
+                        show = False,
+                        save = False,
+                        filename = '',
 
-                               # folium specific args
-                               tiles = 'cartodbdark_matter',
-                               attr = ".",
-                               crs = "EPSG3857",
-                               point_popup_properties = [],
-                               show_distance_geometry = False,
-                               distance_geometry_depth = 4,
-                               zoom_frac = [0,1], #undocumented feature, for now
-                               show_scale = True,
-                               max_zoom = 22,
-                               fast = False,
-                               **kwargs):
+                        # folium specific args
+                        tiles = 'cartodbdark_matter',
+                        attr = ".",
+                        crs = "EPSG3857",
+                        point_popup_properties = [],
+                        show_distance_geometry = False,
+                        distance_geometry_depth = 4,
+                        zoom_frac = [0,1], #undocumented feature, for now
+                        show_scale = True,
+                        max_zoom = 22,
+                        fast = False,
+                        **kwargs):
     """Render a list of trajectories using the folium backend
 
         For documentation on the parameters, please see render_trajectories
@@ -97,10 +97,10 @@ def render_trajectories(trajectories,
     if not fast:
         trajectories, line_color, color_map, gradient_hue \
             = common_processing.common_processing(trajectories,
-                                obj_ids,
-                                line_color,
-                                color_map,
-                                gradient_hue)
+                                                  obj_ids,
+                                                  line_color,
+                                                  color_map,
+                                                  gradient_hue)
     if not trajectories:
         return
 
@@ -122,9 +122,9 @@ def render_trajectories(trajectories,
 
             current_color_map, current_point_cmap, mapper, point_mapper = \
                 coloring.setup_colors(line_color, color_map, gradient_hue,
-                             point_color, color_scale,
-                             trajectory[0].object_id, i,
-                             trajectory_linewidth_generator)
+                                      point_color, color_scale,
+                                      trajectory[0].object_id, i,
+                                      trajectory_linewidth_generator)
         else:
             rgb = hsv_to_rgb([common_processing.hash_short_md5(trajectory[0].object_id), 1.0, 1.0])
             current_color_map = ListedColormap([rgb2hex(rgb)])

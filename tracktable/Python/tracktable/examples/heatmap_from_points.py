@@ -164,7 +164,6 @@ def parse_args():
 
 # ----------------------------------------------------------------------
 
-
 def render_histogram(mymap,
                      domain,
                      point_source,
