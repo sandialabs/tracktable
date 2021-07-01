@@ -40,7 +40,7 @@ import cartopy.crs
 from matplotlib import pyplot
 from tracktable.core import data_directory
 from tracktable.domain.terrestrial import TrajectoryPointReader
-from tracktable.render.map_processing import mapmaker, maps
+from tracktable.render.map_processing import maps
 from tracktable.render.render_heatmap import render_heatmap
 from tracktable.render import render_map
 
@@ -57,7 +57,7 @@ def get_bbox(area, domain):
     coords.append(location['min_corner'][1])
     coords.append(location['max_corner'][0])
     coords.append(location['max_corner'][1])
-    return mapmaker._make_bounding_box(coords, domain)
+    return render_map._make_bounding_box(coords, domain)
 
 def main():
     # First we set up our point source by reading points from a file.
