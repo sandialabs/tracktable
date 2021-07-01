@@ -9,6 +9,7 @@ User Accessible Submodules
 .. toctree::
    :maxdepth: 2
 
+   tracktable.render.mapmaker.rst
    tracktable.render.render_heatmap.rst
    tracktable.render.render_map.rst
    tracktable.render.render_trajectories.rst
@@ -28,7 +29,6 @@ Non-User Accessible Submodules
    tracktable.render.map_decoration.colormaps.rst
    tracktable.render.map_decoration.geographic_decoration.rst
    tracktable.render.map_processing.common_processing.rst
-   tracktable.render.map_processing.mapmaker.rst
    tracktable.render.map_processing.maps.rst
    tracktable.render.map_processing.paths.rst
 
