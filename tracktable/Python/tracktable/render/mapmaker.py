@@ -57,7 +57,7 @@ def mapmaker(domain='terrestrial', *args, **kwargs):
 
     # This will display a DeprecationWarning when the function is called
     warnings.warn(" \nThe tracktable.render.mapmaker mapmaker() function has been deprecated and will be fully removed in release 1.8."
-                " Please use tracktable.render.render_map render_map()\n", category=DeprecationWarning)
+                  " Please use the tracktable.render.render_map render_map() function.\n", category=DeprecationWarning)
 
     # Aliases to smooth the transition of relocation of the function(s)/module(s)
     return render_map(domain, *args, **kwargs)
