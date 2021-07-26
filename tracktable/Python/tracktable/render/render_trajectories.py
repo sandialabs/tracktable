@@ -172,7 +172,7 @@ def render_trajectories(trajectories, backend='', simplify_traj=False, simplify_
         if backend != '':
             logger.error("Error: Invalid backend specified in",
                   "render_trajectories.",
-                  "Valid backends include: folium, and cartopy",
+                  "Valid backends include: folium and cartopy",
                   "Defauting to folium backend")
         if common_processing.in_notebook():
             if type(trajectories) is not list or len(trajectories) <= 10000:
