@@ -13,9 +13,10 @@ variables:
   # This is a switch for determining whether or not to run the
   # code coverage pipeline.  Combined with a schedule on "develop", this
   # should allow us to do code coverage once a week at an innocuous time
-    DO_COVERAGE: "true"
+    DO_COVERAGE: "false"
 
-include: '.gitlab-ci-windows.yml'
-include: '.gitlab-ci-macos.yml'
-include: '.gitlab-ci-ubuntu2004.yml'
-include: '.gitlab-ci-coverage.yml'
+include:
+  - '.gitlab-ci-windows.yml'
+  - '.gitlab-ci-macos.yml'
+  - '.gitlab-ci-ubuntu2004.yml'
+  - '.gitlab-ci-coverage.yml'

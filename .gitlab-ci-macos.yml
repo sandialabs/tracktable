@@ -1,7 +1,7 @@
 # MacOS continuous integration setup for Tracktable
 # This file gets included from .gitlab-ci.yml.
 #
-# Runner configuration: 
+# Runner configuration:
 #
 # Gitlab Runner must run in an environment where the conda executable
 # is on the path.  We also need XCode and the command-line compiler
