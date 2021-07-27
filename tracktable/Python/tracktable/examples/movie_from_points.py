@@ -36,23 +36,20 @@ Note:
 
 """
 
-import tracktable.domain
-from tracktable.feature import annotations
-
-from tracktable.render.render_movie import render_trajectory_movie
-from tracktable.script_helpers import argument_groups, argparse
-from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
-
 import datetime
-import itertools
 import logging
 import sys
 
-import cartopy.crs
-
 import matplotlib
-from matplotlib import pyplot
 import matplotlib.animation
+import tracktable.domain
+from matplotlib import pyplot
+from tracktable.analysis.assemble_trajectories import \
+    AssembleTrajectoryFromPoints
+from tracktable.feature import annotations
+from tracktable.render.render_movie import render_trajectory_movie
+from tracktable.script_helpers import argparse, argument_groups
+
 matplotlib.use('Agg')
 
 # ----------------------------------------------------------------------
