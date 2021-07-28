@@ -28,21 +28,38 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// Simple 'hello world' c extension module
 
-// Tracktable Trajectory Library
-//
-// Boost.Python code to convert datetime.datetime <-> boost::posix_time::ptime
-//
-// To make this work, call install_datetime_converters() from within a
-// Boost.Python BOOST_PYTHON_MODULE.
-//
-// Created by Danny Rintoul and Andy Wilson.
+#define PY_SSIZE_T_CLEAN
+#include <Python.h>
+#include <stdio.h>
 
-#ifndef __DateTimeWrapper_h
-#define __DateTimeWrapper_h
+// Function 1: A simple 'hello world' function
+static PyObject* helloworld(PyObject* self, PyObject* args)
+{
+    printf("Hello World\n");
+    return Py_None;
+}
 
-void install_datetime_converters();
-void install_timestamp_functions();
+// Our Module's Function Definition struct
+// We require this `NULL` to signal the end of our method
+// definition
+static PyMethodDef c_python_methods[] = {
+    { "helloworld", helloworld, METH_NOARGS, "Prints Hello World" },
+    { NULL, NULL, 0, NULL }
+};
 
-#endif
+// Our Module Definition struct
+static struct PyModuleDef c_python_mod = {
+    PyModuleDef_HEAD_INIT,
+    "_c_python",
+    "Hellow World",
+    -1,
+    c_python_methods
+};
 
+// Initializes our module using our above struct
+PyMODINIT_FUNC PyInit__c_python(void)
+{
+    return PyModule_Create(&c_python_mod);
+}

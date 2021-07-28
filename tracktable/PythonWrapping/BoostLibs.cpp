@@ -28,21 +28,27 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+// The purpose of this file is to verify that we can include all of the required boost libraries
 
-// Tracktable Trajectory Library
-//
-// Boost.Python code to convert datetime.datetime <-> boost::posix_time::ptime
-//
-// To make this work, call install_datetime_converters() from within a
-// Boost.Python BOOST_PYTHON_MODULE.
-//
-// Created by Danny Rintoul and Andy Wilson.
+#define PY_SSIZE_T_CLEAN
+#include <boost/python.hpp>
+#include <boost/python/def.hpp>
+#include <boost/python/module.hpp>
+#include <Python.h>
 
-#ifndef __DateTimeWrapper_h
-#define __DateTimeWrapper_h
+#include <boost/date_time.hpp>
+#include <boost/serialization/serialization.hpp>
+#include <boost/log/core.hpp>
+#include <boost/regex.hpp>
+#include <boost/timer/timer.hpp>
 
-void install_datetime_converters();
-void install_timestamp_functions();
 
-#endif
+void func ()
+{
+  return;
+}
 
+BOOST_PYTHON_MODULE(_boost_libs) {
+    using namespace boost::python;
+    def("boost_libs_func", func);
+}

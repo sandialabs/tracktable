@@ -16,7 +16,6 @@ Submodules
    tracktable.core.geomath.rst
    tracktable.core.log.rst
    tracktable.core.misc
-   tracktable.core.register_core_types
    tracktable.core.simple_timezone.rst
    tracktable.core.test_utilities
    tracktable.core.testutils

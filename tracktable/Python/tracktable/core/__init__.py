@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 """
-TrailMix Trajectory Library - Core
+Tracktable Trajectory Library - Core
 
 Basic types (point, trajectory) live in this module.  They are in turn
 imported from the small C extension libraries.

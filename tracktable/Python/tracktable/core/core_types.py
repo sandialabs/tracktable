@@ -30,19 +30,9 @@
 
 from __future__ import print_function, division, absolute_import
 
-try:
-  from tracktable.lib import _core_types
-except ImportError:
-  print("Error importing core types. Path information follows.")
-  import os
-  import string
-  import sys
-  import pprint
-  print("Python path:")
-  pprint.pprint(sys.path)
-  print("System path:")
-  pprint.pprint(os.environ["PATH"].split(os.pathsep))
+# import all of the symbols here for downsteam consumers (geomath, etc)
 
+from tracktable.lib import _core_types
 
 try:
     _core_types.trigger_args_exception()
