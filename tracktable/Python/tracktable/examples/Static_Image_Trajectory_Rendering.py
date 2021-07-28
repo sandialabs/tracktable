@@ -38,9 +38,9 @@ The Trajectory Builder does this.
 """
 
 from tracktable.domain import terrestrial
-from tracktable.render import mapmaker
+from tracktable.render import render_map
 from tracktable.core import data_directory
-from tracktable.render import paths
+from tracktable.render.map_processing import paths
 from tracktable.feature import annotations
 
 import numpy
@@ -79,7 +79,7 @@ def main():
     # Set up the canvas and map projection
     # 8 x 6 inches at 100 dpi = 800x600 image
     figure = pyplot.figure(dpi=100, figsize=(8, 6))
-    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
+    (mymap, map_actors) = render_map.render_map(domain='terrestrial',
                                             map_name='region:world')
 
     color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1)
@@ -101,7 +101,7 @@ def main():
 
     # Set up the canvas and map projection
     figure = pyplot.figure(dpi=100, figsize=(8, 6))
-    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
+    (mymap, map_actors) = render_map.render_map(domain='terrestrial',
                                             map_name='region:conus')
 
     color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1)
@@ -117,7 +117,7 @@ def main():
     trajectories = terrestrial.TrajectoryReader()
     trajectories.input = infile
     figure = pyplot.figure(dpi=100, figsize=(8, 6))
-    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
+    (mymap, map_actors) = render_map.render_map(domain='terrestrial',
                                             map_name='region:world')
 
     # "Progress" produces the multi color trajectories to see the beginning, midpoints, and ends easier

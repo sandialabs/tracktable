@@ -70,9 +70,9 @@ from tracktable.domain.terrestrial import TrajectoryPointReader
 from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
 from tracktable.analysis.dbscan import compute_cluster_labels
 from tracktable.core import data_directory
-from tracktable.render import paths
+from tracktable.render.map_processing import paths
 from tracktable.domain import terrestrial
-from tracktable.render import mapmaker
+from tracktable.render import render_map
 
 from datetime import timedelta
 import cartopy
@@ -148,7 +148,7 @@ def main():
         # Set up the canvas and map projection
         figure = pyplot.figure(figsize=[20, 15])
         axes = figure.add_subplot(1, 1, 1)
-        (mymap, map_actors) = mapmaker.mapmaker(domain = 'terrestrial', map_name='region:conus')
+        (mymap, map_actors) = render_map.render_map(domain = 'terrestrial', map_name='region:conus')
         paths.draw_traffic(traffic_map = mymap, trajectory_iterable = clusters[cluster_id], transform=cartopy.crs.PlateCarree())
         figure.suptitle('{}: {} members'.format(cluster_name(cluster_id),
                                             len(clusters[cluster_id])))

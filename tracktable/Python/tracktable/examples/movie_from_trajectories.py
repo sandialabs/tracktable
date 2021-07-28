@@ -35,12 +35,10 @@ matplotlib.use('Agg')
 import matplotlib.animation
 from matplotlib import pyplot
 
-import csv
 import datetime
-import numpy
-import os
 import shlex
 import sys
+import itertools
 
 #import example_point_reader
 #mport example_trajectory_builder
@@ -49,7 +47,9 @@ import sys
 
 from tracktable.feature               import annotations
 from tracktable.filter.trajectory     import ClipToTimeWindow as ClipTrajectoryToTimeWindow, FilterByBoundingBox as FilterTrajectoriesByBoundingBox
-from tracktable.render                import colormaps, mapmaker, paths
+from tracktable.render                import render_map
+from tracktable.render.map_processing import paths
+from tracktable.render.map_decoration import colormaps
 from tracktable.core                  import geomath
 from tracktable.script_helpers        import argument_groups, argparse
 
@@ -366,7 +366,7 @@ def main():
 
     print("STATUS: Initializing map projection")
     mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
-    (mymap, base_artists) = mapmaker.mapmaker(computed_bbox=data_bbox, **mapmaker_kwargs)
+    (mymap, base_artists) = render_map.render_map(computed_bbox=data_bbox, **mapmaker_kwargs)
 
     print("STATUS: Collecting all trajectories")
     all_trajectories = list(trajectory_source)

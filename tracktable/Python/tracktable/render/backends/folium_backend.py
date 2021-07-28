@@ -36,9 +36,11 @@ from datetime import datetime
 
 import folium as fol
 import matplotlib
+from folium.plugins import HeatMap
 from matplotlib.colors import ListedColormap, hsv_to_rgb, rgb2hex
 from tracktable.core.geomath import compute_bounding_box
-from tracktable.render import coloring, common_processing
+from tracktable.render.map_decoration import coloring
+from tracktable.render.map_processing import common_processing
 
 
 # later can add multiple layers and switch between with:
@@ -51,42 +53,42 @@ from tracktable.render import coloring, common_processing
 # TODO what if color map but no generator or vice versa
 # TODO add point_color_map?
 # TODO could customize choice of mapping hues to trajs
-def render_trajectories_folium(trajectories,
+def render_trajectories(trajectories,
 
-                               #common arguments
-                               map_canvas = None,
-                               obj_ids = [],
-                               map_bbox = None,
-                               show_lines = True,
-                               gradient_hue = None,
-                               color_map = '',
-                               line_color = '',
-                               linewidth = 2.4,
-                               show_points = False,
-                               point_size = 0.6,
-                               point_color = '',
-                               show_dot = True,
-                               dot_size = 0.7,
-                               dot_color = 'white',
-                               trajectory_scalar_generator = common_processing.path_length_fraction_generator,
-                               trajectory_linewidth_generator = None,
-                               color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1),
-                               show = False,
-                               save = False,
-                               filename = '',
+                        #common arguments
+                        map_canvas = None,
+                        obj_ids = [],
+                        map_bbox = None,
+                        show_lines = True,
+                        gradient_hue = None,
+                        color_map = '',
+                        line_color = '',
+                        linewidth = 2.4,
+                        show_points = False,
+                        point_size = 0.6,
+                        point_color = '',
+                        show_dot = True,
+                        dot_size = 0.7,
+                        dot_color = 'white',
+                        trajectory_scalar_generator = common_processing.path_length_fraction_generator,
+                        trajectory_linewidth_generator = None,
+                        color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1),
+                        show = False,
+                        save = False,
+                        filename = '',
 
-                               # folium specific args
-                               tiles = 'cartodbdark_matter',
-                               attr = ".",
-                               crs = "EPSG3857",
-                               point_popup_properties = [],
-                               show_distance_geometry = False,
-                               distance_geometry_depth = 4,
-                               zoom_frac = [0,1], #undocumented feature, for now
-                               show_scale = True,
-                               max_zoom = 22,
-                               fast = False,
-                               **kwargs):
+                        # folium specific args
+                        tiles = 'cartodbdark_matter',
+                        attr = ".",
+                        crs = "EPSG3857",
+                        point_popup_properties = [],
+                        show_distance_geometry = False,
+                        distance_geometry_depth = 4,
+                        zoom_frac = [0,1], #undocumented feature, for now
+                        show_scale = True,
+                        max_zoom = 22,
+                        fast = False,
+                        **kwargs):
     """Render a list of trajectories using the folium backend
 
         For documentation on the parameters, please see render_trajectories
@@ -95,10 +97,10 @@ def render_trajectories_folium(trajectories,
     if not fast:
         trajectories, line_color, color_map, gradient_hue \
             = common_processing.common_processing(trajectories,
-                                obj_ids,
-                                line_color,
-                                color_map,
-                                gradient_hue)
+                                                  obj_ids,
+                                                  line_color,
+                                                  color_map,
+                                                  gradient_hue)
     if not trajectories:
         return
 
@@ -120,9 +122,9 @@ def render_trajectories_folium(trajectories,
 
             current_color_map, current_point_cmap, mapper, point_mapper = \
                 coloring.setup_colors(line_color, color_map, gradient_hue,
-                             point_color, color_scale,
-                             trajectory[0].object_id, i,
-                             trajectory_linewidth_generator)
+                                      point_color, color_scale,
+                                      trajectory[0].object_id, i,
+                                      trajectory_linewidth_generator)
         else:
             rgb = hsv_to_rgb([common_processing.hash_short_md5(trajectory[0].object_id), 1.0, 1.0])
             current_color_map = ListedColormap([rgb2hex(rgb)])
@@ -163,12 +165,12 @@ def render_trajectories_folium(trajectories,
                     current_point_color = \
                         rgb2hex(point_mapper.to_rgba(scalars[i]))
 
-                render_point_folium(trajectory[i],
+                render_point(trajectory[i],
                                     point_popup_properties, c,
                                     point_radius,
                                     current_point_color, map_canvas)
         if show_dot:
-            render_point_folium(trajectory[-1],
+            render_point(trajectory[-1],
                                 point_popup_properties,
                                 coordinates[-1], dot_size,
                                 dot_color, map_canvas)
@@ -197,7 +199,69 @@ def render_trajectories_folium(trajectories,
 
 # ----------------------------------------------------------------------
 
-def render_point_folium(current_point,
+def render_heatmap(points,
+                    trajectories=None,
+                    weights=None,
+                    color_map='viridis',
+                    tiles='cartodbdark_matter',
+                    attr='.',
+                    crs="EPSG3857",
+                    show = False,
+                    save = False,
+                    filename = ''):
+    """Creates an interactive heatmap visualization
+
+    Args:
+        points (list): list of points
+
+    Keyword Arguments:
+        trajectories: (Trajectoies) list of trajectories corresponding to the points,
+            render trajectories if provided (Default: None)
+        weights: (list) list of weights associated with each point (Default: None)
+        color_map: (str) name of matplotlib colormap to use for the heatmap (Default: 'viridis')
+        tiles (str): name of map tiling to use (Default: 'cartodbdark_matter')
+        attr (str): folium specific parameter (Default: '.')
+        crs (str): folium specific parameter (Default: "EPSG3857")
+        show (bool): whether or not to show the result (if possible)
+            (default True) if saving to a file, might not want to view.
+        save (bool): whether or not to save the result to a file.
+            For folium the results can be saved to an html file. For
+            cartopy the results can be saved as an image. If no filename
+            is given, a default filename including the timestamp is used.
+            (default False)
+        filename (str): Path and filename to save the results to, if
+            save is set to True. If no filename is given, a default
+            filename including the timestamp is used.
+
+    Returns: an interactive heatmap
+    """
+
+    # lat, long, (optional weight) of points to render
+    if weights is None:
+        display_points = [[point[1], point[0]] for point in points]
+    else:
+        display_points = [[point[1], point[0], weight] for point, weight in zip(points, weights)]
+
+    # create the heat map
+    heat_map = fol.Map(tiles=tiles, zoom_start=4)
+    gradient = coloring.matplotlib_cmap_to_dict(color_map)
+    if trajectories is not None:
+        heat_map = render_trajectories(trajectories, map=heat_map,
+                                       line_color='grey', linewidth=0.5,
+                                       tiles=tiles, attr=attr, crs=crs)
+    HeatMap(display_points, gradient=gradient).add_to(heat_map)
+    if save:  # saves as .html document
+        if not filename:
+            datetime_str = datetime.now().strftime("%Y-%m-%dT%H%M%S-%f")
+            filename = "heatmap-"+datetime_str+'.html'
+        heat_map.save(filename)
+    if show:
+        display(heat_map)
+    return heat_map
+
+# ----------------------------------------------------------------------
+
+def render_point(current_point,
                         point_popup_properties, coord, point_radius,
                         point_color, map_canvas):
     """Renders a point to the folium map
@@ -225,6 +289,7 @@ def render_point_folium(current_point,
                      color=point_color,
                      tooltip=tooltip_str_point,
                      popup=popup_point).add_to(map_canvas)
+
 # ----------------------------------------------------------------------
 
 def bounding_box_for_folium(trajectories):
@@ -236,3 +301,5 @@ def bounding_box_for_folium(trajectories):
     box_for_folium = [(raw_bbox.min_corner[1], raw_bbox.min_corner[0]),
                       (raw_bbox.max_corner[1], raw_bbox.max_corner[0])]
     return box_for_folium
+
+

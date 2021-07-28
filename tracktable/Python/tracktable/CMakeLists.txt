@@ -134,6 +134,24 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/render
 )
 
+file(GLOB render_backend_files "render/backends/*.py")
+install(
+  FILES ${render_backend_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/render/backends
+)
+
+file(GLOB render_map_decoration_files "render/map_decoration/*.py")
+install(
+  FILES ${render_map_decoration_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/render/map_decoration
+)
+
+file(GLOB render_map_processing_files "render/map_processing/*.py")
+install(
+  FILES ${render_map_processing_file}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/render/map_processing
+)
+
 file (GLOB source_files "source/*.py")
 install(
   FILES ${source_files}

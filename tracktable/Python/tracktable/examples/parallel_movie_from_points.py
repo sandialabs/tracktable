@@ -36,7 +36,8 @@ import tracktable.domain
 from tracktable.feature import annotations
 
 from tracktable.core import geomath
-from tracktable.render import mapmaker, paths
+from tracktable.render import render_map
+from tracktable.render.map_processing import paths
 from tracktable.script_helpers import argument_groups, argparse, n_at_a_time
 from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
 
@@ -421,7 +422,7 @@ def setup_mapmaker(renderer, args):
     """
 
     mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
-    (mymap, map_artists) = mapmaker.mapmaker(**mapmaker_kwargs)
+    (mymap, map_artists) = render_map.render_map(**mapmaker_kwargs)
     renderer.basemap = mymap
 
 # ----------------------------------------------------------------------
@@ -1225,7 +1226,7 @@ def setup_mapmaker(renderer, args):
     """
 
     mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
-    (mymap, base_artists) = mapmaker.mapmaker(**mapmaker_kwargs)
+    (mymap, base_artists) = render_map.render_map(**mapmaker_kwargs)
     renderer.basemap = mymap
 
 # ----------------------------------------------------------------------

@@ -135,7 +135,7 @@ render_trajectories(trajs[26], linewidth=5, backend="folium", show=False, save=T
 
 # You can also adjust the width of the trajectory by some scalar.  In this case the trajectory starts out very narrow
 # and gets wider at each point it passes (as it progresses), but the color remains green throughout.
-from tracktable.render.common_processing import progress_linewidth_generator
+from tracktable.render.map_processing.common_processing import progress_linewidth_generator
 render_trajectories(trajs[28], line_color='green', trajectory_linewidth_generator=progress_linewidth_generator, backend="folium", show=False, save=True, filename="../../../../../TestData/GroundTruth/CustomLinewidth.html")
 
 

@@ -28,11 +28,10 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Tracktable Trajectory Library - Render module
+"""Tracktable Trajectory Library - Map Decoration module
 
-This module contains code to render points or trajectories either in
-regular Cartesian space or on a (world) map.  The 'maps' module
-provides a friendly way to get a map of various parts of the world.
+This module contains code to decorate a given map with different
+features such as a colors or a clock.
 """
 
 pass

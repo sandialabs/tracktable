@@ -31,9 +31,10 @@
 tracktable.render.bokeh - render trajectories in using the bokeh backend
 """
 
-from tracktable.render import coloring, common_processing
+from tracktable.render.map_processing import common_processing
+from tracktable.render.map_decoration import coloring
 
-def render_trajectories_bokeh(trajectories,
+def render_trajectories(trajectories,
                               map_canvas = None,
                               obj_ids = [],
                               line_color = '',
