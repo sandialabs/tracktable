@@ -40,7 +40,7 @@ Note:
 from tracktable.domain.terrestrial import TrajectoryPointReader
 from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
 from tracktable.render.render_trajectories import render_trajectories, render_trajectories_separate
-from tracktable.render.common_processing import progress_linewidth_generator
+from tracktable.render.map_processing.common_processing import progress_linewidth_generator
 from tracktable.core import data_directory
 
 import os.path

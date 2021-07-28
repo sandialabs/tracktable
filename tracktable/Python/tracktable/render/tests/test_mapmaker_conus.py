@@ -36,7 +36,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 from matplotlib import pyplot
-from tracktable.render.mapmaker import mapmaker
+from tracktable.render import render_map
 from tracktable.core import test_utilities
 
 # ----------------------------------------------------------------------
@@ -46,7 +46,7 @@ def test_conus_map(ground_truth_dir,
                    image_filename='ConusMap.png'):
 
     pyplot.figure(figsize=(8, 6))
-    (mymap, artists) = mapmaker(map_name='region:conus', domain='terrestrial', scale_length_in_km=100)
+    (mymap, artists) = render_map.render_map(map_name='region:conus', domain='terrestrial', scale_length_in_km=100)
     pyplot.savefig(os.path.join(test_output_dir, image_filename), dpi=150)
     pyplot.close()
     return test_utilities.compare_image_to_ground_truth(image_filename,

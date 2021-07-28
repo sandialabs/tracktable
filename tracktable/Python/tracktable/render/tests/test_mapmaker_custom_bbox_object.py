@@ -35,7 +35,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 from matplotlib import pyplot
-from tracktable.render.mapmaker import mapmaker
+from tracktable.render import render_map
 from tracktable.domain import terrestrial
 from tracktable.core import test_utilities
 
@@ -48,7 +48,7 @@ def test_florida_map(ground_truth_dir,
     pyplot.figure(figsize=(8, 8))
     # This is approximately Florida
     bounding_box = terrestrial.BoundingBox((-88, 24), (-79.5, 31))
-    (mymap, artists) = mapmaker(domain='terrestrial',
+    (mymap, artists) = render_map.render_map(domain='terrestrial',
                                 map_name='custom',
                                 map_bbox=bounding_box,
                                 scale_length_in_km=50,

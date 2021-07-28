@@ -38,13 +38,14 @@ from datetime import datetime
 import matplotlib
 from matplotlib.colors import ListedColormap, rgb2hex
 from tracktable.core.geomath import compute_bounding_box
-from tracktable.render import coloring, common_processing
+from tracktable.render.map_decoration import coloring
+from tracktable.render.map_processing import common_processing
 
 EARTH_RADIUS = 6378137
 MAX_LATITUDE = 85.0511287798
 
 #todo should we add zoom parameter?
-def render_trajectories_ipyleaflet(trajectories,
+def render_trajectories(trajectories,
                                #common arguments
                                map_canvas = None,
                                obj_ids = [],
