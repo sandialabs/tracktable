@@ -445,41 +445,6 @@ def main():
         # we have some way to color them
         trajectories = [annotations.progress(t) for t in trajectories]
 
-<<<<<<< HEAD
-=======
-    # We can compute the bounding box for Cartesian data automatically.
-    # We don't need to do so for terrestrial data because the map will
-    # default to the whole world.
-    if (args.domain == 'cartesian2d' and
-            (args.map_bbox is None or
-             len(args.map_bbox) == 0)):
-
-        args.map_bbox = geomath.compute_bounding_box(
-            itertools.chain(*trajectories)
-            )
-
-    #
-    # Step 3: Set up the map.
-    #
-    # There are a lot of keyword arguments for the map -- see
-    # tracktable.script_helpers.argument_groups.mapmaker --
-    # so rather than pull them out individually like we did for
-    # the point reader we extract the whole dict using
-    # tracktable.script_helpers.argument_groups.extract_arguments().
-
-    logger.info('Initializing map canvas for rendering.')
-    (figure, axes) = initialize_canvas(args.resolution,
-                                       args.dpi)
-    (mymap, map_artists) = render_map.render_map(**mapmaker_kwargs)
-
-    #
-    # Step 4: Set up the video encoder.
-    #
-    #
-    movie_kwargs = argument_groups.extract_arguments("movie_rendering", args)
-    movie_writer = setup_encoder(**movie_kwargs)
-
->>>>>>> develop
     # This set of arguments will be passed to the savefig() call that
     # grabs the latest movie frame.  This is the place to put things
     # like background color, tight layout and friends.
