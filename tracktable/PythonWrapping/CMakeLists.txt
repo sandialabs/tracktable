@@ -30,7 +30,7 @@
 # This is tracktable/C++/PythonWrapping/CMakeLists.txt
 #
 # Unlike the other libraries in Tracktable we do not generate a
-# Windows export header in here.  Each Python extension module exports
+# Windows export header in here. Each Python extension module exports
 # a single symbol -- its entry point -- and Boost.Python already
 # handles the dllexport/dllimport annotation for that.
 
@@ -38,13 +38,13 @@
 #
 # (Not) Linking against libpython
 #
-# Some Python interpreters link statically against libpython.  Some
-# link dynamically.  If we link to a different libpython than the one
+# Some Python interpreters link statically against libpython. Some
+# link dynamically. If we link to a different libpython than the one
 # in/alongside the interpreter, we get segfaults at runtime.
 #
 # The solution is to not link against libpython and instead tell the
-# linker to leave unresolved symbols unresolved until load time.  GCC
-# and Visual C++ do this by default.  Clang has an applicable link
+# linker to leave unresolved symbols unresolved until load time. GCC
+# and Visual C++ do this by default. Clang has an applicable link
 # flag: "-undefined dynamic_lookup".
 
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -60,8 +60,8 @@ endif()
 #
 # We did most of the work of finding Boost up in the top-level CMakeLists.
 # However, the Python wrapping needs one component that introduces a
-# tricky dependency: the Boost.Python library.  This is because
-# libboost_python uses symbols from libpython.  This introduces two
+# tricky dependency: the Boost.Python library. This is because
+# libboost_python uses symbols from libpython. This introduces two
 # problems:
 #
 # 1. The rest of Tracktable has no reason at all to link against
@@ -80,8 +80,8 @@ endif()
 # So, what's the Boost.Python library called?
 #
 # Versions of Boost from 1.57 through 1.66 generate
-# libboost_python3.so for Python 3.  From 1.67 onward we get
-# libboost_pythonXY.so for Python X.Y.  In order to figure out the
+# libboost_python3.so for Python 3. From 1.67 onward we get
+# libboost_pythonXY.so for Python X.Y. In order to figure out the
 # proper library name we need to know BOTH the Python version and the
 # Boost version.
 
@@ -151,21 +151,36 @@ link_directories(
 
 set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable)
 
-# We use Python-like naming for these files for two reasons.  First,
+# We use Python-like naming for these files for two reasons. First,
 # we're going to be importing these from Python, so it's consistent.
 # Second, the library name has to match what we pass to
 # BOOST_PYTHON_MODULE(), so doing it right here will make that look
 # right as well.
 
 # This is a trivial module whose purpose is to make sure we can
-# build Python extensions at all.  It exports a single function
-# called greet() that returns a hello world message.
+# build barebones C modules for Python. It contains a single function
+# called hello_world() that returns 'Hello World!'.
+add_library(_c_python MODULE
+  CPythonModule.c
+)
+# puts the target into a folder in Visual studio
+set_property(TARGET _c_python PROPERTY FOLDER "Python")
 
+#message("PYTHON_EXTENSION_LIBRARIES ${PYTHON_EXTENSION_LIBRARIES}")
+target_link_libraries(_c_python
+  ${PYTHON_EXTENSION_LIBRARIES}
+  )
+
+install_python_extension(_c_python lib ${Tracktable_PYTHON_DIR})
+
+# This is a trivial module whose purpose is to make sure we can
+# build Boost Python extensions at all. It exports a single function
+# called greet() that returns 'greet'.
 add_library(_tracktable_hello MODULE
   HelloWorldPythonModule.cpp
 )
 # puts the target into a folder in Visual studio
-set_property(TARGET _tracktable_hello           PROPERTY FOLDER "Python")
+set_property(TARGET _tracktable_hello PROPERTY FOLDER "Python")
 
 #message("PYTHON_EXTENSION_LIBRARIES ${PYTHON_EXTENSION_LIBRARIES}")
 target_link_libraries(_tracktable_hello
@@ -173,6 +188,22 @@ target_link_libraries(_tracktable_hello
   )
 
 install_python_extension(_tracktable_hello lib ${Tracktable_PYTHON_DIR})
+
+# This is a trivial module whose purpose is to make sure we can
+# find our required core Boost extensions libraries. It includes
+# the date_time log regex serialization timer libraries.
+add_library(_boost_libs MODULE
+  BoostLibs.cpp
+)
+# puts the target into a folder in Visual studio
+set_property(TARGET _boost_libs PROPERTY FOLDER "Python")
+
+#message("PYTHON_EXTENSION_LIBRARIES ${PYTHON_EXTENSION_LIBRARIES}")
+target_link_libraries(_boost_libs
+  ${PYTHON_EXTENSION_LIBRARIES}
+  )
+
+install_python_extension(_boost_libs lib ${Tracktable_PYTHON_DIR})
 
 add_library(_core_types MODULE
   CorePythonModule.cpp
@@ -283,7 +314,7 @@ add_library(_feature_vector_points MODULE
   ExplicitInstantiation/FeatureVectorWrapper_Extra.cpp
   )
 
-# These modules end up containing so much code due to template 
+# These modules end up containing so much code due to template
 # instantiation that Microsoft Visual C++ needs to use a slightly
 # different object format.
 
@@ -373,7 +404,7 @@ message(STATUS "INFO: Wheel should go in ${CMAKE_BINARY_DIR}/wheel")
 # incidentally Tracktable's shared libraries!), then copy them into
 # the wheel.
 #
-# Windows doesn't have anything comparable.  We have a utility called
+# Windows doesn't have anything comparable. We have a utility called
 # 'winlocate' that tracks down the dependencies and adds them to the
 # list of files to be packaged in the wheel.
 if (UNIX)
@@ -397,7 +428,7 @@ if (UNIX)
       )
   endif (APPLE)
 else (UNIX)
-  # Windows doesn't have delocate/auditwheel yet.  We wrote a replacement.
+  # Windows doesn't have delocate/auditwheel yet. We wrote a replacement.
   set(FIX_WHEEL_EXECUTABLE "${Tracktable_SOURCE_DIR}/packaging/winlocate.py")
 endif (UNIX)
 

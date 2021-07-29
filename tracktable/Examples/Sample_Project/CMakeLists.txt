@@ -11,7 +11,7 @@ set(PROJECT_NAME coolprogram)
 set(PROJECT_VERSION 0.0.1)
 
 # These are your .cpp files for the executable
-set(PROGRAM_SOURCES 
+set(PROGRAM_SOURCES
         cool_main.cpp
 	)
 
@@ -46,7 +46,7 @@ cmake_minimum_required(VERSION 3.12)
 include(GNUInstallDirs)
 
 # Declare the project, languages and version
-project(${PROJECT_NAME} LANGUAGES CXX VERSION ${PROJECT_VERSION})
+project(${PROJECT_NAME} LANGUAGES C CXX VERSION ${PROJECT_VERSION})
 
 # pkgconfig stuff
 find_package(PkgConfig REQUIRED)

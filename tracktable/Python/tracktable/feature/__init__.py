@@ -28,7 +28,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""TrailMix Trajectory Library - Features module
+"""Tracktable Trajectory Library - Features module
 
 All the code for dealing with features (derived quantities) on points
 and trajectories lives in this module.
