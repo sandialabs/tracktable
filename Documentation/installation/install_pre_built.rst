@@ -90,5 +90,5 @@ URL:
 https://aka.ms/vs/16/release/vc_redist.x64.exe
 
 The most common indication that you're missing this library is an import
-error referring to the "_core_types" library when you try to import Tracktable
+error, ``Error importing Tracktable's core types library.``, when you try to import Tracktable
 in a Python interpreter.

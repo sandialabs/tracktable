@@ -104,7 +104,7 @@ if FAILURE_COUNT > 0:
     print("\nIf not using one of Tracktable's included Anaconda environment files, ensure that the version of the ICU library matches the",
           "version specified in the the Tracktable documentation.")
 
-  print("\nAdditional troubleshooting steps can be found in the Tracktable documentation: https://tracktable.readthedocs.io/en/latest/common_errors.html")
+  print("\nAdditional troubleshooting steps can be found in the Tracktable documentation: https://tracktable.readthedocs.io/en/latest/common_errors.html#shared-library-errors")
 
   print("\nDiagnostic Path Information:")
   print("----------------------------")
