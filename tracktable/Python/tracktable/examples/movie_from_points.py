@@ -332,6 +332,9 @@ def trajectory_points_from_file(
       timestamp_column,
       coordinate0_column,
       coordinate1_column,
+      string_fields=None,
+      real_fields=None,
+      time_fields=None,
       comment_character='#',
       field_delimiter=',',
       domain='terrestrial'
@@ -454,13 +457,10 @@ def main():
     #
     # Lights! Camera! Action!
     #
-    # TODO: Finish filling out these args
     render_trajectory_movie(
         trajectories,
         backend='ffmpeg',
-        domain=args.domain,
         filename=args.movie_file[0],
-        trajectory_linewidth=args.trajectory_linewidth,
         **trajectory_rendering_kwargs,
         **mapmaker_kwargs,
         **movie_kwargs,

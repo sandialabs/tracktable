@@ -38,6 +38,8 @@ Note:
 import datetime
 import itertools
 import logging
+import platform
+import subprocess
 
 import cartopy
 import cartopy.crs
@@ -52,6 +54,18 @@ from tracktable.render.map_processing.movie_processing import (
     render_annotated_trajectories, setup_encoder, trajectories_inside_box)
 
 matplotlib.use('Agg')
+
+logger = logging.getLogger(__name__)
+
+# In order to make ffmpeg a soft dependiency we check that ffmpeg is installed and fail accordingly.
+# Also need to make sure that we don't internally call the render_movie functions.
+try:
+    if platform.system() == "Windows":
+        subprocess.check_output(['where', 'ffmpeg'])
+    if platform.system() == "Darwin" or platform.system() == "Linux":
+        subprocess.check_output(['which', 'ffmpeg'])
+except Exception as e:
+    raise ImportError("ffmpeg isn't installed on this system, unable to generate a Tracktable movie. Please install ffmpeg.")
 
 try:
     from tqdm import tqdm
@@ -105,7 +119,8 @@ def render_trajectory_movie(trajectories,
     # 1.  Cull trajectories that are entirely outside the map
     # 2.  Annotate trajectories with scalars needed for color
     # 3.  Compute frame duration
-    # 4.  Add clock to map: TODO: I still need arguments to control whether the clock is included and, if so, where and how it's rendered.
+    # 4.  Add clock to map: TODO: I still need arguments to control whether the clock is included and, if so,
+    #                       where and how it's rendered.
     # 5.  Loop through frames
 
     logger = logging.getLogger(__name__)
@@ -123,18 +138,15 @@ def render_trajectory_movie(trajectories,
     # We can compute the bounding box for Cartesian data automatically.
     # We don't need to do so for terrestrial data because the map will
     # default to the whole world.
-    if (domain == 'cartesian2d' and
-        (map_bbox is None or len(map_bbox) == 0)):
-
-        map_bbox = geomath.compute_bounding_box(
-            itertools.chain(*trajectories))
+    if (domain == 'cartesian2d' and (map_bbox is None or len(map_bbox) == 0)):
+        map_bbox = geomath.compute_bounding_box(itertools.chain(*trajectories))
 
     # Set up the map.
     logger.info('Initializing map canvas for rendering.')
     (figure, axes) = initialize_canvas(resolution, dpi)
     if map_canvas == None:
         (map_canvas, map_actors) = render_map.render_map(domain='terrestrial',
-                                            map_name='custom',
+                                            map_name='region:world',
                                             map_bbox=map_bbox,
                                             map_projection=map_projection,
                                             draw_lonlat=draw_lonlat,
@@ -143,8 +155,9 @@ def render_trajectory_movie(trajectories,
                                             draw_states=draw_states,
                                             fill_land=fill_land,
                                             fill_water=fill_water,
-                                            tiles=tiles,
-                                            **kwargs)
+                                            tiles=tiles)
+
+    map_bbox = map_extent_as_bounding_box(map_canvas, domain=domain)
 
     # Set up the video encoder.
     movie_writer = setup_encoder(encoder=encoder,
@@ -156,9 +169,7 @@ def render_trajectory_movie(trajectories,
                                 fps=fps,
                                 **kwargs)
 
-    #
-    # Lights! Camera! Action!
-    #
+    # Setup trajectory render style
     if trajectory_linewidth == 'taper':
         linewidth_style = 'taper'
         linewidth = trajectory_initial_linewidth
@@ -167,7 +178,6 @@ def render_trajectory_movie(trajectories,
         linewidth_style = 'constant'
         linewidth = trajectory_linewidth
         final_linewidth = linewidth
-
 
     # This set of arguments will be passed to the savefig() call that
     # grabs the latest movie frame.  This is the place to put things
@@ -195,8 +205,6 @@ def render_trajectory_movie(trajectories,
 
     (movie_start_time, movie_end_time) = compute_movie_time_bounds(
         trajectories, start_time, end_time)
-
-    map_bbox = map_extent_as_bounding_box(axes, domain=domain)
 
     # Cull out trajectories that do not overlap the map.  We do not
     # clip them (at least not now) since that would affect measures
