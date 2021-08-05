@@ -399,27 +399,7 @@ def main():
     args = parse_args()
     mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
     movie_kwargs = argument_groups.extract_arguments("movie_rendering", args)
-
-    # TODO: Fix the trajectory_rendering argument group
-    # Eventually we will be able to use argument_groups.extract_arguments() for
-    # this, but right now it's broken.  Not all of the parameters in the
-    # trajectory rendering argument group are supported and some of the names
-    # have changed. For now, we'll extract them by hand.
-
-    # trajectory_rendering_kwargs = argument_groups.extract_arguments("trajectory_rendering", args)
-    trajectory_rendering_kwargs = {
-        'decorate_head': args.decorate_trajectory_head,
-        'head_color': args.trajectory_head_color,
-        'head_size': args.trajectory_head_dot_size,
-        'color_map': args.trajectory_colormap,
-        'scalar': args.trajectory_color,
-        'scalar_min': args.scalar_min,
-        'scalar_max': args.scalar_max,
-        'linewidth_style': 'Constant',
-        'linewidth': args.trajectory_linewidth,
-        'final_linewidth': args.trajectory_final_linewidth,
-        'trajectory_linewidth': args.trajectory_linewidth
-    }
+    trajectory_rendering_kwargs = argument_groups.extract_arguments("trajectory_rendering", args)
 
     # Load all the trajectories into memory.
     point_filename = args.point_data_file[0]
@@ -448,12 +428,6 @@ def main():
         # we have some way to color them
         trajectories = [annotations.progress(t) for t in trajectories]
 
-    # This set of arguments will be passed to the savefig() call that
-    # grabs the latest movie frame.  This is the place to put things
-    # like background color, tight layout and friends.
-
-    # savefig_kwargs = {'facecolor': figure.get_facecolor()}
-
     #
     # Lights! Camera! Action!
     #
@@ -461,6 +435,7 @@ def main():
         trajectories,
         backend='ffmpeg',
         filename=args.movie_file[0],
+        trail_duration=datetime.timedelta(seconds=args.trail_duration),
         **trajectory_rendering_kwargs,
         **mapmaker_kwargs,
         **movie_kwargs,

@@ -375,9 +375,9 @@ def setup_encoder(encoder='ffmpeg',
         encoder_args {list of strings}: Any arguments you wish to
             provide to the encoder.  These are passed through
             to the underlying Matplotlib implementation as
-            :code:`extra_args`.  TODO: get a reference to a
-            documentation page in Matplotlib that explains what
-            these do
+            :code:`extra_args`.  More information about the
+            encoder args can be found here:
+            https://matplotlib.org/stable/api/_as_gen/matplotlib.animation.FFMpegWriter.html#matplotlib-animation-ffmpegwriter
         movie_title {string}: Title string to be embedded in the
             movie's metadata.  This is not rendered on screen.
             Default: "Tracktable Movie"

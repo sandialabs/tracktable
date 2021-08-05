@@ -57,7 +57,7 @@ matplotlib.use('Agg')
 
 logger = logging.getLogger(__name__)
 
-# In order to make ffmpeg a soft dependiency we check that ffmpeg is installed and fail accordingly.
+# In order to keep ffmpeg a soft dependency we check that ffmpeg is installed and fail accordingly.
 # Also need to make sure that we don't internally call the render_movie functions.
 try:
     if platform.system() == "Windows":
@@ -74,45 +74,59 @@ except ImportError:
     tqdm_installed = False
 
 def render_trajectory_movie(trajectories,
-                            map_projection = cartopy.crs.PlateCarree(),
-                            map_canvas = None,
-                            trail_duration=datetime.timedelta(seconds=300),
-                            figure=None,
-                            dpi=100,
-                            filename='movie.mp4',
-                            start_time=None,
-                            end_time=None,
-                            utc_offset=0,
-                            timezone_label=None,
+
+                            # Mapmaker kwargs
                             domain='terrestrial',
-                            map_bbox=[],
-                            resolution=[800, 600],
-                            encoder="ffmpeg",
-                            duration=60,
-                            fps=30,
-                            codec=None,
-                            encoder_args=None,
-                            movie_title='Tracktable Movie',
-                            movie_artist='Tracktable Trajectory Toolkit',
-                            movie_comment='',
-                            draw_lonlat=True,
-                            fill_land=True,
-                            fill_water=True,
+                            map_name="region:world",
                             draw_coastlines=True,
                             draw_countries=True,
                             draw_states=True,
+                            draw_lonlat=True,
+                            map_bbox=[],
+                            map_projection = None,
+                            map_canvas = None,
+                            figure=None,
+                            fill_land=True,
+                            fill_water=True,
                             tiles=None,
-                            decorate_trajectory_head=False,
-                            trajectory_head_color="white",
-                            trajectory_head_dot_size=2,
-                            trajectory_colormap="gist_heat",
+
+                            # Trajectory Rendering kwargs
+                            trajectory_color_type="scalar",
                             trajectory_color="progress",
-                            scalar_min=0,
-                            scalar_max=1,
+                            trajectory_colormap="gist_heat",
+                            trajectory_zorder=10,
+                            decorate_trajectory_head=False,
+                            trajectory_head_dot_size=2,
+                            trajectory_head_color="white",
+                            trajectory_linewidth_style="constant",
                             trajectory_linewidth=0.5,
                             trajectory_initial_linewidth=0.5,
                             trajectory_final_linewidth=0.01,
+                            scalar_min=0,
+                            scalar_max=1,
+                            trail_duration=datetime.timedelta(seconds=300),
+
+                            # Movie kwargs
+                            codec=None,
+                            encoder="ffmpeg",
+                            encoder_args="-c:v mpeg4 -q:v 5",
+                            duration=60,
+                            fps=30,
+                            resolution=[800, 600],
+                            dpi=100,
+                            start_time=None,
+                            end_time=None,
+                            filename='movie.mp4',
+                            movie_title='Tracktable Movie',
+                            movie_artist='Tracktable Trajectory Toolkit',
+                            movie_comment='',
+                            utc_offset=None,
+                            timezone_label=None,
+
+                            # SaveFig kwargs
                             savefig_kwargs=None,
+
+                            # Additional args for Render Map
                             **kwargs):
 
     # Steps:
@@ -145,8 +159,8 @@ def render_trajectory_movie(trajectories,
     logger.info('Initializing map canvas for rendering.')
     (figure, axes) = initialize_canvas(resolution, dpi)
     if map_canvas == None:
-        (map_canvas, map_actors) = render_map.render_map(domain='terrestrial',
-                                            map_name='region:world',
+        (map_canvas, map_actors) = render_map.render_map(domain=domain,
+                                            map_name=map_name,
                                             map_bbox=map_bbox,
                                             map_projection=map_projection,
                                             draw_lonlat=draw_lonlat,
@@ -155,19 +169,20 @@ def render_trajectory_movie(trajectories,
                                             draw_states=draw_states,
                                             fill_land=fill_land,
                                             fill_water=fill_water,
-                                            tiles=tiles)
+                                            tiles=tiles,
+                                            **kwargs)
 
     map_bbox = map_extent_as_bounding_box(map_canvas, domain=domain)
 
     # Set up the video encoder.
     movie_writer = setup_encoder(encoder=encoder,
-                                codec=codec,
-                                encoder_args=encoder_args,
-                                movie_title=movie_title,
-                                movie_artist=movie_artist,
-                                movie_comment=movie_comment,
-                                fps=fps,
-                                **kwargs)
+                            codec=codec,
+                            encoder_args=encoder_args,
+                            movie_title=movie_title,
+                            movie_artist=movie_artist,
+                            movie_comment=movie_comment,
+                            fps=fps,
+                            **kwargs)
 
     # Setup trajectory render style
     if trajectory_linewidth == 'taper':
@@ -183,25 +198,13 @@ def render_trajectory_movie(trajectories,
     # grabs the latest movie frame.  This is the place to put things
     # like background color, tight layout and friends.
     if savefig_kwargs == None:
-        savefig_kwargs = {'facecolor': figure.get_facecolor(), 'bbox_inches':'tight'}
+        savefig_kwargs = {'facecolor': figure.get_facecolor()}
 
-    # Eventually we will be able to use argument_groups.extract_arguments() for
-    # this, but right now it's broken.  Not all of the parameters in the
-    # trajectory rendering argument group are supported and some of the names
-    # have changed.
-    #
-    trajectory_rendering_kwargs = {
-        'decorate_head': decorate_trajectory_head,
-        'head_color': trajectory_head_color,
-        'head_size': trajectory_head_dot_size,
-        'color_map': trajectory_colormap,
-        'scalar': trajectory_color,
-        'scalar_min': scalar_min,
-        'scalar_max': scalar_max,
-        'linewidth_style': linewidth_style,
-        'linewidth': linewidth,
-        'final_linewidth': final_linewidth
-    }
+    # This a know issue in matplotlib that was never fixed so we're on the
+    # hook to ensure that we don't pass the param to ffmpeg
+    if "bbox_inches" in savefig_kwargs:
+        logger.warn('The `bbox_inches` save argument is incompatiable with ffmpeg, argument will be removed from `savefig_kwargs`.')
+        savefig_kwargs.pop("bbox_inches")
 
     (movie_start_time, movie_end_time) = compute_movie_time_bounds(
         trajectories, start_time, end_time)
@@ -233,7 +236,7 @@ def render_trajectory_movie(trajectories,
     if figure is None:
         figure = pyplot.gcf()
 
-
+    counter = 0
     with movie_writer.saving(figure, filename, dpi):
         if tqdm_installed:
             for i in tqdm(range(int(num_frames)), desc="Rendering Frames", unit='frame'):
@@ -249,9 +252,22 @@ def render_trajectory_movie(trajectories,
                 # TODO: Add in scalar accessor
                 trajectory_artists = render_annotated_trajectories(
                     frame_trajectories,
-                    axes,
-                    **trajectory_rendering_kwargs
+                    map_canvas,
+                    color_map=trajectory_colormap,
+                    decorate_head=decorate_trajectory_head,
+                    head_size=trajectory_head_dot_size,
+                    head_color=trajectory_head_color,
+                    linewidth_style=linewidth_style,
+                    linewidth=linewidth,
+                    final_linewidth=final_linewidth,
+                    scalar=trajectory_color,
+                    scalar_min=scalar_min,
+                    scalar_max=scalar_max,
+                    zorder=trajectory_zorder
                     )
+
+                # pyplot.savefig('image_'+str(counter)+'.jpg', **savefig_kwargs)
+                counter+=1
 
                 # TODO: here we could also render the clock
                 movie_writer.grab_frame(**savefig_kwargs)
@@ -280,8 +296,18 @@ def render_trajectory_movie(trajectories,
                 # TODO: Add in scalar accessor
                 trajectory_artists = render_annotated_trajectories(
                     frame_trajectories,
-                    axes,
-                    **trajectory_rendering_kwargs
+                    map_canvas,
+                    color_map=trajectory_colormap,
+                    decorate_head=decorate_trajectory_head,
+                    head_size=trajectory_head_dot_size,
+                    head_color=trajectory_head_color,
+                    linewidth_style=trajectory_linewidth_style,
+                    linewidth=trajectory_linewidth,
+                    final_linewidth=final_linewidth,
+                    scalar=trajectory_color,
+                    scalar_min=scalar_min,
+                    scalar_max=scalar_max,
+                    zorder=trajectory_zorder
                     )
 
                 # TODO: here we could also render the clock
