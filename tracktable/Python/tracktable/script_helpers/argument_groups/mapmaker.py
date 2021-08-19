@@ -274,9 +274,9 @@ def install_group():
                  default="PlateCarree",
                  help="Custom projection for map")
 
-    add_argument("mapmaker", [ "--map-scale-length" ],
+    add_argument("mapmaker", [ "--scale-length-in-km" ],
                  type=float,
-                 default=None,
+                 default=20,
                  help="Length of map scale indicator in km")
 
     add_argument("mapmaker", [ "--region-size" ],

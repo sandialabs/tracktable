@@ -48,7 +48,7 @@ from tracktable.analysis.assemble_trajectories import \
     AssembleTrajectoryFromPoints
 from tracktable.feature import annotations
 from tracktable.render.render_movie import render_trajectory_movie
-from tracktable.script_helpers import argparse, argument_groups
+from tracktable.script_helpers import argparse, argument_groups, n_at_a_time
 
 matplotlib.use('Agg')
 
@@ -119,8 +119,7 @@ def parse_args():
     argument_groups.use_argument_group("movie_rendering", parser)
 
     parser.add_argument('--trail-duration',
-                        help=('How long should each object\'s trail last? '
-                              '(seconds)'),
+                        help="How long should each object's trail last? (seconds)",
                         type=int,
                         default=300)
 
@@ -395,7 +394,7 @@ def trajectory_points_from_file(
 def main():
     logger = logging.getLogger(__name__)
 
-    # Step 0: Parse the command line arguments and grab sets we will need later.
+    # Parse the command line arguments and grab sets we will need later.
     args = parse_args()
     mapmaker_kwargs = argument_groups.extract_arguments("mapmaker", args)
     movie_kwargs = argument_groups.extract_arguments("movie_rendering", args)

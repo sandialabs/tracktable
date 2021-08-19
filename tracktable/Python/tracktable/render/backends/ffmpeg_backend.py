@@ -38,11 +38,12 @@ Note:
 import datetime
 import itertools
 import logging
+import multiprocessing
+import os
 import platform
 import subprocess
+import tempfile
 
-import cartopy
-import cartopy.crs
 import matplotlib
 import matplotlib.animation
 from matplotlib import pyplot
@@ -52,6 +53,12 @@ from tracktable.render.map_processing.movie_processing import (
     clip_trajectories_to_interval, compute_movie_time_bounds,
     initialize_canvas, map_extent_as_bounding_box,
     render_annotated_trajectories, setup_encoder, trajectories_inside_box)
+from tracktable.render.map_processing.parallel_movie_processing import (
+    BatchMovieRenderer, concatenate_movie_chunks, encode_final_movie)
+from tracktable.render.map_processing.parallel_movie_processing import \
+    initialize_canvas as parallel_initialize_canvas
+from tracktable.render.map_processing.parallel_movie_processing import (
+    remove_movie_chunks, render_frame_batch)
 
 matplotlib.use('Agg')
 
@@ -72,6 +79,8 @@ try:
     tqdm_installed = True
 except ImportError:
     tqdm_installed = False
+
+# ---------------------------------------------------------------------
 
 def render_trajectory_movie(trajectories,
 
@@ -107,6 +116,7 @@ def render_trajectory_movie(trajectories,
                             trail_duration=datetime.timedelta(seconds=300),
 
                             # Movie kwargs
+                            movie_writer=None,
                             codec=None,
                             encoder="ffmpeg",
                             encoder_args="-c:v mpeg4 -q:v 5",
@@ -133,11 +143,9 @@ def render_trajectory_movie(trajectories,
     # 1.  Cull trajectories that are entirely outside the map
     # 2.  Annotate trajectories with scalars needed for color
     # 3.  Compute frame duration
-    # 4.  Add clock to map: TODO: I still need arguments to control whether the clock is included and, if so,
-    #                       where and how it's rendered.
+    # 4.  Add clock to map: TODO: I still need arguments to control whether the clock is
+    #                       included and, if so, where and how it's rendered.
     # 5.  Loop through frames
-
-    logger = logging.getLogger(__name__)
 
     #tiles override cartopy map features
     if tiles != None:
@@ -175,14 +183,15 @@ def render_trajectory_movie(trajectories,
     map_bbox = map_extent_as_bounding_box(map_canvas, domain=domain)
 
     # Set up the video encoder.
-    movie_writer = setup_encoder(encoder=encoder,
-                            codec=codec,
-                            encoder_args=encoder_args,
-                            movie_title=movie_title,
-                            movie_artist=movie_artist,
-                            movie_comment=movie_comment,
-                            fps=fps,
-                            **kwargs)
+    if movie_writer is None:
+        movie_writer = setup_encoder(encoder=encoder,
+                                codec=codec,
+                                encoder_args=encoder_args,
+                                movie_title=movie_title,
+                                movie_artist=movie_artist,
+                                movie_comment=movie_comment,
+                                fps=fps,
+                                **kwargs)
 
     # Setup trajectory render style
     if trajectory_linewidth == 'taper':
@@ -200,9 +209,9 @@ def render_trajectory_movie(trajectories,
     if savefig_kwargs == None:
         savefig_kwargs = {'facecolor': figure.get_facecolor()}
 
-    # This a know issue in matplotlib that was never fixed so we're on the
-    # hook to ensure that we don't pass the param to ffmpeg
-    if "bbox_inches" in savefig_kwargs:
+    # This a known issue in matplotlib that was never fixed so we're on the
+    # hook to ensure that we don't pass the bbox_inches param to ffmpeg
+    if "bbox_inches" in savefig_kwargs and encoder == 'ffmpeg':
         logger.warn('The `bbox_inches` save argument is incompatiable with ffmpeg, argument will be removed from `savefig_kwargs`.')
         savefig_kwargs.pop("bbox_inches")
 
@@ -301,7 +310,7 @@ def render_trajectory_movie(trajectories,
                     decorate_head=decorate_trajectory_head,
                     head_size=trajectory_head_dot_size,
                     head_color=trajectory_head_color,
-                    linewidth_style=trajectory_linewidth_style,
+                    linewidth_style=linewidth_style,
                     linewidth=trajectory_linewidth,
                     final_linewidth=final_linewidth,
                     scalar=trajectory_color,
@@ -316,3 +325,236 @@ def render_trajectory_movie(trajectories,
                 # Clean up the figure for the next time around
                 for artist in trajectory_artists:
                     artist.remove()
+
+# --------------------------------------------------------------------
+
+def render_trajectory_movie_parallel(trajectories,
+
+                                    # Mapmaker kwargs
+                                    domain='terrestrial',
+                                    map_name="region:world",
+                                    draw_coastlines=True,
+                                    draw_countries=True,
+                                    draw_states=True,
+                                    draw_lonlat=True,
+                                    map_bbox=[],
+                                    map_projection = None,
+                                    map_canvas = None,
+                                    figure=None,
+                                    fill_land=True,
+                                    fill_water=True,
+                                    tiles=None,
+
+                                    # Trajectory Rendering kwargs
+                                    trajectory_color_type="scalar",
+                                    trajectory_color="progress",
+                                    trajectory_colormap="gist_heat",
+                                    trajectory_zorder=10,
+                                    decorate_trajectory_head=False,
+                                    trajectory_head_dot_size=2,
+                                    trajectory_head_color="white",
+                                    trajectory_linewidth_style="constant",
+                                    trajectory_linewidth=0.5,
+                                    trajectory_initial_linewidth=0.5,
+                                    trajectory_final_linewidth=0.01,
+                                    scalar_min=0,
+                                    scalar_max=1,
+                                    trail_duration=datetime.timedelta(seconds=300),
+
+                                    # Movie kwargs
+                                    codec="ffv1",
+                                    encoder="ffmpeg",
+                                    encoder_args="-c:v mpeg4 -q:v 5",
+                                    duration=60,
+                                    fps=30,
+                                    resolution=[800, 600],
+                                    dpi=100,
+                                    start_time=None,
+                                    end_time=None,
+                                    filename='movie.mp4',
+                                    movie_title='Tracktable Movie',
+                                    movie_artist='Tracktable Trajectory Toolkit',
+                                    movie_comment='',
+                                    utc_offset=None,
+                                    timezone_label=None,
+                                    frame_batch_size = 500,
+
+                                    # SaveFig kwargs
+                                    savefig_kwargs=None,
+
+                                    # Parallel kwargs
+                                    processors=0,
+
+                                    # Additional args for Render Map
+                                    **kwargs):
+
+    # Steps:
+    # TODO (mjfadem): Fill these steps out
+
+    # Configure the batch renderer
+    renderer = BatchMovieRenderer()
+
+    global BATCH_RENDERER
+    BATCH_RENDERER = renderer
+
+    #tiles override cartopy map features
+    if tiles != None:
+        fill_land=False
+        fill_water=False
+        draw_coastlines=False
+        draw_countries=False
+        draw_states=False
+
+    num_frames = fps * duration
+
+    # We can compute the bounding box for Cartesian data automatically.
+    # We don't need to do so for terrestrial data because the map will
+    # default to the whole world.
+    if (domain == 'cartesian2d' and (map_bbox is None or len(map_bbox) == 0)):
+        map_bbox = geomath.compute_bounding_box(itertools.chain(*trajectories))
+
+    # Set up the map.
+    logger.info('Initializing map canvas for rendering.')
+    # (figure, axes) = parallel_initialize_canvas(renderer, resolution, dpi)
+    (figure, axes) = initialize_canvas(resolution, dpi)
+    if map_canvas == None:
+        (map_canvas, map_actors) = render_map.render_map(domain=domain,
+                                            map_name=map_name,
+                                            map_bbox=map_bbox,
+                                            map_projection=map_projection,
+                                            draw_lonlat=draw_lonlat,
+                                            draw_coastlines=draw_coastlines,
+                                            draw_countries=draw_countries,
+                                            draw_states=draw_states,
+                                            fill_land=fill_land,
+                                            fill_water=fill_water,
+                                            tiles=tiles,
+                                            **kwargs)
+
+    map_bbox = map_extent_as_bounding_box(map_canvas, domain=domain)
+
+    # Setup trajectory render style
+    if trajectory_linewidth == 'taper':
+        linewidth_style = 'taper'
+        linewidth = trajectory_initial_linewidth
+        final_linewidth = trajectory_final_linewidth
+    else:
+        linewidth_style = 'constant'
+        linewidth = trajectory_linewidth
+        final_linewidth = linewidth
+
+    # This set of arguments will be passed to the savefig() call that
+    # grabs the latest movie frame.  This is the place to put things
+    # like background color, tight layout and friends.
+    if savefig_kwargs == None:
+        savefig_kwargs = {'facecolor': figure.get_facecolor()}
+
+    # This a known issue in matplotlib that was never fixed so we're on the
+    # hook to ensure that we don't pass the bbox_inches param to ffmpeg
+    if "bbox_inches" in savefig_kwargs and encoder == 'ffmpeg':
+        logger.warn('The `bbox_inches` save argument is incompatiable with ffmpeg, argument will be removed from `savefig_kwargs`.')
+        savefig_kwargs.pop("bbox_inches")
+
+    (movie_start_time, movie_end_time) = compute_movie_time_bounds(
+        trajectories, start_time, end_time)
+
+    # Cull out trajectories that do not overlap the map.  We do not
+    # clip them (at least not now) since that would affect measures
+    # like progress along the path.
+    trajectories_on_map = list(trajectories_inside_box(trajectories, map_bbox))
+    if len(trajectories_on_map) == 0:
+        raise ValueError(
+            ('No trajectories intersect the map bounding box '
+             '(({} {}) - ({} {})).  Is the '
+             'bounding box correct?').format(map_bbox.min_corner[0],
+                                             map_bbox.min_corner[1],
+                                             map_bbox.max_corner[0],
+                                             map_bbox.max_corner[1]))
+
+    logger.info('Movie covers time span from {} to {}'.format(
+        movie_start_time.strftime("%Y-%m-%d %H:%M:%S"),
+        movie_end_time.strftime("%Y-%m-%d %H:%M:%S")))
+
+    frame_duration = ((movie_end_time - movie_start_time) /
+                      num_frames)
+    first_frame_time = movie_start_time + trail_duration
+
+    total_frame_count = num_frames
+
+    if figure is None:
+        figure = pyplot.gcf()
+
+    # Setup the temp dir needed to store the movie parts
+    tmpdir = tempfile.mkdtemp(prefix='movie_parts')
+
+    # Setup the renderers args
+    # Common Args
+    renderer.trajectories = trajectories_on_map
+    renderer.trail_duration = trail_duration
+
+    # Mapmaker Args
+    renderer.domain = domain
+    renderer.map_canvas = map_canvas
+    renderer.figure = figure
+
+    # Movie Args
+    renderer.savefig_kwargs = savefig_kwargs
+    renderer.dpi = dpi
+    renderer.axes = axes
+    renderer.fps = fps
+    renderer.temp_directory = tmpdir
+    if utc_offset:
+        renderer.utc_offset = int(utc_offset)
+    if timezone_label:
+        renderer.timezone_label = timezone_label
+    renderer.frame_duration = frame_duration
+    renderer.first_frame_time = first_frame_time
+    renderer.codec = codec
+    renderer.encoder = encoder
+
+    renderer.color_map=trajectory_colormap,
+    renderer.decorate_head=decorate_trajectory_head,
+    renderer.head_size=trajectory_head_dot_size,
+    renderer.head_color=trajectory_head_color,
+    renderer.linewidth_style=linewidth_style,
+    renderer.linewidth=linewidth,
+    renderer.final_linewidth=final_linewidth,
+    renderer.scalar=trajectory_color,
+    renderer.scalar_min=scalar_min,
+    renderer.scalar_max=scalar_max,
+    renderer.zorder=trajectory_zorder
+
+    # Figure out how many batches we're going to need
+    start_frame = 0
+    batch_id = 0
+    frame_batches = []
+    while start_frame < total_frame_count:
+        last_frame = min(total_frame_count, start_frame + frame_batch_size)
+        num_frames = (last_frame - start_frame) + 1
+        frame_batches.append(( batch_id,
+                               start_frame,
+                               num_frames,
+                               tmpdir ))
+        start_frame += frame_batch_size
+        batch_id += 1
+
+    # Setup the number of thread processors
+    if processors == 0:
+        processors = None
+
+    pool = multiprocessing.Pool(processes=processors)
+    # result = pool.map_async(render_frame_batch, frame_batches)
+    # result = pool.map_async(BatchMovieRenderer.render_frame_batch,frame_batches)
+    result = pool.starmap_async(BatchMovieRenderer.render_frame_batch,frame_batches) # STOPPED HERE
+    batch_result = result.get()
+
+    logger.info("Combining movie parts into raw footage file")
+    concatenate_movie_chunks(batch_result, tmpdir)
+
+    logger.info("Encoding raw footage file to final movie")
+    encode_final_movie(filename, tmpdir, encoder_args)
+
+    logger.info("Cleaning up temporary files")
+    remove_movie_chunks(tmpdir, batch_result)
+
+    os.rmdir(tmpdir)

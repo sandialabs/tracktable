@@ -41,14 +41,13 @@ from tracktable.render.backends import ffmpeg_backend
 
 logger = logging.getLogger(__name__)
 
-def render_trajectory_movie(trajectories, backend='', simplify_traj=False, simplify_tol=0.0001, **kwargs):
+def render_trajectory_movie(trajectories, backend='', simplify_traj=False, simplify_tol=0.0001, parallel=False, **kwargs):
 
-    # TODO: Update this comment for the movie rendering
-    """Render a list of trajectories interactively or as a static image
+    # TODO (mjfadem): Update this comment for the movie rendering
+    """Render a list of trajectories into a matplotlib animation/movie
 
-    This function will render a list of trajectories using Folium (for
-    interactive display) if you are in a Jupyter notebook or using Cartopy
-    (for a static image) if you are running from a script.
+    This function will render a list of trajectories using ffmpeg through the
+    matplotlib animation library.
 
     Args:
         trajectories (single Tracktable trajectory or list of trajectories):
@@ -148,8 +147,15 @@ def render_trajectory_movie(trajectories, backend='', simplify_traj=False, simpl
 
     """
 
-    if backend == 'ffmpeg':
+    render_function = ffmpeg_backend.render_trajectory_movie
+
+    if backend == 'ffmpeg' and parallel == False:
         render_function = ffmpeg_backend.render_trajectory_movie
+    elif backend == 'ffmpeg' and parallel == True:
+        render_function = ffmpeg_backend.render_trajectory_movie_parallel
+    # elif backend != 'ffmpeg' and parallel == True:
+        # TODO mjfadem: Our parallel code has a bunch of spots of ffmpeg hardcoded values, we'll
+        # need to update that before we can support other encoder parallel processing
     else:
         if backend != '':
             logger.error("Error: Invalid backend specified in",

@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""movie_from_points.py - Render a movie of trajectories
+"""movie_processing.py - Functions for supporting rendering a movie
 
 Note:
     Cartopy v0.18.0 is required to successfully render maps and pass
