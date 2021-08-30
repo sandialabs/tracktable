@@ -50,10 +50,15 @@ Installation
 
    After you have installed Cartopy, retry ``pip install tracktable``.
 
-* Python reports ``"Error importing core types.  Path information follows."``
-  or ``"NameError: name '_core_types' is not defined"``.
+* Python reports one of the following error messages when importing tracktable:
 
-    * This is an OS-specific shared library issue. See the second bullet in the ``Runtime`` section below.
+    * ``"Error importing C Python extension example..."``
+    * ``"Error importing Boost.Python example..."``
+    * ``"Error importing core Boost libraries..."``
+    * ``"Error importing Tracktable's core types library..."``
+
+      * This is an OS-specific compiled library issue. See the :ref:`Shared Library <shared_library_errors>`
+        bullet below describing this issue in more detail.
 
 * Errors about client certificates, certificate validation, or connections timing
   out while trying to install anything with Conda or Pip.
@@ -66,8 +71,8 @@ Installation
       Cartopy provide binary packages for Anaconda.
 
     * If you absolutely can't use Anaconda and your operating system's
-      package manager does not include Cartopy, refer to "Pip fails to
-      install Tracktable" above.
+      package manager does not include Cartopy, refer to the **"Pip fails to
+      install Tracktable"** section above.
 
 .. _common_issues_errors_build:
 
@@ -90,7 +95,9 @@ Build Time
       yet propagated to the main distribution. Install ``cmake`` from the
       ``conda-forge`` channel as follows:
 
-      ``$ conda install --channel conda-forge cmake``
+      .. code-block:: console
+
+         conda install --channel conda-forge cmake
 
 * Old Boost version found in /usr/lib or /usr/lib64
 
@@ -140,34 +147,91 @@ Runtime
        .. tip:: We **highly recommend** using Anaconda
           to install and manage tracktable and it's dependencies.
 
-* Python throwing an ``import`` or ``name`` error referring to the ``_core_types`` library when trying to import tracktable
+.. _shared_library_errors:
 
-    * This error occurs when the Python interpreter is unable to find
-      a shared library used by Tracktable or one of the libraries it
-      depends upon. Here are the most common remedies:
+* Shared Library Errors, Python throwing one of the following errors when attempting to import ``Tracktable``
 
-        #. Microsoft Windows: The C++ runtime library may be missing. It can be
-           downloaded from
-           `Microsoft's Visual C++ downloads page <https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0>`_.
+    * ``"Error importing C Python extension example..."``
+    * ``"Error importing Boost.Python example..."``
+    * ``"Error importing core Boost libraries..."``
+    * ``"Error importing Tracktable's core types library..."``
 
-        #. MacOS:  The ICU library may be too recent. Tracktable 1.5 was built using
-           ICU version 64. If you are using Anaconda, run the following command to install
-           the correct version:
 
-           .. code-block:: console
+    These errors occur when the Python interpreter is unable to find
+    a shared library required by Tracktable, such as Boost or Tracktable's
+    compiled libraries. Below is additional information about the error
+    messages as well as some additional tips that may resolve them.
 
-              conda install --channel conda-forge icu=64
+    * **Error Descriptions:**
 
-           .. note:: If Anaconda reports a conflict from that command, you may need
-              to remove and recreate the environment. Conda can often resolve version
-              conflicts when an environment is created. Specify ``icu=64`` as one of
-              the arguments to ``conda create``. Refer to :ref:`Anaconda Virtual Environment <create_conda_environment>`
-              for instructions.
+      #. ``"Error importing C Python extension example..."``
 
-        #. If you built one or more dependencies from source, they may
-           need to be added to your environment. On Windows, add the
-           directory containing the package's libraries to your ``PATH``
-           environment variable. On Linux, add the package's library
-           directory to the ``LD_LIBRARY_PATH`` environment variable.
-           On MacOS, add the package's library directory to the
-           ``DYLD_LIBRARY_PATH`` environment variable.
+          This error indicates that Tracktable was unable to import a module that
+          was built using `Python's builtin C/C++ extension module creation <https://docs.python.org/3/extending/extending.html>`_.
+          Typically, this indicates that there is an issue with either the Tracktable ``_c_python`` module
+          missing from the Tracktable installation or the module not being referenced on the system's path.
+
+      #. ``"Error importing Boost.Python example..."``
+
+          This error indicates that Tracktable was unable to import a module that
+          was built using ``Boost.Python`` module creation. Typically,
+          this indicates that there is an issue with the Tracktable ``_tracktable_hello`` module
+          missing from the Tracktable installation, the module not being referenced on the system's path
+          or the given Boost installation is missing the Python library from it's installation.
+
+      #. ``"Error importing core Boost libraries..."``
+
+          This error indicates that Tracktable was unable to import the core ``Boost`` libraries
+          Outline in the :ref:`C++ Dependencies <cpp_dependencies>` section. Typically,
+          this indicates that there is an issue with the Tracktable ``_boost_libs`` module
+          missing from the Tracktable installation, the module not being referenced on the system's path
+          or the given Boost installation is missing the required libraries from it's installation.
+
+      #. ``"Error importing Tracktable's core types library..."``
+
+          This error indicates that Tracktable was unable to import it's main compiled library
+          ``core_types``. Typically, this indicates that there is an issue with the Tracktable
+          ``_core_types`` module missing from the Tracktable installation or the module not being
+          referenced on the system's path.
+
+    * **Possible Resolutions:**
+
+        * Verify that the Python installation being used was installed correctly.
+
+        * Verify that correct Tracktable installation is being referenced on the system's path if their is more then one Tracktable version installed on the system.
+
+        * Verify that the system and/or Python path contains references to Boost and Tracktable's compiled libraries.
+
+        * Verify that the system's Boost installation contains all of the libraries that are required by Tracktable.
+
+            * Required libraries are listed in the :ref:`C++ Dependencies <cpp_dependencies>` section.
+
+        * **Microsoft Windows:**
+              The C++ runtime library may be missing. It can be downloaded from the
+              `Microsoft's Visual C++ downloads page <https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0>`_.
+
+        * **MacOS:**
+            The ICU library may be too recent. Tracktable 1.5 and newer was built using
+            ICU version 64. If you're using Anaconda, run the following command to install
+            the correct version:
+
+            .. code-block:: console
+
+                conda install --channel conda-forge icu=64
+
+            .. note:: If Anaconda reports a conflict from the above command, you may need
+                to remove and recreate the environment. Conda can often resolve version
+                conflicts when an environment is created. Specify ``icu=64`` as one of
+                the arguments to ``conda create``. Refer to :ref:`Anaconda Virtual Environment <create_conda_environment>`
+                section for further instruction.
+
+        * If you built one or more dependencies from source, they may need to be manually added to your environment.
+
+           * Windows
+              Add the package's library directory to the ``PATH`` environment variable.
+
+           * Linux
+              Add the package's library directory to the ``LD_LIBRARY_PATH`` environment variable.
+
+           * MacOS
+              Add the package's library directory to the ``DYLD_LIBRARY_PATH`` environment variable.

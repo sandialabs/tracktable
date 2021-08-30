@@ -60,6 +60,8 @@ the :ref:`Anaconda Virtual Environment <create_conda_environment_source>` sectio
 
 Tracktable has the following required dependencies:
 
+.. _python_dependencies:
+
 Python
 ^^^^^^
 
@@ -81,6 +83,8 @@ Python
 * Scipy 1.5.2 or newer - https://pypi.org/project/scipy/
 
   .. note:: This package only needs to be installed manually on Linux
+
+.. _cpp_dependencies:
 
 C++
 ^^^
@@ -121,6 +125,8 @@ Tracktable requires a C++14-capable compiler as of release 1.5.
      when absolutely necessary.
 
 
+.. _documentation_dependencies:
+
 Documentation
 ^^^^^^^^^^^^^
 
@@ -134,6 +140,8 @@ If you want to build documentation you will also need the following packages:
 * Breathe 4.26.1 or newer - https://breathe.readthedocs.io/en/latest/
 * Doxygen 1.8.17 or newer - https://www.doxygen.nl/index.html
 * Graphviz (for dot executable) 2.42.2 or newer - https://www.graphviz.org/
+
+.. _movie_dependencies:
 
 Movies
 ^^^^^^
@@ -150,6 +158,8 @@ If you want to render movies you will need FFMPEG:
   .. tip:: Windows users can obtain the ffmpeg executable by installing
     Image Magick (https://www.imagemagick.org)
 
+
+.. _other_dependencies:
 
 Other
 ^^^^^
@@ -365,7 +375,8 @@ Boost import targets not found
 ******************************
 
 This happens when your installed version of CMake is too old for your
-installed version of Boost. Please upgrade CMake to at least 3.12.
+installed version of Boost. Please upgrade CMake to the version listed in
+:ref:` Other Dependencies <other_dependencies>` section.
 If the problem persists, the Boost imports can be manually entered into
 your cmake configuration.
 
@@ -387,7 +398,7 @@ The filenames for the compiled libraries will be updated
 the next time you press ``c`` or ``Configure``.
 
 Windows: import error referring to the "_core_types" library
-******************************************************************
+************************************************************
 
 If you are using Tracktable under Windows, you might also need to install
 the C++ runtime library. This is a necessary component for any program
@@ -397,7 +408,7 @@ URL:
 https://aka.ms/vs/16/release/vc_redist.x64.exe
 
 The most common indication that you're missing this library is an import
-error, ``NameError: name '_core_types' is not defined``, when you try to import Tracktable
+error, ``Error importing Tracktable's core types library.``, when you try to import Tracktable
 in a Python interpreter.
 
 
