@@ -28,6 +28,7 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <tracktable/Core/WarningGuards/DeprecatedDeclaration.h>
 #include <tracktable/Core/WarningGuards/UnusedTypedef.h>
 #include <tracktable/Core/WarningGuards/ShadowedDeclaration.h>
 #include <tracktable/Core/WarningGuards/PragmaMessages.h>
