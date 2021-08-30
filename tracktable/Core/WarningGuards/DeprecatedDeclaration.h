@@ -28,42 +28,11 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-// Tracktable Trajectory Library
-//
-// BoostPythonHeaders - This file wraps up all of the Boost.Python
-// headers we need to define a Python extension module for Tracktable
-// bindings.  More usefully, this disables a couple of warnings that
-// Boost triggers ALL THE TIME.
-
-#ifndef __tracktable_BoostPythonHeaders_h
-#define __tracktable_BoostPythonHeaders_h
-
-#include <tracktable/Core/WarningGuards/PushWarningState.h>
-#include <tracktable/Core/WarningGuards/CommonBoostWarnings.h>
-
-// Sigh.  I don't like including this wholesale.  I don't yet have a
-// good reference for where all the specific bits are.
-#include <boost/python.hpp>
-
-#include <boost/python/class.hpp>
-#include <boost/python/module.hpp>
-#include <boost/python/def.hpp>
-#include <boost/python/return_internal_reference.hpp>
-#include <boost/python/return_value_policy.hpp>
-#include <boost/python/return_by_value.hpp>
-#include <boost/python/def_visitor.hpp>
-#include <boost/python/errors.hpp>
-#include <boost/python/handle.hpp>
-
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <boost/python/suite/indexing/map_indexing_suite.hpp>
-
-#include <boost/python/dict.hpp>
-#include <boost/python/list.hpp>
-#include <boost/python/str.hpp>
-
-#include <tracktable/Core/WarningGuards/PopWarningState.h>
-
-#include <Python.h>
-
+#if defined(__clang__)
+# pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(__GNUC__)
+# pragma GCC diagnostic ignored "-Wpragmas"
 #endif
+
+
+

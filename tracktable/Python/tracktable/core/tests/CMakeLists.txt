@@ -73,3 +73,5 @@ add_python_test(P_KM2LonLat tracktable.core.tests.test_kms_to_lon_lat)
 add_python_test(P_LogLevel tracktable.core.tests.test_log_level)
 
 add_python_test(P_TerrestrialECEF tracktable.core.tests.test_terrestrial_ECEF)
+
+add_python_test(P_TimestampTimeZoneConversion tracktable.core.tests.timestamp_conversion_python_cpp)
