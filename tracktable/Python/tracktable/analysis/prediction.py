@@ -55,6 +55,7 @@ from tracktable.domain.feature_vectors import convert_to_feature_vector
 from tracktable.domain.terrestrial import (Trajectory, TrajectoryPointReader,
                                            TrajectoryReader, TrajectoryWriter)
 from tracktable.render.render_trajectories import render_trajectories
+from tracktable.render.map_decoration.coloring import matplotlib_cmap_to_dict
 
 ###############################################################################
 ######################### PREDICTION HELPER FUNCTIONS #########################
@@ -207,7 +208,7 @@ def sample_traj(trajectory, samples):
     samples_list = []
     for i in range(samples):
         frac = t_length * i / (samples - 1)
-        samples_list.append(point_at_length_fraction(trajectory, frac/100))
+        samples_list.append(point_at_length_fraction(trajectory, frac/t_length))
     return samples_list
 
 
@@ -909,45 +910,6 @@ def predict_origin_destination(observed_traj, predict_dict, neigh_distance=5,
 ###############################################################################
 ############################# IMAGE GENERATION ################################
 ###############################################################################
-
-def matplotlib_cmap_to_dict(colormap_name,
-                            num_colors=16):
-    """Convert a Matplotlib colormap into a dict for Folium
-
-    Folium expects its color maps as a dictionary whose keys
-    are floats between zero and one and whose values are the
-    color to which that value should be mapped.
-
-    Arguments:
-        colormap_name (string): Name of one of Matplotlib's built-in
-            color maps.
-
-    Keyword Arguments:
-        num_colors (int): How many entries to put into the output.
-            Defaults to 16.
-
-    Returns:
-        Colormap in dictionary format
-
-    Raises:
-        ValueError: no such color map exists
-
-    Note:
-        It would be easy to extend this function to fit the
-        color map to a range other than [0, 1] or to make it use a
-        logarithmic scale (or any other scale) instead of linear.
-        Ask, or just do it, if you'd like this.
-    """
-
-    mpl_cmap = matplotlib.pyplot.get_cmap(colormap_name)
-    sample_points = np.linspace(0, 1, num_colors)
-    output = dict()
-    for sample_value in sample_points:
-        output[sample_value] = matplotlib.colors.to_hex(
-            mpl_cmap(sample_value)
-        )
-    return output
-
 
 def display_color_map(cmap):
     """Create a visual representation of a Matplotlib color map.

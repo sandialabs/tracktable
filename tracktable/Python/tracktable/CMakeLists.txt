@@ -80,11 +80,35 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/examples
 )
 
-file(GLOB example_notebooks "examples/notebook_examples/*.ipynb")
+file(GLOB example_python_scripts "examples/python_scripts/*.py")
 install(
-  FILES ${example_notebooks}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/notebook_examples
+  FILES ${example_python_scripts}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/python_scripts
+)
+
+file(GLOB tutorial_notebooks "examples/tutorials/*.ipynb")
+install(
+  FILES ${tutorial_notebooks}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/tutorials
   )
+
+file(GLOB tutorial_helpers "examples/tutorials/*.py")
+  install(
+    FILES ${tutorial_helpers}
+    DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/tutorials
+    )
+
+file(GLOB analytic_demo_notebooks "examples/analytic_demos/*.ipynb")
+  install(
+    FILES ${analytic_demo_notebooks}
+    DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos
+    )
+
+file(GLOB demo_images "examples/analytic_demos/demo_images/*.*")
+  install(
+    FILES ${demo_images}
+    DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos/demo_images
+    )
 
 file(GLOB example_data_files "examples/data/*.*")
 install(
