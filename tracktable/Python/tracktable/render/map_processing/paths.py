@@ -52,6 +52,13 @@ from matplotlib.collections import LineCollection
 from matplotlib.colors import ListedColormap
 from six.moves import range
 import numpy
+
+
+from tracktable.render.backends.patch_cartopy_download_url import patch_cartopy_backend
+
+import cartopy
+patch_cartopy_backend() # noqa
+
 import cartopy.crs
 
 # ----------------------------------------------------------------------
