@@ -34,7 +34,11 @@ tracktable.render.cartopy - render trajectories in using the cartopy backend
 import itertools
 from datetime import datetime
 
+from tracktable.render.backends.patch_cartopy_download_url import patch_cartopy_backend
+
 import cartopy
+patch_cartopy_backend() # noqa
+
 import cartopy.crs
 import matplotlib
 import matplotlib.colors
