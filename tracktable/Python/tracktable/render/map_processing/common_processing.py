@@ -35,11 +35,6 @@ import hashlib
 import logging
 from math import ceil
 
-from tracktable.render.backends.patch_cartopy_download_url import patch_cartopy_backend
-
-import cartopy
-patch_cartopy_backend() # noqa
-
 import cartopy.crs
 import folium as fol
 import matplotlib
