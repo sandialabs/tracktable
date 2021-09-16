@@ -31,7 +31,9 @@ points and trajectories can be found in the modules listed below.
 .. toctree::
    :maxdepth: 5
 
+   python/tracktable.algorithms.rst
    python/tracktable.analysis.rst
+   python/tracktable.applications.rst
    python/tracktable.core.rst
    python/tracktable.data_generators.rst
    python/tracktable.domain.rst

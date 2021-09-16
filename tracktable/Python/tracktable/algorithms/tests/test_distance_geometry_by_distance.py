@@ -33,14 +33,16 @@
 # expected results.  The more exhaustive tests for multiple
 # point domains are in C++.
 
-from __future__ import print_function, division, absolute_import
+from __future__ import absolute_import, division, print_function
 
 import math
 import sys
 
-from tracktable.analysis.distance_geometry import distance_geometry_by_distance
+from tracktable.algorithms.distance_geometry import \
+    distance_geometry_by_distance
 from tracktable.domain.terrestrial import Trajectory as TerrestrialTrajectory
-from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
+from tracktable.domain.terrestrial import \
+    TrajectoryPoint as TerrestrialTrajectoryPoint
 
 
 def make_sample_trajectory():

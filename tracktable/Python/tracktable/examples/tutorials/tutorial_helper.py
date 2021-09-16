@@ -27,18 +27,17 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# TODO (mjfadem): Update this
 """
-tracktable.analysis.assemble_trajectories - Sources that turn a sequence of points into a sequence of trajectories
+tracktable.applications.tutorial_helpers - Helper functions to assist the jupyter notebook tutorials
 """
 
 import os.path
 from datetime import timedelta
 
 from numpy import zeros
-from tracktable.analysis.assemble_trajectories import \
+from tracktable.applications.assemble_trajectories import \
     AssembleTrajectoryFromPoints
-from tracktable.analysis.trajectory_splitter import split_when_idle
+from tracktable.applications.trajectory_splitter import split_when_idle
 from tracktable.core import data_directory
 from tracktable.core.geomath import (convex_hull_area, end_to_end_distance,
                                      length, speed_between)

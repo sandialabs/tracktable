@@ -295,7 +295,7 @@ Once CMake starts you will see a mostly empty screen with the message ``EMPTY CA
     ``BUILD_PYTHON_WRAPPING`` and ``BUILD_SHARED_LIBS``. Leave these set to
     ``ON``.
 
-      .. Warning:: Without these options you will not be able to use
+      .. warning:: Without these options you will not be able to use
         any of Tracktable's Python components.
 
   * Set the value of

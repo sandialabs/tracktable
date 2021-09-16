@@ -27,14 +27,15 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import division, print_function, absolute_import
+from __future__ import absolute_import, division, print_function
 
 import operator
 import random
 import sys
-from six.moves import range
 
-from tracktable.analysis.dbscan import compute_cluster_labels, cluster_labels_to_dict
+from six.moves import range
+from tracktable.algorithms.dbscan import (cluster_labels_to_dict,
+                                          compute_cluster_labels)
 
 # Test dbscan in 3 dimensions
 

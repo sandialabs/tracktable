@@ -39,7 +39,7 @@ from tracktable.core import geomath
 from tracktable.render import render_map
 from tracktable.render.map_processing import paths
 from tracktable.script_helpers import argument_groups, argparse, n_at_a_time
-from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
+from tracktable.applications.assemble_trajectories import AssembleTrajectoryFromPoints
 
 import multiprocessing
 import datetime

@@ -27,7 +27,9 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Label points with cluster IDs using DBSCAN."""
+"""
+tracktable.algorithms.dbscan - Label points with cluster IDs using DBSCAN.
+"""
 
 from __future__ import division, absolute_import, print_function
 

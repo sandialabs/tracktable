@@ -35,7 +35,8 @@ if (UNIX AND APPLE)
 endif (UNIX AND APPLE)
 
 if (BUILD_TESTING)
-  add_subdirectory(analysis/tests)
+  add_subdirectory(algorithms/tests)
+  add_subdirectory(applications/tests)
   add_subdirectory(core/tests)
   add_subdirectory(domain/tests)
   add_subdirectory(examples)
@@ -50,10 +51,23 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}
 )
 
+file(GLOB algorithms_files "algorithms/*.py")
+install(
+  FILES ${algorithms_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/algorithms
+)
+
+# TODO (mjfadem) Remove this in release 1.8
 file(GLOB analysis_files "analysis/*.py")
 install(
   FILES ${analysis_files}
   DESTINATION ${PYTHON_INSTALL_PREFIX}/analysis
+)
+
+file(GLOB applications_files "applications/*.py")
+install(
+  FILES ${applications_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/applications
 )
 
 file(GLOB core_files "core/*.py")
@@ -104,9 +118,9 @@ file(GLOB analytic_demo_notebooks "examples/analytic_demos/*.ipynb")
     DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos
     )
 
-file(GLOB demo_images "examples/analytic_demos/demo_images/*.*")
+file(GLOB analytic_demo_images "examples/analytic_demos/demo_images/*.*")
   install(
-    FILES ${demo_images}
+    FILES ${analytic_demo_images}
     DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos/demo_images
     )
 
@@ -176,12 +190,6 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/render/map_processing
 )
 
-file (GLOB source_files "source/*.py")
-install(
-  FILES ${source_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/source
-)
-
 file (GLOB script_helper_files "script_helpers/*.py")
 install(
   FILES ${script_helper_files}
@@ -192,16 +200,4 @@ file (GLOB script_helper_argument_groups_files "script_helpers/argument_groups/*
 install(
   FILES ${script_helper_argument_groups_files}
   DESTINATION ${PYTHON_INSTALL_PREFIX}/script_helpers/argument_groups
-)
-
-file(GLOB analysis_files "analysis/*.py")
-install(
-  FILES ${analysis_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/analysis
-)
-
-file(GLOB source_files "source/*.py")
-install(
-  FILES ${source_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/source
 )

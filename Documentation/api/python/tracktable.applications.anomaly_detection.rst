@@ -1,5 +1,5 @@
 ================================================
-tracktable.analysis.assemble_trajectories module
+tracktable.applications.anomaly_detection module
 ================================================
 
 
@@ -7,7 +7,7 @@ tracktable.analysis.assemble_trajectories module
 Module contents
 ---------------
 
-.. automodule:: tracktable.analysis.assemble_trajectories
+.. automodule:: tracktable.applications.anomaly_detection
     :members:
     :undoc-members:
     :show-inheritance:

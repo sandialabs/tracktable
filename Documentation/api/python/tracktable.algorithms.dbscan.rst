@@ -1,12 +1,13 @@
 ===================================
-tracktable.analysis.dbscan module
+tracktable.algorithms.dbscan module
 ===================================
 
 
+---------------
 Module contents
 ---------------
 
-.. automodule:: tracktable.analysis.dbscan
+.. automodule:: tracktable.algorithms.dbscan
     :members:
     :undoc-members:
     :show-inheritance:

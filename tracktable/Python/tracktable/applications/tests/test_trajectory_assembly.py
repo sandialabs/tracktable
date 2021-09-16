@@ -27,15 +27,16 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import print_function, division
-from datetime import datetime, timedelta
+from __future__ import division, print_function
+
 import itertools
 import sys
+from datetime import timedelta
 
-from tracktable.feature.interpolated_points import TrajectoryPointSource
-from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
-
+from tracktable.applications.assemble_trajectories import \
+    AssembleTrajectoryFromPoints
 from tracktable.core import Timestamp, geomath
+from tracktable.feature.interpolated_points import TrajectoryPointSource
 
 
 def run_test():
