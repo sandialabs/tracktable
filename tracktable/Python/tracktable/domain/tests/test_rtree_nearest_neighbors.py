@@ -27,14 +27,14 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import print_function, division, absolute_import
-
-import sys
-from six.moves import range
-from tracktable.analysis.rtree import RTree
-from tracktable.domain import feature_vectors as fv
+from __future__ import absolute_import, division, print_function
 
 import enum
+import sys
+
+from six.moves import range
+from tracktable.domain.rtree import RTree
+from tracktable.domain import feature_vectors as fv
 
 
 class CreationMethod(enum.Enum):
@@ -43,7 +43,7 @@ class CreationMethod(enum.Enum):
     ALL_POINTS_AT_ONCE = 3
 
 
-def test_nearest_neighbors(point_type, 
+def test_nearest_neighbors(point_type,
                            rtree_creation=CreationMethod.CONSTRUCTOR):
     points = []
 

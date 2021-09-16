@@ -102,6 +102,16 @@ add_python_test(
   )
 
 add_python_test(
+  P_RTree_Nearest_Neighbors
+  ${DOMAIN}.test_rtree_nearest_neighbors
+  )
+
+add_python_test(
+  P_RTree_Points_In_Box
+  ${DOMAIN}.test_rtree_points_in_box
+  )
+
+add_python_test(
   P_Terrestrial_BasePointWriter
   ${DOMAIN}.test_terrestrial_base_point_writer
   )

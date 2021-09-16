@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from tracktable.domain.terrestrial import TrajectoryPointReader
-from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
+from tracktable.applications.assemble_trajectories import AssembleTrajectoryFromPoints
 from tracktable.render.render_trajectories import render_trajectories
 from tracktable.core import test_utilities as utils
 import os.path

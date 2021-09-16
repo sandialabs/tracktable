@@ -27,45 +27,47 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# TODO (mjfadem): Update this
 """
-tracktable.analysis.assemble_trajectories - Sources that turn a sequence of points into a sequence of trajectories
+tracktable.applications.trajectory_splitter - Split trajectories that are idle for a
+given amount of time in a given location radius. This is typically to prevent
+analyzing trajectories of boats that are docked for long periods of time.
+
+split_when_idle() is the main driver function for splitting trajectories.
 """
 
+import logging
 from math import floor
 
 from tracktable.core.geomath import distance
 
+logger = logging.getLogger(__name__)
 
-def elapsed_time(point1, point2):
+def elapsed_seconds(point1, point2):
     """
     Calculate the time (in seconds) between two trajectory points.  Assumes
     that point1 is the earlier point.
 
-    Parameters
-    ----------
-    point1 : TYPE
-        The eariler occurring trajectory point.
-    point2 : TYPE
-        The later occurring trajectory point.
+    Arguments:
+        point1 (Tracktable point): The eariler occurring trajectory point.
+        point2 (Tracktable point): The later occurring trajectory point.
 
-    Returns
-    -------
-    TYPE
+    Returns:
         The time that has elapsed from the first point to the second point,
         in seconds.
 
     """
     return (point2.timestamp - point1.timestamp).total_seconds()
 
-
+# TODO: Does split_when_idle need to be domain-specific?
+# Could it be easily generalized to handle trajectories from different domains?
 def split_when_idle(trajectory,
                     idle_time_threshold=3600,
                     collocation_radius_threshold=0.2525,
-                    min_points=10,
-                    verbose=False):
+                    min_points=10):
     """
     If over any subset of points the trajectory stays within an area of
+
+    .. math::
 
         PI * collocation_radius_threshold^2,
 
@@ -73,28 +75,21 @@ def split_when_idle(trajectory,
     to create new trajectories before and after the idle area, effectively
     deleting the idle area.
 
-    Parameters
-    ----------
-    trajectory : tracktable.lib._terrestrial.TrajectoryTerrestrial
-        A tracktable trajectory object.
-    idle_time_threshold : int, optional
-        Consider a trajectory area idle if it spends at least
-        idle_time_threshold seconds in the same place.  The default is 3600 sec
-        (one hour).
-    collocation_radius_threshold : float, optional
-        Consider a trajectory area idle if it stays within an area of
-        PI * collocation_radius_threshold^2.  The default is 0.2525 km,
-        creating an area threshold of approx. 0.2 km^2.
-    min_points : int, optional
-        The minimum number of points for a non-idle subinterval of the
-        trajectory to become a new trajectory.  The default is 10 points.
-    verbose : boolean, optional
-        Print out additional status info.  The default is False.  (Change to
-        logging later down the road.)
+    Arguments:
+        trajectory (Tracktable trajectory): The trajectory to split.
 
-    Returns
-    -------
-    list of tracktable.lib._terrestrial.TrajectoryTerrestrial
+    Keyword Arguments:
+        idle_time_threshold (int): Consider a trajectory area idle if it spends at least
+            idle_time_threshold seconds in the same place.  (Default: 3600 (one hour))
+        collocation_radius_threshold (float)
+            Consider a trajectory area idle if it stays within an area of
+            PI * collocation_radius_threshold^2 in terms of km.
+            (Default: 0.2525 (creating an area threshold of approx. 0.2 km^2))
+        min_points (int):
+            The minimum number of points for a non-idle subinterval of the
+            trajectory to become a new trajectory.  (Default: 10)
+
+    Returns:
         A list of trajectories that are each subintervals of the input
         trajectory, and do not contain any idle regions (as defined by the
         input thresholds).
@@ -102,7 +97,7 @@ def split_when_idle(trajectory,
     """
 
 
-    def create_interval_list(verbose=False):
+    def _create_interval_list():
         """
         Divide the trajectory into adjacent intervals, necessarily overlapping
         only at the interval endpoints.  We will efficiently try to make each
@@ -141,13 +136,12 @@ def split_when_idle(trajectory,
                 - collocation_radius_threshold
                 - trajectory_duration
 
-        Returns
-        -------
-        None.
+        Returns:
+            No return value
 
         """
 
-        def create_interval():
+        def _create_interval():
             """
             Creates and returns a dictionary representing a subinterval of the
             trajectory that has duration <= half of the idle time threshold.
@@ -156,13 +150,11 @@ def split_when_idle(trajectory,
                 split_when_idle
                     - trajectory
                     - collocation_radius_threshold
-                create_interval_list
+                _create_interval_list
                     - interval_start
                     - interval_end
 
-            Returns
-            -------
-            interval : dict
+            Returns:
                 A dictionary representing a subinterval of the trajectory that
                 has duration <= half of the idle time threshold.  It has the
                 following key/value pairs:
@@ -176,7 +168,6 @@ def split_when_idle(trajectory,
                     'center': Trajectory point index of the "center" point for
                               the interval, which is always initialized to the
                               same as the 'start' point index.
-
 
             """
 
@@ -227,27 +218,24 @@ def split_when_idle(trajectory,
         interval_start = 0
         interval_end = estimated_interval_jump
         while interval_start < len(trajectory) - 1:
-            if verbose:
-                print(f'Trying interval from {interval_start} to {interval_end}.')
+            logger.debug(f'Trying interval from {interval_start} to {interval_end}.')
 
-            interval_duration = elapsed_time(trajectory[interval_start],
+            interval_duration = elapsed_seconds(trajectory[interval_start],
                                              trajectory[interval_end])
             if interval_duration <= interval_duration_max:
-                if verbose:
-                    print('\tGood interval (shorter than max duration).')
+                logger.debug('\tGood interval (shorter than max duration).')
                 # We have a good interval, label it as idle or not.
-                interval_list.append(create_interval())
+                interval_list.append(_create_interval())
                 # Move to the next possible interval.
                 interval_start = interval_end
                 interval_end = min(interval_start + estimated_interval_jump,
                                    len(trajectory) - 1)
             else:
                 if interval_end == interval_start + 1:
-                    if verbose:
-                        print('\tGood interval (just two points).')
+                    logger.debug('\tGood interval (just two points).')
                     # If we have a two point interval, it's okay if it's over
                     # the maximum interval duration.
-                    interval_list.append(create_interval())
+                    interval_list.append(_create_interval())
                     # Move to the next possible interval.
                     interval_start = interval_end
                     interval_end = min(interval_start + estimated_interval_jump,
@@ -264,7 +252,7 @@ def split_when_idle(trajectory,
         return interval_list
 
 
-    def add_interval_following_mobile_region():
+    def _add_interval_following_mobile_region():
         """
         The last interval was a mobile interval, meaning there is no currently
         defined idle region.
@@ -292,9 +280,8 @@ def split_when_idle(trajectory,
                 - mobile_region
                 - interval
 
-        Returns
-        -------
-        None.
+        Returns:
+            No return value.
 
         """
         if interval['idle']:
@@ -308,7 +295,7 @@ def split_when_idle(trajectory,
             # appropriate.
             for index in range(mobile_region['end']-1,
                                mobile_region['start'], -1):
-                if not update_idle_region_with_point(index, 'start'):
+                if not _update_idle_region_with_point(index, 'start'):
                     mobile_region['end'] = index + 1
                     break
         else:
@@ -317,7 +304,7 @@ def split_when_idle(trajectory,
             mobile_region['end'] = interval['end']
 
 
-    def add_interval_following_idle_region():
+    def _add_interval_following_idle_region():
         """
         The last interval was an idle interval, so there is a currently
         defined idle region and possibly a mobile region.
@@ -351,9 +338,8 @@ def split_when_idle(trajectory,
                 - mobile_region
                 - interval
 
-        Returns
-        -------
-        None.
+        Returns:
+            No return value.
 
         """
         # Either the interval is mobile, or it is idle but failed to be
@@ -363,7 +349,7 @@ def split_when_idle(trajectory,
         # the idle region until they get too far from the center of the
         # idle region.
         for index in range(interval['start']+1, interval['end']+1):
-            if not update_idle_region_with_point(index, 'end'):
+            if not _update_idle_region_with_point(index, 'end'):
                 break
 
         # Check if any part of the current interval wasn't added to the
@@ -372,7 +358,7 @@ def split_when_idle(trajectory,
             # Check if the duration of the idle region is over the idle
             # time threshold and either delete the idle region or add it
             # to the mobile region.
-            check_idle_duration()
+            _check_idle_duration()
             if interval['idle']:
                 # What is left of the current idle interval becomes the
                 # new idle region.
@@ -389,7 +375,7 @@ def split_when_idle(trajectory,
                     mobile_region['end'] = interval['end']
 
 
-    def update_idle_region_with_point(index, location):
+    def _update_idle_region_with_point(index, location):
         """
         Add a point to the idle region, but only if it is close enough to the
         center of the idle region.
@@ -400,18 +386,15 @@ def split_when_idle(trajectory,
                 - collocation_radius_threshold
                 - idle_region
 
-        Parameters
-        ----------
-        index : int
-            The trajectory point index that we would like to attempt to add to
-            the idle region.
-        location : string
-            Either 'start' or 'end' to indicate if we are adding this point to
-            the start or end of the idle region, respectively.
+        Arguments:
+            index : int
+                The trajectory point index that we would like to attempt to add to
+                the idle region.
+            location : string
+                Either 'start' or 'end' to indicate if we are adding this point to
+                the start or end of the idle region, respectively.
 
-        Returns
-        -------
-        bool
+        Returns:
             True - point was successfully added to the idle region
             False - point was not close enough to the center of the idle
                     region, and therefore was not added
@@ -429,7 +412,7 @@ def split_when_idle(trajectory,
         return True
 
 
-    def cut_mobile_region():
+    def _cut_mobile_region():
         """
         Check to see if there is a mobile region and if it has enough points.
         If so, create a new trajectory from the mobile region and append it to
@@ -442,9 +425,8 @@ def split_when_idle(trajectory,
                 - mobile_region
                 - new_trajectories
 
-        Returns
-        -------
-        None.
+        Returns:
+            No return value.
 
         """
         # Check that the mobile region exists and has enough points to be
@@ -452,8 +434,7 @@ def split_when_idle(trajectory,
         if (len(mobile_region) != 0 and
               mobile_region['end'] - mobile_region['start'] + 1 >= min_points):
 
-            if verbose:
-                print(f"\tCreating new trajectory for [{mobile_region['start']}, {mobile_region['end']}]")
+            logger.debug(f"\tCreating new trajectory for [{mobile_region['start']}, {mobile_region['end']}]")
 
             # Create a trajectory from the mobile region.
             new_trajectories.append(trajectory[mobile_region['start']:
@@ -462,7 +443,7 @@ def split_when_idle(trajectory,
         mobile_region.clear()
 
 
-    def check_idle_duration():
+    def _check_idle_duration():
         """
         If the idle region duration is at or above the idle time threshold,
         convert the mobile region (if it exists) to a trajectory and clear the
@@ -479,16 +460,15 @@ def split_when_idle(trajectory,
                 - idle_region
                 - mobile_region
 
-        Returns
-        -------
-        None.
+        Returns:
+            No return value.
 
         """
-        if elapsed_time(trajectory[idle_region['start']],
+        if elapsed_seconds(trajectory[idle_region['start']],
                         trajectory[idle_region['end']]) >= idle_time_threshold:
             # The idle region is too long (in time).  Let all the mobile
             # region points from before the idle region form a new trajectory.
-            cut_mobile_region()
+            _cut_mobile_region()
         else:
             # The idle region is not long enough (in time) to be considered
             # truly idle.  Move those points to the mobile region.
@@ -499,26 +479,9 @@ def split_when_idle(trajectory,
         # Reset the idle region.
         idle_region.clear()
 
+    logger.debug('Commencing trajectory splitting...')
 
-    # Helper function for debugging - delete later?
-    def print_trajectory():
-        for i, point in enumerate(trajectory):
-            if i == 0:
-                print(i)
-            else:
-                print(f'{i}:\t{(elapsed_time(trajectory[i-1], trajectory[i]))/3600} hours')
-
-
-    # Helper function for debugging - delete later?
-    def print_interval_list():
-        for interval in interval_list:
-            print(f"[{interval['start']}, {interval['end']}],\tIdle: {interval['idle']},\tDuration: {elapsed_time(trajectory[interval['start']], trajectory[interval['end']])/3600} hours")
-
-
-    if verbose:
-        print('Commencing trajectory splitting...')
-
-    trajectory_duration = elapsed_time(trajectory[0], trajectory[-1])
+    trajectory_duration = elapsed_seconds(trajectory[0], trajectory[-1])
 
     # If the entire trajectory is below the idle time threshold, there can be
     # no part of it that is idle for the duration of the idle time threshold,
@@ -530,8 +493,7 @@ def split_when_idle(trajectory,
         else:
             return []
 
-    if verbose:
-        print('Creating Interval Lists...')
+    logger.debug('Creating Interval Lists...')
 
     # Create a list that will contain the trajectory broken up into intervals.
     # Each interval will be represented as a dictionary containing the
@@ -540,10 +502,7 @@ def split_when_idle(trajectory,
     # 'idle' (boolean flag), 'center' (this key only exists if 'idle' is true,
     # and contains the trajectory point index of the "center" of the interval,
     # where all idle radius are calculated from).
-    interval_list = create_interval_list(verbose=verbose)
-    if verbose:
-        #print_trajectory()
-        print_interval_list()
+    interval_list = _create_interval_list()
 
     # We will store all non-idle trajectories that we create here (if any).
     new_trajectories = []
@@ -555,8 +514,7 @@ def split_when_idle(trajectory,
     idle_region    = {}
     mobile_region  = {}
 
-    if verbose:
-        print('Initializing mobile/idle regions using first interval...', flush=True)
+    logger.debug('Initializing mobile/idle regions using first interval...')
 
     # Intialize mobile/idle regions using the first interval.
     if interval_list[0]['idle']:
@@ -566,32 +524,29 @@ def split_when_idle(trajectory,
 
     for i, interval in enumerate(interval_list[1:]):
 
-        if verbose:
-            print(f"\tmobile region: {mobile_region}")
-            print(f"\tidle region: {idle_region}")
-            print(f"\nInterval: [{interval['start']}, {interval['end']}]\t Idle: {interval['idle']}")
+        logger.debug(f"\tmobile region: {mobile_region}")
+        logger.debug(f"\tidle region: {idle_region}")
+        logger.debug(f"\nInterval: [{interval['start']}, {interval['end']}]\t Idle: {interval['idle']}")
 
         if len(idle_region) == 0:
-            add_interval_following_mobile_region()
+            _add_interval_following_mobile_region()
         else:
-            add_interval_following_idle_region()
+            _add_interval_following_idle_region()
 
-    if verbose:
-        print(f"\tmobile region: {mobile_region}")
-        print(f"\tidle region: {idle_region}")
-        print(f"\nNo intervals left.  Checking idle region then cutting mobile region...")
+    logger.debug(f"\tmobile region: {mobile_region}")
+    logger.debug(f"\tidle region: {idle_region}")
+    logger.debug(f"\nNo intervals left.  Checking idle region then cutting mobile region...")
 
     if len(idle_region) != 0:
         # There may be some idle points that should be moved to the mobile
         # region.
-        check_idle_duration()
+        _check_idle_duration()
 
     # We're done adding points, so any points left in the mobile region
     # should be checked to see if they qualify to be a trajectory.
-    cut_mobile_region()
+    _cut_mobile_region()
 
-    if verbose:
-        print(f"\tmobile region: {mobile_region}")
-        print(f"\tidle region: {idle_region}")
+    logger.debug(f"\tmobile region: {mobile_region}")
+    logger.debug(f"\tidle region: {idle_region}")
 
     return new_trajectories

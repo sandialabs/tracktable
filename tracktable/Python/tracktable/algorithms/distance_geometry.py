@@ -27,7 +27,9 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Compute the distance geometry signature of a trajectory."""
+"""
+tracktable.algorithms.distance_geometry - Compute the distance geometry signature of a trajectory.
+"""
 
 from __future__ import division, absolute_import, print_function
 

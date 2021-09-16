@@ -47,9 +47,9 @@ requirements:
 test:
   imports:
     - tracktable
-    - tracktable.analysis.dbscan
-    - tracktable.analysis.distance_geometry
-    - tracktable.analysis.rtree
+    - tracktable.algorithms.dbscan
+    - tracktable.algorithms.distance_geometry
+    - tracktable.domain.rtree
     - tracktable.core.geomath
     - tracktable.domain.cartesian2d
     - tracktable.domain.cartesian3d

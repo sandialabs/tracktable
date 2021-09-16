@@ -27,13 +27,14 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Find points in boxes and nearest neighbors with an R-tree."""
+"""
+tracktable.domain.rtree - Find points in boxes and nearest neighbors with an R-tree.
+"""
 
-from __future__ import division, print_function, absolute_import
-
-from tracktable.lib import _rtree
+from __future__ import absolute_import, division, print_function
 
 from tracktable.domain.feature_vectors import convert_to_feature_vector
+from tracktable.lib import _rtree
 
 
 class RTree(object):
@@ -138,11 +139,11 @@ class RTree(object):
         """
 
         if self._tree is None:
-            # Since the input sequence might be a generator or other 
-            # traverse-once-only sequence, we pick the first point and use 
+            # Since the input sequence might be a generator or other
+            # traverse-once-only sequence, we pick the first point and use
             # that to configure the tree, then insert the others as a batch.
 
-            point_iter = iter(points) 
+            point_iter = iter(points)
             try:
                 first_point = next(point_iter)
                 self.insert_point(first_point)
@@ -230,7 +231,7 @@ class RTree(object):
         Returns:
             Number of points that have been added to the Rtree.
         """
-        
+
         if self._tree is None:
             return 0
         else:
