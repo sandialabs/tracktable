@@ -31,12 +31,6 @@
 
 import logging
 
-
-from tracktable.render.backends.patch_cartopy_download_url import patch_cartopy_backend
-
-import cartopy
-patch_cartopy_backend() # noqa
-
 import cartopy
 import cartopy.crs
 from matplotlib import pyplot

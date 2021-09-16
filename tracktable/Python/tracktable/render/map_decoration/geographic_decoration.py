@@ -34,9 +34,6 @@
 from tracktable.render.backends.patch_cartopy_download_url import patch_cartopy_backend
 
 import cartopy
-patch_cartopy_backend() # noqa
-
-import cartopy
 import cartopy.crs
 import matplotlib
 import matplotlib.collections
@@ -245,6 +242,8 @@ def draw_countries(map_axes,
 
     """
 
+    patch_cartopy_backend()
+
     country_borders = cartopy.feature.NaturalEarthFeature(
         'cultural',
         'admin_0_boundary_lines_land',
@@ -287,6 +286,8 @@ def draw_states(map_axes,
 
     """
 
+    patch_cartopy_backend()
+
     return [map_axes.add_feature(
         cartopy.feature.STATES.with_scale(resolution),
         linewidth=linewidth,
@@ -320,6 +321,8 @@ def draw_coastlines(map_axes,
        A list of Matplotlib artists added to the map.
 
     """
+
+    patch_cartopy_backend()
 
     coastlines = cartopy.feature.NaturalEarthFeature(
         name='coastline',
@@ -362,6 +365,8 @@ def fill_land(map_axes,
 
     """
 
+    patch_cartopy_backend()
+
     landmass = cartopy.feature.NaturalEarthFeature(
         name='land',
         category='physical',
@@ -397,6 +402,8 @@ def fill_oceans(map_axes,
        A list of Matplotlib artists added to the map.
 
     """
+
+    patch_cartopy_backend()
 
     oceans = cartopy.feature.NaturalEarthFeature(
         name='ocean',
@@ -436,6 +443,7 @@ def fill_lakes(map_axes,
 
     """
 
+    patch_cartopy_backend()
     lakes = cartopy.feature.NaturalEarthFeature(
         name='lakes',
         category='physical',
