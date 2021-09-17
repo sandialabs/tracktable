@@ -613,11 +613,11 @@ public:
     }
 
   /** Enable/disable logging of point count on read
-   * 
+   *
    * When set to true (the default), the point reader will print out
    * the number of points successfully read and the number of errors
    * to the info log channel when the end of the input is reached.
-   * 
+   *
    * This function is provided because there are cases like the
    * trajectory reader where this results in thousands of lines of
    * spam because the reader is invoked for every trajectory
@@ -626,7 +626,7 @@ public:
    * @param [in] onoff Boolean flag: 'true' means 'yes, log statistics'
    */
 
-  void set_point_count_log_enabled(bool onoff) 
+  void set_point_count_log_enabled(bool onoff)
   {
     this->PointCountLogEnabled = onoff;
   }
@@ -640,7 +640,7 @@ public:
    * @return Whether or not point count logging is enabled
    */
 
-  bool point_count_log_enabled() const 
+  bool point_count_log_enabled() const
   {
     return this->PointCountLogEnabled;
   }
@@ -730,6 +730,21 @@ protected:
             TRACKTABLE_LOG(log::debug) << "Configuring point reader from header.";
             this->configure_reader_from_header(_tokens);
             ++(this->SourceBegin);
+
+            // We just updated the reader based on the header found
+            // That means we also need to update the number of required tokens
+            required_num_tokens =
+              this->CoordinateMap.size()
+              + this->FieldMap.size()
+              + static_cast<std::size_t>(traits::has_object_id<point_type>::value)
+              + static_cast<std::size_t>(traits::has_timestamp<point_type>::value)
+              ;
+
+            TRACKTABLE_LOG(log::debug)
+              << "Required tokens (" << required_num_tokens << ") calculation: coordmap=" << this->CoordinateMap.size()
+              << " propmap=" << this->FieldMap.size()
+              << " objid=" << static_cast<std::size_t>(traits::has_object_id<point_type>::value)
+              << " timestamp=" << static_cast<std::size_t>(traits::has_timestamp<point_type>::value);
             continue;
             }
           else
@@ -738,10 +753,10 @@ protected:
             // parse it as a point.
             if (_tokens.size() >= required_num_tokens)
               {
-              TRACKTABLE_LOG(log::trace) << "Parsing list of "
+              /*TRACKTABLE_LOG(log::trace) << "Parsing list of "
                   << _tokens.size() << " tokens ("
                   << required_num_tokens << " required) "
-                  << "as point.";
+                  << "as point.";*/
               NextPoint = point_shared_ptr_type(new point_type);
               this->populate_coordinates_from_tokens(_tokens, NextPoint);
               this->populate_properties_from_tokens(_tokens, NextPoint);
@@ -884,6 +899,8 @@ protected:
 
         this->FieldMap[property_name] = rw::detail::ColumnTypeAssignment(first_property_column + i, property_type);
         }
+      TRACKTABLE_LOG(log::debug) << "Adjusted property map size = " << this->FieldMap.size() << ".";
+
     }
 
   // ----------------------------------------------------------------------
@@ -932,7 +949,7 @@ protected:
           settings::point_coordinate_type value(boost::lexical_cast<settings::point_coordinate_type>(tokens.at(column)));
           (*point)[coord] = value;
           }
-        catch (boost::bad_lexical_cast e)
+        catch (const boost::bad_lexical_cast& e)
           {
           std::ostringstream fieldbuf;
           fieldbuf << "coordinate " << coord;

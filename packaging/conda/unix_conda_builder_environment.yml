@@ -1,0 +1,10 @@
+# Ananconda Environment For Building Unix (Linux/MacOS) Conda Packages
+name: unix_conda_builder
+channels:
+  - conda-forge
+dependencies:
+  # Conda-Build Dependencies
+  - conda-build
+  - conda-verify
+  - anaconda-client
+  - patch

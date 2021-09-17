@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from tracktable.domain.terrestrial import TrajectoryPointReader
-from tracktable.source.trajectory import AssembleTrajectoryFromPoints
+from tracktable.applications.assemble_trajectories import AssembleTrajectoryFromPoints
 from tracktable.render.render_trajectories import render_trajectories
 from tracktable.core import test_utilities as utils
 import os.path
@@ -257,7 +257,7 @@ def test_render_trajectories(ground_truth_path, test_output_path,
                                                      ignore_uuids=True)
 
     filename = "CustomLinewidth.html"
-    from tracktable.render.render_trajectories import progress_linewidth_generator
+    from tracktable.render.map_processing.common_processing import progress_linewidth_generator
     render_trajectories(trajs[28], line_color='green',
                         trajectory_linewidth_generator=progress_linewidth_generator,
                         backend='folium', show=False, save=True,

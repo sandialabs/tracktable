@@ -2,8 +2,6 @@
 tracktable.rw module
 ====================
 
-.. important:: ``tracktable.rw`` is identical to ``tracktable.io``. All functionality found in ``tracktable.io`` is preserved here.
-
 ----------
 Submodules
 ----------

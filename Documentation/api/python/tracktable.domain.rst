@@ -13,6 +13,7 @@ Submodules
    tracktable.domain.cartesian2d.rst
    tracktable.domain.cartesian3d.rst
    tracktable.domain.feature_vectors.rst
+   tracktable.domain.rtree.rst
    tracktable.domain.terrestrial.rst
 
 

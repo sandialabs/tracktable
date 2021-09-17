@@ -83,7 +83,7 @@ will be shown below but explained in further detail in the
    from tracktable.core import Timestamp
    from tracktable.domain.terrestrial import TrajectoryPoint
    from tracktable.feature.interpolated_points import TrajectoryPointSource
-   from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
+   from tracktable.applications.assemble_trajectories import AssembleTrajectoryFromPoints
 
    albuquerque = TrajectoryPoint( -106.5, 35.25 )
    albuquerque.timestamp = Timestamp.from_string('2010-01-01 12:00:00')

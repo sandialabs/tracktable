@@ -29,12 +29,12 @@
  */
 
 
-// TrailMix Trajectory Library
+// Tracktable Trajectory Library
 //
 // Boost.Python code to convert datetime.datetime <-> boost::posix_time::ptime
 //
 // To make this work, call install_datetime_converters() from within a
-// Boost.Python BOOST_PYTHON_MODULE.  We do this inside TrailMixPythonModule.cpp.
+// Boost.Python BOOST_PYTHON_MODULE.
 //
 // Created by Danny Rintoul and Andy Wilson.
 

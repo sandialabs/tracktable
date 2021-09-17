@@ -31,7 +31,9 @@ points and trajectories can be found in the modules listed below.
 .. toctree::
    :maxdepth: 5
 
+   python/tracktable.algorithms.rst
    python/tracktable.analysis.rst
+   python/tracktable.applications.rst
    python/tracktable.core.rst
    python/tracktable.data_generators.rst
    python/tracktable.domain.rst
@@ -39,12 +41,10 @@ points and trajectories can be found in the modules listed below.
    python/tracktable.feature.rst
    python/tracktable.filter.rst
    python/tracktable.info.rst
-   python/tracktable.io.rst
    python/tracktable.rw.rst
    python/tracktable.lib.rst
    python/tracktable.render.rst
    python/tracktable.script_helpers.rst
-   python/tracktable.source.rst
 
 
 C++ API

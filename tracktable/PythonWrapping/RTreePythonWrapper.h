@@ -52,22 +52,52 @@ public:
 
   void set_points(boost::python::object const& new_points)
     {
-      boost::python::stl_input_iterator<point_type> point_begin(new_points), point_end;
-      std::vector<indexed_point_type> indexed_points;
-      int point_id = 0;
-      for (; point_begin != point_end; ++point_begin, ++point_id)
-        {
-        point_type next_point(*point_begin);
-        indexed_points.push_back(indexed_point_type(*point_begin, point_id));
-        }
-      this->Points = new_points;
-      this->Tree = rtree_type(indexed_points.begin(), indexed_points.end());
+      this->insert_points(new_points);
     }
 
-  boost::python::object points() const
+  std::size_t size() const 
     {
-      return this->Points;
+      return this->Tree.size();
     }
+
+  // ---------------------------------------------------------------------
+  
+  void insert_point(boost::python::object const& new_point) 
+  {
+    int point_id = this->Tree.size();
+    indexed_point_type new_indexed_point(
+      boost::python::extract<point_type>(new_point), 
+      point_id
+      );
+
+    this->Tree.insert(new_indexed_point);
+  }
+
+  // ---------------------------------------------------------------------
+  
+  void insert_points(boost::python::object const& new_points) 
+  {
+    boost::python::stl_input_iterator<point_type> point_begin(new_points), 
+        point_end;
+    std::vector<indexed_point_type> indexed_points;
+    int point_id = this->Tree.size();
+    for (; point_begin != point_end; ++point_begin, ++point_id)
+      {
+      // Unlike insert_point() above, we don't have to call boost::python::
+      // extract() here -- bp::stl_input_iterator<> does that for us.
+      //
+      // TODO: We could save memory by constructing the indexed points
+      // using a transform iterator instead of accumulating a list here.
+      indexed_point_type next_point(
+        //boost::python::extract<point_type>(*point_begin), 
+        *point_begin,
+        point_id
+        );
+      indexed_points.push_back(next_point);
+      }
+    this->Tree.insert(indexed_points.begin(), indexed_points.end());
+  }
+
 
   // ----------------------------------------------------------------------
 
@@ -79,6 +109,31 @@ public:
       point_type _max_corner((boost::python::extract<point_type>(max_corner)));
 
       this->Tree.find_points_inside_box(
+        _min_corner, _max_corner,
+        std::back_inserter(points_in_box)
+        );
+
+      boost::python::list point_indices;
+      for (typename std::vector<indexed_point_type>::const_iterator iter = points_in_box.begin();
+           iter != points_in_box.end();
+           ++iter)
+        {
+        point_indices.append(iter->second);
+        }
+
+      return std::move(point_indices);
+    }
+
+  // ----------------------------------------------------------------------
+
+  boost::python::object intersects(boost::python::object const& min_corner,
+                                   boost::python::object const& max_corner)
+    {
+      std::vector<indexed_point_type> points_in_box;
+      point_type _min_corner((boost::python::extract<point_type>(min_corner)));
+      point_type _max_corner((boost::python::extract<point_type>(max_corner)));
+
+      this->Tree.intersects(
         _min_corner, _max_corner,
         std::back_inserter(points_in_box)
         );
@@ -118,7 +173,6 @@ public:
 
 private:
   rtree_type Tree;
-  boost::python::object Points;
 };
 
 

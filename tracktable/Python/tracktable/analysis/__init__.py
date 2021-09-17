@@ -34,4 +34,40 @@ neighbor search and (eventually) dimensionality reduction.
 
 """
 
-pass
+# TODO (mjfadem): Remove this file in release 1.8
+
+import warnings
+import sys
+
+# Imports for the new module locations
+import tracktable.algorithms
+import tracktable.algorithms.dbscan
+import tracktable.algorithms.distance_geometry
+
+import tracktable.applications
+import tracktable.applications.assemble_trajectories
+
+import tracktable.data_structures
+import tracktable.domain.rtree
+
+# This just stops the source line from printing with the warning
+def format_warning(message, category, filename, lineno, file=None, line=None):
+    return '%s:%s: %s:%s\n' % (filename, lineno, category.__name__, message)
+
+warnings.formatwarning = format_warning
+
+# Allow the DeprecationWarning through since it's disabled by default
+warnings.simplefilter("always", category=DeprecationWarning)
+
+# This will display a DeprecationWarning when the source modules are imported
+warnings.warn(" \ntracktable.analysis have been deprecated, its submodules have been relocated to more appropriate locations which are listed below. tracktable.analysis will be fully removed in release 1.8.\n\n"
+        "\ttracktable.analysis.assemble_trajectories -> tracktable.applications.assemble_trajectories\n"
+        "\ttracktable.analysis.dbscan                -> tracktable.algorithms.dbscan\n"
+        "\ttracktable.analysis.distance_geometry     -> tracktable.algorithms.distance_geometry\n"
+        "\ttracktable.analysis.rtree                 -> tracktable.domain.rtree\n", category=DeprecationWarning)
+
+# Aliases to smooth the transition of relocation of the tracktable.analysis submodules
+sys.modules['tracktable.analysis.assemble_trajectories'] = tracktable.applications.assemble_trajectories
+sys.modules['tracktable.analysis.dbscan'] = tracktable.algorithms.dbscan
+sys.modules['tracktable.analysis.distance_geometry'] = tracktable.algorithms.distance_geometry
+sys.modules['tracktable.analysis.rtree '] = tracktable.domain.rtree

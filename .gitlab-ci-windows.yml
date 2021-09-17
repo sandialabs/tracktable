@@ -1,6 +1,6 @@
 compile-win:
   stage: build
-  tags: 
+  tags:
     - windows
   script:
     - xcopy * C:\Git\tracktable /E /H /Y
