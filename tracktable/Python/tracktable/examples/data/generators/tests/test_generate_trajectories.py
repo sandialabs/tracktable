@@ -33,7 +33,6 @@ from tracktable.examples.data.generators import generate_trajectories
 from tracktable.domain.terrestrial import Trajectory as TerrestrialTrajectory
 from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
 from tracktable.info import airports
-from tracktable.source import combine
 
 def test_gen_single_airport_trajectory():
     '''

@@ -184,6 +184,18 @@ public:
       this->_RTree.insert(value);
     }
 
+  /** Insert multiple elements into an RTRee
+   * 
+   * @param [in] range_begin   Iterator pointing to beginning of input points 
+   * @param [in] range_end     Iterator pointing past end of input points
+   */
+  template<typename value_iterator_type>
+  void insert(value_iterator_type range_begin, 
+              value_iterator_type range_end)
+    {
+      this->_RTree.insert(range_begin, range_end);
+    }
+         
   /** Remove a single element from the RTree
    *
    * @param [in] value  Element to remove
@@ -532,6 +544,158 @@ public:
       return this->_find_points_strictly_inside_box(search_box);
     }
 
+  /** Find points inside a search box (output sink version)
+   *
+   * @fn Rtree::void intersects(corner_type const& min_corner, corner_type const& max_corner, insert_iter_type result_sink) const
+   *
+   * This function finds points/objects that are not disjoint from the box
+   * You must provide an InsertIterator as the third argument. This
+   * iterator will be used to save the results.
+   *
+   * Example:
+   *
+   * @code
+   *
+   *    my_point min_corner, max_corner;
+   *    std::vector<my_point> results;
+   *
+   *    my_tree.intersects(min_corner, max_corner, std::back_inserter(results));
+   *
+   * @endcode
+   *
+   * Note that this function will return points that are exactly on
+   * the boundary of the search box as well as those in the interior.
+   * If you want only the points in the interior, use
+   * `find_points_strictly_inside_box`.
+   *
+   * As with all the other RTree functions, you can use a point type,
+   * a `std::pair<point_type, X>` or a `boost::tuple<point, type, [other
+   * stuff]>` for your searches. In the case of a `std::pair` or
+   * `boost::tuple`, your geometry type must be the first element.
+   *
+   * @param [in] min_corner   Corner at minimum end of search box
+   * @param [in] max_corner   Corner at maximum end of search box
+   * @param [in] result_sink  InsertIterator where results will be stored
+   */
+  template<typename corner_type, typename insert_iter_type>
+  void intersects(corner_type const& min_corner,
+                              corner_type const& max_corner,
+                              insert_iter_type result_sink) const
+    {
+      Box<corner_type> search_box(min_corner, max_corner);
+      this->_intersects(search_box, result_sink);
+    }
+
+  /**
+   * @overload Rtree::void intersects(std::pair<corner_type, T2> const& min_corner, std::pair<corner_type, T2> const& max_corner, insert_iter_type result_sink) const
+   */
+  template<typename corner_type, typename T2, typename insert_iter_type>
+  void intersects(std::pair<corner_type, T2> const& min_corner,
+                              std::pair<corner_type, T2> const& max_corner,
+                              insert_iter_type result_sink) const
+    {
+      Box<corner_type> search_box(min_corner.first, max_corner.first);
+      this->_intersects(search_box, result_sink);
+    }
+
+  /**
+   * @overload Rtree::void intersects(boost::tuple<corner_type, T2, T3, T4, T5, T6, T7, T8, T9> const& min_corner, boost::tuple<corner_type, T2, T3, T4, T5, T6, T7, T8, T9> const& max_corner, insert_iter_type result_sink) const
+  */
+  template<
+    typename corner_type,
+    typename insert_iter_type,
+    typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9
+    >
+  void intersects(
+    boost::tuple<corner_type, T2, T3, T4, T5, T6, T7, T8, T9> const& min_corner,
+    boost::tuple<corner_type, T2, T3, T4, T5, T6, T7, T8, T9> const& max_corner,
+    insert_iter_type result_sink
+    ) const
+    {
+      Box<corner_type> search_box(min_corner.template get<0>(),
+                                  max_corner.template get<0>());
+      this->_intersects(search_box, result_sink);
+    }
+
+  /** Find points inside a search box (iterator range version)
+   *
+   * @fn Rtree::query_result_range_type intersects(corner_type const& min_corner, corner_type const& max_corner) const
+   *
+   * This function finds points inside a box specified as a
+   * tracktable::Box (also known as a tracktable::RTree<point_type>::box_type).
+   *
+   * Example:
+   *
+   * @code
+   *
+   *    typedef typename tracktable::RTree<my_point>::query_result_range_type query_result_type;
+   *    my_point min_corner, max_corner;
+   *
+   *    query_result_type result_range =
+   *    my_tree.intersects(min_corner, max_corner);
+   *
+   *    std::vector<my_point> results(result_range.first, result_range.second);
+   *
+   * @endcode
+   *
+   * Note that this function will return points that are exactly on
+   * the boundary of the search box as well as those in the interior.
+   * If you want only the points in the interior, use
+   * `find_points_strictly_inside_box`.
+   *
+   * As with all the other RTree functions, you can use a point type,
+   * a `std::pair<point_type, X>` or a `boost::tuple<point, type, [other
+   * stuff]>` for your searches. In the case of a `std::pair` or
+   * `boost::tuple`, your geometry type must be the first element.
+   *
+   * @warning
+   *    This function is sensitive to numerical
+   *    imprecision issues when points are (allegedly) right on the
+   *    border of the search box. This is especially problematic in
+   *    the terrestrial domain (longitude/latitude points) since we
+   *    have to do trigonometry to compute point-in-polygon results.
+   *
+   * @param [in] min_corner   Corner at minimum end of search box
+   * @param [in] max_corner   Corner at maximum end of search box
+   * @return   Pair of iterators pointing to query result range
+   */
+  template<typename corner_type>
+  query_result_range_type
+  intersects(corner_type const& min_corner,
+                         corner_type const& max_corner) const
+    {
+      tracktable::Box<corner_type> search_box(min_corner, max_corner);
+      return this->_intersects(search_box);
+    }
+
+  /**
+   * @overload Rtree::query_result_range_type intersects(std::pair<corner_type, T2> const& min_corner, std::pair<corner_type, T2> const& max_corner) const
+   */
+  template<typename corner_type, typename T2>
+  query_result_range_type
+  intersects(std::pair<corner_type, T2> const& min_corner,
+                         std::pair<corner_type, T2> const& max_corner) const
+    {
+      tracktable::Box<corner_type> search_box(min_corner.first, max_corner.first);
+      return this->_intersects(search_box);
+    }
+
+  /**
+   * @overload Rtree::query_result_range_type intersects(boost::tuple<corner_type, T2, T3, T4, T5, T6, T7, T8, T9, T10> const& min_corner, boost::tuple<corner_type, T2, T3, T4, T5, T6, T7, T8, T9, T10> const& max_corner)
+   */
+  template<typename corner_type,
+           typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8, typename T9, typename T10>
+  query_result_range_type
+  intersects(
+    boost::tuple<corner_type, T2, T3, T4, T5, T6, T7, T8, T9, T10> const& min_corner,
+    boost::tuple<corner_type, T2, T3, T4, T5, T6, T7, T8, T9, T10> const& max_corner
+    )
+    {
+      tracktable::Box<corner_type> search_box(min_corner.template get<0>(),
+                                              max_corner.template get<0>());
+      return this->_intersects(search_box);
+    }
+
   /** Find points near a search point (output iterator version)
    *
    * @fn Rtree::void find_nearest_neighbors(search_point_type const& search_point, unsigned int num_neighbors, insert_iter_type result_sink) const
@@ -675,6 +839,26 @@ private:
     {
       return query_result_range_type(
         this->_RTree.qbegin(bgi::covered_by(search_box)),
+        this->_RTree.qend()
+        );
+    }
+
+  /** @internal
+   */
+  template<typename box_type, typename insert_iter_type>
+  void _intersects(box_type const& search_box,
+                               insert_iter_type result_sink) const
+    {
+      this->_copy_range_to_output(this->_intersects(search_box), result_sink);
+    }
+
+  /** @internal
+   */
+  template<typename box_type>
+  query_result_range_type _intersects(box_type const& search_box) const
+    {
+      return query_result_range_type(
+        this->_RTree.qbegin(bgi::intersects(search_box)),
         this->_RTree.qend()
         );
     }

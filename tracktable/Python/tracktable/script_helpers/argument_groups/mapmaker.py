@@ -30,7 +30,7 @@
 
 from tracktable.script_helpers.argument_groups import create_argument_group
 from tracktable.script_helpers.argument_groups import add_argument
-from tracktable.render import maps
+from tracktable.render.map_processing import maps
 
 """Command-line options for creating and decorating maps.
 

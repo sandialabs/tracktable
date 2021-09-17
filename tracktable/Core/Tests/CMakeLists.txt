@@ -27,6 +27,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+include(CplusplusTest)
+
 unset(Boost_FOUND)
 get_filename_component(_TEST_NAME_TMP ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 get_filename_component(_TEST_NAME_2 ${CMAKE_CURRENT_SOURCE_DIR} NAME)
@@ -366,14 +368,14 @@ target_link_libraries(test_trajectory_slicing
 
 # ----------------------------------------------------------------------
 
-add_test(
-  NAME C_PointArithmetic
-  COMMAND test_point_arithmetic
+add_catch2_test(
+  C_PointArithmetic
+  test_point_arithmetic
 )
 
-add_test(
- NAME C_Distance
- COMMAND test_distance
+add_catch2_test(
+ C_Distance
+ test_distance
 )
 
 add_test(

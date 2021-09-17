@@ -6,6 +6,7 @@ Documentation/readthedocs_build/doxygen
 Documentation/examples/tmp_my_tracks.html
 Documentation/examples/tmp_my_tracks.png
 Documentation/examples/trajs*
+Documentation/examples/myfig*.*
 .ipnyb_checkpoints
 *-checkpoint.ipynb
 __pycache__
@@ -16,3 +17,5 @@ __pycache__
 /_build/
 /doxygen/
 /build_ubuntu2004/
+/build_macos/
+Documentation/examples/demo_images/

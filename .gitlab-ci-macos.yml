@@ -1,11 +1,67 @@
-compile-macos:
-  stage: build
-  tags: 
+# MacOS continuous integration setup for Tracktable
+# This file gets included from .gitlab-ci.yml.
+#
+# Runner configuration:
+#
+# Gitlab Runner must run in an environment where the conda executable
+# is on the path.  We also need XCode and the command-line compiler
+# tools installed at the moment.  We will swap that out for the
+# Anaconda toolchain in due course.
+
+setup-macos:
+  stage: setup
+  tags:
     - macos
+    - anaconda
   script:
-    - cmake .
-    - make -j8
-    - cmake .
-    - ctest . --output-on-failure
-  retry: 1
+    - ./ci/macos/configure_anaconda_environment.sh
+    - mkdir build_macos
+  artifacts:
+    paths:
+      - build_macos
+    expire_in: 1 day
+
+configure-macos:
+  stage: configure
+  tags:
+    - macos
+    - anaconda
+  dependencies:
+    - setup-macos
+  script:
+    - ./ci/macos/configure_cmake_build.sh
+  artifacts:
+    paths:
+      - build_macos
+    expire_in: 1 day
+
+build-macos:
+  stage: build
+  tags:
+    - macos
+    - anaconda
+  dependencies:
+    - configure-macos
+  script:
+    - ./ci/macos/run_build.sh
+  artifacts:
+    paths:
+      - build_macos
+    expire_in: 1 day
+
+test-macos:
+  stage: test
+  tags:
+    - macos
+    - anaconda
+  dependencies:
+    - build-macos
+  script:
+    - cp ./build_macos/lib/*.so ./tracktable/Python/tracktable/lib
+    - ./ci/macos/run_test.sh
+  artifacts:
+    paths:
+      - build_macos
+    expire_in: 1 day
+
 

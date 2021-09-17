@@ -55,8 +55,12 @@ package managers such as
     - MacPorts (https://www.macports.org/)
     - Homebrew (https://brew.sh/)
 
+Instructions on using Anaconda to configure a fully functional development environment are located in
+the :ref:`Anaconda Virtual Environment <create_conda_environment_source>` section below.
 
 Tracktable has the following required dependencies:
+
+.. _python_dependencies:
 
 Python
 ^^^^^^
@@ -79,6 +83,8 @@ Python
 * Scipy 1.5.2 or newer - https://pypi.org/project/scipy/
 
   .. note:: This package only needs to be installed manually on Linux
+
+.. _cpp_dependencies:
 
 C++
 ^^^
@@ -119,6 +125,8 @@ Tracktable requires a C++14-capable compiler as of release 1.5.
      when absolutely necessary.
 
 
+.. _documentation_dependencies:
+
 Documentation
 ^^^^^^^^^^^^^
 
@@ -132,6 +140,8 @@ If you want to build documentation you will also need the following packages:
 * Breathe 4.26.1 or newer - https://breathe.readthedocs.io/en/latest/
 * Doxygen 1.8.17 or newer - https://www.doxygen.nl/index.html
 * Graphviz (for dot executable) 2.42.2 or newer - https://www.graphviz.org/
+
+.. _movie_dependencies:
 
 Movies
 ^^^^^^
@@ -148,6 +158,8 @@ If you want to render movies you will need FFMPEG:
   .. tip:: Windows users can obtain the ffmpeg executable by installing
     Image Magick (https://www.imagemagick.org)
 
+
+.. _other_dependencies:
 
 Other
 ^^^^^
@@ -180,6 +192,52 @@ Building FFMPEG
 For up-to-date instructions on building FFMPEG please refer to
 https://trac.ffmpeg.org/wiki/CompilationGuide and choose your OS.
 We recommend that you compile in support for H264 video (via ``libx264``).
+
+
+.. _create_conda_environment_source:
+
+Anaconda Virtual Environment
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. attention:: The tracktable development anaconda environment that is created in this section
+    is plug and play on Linux and MacOS and will build the Tracktable source code with no additional
+    configuration. For Windows, there are additional steps required to configure cmake and an IDE
+    to recognize the anaconda environment. These additional steps are dependent on the existing
+    Windows environment, compiler and IDE being used and are outside the scope of the troubleshooting
+    provided in this documentation.
+
+If you have `Anaconda <https://www.anaconda.com/distribution/>`_
+installed then the Anaconda virtual environment commands
+below will create and configure a virtual environment that is ready to use
+to build Tracktable from source. Enter the following commands in a command/terminal/Anaconda prompt.
+
+    .. important:: Be sure to substitute the location where you saved tracktable_dev_environment.yml in the command above.
+
+#. Verify that the ``tracktable-dev`` virtual environment was created
+
+    .. code-block:: console
+
+      conda env list
+
+#. Activate the virtual environment
+
+    .. code-block:: console
+
+      conda activate tracktable-dev
+
+#. Deactivate the virtual environment (optional)
+
+    .. code-block:: console
+
+      conda deactivate
+
+#. Delete the virtual environment when it is no longer needed
+
+  .. code-block:: console
+
+      conda remove --name tracktable-dev --all
+
+#. Create the Anaconda virtual environment
 
     We include a YML configuration file
     (:download:`tracktable_dev_environment.yml <../../tracktable_dev_environment.yml>`)
@@ -262,7 +320,7 @@ Once CMake starts you will see a mostly empty screen with the message ``EMPTY CA
     ``BUILD_PYTHON_WRAPPING`` and ``BUILD_SHARED_LIBS``. Leave these set to
     ``ON``.
 
-      .. Warning:: Without these options you will not be able to use
+      .. warning:: Without these options you will not be able to use
         any of Tracktable's Python components.
 
   * Set the value of
@@ -342,7 +400,8 @@ Boost import targets not found
 ******************************
 
 This happens when your installed version of CMake is too old for your
-installed version of Boost. Please upgrade CMake to at least 3.12.
+installed version of Boost. Please upgrade CMake to the version listed in
+:ref:` Other Dependencies <other_dependencies>` section.
 If the problem persists, the Boost imports can be manually entered into
 your cmake configuration.
 
@@ -364,7 +423,7 @@ The filenames for the compiled libraries will be updated
 the next time you press ``c`` or ``Configure``.
 
 Windows: import error referring to the "_core_types" library
-******************************************************************
+************************************************************
 
 If you are using Tracktable under Windows, you might also need to install
 the C++ runtime library. This is a necessary component for any program
@@ -374,7 +433,7 @@ URL:
 https://aka.ms/vs/16/release/vc_redist.x64.exe
 
 The most common indication that you're missing this library is an import
-error, ``NameError: name '_core_types' is not defined``, when you try to import Tracktable
+error, ``Error importing Tracktable's core types library.``, when you try to import Tracktable
 in a Python interpreter.
 
 
@@ -389,7 +448,7 @@ Step 3: Build and Test
 Once the build process has finished go to your build directory and run
 ``ctest`` (part of CMake) to run all the tests. They should all succeed.
 
-.. note:: Some of the later Python tests such as P_Mapmaker may take a minute or two.
+.. note:: Some of the later Python tests such as ``P_Mapmaker`` may take a minute or two.
 
 .. tip::  Windows users who chose Visual Studio project files during configuration
    can run the "test" project to run all the tests. This is a thin wrapper that

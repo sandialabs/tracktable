@@ -7,7 +7,9 @@ Data Generation
 When real or quality trajectory data is not available, it is possible
 to generate data sets given some constraints. Current methods for
 auto generation of trajectories are based on using airports or bounding
-boxes as the start and end points of the trajectory.
+boxes as the start and end points of the trajectory. Current methods for
+generating heatmap points are based on placing points around a given set of
+largest cities.
 
 ------------------------------------
 Generate Airport-based Trajectories
@@ -143,3 +145,34 @@ generate a list of 5 new trajectories.
                                                     desired_speed=400,
                                                     seconds_between_points=60,
                                                     minimum_num_points=10)
+
+----------------------------------
+Generate City-based Heatmap Points
+----------------------------------
+
+Tracktable includes data on many large cities around the world. This data includes
+toponymic information and offical standard names. This
+data is available via the ``tracktable.info.cities`` package. The data generation
+package provides methods for generating heatmap points around a given number of large cities.
+
+Important constraints for generating heatmap points include location
+and the minimum number of points that that will be generated around in a given radius around the given
+cities.
+
+Generate Heatmap Points Around Cities
+-------------------------------------
+
+This example shows how to generate heatmap points around 10 of the largest cities.
+
+.. note:: The generated heatmap can be saved to a file by setting the ``write_file`` flag.
+
+.. code-block:: python
+   :linenos:
+
+   from tracktable.examples.data.generators import generate_heatmap_points
+
+   heatmap = generate_heatmap_points.generate_heatmap_points(
+                                             num_cities=10,
+                                             num_points_per_city=30,
+                                             write_file=False,
+                                             outfilename='SampleHeatmapPoints.csv')

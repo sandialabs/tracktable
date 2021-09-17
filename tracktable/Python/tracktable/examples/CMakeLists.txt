@@ -48,7 +48,7 @@ find_package_handle_standard_args(PY_cartopy_module DEFAULT_MSG PY_CARTOPY_MODUL
 if (PY_CARTOPY_MODULE)
   add_python_test(
     P_TerrestrialHeatmapExample
-    ${EXAMPLE_MODULE}.heatmap_from_points
+    ${EXAMPLE_MODULE}.python_scripts.heatmap_from_points
     --domain terrestrial
     --longitude-column 2
     --latitude-column 3
@@ -60,7 +60,7 @@ if (PY_CARTOPY_MODULE)
 
   add_python_test(
     P_CartesianHeatmapExample
-    ${EXAMPLE_MODULE}.heatmap_from_points
+    ${EXAMPLE_MODULE}.python_scripts.heatmap_from_points
       --domain cartesian2d
       --object-id-column 0
       --timestamp-column 1
@@ -72,7 +72,7 @@ if (PY_CARTOPY_MODULE)
 
   add_python_test(
     P_TerrestrialTrajectoryMapExample
-    ${EXAMPLE_MODULE}.trajectory_map_from_points
+    ${EXAMPLE_MODULE}.python_scripts.trajectory_map_from_points
     --domain terrestrial
     --object-id-column 0
     --timestamp-column 1
@@ -85,7 +85,7 @@ if (PY_CARTOPY_MODULE)
 
   add_python_test(
     P_CartesianTrajectoryMapExample
-    ${EXAMPLE_MODULE}.trajectory_map_from_points
+    ${EXAMPLE_MODULE}.python_scripts.trajectory_map_from_points
     --domain cartesian2d
     --object-id-column 0
     --timestamp-column 1
@@ -99,7 +99,7 @@ if (PY_CARTOPY_MODULE)
 
   add_python_test(
     P_CartesianTrajectoryMapAutoBbox
-    ${EXAMPLE_MODULE}.trajectory_map_from_points
+    ${EXAMPLE_MODULE}.python_scripts.trajectory_map_from_points
     --domain cartesian2d
     --object-id-column 0
     --timestamp-column 1
@@ -117,7 +117,7 @@ endif(PY_CARTOPY_MODULE)
 if (TEST_MOVIES)
   #add_python_test(
   #  P_Cartesian2DTrajectoryMovieExample
-  #  ${EXAMPLE_MODULE}.movie_from_points
+  #  ${EXAMPLE_MODULE}.python_scripts.movie_from_points
   #  --domain cartesian2d
   #  --object-id-column 0
   #  --timestamp-column 1
@@ -133,7 +133,7 @@ if (TEST_MOVIES)
 
   #add_python_test(
   # P_ParallelProcessingMovieExample
-  #  ${EXAMPLE_MODULE}.parallel_movie_from_points
+  #  ${EXAMPLE_MODULE}.python_scripts.parallel_movie_from_points
   #  --processors 8
   #  --domain cartesian2d
   #  --object-id-column 0
@@ -150,7 +150,7 @@ if (TEST_MOVIES)
 
   #add_python_test(
   #  P_TerrestrialTrajectoryMovieExample_Points
-  #  ${EXAMPLE_MODULE}.movie_from_points
+  #  ${EXAMPLE_MODULE}.python_scripts.movie_from_points
   #  --domain terrestrial
   #  --object-id-column 0
   #  --timestamp-column 1
@@ -164,11 +164,10 @@ if (TEST_MOVIES)
   #  ${EXAMPLES}/data/SampleTrajectories.csv
   #  ${Tracktable_BINARY_DIR}/TestOutput/test_terrestrial_trajectory_movie_points.m4v
   #  )
-endif (TEST_MOVIES)
 
    #add_python_test(
    #  P_TerrestrialTrajectoryMovieExample_Trajectories
-   #  ${EXAMPLE_MODULE}.movie_from_trajectories
+   #  ${EXAMPLE_MODULE}.python_scripts.movie_from_trajectories
    #  --domain terrestrial
    #  --map region:conus
    #  --trajectory-linewidth taper
@@ -179,3 +178,4 @@ endif (TEST_MOVIES)
    #  ${Tracktable_BINARY_DIR}/TestOutput/test_terrestrial_trajectory_movie_trajectories.m4v
    #  )
 
+   endif (TEST_MOVIES)

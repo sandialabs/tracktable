@@ -120,7 +120,7 @@ values for the distance and time separation thresholds. Here are the details.
 
 
 Tracktable includes a filter,
-:py:class:`tracktable.analysis.assemble_trajectories.AssembleTrajectoryFromPoints`,
+:py:class:`tracktable.applications.assemble_trajectories.AssembleTrajectoryFromPoints`,
 to create a sequence of trajectories from a sequence of trajectory
 points sorted by increasing timestamp. The caller is responsible
 for ensuring that the points are sorted.
@@ -304,7 +304,7 @@ can be used to search for similar trajectories independent of translation,
 uniform scale, rotation, or reflection.
 
 
-The :py:mod:`tracktable.analysis.distance_geometry` module is responsible
+The :py:mod:`tracktable.algorithms.distance_geometry` module is responsible
 for computing the multilevel distance geometry signature of a given
 trajectory. As with extracting points and subsets, we provide functions
 to compute this signature with points sampled by length or time. If your
@@ -339,8 +339,8 @@ Distance Geometry Example
     :caption: Distance Geometry by Distance and Time
     :linenos:
 
-    from tracktable.analysis.distance_geometry import distance_geometry_by_distance
-    from tracktable.analysis.distance_geometry import distance_geometry_by_time
+    from tracktable.algorithms.distance_geometry import distance_geometry_by_distance
+    from tracktable.algorithms.distance_geometry import distance_geometry_by_time
     from tracktable.domain.terrestrial import TrajectoryPointReader
 
     with open('point_data.csv', 'rb') as infile:
@@ -419,13 +419,13 @@ other words, just treat it like an ordinary list or array.
 
 
 
-* The :py:mod:`tracktable.analysis.distance_geometry` submodule will
+* The :py:mod:`tracktable.algorithms.distance_geometry` submodule will
   compute the multilevel distance geometry for a trajectory based on either ``length``
   or ``time``.
-* The :py:mod:`tracktable.analysis.dbscan` submodule will perform box density-based spatial
+* The :py:mod:`tracktable.algorithms.dbscan` submodule will perform box density-based spatial
   clustering of applications with noise analysis to determine the clustering of the
   feature vector points.
-* The :py:mod:`tracktable.analysis.rtree` submodule will generate an R-tree that
+* The :py:mod:`tracktable.domain.rtree` submodule will generate an R-tree that
   can efficiently compute the nearest neighbors of a given point or set of points.
 
 
@@ -476,7 +476,7 @@ A vector of distances is conceptually equivalent to the L-infinity norm.
    Modify this example to use max altitude / max speed as our features. Run
    on an example data set that has a mix of different classes of aircraft.
 
-Our implementation of DBSCAN is in the :py:mod:`tracktable.analysis.dbscan`
+Our implementation of DBSCAN is in the :py:mod:`tracktable.algorithms.dbscan`
 module. Here is an example of how to invoke it.
 
 
@@ -484,7 +484,7 @@ module. Here is an example of how to invoke it.
    :caption: DBSCAN Clustering
    :linenos:
 
-   from tracktable.analysis.dbscan import compute_cluster_labels
+   from tracktable.algorithms.dbscan import compute_cluster_labels
    import tracktable.core.geomath
 
    # Assume that 'all_trajectories' is a list of trajectories from some
@@ -548,7 +548,7 @@ travel distance as our two features.
    :caption: R-Tree Search
    :linenos:
 
-   from tracktable.analysis.rtree import RTree
+   from tracktable.domain.rtree import RTree
    from tracktable.domain.feature_vectors import convert_to_feature_vector
    import tracktable.core.geomath
 

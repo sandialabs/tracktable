@@ -40,22 +40,94 @@ in kilometers.
 
 # \defgroup Tracktable_Python Python components of Tracktable
 
-__version__ = "1.5.0"
+__version__ = "1.6.0"
 __title__ = "Tracktable"
 __description__ = "Trajectory Analysis and Visualization"
 __url__ = "https://tracktable.sandia.gov"
 __uri__ = __url__
 __doc__ = __description__ + " <" + __uri__ + ">"
-__author__ = "Andy Wilson, Danny Rintoul, Chris Valicka, Ben Newton, Paul Schrum, Phil Baxley, Kat Ward, Rick Vinyard, Michael Scoggin, Michael Fadem"
+__author__ = "Andy Wilson, Danny Rintoul, Chris Valicka, Ben Newton, Paul Schrum, Phil Baxley, Kat Ward, Rick Vinyard, Michael Scoggin, Michael Fadem, Geoff Danielson"
 __maintainer__ = "Andy Wilson"
 __license__ = "BSD"
 __copyright__ = "Copyright (c) 2014-2021 National Technology and Engineering Solutions of Sandia, LLC."
 
 
-from .core import register_core_types
+# We need to verify that Tracktable can import the compiled objects from
+# the ``lib`` module when it is first imported to verify that the
+# installation is functional.
+FAILURE_COUNT = 0
 
-# We always start out with the log level set to INFO.
-# You can set it lower in your own code if you want.
-import logging
-import tracktable.core.log
-tracktable.core.log.set_log_level(logging.INFO)
+try:
+  from tracktable.lib import _c_python
+except Exception as e:
+  FAILURE_COUNT += 1
+  print("Error importing C Python extension example. Original exception error text: {}".format(e))
+
+try:
+  from tracktable.lib import _tracktable_hello
+except Exception as e:
+  FAILURE_COUNT += 1
+  print("Error importing Boost.Python example. Original exception error text: {}".format(e))
+
+try:
+  from tracktable.lib import _boost_libs
+except Exception as e:
+  FAILURE_COUNT += 1
+  print("Error importing core Boost libraries. Original exception error text: {}".format(e))
+
+try:
+  from tracktable.lib import _core_types
+except Exception as e:
+  FAILURE_COUNT += 1
+  print("Error importing Tracktable's core types library. Original exception error text: {}".format(e))
+
+
+# We got failures so we need to give the user some useful information
+if FAILURE_COUNT > 0:
+  import os
+  import sys
+  import pprint
+  import platform
+
+  if FAILURE_COUNT == 1:
+    print("\nThere was {} failure when attempting to import Tracktable!\n".format(FAILURE_COUNT))
+  else:
+    print("\nThere were {} failures when attempting to import Tracktable!\n".format(FAILURE_COUNT))
+
+  print("Typically these failures are caused when the Python interpreter can't find shared libraries required by Tracktable",
+      "such as Boost or Tracktable's compiled libraries. \nVerify that the system and/or Python path contains references to",
+      "Boost and Tracktable's compiled libraries.")
+
+  if platform.system() == "Windows":
+    print("\nAlong with verifying the system and/or Python path, ensure that Microsoft's C++ runtime library is installed.")
+  if platform.system() == "Darwin":
+    print("\nIf not using one of Tracktable's included Anaconda environment files, ensure that the version of the ICU library matches the",
+          "version specified in the the Tracktable documentation.")
+
+  print("\nAdditional troubleshooting steps can be found in the Tracktable documentation: https://tracktable.readthedocs.io/en/latest/common_errors.html#shared-library-errors")
+
+  print("\nDiagnostic Path Information:")
+  print("----------------------------")
+  print("Python path:")
+  pprint.pprint(sys.path)
+  print("\nSystem path:")
+  pprint.pprint(os.environ["PATH"].split(os.pathsep))
+
+  # No real reason to include the traceback since this exception
+  # is raised at the top of tracktable
+  if sys.version_info[1] < 7:
+    sys.tracebacklimit = None
+  else:
+    sys.tracebacklimit = 0
+
+  # In order to prevent the user from being able to just `import tracktable` a
+  # second time without the above errors we need to throw an exception
+  print("\n")
+  raise ImportError("Error importing Tracktable, see debug messages above.")
+
+else:
+  # We always start out with the log level set to INFO.
+  # You can set it lower in your own code if you want.
+  import logging
+  import tracktable.core.log
+  tracktable.core.log.set_log_level(logging.INFO)

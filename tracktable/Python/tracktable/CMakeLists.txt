@@ -35,7 +35,8 @@ if (UNIX AND APPLE)
 endif (UNIX AND APPLE)
 
 if (BUILD_TESTING)
-  add_subdirectory(analysis/tests)
+  add_subdirectory(algorithms/tests)
+  add_subdirectory(applications/tests)
   add_subdirectory(core/tests)
   add_subdirectory(domain/tests)
   add_subdirectory(examples)
@@ -50,10 +51,23 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}
 )
 
+file(GLOB algorithms_files "algorithms/*.py")
+install(
+  FILES ${algorithms_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/algorithms
+)
+
+# TODO (mjfadem) Remove this in release 1.8
 file(GLOB analysis_files "analysis/*.py")
 install(
   FILES ${analysis_files}
   DESTINATION ${PYTHON_INSTALL_PREFIX}/analysis
+)
+
+file(GLOB applications_files "applications/*.py")
+install(
+  FILES ${applications_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/applications
 )
 
 file(GLOB core_files "core/*.py")
@@ -80,11 +94,35 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/examples
 )
 
-file(GLOB example_notebooks "examples/notebook_examples/*.ipynb")
+file(GLOB example_python_scripts "examples/python_scripts/*.py")
 install(
-  FILES ${example_notebooks}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/notebook_examples
+  FILES ${example_python_scripts}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/python_scripts
+)
+
+file(GLOB tutorial_notebooks "examples/tutorials/*.ipynb")
+install(
+  FILES ${tutorial_notebooks}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/tutorials
   )
+
+file(GLOB tutorial_helpers "examples/tutorials/*.py")
+  install(
+    FILES ${tutorial_helpers}
+    DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/tutorials
+    )
+
+file(GLOB analytic_demo_notebooks "examples/analytic_demos/*.ipynb")
+  install(
+    FILES ${analytic_demo_notebooks}
+    DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos
+    )
+
+file(GLOB analytic_demo_images "examples/analytic_demos/demo_images/*.*")
+  install(
+    FILES ${analytic_demo_images}
+    DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos/demo_images
+    )
 
 file(GLOB example_data_files "examples/data/*.*")
 install(
@@ -134,10 +172,22 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/render
 )
 
-file (GLOB source_files "source/*.py")
+file(GLOB render_backend_files "render/backends/*.py")
 install(
-  FILES ${source_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/source
+  FILES ${render_backend_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/render/backends
+)
+
+file(GLOB render_map_decoration_files "render/map_decoration/*.py")
+install(
+  FILES ${render_map_decoration_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/render/map_decoration
+)
+
+file(GLOB render_map_processing_files "render/map_processing/*.py")
+install(
+  FILES ${render_map_processing_file}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/render/map_processing
 )
 
 file (GLOB script_helper_files "script_helpers/*.py")
@@ -150,16 +200,4 @@ file (GLOB script_helper_argument_groups_files "script_helpers/argument_groups/*
 install(
   FILES ${script_helper_argument_groups_files}
   DESTINATION ${PYTHON_INSTALL_PREFIX}/script_helpers/argument_groups
-)
-
-file(GLOB analysis_files "analysis/*.py")
-install(
-  FILES ${analysis_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/analysis
-)
-
-file(GLOB source_files "source/*.py")
-install(
-  FILES ${source_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/source
 )

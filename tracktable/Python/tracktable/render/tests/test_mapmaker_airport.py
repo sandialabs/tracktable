@@ -36,7 +36,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 from matplotlib import pyplot
-from tracktable.render.mapmaker import mapmaker
+from tracktable.render import render_map
 from tracktable.core import test_utilities
 
 def test_map_for_airport(ground_truth_dir,
@@ -44,7 +44,7 @@ def test_map_for_airport(ground_truth_dir,
                          image_filename='MapForAirport.png'):
 
     pyplot.figure(figsize=(8, 6))
-    (mymap, artists) = mapmaker(map_name='airport:ORD',
+    (mymap, artists) = render_map.render_map(map_name='airport:ORD',
                                 domain='terrestrial',
                                 region_size=(400, 400),
                                 land_color='#505050',

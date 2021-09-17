@@ -68,10 +68,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # Begin RELEASE VARIABLES
 #-------------------------------------------------------------------------
 
-set(TRACKTABLE_VERSION 1.5.0)
+set(TRACKTABLE_VERSION 1.6.0)
 set(RPM_RELEASE 6)
 
-project(Tracktable LANGUAGES CXX VERSION ${TRACKTABLE_VERSION})
+project(Tracktable LANGUAGES C CXX VERSION ${TRACKTABLE_VERSION})
 
 include(GNUInstallDirs)
 
@@ -103,9 +103,9 @@ include(GNUInstallDirs)
 # +1 :  ? :  0 == new interface that breaks old one
 #  ? :  ? :  0 == no new interfaces, but breaks apps
 #  ? : +1 :  ? == just some internal changes, nothing breaks but might work better
-set(UNIX_SO_VERSION_CURRENT  5)
+set(UNIX_SO_VERSION_CURRENT  6)
 set(UNIX_SO_VERSION_REVISION 0)
-set(UNIX_SO_VERSION_AGE      1)
+set(UNIX_SO_VERSION_AGE      0)
 
 #-------------------------------------------------------------------------
 # End RELEASE VARIABLES
@@ -518,3 +518,13 @@ endif ()
 # End RPM
 #=========================================================================
 
+#-------------------------------------------------------------------------
+# Begin C++ Code Coverage
+#=========================================================================
+
+include(CodeCoverage)
+SETUP_CODE_COVERAGE()
+
+#-------------------------------------------------------------------------
+# End C++ Code Coverage
+#=========================================================================

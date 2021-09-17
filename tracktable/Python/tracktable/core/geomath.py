@@ -1078,6 +1078,22 @@ def kms_to_lat(kms, latitude):
 
 # ----------------------------------------------------------------------
 
+def km_to_radians(distance):
+    """Convert distance from km to radians given that we are working on the
+    surface of the earth
+
+    Arguments:
+        distance: distance in km
+
+    Returns:
+        distance in radians
+    """
+
+    # divide the distance by the radius of the sphere (in this case the earth)
+    return float(distance / 6371)
+
+# ----------------------------------------------------------------------
+
 def current_length_fraction(point):
 
     """Return the fraction length of a point in a trajectory

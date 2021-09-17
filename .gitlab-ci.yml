@@ -4,24 +4,19 @@ stages:
   - build
   - test
 
-compile-win:
-  stage: build
-  tags: 
-    - windows
-  script:
-    - xcopy * C:\Git\tracktable /E /H /Y
-    - cd C:\TrackTable
-    - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" ALL_BUILD.vcxproj /t:Rebuild /p:Configuration=Release /m:8'
-    - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process --output-on-failure -C Release'
-  retry: 1
+variables:
+  # This is a regular expression that identifies tests that CTest
+  # should skip.  We use this for problematic tests that fail for
+  # reasons unrelated to problems with the code -- that is, tests
+  # that themselves are buggy.
+    EXCLUDED_TESTS: "C_MemoryUse|C_GREAT_CIRCLE_FIT|P_Render_Trajectories"
+  # This is a switch for determining whether or not to run the
+  # code coverage pipeline.  Combined with a schedule on "develop", this
+  # should allow us to do code coverage once a week at an innocuous time
+    DO_COVERAGE: "false"
 
-compile-macos:
-  stage: build
-  tags: 
-    - macos
-  script:
-    - cmake .
-    - make -j8
-    - cmake .
-    - ctest . --output-on-failure
-  retry: 1
+include:
+  - '.gitlab-ci-windows.yml'
+  - '.gitlab-ci-macos.yml'
+  - '.gitlab-ci-ubuntu2004.yml'
+  - '.gitlab-ci-coverage.yml'

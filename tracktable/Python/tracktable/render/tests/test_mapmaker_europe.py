@@ -37,7 +37,7 @@ import matplotlib
 matplotlib.use('Agg')
 
 from matplotlib import pyplot
-from tracktable.render.mapmaker import mapmaker
+from tracktable.render import render_map
 from tracktable.core import test_utilities
 
 def test_europe_map(ground_truth_dir,
@@ -45,7 +45,7 @@ def test_europe_map(ground_truth_dir,
                     image_filename='EuropeMap.png'):
 
     pyplot.figure(figsize=(8, 6))
-    (mymap, artists) = mapmaker(
+    (mymap, artists) = render_map.render_map(
         domain='terrestrial',
         map_name='region:europe',
         lonlat_linewidth=0.25,
@@ -58,7 +58,8 @@ def test_europe_map(ground_truth_dir,
         draw_lonlat=True,
         fill_land=True,
         fill_water=True,
-        coastline_linewidth=2,
+        scale_length_in_km=100,
+        coastline_linewidth=1,
         coastline_color='#B0B0B0',
         land_fill_color='#404040',
         water_fill_color='#000030'
