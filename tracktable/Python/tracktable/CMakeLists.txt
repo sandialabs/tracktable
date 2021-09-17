@@ -186,7 +186,7 @@ install(
 
 file(GLOB render_map_processing_files "render/map_processing/*.py")
 install(
-  FILES ${render_map_processing_file}
+  FILES ${render_map_processing_files}
   DESTINATION ${PYTHON_INSTALL_PREFIX}/render/map_processing
 )
 
