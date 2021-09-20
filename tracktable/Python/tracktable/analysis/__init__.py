@@ -47,7 +47,7 @@ import tracktable.algorithms.distance_geometry
 import tracktable.applications
 import tracktable.applications.assemble_trajectories
 
-import tracktable.data_structures
+import tracktable.domain
 import tracktable.domain.rtree
 
 # This just stops the source line from printing with the warning
