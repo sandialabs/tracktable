@@ -4,6 +4,104 @@
 Changelog
 =========
 
+
+VERSION 1.6.0, 16 September 2021
+================================
+
+.. note:: This release includes a hotfix for a download error in Cartopy.  As soon
+    as the Cartopy team is able to fix this in a new release we will update
+    our version requirements and remove the hotfix.  For more information
+    about the underlying problem, see https://github.com/nvkelso/natural-earth-vector/issues/581.
+
+This release includes major API changes:
+
+- Render module (``tracktable.render``) has been refactored to abstract away
+  details of the back end
+- Analysis module (``tracktable.analysis``) has been split into Applications
+  (``tracktable.applications``) and Algorithms (``tracktable.algorithms``).
+  Bindings from the Analysis module are still in place with deprecation
+  warnings and will be removed in release 1.8.
+
+The Applications module contains functions for prediction, anomaly
+detection, clustering, and "boxiness" (how close a trajectory is to a
+perfect square).  We will be refining and updating these modules
+in the next few releases.
+
+We've added better debugging support for our import process.  The common
+error about being unable to import ``_core_types`` has been augmented by
+tests to find out exactly where in the import chain things are going wrong.
+
+
+This release also includes revamped Python tutorials and demos which should be easier to follow
+and try out for yourself! Find them in the code at ``...tracktable/Python/tracktable/examples``
+and on ReadTheDocs at https://tracktable.readthedocs.io/en/latest/examples/examples.html.
+
+GENERAL UPDATES SINCE 1.5.0
+---------------------------
+- The refactor of ``tracktable.render`` should allow for better ease of use going forward as well as providing abstraction the parts of the module that shouldn't be used directly.
+- ``tracktable.analysis`` has been deprecated in favor of ``tracktable.algorithms``, ``tracktable.applications`` and ``tracktable.domain``. All functions under ``tracktable.analysis`` are still usable.  The bindings in ``tracktable.analysis`` will be removed in release 1.8 and will print deprecation warnings in 1.6 and 1.7.
+- Fully removed ``tracktable.io`` and ``tracktable.source``.
+- ``core_types`` error messages have been updated and we've included additional debugging capabilities.
+
+NEW CAPABILITIES SINCE 1.5.0
+----------------------------
+- We've added in the ability to render heatmaps directly from the ``tracktable.render`` module! This process is identical to that of ``render_trajectories``.
+- Two new modules have been added.
+
+  - ``tracktable.applications`` contains pre-built analysis applications such as anomaly detection, trajectory prediction, clustering, trajectory assembly from points, and trajectory partitioning.  We invite you to use these in your own applications and look at the source code if you want to modify or improve them.
+  - ``tracktable.algorithms`` contains the algorithmic building blocks used in the Applications module, chiefly boxiness, DBSCAN and distance geometry.
+- A scale can now be added to static maps.
+- Trajectories can be simplified directly when calling ``render_trajectories``.
+- It's now possible to add points one at a time to an R-tree.
+
+  - We've also reduced the R-tree's memory usage.
+
+BUGS FIXED SINCE 1.5.0
+----------------------
+- The reader for .traj files was skipping trajectories with fewer points
+  than the previous one.
+
+- Minor C++ type issues.
+
+- Time zones on Python datetime objects were being ignored when assigning
+  to a trajectory timestamp.
+
+SPECIFIC ISSUES
+---------------
+- #68 - Better debug support for import errors
+- #293 - Python cartesian plots need to be revisted to address GeoAxes issues
+- #307 - Finalize deprecation of tracktable.io and tracktable.source
+- #336 - draw_scale
+- #368 - Reduce Python R-tree memory usage
+- #369 - Allow for user-specified point indices for RTree points
+- #374 - Very Small Type Problem in C++ Code
+- #375 - Simplify Trajectories During Render_Trajectories
+- #377 - Cleanup render_trajectories.py
+- #379 - Interactive heat map rendering
+- #381 - Move python and data files for new example notebooks from bread crumbs to tracktable
+- #382 - Move tutorial_1 from bread crumbs to tracktable
+- #383 - Move tutorial_2 from bread crumbs to tracktable
+- #384 - Move tutorial_3 from bread crumbs to tracktable
+- #385 - Move tutorial_04 from bread_crumbs to tracktable
+- #386 - Move tutorial_5A from bread_crumbs to tracktable
+- #387 - Move tutorial_5B from bread_crumbs to tracktable
+- #388 - Move tutorial_5C from bread_crumbs to tracktable
+- #389 - Move tutorial_6 from bread_crumbs to tracktable
+- #390 - Move prediction demo from bread_crumbs to tracktable
+- #391 - Move anomaly detection demo from bread_crumbs to tracktable
+- #392 - Move boxiness demo from bread_crumbs to tracktable
+- #393 - Move rendezvous from bread_crumbs to tracktable
+- #394 - Move shape clustering from bread_crumbs to tracktable
+- #395 - Cleanup Python WIP Examples
+- #398 - Investigate Cap Stew Notebook Examples For Useful Code
+- #399 - Refactor Structure Of Render Module
+- #405 - Update Docs And Website With New Information About Core_Types Error
+- #410 - Timestamp should be converted to UTC when assigned to a point
+- #412 - Refactor tracktable.analysis
+- #421 - Cartopy feature downloads are broken
+
+---------------------------------------------------------------------------------------------
+
 VERSION 1.5.0, 3 April 2021
 ==============================
 
