@@ -172,11 +172,17 @@ def main():
         files_from_components(example_data_directory, '*.traj')
         )
 
-    notebook_example_directory = os.path.join(tracktable_home,
-                                              'examples',
-                                              'notebook_examples')
-    notebook_example_files = files_from_components(notebook_example_directory,
-                                                   ' *.ipynb')
+    tutorial_notebook_directory = os.path.join(tracktable_home, 'examples', 'tutorials')
+    tutorial_notebook_files = files_from_components(tutorial_notebook_directory, '*.ipynb')
+
+    analytic_demo_notebook_directory = os.path.join(tracktable_home, 'examples', 'analytic_demos')
+    analytic_demo_notebook_files = files_from_components(analytic_demo_notebook_directory, '*.ipynb')
+
+    analytic_demo_images_directory = os.path.join(tracktable_home, 'examples', 'analytic_demos', 'demo_images')
+    analytic_demo_images_files = files_from_components(analytic_demo_images_directory, '*.png')
+
+    response_files_directory = os.path.join(tracktable_home, 'examples', 'response_files')
+    response_files_files = files_from_components(response_files_directory, '*.txt')
 
     license_files = [os.path.join(tracktable_home, 'LICENSE.txt')]
 
@@ -239,7 +245,10 @@ def main():
                  license_files +
                  aux_data_files +
                  example_data_files +
-                 notebook_example_files)
+                 tutorial_notebook_files +
+                 analytic_demo_notebook_files +
+                 analytic_demo_images_files +
+                 response_files_files)
                 },
         # Assembly information and system parameters
         distclass=BinaryDistribution,
