@@ -40,13 +40,13 @@ in kilometers.
 
 # \defgroup Tracktable_Python Python components of Tracktable
 
-__version__ = "1.5.0"
+__version__ = "1.6.0"
 __title__ = "Tracktable"
 __description__ = "Trajectory Analysis and Visualization"
 __url__ = "https://tracktable.sandia.gov"
 __uri__ = __url__
 __doc__ = __description__ + " <" + __uri__ + ">"
-__author__ = "Andy Wilson, Danny Rintoul, Chris Valicka, Ben Newton, Paul Schrum, Phil Baxley, Kat Ward, Rick Vinyard, Michael Scoggin, Michael Fadem"
+__author__ = "Andy Wilson, Danny Rintoul, Chris Valicka, Ben Newton, Paul Schrum, Phil Baxley, Kat Ward, Rick Vinyard, Michael Scoggin, Michael Fadem, Geoff Danielson"
 __maintainer__ = "Andy Wilson"
 __license__ = "BSD"
 __copyright__ = "Copyright (c) 2014-2021 National Technology and Engineering Solutions of Sandia, LLC."

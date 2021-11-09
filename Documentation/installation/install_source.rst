@@ -211,6 +211,31 @@ installed then the Anaconda virtual environment commands
 below will create and configure a virtual environment that is ready to use
 to build Tracktable from source. Enter the following commands in a command/terminal/Anaconda prompt.
 
+    .. important:: Be sure to substitute the location where you saved tracktable_dev_environment.yml in the command above.
+
+#. Verify that the ``tracktable-dev`` virtual environment was created
+
+    .. code-block:: console
+
+      conda env list
+
+#. Activate the virtual environment
+
+    .. code-block:: console
+
+      conda activate tracktable-dev
+
+#. Deactivate the virtual environment (optional)
+
+    .. code-block:: console
+
+      conda deactivate
+
+#. Delete the virtual environment when it is no longer needed
+
+  .. code-block:: console
+
+      conda remove --name tracktable-dev --all
 
 #. Create the Anaconda virtual environment
 
