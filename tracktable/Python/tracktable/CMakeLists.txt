@@ -112,12 +112,6 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/tutorials
 )
 
-file(GLOB analytic_demo_scripts "examples/analytic_demos/*.py")
-install(
-  FILES ${analytic_demo_scripts}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos
-)
-
 file(GLOB analytic_demo_notebooks "examples/analytic_demos/*.ipynb")
 install(
   FILES ${analytic_demo_notebooks}

@@ -55,7 +55,7 @@ ubuntu2004-test:
   dependencies:
     - ubuntu2004-build
   script:
-    # Cartopy 0.18, which is in the image by default, has outdated URLs 
+    # Cartopy 0.18, which is in the image by default, has outdated URLs
     # for map data.  Hopefully 0.19 will be better.
     # Nope, it isn't.  There's nothing for it but to exclude the tests that
     # are failing.
