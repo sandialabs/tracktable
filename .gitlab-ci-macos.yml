@@ -28,6 +28,9 @@ configure-macos:
     - anaconda
   dependencies:
     - setup-macos
+  needs:
+    - job: setup-macos
+      artifacts: true
   script:
     - ./ci/macos/configure_cmake_build.sh
   artifacts:
@@ -42,6 +45,9 @@ build-macos:
     - anaconda
   dependencies:
     - configure-macos
+  needs:
+    - job: configure-macos
+      artifacts: true
   script:
     - ./ci/macos/run_build.sh
   artifacts:
@@ -56,6 +62,9 @@ test-macos:
     - anaconda
   dependencies:
     - build-macos
+  needs:
+    - job: build-macos
+      artifacts: true
   script:
     - cp ./build_macos/lib/*.so ./tracktable/Python/tracktable/lib
     - ./ci/macos/run_test.sh

@@ -1,52 +1,38 @@
-# This is a multi-stage docker build. The intent of this is to minimize the
-# size of the final docker image to contain only those components absolutely
-# necessary to the compilation and testing of Tracktable.
-#
-# To that end, the first stage will perform all the builds, which will
-# generate .o files and other byproducts of the build process. The end result
-# will be a set of wheels and rpms that can be carried forward to the final
-# image, without carrying forward the unnecessary build artifacts of projects
-# that are not Tracktable. This could also be accomplished with a more diligent
-# cleaning process after each build, but the docker multi-stage approach
-# allows you to start with a clean slate in a much simpler fashion.
-
-##########################################################################
-### BUILD STAGE
-##########################################################################
 # We'll start from a basic Ubuntu 20.04 image.
 FROM cee-gitlab.sandia.gov:4567/innersource/docker/ubuntu:focal as build
 WORKDIR /root
 
-ADD scripts /root/scripts
-ADD requirements.txt /root/requirements.txt
+ARG MINICONDA_VERSION=latest
+ENV MINICONDA_URL=https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh
 
-# Our primary goal is to install as many core packages as we can.
-# We want to try and stay as close as we can to the Ubuntu releases.
+SHELL ["/bin/bash", "--login", "-c"]
 
-RUN sh /root/scripts/apt-install-build-dependencies.sh
+RUN DEBIAN_FRONTEND=noninteractive apt-get -y install curl
 
-RUN sh /root/scripts/pip-build-dependencies.sh
-
-
-##########################################################################
-### FINAL STAGE
-##########################################################################
-
-FROM cee-gitlab.sandia.gov:4567/innersource/docker/ubuntu:focal
-
-WORKDIR /root
-
-COPY --from=build /wheels /wheels
-ADD kitware-archive-latest.asc /root/kitware-archive-latest.asc
-ADD scripts /root/scripts
-ADD requirements.txt /root/requirements.txt
-
-RUN sh /root/scripts/apt-install-runtime-dependencies.sh
-RUN sh /root/scripts/pip-install-dependencies.sh
+RUN curl -L -\# ${MINICONDA_URL} -o /root/miniconda.sh
+RUN /bin/bash /root/miniconda.sh -b
+RUN rm /root/miniconda.sh
+RUN echo "source /root/miniconda3/etc/profile.d/conda.sh" >> /root/.bashrc
+RUN /root/miniconda3/condabin/conda init bash
+RUN /root/miniconda3/condabin/conda config --set proxy_servers.http http://proxy.sandia.gov:80
+RUN /root/miniconda3/condabin/conda config --set proxy_servers.https http://proxy.sandia.gov:80
+RUN /root/miniconda3/condabin/conda config --set ssl_verify /etc/ssl/certs/ca-certificates.crt
+RUN /root/miniconda3/condabin/conda config --add channels conda-forge
+RUN /root/miniconda3/condabin/conda update -qy conda
+ADD tracktable_dev_environment.yml /root/tracktable_dev_environment.yml
+RUN /root/miniconda3/condabin/conda env create -f /root/tracktable_dev_environment.yml
+RUN echo "conda activate tracktable-dev" >> /root/.bashrc
 
 # Finally, when we're done with our image let's go ahead and clean up all our
 # intermediate work that doesn't need to hang around. This will make our
 # gitlab-ci docker image a bit smaller.
 
-RUN sh /root/scripts/cleanup.sh
+ADD build-tracktable-ubuntu2004 /root/bin/build-tracktable-ubuntu2004
+RUN echo "PATH=\"/root/bin:\${PATH}\"" >> /root/.bashrc
+RUN apt-get autoclean
+RUN apt-get --purge -y autoremove
+RUN rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+SHELL ["/bin/bash", "--login", "-c"]
+CMD ["/bin/bash", "-l"]
 
