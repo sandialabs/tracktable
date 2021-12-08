@@ -23,6 +23,7 @@ dependencies:
   - compilers
   - boost>=1.74, <=1.75
   - cmake>=3.19.5
+  - ninja>=1.10.0
 
   # Movie Dependencies
   - ffmpeg>=4.2.4

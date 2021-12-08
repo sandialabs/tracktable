@@ -1,3 +1,12 @@
 #!/bin/sh
-docker build -t cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu:FocalFossa .
+source ./docker.config
 
+# We have to copy this, otherwise it is not inside
+# our docker build context
+cp ../../../../tracktable_dev_environment.yml .
+
+docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+
+if [[ "${TAG_IMAGE_LATEST}" == "true" ]]; then
+    docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${IMAGE_NAME}:latest
+fi

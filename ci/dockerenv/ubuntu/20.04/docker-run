@@ -1,2 +1,4 @@
 #!/bin/sh
-docker run -it cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu:FocalFossa
+source ./docker.config
+
+docker run -it ${IMAGE_NAME}:${IMAGE_TAG}
