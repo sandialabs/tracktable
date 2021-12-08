@@ -1,12 +1,21 @@
 ############################################################
 # Ubuntu 20.04 - Focal Fossa
 ############################################################
+variables:
+    UBUNTU_2004_DOCKER_IMAGE: cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu/20.04:2
+
+.ubuntu2004-before: &ubuntu2004-before
+    - . /root/miniconda3/etc/profile.d/conda.sh
+    - conda activate tracktable-dev
+
 ubuntu2004-setup:
-  image: cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu:FocalFossa
+  image: $UBUNTU_2004_DOCKER_IMAGE
   stage: setup
   tags:
     - ubuntu
     - docker
+  before_script:
+    - *ubuntu2004-before
   script:
     - mkdir build_ubuntu2004
   artifacts:
@@ -15,13 +24,18 @@ ubuntu2004-setup:
     expire_in: 1 hour
 
 ubuntu2004-configure:
-  image: cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu:FocalFossa
+  image: $UBUNTU_2004_DOCKER_IMAGE
   stage: configure
   tags:
     - ubuntu
     - docker
   dependencies:
     - ubuntu2004-setup
+  needs:
+    - job: ubuntu2004-setup
+      artifacts: true
+  before_script:
+    - *ubuntu2004-before
   script:
     - cd build_ubuntu2004
     - cmake -GNinja -DBUILD_DOCUMENTATION_CXX_ONLY=ON ..
@@ -31,13 +45,18 @@ ubuntu2004-configure:
     expire_in: 1 hour
 
 ubuntu2004-build:
-  image: cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu:FocalFossa
+  image: $UBUNTU_2004_DOCKER_IMAGE
   stage: build
   tags:
     - ubuntu
     - docker
   dependencies:
     - ubuntu2004-configure
+  needs:
+    - job: ubuntu2004-configure
+      artifacts: true
+  before_script:
+    - *ubuntu2004-before
   script:
     - cd build_ubuntu2004
     - ninja
@@ -47,22 +66,22 @@ ubuntu2004-build:
     expire_in: 1 hour
 
 ubuntu2004-test:
-  image: cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu:FocalFossa
+  image: $UBUNTU_2004_DOCKER_IMAGE
   stage: test
   tags:
     - ubuntu
     - docker
   dependencies:
     - ubuntu2004-build
+  needs:
+    - job: ubuntu2004-build
+      artifacts: true
+  before_script:
+    - *ubuntu2004-before
   script:
-    # Cartopy 0.18, which is in the image by default, has outdated URLs
-    # for map data.  Hopefully 0.19 will be better.
-    # Nope, it isn't.  There's nothing for it but to exclude the tests that
-    # are failing.
-    - pip3 install --upgrade cartopy
     - cp build_ubuntu2004/lib/_*.so tracktable/Python/tracktable/lib/
     - cd build_ubuntu2004
-    - ctest --output-on-failure --exclude-regex 'C_MemoryUse|C_GREAT_CIRCLE_FIT|P_Render_Trajectories|P_TerrestrialHeatmapExample|P_TerrestrialTrajectoryMapExample|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe'
+    - ctest --output-on-failure --exclude-regex 'C_GREAT_CIRCLE_FIT|C_MemoryUse|C_PointGenerator|P_TerrestrialHeatmapExample|P_TerrestrialTrajectoryMapExample|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe|P_Render_Trajectories'
   artifacts:
     paths:
       - build_ubuntu2004
