@@ -94,6 +94,12 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/examples
 )
 
+file(GLOB response_files "examples/response_files/*.txt")
+install(
+  FILES ${response_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/response_files
+)
+
 file(GLOB example_python_scripts "examples/python_scripts/*.py")
 install(
   FILES ${example_python_scripts}
@@ -122,6 +128,12 @@ file(GLOB analytic_demo_images "examples/analytic_demos/demo_images/*.*")
 install(
   FILES ${analytic_demo_images}
   DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos/demo_images
+)
+
+file(GLOB analytic_demo_helpers "examples/analytic_demos/*.py")
+install(
+  FILES ${analytic_demo_helpers}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos
 )
 
 file(GLOB example_data_files "examples/data/*.*")
