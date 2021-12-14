@@ -3,6 +3,9 @@ name: tracktable-dev
 channels:
   - conda-forge
 dependencies:
+  # Dev Dependencies
+  - git
+
   # Python Dependencies
   - python>=3.6, <=3.9
   - pip
