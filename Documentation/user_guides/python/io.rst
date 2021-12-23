@@ -32,7 +32,28 @@ Loading Points from Delimited Text
 
 Tracktable has a flexible point reader for delimited text files. Each
 point domain provides two versions of it, one for loading base points
-(coordinates only) and one for loading trajectory points.
+(coordinates only) and one for loading trajectory points. As of Tracktable 1.7,
+there is a generalized trajectory loader that will automatically load CSV, TSV
+or TRAJ files into either a list of trajectory points or trajectories.
+
+.. code-block:: python
+   :caption: General Loader
+   :linenos:
+
+   from tracktable.rw.load import load_trajectories
+
+   file = 'TestData/Points/SampleFlightsUS.csv'
+   # file = 'TestData/Points/tab_separated/SampleFlightsUS.tsv'
+
+   # To get the trajectory points set the `return_trajectory_points` flag
+   trajectory_points = load_trajectories(file, return_trajectory_points=True)
+
+   # To get just the trajectories just pass the file
+   trajectories = load_trajectories(file)
+
+.. note::
+   For posterity the example for creating a CSV/TSV reader by hand has been
+   preserved below for reference.
 
 .. code-block:: python
    :linenos:
@@ -165,7 +186,28 @@ point domain provides a trajectory reader. The trajectory reader functionality
 is the same across all point domains. Trajectories can be loaded from standard
 CSV and TSV delimited files as well as tracktable's own TRAJ file type.
 Refer to the :ref:`Tracktable Data <tracktable-data>` page for more
-information about the TRAJ format.
+information about the TRAJ format. As of Tracktable 1.7, there is a generalized
+trajectory loader that will automatically load CSV, TSV or TRAJ files into either
+a list of trajectory points or trajectories.
+
+.. code-block:: python
+   :caption: General Loader
+   :linenos:
+
+   from tracktable.rw.load import load_trajectories
+
+   file = 'TestData/Trajectories/NYHarbor_2020_06_30_first_hour.traj'
+
+   # To get the trajectory points set the `return_trajectory_points` flag
+   trajectory_points = load_trajectories(file, return_trajectory_points=True)
+
+   # To get just the trajectories just pass the file
+   trajectories = load_trajectories(file)
+
+.. note::
+   For posterity the examples for creating TRAJ reader by hand have been
+   preserved below for reference.
+
 
 .. code-block:: python
    :caption: Trajectories From CSV
