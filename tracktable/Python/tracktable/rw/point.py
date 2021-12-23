@@ -138,7 +138,7 @@ def trajectory_point_reader(
         to retrieve the points.
     """
 
-    domain_module = select_domain_from_name(domain)
+    domain_module = domain_module_from_name(domain)
     reader = domain_module.TrajectoryPointReader()
     reader.input = infile
 
@@ -239,7 +239,7 @@ def base_point_reader(
         to retrieve the points.
     """
 
-    domain_module = select_domain_from_name(domain)
+    domain_module = domain_module_from_name(domain)
     reader = domain_module.BasePointReader()
     reader.input = infile
     _configure_reader_file_properties(

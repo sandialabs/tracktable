@@ -10,6 +10,7 @@ Submodules
 .. toctree::
    :maxdepth: 2
 
+   tracktable.rw.load.rst
    tracktable.rw.point.rst
    tracktable.rw.read_write_dictionary.rst
    tracktable.rw.read_write_json.rst
