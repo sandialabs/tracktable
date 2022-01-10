@@ -600,3 +600,112 @@ travel distance as our two features.
    # trajectories, we can also use them as indices back into the
    # list of trajectories.
 
+.. _user-guide-python-airports-ports:
+
+Retrieving Airport and Port Information
+=======================================
+
+Tracktable includes data bases of worldwide airports
+and maritime ports which can be used for rendering, data
+generation and analytics. Rendering guides can be found
+on the :ref:`Rendering <user-guide-python-rendering>` page
+while data generation guides can be found on
+the :ref:`Data Generation <Python_Data_Generation_Example>` page.
+Both airport and port modules have convient functions for Retrieving
+information from their respective databases, these are outlined below.
+
+Airports
+--------
+
+.. code-block:: python
+   :caption: Retrieve All Airports In Database
+   :linenos:
+
+    from tracktable.info import airports
+    all_airports = airports.all_airports()
+
+
+.. code-block:: python
+   :caption: Airport Information Retrieval By Name
+   :linenos:
+
+    from tracktable.info import airports
+    abq_airport = airports.airport_information("ABQ")
+
+.. code-block:: python
+   :caption: Airport Information Retrieval By Rank
+   :linenos:
+
+    from tracktable.info import airports
+    abq_airport = airports.airport_size_rank("ABQ")
+
+Ports
+-----
+
+.. code-block:: python
+   :caption: Retrieve All Ports In Database
+   :linenos:
+
+   from tracktable.info import ports
+   all_ports = ports.all_ports
+
+.. code-block:: python
+   :caption: Port Information Retrieval By Name
+   :linenos:
+
+    from tracktable.info import ports
+    alexandria_port = ports.port_information("Alexandria")
+
+.. code-block:: python
+   :caption: Port Information Retrieval By Name And Specific Country
+   :linenos:
+
+    from tracktable.info import ports
+    newport_port = ports.port_information("Newport", country='United Kingdom')
+
+.. code-block:: python
+   :caption: Port Information Retrieval By A Port's Alternate Name
+   :linenos:
+
+    from tracktable.info import ports
+    new_shoreham_port = ports.port_information("New Shoreham")
+
+.. code-block:: python
+   :caption: Retrieve All Ports For A Specific Country
+   :linenos:
+
+    from tracktable.info import ports
+    united_states_ports = ports.all_ports_by_country("United States")
+
+.. code-block:: python
+   :caption: Retrieve All Ports For A Specific Body Of Water
+   :linenos:
+
+    from tracktable.info import ports
+    pacific_ocean_ports = ports.all_ports_by_water_body("Pacific Ocean")
+
+.. code-block:: python
+   :caption: Retrieve All Ports For A Specific World Port Index Region
+   :linenos:
+
+    from tracktable.info import ports
+
+    # Any of the following will work when retrieving ports by WPI region
+    wpi_region_wales_ports = ports.all_ports_by_wpi_region("Wales -- 34710")
+
+    wpi_region_wales_ports = ports.all_ports_by_wpi_region("Wales")
+
+    wpi_region_wales_ports = ports.all_ports_by_wpi_region("34710")
+
+    wpi_region_wales_ports = ports.all_ports_by_wpi_region(34710)
+
+.. code-block:: python
+   :caption: Retrieve All Ports Within A Specified Bounding Box
+   :linenos:
+
+    from tracktable.domain.terrestrial import BoundingBox
+    from tracktable.info import ports
+
+    # Ports around Florida
+    bbox = BoundingBox((-88, 24), (-79.5, 31))
+    bounding_box_ports = ports.all_ports_within_bounding_box(bbox)

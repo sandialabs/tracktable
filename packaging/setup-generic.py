@@ -163,8 +163,12 @@ def main():
     # tracktable.info
     aux_data_directory = os.path.join(tracktable_home, 'info', 'data')
     tz_shapefiles = files_from_components(aux_data_directory, 'tz_world.*')
+    wpi_shapefiles = files_from_components(aux_data_directory, 'WPI.*')
     aux_data_files = tz_shapefiles
+    for filepath in wpi_shapefiles:
+        aux_data_files.append(filepath)
     aux_data_files.append(os.path.join(aux_data_directory, 'airports.csv'))
+    aux_data_files.append(os.path.join(aux_data_directory, 'ports.csv'))
 
     example_data_directory = os.path.join(tracktable_home, 'examples', 'data')
     example_data_files = (

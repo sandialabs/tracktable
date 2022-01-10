@@ -1,0 +1,53 @@
+------------------------------------------------------------------------
+| National Geospatial-Intelligence Agency World Port Index Disclaimers |
+------------------------------------------------------------------------
+
+Commercial Use Warning
+
+Certain hardcopy NGA nautical products, including nautical charts, are no longer available from NGA.[1] The Agency is in the process of transitioning from hardcopy products and information to digital data and information. The websites https://www.nga.mil and https://msi.nga.mil are the official US Government sources for NGA digital format nautical products, information and data. The full text of current publications will be maintained on these websites and will be available for all users to download. NGA claims no copyright or other intellectual property right in the nautical products posted on this website for public use.
+
+Conditions for Reproduction, Use or Sale of NGA Nautical Products Downloaded from the NGA Website:
+
+Use of Agency Name, Seal or Initials In accordance with 10 U.S.C. § 425[2], the use of the National Geospatial-Intelligence Agency (NGA)(or predecessor organizations, National Imagery and Mapping Agency (NIMA) or Defense Mapping Agency (DMA)) name, seal or initials to imply or suggest approval or any commercial endorsement by NGA without written permission from the Secretary of Defense and the Director of National Intelligence is prohibited. All non-Agency published products, information or data which include the NGA, NIMA or DMA name, seal or initials or otherwise express or imply any association with NGA, NIMA or DMA shall contain the following disclaimer:
+
+Disclaimer
+This reproduction, partial or complete, of any National Geospatial-Intelligence Agency (NGA), National Imagery andMapping Agency (NIMA) or Defense Mapping Agency (DMA) product, information or data is not approved, authorized or endorsed by the Secretary of Defense, the Director of National Intelligence, the Director, NGA or any other element of the US Government. The US Government and NGA accept no liability for the accuracy or quality of this reproduction or the use of any NGA, NIMA or DMA products, information or data."
+
+This disclaimer shall be displayed prominently on the cover and first page of any hardcopy publication, on any map or chart, on any media, video cassette, on the shrink wrap of any CD or DVD, on any DVD or CD-ROM, on the jewel case label and any insert in the jewel case. This disclaimer shall be displayed prominently in the start up or initial screen of any software product or program as well as in the "About" dialog window (usually accessible by the "Help" drop-down menu). In addition, any installation diskettes, CD-ROMS, or DVDs will contain the disclaimer in a separate text file located in the root directory and named "disclaimer.txt."
+
+NGA will not be liable for the accuracy or quality of any user products, reg regardless of the amount or complexity of NGA information or data used in their production.[3]
+
+[1] U.S. Notice to Mariners-Change in Distribution Methods, Fed. Reg. Vol. 69, No. 148 (Aug. 3, 2004). Summary: The National Geospatial-Intelligence Agency (NGA) is changing the way it makes U.S. Notice to Mariners available to the public. NGA will continue to publish electronic versions of the U.S. Notice to Mariners and make them available free of charge via the Internet, but will no longer mass-produce and mail copies of each Notice.
+
+[2] 10 U.S.C. § 425. Prohibition of unauthorized use of name, initials, or seal: specified intelligence agencies Prohibition. Except with the written permission of both the Secretary of Defense and the Director of Central Intelligence, no person may knowingly use, in connection with any merchandise, retail product, impersonation, solicitation, or commercial activity in a manner reasonably calculated to convey the impression that such use is approved, endorsed, or authorized by the Secretary and the Director, any of the following (or any colorable imitation thereof):
+
+(1) The words "National Imagery and Mapping Agency", the initials "NIMA", or seal of the National Imagery and Mapping Agency.
+
+(2) The words "Defense Mapping Agency", the initials "DMA", or the seal of the Defense Mapping Agency.
+
+(3) The words "National Geospatial-Intelligence Agency", the initials "NGA", or the seal of the National Geospatial-Intelligence Agency.
+
+[3] 10 U.S.C. § 456. Civil actions barred
+
+(a) Claims barred. No civil action may be brought against the United States on the basis of the content of a navigational aid prepared or disseminated by the National Geospatial-Intelligence Agency.
+
+(b) Navigational aids covered. Subsection (a) applies with respect to a navigational aid in the form of a map, a chart, or a publication and any other form or medium of product or information in which the National Geospatial-Intelligence Agency prepares or disseminates navigational aids.
+
+
+Legal Disclaimer & Security Policy
+
+LEGAL DISCLAIMER
+Under 10 U.S. Code §456, “no civil action may be brought against the United States on the basis of the content of geospatial information prepared or disseminated by the National Geospatial-Intelligence Agency (NGA).” This bar against civil action also applies to either of NGA’s predecessor organizations, the National Imagery and Mapping Agency (NIMA) or the Defense Mapping Agency. Geospatial information includes navigation information and any navigational product or aid prepared or disseminated by NGA. The geospatial information at this website was developed to meet the requirements of the United States Government. This information is provided "as is," and no warranty, express or implied, including but not limited to the implied warranties of merchantability and fitness for particular purpose or arising by statute or otherwise in law or from a course of dealing or usage in trade, is made by NGA as to the accuracy and functioning of this geospatial information. Neither NGA nor its personnel will be liable for any claims, losses, or damages arising from or connected with the use of this geospatial information. The user agrees to hold harmless the United States National Geospatial-Intelligence Agency. The user's sole and exclusive remedy is to stop using the navigation information provided at this website.
+
+NGA SECURITY POLICY
+DISCLAIMER NOTICE:
+Information from this server resides on a computer system funded by the National Geospatial-Intelligence Agency. This system and related equipment are intended for the communication, transmission, processing and storage of U.S. Government information. These systems and equipment are subject to monitoring to ensure proper functioning, to protect against improper or unauthorized use or access, and to verify their presence or performance of applicable security features or procedures, and for other like purposes. Such monitoring may result in the acquisition, recording and analysis of all data being communicated, transmitted, processed or stored in this system by a user. If monitoring reveals evidence of possible criminal activity, such evidence may be provided to law enforcement personnel. Use of this system constitutes consent to such monitoring.
+
+DISCLAIMER OF LIABILITY:
+With respect to documents available from this server, neither the United States Government nor the National Geospatial-Intelligence Agency Agency nor any of their employees, makes any warranty, express or implied, including the warranties of merchantability and fitness for a particular purpose, or assumes any legal liability or responsibility for the accuracy, completeness, or usefulness of any information, apparatus, product, or process disclosed, or represents that its use would not infringe privately owned rights.
+
+DISCLAIMER OF ENDORSEMENT:
+Reference herein to any specific commercial products, process, or service by trade name, trademark, manufacture, or otherwise, does not necessarily constitute or imply its endorsement, recommendation, or favoring by the United States Government or the National Geospatial-Intelligence Agency. The views and opinions of authors expressed herein do not necessarily state or reflect those of the United States Government or the National Geospatial-Intelligence Agency, and shall not be used for advertising or product endorsement purposes.
+
+USE OF NGA SEAL:
+Federal law prohibits the use of the National Geospatial-Intelligence Agency's name, seal, initials, or any colorable imitation thereof, to convey the impression of commercial endorsement by the Secretary of Defense, without written permission from the Secretary of Defense.
