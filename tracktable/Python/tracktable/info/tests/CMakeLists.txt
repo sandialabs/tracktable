@@ -30,5 +30,6 @@ include(PythonTest)
 
 set(INFO "tracktable.info.tests")
 
+add_python_test(P_PortInfo ${INFO}.test_ports)
 add_python_test(P_CityInfo ${INFO}.test_cities)
 

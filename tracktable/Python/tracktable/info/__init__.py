@@ -28,8 +28,8 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-tracktable.info: Various sources of information on cities and
-airports that we can use to annotate maps.
+tracktable.info: Various sources of information on cities,
+airports and ports that we can use to annotate maps.
 
 XXX TODO: Cite each source and its license here.
 """

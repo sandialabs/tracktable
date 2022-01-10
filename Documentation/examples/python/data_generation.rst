@@ -146,6 +146,14 @@ generate a list of 5 new trajectories.
                                                     seconds_between_points=60,
                                                     minimum_num_points=10)
 
+--------------------------------
+Generate Port-based Trajectories
+--------------------------------
+
+TBD
+
+.. todo:: Create this section once Tracktable is able to intelligently generate trajectories between ports
+
 ----------------------------------
 Generate City-based Heatmap Points
 ----------------------------------

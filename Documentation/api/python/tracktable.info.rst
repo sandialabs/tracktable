@@ -11,6 +11,7 @@ Submodules
 
    tracktable.info.airports.rst
    tracktable.info.cities.rst
+   tracktable.info.ports.rst
    tracktable.info.timezones.rst
 
 ---------------
