@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 National Technology and Engineering
+ * Copyright (c) 2014-2022 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -55,18 +55,18 @@ public:
       this->insert_points(new_points);
     }
 
-  std::size_t size() const 
+  std::size_t size() const
     {
       return this->Tree.size();
     }
 
   // ---------------------------------------------------------------------
-  
-  void insert_point(boost::python::object const& new_point) 
+
+  void insert_point(boost::python::object const& new_point)
   {
     int point_id = this->Tree.size();
     indexed_point_type new_indexed_point(
-      boost::python::extract<point_type>(new_point), 
+      boost::python::extract<point_type>(new_point),
       point_id
       );
 
@@ -74,10 +74,10 @@ public:
   }
 
   // ---------------------------------------------------------------------
-  
-  void insert_points(boost::python::object const& new_points) 
+
+  void insert_points(boost::python::object const& new_points)
   {
-    boost::python::stl_input_iterator<point_type> point_begin(new_points), 
+    boost::python::stl_input_iterator<point_type> point_begin(new_points),
         point_end;
     std::vector<indexed_point_type> indexed_points;
     int point_id = this->Tree.size();
@@ -89,7 +89,7 @@ public:
       // TODO: We could save memory by constructing the indexed points
       // using a transform iterator instead of accumulating a list here.
       indexed_point_type next_point(
-        //boost::python::extract<point_type>(*point_begin), 
+        //boost::python::extract<point_type>(*point_begin),
         *point_begin,
         point_id
         );
