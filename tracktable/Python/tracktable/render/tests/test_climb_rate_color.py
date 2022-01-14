@@ -50,7 +50,7 @@ def create_trajectory():
 
 
     source = path_point_source.TrajectoryPointSource(AirTrajectoryPoint)
-    source.start_time =
+    source.start_time = Timestamp.from_any('2014-01-01 04:00:00')
     source.end_time = Timestamp.from_any('2014-01-01 04:00:00')
     source.start_point = los_angeles
     source.end_point = new_york

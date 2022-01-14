@@ -1,4 +1,5 @@
 stages:
+  - code analysis
   - setup
   - configure
   - build
@@ -16,6 +17,7 @@ variables:
     DO_COVERAGE: "false"
 
 include:
+  - '.gitlab-ci-static_analysis.yml'
   - '.gitlab-ci-windows.yml'
   - '.gitlab-ci-macos.yml'
   - '.gitlab-ci-ubuntu2004.yml'

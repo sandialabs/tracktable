@@ -1,0 +1,73 @@
+########################
+# Python Code Analysis #
+########################
+variables:
+  DOCKER_IMAGE: cee-gitlab.sandia.gov:4567/innersource/docker/ubuntu-dev:18.04-amd64
+
+##
+# NOTE: All of the packages below can be highly customized
+# if we want to narrow the scope of what issues are output.
+# If we start to add a lot of command like params it is probably
+# a good idea to move as much of those as we can to a config file.
+##
+
+# Type Checkers
+mypy:
+  image: $DOCKER_IMAGE
+  stage: code analysis
+  tags:
+    - ubuntu
+    - docker
+  allow_failure: true
+  # rules:
+  #   - if: $CODE_ANALYSIS == "true"
+  script:
+    - pip3 install mypy
+    - pip3 install types-pytz
+    - pip3 install types-six
+    - mypy --pretty --config-file mypy.ini --junit-xml mypy_output.xml tracktable/Python/tracktable/
+  artifacts:
+    reports:
+      junit: mypy_output.xml
+
+# Linters
+
+# When running flake8 on the entire python codebase it runs forever (45+ mins) without output.
+# I think the way it's doing it's tree building with the multiprocessing library isn't playing
+# nice with our code.
+# TODO (mjfadem): For now pylint can give use similar information and we can circle back to this later
+
+# flake8:
+#   image: $DOCKER_IMAGE
+#   stage: code analysis
+#   tags:
+#     - ubuntu
+#     - docker
+#   allow_failure: true
+#   rules:
+#     - if: $CODE_ANALYSIS == "true"
+#   script:
+#     - pip3 install flake8
+#     - flake8 --max-complexity 10 --benchmark --output-file=flake8_output.txt tracktable/Python/tracktable/
+#   artifacts:
+#     paths:
+#       - flake8_output.txt
+
+# Python Static Code Analysis
+pylint:
+  image: $DOCKER_IMAGE
+  stage: code analysis
+  tags:
+    - ubuntu
+    - docker
+  allow_failure: true
+  # rules:
+  #   - if: $CODE_ANALYSIS == "true"
+  script:
+    - pip3 install pylint
+    - pylint --output-format=text:pylint_output.text,colorized tracktable/Python/tracktable/
+  artifacts:
+    paths:
+      - pylint_output.txt
+
+# TODO (mjfadem): C++ Static Code Analysis
