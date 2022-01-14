@@ -42,7 +42,7 @@ from tracktable.core import test_utilities
 
 from matplotlib import (pyplot, colors)
 
-def test_cartesian_histogram(output_dir, ground_truth_dir)
+def test_cartesian_histogram(output_dir, ground_truth_dir):
     point_source = NormalRandomPointSource()
     point_source.num_points = 100000
 
