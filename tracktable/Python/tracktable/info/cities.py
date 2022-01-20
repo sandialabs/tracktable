@@ -220,7 +220,7 @@ def get_city(name, country=None, location=None):
         London, UK
         Springfield, US, with one of the many valid lats or longs
         Springfield, None, with one of the many valid lats or longs
-        Qandahar (there’s only one Qandahar in the world)
+        Qandahar (there's only one Qandahar in the world)
 
     Arguments:
         name (str): City name to search for

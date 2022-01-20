@@ -12,6 +12,8 @@ from the Pip package, Anaconda package and source code distribution in the
 directory ``tracktable/Python/tracktable/examples``, as standalone Python scripts
 and Jupyter_ notebooks.
 
+.. _cpp_examples:
+
 C++ Examples
 ------------
 
@@ -28,6 +30,8 @@ C++ Examples
    /examples/c++/Reduce.rst
    /examples/c++/Sample_Project.rst
    /examples/c++/Serialize.rst
+
+.. _python_examples:
 
 Python Examples
 ---------------
@@ -46,6 +50,8 @@ Jupyter Notebook Examples
 .. note:: We include several Jupyter_ notebooks that demonstrate and illustrate Tracktable's capabilities.
          Each Jupyter notebook page listed below is an actual Jupyter notebook, including output, embedded directly in the documention.
 
+.. _notebook_tutorials:
+
 Tutorials
 *********
 
@@ -63,6 +69,7 @@ Tutorials
       tut5B [label="Tutorial 5B: Static Trajectory Visualization"];
       tut5C [label="Tutorial 5C: Heatmap Trajectory Visualization"];
       tut5D [label="Tutorial 5D: Trajectory Visualization For Print"];
+      tut5E [label="Tutorial 5E: Airport & Port Visualization"];
       tut6 [label="Tutorial 6: Filtering"];
 
       tut1 -> tut2;
@@ -73,6 +80,7 @@ Tutorials
       viz -> tut5B;
       viz -> tut5C;
       viz -> tut5D;
+      viz -> tut5E;
       tut2 -> tut6;
    }
 
@@ -87,7 +95,10 @@ Tutorials
    Tutorial_05B
    Tutorial_05C
    Tutorial_05D
+   Tutorial_05E
    Tutorial_06
+
+.. _analytic_demos:
 
 Analytic Demos
 **************

@@ -34,6 +34,7 @@ tracktable.applications.tutorial_helpers - Helper functions to assist the jupyte
 import os.path
 from datetime import timedelta
 
+import folium as fol
 from numpy import zeros
 from tracktable.applications.assemble_trajectories import \
     AssembleTrajectoryFromPoints
@@ -41,10 +42,11 @@ from tracktable.applications.trajectory_splitter import split_when_idle
 from tracktable.core import data_directory
 from tracktable.core.geomath import (convex_hull_area, end_to_end_distance,
                                      length, speed_between)
-from tracktable.domain.terrestrial import (TrajectoryPointReader,
-                                           TrajectoryReader)
+from tracktable.domain.terrestrial import TrajectoryPointReader
 from tracktable.render import render_map
 from tracktable.render.map_processing import maps
+from tracktable.render.render_map import render_map
+from tracktable.rw.load import load_trajectories
 
 # TODO: Error handling throughout.
 
@@ -55,7 +57,10 @@ SAMPLE_DATA_FILENAMES = {'tutorial-csv': os.path.join(data_directory(),'NYHarbor
                          'boxiness': os.path.join(data_directory(),'VirginiaBeach_2020_06_04_to_06_filtered.traj'),
                          'shape': os.path.join(data_directory(),'US_coastal_2020_06_30.traj'),
                          'anomaly-historical': os.path.join(data_directory(),'NYHarbor_2020_12_first_week.traj'),
-                         'anomaly-test': os.path.join(data_directory(),'NYHarbor_2020_12_08.traj')
+                         'anomaly-test': os.path.join(data_directory(),'NYHarbor_2020_12_08.traj'),
+                         'global-flights': os.path.join(data_directory(),'SampleTrajectories.csv'),
+                         'two-flights': os.path.join(data_directory(),'TwoSampleFlights.csv'),
+                         'us-flights': os.path.join(data_directory(),'SampleFlightsUS.csv'),
                         }
 
 
@@ -132,13 +137,7 @@ def get_trajectory_list_from_csv(filename=SAMPLE_DATA_FILENAMES['tutorial-csv'],
 
 def get_trajectory_list(dataset='tutorial-traj'):
 
-    with open(SAMPLE_DATA_FILENAMES[dataset], 'r') as traj_file:
-        # create a Tracktable TrajectoryReader object
-        reader = TrajectoryReader()
-        # tell it where to find the traj file
-        reader.input = traj_file
-        # import the list of trajectories
-        return list(reader)
+    return load_trajectories(SAMPLE_DATA_FILENAMES[dataset])
 
 
 def count_points(trajectories):
@@ -274,3 +273,11 @@ def filter_trajectories(trajectories,
                 (min_average_speed <= speed_between(trajectory[0], trajectory[-1]) <= max_average_speed) and
                 (min_convex_hull_area <= convex_hull_area(trajectory) <= max_convex_hull_area) and
                 (min_straightness <= end_to_end_distance(trajectory) / length(trajectory) <= max_straightness))]
+
+def generate_blank_folium_map(bbox=None, **kwargs):
+    map = fol.Map(**kwargs)
+    if bbox:
+        map.fit_bounds(bbox)
+        return map
+    else:
+        return map

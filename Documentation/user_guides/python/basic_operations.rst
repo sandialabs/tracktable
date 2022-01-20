@@ -609,9 +609,9 @@ Tracktable includes data bases of worldwide airports
 and maritime ports which can be used for rendering, data
 generation and analytics. Rendering guides can be found
 on the :ref:`Rendering <user-guide-python-rendering>` page
-while data generation guides can be found on
+and in our :ref:`notebook tutorials <notebook_tutorials>` while data generation guides can be found on
 the :ref:`Data Generation <Python_Data_Generation_Example>` page.
-Both airport and port modules have convient functions for Retrieving
+Both airport and port modules have convient functions for retrieving
 information from their respective databases, these are outlined below.
 
 Airports
@@ -669,6 +669,16 @@ Ports
 
     from tracktable.info import ports
     new_shoreham_port = ports.port_information("New Shoreham")
+
+.. code-block:: python
+   :caption: Port Information Retrieval By A Port's World Port Index Number
+   :linenos:
+
+    from tracktable.info import ports
+
+    # WPI number can be str or int
+    newcastle_port = ports.port_information("53610")
+    newcastle_port = ports.port_information(53610)
 
 .. code-block:: python
    :caption: Retrieve All Ports For A Specific Country

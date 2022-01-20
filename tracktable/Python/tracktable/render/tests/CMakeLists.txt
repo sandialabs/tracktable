@@ -44,17 +44,28 @@ find_package_handle_standard_args(PY_cartopy_module DEFAULT_MSG PY_CARTOPY_MODUL
 # message("PY_CARTOPY_MODULE ${PY_CARTOPY_MODULE}")
 
 if (PY_CARTOPY_MODULE)
-  #add_python_test(P_Mapmaker_Airport
+
+  # TODO (mjfadem): Get these tests up and running once we chase the gremlins out of the existing mapmaker tests
+
+  # add_python_test(P_Mapmaker_City
+  #  tracktable.render.tests.test_mapmaker_city "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
+  # )
+
+  # add_python_test(P_Mapmaker_Airport
   #  tracktable.render.tests.test_mapmaker_airport "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
-  #)
+  # )
+
+  # add_python_test(P_Mapmaker_Port
+  #  tracktable.render.tests.test_mapmaker_port "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
+  # )
 
   add_python_test(P_Mapmaker_CONUS
     tracktable.render.tests.test_mapmaker_conus "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
   )
 
-  #add_python_test(P_Mapmaker_NorthAmerica
+  # add_python_test(P_Mapmaker_NorthAmerica
   #  tracktable.render.tests.test_mapmaker_north_america "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
-  #)
+  # )
 
   add_python_test(P_Mapmaker_Custom_Bounding_Box_Object
     tracktable.render.tests.test_mapmaker_custom_bbox_object "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput"
