@@ -40,17 +40,17 @@
 # map_for_country?
 #
 
-from __future__ import print_function, division, absolute_import
+from __future__ import absolute_import, division, print_function
 
-import cartopy.crs
 import logging
 
+import cartopy.crs
+from matplotlib import pyplot as plt
 from tracktable.core import geomath
 
-from matplotlib import pyplot as plt
 airports = None
+ports = None
 cities = None
-
 
 CONVENIENCE_MAPS = {
     'conus': {
@@ -101,6 +101,11 @@ def _ensure_cities_loaded():
     if cities is None:
         from tracktable.info import cities
 
+def _ensure_ports_loaded():
+    global ports
+    if ports is None:
+        from tracktable.info import ports
+
 # ----------------------------------------------------------------------
 
 
@@ -136,7 +141,7 @@ def _flatten(l, ltypes=(list, tuple)):
 
 def airport_map(airport_id,
                 region_size=(200, 200),
-                projection=None):
+                projection=cartopy.crs.Miller):
     """Draw a map for a region surrounding an airport.
 
     Create a map for the region surrounding the requested airport.
@@ -157,16 +162,14 @@ def airport_map(airport_id,
 
     Keyword Args:
         region_size (point2d): (Default: (200, 200))
-        projection (Matplotlib axes): (Default: None)
+        projection (Matplotlib axes): (Default: cartopy.crs.Miller)
 
     Returns:
         This function returns axes for Matplotlib.
     """
 
-    if projection is None:
-        projection = cartopy.crs.Miller
-
     _ensure_airports_loaded()
+
     airport_info = airports.airport_information(airport_id)
     if airport_info is None:
         raise KeyError(("ERROR: Can't find information "
@@ -212,6 +215,216 @@ def airport_map(airport_id,
     return instantiate_map(min_corner,
                            max_corner,
                            projection=projection)
+
+# ----------------------------------------------------------------------
+
+
+def port_map(port_name,
+            port_country=None,
+            region_size=(200, 200),
+            projection=cartopy.crs.Miller):
+    """Draw a map for a region surrounding a port.
+
+    Create a map for the region surrounding the requested port.
+
+    The region will be a rectangle in lon/lat space with the specified
+    width and height in KM. We'll do our best to convert those into a
+    lat/lon bounding box.
+
+    We default to the Miller Cylindrical projection. It does a pretty
+    good job of showing the world in familiar shapes although
+    distortion sets in above/below about 50 degrees. Fortunately,
+    things are still quite recognizable. If you would prefer a
+    different projection then change the value of projection from
+    cartopy.crs.Miller to something else.
+
+    Args:
+        port_name (str): Name of the port to generate a map around.
+
+    Keyword Args:
+        port_country (str): Country that the port is located in. Required if a port_name matches multiple ports. (Default: None)
+        region_size (point2d): (Default: (200, 200))
+        projection (Matplotlib axes): Cartopy projection to generate a map onto. (Default: cartopy.crs.Miller)
+
+    Returns:
+        This function returns axes for Matplotlib.
+    """
+
+    _ensure_ports_loaded()
+
+    port_info = ports.port_information(port_name, country=port_country)
+    if port_info == []:
+        raise KeyError(("Can't find information for port '{}'").format(port_name))
+    if type(port_info) is list:
+        raise AttributeError("More then one port with the name {} found, provide the port's country to narrow results or use the ports WPI number.".format(port_name))
+
+    width = region_size[0]
+    height = region_size[1]
+
+    port_location = port_info.position
+
+    latitude_span = height / geomath.latitude_degree_size(port_location[1])
+
+    bottom_latitude = port_location[1] - latitude_span / 2
+    top_latitude = port_location[1] + latitude_span / 2
+
+    # Allow for the possibility that we've gone past the poles
+    if top_latitude > 90:
+        top_latitude = 90 - top_latitude
+    if bottom_latitude < -90:
+        bottom_latitude = -180 - bottom_latitude
+
+    longitude_width_at_top = max(
+        geomath.longitude_degree_size(top_latitude), 1
+        )
+    longitude_width_at_bottom = max(
+        geomath.longitude_degree_size(bottom_latitude), 1
+        )
+
+    # This could go wrong at very high latitudes but seems OK for now
+    longitude_span = width / min(longitude_width_at_top,
+                                 longitude_width_at_bottom)
+
+    min_corner = (
+        port_location[0] - longitude_span/2,
+        bottom_latitude
+        )
+
+    max_corner = (
+        port_location[0] + longitude_span/2,
+        top_latitude
+        )
+
+    return instantiate_map(min_corner,
+                           max_corner,
+                           projection=projection)
+
+# ----------------------------------------------------------------------
+
+
+def city_map(city_name,
+            city_country=None,
+            city_location=None,
+            region_size=(200, 200),
+            projection=cartopy.crs.Miller):
+    """Draw a map for a region surrounding a city.
+
+    Create a map for the region surrounding the requested city.
+
+    The region will be a rectangle in lon/lat space with the specified
+    width and height in KM. We'll do our best to convert those into a
+    lat/lon bounding box.
+
+    We default to the Miller Cylindrical projection. It does a pretty
+    good job of showing the world in familiar shapes although
+    distortion sets in above/below about 50 degrees. Fortunately,
+    things are still quite recognizable. If you would prefer a
+    different projection then change the value of projection from
+    cartopy.crs.Miller to something else.
+
+    Args:
+        city_name (str): Name of the city to generate a map around.
+
+    Keyword Args:
+        city_country (str): two character country code.  (Default: None).
+        city_location (tuple, TrajectoryPoint, BasePoint): location to search near (Default: None).
+        region_size (point2d): (Default: (200, 200))
+        projection (Matplotlib axes): Cartopy projection to generate a map onto. (Default: cartopy.crs.Miller)
+
+    Returns:
+        This function returns axes for Matplotlib.
+    """
+
+    _ensure_cities_loaded()
+
+    city_info = cities.get_city(city_name, country=city_country, location=city_location)
+    if city_info is None:
+        raise KeyError(("ERROR: Can't find information for city '{}'").format(city_info))
+
+    width = region_size[0]
+    height = region_size[1]
+
+    # TODO (mjfadem): This might be (lat, lon) not (lon, lat).
+    city_location = city_info.location
+
+    latitude_span = height / geomath.latitude_degree_size(city_location[1])
+
+    bottom_latitude = city_location[1] - latitude_span / 2
+    top_latitude = city_location[1] + latitude_span / 2
+
+    # Allow for the possibility that we've gone past the poles
+    if top_latitude > 90:
+        top_latitude = 90 - top_latitude
+    if bottom_latitude < -90:
+        bottom_latitude = -180 - bottom_latitude
+
+    longitude_width_at_top = max(
+        geomath.longitude_degree_size(top_latitude), 1
+        )
+    longitude_width_at_bottom = max(
+        geomath.longitude_degree_size(bottom_latitude), 1
+        )
+
+    # This could go wrong at very high latitudes but seems OK for now
+    longitude_span = width / min(longitude_width_at_top,
+                                 longitude_width_at_bottom)
+
+    min_corner = (
+        city_location[0] - longitude_span/2,
+        bottom_latitude
+        )
+
+    max_corner = (
+        city_location[0] + longitude_span/2,
+        top_latitude
+        )
+
+    return instantiate_map(min_corner,
+                           max_corner,
+                           projection=projection)
+
+# ---------------------------------------------------------------------
+
+
+def region_map(region_name,
+               projection=None):
+    """Create map for predefined region
+
+    Create a geographic map for one of several common regions in the
+    world. For a list of supported regions please see
+    tracktable.maps.available_maps().
+
+    Args:
+       region_name (str): Name of desired region
+
+    Keyword Arguments:
+       projection (Matplotlib axes): a projection from cartopy.crs (Default: None)
+
+    Returns:
+       Cartopy axes for given region
+    """
+
+    if region_name not in available_maps():
+        raise ValueError(("There is no predefined map "
+                          "for region '{}'.").format(region_name))
+
+    global CONVENIENCE_MAPS
+    params = CONVENIENCE_MAPS[region_name]
+
+    if projection is None:
+        projection = cartopy.crs.Miller
+
+    logger = logging.getLogger(__name__)
+    logger.debug("region_map: projection is {}".format(projection))
+
+    map_axes = instantiate_map(
+        min_corner=params['min_corner'],
+        max_corner=params['max_corner'],
+        projection=projection
+        )
+
+    logger.debug("region_map: map_axes are {}".format(map_axes))
+    return map_axes
 
 # ----------------------------------------------------------------------
 
@@ -295,35 +508,49 @@ def instantiate_map(min_corner,
 # ----------------------------------------------------------------------
 
 def predefined_map(mapname,
+                   country=None,
+                   location=None,
                    region_size=(200, 200),
                    projection=None):
     """Create a map of one of several familiar regions in the world.
 
-    You can ask for one of three types of map.
+    You can ask for one of four types of map.
 
-       Region: one of 'region:conus' (continental US), 'region:europe',
+        Region: one of 'region:conus' (continental US), 'region:europe',
                       'region:world', 'region:north_america',
                       'region:south_america', 'region:australia'
 
-       Airport: 'airport:DFW' where 'DFW' is the 3- or 4-letter ICAO
+        Airport: 'airport:DFW' where 'DFW' is the 3- or 4-letter ICAO
                  abbreviation for the airport you want
 
-       City (NOT YET IMPLEMENTED): 'city:WashingtonDC' where
-          'WashingtonDC' is the city name without spaces or
-          punctuation marks.
+        Port: 'port:Alexandria' where 'Alexandria' is the port name
 
-    For the airport and city maps you may specify an additional
+        City: 'city:WashingtonDC' where 'WashingtonDC' is the city name
+          without spaces or punctuation marks.
+
+    For the airport, port and city maps you may specify an additional
     'region_size' argument that gives the desired width and height of
     the map region in KM. For example, a 200km-by-100km window
     centered on St. Louis airport could be created this way:
 
-    my_map_axes = predefined_map('airport:STL',
-                                 region_size=(200, 100))
+    .. code-block:: python
+
+        my_map_axes = predefined_map('airport:STL', region_size=(200, 100))
+
+    For the port and city maps you may need to specify the country (ports and cities)
+    or location (cities) to search near if the port or city shares a name with
+    another port or city in our internal database.
+
+    .. code-block:: python
+
+        my_map_axes = predefined_map('port:Newport', country="United Kingdom")
 
     Args:
         mapname (str): String naming which predefined map you want
 
     Keyword Arg:
+        country (str): Two character country code for city maps, full country name for port maps. Required if a port or city name matches multiple items.  (Default: None).
+        location (tuple, TrajectoryPoint, BasePoint): Location to search near, exclusively used for city maps (Default: None).
         region_size (point2d): 2-element tuple with (width, height) as km (Default: (200, 200))
         projection (Matplotlib axes): a projection from cartopy.crs (Default: None)
 
@@ -337,11 +564,15 @@ def predefined_map(mapname,
     mapname_upper = mapname.upper()
     if mapname_upper.startswith('AIRPORT:'):
         airport_id = mapname.split(':')[1].upper()
-        return airport_map(airport_id, region_size, projection=projection)
+        return airport_map(airport_id, region_size=region_size, projection=projection)
+
+    if mapname_upper.startswith('PORT:'):
+        port_name = mapname.split(':')[1].upper()
+        return port_map(port_name, port_country=country, region_size=region_size, projection=projection)
 
     elif mapname_upper.startswith('CITY:'):
         city_name = mapname.split(':')[1]
-        return city_map(city_name, region_size, projection=projection)
+        return city_map(city_name, city_country=country, city_location=location, region_size=region_size, projection=projection)
 
     elif mapname_upper.startswith('REGION:'):
         region_name = mapname.split(':')[1]
@@ -349,56 +580,7 @@ def predefined_map(mapname,
 
     else:
         raise KeyError(("Unknown name for predefined map: {}"
-                        " Valid argments are 'region:XXX', 'city:XXX' or"
-                        " 'airport:XXX'.").format(mapname))
+                        " Valid argments are 'region:<region>', 'city:<city>'"
+                        " 'airport:<airport>' or 'port:<port>'.").format(mapname))
 
 # ----------------------------------------------------------------------
-
-
-def city_map(*args):
-    """ city_map is not implemented yet
-    """
-    raise NotImplementedError("city_map not yet implemented")
-
-# ---------------------------------------------------------------------
-
-
-def region_map(region_name,
-               projection=None):
-    """Create map for predefined region
-
-    Create a geographic map for one of several common regions in the
-    world. For a list of supported regions please see
-    tracktable.maps.available_maps().
-
-    Args:
-       region_name (str): Name of desired region
-
-    Keyword Arguments:
-       projection (Matplotlib axes): a projection from cartopy.crs (Default: None)
-
-    Returns:
-       Cartopy axes for given region
-    """
-
-    if region_name not in available_maps():
-        raise ValueError(("There is no predefined map "
-                          "for region '{}'.").format(region_name))
-
-    global CONVENIENCE_MAPS
-    params = CONVENIENCE_MAPS[region_name]
-
-    if projection is None:
-        projection = cartopy.crs.Miller
-
-    logger = logging.getLogger(__name__)
-    logger.debug("region_map: projection is {}".format(projection))
-
-    map_axes = instantiate_map(
-        min_corner=params['min_corner'],
-        max_corner=params['max_corner'],
-        projection=projection
-        )
-
-    logger.debug("region_map: map_axes are {}".format(map_axes))
-    return map_axes

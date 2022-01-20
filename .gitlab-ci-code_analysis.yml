@@ -19,8 +19,9 @@ mypy:
     - ubuntu
     - docker
   allow_failure: true
-  # rules:
-  #   - if: $CODE_ANALYSIS == "true"
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
+    # - if: $CODE_ANALYSIS == "true"
   script:
     - pip3 install mypy
     - pip3 install types-pytz
@@ -45,6 +46,7 @@ mypy:
 #     - docker
 #   allow_failure: true
 #   rules:
+#     - if: $CI_COMMIT_BRANCH == "develop"
 #     - if: $CODE_ANALYSIS == "true"
 #   script:
 #     - pip3 install flake8
@@ -61,7 +63,8 @@ pylint:
     - ubuntu
     - docker
   allow_failure: true
-  # rules:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop"
   #   - if: $CODE_ANALYSIS == "true"
   script:
     - pip3 install pylint

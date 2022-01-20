@@ -49,7 +49,7 @@ class Port(object):
     country (str): Country where port is located
     water_body (str): Body of water where the port is located
     position (tuple): (longitude, latitude) position of port
-    attributes (int): All other misc attributes of the given port, see ports.csv all attributes names
+    attributes (int): All other misc attributes of the given port, see ports.csv for all other attributes
   """
 
   def __init__(self):
@@ -127,9 +127,9 @@ def port_information(port_info, country=None):
   """Look up information about an port
 
   Args:
-    port (str or int): Name (str), Alternate Name (str) or World Port Index Number (int) of port
+    port_info (str or int): Name (str), Alternate Name (str) or World Port Index Number (int) of port
 
-  Kwargs:
+  Keyword Arguments:
     country (string): Country containing the desired port. (Default: None)
 
   Returns:
@@ -153,16 +153,17 @@ def port_information(port_info, country=None):
         if port_info.lower() == port.alternate_name.lower():
           logger.info("`{}` is the alternate port name for `{}`".format(port.alternate_name, port.name))
         if country is not None and country.lower() == port.country.lower():
-          return PORT_DICT[port_index]
-        else:
+          matching_ports.append(port)
+        elif country is None:
           matching_ports.append(port)
     if len(matching_ports) > 1:
-      logger.warning("""`{}` matches {} port names, provide a `country` along with a
-        port name to narrow results or provide the port's World Port Index Number to retrieve the
-        desired port.""".format(port_info, len(matching_ports)))
+      logger.warning("`{}` matches {} port names, provide a `country` along with a port name to narrow results or provide the port's World Port Index Number to retrieve the desired port.".format(port_info, len(matching_ports)))
       return matching_ports
-    else:
+    elif len(matching_ports) == 1:
       return matching_ports[0]
+    else:
+      logger.warning("No ports found with the provided name `{}`. Double check the provided port information and/or remove the provided country.".format(port_info))
+      return []
 
 # ----------------------------------------------------------------------
 
@@ -240,7 +241,7 @@ def all_ports_by_wpi_region(wpi_region):
 
   Args:
     wpi_region (str or int): WPI region and/or accompanying numeric value to return all ports from.
-      For example, wpi_region can be of the format `Australia -- 53290` (str) OR `Australia` (str) OR `53290` (int).
+      For example, wpi_region can be of the format ``Australia -- 53290`` (str) OR ``Australia`` (str) OR ``53290`` (int).
 
   Returns:
     Dictionary of ports from the given wpi region.

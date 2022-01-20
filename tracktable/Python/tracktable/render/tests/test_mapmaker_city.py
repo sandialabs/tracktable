@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2022 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -31,7 +31,6 @@
 
 import sys
 import os.path
-import traceback
 import matplotlib
 matplotlib.use('Agg')
 
@@ -39,18 +38,16 @@ from matplotlib import pyplot
 from tracktable.render import render_map
 from tracktable.core import test_utilities
 
-def test_map_for_airport(ground_truth_dir,
+def test_map_for_city(ground_truth_dir,
                          test_output_dir,
-                         image_filename='MapForAirport.png'):
+                         image_filename='MapForcity.png'):
 
     pyplot.figure(figsize=(8, 6))
-    (mymap, artists) = render_map.render_map(map_name='airport:ABQ',
-                                domain='terrestrial',
-                                region_size=(2000, 2000),
-                                land_color='#505050',
-                                draw_coastlines=True,
-                                draw_scale=False,
-                                draw_airports=True)
+
+    (mymap, artists) = render_map.render_map(domain='terrestrial',
+                                        map_name='custom',
+                                        map_bbox = [123.5, 23.5, 148, 48],
+                                        draw_cities_larger_than=2000000)
 
     pyplot.savefig(os.path.join(test_output_dir, image_filename),
                    dpi=150)
@@ -64,7 +61,7 @@ def test_map_for_airport(ground_truth_dir,
 
 def test_mapmaker(ground_truth_path, test_output_path):
 
-    return test_map_for_airport(ground_truth_path, test_output_path)
+    return test_map_for_city(ground_truth_path, test_output_path)
 
 # ----------------------------------------------------------------------
 

@@ -32,6 +32,7 @@ tracktable.render.folium - render trajectories in using the folium backend
 """
 
 import itertools
+import logging
 from datetime import datetime
 
 import folium as fol
@@ -39,9 +40,11 @@ import matplotlib
 from folium.plugins import HeatMap
 from matplotlib.colors import ListedColormap, hsv_to_rgb, rgb2hex
 from tracktable.core.geomath import compute_bounding_box
+from tracktable.info import airports, ports
 from tracktable.render.map_decoration import coloring
 from tracktable.render.map_processing import common_processing
 
+logger = logging.getLogger(__name__)
 
 # later can add multiple layers and switch between with:
 # folium.TileLayer('cartodbdark_matter', attr='.').add_to(map)
@@ -88,6 +91,26 @@ def render_trajectories(trajectories,
                         show_scale = True,
                         max_zoom = 22,
                         fast = False,
+
+                        # Airport and poirt specific args
+                        draw_airports=False,
+                        draw_ports=False,
+                        airport_color='red',
+                        port_color='blue',
+                        airport_dot_size = 1,
+                        port_dot_size = 1,
+                        use_shapefile=False,
+                        use_markers=False,
+                        popup_width=250,
+                        airport_list=[],
+                        port_list=[],
+                        airport_bounding_box=None,
+                        port_country=None,
+                        port_water_body=None,
+                        port_wpi_region=None,
+                        port_bounding_box=None,
+                        port_and_country_seperate=False,
+                        prefer_canvas=False,
                         **kwargs):
     """Render a list of trajectories using the folium backend
 
@@ -107,7 +130,26 @@ def render_trajectories(trajectories,
     if map_canvas == None:
         map_canvas = fol.Map(tiles=tiles, attr=attr, crs=crs,
                              control_scale = show_scale,
-                             max_zoom=max_zoom)
+                             max_zoom=max_zoom, prefer_canvas=prefer_canvas)
+
+    render_airports_and_ports(map_canvas,
+                        draw_airports=draw_airports,
+                        draw_ports=draw_ports,
+                        airport_color=airport_color,
+                        port_color=port_color,
+                        airport_dot_size = airport_dot_size,
+                        port_dot_size = port_dot_size,
+                        use_shapefile=use_shapefile,
+                        use_markers=use_markers,
+                        popup_width=popup_width,
+                        airport_list=airport_list,
+                        port_list=port_list,
+                        airport_bounding_box=airport_bounding_box,
+                        port_country=port_country,
+                        port_water_body=port_water_body,
+                        port_wpi_region=port_wpi_region,
+                        port_bounding_box=port_bounding_box,
+                        port_and_country_seperate=port_and_country_seperate)
 
     for i, trajectory in enumerate(trajectories):
         coordinates = [(point[1], point[0]) for point in trajectory]
@@ -208,32 +250,29 @@ def render_heatmap(points,
                     crs="EPSG3857",
                     show = False,
                     save = False,
-                    filename = ''):
-    """Creates an interactive heatmap visualization
+                    filename = '',
+                    draw_airports=False,
+                    draw_ports=False,
+                    airport_color='red',
+                    port_color='blue',
+                    airport_dot_size = 1,
+                    port_dot_size = 1,
+                    use_shapefile=False,
+                    use_markers=False,
+                    popup_width=250,
+                    airport_list=[],
+                    port_list=[],
+                    airport_bounding_box=None,
+                    port_country=None,
+                    port_water_body=None,
+                    port_wpi_region=None,
+                    port_bounding_box=None,
+                    port_and_country_seperate=False,
+                    prefer_canvas=False,
+                    **kwargs):
+    """Creates an interactive heatmap visualization using the folium backend
 
-    Args:
-        points (list): list of points
-
-    Keyword Arguments:
-        trajectories: (Trajectoies) list of trajectories corresponding to the points,
-            render trajectories if provided (Default: None)
-        weights: (list) list of weights associated with each point (Default: None)
-        color_map: (str) name of matplotlib colormap to use for the heatmap (Default: 'viridis')
-        tiles (str): name of map tiling to use (Default: 'cartodbdark_matter')
-        attr (str): folium specific parameter (Default: '.')
-        crs (str): folium specific parameter (Default: "EPSG3857")
-        show (bool): whether or not to show the result (if possible)
-            (default True) if saving to a file, might not want to view.
-        save (bool): whether or not to save the result to a file.
-            For folium the results can be saved to an html file. For
-            cartopy the results can be saved as an image. If no filename
-            is given, a default filename including the timestamp is used.
-            (default False)
-        filename (str): Path and filename to save the results to, if
-            save is set to True. If no filename is given, a default
-            filename including the timestamp is used.
-
-    Returns: an interactive heatmap
+        For documentation on the parameters, please see render_heatmap
     """
 
     # lat, long, (optional weight) of points to render
@@ -243,12 +282,33 @@ def render_heatmap(points,
         display_points = [[point[1], point[0], weight] for point, weight in zip(points, weights)]
 
     # create the heat map
-    heat_map = fol.Map(tiles=tiles, zoom_start=4)
+    heat_map = fol.Map(tiles=tiles, zoom_start=4, prefer_canvas=prefer_canvas)
+
+    render_airports_and_ports(heat_map,
+                            draw_airports=draw_airports,
+                            draw_ports=draw_ports,
+                            airport_color=airport_color,
+                            port_color=port_color,
+                            airport_dot_size = airport_dot_size,
+                            port_dot_size = port_dot_size,
+                            use_shapefile=use_shapefile,
+                            use_markers=use_markers,
+                            popup_width=popup_width,
+                            airport_list=airport_list,
+                            port_list=port_list,
+                            airport_bounding_box=airport_bounding_box,
+                            port_country=port_country,
+                            port_water_body=port_water_body,
+                            port_wpi_region=port_wpi_region,
+                            port_bounding_box=port_bounding_box,
+                            port_and_country_seperate=port_and_country_seperate)
+
     gradient = coloring.matplotlib_cmap_to_dict(color_map)
-    if trajectories is not None:
-        heat_map = render_trajectories(trajectories, map=heat_map,
+    if trajectories:
+        heat_map = render_trajectories(trajectories, map_canvas=heat_map,
                                        line_color='grey', linewidth=0.5,
-                                       tiles=tiles, attr=attr, crs=crs)
+                                       tiles=tiles, attr=attr, crs=crs,
+                                       prefer_canvas=prefer_canvas)
     HeatMap(display_points, gradient=gradient).add_to(heat_map)
     if save:  # saves as .html document
         if not filename:
@@ -262,8 +322,8 @@ def render_heatmap(points,
 # ----------------------------------------------------------------------
 
 def render_point(current_point,
-                        point_popup_properties, coord, point_radius,
-                        point_color, map_canvas):
+                point_popup_properties, coord, point_radius,
+                point_color, map_canvas):
     """Renders a point to the folium map
 
     Args:
@@ -289,6 +349,195 @@ def render_point(current_point,
                      color=point_color,
                      tooltip=tooltip_str_point,
                      popup=popup_point).add_to(map_canvas)
+
+# ----------------------------------------------------------------------
+
+def render_airports_and_ports(map_canvas,
+                            draw_airports=False,
+                            draw_ports=False,
+                            airport_color='red',
+                            port_color='blue',
+                            airport_dot_size = 1,
+                            port_dot_size = 1,
+                            use_shapefile=False, # Undocumented for now
+                            use_markers=False,
+                            popup_width=250,
+                            airport_list=[],
+                            port_list=[],
+                            airport_bounding_box=None,
+                            port_country=None,
+                            port_water_body=None,
+                            port_wpi_region=None,
+                            port_bounding_box=None,
+                            port_and_country_seperate=False,
+                            **kwargs):
+
+    """Renders airports and/or ports to the folium map
+
+    Args:
+        map_canvas (folium map object): Canvas to draw the airports/ports on
+
+    Keyword Arguments:
+        draw_airports (bool): Whether or not to draw airports (Default: False)
+        draw_ports (bool): Whether or not to draw ports (Default: False)
+        airport_color (name of standard color as string, hex color string or
+            matplotlib color object): Color of the airport dot or marker (Default: 'red')
+        port_color (name of standard color as string, hex color string or
+            matplotlib color object): Color of the port dot or marker (Default: 'blue')
+        airport_dot_size (float): Radius of a airport dot (Default: 1)
+        port_dot_size (float): radius of a port dot (Default: 1)
+        use_markers (bool): Bool for using marker object instead of dots for airports and prots,
+            used for Folium rendering only. (Default: False)
+        popup_width (int): Size of the popup window that displays airport/port information, used for Folium rendering only (Default: 250)
+        airport_list (list(str)): IATA code of airports to render onto the map (Default: [])
+        port_list (list(str)): Name or WPI index number of ports to render onto the map (Default: [])
+        airport_bounding_box (BoundingBox or tuple/list of points): bounding box for
+            rendering airports within. (Default: None)
+        port_bounding_box (BoundingBox or tuple/list of points): bounding box for
+            rendering ports within. (Default: None)
+        port_country (str): Name of country to render ports in. (Default: None)
+        port_water_body (str): Name of body of water to render ports on. (Default: None)
+        port_wpi_region (str): Name of WPI region to render ports in. (Default: None)
+        port_and_country_seperate (bool): Bool for searching the ports database for a port and not considering it's
+            country to see if it's rendered. i.e. You want to render a port in the U.K. while rendering all ports in
+            Japan. (Default: False)
+
+    Returns:
+        No return value
+
+    """
+
+    if use_shapefile:
+            logger.warning("Using a shapefile is currently unsupported for rendering airports and ports.")
+
+    if use_markers:
+            logger.warning("Using `markers` causes a considerable performance decrease, ensure `prefer_canvas=True` is set for the Folium map to help performance.")
+
+    if draw_airports:
+        display_all_airports = True
+        all_airports = []
+
+        if airport_bounding_box:
+            display_all_airports = False
+            for airport_name, airport in airports.all_airports_within_bounding_box(airport_bounding_box).items():
+                all_airports.append(airport)
+
+        if len(airport_list) > 0:
+            display_all_airports = False
+            for airport in airport_list:
+                all_airports.append(airports.airport_information(airport))
+
+        if display_all_airports:
+            all_airports = airports.all_airports()
+        else:
+            # Remove duplicates since there is a chance you'll double up on ports with how this code is structured
+            all_airports = list(set(all_airports))
+
+        for airport in all_airports:
+            airport_properties = "Airport = " + airport.name + \
+                                    "<br>City = " + airport.city + \
+                                    "<br>Country = " + airport.country + \
+                                    "<br>Lat = " + str(airport.position[1]) + \
+                                    "<br>Lon = " + str(airport.position[0]) + \
+                                    "<br>Alt = " + str(airport.position[2]) + " ft | " + str(round(airport.position[2]/3.281, 2)) + " m" + \
+                                    "<br>IATA Code = " + str(airport.iata_code) + \
+                                    "<br>ICAO Code = " + str(airport.icao_code) + \
+                                    "<br>UTC Offset = " + str(airport.utc_offset) + \
+                                    "<br>Daylight Savings = " + airport.daylight_savings
+            if use_markers:
+                fol.Marker(location=[airport.position[1], airport.position[0]], tooltip=airport.name,
+                        popup=fol.Popup(airport_properties, max_width=popup_width, min_width=popup_width), icon=fol.Icon(color=airport_color, icon='fa-plane', prefix='fa')).add_to(map_canvas)
+            else:
+                fol.CircleMarker((airport.position[1], airport.position[0]), radius=airport_dot_size, fill=True,
+                        fill_opacity=1.0,
+                        fill_color=airport_color,
+                        color=airport_color,
+                        tooltip=airport.name,
+                        popup=fol.Popup(airport_properties, max_width=popup_width, min_width=popup_width)).add_to(map_canvas)
+
+    if draw_ports:
+        display_all_ports = True
+        all_ports = []
+
+        if port_water_body:
+            display_all_ports = False
+            for port_index, port in ports.all_ports_by_water_body(port_water_body).items():
+                all_ports.append(port)
+
+        if port_wpi_region:
+            display_all_ports = False
+            for port_index, port in ports.all_ports_by_wpi_region(port_wpi_region).items():
+                all_ports.append(port)
+
+        if port_bounding_box:
+            display_all_ports = False
+            for port_index, port in ports.all_ports_within_bounding_box(port_bounding_box).items():
+                all_ports.append(port)
+
+        if len(port_list) > 0:
+            display_all_ports = False
+            if port_and_country_seperate:
+                if port_country:
+                    for port_index, port in ports.all_ports_by_country(port_country).items():
+                        all_ports.append(port)
+                else:
+                    logger.info("No `port_country` specified only ports listed in `port_list` will be rendered.")
+                for port in port_list:
+                    all_ports.append(ports.port_information(port))
+            else:
+                for port in port_list:
+                    all_ports.append(ports.port_information(port, country=port_country))
+
+            flatten_all_ports = []
+            for port in all_ports: # Since port_information can return lists we need to flatten the all_ports list
+                if type(port) is list:
+                    for i in port:
+                        flatten_all_ports.append(i)
+                else:
+                    flatten_all_ports.append(port)
+
+            all_ports = flatten_all_ports
+
+        if len(port_list) == 0 and port_country:
+            display_all_ports = False
+            for port_index, port in ports.all_ports_by_country(port_country).items():
+                all_ports.append(port)
+
+        if display_all_ports:
+            all_ports = ports.all_ports()
+        else:
+            # Remove duplicates since there is a chance you'll double up on ports with how this code is structured
+            all_ports = list(set(all_ports))
+
+        for port in all_ports:
+            port_properties = "Port = " + port.name + \
+                                "<br>Alternate Port Name = " + port.alternate_name + \
+                                "<br>Country = " + port.country + \
+                                "<br>Lat = " + str(port.position[1]) + \
+                                "<br>Lon = " + str(port.position[0]) + \
+                                "<br>Region = " + port.region + \
+                                "<br>Water Body = " + port.water_body + \
+                                "<br>UN/LOCODE = " + str(port.un_locode) + \
+                                "<br>World Port Index Number = " + str(port.world_port_index_number)
+
+            # TODO (mjfadem): It appears that the WIP.shp file is made up of coordinates and not polygon lists so
+            # it's no different then the CSV data we use as a baseline. This needs a bit more investigation.
+            # if use_shapefile:
+                # sf = shapefile.Reader("tracktable/Python/tracktable/info/data/WPI.shp")
+                # for record in sf.shapeRecords():
+                #     fol.GeoJson(shape(record.shape.__geo_interface__)).add_to(map_canvas)
+
+            if use_markers:
+                fol.Marker(location=[port.position[1], port.position[0]], tooltip=port.name,
+                        popup=fol.Popup(port_properties, max_width=popup_width, min_width=popup_width),
+                        icon=fol.Icon(color=port_color, icon='fa-ship', prefix='fa')).add_to(map_canvas)
+            else:
+                fol.CircleMarker((port.position[1], port.position[0]), radius=port_dot_size, fill=True,
+                        fill_opacity=1.0,
+                        fill_color=port_color,
+                        color=port_color,
+                        tooltip=port.name,
+                        popup=fol.Popup(port_properties, max_width=popup_width, min_width=popup_width)).add_to(map_canvas)
 
 # ----------------------------------------------------------------------
 

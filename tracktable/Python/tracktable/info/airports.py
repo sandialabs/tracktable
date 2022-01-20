@@ -36,6 +36,9 @@ import os
 import os.path
 from csv import DictReader
 
+from tracktable.core.geomath import intersects
+from tracktable.domain.terrestrial import TrajectoryPoint
+
 class Airport(object):
     """Information about a single airport
 
@@ -134,7 +137,8 @@ def build_airport_dict():
 
             # now we add traffic information - rank each airport by
             # the amount of traffic it sees in some arbitrary period
-            from tracktable.info.data.airport_traffic import AIRPORTS_BY_TRAFFIC
+            from tracktable.info.data.airport_traffic import \
+                AIRPORTS_BY_TRAFFIC
             airports_with_traffic = sorted(AIRPORTS_BY_TRAFFIC.items(),
                                            key=operator.itemgetter(1),
                                            reverse=True)
@@ -199,6 +203,30 @@ def all_airports():
         build_airport_dict()
 
     return list(set(AIRPORT_DICT.values()))
+
+# ----------------------------------------------------------------------
+
+def all_airports_within_bounding_box(bounding_box):
+  """Return all the airport records we have from a given bounding box.
+
+  Args:
+    bounding_box (str): Bounding box to return all airports from.
+
+  Returns:
+    Dictionary of airports from the given bounding box.
+  """
+
+  global AIRPORT_DICT
+
+  if len(AIRPORT_DICT) == 0:
+      build_airport_dict()
+
+  airports = {}
+  for airport_name, airport in AIRPORT_DICT.items():
+    if intersects(TrajectoryPoint(airport.position[0], airport.position[1]), bounding_box):
+      airports[airport_name] = airport
+
+  return airports
 
 # ----------------------------------------------------------------------
 

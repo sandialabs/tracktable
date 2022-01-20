@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2022 National Technology and Engineering
+# Copyright (c) 2014-2021 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -44,13 +44,14 @@ def test_map_for_airport(ground_truth_dir,
                          image_filename='MapForAirport.png'):
 
     pyplot.figure(figsize=(8, 6))
-    (mymap, artists) = render_map.render_map(map_name='airport:ABQ',
+    (mymap, artists) = render_map.render_map(map_name='port:Newport',
                                 domain='terrestrial',
-                                region_size=(2000, 2000),
+                                region_size=(400, 400),
                                 land_color='#505050',
                                 draw_coastlines=True,
                                 draw_scale=False,
-                                draw_airports=True)
+                                draw_ports=True,
+                                country="United Kingdom")
 
     pyplot.savefig(os.path.join(test_output_dir, image_filename),
                    dpi=150)
