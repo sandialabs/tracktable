@@ -128,9 +128,12 @@ def render_trajectories(trajectories,
         return
 
     if map_canvas == None:
-        map_canvas = fol.Map(tiles=tiles, attr=attr, crs=crs,
-                             control_scale = show_scale,
-                             max_zoom=max_zoom, prefer_canvas=prefer_canvas)
+        map_canvas = fol.Map(tiles=tiles,
+                            attr=attr,
+                            crs=crs,
+                            control_scale=show_scale,
+                            max_zoom=max_zoom,
+                            prefer_canvas=prefer_canvas)
 
     render_airports_and_ports(map_canvas,
                         draw_airports=draw_airports,
@@ -251,6 +254,8 @@ def render_heatmap(points,
                     show = False,
                     save = False,
                     filename = '',
+                    show_scale = True,
+                    max_zoom = 22,
                     draw_airports=False,
                     draw_ports=False,
                     airport_color='red',
@@ -282,7 +287,13 @@ def render_heatmap(points,
         display_points = [[point[1], point[0], weight] for point, weight in zip(points, weights)]
 
     # create the heat map
-    heat_map = fol.Map(tiles=tiles, zoom_start=4, prefer_canvas=prefer_canvas)
+    heat_map = fol.Map(tiles=tiles,
+                        zoom_start=4,
+                        attr=attr,
+                        crs=crs,
+                        control_scale=show_scale,
+                        max_zoom=max_zoom,
+                        prefer_canvas=prefer_canvas)
 
     render_airports_and_ports(heat_map,
                             draw_airports=draw_airports,
