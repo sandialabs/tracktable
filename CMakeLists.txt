@@ -188,6 +188,8 @@ option(BUILD_EXAMPLES "Build Tracktable example programs" ON)
 option(BUILD_DOCUMENTATION "Build Python and C++ documentation for Tracktable." OFF)
 option(BUILD_DOCUMENTATION_CXX_ONLY "Build only C++ documentation for Tracktable." OFF)
 
+option(COPY_NOTEBOOKS_TRACKTABLE_DATA "Copy and clean notebooks from tracktable-data." ON)
+
 set(PYTHON_INSTALL_PREFIX "Python/tracktable" CACHE PATH "Install directory for python modules" )
 set(Python3_EXECUTABLE "" CACHE FILEPATH "Python executable for running tests and compiling modules")
 set(Python3_ROOT_DIR "" CACHE PATH "Location of python installation for running tests and compiling modules")
@@ -239,7 +241,7 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
   # Whichever is being build, we need Doxygen
   find_package(Doxygen REQUIRED)
 
-  set( DOC_SOURCE_DIR ${Tracktable_SOURCE_DIR}/Documentation )
+  set( DOC_SOURCE_DIR ${Tracktable_SOURCE_DIR}/tracktable-docs/Documentation )
   set( DOC_BINARY_DIR ${Tracktable_BINARY_DIR}/Documentation )
 
   if(DOXYGEN_FOUND)

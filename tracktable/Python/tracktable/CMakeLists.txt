@@ -46,6 +46,11 @@ if (BUILD_TESTING)
   add_subdirectory(render/tests)
  endif (BUILD_TESTING)
 
+if (COPY_NOTEBOOKS_TRACKTABLE_DATA)
+ message(STATUS "Copying notebooks from tracktable-docs. Don't modify these copies!")
+ execute_process(COMMAND ${Python3_EXECUTABLE} _copy_notebooks.py WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+endif (COPY_NOTEBOOKS_TRACKTABLE_DATA)
+
 install(
   FILES __init__.py
   DESTINATION ${PYTHON_INSTALL_PREFIX}

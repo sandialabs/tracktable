@@ -19,7 +19,7 @@ version: 2
 # Build documentation in the Documentation/ directory using Sphinx.
 sphinx:
   fail_on_warning: false
-  configuration: Documentation/conf.py
+  configuration: tracktable-docs/Documentation/conf.py
 
 # Eventually we will also build docs as PDF and ePub.
 # formats: all
@@ -31,3 +31,8 @@ build:
 # The Anaconda environment to build the docs
 conda:
   environment: environment.yml
+
+submodules:
+  include:
+    - tracktable-docs
+  recursive: true
