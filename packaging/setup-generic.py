@@ -38,7 +38,7 @@ import platform
 import re
 import sys
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 from setuptools.dist import Distribution
 
 
@@ -95,7 +95,6 @@ def find_metadata_property(text, property_name):
             ))
 
 # --------------------------------------------------------------------
-
 
 def main():
     here = os.getcwd()

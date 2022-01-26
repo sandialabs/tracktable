@@ -15,6 +15,7 @@ variables:
   # code coverage pipeline.  Combined with a schedule on "develop", this
   # should allow us to do code coverage once a week at an innocuous time
     DO_COVERAGE: "false"
+    GIT_SUBMODULE_STRATEGY: recursive
 
 include:
   - '.gitlab-ci-code_analysis.yml'
