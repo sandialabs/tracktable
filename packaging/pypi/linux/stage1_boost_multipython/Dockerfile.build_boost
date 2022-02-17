@@ -1,0 +1,41 @@
+# Manylinux2010-derived image that will include Boost and versions of
+# Boost.Python for all available Python versions.
+
+ARG PYTHON_IMPLEMENTATION=pydefault
+ARG BOOST_MINOR_VERSION=76
+
+# Download our boost base image
+FROM boost_downloaded:1.${BOOST_MINOR_VERSION}.0
+
+ARG PYTHON_IMPLEMENTATION
+ARG BOOST_MINOR_VERSION
+
+ENV boost_minor_version=${BOOST_MINOR_VERSION}
+ENV python_implementation=${PYTHON_IMPLEMENTATION}
+
+### ----------------------------------------------------------------------
+###
+### Step 1: Make sure Boost.Build will be able to find the include files
+###
+
+WORKDIR /opt/src
+COPY make_python_include_symlink.sh .
+RUN ls /opt/python/
+RUN /opt/src/make_python_include_symlink.sh ${PYTHON_IMPLEMENTATION}
+
+### ----------------------------------------------------------------------
+###
+### Step 2: Build and install Boost
+###
+
+# Build and install Boost and clean up after ourselves
+ENV BOOST_VERSION=1_${BOOST_MINOR_VERSION}_0
+WORKDIR /opt/src/boost_${BOOST_VERSION}
+RUN echo " Building Boost for Python ${PYTHON_IMPLEMENTATION}" \
+&& ./bootstrap.sh --prefix=/usr/local --with-python=/opt/python/${PYTHON_IMPLEMENTATION}/bin/python \
+&& ./b2 -j 8 -d0 install
+WORKDIR /opt/src
+RUN rm -rf boost_1_${BOOST_MINOR_VERSION}_0
+
+ENTRYPOINT [ "/bin/bash" ]
+

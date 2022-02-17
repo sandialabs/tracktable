@@ -4,6 +4,7 @@ stages:
   - configure
   - build
   - test
+  - deploy
 
 variables:
   # This is a regular expression that identifies tests that CTest
@@ -21,5 +22,5 @@ include:
   - '.gitlab-ci-code_analysis.yml'
   - '.gitlab-ci-windows.yml'
   - '.gitlab-ci-macos.yml'
-  - '.gitlab-ci-ubuntu2004.yml'
+  - '.gitlab-ci-linux.yml'
   - '.gitlab-ci-coverage.yml'

@@ -6,7 +6,7 @@
 # enable_debug
 # disable_debug
 
-### 
+###
 ### INTERNAL-ONLY FUNCTIONS
 ###
 
@@ -18,7 +18,7 @@ function _disable_debug () {
 	set +o nounset
 }
 
-function _enable_debug () { 
+function _enable_debug () {
 	set -o pipefail
 	set -o nounset
 }
@@ -83,7 +83,7 @@ function conda_environment_name () {
 
 function conda_environment_exists () {
 	local __python_version="$1"
-	
+
 	msg_debug "Checking for Conda environment for Python ${__python_version}"
 
 	conda_environment_name ${__python_version}
@@ -107,9 +107,9 @@ function conda_environment_exists () {
 # Return Value:
 #     1 on success, 0 on failure
 #
-# NOTE: 
+# NOTE:
 #     This function could be enhanced to parameterize on Boost
-#     version as well. 
+#     version as well.
 #
 # NOTE:
 #     Channel names and package contents are hard-coded.  Further
@@ -122,12 +122,12 @@ function conda_environment_exists () {
 function create_conda_environment () {
 	local __python_version=$1
 	local __envname
-	
+
 	conda_environment_name ${__python_version}
 	__envname=${conda_environment_name_OUTPUT}
 
 	msg_debug "Creating Conda build environment ${__envname}"
-	
+
 	_disable_debug
 
 	conda create \
@@ -151,6 +151,7 @@ function create_conda_environment () {
 		pytz \
 		sphinx \
 		sphinx_rtd_theme \
+		tracktable-data \
 		tqdm
 
 	# Refresh the list of environments -- we just added one
@@ -199,7 +200,7 @@ function enable_anaconda () {
 
 
 
-# Retrieve the path containing the Conda environment for a given 
+# Retrieve the path containing the Conda environment for a given
 # Python version
 #
 # Arguments:
@@ -208,7 +209,7 @@ function enable_anaconda () {
 # Returns:
 #     0 if the environment exists, 1 otherwise
 #
-# Output Variables: 
+# Output Variables:
 #     find_conda_environment_path_OUTPUT: Path to environment
 #
 # Global Variables:

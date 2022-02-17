@@ -1,5 +1,5 @@
-# Fully Featured Tracktable Development Anaconda Environment
-name: tracktable-dev
+# Tracktable MacOS CI/CD Anaconda Environment
+name: tracktable-macos-ci
 channels:
   - conda-forge
 dependencies:
@@ -8,6 +8,7 @@ dependencies:
 
   # Python Dependencies
   - python>=3.6, <=3.10
+  - python_abi=*=*_cp*
   - pip
   - numpy>=1.7
   - matplotlib>=3.0
@@ -18,11 +19,10 @@ dependencies:
   - folium>=0.11.0
   - scipy>=1.5.2
   - tqdm>=4.51.0
-  - tracktable-data>=1.7.0
 
   # C++ Dependencies
   - compilers
-  - boost>=1.74, <=1.76
+  - boost>=1.74, <=1.75
   - cmake>=3.19.5
   - ninja>=1.10.0
 
@@ -44,3 +44,8 @@ dependencies:
   - doxygen>=1.8.17
   - graphviz >=2.42.2
   - breathe>=4.26.1
+
+  # Packaging Dependencies
+  - delocate=0.8.2
+  - unzip
+  - twine

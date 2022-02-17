@@ -222,7 +222,7 @@ function(build_wheel _build_directory _base_directory _output_directory _setup_p
     elseif (${_fixwheel} MATCHES ".*delocate.*")
       execute_process(
         COMMAND
-        ${_fixwheel} ${_wheel_to_fix}
+        ${_fixwheel} -v ${_wheel_to_fix}
         RESULT_VARIABLE _fixwheel_result
         WORKING_DIRECTORY ${_output_directory}
         OUTPUT_VARIABLE _fixwheel_output

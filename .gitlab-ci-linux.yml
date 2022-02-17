@@ -1,0 +1,191 @@
+########################
+# Linux CI/CD Pipeline #
+########################
+
+# Note: We currently run the tests against a Ubuntu 20.04 docker container
+# and create PYPI packages with a ManyLinux CentOS docker container
+
+variables:
+    UBUNTU_2004_DOCKER_IMAGE: cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu/20.04:2
+
+.linux-before: &linux-before
+    - . /root/miniconda3/etc/profile.d/conda.sh
+    - conda activate tracktable-dev
+    - conda install auditwheel unzip -y
+
+linux-setup:
+  image: $UBUNTU_2004_DOCKER_IMAGE
+  stage: setup
+  tags:
+    - linux
+  before_script:
+    - *linux-before
+  script:
+    - mkdir build_linux
+  artifacts:
+    paths:
+      - build_linux
+    expire_in: 1 hour
+
+linux-configure:
+  image: $UBUNTU_2004_DOCKER_IMAGE
+  stage: configure
+  tags:
+    - linux
+  dependencies:
+    - linux-setup
+  needs:
+    - job: linux-setup
+      artifacts: true
+  before_script:
+    - *linux-before
+  script:
+    - cd build_linux
+    - cmake -GNinja -DBUILD_DOCUMENTATION_CXX_ONLY=ON ..
+  artifacts:
+    paths:
+      - build_linux
+    expire_in: 1 hour
+
+linux-build:
+  image: $UBUNTU_2004_DOCKER_IMAGE
+  stage: build
+  tags:
+    - linux
+  dependencies:
+    - linux-configure
+  needs:
+    - job: linux-configure
+      artifacts: true
+  before_script:
+    - *linux-before
+  script:
+    - cd build_linux
+    - ninja
+  artifacts:
+    paths:
+      - build_linux
+    expire_in: 1 hour
+
+linux-test:
+  image: $UBUNTU_2004_DOCKER_IMAGE
+  stage: test
+  tags:
+    - linux
+  dependencies:
+    - linux-build
+  needs:
+    - job: linux-build
+      artifacts: true
+  before_script:
+    - *linux-before
+  script:
+    - pip3 install --trusted-host pypi.org --trusted-host files.pythonhosted.org tracktable-data # TODO (mjfadem): This is a band-aid fix for right now
+    - cp build_linux/lib/_*.so tracktable/Python/tracktable/lib/
+    - cd build_linux
+    - ctest --output-on-failure --exclude-regex 'C_GREAT_CIRCLE_FIT|C_MemoryUse|C_PointGenerator|P_TerrestrialHeatmapExample|P_TerrestrialTrajectoryMapExample|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe|P_Render_Trajectories'
+  artifacts:
+    paths:
+      - build_linux
+    expire_in: 1 hour
+
+########################################
+# Build And Deploy Linux PYPI Packages #
+########################################
+.linux-wheel-docker-login-script: &linux-wheel-docker-login-script
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+# linux-deploy-boost-multipython:
+#   stage: deploy
+#   tags:
+#     - linux-shell
+#   timeout: 2 hours
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "schedule" && $LINUX_BUILD_FROM_SCRATCH == "true"
+#   before_script:
+#     - *linux-wheel-docker-login-script
+#   script:
+#     - docker image prune -a -f
+#     - docker container prune -f
+#     - cd packaging/pypi/linux/stage1_boost_multipython
+#     - ./build_all.sh
+
+# linux-deploy-cmake:
+#   stage: deploy
+#   tags:
+#     - linux-shell
+#   timeout: 2 hours
+#   rules:
+#     - if: $CI_PIPELINE_SOURCE == "schedule" && $LINUX_BUILD_FROM_SCRATCH == "true"
+#   needs: ["linux-deploy-boost-multipython"]
+#   before_script:
+#     - *linux-wheel-docker-login-script
+#   script:
+#     - cd packaging/pypi/linux/stage2_cmake
+#     - ./build_all.sh
+
+linux-deploy-tracktable:
+  stage: deploy
+  tags:
+    - linux-shell
+  timeout: 2 hours
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  # needs: ["linux-deploy-cmake"] # If your building from scratch this needs to be uncommented
+  needs: ["linux-test"]
+  before_script:
+    - *linux-wheel-docker-login-script
+  script:
+    - echo $NIGHTLY
+    - cd packaging/pypi/linux/stage3_tracktable
+    - ./build_all.sh
+
+linux-deploy-wheels:
+  stage: deploy
+  tags:
+    - linux-shell
+  timeout: 2 hours
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  needs: ["linux-deploy-tracktable"]
+  before_script:
+    - *linux-wheel-docker-login-script
+  script:
+    - cd packaging/pypi/linux/stage4_wheel
+    - ./build_all.sh
+  artifacts:
+    paths:
+      - packaging/pypi/linux/finished_wheels
+    expire_in: 1 hour
+
+linux-deploy-upload:
+  stage: deploy
+  tags:
+    - linux-shell
+  timeout: 2 hours
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  dependencies:
+    - linux-deploy-wheels
+  needs:
+    - job: linux-deploy-wheels
+      artifacts: true
+  script:
+    - cd packaging/pypi/linux/
+    # - python3 -m pip install twine
+    - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token HTTPS_PROXY= https_proxy= python3 -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi finished_wheels/*.whl
+
+linux-deploy-cleanup:
+  stage: deploy
+  tags:
+    - linux-shell
+  timeout: 2 hours
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  needs: ["linux-deploy-upload"]
+  script:
+    - cd packaging/pypi/linux/
+    - ./clean_tracktable.sh
+    - docker image prune -a -f
+    # - docker container prune -f
+    # - ./clean_all.sh

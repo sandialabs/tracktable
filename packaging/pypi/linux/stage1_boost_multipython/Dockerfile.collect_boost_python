@@ -1,0 +1,13 @@
+# Manylinux2010-derived image that will include Boost and versions of
+# Boost.Python for all available Python versions.
+
+FROM boost-1.76.0:cp37
+
+COPY --from=boost-1.76.0:cp36 /usr/local/lib/libboost_python* /usr/local/lib/
+COPY --from=boost-1.76.0:cp37 /usr/local/lib/libboost_python* /usr/local/lib/
+COPY --from=boost-1.76.0:cp38 /usr/local/lib/libboost_python* /usr/local/lib/
+COPY --from=boost-1.76.0:cp39 /usr/local/lib/libboost_python* /usr/local/lib/
+COPY --from=boost-1.76.0:cp310 /usr/local/lib/libboost_python* /usr/local/lib/
+
+ENTRYPOINT [ "/bin/bash" ]
+

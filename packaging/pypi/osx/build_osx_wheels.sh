@@ -2,7 +2,7 @@
 
 # This script will build OSX wheels for Tracktable from the currently
 # checked-out repository.  By default it will build for Python versions
-# 3.5, 3.6, 3.7, 3.8, and 3.9.
+# 3.6, 3.7, 3.8, 3.9 and 3.10.
 #
 # To request just one version, use the '--python-version 3.x' argument.
 # To set the output directory for wheels, use the '--output-directory /path' argument.
@@ -109,8 +109,8 @@ Required Arguments:
 Options:
     -p,--python-version X.Y: Build for Python version X.Y.  This can be
         specified multiple times to build for multiple versions.  By
-        default, wheels will be built for Python 3.5, 3.6, 3.7, 3.8,
-        and 3.9.
+        default, wheels will be built for Python 3.6, 3.7, 3.8,
+        3.9 and 3.10.
 
     -b,--build-root <path>: Build trees will be created under the
         specified directory.  This defaults to the value of the
@@ -152,7 +152,7 @@ EOF
 # same thing everywhere.
 #
 # Arguments:
-#    Argument 1: Python version (e.g. 3.5, 3.8)
+#    Argument 1: Python version (e.g. 3.6, 3.8)
 #
 # Variables Set:
 #    build_directory_name_OUTPUT: requested directory name
@@ -169,7 +169,7 @@ function build_directory_name () {
 # we want.
 #
 # Arguments:
-#     Argument 1: Python version (for example, 3.5)
+#     Argument 1: Python version (for example, 3.6)
 #
 # Returns:
 #     0 on success, 1 on error
@@ -327,7 +327,7 @@ function cmake_run_install () {
 # Like build_directory_name, this is here for consistency.
 #
 # Arguments:
-#     Argument 1: Python version (for example, 3.5)
+#     Argument 1: Python version (for example, 3.6)
 #
 # Output Variables:
 #     conda_environment_name_OUTPUT: String name of environment
@@ -341,7 +341,7 @@ function conda_environment_name () {
 # Check to see if a Conda environment exists for a Python version.
 #
 # Arguments:
-#    Argument 1: Python version (for example, 3.5)
+#    Argument 1: Python version (for example, 3.6)
 #    Argument 2: Name of associative array of Conda environments (retrieve
 #        with list_conda_environments)
 #
@@ -393,7 +393,7 @@ function copy_wheel_to_output () {
 # Create a Conda virtual environment for a given Python version.
 #
 # Arguments:
-#     Argument 1: Python version (for example, 3.5)
+#     Argument 1: Python version (for example, 3.6)
 #
 # Return Value:
 #     1 on success, 0 on failure
@@ -418,23 +418,49 @@ function create_conda_environment () {
 	__envname=${conda_environment_name_OUTPUT}
 
 	msg_info "Creating Conda build environment ${__envname}"
-	conda create \
-		--name ${__envname} \
-		--yes \
-		--channel conda-forge \
-		python=${__python_version} \
-		boost \
-		cartopy \
-		doxygen \
-		folium \
-		graphviz \
-		jupyter \
-		numpy \
-		pip \
-		pytz \
-		sphinx \
-		sphinx_rtd_theme \
-	 	tracktable-data
+	if [ ${__python_version} == "3.5" ]; then
+		conda create \
+			--name ${__envname} \
+			--yes \
+			--channel conda-forge \
+			python=${__python_version} \
+			"python_abi=*=*_cp*" \
+			"boost<=1.76" \
+			cartopy \
+			doxygen \
+			folium \
+			graphviz \
+			jupyter \
+			numpy \
+			pip \
+			pytz \
+			sphinx \
+			twine \
+			tracktable-data \
+			sphinx_rtd_theme
+	else
+		conda create \
+			--name ${__envname} \
+			--yes \
+			--channel conda-forge \
+			python=${__python_version} \
+			"python_abi=*=*_cp*" \
+			"boost<=1.76" \
+			cartopy \
+			doxygen \
+			folium \
+			graphviz \
+			jupyter \
+			numpy \
+			pip \
+			pytz \
+			sphinx \
+			sphinx_rtd_theme \
+			breathe \
+			twine \
+			tracktable-data \
+			"delocate=0.8.2"
+	fi
 
 	# Refresh the list of environments -- we just added one
 	list_conda_environments;
@@ -449,10 +475,12 @@ function create_conda_environment () {
 		exit 6
 	fi
 
-	# These utilities aren't in conda main or conda-forge
-	pip install \
-		delocate \
-		breathe
+	# These utilities aren't supported with conda-forge and python 3.5 so we need to pip install them
+	if [ ${__python_version} == "3.5" ]; then
+		pip install \
+			delocate \
+			breathe
+	fi
 }
 
 
@@ -462,7 +490,7 @@ function create_conda_environment () {
 # that the build directory actually exists.
 #
 # Arguments:
-#     Argument #1: Python version (for example, 3.5)
+#     Argument #1: Python version (for example, 3.6)
 #
 # Returns:
 #     0 on success, 1 on error
@@ -589,7 +617,7 @@ function exit_cleanup () {
 # Python version
 #
 # Arguments:
-#     $1: Python version (for example, 3.5)
+#     $1: Python version (for example, 3.6)
 #
 # Returns:
 #     0 if the environment exists, 1 otherwise
@@ -639,7 +667,7 @@ function list_conda_environments () {
     declare -gA list_conda_environments_OUTPUT
 	local __env_regex="^([a-zA-Z0-9._-]+)[ *]+(\/.+)\$"
 	while IFS= read -r __line; do
-		#msg_debug "Processing line ${__line}"
+		msg_debug "Processing line ${__line}"
 		if [[ ${__line} =~ ${__env_regex} ]]
 			then
 				local __env_name="${BASH_REMATCH[1]}"
@@ -829,7 +857,7 @@ function main () {
 			-j | --parallel ) PARALLEL_JOBS="$2"; shift 2 ;;
 	        -k | --keep-build-trees ) KEEP_BUILD_TREES=1; shift ;;
 			-h | --help ) usage; exit 3 ;;
-			-- ) shift; break ;; ## everything after here is not a swiutch
+			-- ) shift; break ;; ## everything after here is not a switch
 		* ) break ;;
 		esac
 	done
@@ -883,8 +911,8 @@ function main () {
 	# Set default value for Python versions
 	if [[ "${PYTHON_VERSIONS}" == "unset" ]]
 	then
-		msg_debug "No Python versions requested.  Defaulting to 3.5 - 3.9."
-		PYTHON_VERSIONS=(3.5 3.6 3.7 3.8 3.9)
+		msg_debug "No Python versions requested.  Defaulting to 3.6 - 3.10."
+		PYTHON_VERSIONS=(3.6 3.7 3.8 3.9 3.10)
 	fi
 
 	# Check the syntax of all the Python versions
