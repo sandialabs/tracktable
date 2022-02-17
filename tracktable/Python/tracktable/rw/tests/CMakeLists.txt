@@ -30,6 +30,6 @@ include(PythonTest)
 
 set(RW "tracktable.rw.tests")
 
-add_python_test(P_TrajLoad ${RW}.test_load ${Tracktable_SOURCE_DIR}/TestData/Points/SampleFlightsUS.csv ${Tracktable_SOURCE_DIR}/TestData/Points/tab_separated/SampleFlightsUS.tsv ${Tracktable_SOURCE_DIR}/TestData/Trajectories/NYHarbor_2020_06_30_first_hour.traj)
+add_python_test(P_TrajLoad ${RW}.test_load ${Tracktable_DATA_DIR}/internal_test_data/Points/SampleFlightsUS.csv ${Tracktable_DATA_DIR}/internal_test_data/Points/tab_separated/SampleFlightsUS.tsv ${Tracktable_DATA_DIR}/internal_test_data/Trajectories/NYHarbor_2020_06_30_first_hour.traj)
 add_python_test(P_TrajToFromDictionary ${RW}.test_read_write_dictionary)
 add_python_test(P_TrajToFromJson ${RW}.test_read_write_json)

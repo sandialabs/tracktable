@@ -231,6 +231,6 @@ add_test(
 
 add_test(
   NAME C_TrajectoryAssemblyDomain
-  COMMAND test_trajectory_assembly_with_domain ${Tracktable_SOURCE_DIR}/TestData/Points/SampleTrajectories.csv 91 109 86321
+  COMMAND test_trajectory_assembly_with_domain ${Tracktable_DATA_DIR}/internal_test_data/Points/SampleTrajectories.csv 91 109 86321
   )
 

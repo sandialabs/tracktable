@@ -38,7 +38,7 @@ include(PythonTest)
 include(FindPythonModule)
 
 set(EXAMPLE_MODULE tracktable.examples)
-set(EXAMPLES ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable/examples)
+set(TEST_DATA ${Tracktable_DATA_DIR}/internal_test_data)
 
 find_python_module(cartopy CARTOPY_MODULE_STATUS CARTOPY_MODULE_LOCATION)
 
@@ -54,7 +54,7 @@ if (PY_CARTOPY_MODULE)
     --latitude-column 3
     --object-id-column 0
     --timestamp-column 1
-    ${EXAMPLES}/data/SampleHeatmapPoints.csv
+    ${TEST_DATA}/Points/SampleHeatmapPoints.csv
     ${Tracktable_BINARY_DIR}/TestOutput/test_output_heatmap_terrestrial.png
   )
 
@@ -66,7 +66,7 @@ if (PY_CARTOPY_MODULE)
       --timestamp-column 1
       --x-column 2
       --y-column 3
-      ${EXAMPLES}/data/SamplePointsCartesian.csv
+      ${TEST_DATA}/Points/SamplePointsCartesian.csv
       ${Tracktable_BINARY_DIR}/TestOutput/test_output_heatmap_cartesian.png
   )
 
@@ -78,7 +78,7 @@ if (PY_CARTOPY_MODULE)
     --timestamp-column 1
     --longitude-column 2
     --latitude-column 3
-    ${EXAMPLES}/data/SampleTrajectories.csv
+    ${TEST_DATA}/Points/SampleTrajectories.csv
     ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_terrestrial.png
   )
 
@@ -92,7 +92,7 @@ if (PY_CARTOPY_MODULE)
     --x-column 2
     --y-column 3
     --map-bbox -100 -100 100 100
-    ${EXAMPLES}/data/SamplePointsCartesian.csv
+    ${TEST_DATA}/Points/SamplePointsCartesian.csv
     ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_cartesian.png
   )
 
@@ -105,7 +105,7 @@ if (PY_CARTOPY_MODULE)
     --timestamp-column 1
     --x-column 2
     --y-column 3
-    ${EXAMPLES}/data/SamplePointsCartesian.csv
+    ${TEST_DATA}/Points/SamplePointsCartesian.csv
     ${Tracktable_BINARY_DIR}/TestOutput/test_output_trajectory_map_cartesian_auto_bbox.png
   )
 else (PY_CARTOPY_MODULE)
@@ -127,7 +127,7 @@ if (TEST_MOVIES)
   #  --trajectory-linewidth taper
   #  --trajectory-initial-linewidth 4
   #  --trajectory-final-linewidth 1
-  #  ${EXAMPLES}/data/SamplePointsCartesian.csv
+  #  ${TEST_DATA}/Points/SamplePointsCartesian.csv
   #  ${Tracktable_BINARY_DIR}/TestOutput/test_cartesian_trajectory_movie.m4v
   #  )
 
@@ -144,7 +144,7 @@ if (TEST_MOVIES)
   #  --trajectory-linewidth taper
   #  --trajectory-initial-linewidth 4
   #  --trajectory-final-linewidth 1
-  #  ${EXAMPLES}/data/SamplePointsCartesian.csv
+  #  ${TEST_DATA}/Points/SamplePointsCartesian.csv
   #  ${Tracktable_BINARY_DIR}/TestOutput/test_parallel_cartesian_trajectory_movie.m4v
   #  )
 
@@ -161,7 +161,7 @@ if (TEST_MOVIES)
   #  --trajectory-initial-linewidth 2
   #  --trajectory-final-linewidth 0.5
   #  --trail-duration 1800
-  #  ${EXAMPLES}/data/SampleTrajectories.csv
+  #  ${TEST_DATA}/Points/SampleTrajectories.csv
   #  ${Tracktable_BINARY_DIR}/TestOutput/test_terrestrial_trajectory_movie_points.m4v
   #  )
 
@@ -174,7 +174,7 @@ if (TEST_MOVIES)
    #  --trajectory-initial-linewidth 2
    #  --trajectory-final-linewidth 0.5
    #  --trail-duration 1800
-   #  ${EXAMPLES}/data/SampleTrajectories.traj
+   #  ${TEST_DATA}/Points/SampleTrajectories.traj
    #  ${Tracktable_BINARY_DIR}/TestOutput/test_terrestrial_trajectory_movie_trajectories.m4v
    #  )
 

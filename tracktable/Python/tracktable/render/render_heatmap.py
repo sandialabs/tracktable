@@ -64,9 +64,8 @@ def render_heatmap(points, backend='', trajectories=None, **kwargs):
             Defaults to None, which lets the renderer select automatically.
         trajectories (Trajectory): list of trajectories corresponding to the points,
             render trajectories if provided. (Default: None)
-        simplify_traj (bool): Simplify trajectories prior to rendering them
-        simplify_tol (float): Tolerance to use when simplifying trajectories,
-            default is 0.0001
+        simplify_traj (bool): Simplify trajectories prior to rendering them (Default: False)
+        simplify_tol (float): Tolerance to use when simplifying trajectories (Default: 0.0001)
         weights: (list) list of weights associated with each point (Default: None)
         color_map: (str) name of matplotlib colormap to use for the heatmap (Default: 'viridis')
         tiles (str): name of map tiling to use (Default: 'cartodbdark_matter')

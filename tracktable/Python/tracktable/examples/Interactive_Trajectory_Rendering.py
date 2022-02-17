@@ -42,7 +42,7 @@ from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoin
 from tracktable.render.render_trajectories import render_trajectories, render_trajectories_separate
 from tracktable.render.render_trajectories import render_trajectories
 from tracktable.render.render_trajectories import progress_linewidth_generator
-from tracktable.core import data_directory
+from tracktable_data.data import retrieve
 
 import os.path
 import sys
@@ -59,7 +59,7 @@ def main():
 
     #Load sample data for rendering exmples
     #Read in points and assemble trajectories
-    inFile = open(os.path.join(data_directory(), 'SampleFlightsUS.csv'))
+    inFile = open(retrieve('SampleFlightsUS.csv'))
     reader = TrajectoryPointReader()
     reader.input = inFile
     reader.comment_character = '#'

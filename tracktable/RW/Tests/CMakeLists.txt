@@ -236,27 +236,27 @@ add_test(
 
 add_test(
   NAME C_IntegratedPointReader_Cartesian5
-  COMMAND test_integrated_point_reader_cart5 14 ${Tracktable_SOURCE_DIR}/TestData/Points/PointsWithComments.csv
+  COMMAND test_integrated_point_reader_cart5 14 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv
 )
 
 add_test(
   NAME C_IntegratedPointReader_PointFields
-  COMMAND test_point_fields 826 ${Tracktable_SOURCE_DIR}/TestData/Points/SampleNFlights.csv
+  COMMAND test_point_fields 826 ${Tracktable_DATA_DIR}/internal_test_data/Points/SampleNFlights.csv
 )
 
 add_test(
   NAME C_IntegratedPointReader_TPLonLat
-  COMMAND test_integrated_point_reader_traj_lonlat 14 ${Tracktable_SOURCE_DIR}/TestData/Points/PointsWithComments.csv
+  COMMAND test_integrated_point_reader_traj_lonlat 14 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv
 )
 
 add_test(
   NAME C_LineReader
-  COMMAND test_line_reader 1000 ${Tracktable_SOURCE_DIR}/TestData/Points/Points1000.csv
+  COMMAND test_line_reader 1000 ${Tracktable_DATA_DIR}/internal_test_data/Points/Points1000.csv
 )
 
 add_test(
   NAME C_PointFromTokensReader
-  COMMAND test_point_from_tokens_reader 14 ${Tracktable_SOURCE_DIR}/TestData/Points/PointsWithComments.csv
+  COMMAND test_point_from_tokens_reader 14 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv
 )
 
 add_test(
@@ -281,27 +281,27 @@ add_test(
 
 add_test(
   NAME C_SkipCommentsReader
-  COMMAND test_comment_reader 15 ${Tracktable_SOURCE_DIR}/TestData/Points/PointsWithComments.csv
+  COMMAND test_comment_reader 15 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv
 )
 
 add_test(
   NAME C_SkipHeadersReader
-  COMMAND test_reader_skip_headers 4 14 ${Tracktable_SOURCE_DIR}/TestData/Points/PointsWithSkippableHeaders.csv
+  COMMAND test_reader_skip_headers 4 14 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithSkippableHeaders.csv
 )
 
 add_test(
   NAME C_TimestampFormatsReader
-  COMMAND test_reader_timestamp_formats ${Tracktable_SOURCE_DIR}/TestData/Timestamps/
+  COMMAND test_reader_timestamp_formats ${Tracktable_DATA_DIR}/internal_test_data/Timestamps/
 )
 
 add_test(
   NAME C_StringTokenizingReader
-  COMMAND test_tokenizing_reader ${Tracktable_SOURCE_DIR}/TestData/Points/SampleASDI.csv
+  COMMAND test_tokenizing_reader ${Tracktable_DATA_DIR}/internal_test_data/Points/SampleASDI.csv
 )
 
 add_test(
   NAME C_TrajectoryPointReader_DefaultConfiguration
-  COMMAND test_trajectory_point_reader_default 998 ${Tracktable_SOURCE_DIR}/TestData/Points/Points1000.csv
+  COMMAND test_trajectory_point_reader_default 998 ${Tracktable_DATA_DIR}/internal_test_data/Points/Points1000.csv
 )
 
 add_test(

@@ -66,9 +66,8 @@ def render_trajectories(trajectories, backend='', simplify_traj=False, simplify_
         backend (str): Which back end to use.  This can be 'folium' to force
             Folium interactive rendering or 'cartopy' to force static images.
             Defaults to None, which lets the renderer select automatically.
-        simplify_traj (bool): Simplify trajectories prior to rendering them
-        simplify_tol (float): Tolerance to use when simplifying trajectories,
-            default is 0.0001
+        simplify_traj (bool): Simplify trajectories prior to rendering them (Default: False)
+        simplify_tol (float): Tolerance to use when simplifying trajectories (Default: 0.0001)
         map_canvas (map object for given backend): rather than create a new
             map, append to this given map
         obj_ids (str or list of str): only display trajecteories

@@ -36,7 +36,7 @@ from tracktable.domain.terrestrial import TrajectoryPointReader
 from tracktable.render import mapmaker
 from tracktable.render.histogram2d import render_histogram
 from tracktable.render import maps
-from tracktable.core import data_directory
+from tracktable_data.data import retrieve
 
 from matplotlib import pyplot
 import os.path
@@ -62,7 +62,7 @@ def main():
     # so we leave all the column fields as default.
     # The data file we use here is bundled with Tracktable.
     points = []
-    data_filename = os.path.join(data_directory(), 'SampleHeatmapPoints.csv')
+    data_filename = retrieve('SampleHeatmapPoints.csv')
     with open(data_filename, 'r') as inFile:
         reader = TrajectoryPointReader()
         reader.input = inFile

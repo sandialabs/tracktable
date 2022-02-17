@@ -158,23 +158,6 @@ def main():
                 )
         )
 
-    # Include any auxiliary data files such as the stuff in
-    # tracktable.info
-    aux_data_directory = os.path.join(tracktable_home, 'info', 'data')
-    tz_shapefiles = files_from_components(aux_data_directory, 'tz_world.*')
-    wpi_shapefiles = files_from_components(aux_data_directory, 'WPI.*')
-    aux_data_files = tz_shapefiles
-    for filepath in wpi_shapefiles:
-        aux_data_files.append(filepath)
-    aux_data_files.append(os.path.join(aux_data_directory, 'airports.csv'))
-    aux_data_files.append(os.path.join(aux_data_directory, 'ports.csv'))
-
-    example_data_directory = os.path.join(tracktable_home, 'examples', 'data')
-    example_data_files = (
-        files_from_components(example_data_directory, '*.csv') +
-        files_from_components(example_data_directory, '*.traj')
-        )
-
     tutorial_notebook_directory = os.path.join(tracktable_home, 'examples', 'tutorials')
     tutorial_notebook_files = files_from_components(tutorial_notebook_directory, '*.ipynb')
 
@@ -220,7 +203,8 @@ def main():
         'matplotlib',
         'pyshp',
         'pytz',
-        'six'
+        'six',
+        'tracktable-data'
     ]
 
     package_name = 'tracktable'
@@ -246,8 +230,6 @@ def main():
                 (binary_extensions +
                  support_libraries +
                  license_files +
-                 aux_data_files +
-                 example_data_files +
                  tutorial_notebook_files +
                  analytic_demo_notebook_files +
                  analytic_demo_images_files +

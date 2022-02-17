@@ -35,6 +35,7 @@ import operator
 import os
 import os.path
 from csv import DictReader
+from tracktable_data.data import retrieve
 
 from tracktable.core.geomath import intersects
 from tracktable.domain.terrestrial import TrajectoryPoint
@@ -90,7 +91,6 @@ def build_airport_dict():
     else:
         AIRPORT_DICT = dict()
 
-        data_filename = '%s/data/airports.csv' % os.path.dirname(__file__)
         openflight_field_names = [ 'numeric_id',
                                    'name',
                                    'city',
@@ -103,7 +103,7 @@ def build_airport_dict():
                                    'utc_offset',
                                    'daylight_savings' ]
 
-        with open(data_filename, mode='r', encoding='utf-8') as infile:
+        with open(retrieve('airports.csv'), mode='r', encoding='utf-8') as infile:
 #        with open(data_filename, mode='r') as infile:
             csvreader = DictReader(
                 infile,
@@ -137,8 +137,7 @@ def build_airport_dict():
 
             # now we add traffic information - rank each airport by
             # the amount of traffic it sees in some arbitrary period
-            from tracktable.info.data.airport_traffic import \
-                AIRPORTS_BY_TRAFFIC
+            from tracktable_data.python_info_data.airport_traffic import AIRPORTS_BY_TRAFFIC
             airports_with_traffic = sorted(AIRPORTS_BY_TRAFFIC.items(),
                                            key=operator.itemgetter(1),
                                            reverse=True)

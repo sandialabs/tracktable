@@ -173,6 +173,11 @@ set(CMAKE_MACOSX_RPATH ON)
 
 # ----------------------------------------------------------------------
 
+# Git submodule paths
+set(Tracktable_DATA_DIR ${Tracktable_SOURCE_DIR}/tracktable-data/tracktable-data/tracktable_data)
+
+# ----------------------------------------------------------------------
+
 ### Organize programs into folders in Visual Studio, Windows
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 

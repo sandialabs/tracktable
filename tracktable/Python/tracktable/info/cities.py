@@ -235,7 +235,7 @@ def get_city(name, country=None, location=None):
     """
     global CITY_TABLE
     if not CITY_TABLE:
-        from tracktable.info.data.city_table import city_table as cities
+        from tracktable_data.python_info_data.city_table import city_table as cities
         CITY_TABLE = cities
 
     city_list = CITY_TABLE

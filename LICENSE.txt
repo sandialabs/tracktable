@@ -106,7 +106,7 @@ is distributed under the following license:
 ----------
 
 The list of airports in
-tracktable/Python/tracktable/info/data/airports.csv was obtained from
+tracktable-data/tracktable-data/tracktable_data/python_info_data/airports.csv was obtained from
 http://www.partow.net/miscellaneous/airportdatabase and is used in
 accordance with the OSI "Common Public License".  The most recent
 version of this license as of July 2014 is included below.

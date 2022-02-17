@@ -34,6 +34,7 @@ from csv import DictReader
 
 from tracktable.core.geomath import intersects
 from tracktable.domain.terrestrial import TrajectoryPoint
+from tracktable_data.data import retrieve
 
 logger = logging.getLogger(__name__)
 
@@ -90,8 +91,7 @@ def build_port_dict():
   else:
     PORT_DICT = dict()
 
-    data_filename = '%s/data/ports.csv' % os.path.dirname(__file__)
-    with open(data_filename, mode='r', encoding='utf-8') as infile:
+    with open(retrieve('ports.csv'), mode='r', encoding='utf-8') as infile:
         csvreader = DictReader(infile, delimiter=',', quotechar='"')
 
         for row in csvreader:
@@ -111,7 +111,7 @@ def build_port_dict():
         # TODO: If we get decent port traffic stats
         # uncomment this code to sort ports by their traffic
 
-        # from tracktable.info.data.port_traffic import PORTS_BY_TRAFFIC
+        # from tracktable_data.python_info_data.airport_traffic import PORTS_BY_TRAFFIC
         # ports_with_traffic = sorted(PORTS_BY_TRAFFIC.items(),
         #                                 key=operator.itemgetter(1),
         #                                 reverse=True)
