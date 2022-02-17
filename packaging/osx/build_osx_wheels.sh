@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-# This script will build OSX wheels for Tracktable from the currently 
-# checked-out repository.  By default it will build for Python versions 
-# 3.5, 3.6, 3.7, 3.8, and 3.9.  
+# This script will build OSX wheels for Tracktable from the currently
+# checked-out repository.  By default it will build for Python versions
+# 3.5, 3.6, 3.7, 3.8, and 3.9.
 #
-# To request just one version, use the '--python-version 3.x' argument.  
+# To request just one version, use the '--python-version 3.x' argument.
 # To set the output directory for wheels, use the '--output-directory /path' argument.
 # To set the parent directory for the build, use the '--build-root /path' argument.
 
@@ -21,7 +21,7 @@
 ### -------------------------------------------------------------------
 
 # TO DO:
-# 
+#
 # Check CMake version
 # Check Conda environment contents
 # Copy wheel to output directory
@@ -60,7 +60,7 @@ function disable_debug () {
 	set +o nounset
 }
 
-function enable_debug () { 
+function enable_debug () {
 	set -o pipefail
 	set -o nounset
 }
@@ -107,7 +107,7 @@ Required Arguments:
         CMakeLists.txt and RELEASE_NOTES.md.
 
 Options:
-    -p,--python-version X.Y: Build for Python version X.Y.  This can be 
+    -p,--python-version X.Y: Build for Python version X.Y.  This can be
         specified multiple times to build for multiple versions.  By
         default, wheels will be built for Python 3.5, 3.6, 3.7, 3.8,
         and 3.9.
@@ -116,7 +116,7 @@ Options:
         specified directory.  This defaults to the value of the
         environment variable TMPDIR, which is often /tmp on Unix-like
         systems.  This directory needs to have about 1 gigabyte free
-        for each version of Python in the build list.  
+        for each version of Python in the build list.
 
         Note that the build trees will be collected in a temporary
         subdirectory of the build root named 'tracktable-build.XXXXXX'
@@ -130,12 +130,12 @@ Options:
 
     -j,--parallel <jobs>: Run <jobs> parallel build jobs.  The default
         is controlled by the native build tool.  For GNU Make, the default
-        is one.  
+        is one.
 
 Notes:
-    At present, this script does not allow the specification of patch 
-    levels for Python versions (e.g. 3.8.2), only major and minor versions.  
-    It also does not check whether requested Python versions actually exist 
+    At present, this script does not allow the specification of patch
+    levels for Python versions (e.g. 3.8.2), only major and minor versions.
+    It also does not check whether requested Python versions actually exist
     until build time.
 
     This script will be enhanced to allow specification of a post-build
@@ -147,7 +147,7 @@ EOF
 
 # Construct the directory name for a particular Python version.
 #
-# This function is here so that we can just call it to get the 
+# This function is here so that we can just call it to get the
 # directory name instead of having to make sure we type the
 # same thing everywhere.
 #
@@ -263,7 +263,7 @@ function cmake_configure () {
 # Have CMake invoke 'make wheel'.
 #
 # This calls CMake to invoke the build target since we might not always
-# be using GNU make.  
+# be using GNU make.
 #
 # Arguments:
 #     $1: Build directory
@@ -291,7 +291,7 @@ function cmake_build_wheel () {
 #
 # Note:
 #     This function can be parameterized to include parallelization options
-#     for build tools that support it.  
+#     for build tools that support it.
 
 function cmake_run_build () {
 	local __build_directory="$1"
@@ -354,7 +354,7 @@ function conda_environment_name () {
 
 function conda_environment_exists () {
 	local __python_version="$1"
-	
+
 	msg_debug "Checking for Conda environment for Python ${__python_version}"
 
 	conda_environment_name ${__python_version}
@@ -380,7 +380,7 @@ function conda_environment_exists () {
 #     $2: destination directory
 #
 # Returns:
-#     0 on success, 1 on failure 
+#     0 on success, 1 on failure
 
 function copy_wheel_to_output () {
 	local __build_directory="$1"
@@ -398,9 +398,9 @@ function copy_wheel_to_output () {
 # Return Value:
 #     1 on success, 0 on failure
 #
-# NOTE: 
+# NOTE:
 #     This function could be enhanced to parameterize on Boost
-#     version as well. 
+#     version as well.
 #
 # NOTE:
 #     Channel names and package contents are hard-coded.  Further
@@ -413,7 +413,7 @@ function copy_wheel_to_output () {
 function create_conda_environment () {
 	local __python_version=$1
 	local __envname
-	
+
 	conda_environment_name ${__python_version}
 	__envname=${conda_environment_name_OUTPUT}
 
@@ -433,7 +433,8 @@ function create_conda_environment () {
 		pip \
 		pytz \
 		sphinx \
-		sphinx_rtd_theme
+		sphinx_rtd_theme \
+	 	tracktable-data
 
 	# Refresh the list of environments -- we just added one
 	list_conda_environments;
@@ -584,7 +585,7 @@ function exit_cleanup () {
 }
 
 
-# Retrieve the path containing the Conda environment for a given 
+# Retrieve the path containing the Conda environment for a given
 # Python version
 #
 # Arguments:
@@ -593,7 +594,7 @@ function exit_cleanup () {
 # Returns:
 #     0 if the environment exists, 1 otherwise
 #
-# Output Variables: 
+# Output Variables:
 #     find_conda_environment_path_OUTPUT: Path to environment
 #
 # Global Variables:
@@ -655,7 +656,7 @@ function list_conda_environments () {
 		)
 }
 
-   
+
 # Create the build directory for a specific Python version.
 #
 # Relies on BUILD_ROOT being set to provide the root path for all
@@ -707,22 +708,22 @@ function map_has_key () {
 
 
 
-# Write an error message.  This will only produce output if the 
+# Write an error message.  This will only produce output if the
 # variable ERROR is set to 1.
 #
 # No return values.
 
 function msg_error() {
-	[[ "${ERROR}" == "1" ]] && echo -e "[ERROR]: $*" >&2 
+	[[ "${ERROR}" == "1" ]] && echo -e "[ERROR]: $*" >&2
 }
 
-# Write a debug message.  This will only produce output if the 
+# Write a debug message.  This will only produce output if the
 # variable DEBUG is set to 1.
 #
 # No return values.
 
 function msg_debug() {
-	[[ "${DEBUG}" == "1" ]] && echo -e "[DEBUG]: $*" 
+	[[ "${DEBUG}" == "1" ]] && echo -e "[DEBUG]: $*"
 }
 
 # Write an informational message.  This will only produce output
@@ -736,7 +737,7 @@ function msg_info() {
 
 
 # Parse a version string to make sure it's of the format <major>.<minor>,
-# where <major> is a single digit and <minor> is an integer.  
+# where <major> is a single digit and <minor> is an integer.
 #
 # Arguments:
 #    Argument 1: String to be parsed
@@ -798,7 +799,7 @@ function main () {
 
 	### -------------------------------------------------------------------
 	### Parse command line options
-	### 
+	###
 	### This section sets the following variables:
 	###
 	### _tmpdir_root - Where to make our temporary directory
@@ -820,11 +821,11 @@ function main () {
 	while true; do
 		case "$1" in
 			-b | --build-root ) WORKDIR_LOCATION="$2"; shift 2 ;;
-			-p | --python-version ) if [ "${PYTHON_VERSIONS}" == "unset" ]; 
-									then PYTHON_VERSIONS=("$2"); 
+			-p | --python-version ) if [ "${PYTHON_VERSIONS}" == "unset" ];
+									then PYTHON_VERSIONS=("$2");
 									else PYTHON_VERSIONS+=("$2");
 									fi; shift 2 ;;
-			-w | --wheel-directory ) WHEEL_DIRECTORY="$2"; shift 2 ;; 
+			-w | --wheel-directory ) WHEEL_DIRECTORY="$2"; shift 2 ;;
 			-j | --parallel ) PARALLEL_JOBS="$2"; shift 2 ;;
 	        -k | --keep-build-trees ) KEEP_BUILD_TREES=1; shift ;;
 			-h | --help ) usage; exit 3 ;;
@@ -911,7 +912,7 @@ function main () {
 	### --------------------------------------------------------------------
 	### Grab Conda environments for future reference
 	### This will populate the variable list_conda_environments_OUTPUT
-	list_conda_environments 
+	list_conda_environments
 
 	### --------------------------------------------------------------------
 	### Make sure we have a place for our builds
@@ -973,7 +974,7 @@ function main () {
 		fi
 
 
-		if ! cmake_run_install ${__build_directory}; then 
+		if ! cmake_run_install ${__build_directory}; then
 			msg_error "CMake install stage failed.  Exiting."
 			return 30
 		fi

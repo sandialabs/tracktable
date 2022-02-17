@@ -33,6 +33,8 @@
 import os
 import shutil
 import subprocess
+import filecmp
+import hashlib
 
 def copy_notebooks(source, dest):
     for thing in os.scandir(source):
@@ -41,7 +43,11 @@ def copy_notebooks(source, dest):
                 os.mkdir(os.path.join(dest, thing.name))
             copy_notebooks(os.path.join(source, thing.name), os.path.join(dest, thing.name))
         else:
-            shutil.copy(os.path.join(source, thing.name), dest)
+            if os.path.exists(os.path.join(dest, thing.name)): # If the files are already copied check if we even need to copy them
+                if not filecmp.cmp(os.path.join(source, thing.name), os.path.join(dest, thing.name)):
+                    shutil.copy(os.path.join(source, thing.name), dest)
+            else:
+                shutil.copy(os.path.join(source, thing.name), dest)
 
 # --------------------------------------------------------------------
 
@@ -67,17 +73,25 @@ def main():
 
     # Copy tutorial notebooks to tracktable and clear output
     tracktable_docs_tutorial_notebook_directory = os.path.join(tracktable_docs, 'tutorial_notebooks')
+    tracktable_docs_cleaned_tutorial_notebook_directory = os.path.join(tracktable_docs, "cleaned_tutorial_notebooks")
     tutorial_notebook_directory = os.path.join(tracktable_home, 'examples', 'tutorials')
 
-    copy_notebooks(tracktable_docs_tutorial_notebook_directory, tutorial_notebook_directory)
-    clear_notebook_output(tutorial_notebook_directory, nbconvert_version)
+    os.mkdir(tracktable_docs_cleaned_tutorial_notebook_directory)
+    copy_notebooks(tracktable_docs_tutorial_notebook_directory, tracktable_docs_cleaned_tutorial_notebook_directory)
+    clear_notebook_output(tracktable_docs_cleaned_tutorial_notebook_directory, nbconvert_version)
+    copy_notebooks(tracktable_docs_cleaned_tutorial_notebook_directory, tutorial_notebook_directory)
+    shutil.rmtree(tracktable_docs_cleaned_tutorial_notebook_directory)
 
     # Copy analytic demo notebooks and images to tracktable and clear output
     tracktable_docs_analytic_demo_notebook_directory = os.path.join(tracktable_docs, 'analytic_demo_notebooks')
+    tracktable_docs_cleaned_analytic_demo_notebook_directory = os.path.join(tracktable_docs, "cleaned_analytic_demo_notebooks")
     analytic_demo_notebook_directory = os.path.join(tracktable_home, 'examples', 'analytic_demos')
 
-    copy_notebooks(tracktable_docs_analytic_demo_notebook_directory, analytic_demo_notebook_directory)
-    clear_notebook_output(analytic_demo_notebook_directory, nbconvert_version)
+    os.mkdir(tracktable_docs_cleaned_analytic_demo_notebook_directory)
+    copy_notebooks(tracktable_docs_analytic_demo_notebook_directory, tracktable_docs_cleaned_analytic_demo_notebook_directory)
+    clear_notebook_output(tracktable_docs_cleaned_analytic_demo_notebook_directory, nbconvert_version)
+    copy_notebooks(tracktable_docs_cleaned_analytic_demo_notebook_directory, analytic_demo_notebook_directory)
+    shutil.rmtree(tracktable_docs_cleaned_analytic_demo_notebook_directory)
 
 
 if __name__=='__main__':

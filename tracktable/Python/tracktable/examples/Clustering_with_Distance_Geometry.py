@@ -69,7 +69,7 @@ from tracktable.analysis.distance_geometry import distance_geometry_by_distance
 from tracktable.domain.terrestrial import TrajectoryPointReader
 from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
 from tracktable.analysis.dbscan import compute_cluster_labels
-from tracktable.core import data_directory
+from tracktable_data.data import retrieve
 from tracktable.render import paths
 from tracktable.domain import terrestrial
 from tracktable.render import mapmaker
@@ -90,7 +90,7 @@ def cluster_name(cid):
 
 def main():
 
-    data_filename = os.path.join(data_directory(), 'SampleFlightsUS.csv')
+    data_filename = retrieve('SampleFlightsUS.csv')
     inFile = open(data_filename, 'r')
     reader = TrajectoryPointReader()
     reader.input = inFile

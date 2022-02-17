@@ -39,28 +39,23 @@ from numpy import zeros
 from tracktable.applications.assemble_trajectories import \
     AssembleTrajectoryFromPoints
 from tracktable.applications.trajectory_splitter import split_when_idle
-from tracktable.core import data_directory
 from tracktable.core.geomath import (convex_hull_area, end_to_end_distance,
                                      length, speed_between)
 from tracktable.domain.terrestrial import TrajectoryPointReader
 from tracktable.render import render_map
 from tracktable.render.map_processing import maps
-from tracktable.render.render_map import render_map
-from tracktable.rw.load import load_trajectories
+from tracktable_data.data import retrieve
 
 # TODO: Error handling throughout.
 
-SAMPLE_DATA_FILENAMES = {'tutorial-csv': os.path.join(data_directory(),'NYHarbor_2020_06_30_first_hour.csv'),
-                         'tutorial-traj': os.path.join(data_directory(),'NYHarbor_2020_06_30_first_hour.traj'),
-                         'tutorial-static-viz': os.path.join(data_directory(), 'SampleTrajectories.traj'),
-                         'rendezvous': os.path.join(data_directory(),'VirginiaBeach_2020_06_04_to_06_filtered.traj'),
-                         'boxiness': os.path.join(data_directory(),'VirginiaBeach_2020_06_04_to_06_filtered.traj'),
-                         'shape': os.path.join(data_directory(),'US_coastal_2020_06_30.traj'),
-                         'anomaly-historical': os.path.join(data_directory(),'NYHarbor_2020_12_first_week.traj'),
-                         'anomaly-test': os.path.join(data_directory(),'NYHarbor_2020_12_08.traj'),
-                         'global-flights': os.path.join(data_directory(),'SampleTrajectories.csv'),
-                         'two-flights': os.path.join(data_directory(),'TwoSampleFlights.csv'),
-                         'us-flights': os.path.join(data_directory(),'SampleFlightsUS.csv'),
+SAMPLE_DATA_FILENAMES = {'tutorial-csv': retrieve('NYHarbor_2020_06_30_first_hour.csv'),
+                         'tutorial-traj': retrieve('NYHarbor_2020_06_30_first_hour.traj'),
+                         'tutorial-static-viz': retrieve( 'SampleTrajectories.traj'),
+                         'rendezvous': retrieve('VirginiaBeach_2020_06_04_to_06_filtered.traj'),
+                         'boxiness': retrieve('VirginiaBeach_2020_06_04_to_06_filtered.traj'),
+                         'shape': retrieve('US_coastal_2020_06_30.traj'),
+                         'anomaly-historical': retrieve('NYHarbor_2020_12_first_week.traj'),
+                         'anomaly-test': retrieve('NYHarbor_2020_12_08.traj')
                         }
 
 

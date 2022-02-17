@@ -10,12 +10,12 @@ variables:
   # should skip.  We use this for problematic tests that fail for
   # reasons unrelated to problems with the code -- that is, tests
   # that themselves are buggy.
-    EXCLUDED_TESTS: "C_MemoryUse|C_GREAT_CIRCLE_FIT|P_Render_Trajectories|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe"
+  EXCLUDED_TESTS: "C_MemoryUse|C_GREAT_CIRCLE_FIT|P_Render_Trajectories|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe"
   # This is a switch for determining whether or not to run the
   # code coverage pipeline.  Combined with a schedule on "develop", this
   # should allow us to do code coverage once a week at an innocuous time
-    DO_COVERAGE: "false"
-    GIT_SUBMODULE_STRATEGY: recursive
+  DO_COVERAGE: "false"
+  GIT_SUBMODULE_STRATEGY: recursive
 
 include:
   - '.gitlab-ci-code_analysis.yml'

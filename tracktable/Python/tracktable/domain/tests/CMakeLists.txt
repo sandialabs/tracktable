@@ -44,16 +44,16 @@ add_python_test(P_GeometricMedian ${DOMAIN}.test_geometric_median)
 add_python_test(P_NoFlushClosedStream ${DOMAIN}.test_no_flush_closed_stream)
 
 add_python_test(P_Terrestrial_BasePointReader
-  ${DOMAIN}.test_terrestrial_base_point_reader ${Tracktable_SOURCE_DIR}/TestData/Points/PointsWithComments.csv 14
+  ${DOMAIN}.test_terrestrial_base_point_reader ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv 14
   )
 
 add_python_test(P_Terrestrial_TrajectoryPointReader
-  ${DOMAIN}.test_terrestrial_trajectory_point_reader ${Tracktable_SOURCE_DIR}/TestData/Points/PointsWithComments.csv 14
+  ${DOMAIN}.test_terrestrial_trajectory_point_reader ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv  14
   )
 
 add_python_test(
   P_Terrestrial_ManyBasePointReader
-  ${DOMAIN}.test_terrestrial_many_base_point_reader ${Tracktable_SOURCE_DIR}/TestData/Points/tab_separated/SampleHeatmapPoints.tsv 50000
+  ${DOMAIN}.test_terrestrial_many_base_point_reader ${Tracktable_DATA_DIR}/internal_test_data/Points/tab_separated/SampleHeatmapPoints.tsv 50000
   )
 
 add_python_test(
@@ -203,7 +203,7 @@ add_python_test(
 
 add_python_test(
   P_Terrestrial_ManyTrajectoryPointReader
-  ${DOMAIN}.test_terrestrial_many_trajectory_point_reader ${Tracktable_SOURCE_DIR}/TestData/Points/tab_separated/SampleHeatmapPoints.tsv 50000
+  ${DOMAIN}.test_terrestrial_many_trajectory_point_reader ${Tracktable_DATA_DIR}/internal_test_data/Points/tab_separated/SampleHeatmapPoints.tsv 50000
 )
 
 add_python_test(

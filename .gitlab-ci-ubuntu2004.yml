@@ -79,6 +79,7 @@ ubuntu2004-test:
   before_script:
     - *ubuntu2004-before
   script:
+    - pip3 install --trusted-host pypi.org --trusted-host files.pythonhosted.org tracktable-data # TODO (mjfadem): This is a band-aid fix for right now
     - cp build_ubuntu2004/lib/_*.so tracktable/Python/tracktable/lib/
     - cd build_ubuntu2004
     - ctest --output-on-failure --exclude-regex 'C_GREAT_CIRCLE_FIT|C_MemoryUse|C_PointGenerator|P_TerrestrialHeatmapExample|P_TerrestrialTrajectoryMapExample|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe|P_Render_Trajectories'

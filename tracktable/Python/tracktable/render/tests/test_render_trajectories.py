@@ -36,8 +36,7 @@ import os.path
 import sys
 
 def load_sample_data(path):
-    inFile = open(os.path.join(path,
-                               '../../examples/data/SampleFlightsUS.csv'))
+    inFile = open(os.path.join(path, 'SampleFlightsUS.csv'))
     reader = TrajectoryPointReader()
     reader.input = inFile
     reader.comment_character = '#'

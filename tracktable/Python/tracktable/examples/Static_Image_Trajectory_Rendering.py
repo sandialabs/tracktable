@@ -39,7 +39,7 @@ The Trajectory Builder does this.
 
 from tracktable.domain import terrestrial
 from tracktable.render import mapmaker
-from tracktable.core import data_directory
+from tracktable_data.data import retrieve
 from tracktable.render import paths
 from tracktable.feature import annotations
 
@@ -71,7 +71,7 @@ def main():
     # Replace the following with your own code to build the trajectories
     # or use the provided example.
 
-    trajectory_filename = os.path.join(data_directory(), 'SampleTrajectories.traj')
+    trajectory_filename = retrieve('SampleTrajectories.traj')
     infile = open(trajectory_filename, 'r')
     trajectories = terrestrial.TrajectoryReader()
     trajectories.input = infile
@@ -94,7 +94,7 @@ def main():
     # north_america, south_america, australia and world.
 
     # Let us expand our view using another custom map.
-    trajectory_filename = os.path.join(data_directory(), 'SampleTrajectories.traj')
+    trajectory_filename = retrieve('SampleTrajectories.traj')
     infile = open(trajectory_filename, 'r')
     trajectories = terrestrial.TrajectoryReader()
     trajectories.input = infile
@@ -112,7 +112,7 @@ def main():
     # We can customize our trajectories by adding color, changing the linewidth, etc.
 
     # Get trajectories and set up the map figure
-    trajectory_filename = os.path.join(data_directory(), 'SampleTrajectories.traj')
+    trajectory_filename = retrieve('SampleTrajectories.traj')
     infile = open(trajectory_filename, 'r')
     trajectories = terrestrial.TrajectoryReader()
     trajectories.input = infile

@@ -81,9 +81,7 @@ def main():
     if len(sys.argv) == 2:
         trajectory_filename = sys.argv[1]
     else:
-        trajectory_filename = os.path.join(
-            tracktable.core.data_directory(), 'SampleTrajectories.csv'
-            )
+        trajectory_filename = os.path.join(os.path.dirname(__file__), '../../../../../tracktable-data/tracktable-data/tracktable_data/internal_test_data/Points/SampleTrajectories.csv')
 
     all_trajectories = load_trajectories(trajectory_filename)
     print('Loaded {} trajectories from disk.'.format(len(all_trajectories)))

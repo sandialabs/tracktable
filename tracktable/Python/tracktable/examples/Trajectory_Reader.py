@@ -38,7 +38,7 @@ you have and access the properties of the points in each trajectory.
 """
 
 from tracktable.domain.terrestrial import TrajectoryReader
-from tracktable.core import data_directory
+from tracktable_data.data import retrieve
 import os.path
 import sys
 
@@ -49,7 +49,7 @@ def main():
     # we use the default which is the terrestrial point reader. Terrestrial
     # is typically used on real data. In order to access the trajectories,
     # iterate over the reader.
-    data_filename = os.path.join(data_directory(), 'SampleTrajectories.traj')
+    data_filename = retrieve('SampleTrajectories.traj')
     inFile = open(data_filename, 'r')
     reader = TrajectoryReader()
     reader.input = inFile
