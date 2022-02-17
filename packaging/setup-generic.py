@@ -120,6 +120,16 @@ def main():
 
     # --------------------
 
+    # Update tracktable's version if we're doing a nightly build
+    if os.getenv("NIGHTLY") == "true":
+        from datetime import datetime
+        today = datetime.today().strftime('%m%d%Y') # month, day, year format
+        nightly_version = ".dev" + today # `dev` or `post` are the only words accepted in version strings
+        metadata_from_init["version"] =  metadata_from_init["version"] + nightly_version
+        print("Updating version to nightly version: {}".format(metadata_from_init["version"]))
+
+    # --------------------
+
     # Computed properties here
 
     here = os.getcwd()
@@ -188,10 +198,11 @@ def main():
         os_classifier,
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: C++",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Scientific/Engineering :: Information Analysis",
@@ -208,9 +219,11 @@ def main():
     ]
 
     package_name = 'tracktable'
-    version_required = '>=3.5'
+    version_required = '>=3.6'
 
     # --------------------
+
+    print(metadata_from_init)
 
     setup(
         # Static properties

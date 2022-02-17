@@ -1,5 +1,5 @@
-# Fully Featured Tracktable Development Anaconda Environment
-name: tracktable-dev
+# Tracktable Windows Python 3.9 CI/CD Anaconda Environment
+name: tracktable-windows-ci-py39
 channels:
   - conda-forge
 dependencies:
@@ -7,7 +7,7 @@ dependencies:
   - git
 
   # Python Dependencies
-  - python>=3.6, <=3.10
+  - python=3.9
   - pip
   - numpy>=1.7
   - matplotlib>=3.0
@@ -22,7 +22,7 @@ dependencies:
 
   # C++ Dependencies
   - compilers
-  - boost>=1.74, <=1.76
+  - boost>=1.74, <=1.75
   - cmake>=3.19.5
   - ninja>=1.10.0
 
@@ -44,3 +44,6 @@ dependencies:
   - doxygen>=1.8.17
   - graphviz >=2.42.2
   - breathe>=4.26.1
+
+  # Packaging Dependencies
+  - twine

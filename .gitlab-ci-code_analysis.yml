@@ -16,8 +16,7 @@ mypy:
   image: $DOCKER_IMAGE
   stage: code analysis
   tags:
-    - ubuntu
-    - docker
+    - linux
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH == "develop"
@@ -42,8 +41,7 @@ mypy:
 #   image: $DOCKER_IMAGE
 #   stage: code analysis
 #   tags:
-#     - ubuntu
-#     - docker
+#     - linux
 #   allow_failure: true
 #   rules:
 #     - if: $CI_COMMIT_BRANCH == "develop"
@@ -60,8 +58,7 @@ pylint:
   image: $DOCKER_IMAGE
   stage: code analysis
   tags:
-    - ubuntu
-    - docker
+    - linux
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH == "develop"
