@@ -52,7 +52,7 @@ function(SETUP_CODE_COVERAGE)
             set(LCOV_BRANCH_COVERAGE ${LCOV_PATH} --rc lcov_branch_coverage=1)
 
             add_custom_target(cov_init
-                COMMAND ${LCOV_BRANCH_COVERAGE} --capture --initial --directory ${CMAKE_SOURCE_DIR} --output-file coverage_base.info
+                COMMAND ${LCOV_BRANCH_COVERAGE} --capture --initial --directory ${CMAKE_SOURCE_DIR} --output-file coverage_base.info --no-external
             )
 
             add_custom_target(cov_unit
@@ -62,12 +62,13 @@ function(SETUP_CODE_COVERAGE)
             )
 
             add_custom_target(cov_capture
-                COMMAND ${LCOV_BRANCH_COVERAGE} --capture --directory ${CMAKE_SOURCE_DIR} --output-file coverage_test.info
+                COMMAND ${LCOV_BRANCH_COVERAGE} --capture --directory ${CMAKE_SOURCE_DIR} --output-file coverage_test.info --no-external
                 COMMAND ${LCOV_BRANCH_COVERAGE} --add-tracefile coverage_base.info --add-tracefile coverage_test.info --output coverage_total.info
                 COMMAND ${LCOV_BRANCH_COVERAGE} --remove coverage_total.info
                     '/usr/*'                         # Exclude stuff from /usr/
                     ${CODE_COVERAGE_EXCLUDES}
                     --output-file coverage_filtered.info
+                COMMAND ${LCOV_BRANCH_COVERAGE} --list coverage_test.info --no-external
             )
 
             if (GENHTML_PATH)

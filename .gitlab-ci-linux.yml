@@ -41,7 +41,7 @@ linux-configure:
     - *linux-before
   script:
     - cd build_linux
-    - cmake -GNinja -DBUILD_DOCUMENTATION_CXX_ONLY=ON ..
+    - cmake -GNinja -DBUILD_DOCUMENTATION=OFF ..
   artifacts:
     paths:
       - build_linux
