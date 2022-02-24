@@ -15,7 +15,6 @@ variables:
   # This is a switch for determining whether or not to run the
   # code coverage pipeline.  Combined with a schedule on "develop", this
   # should allow us to do code coverage once a week at an innocuous time
-  DO_COVERAGE: "false"
   GIT_SUBMODULE_STRATEGY: recursive
 
 include:
@@ -23,4 +22,3 @@ include:
   - '.gitlab-ci-windows.yml'
   - '.gitlab-ci-macos.yml'
   - '.gitlab-ci-linux.yml'
-  - '.gitlab-ci-coverage.yml'
