@@ -111,12 +111,19 @@ def main():
     # Parse the following properties out of the top-level __init__.py
     # so that they are always current.
     properties_in_init = [
-        'author', 'description', 'license', 'maintainer', 'url', 'version'
-    ]
+                        'author',
+                        'description',
+                        'license',
+                        'maintainer',
+                        'url'
+                    ]
 
     metadata_from_init = {}
     for key in properties_in_init:
         metadata_from_init[key] = find_metadata_property(init_file_text, key)
+
+    version = re.search(r"^TRACKTABLE VERSION ([0-9\.]*)", open(os.path.join(os.path.dirname(__file__), "..", "version.txt"), "rt").read(), re.M).group(1)
+    metadata_from_init['version'] = version
 
     # --------------------
 
@@ -215,6 +222,7 @@ def main():
         'pyshp',
         'pytz',
         'six',
+        'folium'
         'tracktable-data'
     ]
 

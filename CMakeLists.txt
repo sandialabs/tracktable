@@ -29,7 +29,9 @@
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
-cmake_minimum_required(VERSION 3.19)
+file(READ "version.txt" ver)
+string(REGEX MATCH "CMAKE VERSION ([0-9\\.]*)" _ ${ver})
+cmake_minimum_required(VERSION ${CMAKE_MATCH_1})
 message(STATUS "Building with CMake version ${CMAKE_VERSION}")
 
 if (POLICY CMP0042)
@@ -67,8 +69,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ##########################################################################
 # Begin RELEASE VARIABLES
 #-------------------------------------------------------------------------
-
-set(TRACKTABLE_VERSION 1.6.0)
+string(REGEX MATCH "TRACKTABLE VERSION ([0-9\\.]*)" _ ${ver})
+set(TRACKTABLE_VERSION ${CMAKE_MATCH_1})
 set(RPM_RELEASE 6)
 
 project(Tracktable LANGUAGES C CXX VERSION ${TRACKTABLE_VERSION})
@@ -103,9 +105,12 @@ include(GNUInstallDirs)
 # +1 :  ? :  0 == new interface that breaks old one
 #  ? :  ? :  0 == no new interfaces, but breaks apps
 #  ? : +1 :  ? == just some internal changes, nothing breaks but might work better
-set(UNIX_SO_VERSION_CURRENT  6)
-set(UNIX_SO_VERSION_REVISION 0)
-set(UNIX_SO_VERSION_AGE      0)
+string(REGEX MATCH "UNIX SO VERSION CURRENT ([0-9]*)" _ ${ver})
+set(UNIX_SO_VERSION_CURRENT  ${CMAKE_MATCH_1})
+string(REGEX MATCH "UNIX SO VERSION REVISION ([0-9]*)" _ ${ver})
+set(UNIX_SO_VERSION_REVISION ${CMAKE_MATCH_1})
+string(REGEX MATCH "UNIX SO VERSION AGE ([0-9]*)" _ ${ver})
+set(UNIX_SO_VERSION_AGE      ${CMAKE_MATCH_1})
 
 #-------------------------------------------------------------------------
 # End RELEASE VARIABLES
@@ -388,7 +393,8 @@ message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")
 #=========================================================================
 # Begin FindBoost
 #-------------------------------------------------------------------------
-set(BOOST_MINIMUM_VERSION_REQUIRED 1.67)
+string(REGEX MATCH "BOOST VERSION ([0-9\\.]*)" _ ${ver})
+set(BOOST_MINIMUM_VERSION_REQUIRED ${CMAKE_MATCH_1})
 
 # Do not use Boost's CMake modules yet.
 set(Boost_NO_BOOST_CMAKE ON)
