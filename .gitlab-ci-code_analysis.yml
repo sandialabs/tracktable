@@ -5,8 +5,13 @@
 # Note: We leverage Ubuntu dockers container to run our code analysis stages
 
 variables:
-  PYTHON_ANALYSIS_DOCKER_IMAGE: cee-gitlab.sandia.gov:4567/innersource/docker/ubuntu-dev:18.04-amd64
-  COVERAGE_DOCKER_IMAGE: cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu/20.04:2
+  PYTHON_ANALYSIS_DOCKER_IMAGE: $CI_REGISTRY/innersource/docker/ubuntu-dev:18.04-amd64
+  COVERAGE_DOCKER_IMAGE: $CI_REGISTRY/trajectory/tracktable/ubuntu/20.04:2
+  CPP_ANALYSIS_DOCKER_IMAGE: $CI_REGISTRY/trajectory/tracktable/ubuntu/20.04:2
+
+.linux-before: &linux-before
+    - . /root/miniconda3/etc/profile.d/conda.sh
+    - conda activate tracktable-dev
 
 ########################
 # Python Code Analysis #
@@ -77,7 +82,48 @@ pylint:
 #####################
 # C++ Code Analysis #
 #####################
-# TODO: Add C++ code analysis
+snl-analysis-tool:
+  stage: code analysis
+  tags:
+    - linux-shell
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY/${SNL_ANALYSIS_TOOL}/${SNL_ANALYSIS_TOOL}/${SNL_ANALYSIS_TOOL}
+    - docker tag $CI_REGISTRY/${SNL_ANALYSIS_TOOL}/${SNL_ANALYSIS_TOOL}/${SNL_ANALYSIS_TOOL} ${SNL_ANALYSIS_TOOL}:latest
+    - cd tracktable
+    - mkdir snl_analysis
+    - docker run --rm -v $(pwd):/src --name source ${SNL_ANALYSIS_TOOL} -f xml -f html -o snl_analysis
+  artifacts:
+    paths:
+      - tracktable/snl_analysis
+
+cppcheck:
+  image: $CPP_ANALYSIS_DOCKER_IMAGE
+  stage: code analysis
+  tags:
+    - linux
+  before_script:
+    - *linux-before
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
+  script:
+    - conda install -c conda-forge cppcheck pygments -y
+    - cd tracktable
+    - cppcheck . -iThirdParty --force --enable=all --xml 2> err.xml --verbose -j 6
+    - cppcheck-htmlreport --file=err.xml --report-dir=cppcheck_output --source-dir=.
+
+    # This takes forever to run, not sure if the results are worth it from the partial results I've seen.
+    # - cppcheck . -iThirdParty --force --enable=all --xml 2> err.xml --verbose -j 6 --bug-hunting
+    # - cppcheck-htmlreport --file=err.xml --report-dir=cppcheck_output_bug_hunting --source-dir=.
+  artifacts:
+    paths:
+      - tracktable/err.xml
+      - tracktable/cppcheck_output
+      # - tracktable/cppcheck_output_bug_hunting
 
 #################
 # Code Coverage #
