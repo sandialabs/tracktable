@@ -1,6 +1,10 @@
 # We'll start from a basic Ubuntu 20.04 image.
-FROM cee-gitlab.sandia.gov:4567/innersource/docker/ubuntu:focal as build
+ARG CI_REGISTRY
+FROM ${CI_REGISTRY}/innersource/docker/ubuntu:focal as build
 WORKDIR /root
+
+ARG HTTPS_PROXY
+ARG HTTP_PROXY
 
 ARG MINICONDA_VERSION=latest
 ENV MINICONDA_URL=https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh
@@ -14,8 +18,8 @@ RUN /bin/bash /root/miniconda.sh -b
 RUN rm /root/miniconda.sh
 RUN echo "source /root/miniconda3/etc/profile.d/conda.sh" >> /root/.bashrc
 RUN /root/miniconda3/condabin/conda init bash
-RUN /root/miniconda3/condabin/conda config --set proxy_servers.http http://proxy.sandia.gov:80
-RUN /root/miniconda3/condabin/conda config --set proxy_servers.https http://proxy.sandia.gov:80
+RUN /root/miniconda3/condabin/conda config --set proxy_servers.http ${HTTP_PROXY}
+RUN /root/miniconda3/condabin/conda config --set proxy_servers.https ${HTTPS_PROXY}
 RUN /root/miniconda3/condabin/conda config --set ssl_verify /etc/ssl/certs/ca-certificates.crt
 RUN /root/miniconda3/condabin/conda config --add channels conda-forge
 RUN /root/miniconda3/condabin/conda update -qy conda

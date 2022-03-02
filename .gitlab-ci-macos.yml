@@ -7,6 +7,10 @@ macos-setup:
   tags:
     - macos
     - anaconda
+  # TODO: Figure out how to skip the pipeline, this rule doesn't work for some reason
+  # rules:
+  #   - if: $SKIP_NORMAL_PIPELINE && $SKIP_NORMAL_PIPELINE == "true"
+  #     when: never
   script:
     - ./ci/macos/configure_anaconda_environment.sh
     - mkdir build_macos

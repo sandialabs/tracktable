@@ -1,7 +1,0 @@
-pytz
-folium
-leaflet
-cartopy
-auditwheel
-nbsphinx-link
-tracktable-data

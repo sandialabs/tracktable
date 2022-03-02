@@ -44,5 +44,5 @@ docker build \
        .
 
 echo "Uploading boost multipython container to container registry"
-docker tag boost_multipython:latest cee-gitlab.sandia.gov:4567/trajectory/tracktable/linux/boost_multipython:latest
-docker push cee-gitlab.sandia.gov:4567/trajectory/tracktable/linux/boost_multipython:latest
+docker tag boost_multipython:latest ${CI_REGISTRY}/trajectory/tracktable/linux/boost_multipython:latest
+docker push ${CI_REGISTRY}/trajectory/tracktable/linux/boost_multipython:latest

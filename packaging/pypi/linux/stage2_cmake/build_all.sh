@@ -10,8 +10,9 @@ curl \
 echo "Building boost multipython cmake container"
 docker build \
        -t boost_multipython_cmake:latest \
+       --build-arg CI_REGISTRY=${CI_REGISTRY} \
        .
 
 echo "Uploading boost multipython cmake container to container registry"
-docker tag boost_multipython_cmake:latest cee-gitlab.sandia.gov:4567/trajectory/tracktable/linux/boost_multipython_cmake:latest
-docker push cee-gitlab.sandia.gov:4567/trajectory/tracktable/linux/boost_multipython_cmake:latest
+docker tag boost_multipython_cmake:latest ${CI_REGISTRY}/trajectory/tracktable/linux/boost_multipython_cmake:latest
+docker push ${CI_REGISTRY}/trajectory/tracktable/linux/boost_multipython_cmake:latest

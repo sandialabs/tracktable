@@ -135,6 +135,12 @@ def main():
         metadata_from_init["version"] =  metadata_from_init["version"] + nightly_version
         print("Updating version to nightly version: {}".format(metadata_from_init["version"]))
 
+    # Update tracktable's version if we're doing a development build
+    if os.getenv("DEVELOPMENT") == "true":
+        development_version = ".dev" + str(os.getenv("DEV_NUMBER")) # `dev` or `post` are the only words accepted in version strings
+        metadata_from_init["version"] =  metadata_from_init["version"] + development_version
+        print("Updating version to development version: {}".format(metadata_from_init["version"]))
+
     # --------------------
 
     # Computed properties here

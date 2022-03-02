@@ -1,4 +1,5 @@
-FROM cee-gitlab.sandia.gov:4567/trajectory/tracktable/linux/boost_multipython_cmake:latest
+ARG CI_REGISTRY
+FROM ${CI_REGISTRY}/trajectory/tracktable/linux/boost_multipython_cmake:latest
 
 ARG PYTHON_IMPLEMENTATION
 ARG CI_PROJECT_DIR

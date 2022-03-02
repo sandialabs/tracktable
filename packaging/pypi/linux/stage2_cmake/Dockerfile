@@ -2,7 +2,8 @@
 # for use on Linux.
 
 # Download base image
-FROM cee-gitlab.sandia.gov:4567/trajectory/tracktable/linux/boost_multipython:latest
+ARG CI_REGISTRY
+FROM ${CI_REGISTRY}/trajectory/tracktable/linux/boost_multipython:latest
 
 ENV CMAKE_VERSION 3.22.2
 
