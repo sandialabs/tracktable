@@ -13,9 +13,14 @@ windows-setup:
   stage: setup
   tags:
     - windows
+  # TODO: Figure out how to skip the pipeline, this rule doesn't work for some reason
+  # rules:
+  #   - if: $SKIP_NORMAL_PIPELINE && $SKIP_NORMAL_PIPELINE == "true"
+  #     when: never
   before_script:
     - *windows-ci-before-script
   script:
+    - echo $SKIP_NORMAL_PIPELINE
     - mkdir build_windows
   artifacts:
     paths:

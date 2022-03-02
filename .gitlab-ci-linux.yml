@@ -6,7 +6,7 @@
 # and create PYPI packages with a ManyLinux CentOS docker container
 
 variables:
-    UBUNTU_2004_DOCKER_IMAGE: cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu/20.04:2
+    UBUNTU_2004_DOCKER_IMAGE: $CI_REGISTRY/trajectory/tracktable/ubuntu/20.04:2
 
 .linux-before: &linux-before
     - . /root/miniconda3/etc/profile.d/conda.sh
@@ -18,6 +18,10 @@ linux-setup:
   stage: setup
   tags:
     - linux
+  # TODO: Figure out how to skip the pipeline, this rule doesn't work for some reason
+  # rules:
+  #   - if: $SKIP_NORMAL_PIPELINE && $SKIP_NORMAL_PIPELINE == "true"
+  #     when: never
   before_script:
     - *linux-before
   script:

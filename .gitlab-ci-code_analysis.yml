@@ -55,7 +55,7 @@ mypy:
 #     - linux
 #   allow_failure: true
 #   rules:
-#     - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
+#    - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
 #   script:
 #     - pip3 install flake8
 #     - flake8 --max-complexity 10 --benchmark --output-file=flake8_output.txt tracktable/Python/tracktable/

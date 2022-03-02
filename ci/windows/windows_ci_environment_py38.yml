@@ -34,6 +34,7 @@ dependencies:
 
   # Code Coverage Dependencies
   - lcov>=1.14
+  - coverage>=6.3.2
 
   # Documentation Dependencies
   - sphinx>=3.4.3
