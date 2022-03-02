@@ -33,13 +33,9 @@ This template is for creating a Tracktable release that will go out to the world
 ### Checklist
 
 - [ ] Create release branch from `develop`
-- [ ] Bump Libtool version numbers
-- [ ] Bump version numbers
-    * [ ] Top-level CMakeLists.txt
-    * [ ] Documentation/conf.py
-    * [ ] Documentation/conf.py.in
-    * [ ] Documentation/readthedocs/Doxyfile-readthedocs
-    * [ ] tracktable/Python/tracktable/__init__.py
+- [ ] Bump Libtool version numbers in `version.txt`
+    - Reference https://www.gnu.org/software/libtool/manual/html_node/Libtool-versioning.html on how to update the Libtool version
+- [ ] Bump Tracktable version number in `version.txt`
 - [ ] Wheels
     * [ ] Build Wheels
         - [ ] Linux
