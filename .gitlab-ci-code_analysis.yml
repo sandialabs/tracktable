@@ -2,16 +2,14 @@
 # Python/C++ Code Analysis & Code Coverage #
 ############################################
 
-# Note: We leverage Ubuntu dockers container to run our code analysis stages
+# Note: We use a Ubuntu docker container to run our code analysis stages
 
 variables:
-  PYTHON_ANALYSIS_DOCKER_IMAGE: $CI_REGISTRY/innersource/docker/ubuntu-dev:18.04-amd64
-  COVERAGE_DOCKER_IMAGE: $CI_REGISTRY/trajectory/tracktable/ubuntu/20.04:2
-  CPP_ANALYSIS_DOCKER_IMAGE: $CI_REGISTRY/trajectory/tracktable/ubuntu/20.04:2
+  UBUNTU_2004_DOCKER_IMAGE: $CI_REGISTRY/trajectory/tracktable/ubuntu/20.04:latest
 
 .linux-before: &linux-before
-    - . /root/miniconda3/etc/profile.d/conda.sh
-    - conda activate tracktable-dev
+  - . /root/miniconda3/etc/profile.d/conda.sh
+  - conda activate tracktable-linux-ci
 
 ########################
 # Python Code Analysis #
@@ -25,17 +23,16 @@ variables:
 
 # Type Checkers
 mypy:
-  image: $PYTHON_ANALYSIS_DOCKER_IMAGE
+  image: $UBUNTU_2004_DOCKER_IMAGE
   stage: code analysis
   tags:
     - linux
+  before_script:
+    - *linux-before
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
   script:
-    - pip3 install mypy
-    - pip3 install types-pytz
-    - pip3 install types-six
     - mypy --pretty --config-file mypy.ini --junit-xml mypy_output.xml tracktable/Python/tracktable/
   artifacts:
     reports:
@@ -49,15 +46,16 @@ mypy:
 # TODO (mjfadem): For now pylint can give use similar information and we can circle back to this later
 
 # flake8:
-#   image: $PYTHON_ANALYSIS_DOCKER_IMAGE
+#   image: $UBUNTU_2004_DOCKER_IMAGE
 #   stage: code analysis
 #   tags:
 #     - linux
+#   before_script:
+#     - *linux-before
 #   allow_failure: true
 #   rules:
 #    - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
 #   script:
-#     - pip3 install flake8
 #     - flake8 --max-complexity 10 --benchmark --output-file=flake8_output.txt tracktable/Python/tracktable/
 #   artifacts:
 #     paths:
@@ -65,15 +63,16 @@ mypy:
 
 # Python Static Code Analysis
 pylint:
-  image: $PYTHON_ANALYSIS_DOCKER_IMAGE
+  image: $UBUNTU_2004_DOCKER_IMAGE
   stage: code analysis
   tags:
     - linux
+  before_script:
+    - *linux-before
   allow_failure: true
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
   script:
-    - pip3 install pylint
     - pylint --output-format=text:pylint_output.text,colorized tracktable/Python/tracktable/
   artifacts:
     paths:
@@ -101,7 +100,7 @@ snl-analysis-tool:
       - tracktable/snl_analysis
 
 cppcheck:
-  image: $CPP_ANALYSIS_DOCKER_IMAGE
+  image: $UBUNTU_2004_DOCKER_IMAGE
   stage: code analysis
   tags:
     - linux
@@ -111,7 +110,6 @@ cppcheck:
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
   script:
-    - conda install -c conda-forge cppcheck pygments -y
     - cd tracktable
     - cppcheck . -iThirdParty --force --enable=all --xml 2> err.xml --verbose -j 6
     - cppcheck-htmlreport --file=err.xml --report-dir=cppcheck_output --source-dir=.
@@ -128,19 +126,15 @@ cppcheck:
 #################
 # Code Coverage #
 #################
-.coverage-before: &coverage-before
-    - . /root/miniconda3/etc/profile.d/conda.sh
-    - conda activate tracktable-dev
-
 coverage-setup:
-  image: $COVERAGE_DOCKER_IMAGE
+  image: $UBUNTU_2004_DOCKER_IMAGE
   stage: code analysis
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
   tags:
     - linux
   before_script:
-    - *coverage-before
+    - *linux-before
   script:
     - mkdir build_coverage
   artifacts:
@@ -149,14 +143,14 @@ coverage-setup:
     expire_in: 2 hours
 
 coverage-configure:
-  image: $COVERAGE_DOCKER_IMAGE
+  image: $UBUNTU_2004_DOCKER_IMAGE
   stage: code analysis
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
   tags:
     - linux
   before_script:
-    - *coverage-before
+    - *linux-before
   dependencies:
     - coverage-setup
   needs:
@@ -171,21 +165,20 @@ coverage-configure:
     expire_in: 1 hours
 
 coverage-build:
-  image: $COVERAGE_DOCKER_IMAGE
+  image: $UBUNTU_2004_DOCKER_IMAGE
   stage: code analysis
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
   tags:
     - linux
   before_script:
-    - *coverage-before
+    - *linux-before
   dependencies:
     - coverage-configure
   needs:
     - job: coverage-configure
       artifacts: true
   script:
-    - conda install -c conda-forge tracktable-data -y # TODO (mjfadem): This is a band-aid fix for right now
     - cd build_coverage
     - ninja
     - ninja cov_init
@@ -198,14 +191,14 @@ coverage-build:
     expire_in: 1 week
 
 pages:
-  image: $COVERAGE_DOCKER_IMAGE
+  image: $UBUNTU_2004_DOCKER_IMAGE
   stage: code analysis
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
   tags:
     - linux
   before_script:
-    - *coverage-before
+    - *linux-before
   dependencies:
     - coverage-build
   needs:

@@ -23,15 +23,15 @@ RUN /root/miniconda3/condabin/conda config --set proxy_servers.https ${HTTPS_PRO
 RUN /root/miniconda3/condabin/conda config --set ssl_verify /etc/ssl/certs/ca-certificates.crt
 RUN /root/miniconda3/condabin/conda config --add channels conda-forge
 RUN /root/miniconda3/condabin/conda update -qy conda
-ADD tracktable_dev_environment.yml /root/tracktable_dev_environment.yml
-RUN /root/miniconda3/condabin/conda env create -f /root/tracktable_dev_environment.yml
-RUN echo "conda activate tracktable-dev" >> /root/.bashrc
+ADD linux_ci_environment.yml /root/linux_ci_environment.yml
+RUN /root/miniconda3/condabin/conda env create -f /root/linux_ci_environment.yml
+RUN echo "conda activate tracktable-linux-ci" >> /root/.bashrc
 
 # Finally, when we're done with our image let's go ahead and clean up all our
 # intermediate work that doesn't need to hang around. This will make our
 # gitlab-ci docker image a bit smaller.
 
-ADD build-tracktable-ubuntu2004 /root/bin/build-tracktable-ubuntu2004
+ADD build-tracktable-ubuntu2004.sh /root/bin/build-tracktable-ubuntu2004.sh
 RUN echo "PATH=\"/root/bin:\${PATH}\"" >> /root/.bashrc
 RUN apt-get autoclean
 RUN apt-get --purge -y autoremove

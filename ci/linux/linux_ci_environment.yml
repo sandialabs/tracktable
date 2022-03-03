@@ -7,7 +7,7 @@ dependencies:
   - git
 
   # Python Dependencies
-  - python>=3.6, <=3.10
+  - python=3.8
   - pip
   - numpy>=1.7
   - matplotlib>=3.0
@@ -50,3 +50,13 @@ dependencies:
   - auditwheel
   - unzip
   - twine
+
+  # Static Code Analysis Dependencies
+  - mypy
+  - mypy_extensions
+  - types-six
+  - types-pytz
+  - flake8
+  - pylint
+  - cppcheck
+  - pygments
