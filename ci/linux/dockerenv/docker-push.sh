@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 source ./docker.config
 
 docker push ${IMAGE_NAME}:${IMAGE_TAG}

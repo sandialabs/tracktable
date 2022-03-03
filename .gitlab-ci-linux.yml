@@ -6,12 +6,11 @@
 # and create PYPI packages with a ManyLinux CentOS docker container
 
 variables:
-    UBUNTU_2004_DOCKER_IMAGE: $CI_REGISTRY/trajectory/tracktable/ubuntu/20.04:2
+    UBUNTU_2004_DOCKER_IMAGE: $CI_REGISTRY/trajectory/tracktable/ubuntu/20.04:latest
 
 .linux-before: &linux-before
     - . /root/miniconda3/etc/profile.d/conda.sh
-    - conda activate tracktable-dev
-    - conda install auditwheel unzip -y
+    - conda activate tracktable-linux-ci
 
 linux-setup:
   image: $UBUNTU_2004_DOCKER_IMAGE
@@ -84,7 +83,6 @@ linux-test:
   before_script:
     - *linux-before
   script:
-    - pip3 install --trusted-host pypi.org --trusted-host files.pythonhosted.org tracktable-data # TODO (mjfadem): This is a band-aid fix for right now
     - cp build_linux/lib/_*.so tracktable/Python/tracktable/lib/
     - cd build_linux
     - ctest --output-on-failure --exclude-regex 'C_GREAT_CIRCLE_FIT|C_MemoryUse|C_PointGenerator|P_TerrestrialHeatmapExample|P_TerrestrialTrajectoryMapExample|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe|P_Render_Trajectories'
