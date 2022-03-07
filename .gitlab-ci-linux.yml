@@ -188,7 +188,7 @@ linux-deploy-cleanup:
   script:
     - cd packaging/pypi/linux/
     - ./clean_tracktable.sh
-    - doker system prune -fa
+    - docker system prune -a -f
     # - docker image prune -a -f
     # - docker container prune -f
     # - ./clean_all.sh
