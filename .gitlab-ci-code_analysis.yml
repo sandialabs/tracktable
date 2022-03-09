@@ -192,7 +192,7 @@ coverage-build-cpp:
     expire_in: 1 week
 
 coverage-build-python:
-  image: $COVERAGE_DOCKER_IMAGE
+  image: $UBUNTU_2004_DOCKER_IMAGE
   stage: code analysis
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
