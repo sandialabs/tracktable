@@ -32,10 +32,18 @@
 
 function(add_python_test test_name module_to_run)
 
-add_test(
-  NAME ${test_name}
-  COMMAND ${Python3_EXECUTABLE} -m ${module_to_run} ${ARGN}
-  )
+IF(CMAKE_BUILD_TYPE MATCHES Coverage)
+  add_test(
+    NAME ${test_name}
+    COMMAND coverage run -m ${module_to_run} ${ARGN}
+    )
+ELSE(CMAKE_BUILD_TYPE MATCHES Coverage)
+  add_test(
+    NAME ${test_name}
+    COMMAND ${Python3_EXECUTABLE} -m ${module_to_run} ${ARGN}
+    )
+ENDIF(CMAKE_BUILD_TYPE MATCHES Coverage)
+
 
 if (MINGW OR MSVC)
   string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )

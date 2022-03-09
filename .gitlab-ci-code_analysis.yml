@@ -164,7 +164,7 @@ coverage-configure:
       - build_coverage
     expire_in: 1 hours
 
-coverage-build:
+coverage-build-cpp:
   image: $UBUNTU_2004_DOCKER_IMAGE
   stage: code analysis
   rules:
@@ -185,13 +185,14 @@ coverage-build:
     - ctest --output-on-failure --exclude-regex 'C_TrajectoryAssemblyDomain|C_GREAT_CIRCLE_FIT|C_MemoryUse|C_PointGenerator|P_TerrestrialHeatmapExample|P_TerrestrialTrajectoryMapExample|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe|P_Render_Trajectories'
     - ninja cov_capture
     - ninja cov_genhtml
+  coverage: '/Total:\|(\d+\.?\d+\%)/'
   artifacts:
     paths:
-      - build_coverage/coverage
+      - build_coverage
     expire_in: 1 week
 
-pages:
-  image: $UBUNTU_2004_DOCKER_IMAGE
+coverage-build-python:
+  image: $COVERAGE_DOCKER_IMAGE
   stage: code analysis
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
@@ -200,13 +201,42 @@ pages:
   before_script:
     - *linux-before
   dependencies:
-    - coverage-build
+    - coverage-build-cpp
   needs:
-    - job: coverage-build
+    - job: coverage-build-cpp
       artifacts: true
   script:
-    - mv build_coverage/coverage/ public
+    - cd build_coverage
+    - coverage combine tracktable/Python/tracktable/*/*/.coverage
+    - coverage report -m
+    - coverage html
+  coverage: '/^TOTAL.+?(\d+\%)$/'
   artifacts:
     paths:
-      - public
+      - build_coverage
     expire_in: 1 week
+
+# pages:
+#   image: $UBUNTU_2004_DOCKER_IMAGE
+#   stage: code analysis
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
+#   tags:
+#     - linux
+#   before_script:
+#     - *coverage-before
+#   dependencies:
+#     - coverage-build-python
+#   needs:
+#     - job: coverage-build-python
+#       artifacts: true
+#   script:
+#     # This might not work, but this does `- mv build_coverage/coverage public`
+#     - mkdir public/cpp_coverage
+#     - mkdir public/python_coverage
+#     - mv build_coverage/coverage public/cpp_coverage
+#     - mv build_coverage/htmlcov public/python_coverage
+#   artifacts:
+#     paths:
+#       - public
+#     expire_in: 1 week
