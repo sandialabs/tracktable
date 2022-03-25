@@ -65,10 +65,14 @@ linux-build:
   script:
     - cd build_linux
     - ninja
+    - |-
+      if [[ $CI_PIPELINE_SOURCE == "schedule" && $NIGHTLY == "true" ]]; then
+        cmake -GNinja -DBUILD_DOCUMENTATION=ON .. && ninja doc
+      fi
   artifacts:
     paths:
       - build_linux
-    expire_in: 1 hour
+    expire_in: 1 week
 
 linux-test:
   image: $UBUNTU_2004_DOCKER_IMAGE
