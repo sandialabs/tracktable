@@ -138,7 +138,6 @@ linux-deploy-tracktable:
   before_script:
     - *linux-wheel-docker-login-script
   script:
-    - echo $NIGHTLY
     - cd packaging/pypi/linux/stage3_tracktable
     - ./build_all.sh
 
@@ -153,6 +152,9 @@ linux-deploy-wheels:
   before_script:
     - *linux-wheel-docker-login-script
   script:
+    - echo $NIGHTLY
+    - echo $DEVELOPMENT
+    - echo $DEV_NUMBER
     - cd packaging/pypi/linux/stage4_wheel
     - ./build_all.sh
   artifacts:

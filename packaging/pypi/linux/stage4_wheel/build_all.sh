@@ -15,6 +15,8 @@ for PYTHON_IMPLEMENTATION in cp36 cp37 cp38 cp39 cp310; do
            --build-arg HTTP_PROXY=${SNL_HTTP_PROXY} \
            --build-arg NO_PROXY=${SNL_NO_PROXY} \
            --build-arg NIGHTLY=${NIGHTLY} \
+           --build-arg DEVELOPMENT=${DEVELOPMENT} \
+           --build-arg DEV_NUMBER=${DEV_NUMBER} \
            . && \
     docker run \
            --rm \
