@@ -153,6 +153,7 @@ set( Core_Detail_TraitSignatures_HEADERS
 
 set( Core_WarningGuards_HEADERS
   WarningGuards/CommonBoostWarnings.h
+  WarningGuards/DeprecatedDeclaration.h
   WarningGuards/PopWarningState.h
   WarningGuards/PragmaMessages.h
   WarningGuards/PushWarningState.h
