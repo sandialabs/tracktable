@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 National Technology and Engineering
+ * Copyright (c) 2014-2022 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -32,8 +32,13 @@
 #define __tracktable_PythonWrapping_DBSCAN_h
 
 #include <tracktable/Core/TracktableCommon.h>
+
+// Fix regression in Boost 1.74 with missing header file
+#include <boost/geometry/geometry.hpp>
+
 #include <tracktable/Analysis/ComputeDBSCANClustering.h>
 #include <tracktable/Domain/FeatureVectors.h>
+
 
 #include <tracktable/PythonWrapping/GuardedBoostPythonHeaders.h>
 

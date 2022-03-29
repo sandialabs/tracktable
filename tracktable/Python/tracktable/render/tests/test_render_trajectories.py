@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -29,15 +29,14 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 from tracktable.domain.terrestrial import TrajectoryPointReader
-from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
+from tracktable.applications.assemble_trajectories import AssembleTrajectoryFromPoints
 from tracktable.render.render_trajectories import render_trajectories
 from tracktable.core import test_utilities as utils
 import os.path
 import sys
 
 def load_sample_data(path):
-    inFile = open(os.path.join(path,
-                               '../../examples/data/SampleFlightsUS.csv'))
+    inFile = open(os.path.join(path, 'SampleFlightsUS.csv'))
     reader = TrajectoryPointReader()
     reader.input = inFile
     reader.comment_character = '#'

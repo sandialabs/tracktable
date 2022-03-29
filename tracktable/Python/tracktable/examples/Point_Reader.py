@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -34,7 +34,7 @@ The basic object in tracktable is the point reader. This data structure reads ta
 """
 
 from tracktable.domain.terrestrial import TrajectoryPointReader
-from tracktable.core import data_directory
+from tracktable_data.data import retrieve
 import os.path
 import sys
 
@@ -46,7 +46,7 @@ def main():
     #  - comment character - The character marking comments in the file and will be ignored by the point reader
     # The domain will default to terrestrial, which is what we typically use for real data.
 
-    data_filename = os.path.join(data_directory(), 'SampleASDI.csv')
+    data_filename = retrieve('SampleASDI.csv')
     inFile = open(data_filename, 'r')
     reader = TrajectoryPointReader()
     reader.input = inFile
@@ -87,7 +87,7 @@ def main():
     #
     # Next we set a numeric field (speed) and a string field(status) and see the results.
 
-    data_filename = os.path.join(data_directory(), 'SampleASDI.csv')
+    data_filename = retrieve('SampleASDI.csv')
     inFile = open(data_filename, 'r')
     reader.input = inFile
     reader.object_id_column = 0

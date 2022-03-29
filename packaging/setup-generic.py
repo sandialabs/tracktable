@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC . Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -38,7 +38,7 @@ import platform
 import re
 import sys
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 from setuptools.dist import Distribution
 
 
@@ -96,7 +96,6 @@ def find_metadata_property(text, property_name):
 
 # --------------------------------------------------------------------
 
-
 def main():
     here = os.getcwd()
     tracktable_home = os.path.join(here, 'Python', 'tracktable')
@@ -112,12 +111,35 @@ def main():
     # Parse the following properties out of the top-level __init__.py
     # so that they are always current.
     properties_in_init = [
-        'author', 'description', 'license', 'maintainer', 'url', 'version'
-    ]
+                        'author',
+                        'description',
+                        'license',
+                        'maintainer',
+                        'url'
+                    ]
 
     metadata_from_init = {}
     for key in properties_in_init:
         metadata_from_init[key] = find_metadata_property(init_file_text, key)
+
+    version = re.search(r"^TRACKTABLE VERSION ([0-9\.]*)", open(os.path.join(os.path.dirname(__file__), "..", "version.txt"), "rt").read(), re.M).group(1)
+    metadata_from_init['version'] = version
+
+    # --------------------
+
+    # Update tracktable's version if we're doing a nightly build
+    if os.getenv("NIGHTLY") == "true":
+        from datetime import datetime
+        today = datetime.today().strftime('%m%d%Y') # month, day, year format
+        nightly_version = ".dev" + today # `dev` or `post` are the only words accepted in version strings
+        metadata_from_init["version"] =  metadata_from_init["version"] + nightly_version
+        print("Updating version to nightly version: {}".format(metadata_from_init["version"]))
+
+    # Update tracktable's version if we're doing a development build
+    if os.getenv("DEVELOPMENT") == "true":
+        development_version = ".dev" + str(os.getenv("DEV_NUMBER")) # `dev` or `post` are the only words accepted in version strings
+        metadata_from_init["version"] =  metadata_from_init["version"] + development_version
+        print("Updating version to development version: {}".format(metadata_from_init["version"]))
 
     # --------------------
 
@@ -159,24 +181,17 @@ def main():
                 )
         )
 
-    # Include any auxiliary data files such as the stuff in
-    # tracktable.info
-    aux_data_directory = os.path.join(tracktable_home, 'info', 'data')
-    tz_shapefiles = files_from_components(aux_data_directory, 'tz_world.*')
-    aux_data_files = tz_shapefiles
-    aux_data_files.append(os.path.join(aux_data_directory, 'airports.csv'))
+    tutorial_notebook_directory = os.path.join(tracktable_home, 'examples', 'tutorials')
+    tutorial_notebook_files = files_from_components(tutorial_notebook_directory, '*.ipynb')
 
-    example_data_directory = os.path.join(tracktable_home, 'examples', 'data')
-    example_data_files = (
-        files_from_components(example_data_directory, '*.csv') +
-        files_from_components(example_data_directory, '*.traj')
-        )
+    analytic_demo_notebook_directory = os.path.join(tracktable_home, 'examples', 'analytic_demos')
+    analytic_demo_notebook_files = files_from_components(analytic_demo_notebook_directory, '*.ipynb')
 
-    notebook_example_directory = os.path.join(tracktable_home,
-                                              'examples',
-                                              'notebook_examples')
-    notebook_example_files = files_from_components(notebook_example_directory,
-                                                   ' *.ipynb')
+    analytic_demo_images_directory = os.path.join(tracktable_home, 'examples', 'analytic_demos', 'demo_images')
+    analytic_demo_images_files = files_from_components(analytic_demo_images_directory, '*.png')
+
+    response_files_directory = os.path.join(tracktable_home, 'examples', 'response_files')
+    response_files_files = files_from_components(response_files_directory, '*.txt')
 
     license_files = [os.path.join(tracktable_home, 'LICENSE.txt')]
 
@@ -196,10 +211,11 @@ def main():
         os_classifier,
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: C++",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Scientific/Engineering :: Information Analysis",
@@ -211,13 +227,17 @@ def main():
         'matplotlib',
         'pyshp',
         'pytz',
-        'six'
+        'six',
+        'folium'
+        'tracktable-data'
     ]
 
     package_name = 'tracktable'
-    version_required = '>=3.5'
+    version_required = '>=3.6'
 
     # --------------------
+
+    print(metadata_from_init)
 
     setup(
         # Static properties
@@ -237,9 +257,10 @@ def main():
                 (binary_extensions +
                  support_libraries +
                  license_files +
-                 aux_data_files +
-                 example_data_files +
-                 notebook_example_files)
+                 tutorial_notebook_files +
+                 analytic_demo_notebook_files +
+                 analytic_demo_images_files +
+                 response_files_files)
                 },
         # Assembly information and system parameters
         distclass=BinaryDistribution,

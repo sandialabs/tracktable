@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 National Technology and Engineering
+ * Copyright (c) 2014-2022 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -66,7 +66,6 @@ namespace
 {
   boost::python::object DEFAULT_TIMEZONE;
 
-
   bool already_installed = false;
 
   long get_usecs(boost::posix_time::time_duration const& d)
@@ -81,6 +80,50 @@ namespace
       {
       return fracsecs * (1000000 / resolution);
       }
+  }
+
+  /// Utility function: wrap a PyObject* without assuming ownership
+  //
+  // Normally, a boost::python::object created around a PyObject
+  // pointer assumes ownership of the object.  This convenience function
+  // creates a borrowed reference that will not lead to the wrapped object's
+  // destruction when the wrapper goes out of scope.
+  //
+  // @param[in] py_object (PyObject*) Object to wrap
+  // @return New boost::python::object wrapping Python object
+
+  boost::python::object borrowed_reference(PyObject* py_object)
+  {
+    return boost::python::object(
+      boost::python::handle<>(
+        boost::python::borrowed(py_object)));
+  }
+
+  /// Localize a timestamp into the default timezone
+  //
+  // Timestamps may come in from Python with arbitrary time zones
+  // attached.  This function creates a new timestamp guaranteed to
+  // be in our default timezone.
+  //
+  // @param[in] timestamp: (PyDateTime_DateTime*) Time stamp from Python
+  // @returns New boost::python::object containing an aware datetime
+  //     object in our default time zone
+  boost::python::object as_default_timezone(PyObject* timestamp)
+  {
+    using boost::python::object;
+
+    object foreign_timestamp(borrowed_reference(timestamp));
+    object fn_astimezone(foreign_timestamp.attr("astimezone"));
+    if (fn_astimezone.is_none())
+    {
+      PyErr_SetString(PyExc_AttributeError,
+        "Timestamp to convert has no astimezone attribute");
+      boost::python::throw_error_already_set();
+    }
+
+    // This will create a new datetime.datetime in our default
+    // timezone.
+    return fn_astimezone(DEFAULT_TIMEZONE);
   }
 
   /// Convert a boost::posix::ptime to a Python datetime.datetime
@@ -173,22 +216,27 @@ namespace
     static void construct(PyObject* obj_ptr,
                           boost::python::converter::rvalue_from_python_stage1_data* data)
       {
-        PyDateTime_DateTime const* pydate = reinterpret_cast<PyDateTime_DateTime*>(obj_ptr);
+        boost::python::object localized_pydate(as_default_timezone(obj_ptr));
+
+        PyDateTime_DateTime const* raw_localized_pydate =
+          reinterpret_cast<PyDateTime_DateTime const*>(
+            localized_pydate.ptr());
 
         // Create date object
         boost::gregorian::date
-          _date(PyDateTime_GET_YEAR(pydate),
-                PyDateTime_GET_MONTH(pydate),
-                PyDateTime_GET_DAY(pydate));
+          _date(PyDateTime_GET_YEAR(raw_localized_pydate),
+                PyDateTime_GET_MONTH(raw_localized_pydate),
+                PyDateTime_GET_DAY(raw_localized_pydate));
 
         // Create time duration object
         boost::posix_time::time_duration
-          _duration(PyDateTime_DATE_GET_HOUR(pydate),
-                    PyDateTime_DATE_GET_MINUTE(pydate),
-                    PyDateTime_DATE_GET_SECOND(pydate),
+          _duration(PyDateTime_DATE_GET_HOUR(raw_localized_pydate),
+                    PyDateTime_DATE_GET_MINUTE(raw_localized_pydate),
+                    PyDateTime_DATE_GET_SECOND(raw_localized_pydate),
                     0);
         // Set the usecs
-        _duration += boost::posix_time::microseconds(PyDateTime_DATE_GET_MICROSECOND(pydate));
+        _duration += boost::posix_time::microseconds(
+          PyDateTime_DATE_GET_MICROSECOND(raw_localized_pydate));
 
         // Create POSIX time object
         void* storage =

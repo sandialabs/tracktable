@@ -2,7 +2,7 @@
 #
 # This is tracktable/Python/tracktable/CMakeLists.txt
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -35,7 +35,8 @@ if (UNIX AND APPLE)
 endif (UNIX AND APPLE)
 
 if (BUILD_TESTING)
-  add_subdirectory(analysis/tests)
+  add_subdirectory(algorithms/tests)
+  add_subdirectory(applications/tests)
   add_subdirectory(core/tests)
   add_subdirectory(domain/tests)
   add_subdirectory(examples)
@@ -45,15 +46,33 @@ if (BUILD_TESTING)
   add_subdirectory(render/tests)
  endif (BUILD_TESTING)
 
+if (COPY_NOTEBOOKS_TRACKTABLE_DATA)
+ message(STATUS "Copying notebooks from tracktable-docs. Don't modify these copies!")
+ execute_process(COMMAND ${Python3_EXECUTABLE} _copy_notebooks.py WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+endif (COPY_NOTEBOOKS_TRACKTABLE_DATA)
+
 install(
   FILES __init__.py
   DESTINATION ${PYTHON_INSTALL_PREFIX}
 )
 
+file(GLOB algorithms_files "algorithms/*.py")
+install(
+  FILES ${algorithms_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/algorithms
+)
+
+# TODO (mjfadem) Remove this in release 1.8
 file(GLOB analysis_files "analysis/*.py")
 install(
   FILES ${analysis_files}
   DESTINATION ${PYTHON_INSTALL_PREFIX}/analysis
+)
+
+file(GLOB applications_files "applications/*.py")
+install(
+  FILES ${applications_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/applications
 )
 
 file(GLOB core_files "core/*.py")
@@ -80,11 +99,47 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/examples
 )
 
-file(GLOB example_notebooks "examples/notebook_examples/*.ipynb")
+file(GLOB response_files "examples/response_files/*.txt")
 install(
-  FILES ${example_notebooks}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/notebook_examples
-  )
+  FILES ${response_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/response_files
+)
+
+file(GLOB example_python_scripts "examples/python_scripts/*.py")
+install(
+  FILES ${example_python_scripts}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/python_scripts
+)
+
+file(GLOB tutorial_notebooks "examples/tutorials/*.ipynb")
+install(
+  FILES ${tutorial_notebooks}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/tutorials
+)
+
+file(GLOB tutorial_helpers "examples/tutorials/*.py")
+install(
+  FILES ${tutorial_helpers}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/tutorials
+)
+
+file(GLOB analytic_demo_notebooks "examples/analytic_demos/*.ipynb")
+install(
+  FILES ${analytic_demo_notebooks}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos
+)
+
+file(GLOB analytic_demo_images "examples/analytic_demos/demo_images/*.*")
+install(
+  FILES ${analytic_demo_images}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos/demo_images
+)
+
+file(GLOB analytic_demo_helpers "examples/analytic_demos/*.py")
+install(
+  FILES ${analytic_demo_helpers}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos
+)
 
 file(GLOB example_data_files "examples/data/*.*")
 install(
@@ -148,14 +203,8 @@ install(
 
 file(GLOB render_map_processing_files "render/map_processing/*.py")
 install(
-  FILES ${render_map_processing_file}
+  FILES ${render_map_processing_files}
   DESTINATION ${PYTHON_INSTALL_PREFIX}/render/map_processing
-)
-
-file (GLOB source_files "source/*.py")
-install(
-  FILES ${source_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/source
 )
 
 file (GLOB script_helper_files "script_helpers/*.py")
@@ -168,16 +217,4 @@ file (GLOB script_helper_argument_groups_files "script_helpers/argument_groups/*
 install(
   FILES ${script_helper_argument_groups_files}
   DESTINATION ${PYTHON_INSTALL_PREFIX}/script_helpers/argument_groups
-)
-
-file(GLOB analysis_files "analysis/*.py")
-install(
-  FILES ${analysis_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/analysis
-)
-
-file(GLOB source_files "source/*.py")
-install(
-  FILES ${source_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/source
 )

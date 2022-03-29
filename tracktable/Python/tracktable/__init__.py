@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -39,17 +39,18 @@ in kilometers.
 """
 
 # \defgroup Tracktable_Python Python components of Tracktable
-
-__version__ = "1.5.0"
+import re
+import os
+__version__ = re.search(r"^TRACKTABLE VERSION ([0-9\.]*)", open(os.path.join(os.path.dirname(__file__), "..", "..", "..", "version.txt"), "rt").read(), re.M).group(1)
 __title__ = "Tracktable"
 __description__ = "Trajectory Analysis and Visualization"
 __url__ = "https://tracktable.sandia.gov"
 __uri__ = __url__
 __doc__ = __description__ + " <" + __uri__ + ">"
-__author__ = "Andy Wilson, Danny Rintoul, Chris Valicka, Ben Newton, Paul Schrum, Phil Baxley, Kat Ward, Rick Vinyard, Michael Scoggin, Michael Fadem"
+__author__ = "Andy Wilson, Danny Rintoul, Chris Valicka, Ben Newton, Paul Schrum, Phil Baxley, Kat Ward, Rick Vinyard, Michael Scoggin, Michael Fadem, Geoff Danielson"
 __maintainer__ = "Andy Wilson"
 __license__ = "BSD"
-__copyright__ = "Copyright (c) 2014-2021 National Technology and Engineering Solutions of Sandia, LLC."
+__copyright__ = "Copyright (c) 2014-2022 National Technology and Engineering Solutions of Sandia, LLC."
 
 
 # We need to verify that Tracktable can import the compiled objects from
@@ -104,7 +105,7 @@ if FAILURE_COUNT > 0:
     print("\nIf not using one of Tracktable's included Anaconda environment files, ensure that the version of the ICU library matches the",
           "version specified in the the Tracktable documentation.")
 
-  print("\nAdditional troubleshooting steps can be found in the Tracktable documentation: https://tracktable.readthedocs.io/en/latest/common_errors.html")
+  print("\nAdditional troubleshooting steps can be found in the Tracktable documentation: https://tracktable.readthedocs.io/en/latest/common_errors.html#shared-library-errors")
 
   print("\nDiagnostic Path Information:")
   print("----------------------------")

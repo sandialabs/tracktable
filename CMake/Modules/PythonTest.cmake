@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -32,10 +32,18 @@
 
 function(add_python_test test_name module_to_run)
 
-add_test(
-  NAME ${test_name}
-  COMMAND ${Python3_EXECUTABLE} -m ${module_to_run} ${ARGN}
-  )
+IF(CMAKE_BUILD_TYPE MATCHES Coverage)
+  add_test(
+    NAME ${test_name}
+    COMMAND coverage run -m ${module_to_run} ${ARGN}
+    )
+ELSE(CMAKE_BUILD_TYPE MATCHES Coverage)
+  add_test(
+    NAME ${test_name}
+    COMMAND ${Python3_EXECUTABLE} -m ${module_to_run} ${ARGN}
+    )
+ENDIF(CMAKE_BUILD_TYPE MATCHES Coverage)
+
 
 if (MINGW OR MSVC)
   string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )

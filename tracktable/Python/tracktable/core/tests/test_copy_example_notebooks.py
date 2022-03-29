@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering Solutions of
+# Copyright (c) 2014-2022 National Technology and Engineering Solutions of
 # Sandia, LLC. Under the terms of Contract DE-NA0003525 with National
 # Technology and Engineering Solutions of Sandia, LLC, the
 # U.S. Government retains certain rights in this software.
@@ -39,15 +39,21 @@ import os.path
 import sys
 import tempfile
 
+logger = logging.getLogger(__name__)
 
 def test_copy_example_notebooks(destdir):
 
     # Get a list of all the example notebooks
     here = os.path.dirname(__file__)
-    notebook_dir = os.path.normpath(
-        os.path.join(here, '..', '..', 'examples', 'notebook_examples')
+    tutorial_notebook_dir = os.path.normpath(
+        os.path.join(here, '..', '..', 'examples', 'tutorials')
         )
-    notebook_files = glob.glob('{}/*.ipynb'.format(notebook_dir))
+    tutorial_notebook_files = glob.glob('{}/*.ipynb'.format(tutorial_notebook_dir))
+
+    analytic_demo_notebook_dir = os.path.normpath(
+        os.path.join(here, '..', '..', 'examples', 'analytic_demos')
+        )
+    analytic_demo_notebook_files = glob.glob('{}/*.ipynb'.format(analytic_demo_notebook_dir))
 
     tracktable.examples.copy_example_notebooks(destdir)
 
@@ -55,20 +61,38 @@ def test_copy_example_notebooks(destdir):
     # the same size
 
     error_count = 0
-    for notebook in notebook_files:
+    for notebook in tutorial_notebook_files:
         filename_only = os.path.split(notebook)[1]
         copied_filename = os.path.join(destdir, filename_only)
 
         if not os.path.exists(copied_filename):
-            print('ERROR: Notebook {} was not copied from {}'.format(
-                filename_only, notebook_dir))
+            logger.error('Notebook {} was not copied from {}'.format(
+                filename_only, tutorial_notebook_dir))
             error_count += 1
         else:
             # It was copied - is it plausibly the same thing?
             original_stat = os.stat(notebook)
             new_stat = os.stat(copied_filename)
             if original_stat.st_size != new_stat.st_size:
-                print(('ERROR: Notebook {} has incorrect size after copy. '
+                logger.error(('Notebook {} has incorrect size after copy. '
+                       'Original size was {} and copied size is {}.').format(
+                       original_stat.st_size, new_stat.st_size))
+                error_count += 1
+
+    for notebook in analytic_demo_notebook_files:
+        filename_only = os.path.split(notebook)[1]
+        copied_filename = os.path.join(destdir, filename_only)
+
+        if not os.path.exists(copied_filename):
+            logger.error('Notebook {} was not copied from {}'.format(
+                filename_only, analytic_demo_notebook_dir))
+            error_count += 1
+        else:
+            # It was copied - is it plausibly the same thing?
+            original_stat = os.stat(notebook)
+            new_stat = os.stat(copied_filename)
+            if original_stat.st_size != new_stat.st_size:
+                logger.error(('Notebook {} has incorrect size after copy. '
                        'Original size was {} and copied size is {}.').format(
                        original_stat.st_size, new_stat.st_size))
                 error_count += 1

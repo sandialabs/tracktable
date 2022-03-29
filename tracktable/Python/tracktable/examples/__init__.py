@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -70,12 +70,17 @@ def copy_example_notebooks(destdir, create_dir=True):
     """
 
     here = os.path.dirname(__file__)
-    notebook_dir = os.path.join(here, 'notebook_examples')
+    tutorial_notebook_dir = os.path.join(here, 'tutorials')
+    analytic_demo_notebook_dir = os.path.join(here, 'analytic_demos')
 
     if create_dir:
         pathlib.Path(destdir).mkdir(parents=True, exist_ok=True)
 
-    all_notebooks = glob.glob('{}/*.ipynb'.format(notebook_dir))
-    for notebook in all_notebooks:
+    tutorial_notebooks = glob.glob('{}/*.ipynb'.format(tutorial_notebook_dir))
+    for notebook in tutorial_notebooks:
+        shutil.copy(notebook, destdir)
+
+    analytic_demo_notebooks = glob.glob('{}/*.ipynb'.format(analytic_demo_notebook_dir))
+    for notebook in analytic_demo_notebooks:
         shutil.copy(notebook, destdir)
 

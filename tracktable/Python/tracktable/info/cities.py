@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -220,7 +220,7 @@ def get_city(name, country=None, location=None):
         London, UK
         Springfield, US, with one of the many valid lats or longs
         Springfield, None, with one of the many valid lats or longs
-        Qandahar (there’s only one Qandahar in the world)
+        Qandahar (there's only one Qandahar in the world)
 
     Arguments:
         name (str): City name to search for
@@ -235,7 +235,7 @@ def get_city(name, country=None, location=None):
     """
     global CITY_TABLE
     if not CITY_TABLE:
-        from tracktable.info.data.city_table import city_table as cities
+        from tracktable_data.python_info_data.city_table import city_table as cities
         CITY_TABLE = cities
 
     city_list = CITY_TABLE

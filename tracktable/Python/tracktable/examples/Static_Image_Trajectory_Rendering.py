@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -38,9 +38,9 @@ The Trajectory Builder does this.
 """
 
 from tracktable.domain import terrestrial
-from tracktable.render import render_map
-from tracktable.core import data_directory
-from tracktable.render.map_processing import paths
+from tracktable.render import mapmaker
+from tracktable_data.data import retrieve
+from tracktable.render import paths
 from tracktable.feature import annotations
 
 import numpy
@@ -71,7 +71,7 @@ def main():
     # Replace the following with your own code to build the trajectories
     # or use the provided example.
 
-    trajectory_filename = os.path.join(data_directory(), 'SampleTrajectories.traj')
+    trajectory_filename = retrieve('SampleTrajectories.traj')
     infile = open(trajectory_filename, 'r')
     trajectories = terrestrial.TrajectoryReader()
     trajectories.input = infile
@@ -79,7 +79,7 @@ def main():
     # Set up the canvas and map projection
     # 8 x 6 inches at 100 dpi = 800x600 image
     figure = pyplot.figure(dpi=100, figsize=(8, 6))
-    (mymap, map_actors) = render_map.render_map(domain='terrestrial',
+    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
                                             map_name='region:world')
 
     color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1)
@@ -94,14 +94,14 @@ def main():
     # north_america, south_america, australia and world.
 
     # Let us expand our view using another custom map.
-    trajectory_filename = os.path.join(data_directory(), 'SampleTrajectories.traj')
+    trajectory_filename = retrieve('SampleTrajectories.traj')
     infile = open(trajectory_filename, 'r')
     trajectories = terrestrial.TrajectoryReader()
     trajectories.input = infile
 
     # Set up the canvas and map projection
     figure = pyplot.figure(dpi=100, figsize=(8, 6))
-    (mymap, map_actors) = render_map.render_map(domain='terrestrial',
+    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
                                             map_name='region:conus')
 
     color_scale = matplotlib.colors.Normalize(vmin=0, vmax=1)
@@ -112,12 +112,12 @@ def main():
     # We can customize our trajectories by adding color, changing the linewidth, etc.
 
     # Get trajectories and set up the map figure
-    trajectory_filename = os.path.join(data_directory(), 'SampleTrajectories.traj')
+    trajectory_filename = retrieve('SampleTrajectories.traj')
     infile = open(trajectory_filename, 'r')
     trajectories = terrestrial.TrajectoryReader()
     trajectories.input = infile
     figure = pyplot.figure(dpi=100, figsize=(8, 6))
-    (mymap, map_actors) = render_map.render_map(domain='terrestrial',
+    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
                                             map_name='region:world')
 
     # "Progress" produces the multi color trajectories to see the beginning, midpoints, and ends easier

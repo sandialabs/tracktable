@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -39,7 +39,7 @@ The trajectory builder does all of this.
 
 from tracktable.domain.terrestrial import TrajectoryPointReader        # Read points from file
 from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints  # Turn points into trajectories
-from tracktable.core import data_directory
+from tracktable_data.data import retrieve
 
 import os.path
 import sys
@@ -51,7 +51,7 @@ def main():
     # we need a source that gives us data points in time sequential order.
     # As with before, we can use the Point Reader.
 
-    data_filename = os.path.join(data_directory(), 'SampleFlightsUS.csv')
+    data_filename = retrieve('SampleFlightsUS.csv')
     inFile = open(data_filename, 'r')
     reader = TrajectoryPointReader()
     reader.input = inFile

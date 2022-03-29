@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC . Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -29,7 +29,9 @@
 
 set(CMAKE_LEGACY_CYGWIN_WIN32 0)
 
-cmake_minimum_required(VERSION 3.19)
+file(READ "version.txt" ver)
+string(REGEX MATCH "CMAKE VERSION ([0-9\\.]*)" _ ${ver})
+cmake_minimum_required(VERSION ${CMAKE_MATCH_1})
 message(STATUS "Building with CMake version ${CMAKE_VERSION}")
 
 if (POLICY CMP0042)
@@ -67,8 +69,8 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 ##########################################################################
 # Begin RELEASE VARIABLES
 #-------------------------------------------------------------------------
-
-set(TRACKTABLE_VERSION 1.5.0)
+string(REGEX MATCH "TRACKTABLE VERSION ([0-9\\.]*)" _ ${ver})
+set(TRACKTABLE_VERSION ${CMAKE_MATCH_1})
 set(RPM_RELEASE 6)
 
 project(Tracktable LANGUAGES C CXX VERSION ${TRACKTABLE_VERSION})
@@ -103,9 +105,12 @@ include(GNUInstallDirs)
 # +1 :  ? :  0 == new interface that breaks old one
 #  ? :  ? :  0 == no new interfaces, but breaks apps
 #  ? : +1 :  ? == just some internal changes, nothing breaks but might work better
-set(UNIX_SO_VERSION_CURRENT  5)
-set(UNIX_SO_VERSION_REVISION 0)
-set(UNIX_SO_VERSION_AGE      1)
+string(REGEX MATCH "UNIX SO VERSION CURRENT ([0-9]*)" _ ${ver})
+set(UNIX_SO_VERSION_CURRENT  ${CMAKE_MATCH_1})
+string(REGEX MATCH "UNIX SO VERSION REVISION ([0-9]*)" _ ${ver})
+set(UNIX_SO_VERSION_REVISION ${CMAKE_MATCH_1})
+string(REGEX MATCH "UNIX SO VERSION AGE ([0-9]*)" _ ${ver})
+set(UNIX_SO_VERSION_AGE      ${CMAKE_MATCH_1})
 
 #-------------------------------------------------------------------------
 # End RELEASE VARIABLES
@@ -173,6 +178,11 @@ set(CMAKE_MACOSX_RPATH ON)
 
 # ----------------------------------------------------------------------
 
+# Git submodule paths
+set(Tracktable_DATA_DIR ${Tracktable_SOURCE_DIR}/tracktable-data/tracktable-data/tracktable_data)
+
+# ----------------------------------------------------------------------
+
 ### Organize programs into folders in Visual Studio, Windows
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
@@ -187,6 +197,8 @@ CMAKE_DEPENDENT_OPTION(
 option(BUILD_EXAMPLES "Build Tracktable example programs" ON)
 option(BUILD_DOCUMENTATION "Build Python and C++ documentation for Tracktable." OFF)
 option(BUILD_DOCUMENTATION_CXX_ONLY "Build only C++ documentation for Tracktable." OFF)
+
+option(COPY_NOTEBOOKS_TRACKTABLE_DATA "Copy and clean notebooks from tracktable-data." ON)
 
 set(PYTHON_INSTALL_PREFIX "Python/tracktable" CACHE PATH "Install directory for python modules" )
 set(Python3_EXECUTABLE "" CACHE FILEPATH "Python executable for running tests and compiling modules")
@@ -239,7 +251,7 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
   # Whichever is being build, we need Doxygen
   find_package(Doxygen REQUIRED)
 
-  set( DOC_SOURCE_DIR ${Tracktable_SOURCE_DIR}/Documentation )
+  set( DOC_SOURCE_DIR ${Tracktable_SOURCE_DIR}/tracktable-docs/Documentation )
   set( DOC_BINARY_DIR ${Tracktable_BINARY_DIR}/Documentation )
 
   if(DOXYGEN_FOUND)
@@ -381,7 +393,8 @@ message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")
 #=========================================================================
 # Begin FindBoost
 #-------------------------------------------------------------------------
-set(BOOST_MINIMUM_VERSION_REQUIRED 1.67)
+string(REGEX MATCH "BOOST VERSION ([0-9\\.]*)" _ ${ver})
+set(BOOST_MINIMUM_VERSION_REQUIRED ${CMAKE_MATCH_1})
 
 # Do not use Boost's CMake modules yet.
 set(Boost_NO_BOOST_CMAKE ON)

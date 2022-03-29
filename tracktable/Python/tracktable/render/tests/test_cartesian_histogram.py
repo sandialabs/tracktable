@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -42,7 +42,7 @@ from tracktable.core import test_utilities
 
 from matplotlib import (pyplot, colors)
 
-def test_cartesian_histogram(output_dir, ground_truth_dir)
+def test_cartesian_histogram(output_dir, ground_truth_dir):
     point_source = NormalRandomPointSource()
     point_source.num_points = 100000
 

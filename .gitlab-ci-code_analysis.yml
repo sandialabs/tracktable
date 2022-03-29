@@ -1,0 +1,242 @@
+############################################
+# Python/C++ Code Analysis & Code Coverage #
+############################################
+
+# Note: We use a Ubuntu docker container to run our code analysis stages
+
+variables:
+  UBUNTU_2004_DOCKER_IMAGE: $CI_REGISTRY/trajectory/tracktable/ubuntu/20.04:latest
+
+.linux-before: &linux-before
+  - . /root/miniconda3/etc/profile.d/conda.sh
+  - conda activate tracktable-linux-ci
+
+########################
+# Python Code Analysis #
+########################
+##
+# NOTE: All of the packages below can be highly customized
+# if we want to narrow the scope of what issues are output.
+# If we start to add a lot of command-like params it is probably
+# a good idea to move as much of those as we can to a config file.
+##
+
+# Type Checkers
+mypy:
+  image: $UBUNTU_2004_DOCKER_IMAGE
+  stage: code analysis
+  tags:
+    - linux
+  before_script:
+    - *linux-before
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
+  script:
+    - mypy --pretty --config-file mypy.ini --junit-xml mypy_output.xml tracktable/Python/tracktable/
+  artifacts:
+    reports:
+      junit: mypy_output.xml
+
+# Linters
+
+# When running flake8 on the entire python codebase it runs forever (45+ mins) without output.
+# I think the way it's doing it's tree building with the multiprocessing library isn't playing
+# nice with our code.
+# TODO (mjfadem): For now pylint can give use similar information and we can circle back to this later
+
+# flake8:
+#   image: $UBUNTU_2004_DOCKER_IMAGE
+#   stage: code analysis
+#   tags:
+#     - linux
+#   before_script:
+#     - *linux-before
+#   allow_failure: true
+#   rules:
+#    - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
+#   script:
+#     - flake8 --max-complexity 10 --benchmark --output-file=flake8_output.txt tracktable/Python/tracktable/
+#   artifacts:
+#     paths:
+#       - flake8_output.txt
+
+# Python Static Code Analysis
+pylint:
+  image: $UBUNTU_2004_DOCKER_IMAGE
+  stage: code analysis
+  tags:
+    - linux
+  before_script:
+    - *linux-before
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
+  script:
+    - pylint --output-format=text:pylint_output.text,colorized tracktable/Python/tracktable/
+  artifacts:
+    paths:
+      - pylint_output.txt
+
+#####################
+# C++ Code Analysis #
+#####################
+snl-analysis-tool:
+  stage: code analysis
+  tags:
+    - linux-shell
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY/${SNL_ANALYSIS_TOOL}/${SNL_ANALYSIS_TOOL}/${SNL_ANALYSIS_TOOL}
+    - docker tag $CI_REGISTRY/${SNL_ANALYSIS_TOOL}/${SNL_ANALYSIS_TOOL}/${SNL_ANALYSIS_TOOL} ${SNL_ANALYSIS_TOOL}:latest
+    - cd tracktable
+    - mkdir snl_analysis
+    - docker run --rm -v $(pwd):/src --name source ${SNL_ANALYSIS_TOOL} -f xml -f html -o snl_analysis
+  artifacts:
+    paths:
+      - tracktable/snl_analysis
+
+cppcheck:
+  image: $UBUNTU_2004_DOCKER_IMAGE
+  stage: code analysis
+  tags:
+    - linux
+  before_script:
+    - *linux-before
+  allow_failure: true
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
+  script:
+    - cd tracktable
+    - cppcheck . -iThirdParty --force --enable=all --xml 2> err.xml --verbose -j 6
+    - cppcheck-htmlreport --file=err.xml --report-dir=cppcheck_output --source-dir=.
+
+    # This takes forever to run, not sure if the results are worth it from the partial results I've seen.
+    # - cppcheck . -iThirdParty --force --enable=all --xml 2> err.xml --verbose -j 6 --bug-hunting
+    # - cppcheck-htmlreport --file=err.xml --report-dir=cppcheck_output_bug_hunting --source-dir=.
+  artifacts:
+    paths:
+      - tracktable/err.xml
+      - tracktable/cppcheck_output
+      # - tracktable/cppcheck_output_bug_hunting
+
+#################
+# Code Coverage #
+#################
+coverage-setup:
+  image: $UBUNTU_2004_DOCKER_IMAGE
+  stage: code analysis
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
+  tags:
+    - linux
+  before_script:
+    - *linux-before
+  script:
+    - mkdir build_coverage
+  artifacts:
+    paths:
+      - build_coverage
+    expire_in: 2 hours
+
+coverage-configure:
+  image: $UBUNTU_2004_DOCKER_IMAGE
+  stage: code analysis
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
+  tags:
+    - linux
+  before_script:
+    - *linux-before
+  dependencies:
+    - coverage-setup
+  needs:
+    - job: coverage-setup
+      artifacts: true
+  script:
+    - cd build_coverage
+    - cmake -GNinja -DCMAKE_BUILD_TYPE=Coverage ..
+  artifacts:
+    paths:
+      - build_coverage
+    expire_in: 1 hours
+
+coverage-build-cpp:
+  image: $UBUNTU_2004_DOCKER_IMAGE
+  stage: code analysis
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
+  tags:
+    - linux
+  before_script:
+    - *linux-before
+  dependencies:
+    - coverage-configure
+  needs:
+    - job: coverage-configure
+      artifacts: true
+  script:
+    - cd build_coverage
+    - ninja
+    - ninja cov_init
+    - ctest --output-on-failure --exclude-regex 'C_TrajectoryAssemblyDomain|C_GREAT_CIRCLE_FIT|C_MemoryUse|C_PointGenerator|P_TerrestrialHeatmapExample|P_TerrestrialTrajectoryMapExample|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe|P_Render_Trajectories'
+    - ninja cov_capture
+    - ninja cov_genhtml
+  coverage: '/Total:\|(\d+\.?\d+\%)/'
+  artifacts:
+    paths:
+      - build_coverage
+    expire_in: 1 week
+
+coverage-build-python:
+  image: $UBUNTU_2004_DOCKER_IMAGE
+  stage: code analysis
+  rules:
+    - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
+  tags:
+    - linux
+  before_script:
+    - *linux-before
+  dependencies:
+    - coverage-build-cpp
+  needs:
+    - job: coverage-build-cpp
+      artifacts: true
+  script:
+    - cd build_coverage
+    - coverage combine tracktable/Python/tracktable/*/*/.coverage
+    - coverage report -m
+    - coverage html
+  coverage: '/^TOTAL.+?(\d+\%)$/'
+  artifacts:
+    paths:
+      - build_coverage
+    expire_in: 1 week
+
+# pages:
+#   image: $UBUNTU_2004_DOCKER_IMAGE
+#   stage: code analysis
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
+#   tags:
+#     - linux
+#   before_script:
+#     - *coverage-before
+#   dependencies:
+#     - coverage-build-python
+#   needs:
+#     - job: coverage-build-python
+#       artifacts: true
+#   script:
+#     # This might not work, but this does `- mv build_coverage/coverage public`
+#     - mkdir public/cpp_coverage
+#     - mkdir public/python_coverage
+#     - mv build_coverage/coverage public/cpp_coverage
+#     - mv build_coverage/htmlcov public/python_coverage
+#   artifacts:
+#     paths:
+#       - public
+#     expire_in: 1 week

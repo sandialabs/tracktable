@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021, Sandia Corporation.  All rights
+# Copyright (c) 2014-2022, Sandia Corporation.  All rights
 # reserved.
 #
 # Redistribution and use in source and binary forms, with or without

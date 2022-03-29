@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -32,18 +32,15 @@ Heat Map Rendering Example
 Purpose: Sample code to render heatmap of points
 """
 
-import os.path
-import sys
-import cartopy
-import cartopy.crs
+from tracktable.domain.terrestrial import TrajectoryPointReader
+from tracktable.render import mapmaker
+from tracktable.render.histogram2d import render_histogram
+from tracktable.render import maps
+from tracktable_data.data import retrieve
 
 from matplotlib import pyplot
-from tracktable.core import data_directory
-from tracktable.domain.terrestrial import TrajectoryPointReader
-from tracktable.render.map_processing import maps
-from tracktable.render.render_heatmap import render_heatmap
-from tracktable.render import render_map
-
+import os.path
+import sys
 
 # Generate a map and create a heatmap from the points we generated.
 # The type of map, colors, scaling can be customised depending the
@@ -57,7 +54,7 @@ def get_bbox(area, domain):
     coords.append(location['min_corner'][1])
     coords.append(location['max_corner'][0])
     coords.append(location['max_corner'][1])
-    return render_map._make_bounding_box(coords, domain)
+    return mapmaker._make_bounding_box(coords, domain)
 
 def main():
     # First we set up our point source by reading points from a file.
@@ -65,7 +62,7 @@ def main():
     # so we leave all the column fields as default.
     # The data file we use here is bundled with Tracktable.
     points = []
-    data_filename = os.path.join(data_directory(), 'SampleHeatmapPoints.csv')
+    data_filename = retrieve('SampleHeatmapPoints.csv')
     with open(data_filename, 'r') as inFile:
         reader = TrajectoryPointReader()
         reader.input = inFile
@@ -76,20 +73,15 @@ def main():
 
     # 100 DPI * (8, 6) gives an 800x600-pixel image
     figure = pyplot.figure(dpi=100, figsize=(8, 6))
-    (mymap, map_actors) = render_map.render_map(domain='terrestrial',
+    (mymap, map_actors) = mapmaker.mapmaker(domain='terrestrial',
                                             map_name='region:conus')
     bbox = get_bbox('conus', 'terrestrial')
-
-    render_heatmap(points, # Our list of points we created above
-                    backend='cartopy',
-                    map_canvas=mymap,
-                    bounding_box=bbox,       # Bounding box is generated from mymap
+    render_histogram(map_projection=mymap,
+                    point_source=points,       # Our list of points we created above
+                    bounding_box = bbox,       # Bounding box is generated from mymap
                     bin_size=0.25,
                     colormap='gist_heat')
-
     pyplot.show()
-
-    heatmap = render_heatmap(points, backend='folium')
 
 if __name__ == '__main__':
     sys.exit(main())

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -30,6 +30,8 @@
 
 """Render cities, coastlines, etc onto maps"""
 
+import logging
+
 import cartopy
 import cartopy.crs
 import matplotlib
@@ -38,13 +40,18 @@ import matplotlib.colors
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
 from matplotlib import pyplot
 from tracktable.core.geomath import longitude_degree_size
+from tracktable.info import airports, ports
+from tracktable.render.backends.patch_cartopy_download_url import \
+    patch_cartopy_backend
+
+logger = logging.getLogger(__name__)
 
 cities = None
 
 def _ensure_cities_loaded():
     global cities
     if cities is None:
-        from ..info import cities
+        from tracktable.info import cities
 
 def draw_largest_cities(map_axes,
                         num_cities,
@@ -152,7 +159,11 @@ def draw_cities(map_axes,
                 label_color='white',
                 dot_color='white',
                 zorder=10,
-                transform=None):
+                transform=None,
+                map_name=None,
+                map_bbox=None,
+                country=None,
+                location=None):
     """Decorate a map with specified number of cities
 
     Args:
@@ -171,6 +182,9 @@ def draw_cities(map_axes,
        A list of artists added to the axes
 
     """
+
+    # TODO (mjfadem): draw_cities needs to be updated to function like draw_ports and draw_airports
+    # along with keeping it's existing functionality
 
     # TODO: Transform is kwarg here but doesn't exist in the params
     # for draw_cities_larger_than() and draw_largest_cities() which
@@ -198,17 +212,398 @@ def draw_cities(map_axes,
             longitude = city.longitude
             latitude = city.latitude
             text_artist = map_axes.annotate(
+                s=city.name,
                 xy=(longitude, latitude),
                 xytext=(6, 0),
                 textcoords="offset points",
-                text=city.name,
                 fontsize=label_size,
                 color=label_color,
                 ha="left",
                 va="center",
                 zorder=zorder,
+                xycoords=transform._as_mpl_transform(map_axes), # https://stackoverflow.com/a/25421922, the given transformation gets destroyed by annotate
+            )
+            artists.append(text_artist)
+
+    return artists
+
+# ----------------------------------------------------------------------
+
+
+def draw_airports(map_axes,
+                airport_list=[],
+                label_size=12,
+                dot_size=2,
+                label_color='white',
+                dot_color='red',
+                zorder=10,
+                transform=cartopy.crs.PlateCarree(),
+                map_name=None,
+                map_bbox=None,
+                airport_bounding_box=None,
+                draw_all_airports=False,
+                draw_arrows=True):
+    """Decorate a map with airports
+
+    Args:
+       map_axes (GeoAxes): Map to decorate
+
+    Keyword Args:
+       airport_list (list(str)): IATA code of airports to render onto the map (Default: [])
+       label_size (int): Font size (points) for label (Default: 10)
+       dot_size (int): Size (in points) of dot marking airport location (Default: 2)
+       label_color (str): Color (name or hex string) for airport labels (Default: 'white')
+       dot_color (str): Color (name or hex string) for airport markers (Default: 'white')
+       zorder (int): Image layer (z-order) for airports (Default: 10)
+       transform (cartopy crs object): Transform the corrdinate system (Default: None)
+       map_name (str): Name of the map to draw on (Default: None)
+       airport_bounding_box (BoundingBox or tuple/list of points): bounding box for
+            rendering airports within. (Default: None)
+       draw_all_airports (bool): Draw all of the airports in the bounding box (Default: False)
+       draw_arrows (bool): Whether or not to draw arrows from airport labels to corresponding dots (Default: True)
+
+    Returns:
+       A list of artists added to the axes
+
+    """
+
+    artists = []
+    if map_name and map_name != "custom" and map_name.split(':')[0].lower() == "airport": # We're rendering an airport specifc map
+        airport_code = map_name.split(':')[1]
+        airport = airports.airport_information(airport_code)
+        longitude = airport.position[0]
+        latitude = airport.position[1]
+
+        artists.append(
+            map_axes.scatter(
+                longitude,
+                latitude,
+                s=dot_size,
+                color=dot_color,
+                zorder=zorder,
                 transform=transform
             )
+        )
+
+        if draw_arrows:
+            text_artist = map_axes.annotate(
+                s=airport_code,
+                xy=(longitude, latitude),
+                xytext=(-20, 20),
+                textcoords="offset points",
+                fontsize=label_size,
+                color=label_color,
+                ha="left",
+                va="bottom",
+                zorder=zorder,
+                xycoords=transform._as_mpl_transform(map_axes), # https://stackoverflow.com/a/25421922, the given transformation gets destroyed by annotate
+                arrowprops=dict(color=label_color,
+                                arrowstyle="->")
+            )
+        else:
+            text_artist = map_axes.annotate(
+                s=airport_code,
+                xy=(longitude, latitude),
+                xytext=(-10, 5),
+                textcoords="offset points",
+                fontsize=label_size,
+                color=label_color,
+                ha="left",
+                va="bottom",
+                zorder=zorder,
+                xycoords=transform._as_mpl_transform(map_axes), # https://stackoverflow.com/a/25421922, the given transformation gets destroyed by annotate
+            )
+
+        artists.append(text_artist)
+
+    else: # We're rendering a custom map
+        display_all_airports = True
+        all_airports = []
+
+        if draw_all_airports and not airport_bounding_box:
+            display_all_airports = False
+            for airport_name, airport in airports.all_airports_within_bounding_box(map_bbox).items():
+                all_airports.append(airport)
+
+        elif airport_bounding_box and not draw_all_airports:
+            display_all_airports = False
+            for airport_name, airport in airports.all_airports_within_bounding_box(airport_bounding_box).items():
+                all_airports.append(airport)
+
+        elif airport_bounding_box and draw_all_airports:
+            logger.info("`airport_bounding_box` and `draw_all_airports` both provided, using `map_bbox`.")
+            display_all_airports = False
+            for airport_name, airport in airports.all_airports_within_bounding_box(map_bbox).items():
+                all_airports.append(airport)
+
+        if len(airport_list) > 0:
+            display_all_airports = False
+            for airport in airport_list:
+                all_airports.append(airports.airport_information(airport))
+
+        if display_all_airports:
+            all_airports = airports.all_airports()
+        else:
+            # Remove duplicates since there is a chance you'll double up on ports with how this code is structured
+            all_airports = list(set(all_airports))
+
+        for airport in all_airports:
+            longitude = airport.position[0]
+            latitude = airport.position[1]
+
+            artists.append(
+                map_axes.scatter(
+                    longitude,
+                    latitude,
+                    s=dot_size,
+                    color=dot_color,
+                    zorder=zorder,
+                    transform=transform
+                )
+            )
+
+            if draw_arrows:
+                text_artist = map_axes.annotate(
+                    s=airport.name,
+                    xy=(longitude, latitude),
+                    xytext=(-20, 20),
+                    textcoords="offset points",
+                    fontsize=label_size,
+                    color=label_color,
+                    ha="left",
+                    va="bottom",
+                    zorder=zorder,
+                    xycoords=transform._as_mpl_transform(map_axes), # https://stackoverflow.com/a/25421922, the given transformation gets destroyed by annotate
+                    arrowprops=dict(color=label_color,
+                                    arrowstyle="->")
+                )
+            else:
+                text_artist = map_axes.annotate(
+                    s=airport.name,
+                    xy=(longitude, latitude),
+                    xytext=(-10, 5),
+                    textcoords="offset points",
+                    fontsize=label_size,
+                    color=label_color,
+                    ha="left",
+                    va="bottom",
+                    zorder=zorder,
+                    xycoords=transform._as_mpl_transform(map_axes), # https://stackoverflow.com/a/25421922, the given transformation gets destroyed by annotate
+                )
+
+            artists.append(text_artist)
+
+    return artists
+
+# ----------------------------------------------------------------------
+
+
+def draw_ports(map_axes,
+                port_list=[],
+                label_size=12,
+                dot_size=2,
+                label_color='white',
+                dot_color='blue',
+                zorder=10,
+                transform=cartopy.crs.PlateCarree(),
+                map_name=None,
+                map_bbox=None,
+                country=None,
+                port_country=None,
+                port_water_body=None,
+                port_wpi_region=None,
+                port_bounding_box=None,
+                port_and_country_seperate=False,
+                draw_all_ports=False,
+                draw_arrows=True):
+    """Decorate a map with specified number of ports
+
+    Args:
+       map_axes (GeoAxes): Map to decorate
+
+    Keyword Args:
+       port_list (list(str)): Name or WPI index number of ports to render onto the map (Default: [])
+       label_size (int): Font size (points) for label (Default: 10)
+       dot_size (int): Size (in points) of dot marking port location (Default: 2)
+       label_color (str): Color (name or hex string) for port labels (Default: 'white')
+       dot_color (str): Color (name or hex string) for port markers (Default: 'white')
+       zorder (int): Image layer (z-order) for ports (Default: 10)
+       transform (cartopy crs object): Transform the corrdinate system (Default: None)
+       map_name (str): Name of the map to draw on (Default: None)
+       country (str): Name of the country the port is located in (Default: None)
+       port_country (str): Name of country to render ports in. (Default: None)
+       port_water_body (str): Name of body of water to render ports on. (Default: None)
+       port_wpi_region (str): Name of WPI region to render ports in. (Default: None)
+       port_bounding_box (BoundingBox or tuple/list of points): bounding box for rendering ports within. (Default: None)
+       port_and_country_seperate (bool): Bool for searching the ports database for a port and not considering it's country to see if it's rendered. i.e. You want to render a port in the U.K. while rendering all ports in Japan. (Default: False)
+        draw_arrows (bool): Whether or not to draw arrows from airport labels to corresponding dots (Default: True)
+
+    Returns:
+       A list of artists added to the axes
+
+    """
+
+    artists = []
+    if map_name and map_name != "custom" and map_name.split(':')[0].lower() == "port": # We're rendering an port specifc map
+        port_name = map_name.split(':')[1]
+        port = ports.port_information(port_name, country=country)
+        port_name = port.name
+        longitude = port.position[0]
+        latitude = port.position[1]
+
+        artists.append(
+            map_axes.scatter(
+                longitude,
+                latitude,
+                s=dot_size,
+                color=dot_color,
+                zorder=zorder,
+                transform=transform
+            )
+        )
+
+        if draw_arrows:
+            text_artist = map_axes.annotate(
+                s=port_name,
+                xy=(longitude, latitude),
+                xytext=(-20, 20),
+                textcoords="offset points",
+                fontsize=label_size,
+                color=label_color,
+                ha="left",
+                va="bottom",
+                zorder=zorder,
+                xycoords=transform._as_mpl_transform(map_axes), # https://stackoverflow.com/a/25421922, the given transformation gets destroyed by annotate
+                arrowprops=dict(color=label_color,
+                                arrowstyle="->")
+            )
+        else:
+            text_artist = map_axes.annotate(
+                s=port_name,
+                xy=(longitude, latitude),
+                xytext=(-10, 5),
+                textcoords="offset points",
+                fontsize=label_size,
+                color=label_color,
+                ha="left",
+                va="bottom",
+                zorder=zorder,
+                xycoords=transform._as_mpl_transform(map_axes), # https://stackoverflow.com/a/25421922, the given transformation gets destroyed by annotate
+            )
+
+        artists.append(text_artist)
+
+    else: # We're rendering a custom map
+        display_all_ports = True
+        all_ports = []
+
+        if draw_all_ports and not port_bounding_box:
+            display_all_ports = False
+            for port_index, port in ports.all_ports_within_bounding_box(map_bbox).items():
+                all_ports.append(port)
+
+        elif port_bounding_box and not draw_all_ports:
+            display_all_ports = False
+            for port_index, port in ports.all_ports_within_bounding_box(port_bounding_box).items():
+                all_ports.append(port)
+
+        elif port_bounding_box and draw_all_ports:
+            logger.info("`airport_bounding_box` and `draw_all_ports` both provided, using `map_bbox`.")
+            display_all_ports = False
+            for port_index, port in ports.all_ports_within_bounding_box(map_bbox).items():
+                all_ports.append(port)
+
+        if port_water_body:
+            display_all_ports = False
+            for port_index, port in ports.all_ports_by_water_body(port_water_body).items():
+                all_ports.append(port)
+
+        if port_wpi_region:
+            display_all_ports = False
+            for port_index, port in ports.all_ports_by_wpi_region(port_wpi_region).items():
+                all_ports.append(port)
+
+        if len(port_list) > 0:
+            display_all_ports = False
+            if port_and_country_seperate:
+                if port_country:
+                    for port_index, port in ports.all_ports_by_country(port_country).items():
+                        all_ports.append(port)
+                else:
+                    logger.info("No `port_country` specified only ports listed in `port_list` will be rendered.")
+                for port in port_list:
+                    all_ports.append(ports.port_information(port))
+            else:
+                for port in port_list:
+                    all_ports.append(ports.port_information(port, country=port_country))
+
+            flatten_all_ports = []
+            for port in all_ports: # Since port_information can return lists we need to flatten the all_ports list
+                if type(port) is list:
+                    for i in port:
+                        flatten_all_ports.append(i)
+                else:
+                    flatten_all_ports.append(port)
+
+            all_ports = flatten_all_ports
+
+        if len(port_list) == 0 and port_country:
+            display_all_ports = False
+            for port_index, port in ports.all_ports_by_country(port_country).items():
+                all_ports.append(port)
+
+        if display_all_ports:
+            all_ports = ports.all_ports()
+        else:
+            # Remove duplicates since there is a chance you'll double up on ports with how this code is structured
+            all_ports = list(set(all_ports))
+
+        for port in all_ports:
+            longitude = port.position[0]
+            latitude = port.position[1]
+
+            artists.append(
+                map_axes.scatter(
+                    longitude,
+                    latitude,
+                    s=dot_size,
+                    color=dot_color,
+                    zorder=zorder,
+                    transform=transform
+                )
+            )
+
+            if draw_arrows:
+                text_artist = map_axes.annotate(
+                    s=port.name,
+                    clip_on=True,
+                    xy=(longitude, latitude),
+                    xytext=(-20, 20),
+                    textcoords="offset points",
+                    fontsize=label_size,
+                    color=label_color,
+                    ha="left",
+                    va="bottom",
+                    zorder=zorder,
+                    xycoords=transform._as_mpl_transform(map_axes), # https://stackoverflow.com/a/25421922, the given transformation gets destroyed by annotate
+                    arrowprops=dict(color=label_color,
+                                    arrowstyle="->")
+                )
+            else:
+                text_artist = map_axes.annotate(
+                    s=port.name,
+                    clip_on=True,
+                    xy=(longitude, latitude),
+                    xytext=(-10, 5),
+                    textcoords="offset points",
+                    fontsize=label_size,
+                    color=label_color,
+                    ha="left",
+                    va="bottom",
+                    zorder=zorder,
+                    xycoords=transform._as_mpl_transform(map_axes), # https://stackoverflow.com/a/25421922, the given transformation gets destroyed by annotate
+                )
+
             artists.append(text_artist)
 
     return artists
@@ -238,6 +633,8 @@ def draw_countries(map_axes,
        A list of Matplotlib artists added to the figure.
 
     """
+
+    patch_cartopy_backend()
 
     country_borders = cartopy.feature.NaturalEarthFeature(
         'cultural',
@@ -281,6 +678,8 @@ def draw_states(map_axes,
 
     """
 
+    patch_cartopy_backend()
+
     return [map_axes.add_feature(
         cartopy.feature.STATES.with_scale(resolution),
         linewidth=linewidth,
@@ -314,6 +713,8 @@ def draw_coastlines(map_axes,
        A list of Matplotlib artists added to the map.
 
     """
+
+    patch_cartopy_backend()
 
     coastlines = cartopy.feature.NaturalEarthFeature(
         name='coastline',
@@ -356,6 +757,8 @@ def fill_land(map_axes,
 
     """
 
+    patch_cartopy_backend()
+
     landmass = cartopy.feature.NaturalEarthFeature(
         name='land',
         category='physical',
@@ -391,6 +794,8 @@ def fill_oceans(map_axes,
        A list of Matplotlib artists added to the map.
 
     """
+
+    patch_cartopy_backend()
 
     oceans = cartopy.feature.NaturalEarthFeature(
         name='ocean',
@@ -430,6 +835,7 @@ def fill_lakes(map_axes,
 
     """
 
+    patch_cartopy_backend()
     lakes = cartopy.feature.NaturalEarthFeature(
         name='lakes',
         category='physical',
@@ -526,7 +932,6 @@ def draw_scale(mymap,
         )
 
     return artists
-
 
 # ----------------------------------------------------------------------
 

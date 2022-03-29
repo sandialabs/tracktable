@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -329,3 +329,32 @@ def generate_bbox_trajectories(start_bbox, end_bbox, num_paths,
         new_trajectory = TerrestrialTrajectory.from_position_list(point_list)
         new_trajectories.append(new_trajectory)
     return new_trajectories
+
+def generate_port_trajectory(start_port, end_port, **kwargs):
+    '''
+    Create a trajectory object from a starting port to an ending
+    port.
+
+    Args:
+        start_port (Port): starting port
+        end_port (Port): ending port
+        **kwargs: see __trajectory_point_generator for values
+
+    Returns:
+        TerrestrialTrajectory
+    '''
+
+    raise NotImplementedError('Tracktable is currently unable to generate a trajectory from scratch between ports')
+
+    # TODO (mjfadem): In order to generate trajectories between ports Tracktable needs to be aware of coasts and landmass
+    # between the two ports as it will currently try to draw the most direct path which isn't correct
+    start_position = TerrestrialTrajectoryPoint(start_port.position)
+    end_position = TerrestrialTrajectoryPoint(end_port.position)
+
+    print("INFO: generating trajectory for {} - {}".format(start_port.name, end_port.name))
+
+    point_list = __trajectory_point_generator(start=start_position,
+                                            end=end_position,
+                                            **kwargs)
+    new_trajectory = TerrestrialTrajectory.from_position_list(point_list)
+    return new_trajectory

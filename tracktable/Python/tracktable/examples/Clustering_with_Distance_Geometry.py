@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -69,10 +69,10 @@ from tracktable.analysis.distance_geometry import distance_geometry_by_distance
 from tracktable.domain.terrestrial import TrajectoryPointReader
 from tracktable.analysis.assemble_trajectories import AssembleTrajectoryFromPoints
 from tracktable.analysis.dbscan import compute_cluster_labels
-from tracktable.core import data_directory
-from tracktable.render.map_processing import paths
+from tracktable_data.data import retrieve
+from tracktable.render import paths
 from tracktable.domain import terrestrial
-from tracktable.render import render_map
+from tracktable.render import mapmaker
 
 from datetime import timedelta
 import cartopy
@@ -90,7 +90,7 @@ def cluster_name(cid):
 
 def main():
 
-    data_filename = os.path.join(data_directory(), 'SampleFlightsUS.csv')
+    data_filename = retrieve('SampleFlightsUS.csv')
     inFile = open(data_filename, 'r')
     reader = TrajectoryPointReader()
     reader.input = inFile
@@ -148,7 +148,7 @@ def main():
         # Set up the canvas and map projection
         figure = pyplot.figure(figsize=[20, 15])
         axes = figure.add_subplot(1, 1, 1)
-        (mymap, map_actors) = render_map.render_map(domain = 'terrestrial', map_name='region:conus')
+        (mymap, map_actors) = mapmaker.mapmaker(domain = 'terrestrial', map_name='region:conus')
         paths.draw_traffic(traffic_map = mymap, trajectory_iterable = clusters[cluster_id], transform=cartopy.crs.PlateCarree())
         figure.suptitle('{}: {} members'.format(cluster_name(cluster_id),
                                             len(clusters[cluster_id])))

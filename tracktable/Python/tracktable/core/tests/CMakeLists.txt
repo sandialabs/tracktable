@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -44,15 +44,13 @@ add_python_test(P_ConvexHullPerimeter tracktable.core.tests.test_convex_hull_per
 
 add_python_test(P_CopyExampleNotebooks tracktable.core.tests.test_copy_example_notebooks "${Tracktable_BINARY_DIR}/TestOutput/")
 
-add_python_test(P_DataDirectory tracktable.core.tests.test_data_directory)
-
 add_python_test(P_EchoArgs tracktable.core.tests.echo_args foo bar baz)
 
 add_python_test(P_ParseTimestampNoTimeZone tracktable.core.tests.parse_timestamp_no_time_zone)
 
 add_python_test(P_ParseTimestampWithTimeZone tracktable.core.tests.parse_timestamp_with_time_zone)
 
-add_python_test(P_ReaderTimestampFormats tracktable.core.tests.test_reader_timestamps "${Tracktable_SOURCE_DIR}/TestData/Timestamps/")
+add_python_test(P_ReaderTimestampFormats tracktable.core.tests.test_reader_timestamps "${Tracktable_DATA_DIR}/internal_test_data/Timestamps/")
 
 add_python_test(P_SpeedBetween tracktable.core.tests.test_speed_between)
 
@@ -73,3 +71,5 @@ add_python_test(P_KM2LonLat tracktable.core.tests.test_kms_to_lon_lat)
 add_python_test(P_LogLevel tracktable.core.tests.test_log_level)
 
 add_python_test(P_TerrestrialECEF tracktable.core.tests.test_terrestrial_ECEF)
+
+add_python_test(P_TimestampTimeZoneConversion tracktable.core.tests.timestamp_conversion_python_cpp)

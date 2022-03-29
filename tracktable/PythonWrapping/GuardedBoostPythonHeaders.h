@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 National Technology and Engineering
+ * Copyright (c) 2014-2022 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -52,6 +52,8 @@
 #include <boost/python/return_value_policy.hpp>
 #include <boost/python/return_by_value.hpp>
 #include <boost/python/def_visitor.hpp>
+#include <boost/python/errors.hpp>
+#include <boost/python/handle.hpp>
 
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 #include <boost/python/suite/indexing/map_indexing_suite.hpp>

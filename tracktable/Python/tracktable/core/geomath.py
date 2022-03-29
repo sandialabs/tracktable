@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -1075,6 +1075,22 @@ def kms_to_lat(kms, latitude):
     """
 
     return kms / latitude_degree_size(latitude)
+
+# ----------------------------------------------------------------------
+
+def km_to_radians(distance):
+    """Convert distance from km to radians given that we are working on the
+    surface of the earth
+
+    Arguments:
+        distance: distance in km
+
+    Returns:
+        distance in radians
+    """
+
+    # divide the distance by the radius of the sphere (in this case the earth)
+    return float(distance / 6371)
 
 # ----------------------------------------------------------------------
 

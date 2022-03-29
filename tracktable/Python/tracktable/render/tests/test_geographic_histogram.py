@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -66,7 +66,7 @@ def test_geographic_histogram():
 
         pyplot.savefig('tracktable_geographic_histogram_test.png', figsize=(4, 4), dpi=150)
         return True
-    except Exception, e:
+    except Exception as e:
         traceback.print_exc()
         return False
 

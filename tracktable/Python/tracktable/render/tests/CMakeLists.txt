@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2022 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -44,32 +44,42 @@ find_package_handle_standard_args(PY_cartopy_module DEFAULT_MSG PY_CARTOPY_MODUL
 # message("PY_CARTOPY_MODULE ${PY_CARTOPY_MODULE}")
 
 if (PY_CARTOPY_MODULE)
-  #add_python_test(P_Mapmaker_Airport
-  #  tracktable.render.tests.test_mapmaker_airport "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
-  #)
+  # TODO (mjfadem): Get these tests up and running once we chase the gremlins out of the existing mapmaker tests
+
+  # add_python_test(P_Mapmaker_City
+  #  tracktable.render.tests.test_mapmaker_city "${Tracktable_SOURCE_DIR}/internal_test_data/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
+  # )
+
+  # add_python_test(P_Mapmaker_Airport
+  #  tracktable.render.tests.test_mapmaker_airport "${Tracktable_SOURCE_DIR}/internal_test_data/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
+  # )
+
+  # add_python_test(P_Mapmaker_Port
+  #  tracktable.render.tests.test_mapmaker_port "${Tracktable_SOURCE_DIR}/internal_test_data/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
+  # )
 
   add_python_test(P_Mapmaker_CONUS
-    tracktable.render.tests.test_mapmaker_conus "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
+    tracktable.render.tests.test_mapmaker_conus "${Tracktable_DATA_DIR}/internal_test_data/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
   )
 
   #add_python_test(P_Mapmaker_NorthAmerica
-  #  tracktable.render.tests.test_mapmaker_north_america "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
+  #  tracktable.render.tests.test_mapmaker_north_america "${Tracktable_DATA_DIR}/internal_test_data/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
   #)
 
   add_python_test(P_Mapmaker_Custom_Bounding_Box_Object
-    tracktable.render.tests.test_mapmaker_custom_bbox_object "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput"
+    tracktable.render.tests.test_mapmaker_custom_bbox_object "${Tracktable_DATA_DIR}/internal_test_data/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput"
   )
 
   add_python_test(P_Mapmaker_Custom_Bounding_Box_Floats
-    tracktable.render.tests.test_mapmaker_custom_bbox_float "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput"
+    tracktable.render.tests.test_mapmaker_custom_bbox_float "${Tracktable_DATA_DIR}/internal_test_data/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput"
   )
 
   add_python_test(P_Mapmaker_Europe
-    tracktable.render.tests.test_mapmaker_europe "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
+    tracktable.render.tests.test_mapmaker_europe "${Tracktable_DATA_DIR}/internal_test_data/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/"
   )
 
   add_python_test(P_Render_Trajectories
-    tracktable.render.tests.test_render_trajectories "${Tracktable_SOURCE_DIR}/TestData/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/" "${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable/examples/data/"
+    tracktable.render.tests.test_render_trajectories "${Tracktable_DATA_DIR}/internal_test_data/GroundTruth" "${Tracktable_BINARY_DIR}/TestOutput/" "${Tracktable_DATA_DIR}/internal_test_data/Points"
   )
 
 else (PY_CARTOPY_MODULE)
