@@ -44,7 +44,7 @@ import matplotlib
 import matplotlib.animation
 import tracktable.domain
 from matplotlib import pyplot
-from tracktable.analysis.assemble_trajectories import \
+from tracktable.applications.assemble_trajectories import \
     AssembleTrajectoryFromPoints
 from tracktable.feature import annotations
 from tracktable.render.render_movie import render_trajectory_movie

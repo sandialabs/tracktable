@@ -27,7 +27,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""movie_from_points.py - Render a movie of trajectories
+"""ffmpeg_backend.py - Render a movie of trajectories using ffmpeg
 
 Note:
     Cartopy v0.18.0 is required to successfully render maps and pass
@@ -49,16 +49,13 @@ import matplotlib.animation
 from matplotlib import pyplot
 from tracktable.core import geomath
 from tracktable.render import render_map
-from tracktable.render.map_processing.movie_processing import (
+from tracktable.render.map_processing.movies import (
     clip_trajectories_to_interval, compute_movie_time_bounds,
     initialize_canvas, map_extent_as_bounding_box,
     render_annotated_trajectories, setup_encoder, trajectories_inside_box)
-from tracktable.render.map_processing.parallel_movie_processing import (
-    BatchMovieRenderer, concatenate_movie_chunks, encode_final_movie)
-from tracktable.render.map_processing.parallel_movie_processing import \
-    initialize_canvas as parallel_initialize_canvas
-from tracktable.render.map_processing.parallel_movie_processing import (
-    remove_movie_chunks, render_frame_batch)
+from tracktable.render.map_processing.parallel_movies import (
+    BatchMovieRenderer, concatenate_movie_chunks, encode_final_movie,
+    remove_movie_chunks)
 
 matplotlib.use('Agg')
 
@@ -138,6 +135,11 @@ def render_trajectory_movie(trajectories,
 
                             # Additional args for Render Map
                             **kwargs):
+
+    """Render a list of trajectories into a movie
+
+        For documentation on the parameters, please see render_movie
+    """
 
     # Steps:
     # 1.  Cull trajectories that are entirely outside the map
@@ -388,8 +390,19 @@ def render_trajectory_movie_parallel(trajectories,
                                     # Additional args for Render Map
                                     **kwargs):
 
+    """Render a list of trajectories into a movie in parallel
+
+        For documentation on the parameters, please see render_movie
+    """
+
     # Steps:
-    # TODO (mjfadem): Fill these steps out
+    # 1.  Cull trajectories that are entirely outside the map
+    # 2.  Annotate trajectories with scalars needed for color
+    # 3.  Split trajectories into equal sized batches
+    # 4.  Add clock to map: TODO: I still need arguments to control whether the clock is
+    #                       included and, if so, where and how it's rendered.
+    # 5.  Generate a movie for each batch of trajectories using multiprocessing pool
+    # 6.  Splice movies together into a single movie
 
     # Configure the batch renderer
     renderer = BatchMovieRenderer()
@@ -415,7 +428,6 @@ def render_trajectory_movie_parallel(trajectories,
 
     # Set up the map.
     logger.info('Initializing map canvas for rendering.')
-    # (figure, axes) = parallel_initialize_canvas(renderer, resolution, dpi)
     (figure, axes) = initialize_canvas(resolution, dpi)
     if map_canvas == None:
         (map_canvas, map_actors) = render_map.render_map(domain=domain,
@@ -512,16 +524,16 @@ def render_trajectory_movie_parallel(trajectories,
     renderer.codec = codec
     renderer.encoder = encoder
 
-    renderer.color_map=trajectory_colormap,
-    renderer.decorate_head=decorate_trajectory_head,
-    renderer.head_size=trajectory_head_dot_size,
-    renderer.head_color=trajectory_head_color,
-    renderer.linewidth_style=linewidth_style,
-    renderer.linewidth=linewidth,
-    renderer.final_linewidth=final_linewidth,
-    renderer.scalar=trajectory_color,
-    renderer.scalar_min=scalar_min,
-    renderer.scalar_max=scalar_max,
+    renderer.color_map=trajectory_colormap
+    renderer.decorate_head=decorate_trajectory_head
+    renderer.head_size=trajectory_head_dot_size
+    renderer.head_color=trajectory_head_color
+    renderer.linewidth_style=linewidth_style
+    renderer.linewidth=linewidth
+    renderer.final_linewidth=final_linewidth
+    renderer.scalar=trajectory_color
+    renderer.scalar_min=scalar_min
+    renderer.scalar_max=scalar_max
     renderer.zorder=trajectory_zorder
 
     # Figure out how many batches we're going to need
@@ -543,9 +555,7 @@ def render_trajectory_movie_parallel(trajectories,
         processors = None
 
     pool = multiprocessing.Pool(processes=processors)
-    # result = pool.map_async(render_frame_batch, frame_batches)
-    # result = pool.map_async(BatchMovieRenderer.render_frame_batch,frame_batches)
-    result = pool.starmap_async(BatchMovieRenderer.render_frame_batch,frame_batches) # STOPPED HERE
+    result = pool.map_async(renderer.render_frame_batch, frame_batches)
     batch_result = result.get()
 
     logger.info("Combining movie parts into raw footage file")

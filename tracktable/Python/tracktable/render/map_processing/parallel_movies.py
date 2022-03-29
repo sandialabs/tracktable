@@ -42,8 +42,7 @@ import subprocess
 
 import matplotlib
 import matplotlib.animation
-from matplotlib import pyplot
-from tracktable.render.map_processing import movie_processing
+from tracktable.render.map_processing import movies
 
 matplotlib.use('Agg')
 
@@ -158,18 +157,27 @@ class BatchMovieRenderer(object):
         self.temp_directory = batch_info[3]
 
         # TODO (mjfadem): Do we need to pass the movie title, artist and comment here?
-        batch_writer = movie_processing.setup_encoder(encoder=self.encoder,codec=self.codec,fps=self.fps)
+        batch_writer = movies.setup_encoder(encoder=self.encoder,codec=self.codec,fps=self.fps)
         batch_filename = os.path.join(self.temp_directory, 'movie_chunk_{}.mkv'.format(batch_id))
 
         # Hand off to the parallel movie renderer to actually draw the trajectories
         parallel_movie_rendering(self.trajectories,
 
                                 # Mapmaker kwargs
-                                domain=self.domain,
                                 map_canvas=self.map_canvas,
 
                                 # Trajectory Rendering kwargs
-                                trajectory_rendering_kwargs=self.trajectory_rendering_kwargs,
+                                color_map = self.color_map,
+                                decorate_head = self.decorate_head,
+                                head_size = self.head_size,
+                                head_color = self.head_color,
+                                linewidth_style = self.linewidth_style,
+                                linewidth = self.linewidth,
+                                final_linewidth = self.final_linewidth,
+                                scalar = self.scalar,
+                                scalar_min = self.scalar_min,
+                                scalar_max = self.scalar_max,
+                                zorder = self.zorder,
 
                                 # Movie kwargs
                                 dpi=self.dpi,
@@ -178,9 +186,8 @@ class BatchMovieRenderer(object):
                                 filename=batch_filename,
                                 first_frame=start_frame,
                                 num_frames=num_frames,
-                                num_frames_overall=self.num_frames_overall,
-                                start_time=self.start_time,
-                                end_time=self.end_time,
+                                frame_duration=self.frame_duration,
+                                first_frame_time=self.first_frame_time,
                                 trail_duration=self.trail_duration,
 
                                 # SaveFig kwargs
@@ -299,54 +306,6 @@ def remove_movie_chunks(tmpdir, filenames):
 
 # --------------------------------------------------------------------
 
-# TODO (mjfadem): I'm 99% sure I can remove this function
-def initialize_canvas(renderer,
-                      resolution,
-                      dpi=72,
-                      facecolor='black'
-                      ):
-    """Set up Matplotlib canvas for rendering
-
-    This function sets up a Matplotlib figure with specified resolution,
-    DPI, and background/edge color.
-
-    Since font sizes are specified in points, the combination of DPI and
-    resolution determines how large a font will appear when text is
-    rendered into the image.  One inch is 72 points, so a 12-point font
-    will produce text where each line is (dpi / 6) pixels tall.
-
-    Arguments:
-        resolution {2 ints}: how large the images should be in pixels
-
-    Keyword arguments:
-        dpi {integer}: how many pixels per inch (pertains to text rendering).
-            Defaults to 72.
-        facecolor {string}: Default color for image background.  Can be
-            specified as the name of a color ('black'), a float value for
-            grays (0.75 == #B0B0B0), an RGBA tuple ((1, 0, 0, 1) is red),
-            or an #RRGGBB string.  Defaults to 'black'.
-
-    Returns:
-        (figure, axes), where 'figure' is a Matplotlib figure and 'axes'
-        are the default axes to render into.
-    """
-
-    figure_dimensions = movie_processing.compute_figure_dimensions(resolution, dpi)
-    figure = pyplot.figure(figsize=figure_dimensions,
-                           facecolor=facecolor)
-    # axes = figure.add_axes([-100, -100, 100, 100], frameon=False, facecolor=facecolor)
-    axes = figure.add_axes([0, 0, 1, 1], frameon=False, facecolor=facecolor)
-    axes.set_frame_on(False)
-
-    # renderer.dpi = dpi
-    # renderer.figure = figure
-    # renderer.axes = axes
-    # renderer.savefig_kwargs = { 'facecolor': figure.get_facecolor() }
-
-    #return (figure, axes)
-
-# ----------------------------------------------------------------------------------
-
 def parallel_movie_rendering(trajectories,
 
                             # Mapmaker kwargs
@@ -396,14 +355,15 @@ def parallel_movie_rendering(trajectories,
                         current_time.strftime("%Y-%m-%d %H:%M:%S"),
                         trail_start_time.strftime("%Y-%m-%d %H:%M:%S")))
 
-                frame_trajectories = movie_processing.clip_trajectories_to_interval(
+
+                frame_trajectories = movies.clip_trajectories_to_interval(
                     trajectories,
                     start_time=trail_start_time,
                     end_time=current_time
                     )
 
                 # TODO: Add in scalar accessor
-                trajectory_artists = movie_processing.render_annotated_trajectories(
+                trajectory_artists = movies.render_annotated_trajectories(
                     frame_trajectories,
                     map_canvas,
                     color_map=color_map,
@@ -440,14 +400,14 @@ def parallel_movie_rendering(trajectories,
                         current_time.strftime("%Y-%m-%d %H:%M:%S"),
                         trail_start_time.strftime("%Y-%m-%d %H:%M:%S")))
 
-                frame_trajectories = movie_processing.clip_trajectories_to_interval(
+                frame_trajectories = movies.clip_trajectories_to_interval(
                     trajectories,
                     start_time=trail_start_time,
                     end_time=current_time
                     )
 
                 # TODO: Add in scalar accessor
-                trajectory_artists = movie_processing.render_annotated_trajectories(
+                trajectory_artists = movies.render_annotated_trajectories(
                     frame_trajectories,
                     map_canvas,
                     color_map=color_map,

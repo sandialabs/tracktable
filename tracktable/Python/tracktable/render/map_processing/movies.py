@@ -234,76 +234,70 @@ def render_annotated_trajectories(trajectories,
                                   zorder=10):
     """Render decorated trajectories (with scalars) onto a map.
 
-    Given a map instance and an iterable containing trajectories,
-    draw the trajectories onto the map with the specified appearance
-    parameters.  You can control the trajectory color, linewidth,
-    z-order and whether or not a dot is drawn at the head of each
-    path.
+        Given a map instance and an iterable containing trajectories,
+        draw the trajectories onto the map with the specified appearance
+        parameters.  You can control the trajectory color, linewidth,
+        z-order and whether or not a dot is drawn at the head of each
+        path.
 
-    The "annotated" part of render_annotated_trajectories refers to
-    per-point scalar metadata on each trajectory.  For example, if your
-    trajectories have a property "speed" at each point, you could render
-    a movie where trajectories being displayed are color-coded by speed.
-    If you supply the name of a property for the `scalar_property`
-    argument, that property will be used along with `colormap` to determine
-    color.  If you don't specify a property, trajectories will be colored
-    so that traverse the entire colormap from start to finish.
+        The "annotated" part of render_annotated_trajectories refers to
+        per-point scalar metadata on each trajectory.  For example, if your
+        trajectories have a property "speed" at each point, you could render
+        a movie where trajectories being displayed are color-coded by speed.
+        If you supply the name of a property for the `scalar_property`
+        argument, that property will be used along with `colormap` to determine
+        color.  If you don't specify a property, trajectories will be colored
+        so that traverse the entire colormap from start to finish.
 
-    Arguments:
-        axes {matplotlib Axes}: Axes to render into
-        trajectories {iterable of Tracktable trajectories}: trajectories
-            to render
+        Args::
+            axes (matplotlib Axes): Axes to render into
+            trajectories (iterable of Tracktable trajectories): trajectories to render
 
-    Keyword Arguments:
-        color_map {name of colormap or :obj:`matplotlib.colors.Colormap`}:
-            Trajectory scalars will be mapped to this color map.  (default:
-            'plasma')
-        decorate_head {boolean}: If true, a dot will be drawn at the current
-            position of each object on the screen.  (default: False)
-        head_size {float}: How large the dot should be for decorated
-            trajectories, measured in points.  (default: 2)
-        head_color {string or tuple}: What color the head dot should be for
-            decorated trajectories.  Can be any Matplotlib color specification
-            such as a color name, an '#RRGGBB' string, or a tuple of RGB or
-            RGBA values.  The value 'scalar' means to use the scalar value
-            at the head of the trajectory so that the dot is the same color
-            as its trail.
-        linewidth_style {string}: Either 'constant', in which case the lines
-            for each trajectory will have constant width (see the `linewidth`
-            parameter); or 'taper', in which case the line width will vary
-            smoothly from `linewidth` at the object's current position to
-            `final_linewidth` at the oldest end of the trail. (default:
-            'taper')
-        linewidth {float}: Width of trajectory trail subject to
-            `linewidth_style`. (default: 0.5)
-        final_linewidth {float}: Width of oldest end of trajectory trail.
-            Only used when `linewidth_style` is 'taper'.
-        scalar {string}: Real-valued property to be used to determine
-            trajectory color.  You must make sure that this property is present
-            at all points in the trajectory data.  The default 'progress'
-            scalar is added automatically. (default: 'progress')
-        scalar_min {float}: Bottom of range of scalar values that you care
-            about. If your scalars are outside the range (0,1), you should set
-            this.  Values below this will be treated as the minimum value.
-            (default: 0)
-        scalar_max {float}: Top of range of scalar values that you care about.
-            If your scalars are outside the range (0,1), you should set this.
-            Values above this will be treated as the maximum value.
-            (default: 1)
-        zorder {integer}: Z-order for drawn items.  Items with a higher
-            Z-order will appear on top of items with a lower Z-order.  This is
-            Matplotlib-specific. (default: 10)
+        Keyword Arguments:
+            color_map (name of colormap or :obj:`matplotlib.colors.Colormap`): Trajectory scalars will be mapped to this color map.  (default: 'plasma')
+            decorate_head (boolean): If true, a dot will be drawn at the current position of each object on the screen.  (default: False)
+            head_size (float): How large the dot should be for decorated trajectories, measured in points.  (default: 2)
+            head_color (string or tuple): What color the head dot should be for
+                decorated trajectories.  Can be any Matplotlib color specification
+                such as a color name, an '#RRGGBB' string, or a tuple of RGB or
+                RGBA values.  The value 'scalar' means to use the scalar value
+                at the head of the trajectory so that the dot is the same color
+                as its trail.
+            linewidth_style (string): Either 'constant', in which case the lines
+                for each trajectory will have constant width (see the `linewidth`
+                parameter); or 'taper', in which case the line width will vary
+                smoothly from `linewidth` at the object's current position to
+                `final_linewidth` at the oldest end of the trail. (default:
+                'taper')
+            linewidth (float): Width of trajectory trail subject to `linewidth_style`. (default: 0.5)
+            final_linewidth (float): Width of oldest end of trajectory trail. Only used when `linewidth_style` is 'taper'.
+            scalar (string): Real-valued property to be used to determine
+                trajectory color.  You must make sure that this property is present
+                at all points in the trajectory data.  The default 'progress'
+                scalar is added automatically. (default: 'progress')
+            scalar_min (float): Bottom of range of scalar values that you care
+                about. If your scalars are outside the range (0,1), you should set
+                this.  Values below this will be treated as the minimum value.
+                (default: 0)
+            scalar_max (float): Top of range of scalar values that you care about.
+                If your scalars are outside the range (0,1), you should set this.
+                Values above this will be treated as the maximum value.
+                (default: 1)
+            zorder (integer): Z-order for drawn items.  Items with a higher
+                Z-order will appear on top of items with a lower Z-order.  This is
+                Matplotlib-specific. (default: 10)
 
-    Returns:
-        List of Matplotlib artists added to the figure.
+        Returns:
+            List of Matplotlib artists added to the figure.
 
-    Raises:
-        KeyError: The desired scalar is not present
-        ValueError: linewidth_style is neither 'constant' nor 'taper'
+        Raises:
+            KeyError: The desired scalar is not present
+            ValueError: linewidth_style is neither 'constant' nor 'taper'
 
-    Note:
-        A gallery of Matplotlib colormaps can be found at
-        https://matplotlib.org/3.1.1/gallery/color/colormap_reference.html
+        Note:
+            A gallery of Matplotlib colormaps can be found at
+            https://matplotlib.org/3.1.1/gallery/color/colormap_reference.html
+
     """
 
     if linewidth_style not in ['constant', 'taper']:
@@ -365,28 +359,28 @@ def setup_encoder(encoder='ffmpeg',
     function is a convenience interface to that.
 
     Keyword Arguments:
-        encoder {string}: Name of encoder.  This must be one of the
+        encoder (string): Name of encoder.  This must be one of the
             values in :code:`matplotlib.animation.writers.list`.
             Default: 'ffmpeg' (requires that you have FFmpeg installed
             on your system)
-        codec {string}: Name of specific encoding algorithm to use.
+        codec (string): Name of specific encoding algorithm to use.
             This is specific to the encoder you choose.  Default:
             None (whatever the encoder prefers)
-        encoder_args {list of strings}: Any arguments you wish to
+        encoder_args (list of strings): Any arguments you wish to
             provide to the encoder.  These are passed through
             to the underlying Matplotlib implementation as
             :code:`extra_args`.  More information about the
             encoder args can be found here:
             https://matplotlib.org/stable/api/_as_gen/matplotlib.animation.FFMpegWriter.html#matplotlib-animation-ffmpegwriter
-        movie_title {string}: Title string to be embedded in the
+        movie_title (string): Title string to be embedded in the
             movie's metadata.  This is not rendered on screen.
             Default: "Tracktable Movie"
-        movie_artist {string}: Movie creator to be embedded in the
+        movie_artist (string): Movie creator to be embedded in the
             movie's metadata.  This is not rendered on screen.
             Default: "Tracktable Trajectory Toolkit"
-        movie_comment {string}: Any other comments you want to
+        movie_comment (string): Any other comments you want to
             embed in metadata.  Default: empty string
-        fps {int}: Desired frames per second for the result.
+        fps (int): Desired frames per second for the result.
             Default: 30
 
     Returns:
