@@ -9,7 +9,7 @@ variables:
     UBUNTU_2004_DOCKER_IMAGE: $CI_REGISTRY/trajectory/tracktable/ubuntu/20.04:latest
 
 .linux-before: &linux-before
-    - . /root/miniconda3/etc/profile.d/conda.sh
+    - . /opt/conda/etc/profile.d/conda.sh
     - conda activate tracktable-linux-ci
 
 linux-setup:
