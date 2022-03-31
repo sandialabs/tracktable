@@ -60,3 +60,8 @@ dependencies:
   - pylint
   - cppcheck
   - pygments
+
+  # Repo Badging
+  - pip:
+      - pylint-exit
+      - anybadge

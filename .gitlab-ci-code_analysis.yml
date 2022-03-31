@@ -8,7 +8,7 @@ variables:
   UBUNTU_2004_DOCKER_IMAGE: $CI_REGISTRY/trajectory/tracktable/ubuntu/20.04:latest
 
 .linux-before: &linux-before
-  - . /root/miniconda3/etc/profile.d/conda.sh
+  - . /opt/conda/etc/profile.d/conda.sh
   - conda activate tracktable-linux-ci
 
 ########################
@@ -73,10 +73,15 @@ pylint:
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
   script:
-    - pylint --output-format=text:pylint_output.text,colorized tracktable/Python/tracktable/
+    - mkdir ./pylint
+    - pylint --output-format=text:pylint_output.txt,colorized tracktable/Python/tracktable/ | tee ./pylint/pylint.log || pylint-exit $?
+    - PYLINT_SCORE=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' ./pylint/pylint.log)
+    - anybadge --label=Pylint --file=pylint/pylint.svg --value=$PYLINT_SCORE 2=red 4=orange 8=yellow 10=green
+    - echo "Pylint score is $PYLINT_SCORE"
   artifacts:
     paths:
       - pylint_output.txt
+      - ./pylint/
 
 #####################
 # C++ Code Analysis #
