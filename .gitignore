@@ -26,3 +26,4 @@ Documentation/examples/demo_images/
 .mypy_cache
 sandbox.*
 scratchpad.*
+*.mp4
