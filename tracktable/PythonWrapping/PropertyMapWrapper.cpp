@@ -41,6 +41,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <tracktable/Core/WarningGuards/PopWarningState.h>
+#include <tracktable/Core/PropertyValue.h>
 
 #include <boost/variant/apply_visitor.hpp>
 
@@ -97,16 +98,17 @@ struct object_to_property_value
 
   static void* convertible(PyObject* obj_ptr)
     {
-      if (PyFloat_Check(obj_ptr) ||
+      if (obj_ptr == Py_None ||
+          PyFloat_Check(obj_ptr) ||
           PyBytes_Check(obj_ptr) ||
           PyUnicode_Check(obj_ptr) ||
           PyDateTime_Check(obj_ptr))
         {
-        return obj_ptr;
+          return obj_ptr;
         }
       else
         {
-        return 0;
+          return 0;
         }
     }
 
