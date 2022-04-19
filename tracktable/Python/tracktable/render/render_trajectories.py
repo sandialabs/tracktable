@@ -73,7 +73,7 @@ def render_trajectories(trajectories, backend='', simplify_traj=False, simplify_
         obj_ids (str or list of str): only display trajecteories
             whose object id matches the given string or a string from
             the given list of strings.
-        map_bbox ([minLon, minLat, maxLon, maxLat]): bounding box for
+        map_bbox ([minLon, minLat, maxLon, maxLat]): Bounding box for
             custom map extent. By default automatically set to
             make all trajectories visible.
         show_lines (bool): whether or not to show the line segments
@@ -159,7 +159,7 @@ def render_trajectories(trajectories, backend='', simplify_traj=False, simplify_
         draw_airports (bool): Whether or not to draw airports (Default: False)
         draw_all_airports (bool): Render all of the ports in the map_bbox, used for Cartopy rendering only. (Default: False)
         airport_list (list(str)): IATA code of airports to render onto the map (Default: [])
-        airport_bounding_box (BoundingBox or tuple/list of points): bounding box for
+        airport_bounding_box (BoundingBox or tuple/list of points): Bounding box for
             rendering airports within. (Default: None)
         airport_color (name of standard color as string, hex color string or
             matplotlib color object): Color of the airport dot or marker (Default: 'red')
@@ -176,7 +176,7 @@ def render_trajectories(trajectories, backend='', simplify_traj=False, simplify_
         port_country (str): Name of country to render ports in. (Default: None)
         port_water_body (str): Name of body of water to render ports on. (Default: None)
         port_wpi_region (str): Name of WPI region to render ports in. (Default: None)
-        port_bounding_box (BoundingBox or tuple/list of points): bounding box for
+        port_bounding_box (BoundingBox or tuple/list of points): Bounding box for
             rendering ports within. (Default: None)
         port_and_country_seperate (bool): Bool for searching the ports database for a port and not considering it's
             country to see if it's rendered. i.e. You want to render a port in the U.K. while rendering all ports in
@@ -188,6 +188,40 @@ def render_trajectories(trajectories, backend='', simplify_traj=False, simplify_
 
         draw_arrows (bool): Whether or not to draw arrows from airport/port labels to dots, used for Cartopy rendering only. (Default: True)
         prefer_canvas (bool): Whether or not to prefer canvas rendering over SVG, used for Folium rendering only. (Default: False)
+
+        draw_shorelines (bool): Whether or not to draw shorelines (Default: False)
+        draw_rivers (bool): Whether or not to draw rivers (Default: False)
+        draw_borders (bool): Whether or not to draw borders (Default: False)
+        shoreline_color (name of standard color as string, hex color string or
+            matplotlib color object): Color of the shoreline (Default: 'red')
+        river_color (name of standard color as string, hex color string or
+            matplotlib color object): Color of the river (Default: 'blue')
+        border_color (name of standard color as string, hex color string or
+            matplotlib color object): Color of the border (Default: 'green')
+        shoreline_fill_polygon (bool): Whether or not to fill in the inside of the shoreline polygon (Default: True)
+        shoreline_fill_color (name of standard color as string, hex color string or
+            matplotlib color object): Fill color of the shoreline (Default: 'red')
+        popup_width (int): Size of the popup window that displays airport/port information, used for Folium rendering only (Default: 375)
+        shoreline_list (list(int)): GSHHS index number of the shoreline polygons to render (Default: [])
+        river_list (list(int)): WDBII index number of the river polygons to render (Default: [])
+        border_list (list(int)): WDBII index number of the border polygons to render (Default: [])
+        shoreline_bounding_box (BoundingBox): Bounding box for
+            rendering shorelines within. (Default: None)
+        river_bounding_box (BoundingBox): Bounding box for
+            rendering rivers within. (Default: None)
+        border_bounding_box (BoundingBox): Bounding box for
+            rendering borders within. (Default: None)
+        shoreline_resolution (string): Resolution of the shapes to pull from the shapefile. (Default: "low")
+        shoreline_level (string): See the docstring for build_shoreline_dict() for more information about levels. (Default: "L1")
+        river_resolution (string): Resolution of the shapes to pull from the shapefile. (Default: "low")
+        river_level (string): See the docstring for build_river_dict() for more information about levels. (Default: "L01")
+        border_resolution (string): Resolution of the shapes to pull from the shapefile. (Default: "low")
+        border_level (string): See the docstring for build_border_dict() for more information about levels. (Default: "L1")
+        display_polygon_tooltip (bool): Whether or not to display the tooltip when hovering over a polygon,
+            used for folium rendering only (Default: True)
+        draw_all_shorelines (bool): Render all of the shorelines in the map_bbox, used for Cartopy rendering only. (Default: False)
+        draw_all_rivers (bool): Render all of the rivers in the map_bbox, used for Cartopy rendering only. (Default: False)
+        draw_all_borders (bool): Render all of the borders in the map_bbox, used for Cartopy rendering only. (Default: False)
     """
 
     render_function = folium_backend.render_trajectories

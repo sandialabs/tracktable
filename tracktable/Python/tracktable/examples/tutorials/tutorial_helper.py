@@ -31,7 +31,6 @@
 tracktable.applications.tutorial_helpers - Helper functions to assist the jupyter notebook tutorials
 """
 
-import os.path
 from datetime import timedelta
 
 import folium as fol
@@ -45,6 +44,7 @@ from tracktable.domain.terrestrial import TrajectoryPointReader
 from tracktable.render import render_map
 from tracktable.render.map_processing import maps
 from tracktable_data.data import retrieve
+from tracktable.rw.load import load_trajectories
 
 # TODO: Error handling throughout.
 
@@ -55,7 +55,13 @@ SAMPLE_DATA_FILENAMES = {'tutorial-csv': retrieve('NYHarbor_2020_06_30_first_hou
                          'boxiness': retrieve('VirginiaBeach_2020_06_04_to_06_filtered.traj'),
                          'shape': retrieve('US_coastal_2020_06_30.traj'),
                          'anomaly-historical': retrieve('NYHarbor_2020_12_first_week.traj'),
-                         'anomaly-test': retrieve('NYHarbor_2020_12_08.traj')
+                         'anomaly-test': retrieve('NYHarbor_2020_12_08.traj'),
+                         'global-flights': retrieve('SampleTrajectories.csv'),
+                         'global-flights-traj': retrieve('SampleTrajectories.traj'),
+                         'one-flight': retrieve('SampleFlight.csv'),
+                         'two-flights': retrieve('TwoSampleFlights.csv'),
+                         'us-flights': retrieve('SampleFlightsUS.csv'),
+
                         }
 
 

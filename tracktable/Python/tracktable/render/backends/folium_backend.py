@@ -40,7 +40,7 @@ import matplotlib
 from folium.plugins import HeatMap
 from matplotlib.colors import ListedColormap, hsv_to_rgb, rgb2hex
 from tracktable.core.geomath import compute_bounding_box
-from tracktable.info import airports, ports
+from tracktable.info import airports, borders, ports, rivers, shorelines
 from tracktable.render.map_decoration import coloring
 from tracktable.render.map_processing import common_processing
 
@@ -111,6 +111,28 @@ def render_trajectories(trajectories,
                         port_bounding_box=None,
                         port_and_country_seperate=False,
                         prefer_canvas=False,
+
+                        # Shoreline, River and Border specific args
+                        draw_shorelines=False,
+                        draw_rivers=False,
+                        draw_borders=False,
+                        shoreline_color='red',
+                        river_color='blue',
+                        border_color='green',
+                        shoreline_fill_polygon=True,
+                        shoreline_fill_color='red',
+                        shoreline_list=[],
+                        river_list=[],
+                        border_list=[],
+                        shoreline_bounding_box=None,
+                        river_bounding_box=None,
+                        border_bounding_box=None,
+                        shoreline_resolution="low",
+                        shoreline_level="L1",
+                        river_resolution="low",
+                        river_level="L01",
+                        border_resolution="low",
+                        border_level="L1",
                         **kwargs):
     """Render a list of trajectories using the folium backend
 
@@ -153,6 +175,28 @@ def render_trajectories(trajectories,
                         port_wpi_region=port_wpi_region,
                         port_bounding_box=port_bounding_box,
                         port_and_country_seperate=port_and_country_seperate)
+
+    render_shorelines_rivers_borders(map_canvas,
+                                draw_shorelines=draw_shorelines,
+                                draw_rivers=draw_rivers,
+                                draw_borders=draw_borders,
+                                shoreline_color=shoreline_color,
+                                river_color=river_color,
+                                border_color=border_color,
+                                shoreline_fill_polygon=shoreline_fill_polygon,
+                                shoreline_fill_color=shoreline_fill_color,
+                                shoreline_list=shoreline_list,
+                                river_list=river_list,
+                                border_list=border_list,
+                                shoreline_bounding_box=shoreline_bounding_box,
+                                river_bounding_box=river_bounding_box,
+                                border_bounding_box=border_bounding_box,
+                                shoreline_resolution=shoreline_resolution,
+                                shoreline_level=shoreline_level,
+                                river_resolution=river_resolution,
+                                river_level=river_level,
+                                border_resolution=border_resolution,
+                                border_level=border_level)
 
     for i, trajectory in enumerate(trajectories):
         coordinates = [(point[1], point[0]) for point in trajectory]
@@ -256,6 +300,8 @@ def render_heatmap(points,
                     filename = '',
                     show_scale = True,
                     max_zoom = 22,
+
+                    # Airport and poirt specific args
                     draw_airports=False,
                     draw_ports=False,
                     airport_color='red',
@@ -274,6 +320,28 @@ def render_heatmap(points,
                     port_bounding_box=None,
                     port_and_country_seperate=False,
                     prefer_canvas=False,
+
+                    # Shoreline, River and Border specific args
+                    draw_shorelines=False,
+                    draw_rivers=False,
+                    draw_borders=False,
+                    shoreline_color='red',
+                    river_color='blue',
+                    border_color='green',
+                    shoreline_fill_polygon=True,
+                    shoreline_fill_color='red',
+                    shoreline_list=[],
+                    river_list=[],
+                    border_list=[],
+                    shoreline_bounding_box=None,
+                    river_bounding_box=None,
+                    border_bounding_box=None,
+                    shoreline_resolution="low",
+                    shoreline_level="L1",
+                    river_resolution="low",
+                    river_level="L01",
+                    border_resolution="low",
+                    border_level="L1",
                     **kwargs):
     """Creates an interactive heatmap visualization using the folium backend
 
@@ -313,6 +381,28 @@ def render_heatmap(points,
                             port_wpi_region=port_wpi_region,
                             port_bounding_box=port_bounding_box,
                             port_and_country_seperate=port_and_country_seperate)
+
+    render_shorelines_rivers_borders(heat_map,
+                                draw_shorelines=draw_shorelines,
+                                draw_rivers=draw_rivers,
+                                draw_borders=draw_borders,
+                                shoreline_color=shoreline_color,
+                                river_color=river_color,
+                                border_color=border_color,
+                                shoreline_fill_polygon=shoreline_fill_polygon,
+                                shoreline_fill_color=shoreline_fill_color,
+                                shoreline_list=shoreline_list,
+                                river_list=river_list,
+                                border_list=border_list,
+                                shoreline_bounding_box=shoreline_bounding_box,
+                                river_bounding_box=river_bounding_box,
+                                border_bounding_box=border_bounding_box,
+                                shoreline_resolution=shoreline_resolution,
+                                shoreline_level=shoreline_level,
+                                river_resolution=river_resolution,
+                                river_level=river_level,
+                                border_resolution=border_resolution,
+                                border_level=border_level)
 
     gradient = coloring.matplotlib_cmap_to_dict(color_map)
     if trajectories:
@@ -531,7 +621,7 @@ def render_airports_and_ports(map_canvas,
                                 "<br>UN/LOCODE = " + str(port.un_locode) + \
                                 "<br>World Port Index Number = " + str(port.world_port_index_number)
 
-            # TODO (mjfadem): It appears that the WIP.shp file is made up of coordinates and not polygon lists so
+            # TODO (mjfadem): It appears that the WPI.shp file is made up of coordinates and not polygon lists so
             # it's no different then the CSV data we use as a baseline. This needs a bit more investigation.
             # if use_shapefile:
                 # sf = shapefile.Reader("tracktable/Python/tracktable/info/data/WPI.shp")
@@ -549,6 +639,182 @@ def render_airports_and_ports(map_canvas,
                         color=port_color,
                         tooltip=port.name,
                         popup=fol.Popup(port_properties, max_width=popup_width, min_width=popup_width)).add_to(map_canvas)
+
+# ----------------------------------------------------------------------
+
+def render_shorelines_rivers_borders(map_canvas,
+                            draw_shorelines=False,
+                            draw_rivers=False,
+                            draw_borders=False,
+                            shoreline_color='red',
+                            river_color='blue',
+                            border_color='green',
+                            shoreline_fill_polygon=True,
+                            shoreline_fill_color='red',
+                            popup_width=375,
+                            shoreline_list=[],
+                            river_list=[],
+                            border_list=[],
+                            shoreline_bounding_box=None,
+                            river_bounding_box=None,
+                            border_bounding_box=None,
+                            shoreline_resolution="low",
+                            shoreline_level="L1",
+                            river_resolution="low",
+                            river_level="L01",
+                            border_resolution="low",
+                            border_level="L1",
+                            display_polygon_tooltip=True,
+                            **kwargs):
+
+    """Renders shorelines, rivers and/or borders to the folium map
+
+    Args:
+        map_canvas (folium map object): Canvas to draw the shorelines/rivers/borders on
+
+    Keyword Arguments:
+        draw_shorelines (bool): Whether or not to draw shorelines (Default: False)
+        draw_rivers (bool): Whether or not to draw rivers (Default: False)
+        draw_borders (bool): Whether or not to draw borders (Default: False)
+        shoreline_color (name of standard color as string, hex color string or
+            matplotlib color object): Color of the shoreline (Default: 'red')
+        river_color_color (name of standard color as string, hex color string or
+            matplotlib color object): Color of the river (Default: 'blue')
+        border_color (name of standard color as string, hex color string or
+            matplotlib color object): Color of the border (Default: 'green')
+        shoreline_fill_polygon (bool): Whether or not to fill in the inside of the shoreline polygon (Default: True)
+        shoreline_fill_color (name of standard color as string, hex color string or
+            matplotlib color object): Fill color of the shoreline (Default: 'red')
+        popup_width (int): Size of the popup window that displays airport/port information, used for Folium rendering only (Default: 375)
+        shoreline_list (list(int)): GSHHS index number of the shoreline polygons to render (Default: [])
+        river_list (list(int)): WDBII index number of the river polygons to render (Default: [])
+        border_list (list(int)): WDBII index number of the border polygons to render (Default: [])
+        shoreline_bounding_box (BoundingBox): bounding box for
+            rendering shorelines within. (Default: None)
+        river_bounding_box (BoundingBox): bounding box for
+            rendering rivers within. (Default: None)
+        border_bounding_box (BoundingBox): bounding box for
+            rendering borders within. (Default: None)
+        shoreline_resolution (string): Resolution of the shapes to pull from the shapefile. (Default: "low")
+        shoreline_level (string): See the docstring for build_shoreline_dict() for more information about levels. (Default: "L1")
+        river_resolution (string): Resolution of the shapes to pull from the shapefile. (Default: "low")
+        river_level (string): See the docstring for build_river_dict() for more information about levels. (Default: "L01")
+        border_resolution (string): Resolution of the shapes to pull from the shapefile. (Default: "low")
+        border_level (string): See the docstring for build_border_dict() for more information about levels. (Default: "L1")
+        display_polygon_tooltip (bool): Whether or not to display the tooltip when hovering over a polygon. (Default: True)
+
+    Returns:
+        No return value
+
+    """
+
+    if draw_shorelines:
+        display_all_shorelines = True
+        all_shorelines = []
+
+        if shoreline_bounding_box:
+            display_all_shorelines = False
+            for shoreline_index, shoreline in shorelines.all_shorelines_within_bounding_box(shoreline_bounding_box, resolution=shoreline_resolution, level=shoreline_level).items():
+                all_shorelines.append(shoreline)
+
+        if len(shoreline_list) > 0:
+            display_all_shorelines = False
+            for shoreline in shoreline_list:
+                all_shorelines.append(shorelines.shoreline_information(shoreline, resolution=shoreline_resolution, level=shoreline_level))
+
+        if display_all_shorelines:
+            all_shorelines = shorelines.all_shorelines(resolution=shoreline_resolution, level=shoreline_level)
+        else:
+            # Remove duplicates since there is a chance you'll double up on shorelines with how this code is structured
+            all_shorelines = list(set(all_shorelines))
+
+        for shoreline in all_shorelines:
+            shoreline_properties = f"GSHHS Index = {shoreline.index} <br>Bounding Box = {shoreline.shape_bbox} <br>Centroid = {shoreline.shape_centroid} <br>GSHHS Level = {shoreline.level} <br>Resolution = {shoreline.resolution}"
+            if shoreline_fill_polygon:
+                if display_polygon_tooltip:
+                    fol_geojson_obj = fol.GeoJson(data=shoreline.geojson,
+                                        tooltip=shoreline.index,
+                                        style_function=lambda x: {'fillColor': shoreline_fill_color, 'color': shoreline_color})
+                else:
+                    fol_geojson_obj = fol.GeoJson(data=shoreline.geojson,
+                                        style_function=lambda x: {'fillColor': shoreline_fill_color, 'color': shoreline_color})
+            else:
+                if display_polygon_tooltip:
+                    fol_geojson_obj = fol.GeoJson(data=shoreline.geojson,
+                                        tooltip=shoreline.index,
+                                        style_function=lambda x: {'fillColor': 'none', 'color': shoreline_color})
+                else:
+                    fol_geojson_obj = fol.GeoJson(data=shoreline.geojson,
+                                        style_function=lambda x: {'fillColor': 'none', 'color': shoreline_color})
+
+            fol.Popup(shoreline_properties, max_width=popup_width, min_width=popup_width).add_to(fol_geojson_obj)
+            fol_geojson_obj.add_to(map_canvas)
+
+    if draw_rivers:
+        display_all_rivers = True
+        all_rivers = []
+
+        if river_bounding_box:
+            display_all_rivers = False
+            for river_index, river in rivers.all_rivers_within_bounding_box(river_bounding_box, resolution=river_resolution, level=river_level).items():
+                all_rivers.append(river)
+
+        if len(river_list) > 0:
+            display_all_rivers = False
+            for river in river_list:
+                all_rivers.append(rivers.river_information(river, resolution=river_resolution, level=river_level))
+
+        if display_all_rivers:
+            all_rivers = rivers.all_rivers(resolution=river_resolution, level=river_level)
+        else:
+            # Remove duplicates since there is a chance you'll double up on rivers with how this code is structured
+            all_rivers = list(set(all_rivers))
+
+        for river in all_rivers:
+            river_properties = f"WBDII River Index = {river.index} <br>Bounding Box = {river.shape_bbox} <br>Centroid = {river.shape_centroid} <br>WBDII Level = {river.level} <br>Resolution = {river.resolution}"
+            if display_polygon_tooltip:
+                fol_geojson_obj = fol.GeoJson(data=river.geojson,
+                            tooltip=river.index,
+                            style_function=lambda x: {'fillColor': 'none', 'color': river_color})
+            else:
+                fol_geojson_obj = fol.GeoJson(data=river.geojson,
+                                style_function=lambda x: {'fillColor': 'none', 'color': river_color})
+
+            fol.Popup(river_properties, max_width=popup_width, min_width=popup_width).add_to(fol_geojson_obj)
+            fol_geojson_obj.add_to(map_canvas)
+
+    if draw_borders:
+        display_all_borders = True
+        all_borders = []
+
+        if border_bounding_box:
+            display_all_borders = False
+            for border_index, border in borders.all_borders_within_bounding_box(border_bounding_box, resolution=border_resolution, level=border_level).items():
+                all_borders.append(border)
+
+        if len(border_list) > 0:
+            display_all_borders = False
+            for border in border_list:
+                all_borders.append(borders.border_information(border, resolution=border_resolution, level=border_level))
+
+        if display_all_borders:
+            all_borders = borders.all_borders(resolution=border_resolution, level=border_level)
+        else:
+            # Remove duplicates since there is a chance you'll double up on borders with how this code is structured
+            all_borders = list(set(all_borders))
+
+        for border in all_borders:
+            border_properties = f"WBDII Border Index = {border.index} <br>Bounding Box = {border.shape_bbox} <br>Centroid = {border.shape_centroid} <br>WBDII Level = {border.level} <br>Resolution = {border.resolution}"
+            if display_polygon_tooltip:
+                fol_geojson_obj = fol.GeoJson(data=border.geojson,
+                                tooltip=border.index,
+                                style_function=lambda x: {'fillColor': 'none', 'color': border_color})
+            else:
+                fol_geojson_obj = fol.GeoJson(data=border.geojson,
+                                style_function=lambda x: {'fillColor': 'none', 'color': border_color})
+
+            fol.Popup(border_properties, max_width=popup_width, min_width=popup_width).add_to(fol_geojson_obj)
+            fol_geojson_obj.add_to(map_canvas)
 
 # ----------------------------------------------------------------------
 

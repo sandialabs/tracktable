@@ -28,7 +28,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""tracktable.rw.loader: Load in trajectories or trajectory points from a file
+"""tracktable.rw.load: Load in trajectories or trajectory points from a file
 
 This file will intelligently load in trajectory or trajectory point files for
 supported file types (.csv, .tsv, .traj). This includes automatic trajectory assembly if
@@ -44,6 +44,12 @@ import os
 from tracktable.applications.assemble_trajectories import \
     AssembleTrajectoryFromPoints
 from tracktable.domain import domain_module_from_name
+
+try:
+    from tqdm import tqdm
+    tqdm_installed = True
+except ImportError as e:
+    tqdm_installed = False
 
 logger = logging.getLogger(__name__)
 
@@ -132,14 +138,24 @@ def load_trajectories(infile,
         # Read in the trajectories from the traj file
         reader = domain_module.TrajectoryReader()
         reader.input = open(infile, 'r')
-        trajectories = list(reader)
+        if tqdm_installed:
+            trajectories = list(tqdm(reader, desc="Loading Trajectories", unit=" trajectory"))
+        else:
+            trajectories = list(reader)
         if return_trajectory_points:
             trajectory_points = []
-            for trajectory in trajectories:
-                point_list = []
-                for point in trajectory:
-                    point_list.append(point)
-                trajectory_points.append(point_list)
+            if tqdm_installed:
+                for trajectory in tqdm(trajectories, desc="Decomposing Trajectories Into Trajectory Points", unit=" trajectory"):
+                    point_list = []
+                    for point in trajectory:
+                        point_list.append(point)
+                    trajectory_points.append(point_list)
+            else:
+                for trajectory in trajectories:
+                    point_list = []
+                    for point in trajectory:
+                        point_list.append(point)
+                    trajectory_points.append(point_list)
             return trajectory_points
         else:
             return trajectories
@@ -174,7 +190,10 @@ def load_trajectories(infile,
             reader.set_time_field_column(name, column_num)
 
         if return_trajectory_points:
-            trajectory_points = list(reader)
+            if tqdm_installed:
+                trajectory_points = list(tqdm(reader, desc="Loading Trajectory Points", unit=" point"))
+            else:
+                trajectory_points = list(reader)
             return trajectory_points
         else:
             # Assemble the points into trajectories
@@ -183,7 +202,10 @@ def load_trajectories(infile,
             assembler.separation_distance = separation_distance
             assembler.separation_time = timedelta(minutes=separation_time)
             assembler.minimum_length = minimum_length
-            trajectories = list(assembler.trajectories())
+            if tqdm_installed:
+                trajectories = list(tqdm(assembler.trajectories(), desc="Loading Trajectory Points And Assembling Points Into Trajectories", unit=" trajectory"))
+            else:
+                trajectories = list(assembler.trajectories())
             return trajectories
     else:
         filename, file_extension = os.path.splitext(infile)
