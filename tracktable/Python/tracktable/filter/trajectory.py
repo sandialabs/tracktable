@@ -32,8 +32,11 @@
 
 import logging
 
-from tracktable.core import geomath
-from tracktable.core.geomath import subset_during_interval
+from shapely.geometry import Polygon
+from tracktable.core.geomath import (compute_bounding_box, intersects,
+                                     subset_during_interval)
+
+logger = logging.getLogger(__name__)
 
 class ClipToTimeWindow(object):
     """Truncate trajectories to fit within a time window
@@ -79,7 +82,7 @@ class ClipToTimeWindow(object):
             raise ValueError("ClipToTimeWindow: Incomplete time window!  You must set both 'start_time' and 'end_time'. The current time window is ({}, {}).".format(self.start_time, self.end_time))
 
         for trajectory in self.input:
-            subset = geomath.subset_during_interval(trajectory,
+            subset = subset_during_interval(trajectory,
                 self.start_time,
                 self.end_time)
             if len(subset) > 0:
@@ -115,13 +118,12 @@ class FilterByBoundingBox(object):
         """
 
         if self.box is None:
-            logging.getLogger(__name__).warning(
-                "FilterByBoundingBox: Box is not set.")
+            logger.warning("FilterByBoundingBox: Box is not set.")
 
         for trajectory in self.input:
             if self.box is None:
                 yield(trajectory)
-            elif geomath.intersects(self.box, trajectory):
+            elif intersects(self.box, trajectory):
                 yield(trajectory)
 
 
@@ -180,3 +182,60 @@ class FilterByAltitude(object):
 
                     if point_below and point_above:
                         yield(trajectory)
+
+class FilterByPolygon(object):
+
+    """Filter out trajectories that lie within a shoreline, river or border polygon
+
+    Given a source that produces Trajectories, return only those
+    trajectories that are outside of a given shoreline, river or border polygon.
+
+    Trajectories will only be filtered out if the entire trajectory is contained
+    within the bounds of the given polygon.
+
+    Attributes:
+       trajectory (iterable): Iterable containing Trajectory objects
+       polygon (Shapely polygon): Polygon to filter trajectories
+    """
+
+    def __init__(self):
+        """Initialize the filter with no trajectory input or polygon
+        """
+        self.input = None
+        self.polygon = None
+
+    def trajectories(self):
+        """Return just the trajectories that are entirely outside of the given polygon
+
+        Yields:
+           Trajectory objects that are entirely outside of the given polygon
+        """
+
+        # First check the necessary condition that the trajectory's
+        # bounding box is outside of the coastal polygon's bounding box.
+        for trajectory in self.input:
+            trajectory_bounding_box = compute_bounding_box(trajectory)
+            (min_lon, min_lat, max_lon, max_lat) = self.polygon.bounds
+
+            if (min_lon > trajectory_bounding_box.min_corner[0] or max_lon < trajectory_bounding_box.max_corner[0]
+                or min_lat > trajectory_bounding_box.min_corner[1] or max_lat < trajectory_bounding_box.max_corner[1]):
+                yield(trajectory)
+
+            # Next, let's check a stronger necessary condition - is the trajectory's
+            # bounding box outside the coastal polygon itself?
+            trajectory_bounding_box_polygon = Polygon([(trajectory_bounding_box.min_corner[0], trajectory_bounding_box.min_corner[1]),
+                                                (trajectory_bounding_box.min_corner[0], trajectory_bounding_box.max_corner[1]),
+                                                (trajectory_bounding_box.max_corner[0], trajectory_bounding_box.max_corner[1]),
+                                                (trajectory_bounding_box.max_corner[0], trajectory_bounding_box.min_corner[1])])
+
+            if not trajectory_bounding_box_polygon.within(self.polygon):
+                yield(trajectory)
+
+            # TODO (mjfadem): Do we need this additional check? Everything above seems to be enough.
+            # Finally, check that the polygon created by the trajectory is outside the coastal polygon.
+            # trajectory_points = [(point[0], point[1]) for point in trajectory]
+            # trajectory_polygon = Polygon(trajectory_points)
+
+            # if trajectory_polygon.within(self.polygon):
+            #     pass
+            #     yield(trajectory)

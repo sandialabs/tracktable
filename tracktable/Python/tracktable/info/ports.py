@@ -276,7 +276,7 @@ def all_ports_within_bounding_box(bounding_box):
   """Return all the port records we have from a given bounding box.
 
   Args:
-    bounding_box (str): Bounding box to return all ports from.
+    bounding_box (Bounding Box): Bounding box to return all ports from.
 
   Returns:
     Dictionary of ports from the given bounding box.

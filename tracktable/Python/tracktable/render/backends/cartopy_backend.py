@@ -35,7 +35,6 @@ import itertools
 from datetime import datetime
 
 import cartopy
-
 import cartopy.crs
 import matplotlib
 import matplotlib.colors
@@ -83,6 +82,9 @@ def render_trajectories(trajectories,
                         zoom_frac = [0,1], #undocumented feature, for now
                         draw_airports=False,
                         draw_ports=False,
+                        draw_shorelines=False,
+                        draw_rivers=False,
+                        draw_borders=False,
 
                         #cartopy specific arguments
                         draw_lonlat=True,
@@ -170,6 +172,9 @@ def render_trajectories(trajectories,
                                             draw_states=draw_states,
                                             draw_airports=draw_airports,
                                             draw_ports=draw_ports,
+                                            draw_shorelines=draw_shorelines,
+                                            draw_rivers=draw_rivers,
+                                            draw_borders=draw_borders,
                                             draw_cities=draw_cities,
                                             fill_land=fill_land,
                                             fill_water=fill_water,
@@ -225,6 +230,9 @@ def render_heatmap(points,
                    draw_states=True,
                    draw_airports=False,
                    draw_ports=False,
+                   draw_shorelines=False,
+                   draw_rivers=False,
+                   draw_borders=False,
                    draw_cities=False,
                    map_projection = None,
                    transform = cartopy.crs.PlateCarree(),
@@ -268,6 +276,9 @@ def render_heatmap(points,
                                             draw_states=draw_states,
                                             draw_airports=draw_airports,
                                             draw_ports=draw_ports,
+                                            draw_shorelines=draw_shorelines,
+                                            draw_rivers=draw_rivers,
+                                            draw_borders=draw_borders,
                                             draw_cities=draw_cities,
                                             fill_land=fill_land,
                                             fill_water=fill_water,

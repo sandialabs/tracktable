@@ -40,7 +40,7 @@ import matplotlib.colors
 from cartopy.mpl.gridliner import LATITUDE_FORMATTER, LONGITUDE_FORMATTER
 from matplotlib import pyplot
 from tracktable.core.geomath import longitude_degree_size
-from tracktable.info import airports, ports
+from tracktable.info import airports, borders, ports, rivers, shorelines
 from tracktable.render.backends.patch_cartopy_download_url import \
     patch_cartopy_backend
 
@@ -255,8 +255,9 @@ def draw_airports(map_axes,
        label_color (str): Color (name or hex string) for airport labels (Default: 'white')
        dot_color (str): Color (name or hex string) for airport markers (Default: 'white')
        zorder (int): Image layer (z-order) for airports (Default: 10)
-       transform (cartopy crs object): Transform the corrdinate system (Default: None)
+       transform (cartopy crs object): Transform the corrdinate system (Default: cartopy.crs.PlateCarree())
        map_name (str): Name of the map to draw on (Default: None)
+       map_bbox (BoundingBox): Bounding box of the map being decorated (Default: None)
        airport_bounding_box (BoundingBox or tuple/list of points): bounding box for
             rendering airports within. (Default: None)
        draw_all_airports (bool): Draw all of the airports in the bounding box (Default: False)
@@ -428,8 +429,9 @@ def draw_ports(map_axes,
        label_color (str): Color (name or hex string) for port labels (Default: 'white')
        dot_color (str): Color (name or hex string) for port markers (Default: 'white')
        zorder (int): Image layer (z-order) for ports (Default: 10)
-       transform (cartopy crs object): Transform the corrdinate system (Default: None)
+       transform (cartopy crs object): Transform the corrdinate system (Default: cartopy.crs.PlateCarree())
        map_name (str): Name of the map to draw on (Default: None)
+       map_bbox (BoundingBox): Bounding box of the map being decorated (Default: None)
        country (str): Name of the country the port is located in (Default: None)
        port_country (str): Name of country to render ports in. (Default: None)
        port_water_body (str): Name of body of water to render ports on. (Default: None)
@@ -608,8 +610,246 @@ def draw_ports(map_axes,
 
     return artists
 
+
 # ----------------------------------------------------------------------
 
+def draw_shorelines(map_axes,
+                    zorder=7,
+                    map_bbox=None,
+                    shoreline_list=[],
+                    shoreline_color='red',
+                    shoreline_fill_polygon=True,
+                    shoreline_fill_color='red',
+                    shoreline_bounding_box=None,
+                    shoreline_resolution='low',
+                    shoreline_level='L1',
+                    draw_all_shorelines=False,
+                    transform=cartopy.crs.PlateCarree()):
+    """Decorate a map with shorelines
+
+    Args:
+       map_axes (GeoAxes): Map to decorate
+
+    Keyword Args:
+       map_name (str): Name of the map to draw on (Default: None)
+       map_bbox (BoundingBox): Bounding box of the map being decorated (Default: None)
+       zorder (int): Image layer (z-order) for shorelines (Default: 10)
+       shoreline_list (list(int)): GSHHS index number of the shoreline polygons to render (Default: [])
+       shoreline_color (name of standard color as string, hex color string or matplotlib color object): Color of the shoreline (Default: 'red')
+       shoreline_zorder (int): Image layer for shorelines (Default: 7)
+       shoreline_resolution (string): Resolution of the shapes to pull from the shapefile. (Default: "low")
+       shoreline_level (string): See the docstring for build_shoreline_dict() for more information about levels. (Default: "L1")
+       shoreline_bounding_box (BoundingBox): Bounding box for rendering shorelines within. (Default: None)
+       shoreline_fill_polygon (bool): Whether or not to fill in the inside of the shoreline polygon (Default: True)
+       shoreline_fill_color (name of standard color as string, hex color string or
+            matplotlib color object): Fill color of the shoreline (Default: 'red')
+       transform (cartopy crs object): Transform the corrdinate system (Default: cartopy.crs.PlateCarree())
+
+    Returns:
+       A list of artists added to the axes
+
+    """
+
+    artists = []
+    display_all_shorelines = True
+    all_shorelines = []
+
+    if draw_all_shorelines and not shoreline_bounding_box:
+        display_all_shorelines = False
+        for shoreline_name, shoreline in shorelines.all_shorelines_within_bounding_box(map_bbox, resolution=shoreline_resolution, level=shoreline_level).items():
+            all_shorelines.append(shoreline)
+
+    elif shoreline_bounding_box and not draw_all_shorelines:
+        display_all_shorelines = False
+        for shoreline_name, shoreline in shorelines.all_shorelines_within_bounding_box(shoreline_bounding_box, resolution=shoreline_resolution, level=shoreline_level).items():
+            all_shorelines.append(shoreline)
+
+    elif shoreline_bounding_box and draw_all_shorelines:
+        logger.info("`shoreline_bounding_box` and `draw_all_shorelines` both provided, using `map_bbox`.")
+        display_all_shorelines = False
+        for shoreline_name, shoreline in shorelines.all_shorelines_within_bounding_box(map_bbox, resolution=shoreline_resolution, level=shoreline_level).items():
+            all_shorelines.append(shoreline)
+
+    if len(shoreline_list) > 0:
+        display_all_shorelines = False
+        for shoreline in shoreline_list:
+            all_shorelines.append(shorelines.shoreline_information(shoreline, resolution=shoreline_resolution, level=shoreline_level))
+
+    if display_all_shorelines:
+        all_shorelines = shorelines.all_shorelines(resolution=shoreline_resolution, level=shoreline_level)
+    else:
+        # Remove duplicates since there is a chance you'll double up on ports with how this code is structured
+        all_shorelines = list(set(all_shorelines))
+
+    if shoreline_fill_polygon:
+        artists.append(
+            map_axes.add_geometries([shoreline.polygon for shoreline in all_shorelines],
+                                    crs = transform,
+                                    edgecolor=shoreline_color,
+                                    zorder = zorder,
+                                    facecolor=shoreline_fill_color)
+        )
+    else:
+        artists.append(
+            map_axes.add_geometries([shoreline.polygon for shoreline in all_shorelines],
+                                    crs = transform,
+                                    edgecolor=shoreline_color,
+                                    zorder = zorder,
+                                    facecolor='none')
+        )
+
+    return artists
+
+# ----------------------------------------------------------------------
+
+def draw_rivers(map_axes,
+                    zorder=7,
+                    map_bbox=None,
+                    river_list=[],
+                    river_color='blue',
+                    river_bounding_box=None,
+                    river_resolution='low',
+                    river_level='L01',
+                    draw_all_rivers=False,
+                    transform=cartopy.crs.PlateCarree()):
+    """Decorate a map with rivers
+
+    Args:
+       map_axes (GeoAxes): Map to decorate
+
+    Keyword Args:
+       map_name (str): Name of the map to draw on (Default: None)
+       map_bbox (BoundingBox): Bounding box of the map being decorated (Default: None)
+       zorder (int): Image layer (z-order) for rivers (Default: 10)
+       river_list (list(int)): GSHHS index number of the river polygons to render (Default: [])
+       river_color (name of standard color as string, hex color string or matplotlib color object): Color of the river (Default: 'blue')
+       river_zorder (int): Image layer for rivers (Default: 7)
+       river_resolution (string): Resolution of the shapes to pull from the shapefile. (Default: "low")
+       river_level (string): See the docstring for build_river_dict() for more information about levels. (Default: "L1")
+       river_bounding_box (BoundingBox): Bounding box for rendering rivers within. (Default: None)
+       transform (cartopy crs object): Transform the corrdinate system (Default: cartopy.crs.PlateCarree())
+
+    Returns:
+       A list of artists added to the axes
+
+    """
+    artists = []
+    display_all_rivers = True
+    all_rivers = []
+
+    if draw_all_rivers and not river_bounding_box:
+        display_all_rivers = False
+        for river_name, river in rivers.all_rivers_within_bounding_box(map_bbox, resolution=river_resolution, level=river_level).items():
+            all_rivers.append(river)
+
+    elif river_bounding_box and not draw_all_rivers:
+        display_all_rivers = False
+        for river_name, river in rivers.all_rivers_within_bounding_box(river_bounding_box, resolution=river_resolution, level=river_level).items():
+            all_rivers.append(river)
+
+    elif river_bounding_box and draw_all_rivers:
+        logger.info("`river_bounding_box` and `draw_all_rivers` both provided, using `map_bbox`.")
+        display_all_rivers = False
+        for river_name, river in rivers.all_rivers_within_bounding_box(map_bbox, resolution=river_resolution, level=river_level).items():
+            all_rivers.append(river)
+
+    if len(river_list) > 0:
+        display_all_rivers = False
+        for river in river_list:
+            all_rivers.append(rivers.river_information(river, resolution=river_resolution, level=river_level))
+
+    if display_all_rivers:
+        all_rivers = rivers.all_rivers(resolution=river_resolution, level=river_level)
+    else:
+        # Remove duplicates since there is a chance you'll double up on ports with how this code is structured
+        all_rivers = list(set(all_rivers))
+
+    artists.append(
+        map_axes.add_geometries([river.polygon for river in all_rivers],
+                                crs = transform,
+                                edgecolor=river_color,
+                                zorder = zorder,
+                                facecolor='none')
+    )
+
+    return artists
+
+# ----------------------------------------------------------------------
+
+def draw_borders(map_axes,
+                    zorder=7,
+                    map_bbox=None,
+                    border_list=[],
+                    border_color='green',
+                    border_bounding_box=None,
+                    border_resolution='low',
+                    border_level='L1',
+                    draw_all_borders=False,
+                    transform=cartopy.crs.PlateCarree()):
+    """Decorate a map with borders
+
+    Args:
+       map_axes (GeoAxes): Map to decorate
+
+    Keyword Args:
+       map_name (str): Name of the map to draw on (Default: None)
+       map_bbox (BoundingBox): Bounding box of the map being decorated (Default: None)
+       zorder (int): Image layer (z-order) for borders (Default: 10)
+       border_list (list(int)): GSHHS index number of the border polygons to render (Default: [])
+       border_color (name of standard color as string, hex color string or matplotlib color object): Color of the border (Default: 'green')
+       border_zorder (int): Image layer for borders (Default: 7)
+       border_resolution (string): Resolution of the shapes to pull from the shapefile. (Default: "low")
+       border_level (string): See the docstring for build_border_dict() for more information about levels. (Default: "L1")
+       border_bounding_box (BoundingBox): Bounding box for rendering borders within. (Default: None)
+       transform (cartopy crs object): Transform the corrdinate system (Default: cartopy.crs.PlateCarree())
+
+    Returns:
+       A list of artists added to the axes
+
+    """
+
+    artists = []
+    display_all_borders = True
+    all_borders = []
+
+    if draw_all_borders and not border_bounding_box:
+        display_all_borders = False
+        for border_name, border in borders.all_borders_within_bounding_box(map_bbox, resolution=border_resolution, level=border_level).items():
+            all_borders.append(border)
+
+    elif border_bounding_box and not draw_all_borders:
+        display_all_borders = False
+        for border_name, border in borders.all_borders_within_bounding_box(border_bounding_box, resolution=border_resolution, level=border_level).items():
+            all_borders.append(border)
+
+    elif border_bounding_box and draw_all_borders:
+        logger.info("`border_bounding_box` and `draw_all_borders` both provided, using `map_bbox`.")
+        display_all_borders = False
+        for border_name, border in borders.all_borders_within_bounding_box(map_bbox, resolution=border_resolution, level=border_level).items():
+            all_borders.append(border)
+
+    if len(border_list) > 0:
+        display_all_borders = False
+        for border in border_list:
+            all_borders.append(borders.border_information(border, resolution=border_resolution, level=border_level))
+
+    if display_all_borders:
+        all_borders = borders.all_borders(resolution=border_resolution, level=border_level)
+    else:
+        # Remove duplicates since there is a chance you'll double up on ports with how this code is structured
+        all_borders = list(set(all_borders))
+
+    artists.append(
+        map_axes.add_geometries([border.polygon for border in all_borders],
+                                crs = transform,
+                                edgecolor=border_color,
+                                zorder = zorder,
+                                facecolor='none')
+    )
+
+    return artists
+
+# ----------------------------------------------------------------------
 
 def draw_countries(map_axes,
                    linewidth=0.5,
