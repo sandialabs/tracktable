@@ -25,7 +25,7 @@
     If at all possible, please include a code sample either inline or as an attachment to the issue.  
     If data files are involved, please attach a small (<1MB) file.
 
-    For inline code examples please use one of the following formats so your code
+    For inline code examples PLEASE use one of the following formats so your code
     is rendered correctly with syntax highlighting.
     
     Example Python Code Snippet:
@@ -62,7 +62,7 @@
     The box should look like `[X]` NOT `[X ]`,`[ X]` or `[ X ]`
 -->
 
-Severity Level:
+- [ ] Urgent (**Only use this checkbox and the accompanying label if you need to attention of the *entire* engineering team immediately**)
 - [ ] Level 1 (Highest)  
 - [ ] Level 2   
 - [ ] Level 3 
@@ -76,7 +76,6 @@ Severity Level:
     The box should look like `[X]` NOT `[X ]`,`[ X]` or `[ X ]`
 -->
 
-Operating System:
 - [ ] Linux
 - [ ] MacOS   
 - [ ] Windows 
@@ -88,7 +87,6 @@ Operating System:
     The box should look like `[X]` NOT `[X ]`,`[ X]` or `[ X ]`
 -->
 
-Python Version:
 - [ ] 3.5
 - [ ] 3.6   
 - [ ] 3.7 
@@ -103,13 +101,14 @@ Python Version:
     The box should look like `[X]` NOT `[X ]`,`[ X]` or `[ X ]`
 -->
 
-Tracktable Version:
-- [ ] From Source (Please provide branch name and date of build)
+- [ ] From Source (Please provide branch name, version number and date of build)
 - [ ] 1.2   
 - [ ] 1.3 
 - [ ] 1.4 
 - [ ] 1.5 
 - [ ] 1.6 
+- [ ] 1.7
+- [ ] Other 
 
 ### Where did you install Tracktable from?
 
@@ -118,6 +117,7 @@ Tracktable Version:
     The box should look like `[X]` NOT `[X ]`,`[ X]` or `[ X ]`
 -->
 
-Tracktable Installation Location:
 - [ ] Pypi
 - [ ] Conda-Forge  
+- [ ] Nightly (Please provide build date)
+- [ ] Internal Development (Please provide build date)
