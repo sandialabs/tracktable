@@ -70,7 +70,8 @@ def load_trajectories(infile,
         separation_distance = None, # km
         separation_time = 30, # minutes
         minimum_length=2, # points
-        return_trajectory_points = False
+        return_trajectory_points = False,
+        return_list=True
         ):
 
     """Load trajectories or trajectory points from .csv, .tsv and .traj files
@@ -123,14 +124,19 @@ def load_trajectories(infile,
         return_trajectory_points (boolean): When loading a .csv or .tsv file return the points in the
             file and don't generate trajectories. When loading a .traj return a list of lists of the points
             that make up the given trajectory for all trajectories in the file. (default: False)
+        return_list (boolean): When returning the reader or assembler object have the loader
+            automatically pull all of the yielded trajectories into a list for further processing. (default: False)
 
     Returns:
         List of trajectory points or trajectories depending on input file and params.
 
     Raises:
         IOError: Unsupported filetype
-        KeyError: Unsupported domain
+        ValueError: Unsupported domain or comment character
     """
+
+    if len(comment_character) != 1:
+        raise ValueError('Unsupported comment character `{}`, comment character must be 1 character long.'.format(comment_character))
 
     domain_module = domain_module_from_name(domain)
 
@@ -138,10 +144,15 @@ def load_trajectories(infile,
         # Read in the trajectories from the traj file
         reader = domain_module.TrajectoryReader()
         reader.input = open(infile, 'r')
-        if tqdm_installed:
-            trajectories = list(tqdm(reader, desc="Loading Trajectories", unit=" trajectory"))
+
+        if return_list:
+            if tqdm_installed:
+                trajectories = list(tqdm(reader, desc="Loading Trajectories", unit=" trajectory"))
+            else:
+                trajectories = list(reader)
         else:
-            trajectories = list(reader)
+            trajectories = reader
+
         if return_trajectory_points:
             trajectory_points = []
             if tqdm_installed:
@@ -178,7 +189,7 @@ def load_trajectories(infile,
             if domain == 'cartesian3d':
                 reader.coordinates[2] = z_column
         else:
-            raise KeyError('Unsupported domain: `{}`, supported domains are terrestrial, cartesian2d and cartesian3d'.format(domain))
+            raise ValueError('Unsupported domain: `{}`, supported domains are terrestrial, cartesian2d and cartesian3d'.format(domain))
 
         for name, column_num in real_fields.items():
             reader.set_real_field_column(name, column_num)
@@ -190,10 +201,13 @@ def load_trajectories(infile,
             reader.set_time_field_column(name, column_num)
 
         if return_trajectory_points:
-            if tqdm_installed:
-                trajectory_points = list(tqdm(reader, desc="Loading Trajectory Points", unit=" point"))
+            if return_list:
+                if tqdm_installed:
+                    trajectory_points = list(tqdm(reader, desc="Loading Trajectory Points", unit=" point"))
+                else:
+                    trajectory_points = list(reader)
             else:
-                trajectory_points = list(reader)
+                trajectory_points = reader
             return trajectory_points
         else:
             # Assemble the points into trajectories
@@ -202,10 +216,13 @@ def load_trajectories(infile,
             assembler.separation_distance = separation_distance
             assembler.separation_time = timedelta(minutes=separation_time)
             assembler.minimum_length = minimum_length
-            if tqdm_installed:
-                trajectories = list(tqdm(assembler.trajectories(), desc="Loading Trajectory Points And Assembling Points Into Trajectories", unit=" trajectory"))
+            if return_list:
+                if tqdm_installed:
+                    trajectories = list(tqdm(assembler.trajectories(), desc="Loading Trajectory Points And Assembling Points Into Trajectories", unit=" trajectory"))
+                else:
+                    trajectories = list(assembler.trajectories())
             else:
-                trajectories = list(assembler.trajectories())
+                trajectories = assembler
             return trajectories
     else:
         filename, file_extension = os.path.splitext(infile)
