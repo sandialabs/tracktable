@@ -78,24 +78,16 @@ def create_point_reader(filename=SAMPLE_DATA_FILENAMES['tutorial-csv'],
                         string_fields={'vessel-name': 7},
                         time_fields={'eta': 17}):
 
-    # set up the reader to match the file structure
-    reader = TrajectoryPointReader()
-    reader.input = open(filename, 'r')
-
-    # required columns
-    reader.object_id_column = object_id_column
-    reader.timestamp_column = timestamp_column
-    reader.coordinates[0] = longitude_column
-    reader.coordinates[1] = latitude_column
-
-    for name, column_num in real_fields.items():
-        reader.set_real_field_column(name, column_num)
-
-    for name, column_num in string_fields.items():
-        reader.set_string_field_column(name, column_num)
-
-    for name, column_num in time_fields.items():
-        reader.set_time_field_column(name, column_num)
+    reader = load_trajectories(filename,
+                      object_id_column=object_id_column,
+                      timestamp_column=timestamp_column,
+                      longitude_column=longitude_column,
+                      latitude_column=latitude_column,
+                      real_fields=real_fields,
+                      string_fields=string_fields,
+                      time_fields=time_fields,
+                      return_trajectory_points=True,
+                      return_list=False)
 
     return reader
 
@@ -109,31 +101,24 @@ def get_trajectory_list_from_csv(filename=SAMPLE_DATA_FILENAMES['tutorial-csv'],
                                  string_fields={'vessel-name': 7},
                                  time_fields={'eta': 17},
                                  separation_distance=10, # km
-                                 separation_time=timedelta(minutes=20),
+                                 separation_time=20,
                                  minimum_length=5 # points
                                 ):
 
-    # create the reader using Tracktable sample data
-    reader = create_point_reader(filename=filename,
-                                 object_id_column=object_id_column,
-                                 timestamp_column=timestamp_column,
-                                 longitude_column=longitude_column,
-                                 latitude_column=latitude_column,
-                                 real_fields=real_fields,
-                                 string_fields=string_fields,
-                                 time_fields=time_fields)
+    builder = load_trajectories(filename,
+                      object_id_column=object_id_column,
+                      timestamp_column=timestamp_column,
+                      longitude_column=longitude_column,
+                      latitude_column=latitude_column,
+                      real_fields=real_fields,
+                      string_fields=string_fields,
+                      time_fields=time_fields,
+                      separation_distance=separation_distance,
+                      separation_time=separation_time,
+                      minimum_length=minimum_length
+                    )
 
-    # create the builder object
-    builder = AssembleTrajectoryFromPoints()
-    builder.input = reader
-
-    # specify optional builder parameters
-    builder.separation_distance = separation_distance # km
-    builder.separation_time = separation_time
-    builder.minimum_length = minimum_length # points
-
-    # assemble trajectories
-    return list(builder)
+    return builder
 
 
 def get_trajectory_list(dataset='tutorial-traj'):
