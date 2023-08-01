@@ -29,16 +29,18 @@
 
 
 """
-This file contains functions for generating heatmap points.
+tracktable.data_generators.heatmap point - Generating heatmap points around n largest cities.
 """
 import csv
 import datetime
+import logging
 
 from tracktable.data_generators import point
 from tracktable.domain import terrestrial
 from tracktable.feature import interleave_points
 from tracktable.info import cities
 
+logger = logging.getLogger(__name__)
 
 def n_largest_cities(howmany):
     """
@@ -90,7 +92,7 @@ def points_near_city(city, num_points):
 # ----------------------------------------------------------------------
 
 def generate_heatmap_points(**kwargs):
-    print("INFO: Generating {} points around each of the {} largest cities in the world.".format(kwargs['num_points_per_city'], kwargs['num_cities']))
+    logger.info("Generating {} points around each of the {} largest cities in the world.".format(kwargs['num_points_per_city'], kwargs['num_cities']))
     heatmap_points = [ points_near_city(city, kwargs['num_points_per_city']) for city in n_largest_cities(kwargs['num_cities']) ]
     combined_point_source = interleave_points.interleave_points_by_timestamp(*heatmap_points)
     if kwargs['write_file']:

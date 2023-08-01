@@ -38,9 +38,9 @@ if (BUILD_TESTING)
   add_subdirectory(algorithms/tests)
   add_subdirectory(applications/tests)
   add_subdirectory(core/tests)
+  add_subdirectory(data_generators/tests)
   add_subdirectory(domain/tests)
   add_subdirectory(examples)
-  add_subdirectory(examples/data/generators/tests)
   add_subdirectory(rw/tests)
   add_subdirectory(info/tests)
   add_subdirectory(render/tests)
@@ -139,18 +139,6 @@ file(GLOB analytic_demo_helpers "examples/analytic_demos/*.py")
 install(
   FILES ${analytic_demo_helpers}
   DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos
-)
-
-file(GLOB example_data_files "examples/data/*.*")
-install(
-  FILES ${example_data_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/data
-)
-
-file(GLOB example_data_generator_files "examples/data/generators/*.py")
-install(
-  FILES ${example_data_generator_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/data/generators
 )
 
 file(GLOB feature_files "feature/*.py")
