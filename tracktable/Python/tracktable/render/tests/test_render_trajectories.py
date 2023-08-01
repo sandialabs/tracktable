@@ -329,13 +329,23 @@ def test_render_trajectories(ground_truth_path, test_output_path,
                                                      ground_truth_path,
                                                      test_output_path,
                                                      ignore_uuids=True)
+
+    filename = "Animate.html"
+    render_trajectories(trajs[23], animate=True,
+                        backend='folium', show=False, save=True,
+                        filename=os.path.join(test_output_path,
+                                              filename))
+    num_errors += utils.compare_html_to_ground_truth(filename,
+                                                     ground_truth_path,
+                                                     test_output_path,
+                                                     ignore_uuids=True)
     return num_errors
 
 # ----------------------------------------------------------------------
 
 def main():
     if len(sys.argv) != 4:
-        print("usage: {} ground_truth_dir test_output_dir".format(sys.argv[0]))
+        print("usage: {} ground_truth_dir test_output_dir test_data_dir".format(sys.argv[0]))
         exit(-1)
         #arg 3 is path to sample data
     return test_render_trajectories(sys.argv[1], sys.argv[2], sys.argv[3])

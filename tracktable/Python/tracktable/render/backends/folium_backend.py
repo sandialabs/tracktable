@@ -33,7 +33,7 @@ tracktable.render.folium - render trajectories in using the folium backend
 
 import itertools
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import folium as fol
 import matplotlib
@@ -56,6 +56,46 @@ logger = logging.getLogger(__name__)
 # TODO what if color map but no generator or vice versa
 # TODO add point_color_map?
 # TODO could customize choice of mapping hues to trajs
+
+def timedelta_to_iso8601_duration(td: timedelta) -> str:
+    """Convert a datetime.timedelta to ISO8601 Duration format
+
+    This function converts a duration specified as a ``datetime.timedelta``
+    to ISO 8601 string format.  Fractional seconds will be rounded to the nearest second.
+
+    Arguments:
+        td (datetime.timedelta): Interval to convert
+
+    Returns:
+        Duration represented as a string in ISO8601 format (without fractional seconds)
+    """
+    #Adapted from isodate's _strfduration method.  
+    ret = []
+    usecs = abs(
+        (td.days * 24 * 60 * 60 + td.seconds) * 1000000 + td.microseconds
+    )
+    seconds, usecs = divmod(usecs, 1000000)
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    days, hours = divmod(hours, 24)
+    if days:
+        ret.append("%sD" % days)
+    if hours or minutes or seconds or usecs:
+        ret.append("T")
+        if hours:
+            ret.append("%sH" % hours)
+        if minutes:
+            ret.append("%sM" % minutes)
+        if seconds or usecs:
+            if usecs:
+                seconds = seconds + int(round(usecs/1000000)) #we don't want fractional seconds
+            ret.append("%dS" % seconds)
+    if len(ret) == 0:     # at least one component has to be there, if not 0D
+        return "P0D"
+    else:
+        return "P"+"".join(ret)
+
+
 def render_trajectories(trajectories,
 
                         #common arguments
@@ -91,6 +131,10 @@ def render_trajectories(trajectories,
                         show_scale = True,
                         max_zoom = 22,
                         fast = False,
+                        animate = False,
+                        anim_display_update_interval=timedelta(microseconds=200000),
+                        anim_timestamp_update_step=timedelta(minutes=1),
+                        anim_trail_duration=None,
 
                         # Airport and poirt specific args
                         draw_airports=False,
@@ -157,6 +201,11 @@ def render_trajectories(trajectories,
                             max_zoom=max_zoom,
                             prefer_canvas=prefer_canvas)
 
+    if animate:
+        from folium import plugins # to not require it always. Reconsider moving to top?
+        segments = []
+        anim_points = []
+
     render_airports_and_ports(map_canvas,
                         draw_airports=draw_airports,
                         draw_ports=draw_ports,
@@ -200,6 +249,9 @@ def render_trajectories(trajectories,
 
     for i, trajectory in enumerate(trajectories):
         coordinates = [(point[1], point[0]) for point in trajectory]
+        if animate:
+            times = [point.timestamp.strftime('%Y-%m-%d %H:%M:%S') for point in trajectory]
+
 
         if not fast:
             # set up generators
@@ -239,25 +291,34 @@ def render_trajectories(trajectories,
                     if trajectory_linewidth_generator:
                         weight = widths[i]
                     segment_color = rgb2hex(mapper.to_rgba(scalars[i]))
-                    fol.PolyLine([last_pos,pos],
-                                 color=segment_color, weight=weight,
-                                 opacity=1, tooltip=tooltip_str,
-                                 popup=popup_str).add_to(map_canvas)
+                    if animate:
+                        segments.append({'coordinates': [[last_pos[1], last_pos[0]], [pos[1], pos[0]]],
+                                         'times': [times[i], times[i+1]], #i is off by one, so in first iter times[0] is the previous time
+                                         'color': segment_color,
+                                         'weight': weight
+                                     })
+                    else:
+                        fol.PolyLine([last_pos,pos],
+                                     color=segment_color, weight=weight,
+                                     opacity=1, tooltip=tooltip_str,
+                                     popup=popup_str).add_to(map_canvas)
                     last_pos = pos
         if show_points:
-            for i, c in enumerate(coordinates[:-1]): # all but last (dot)
+            for coord_ind, c in enumerate(coordinates[:-1]): # all but last (dot)
                 point_radius = point_size
                 if type(current_point_cmap) is ListedColormap \
                    and len(current_point_cmap.colors) == 1: # one color
                     current_point_color = current_point_cmap.colors[0]
                 else:
                     current_point_color = \
-                        rgb2hex(point_mapper.to_rgba(scalars[i]))
-
-                render_point(trajectory[i],
-                                    point_popup_properties, c,
-                                    point_radius,
-                                    current_point_color, map_canvas)
+                        rgb2hex(point_mapper.to_rgba(scalars[coord_ind]))
+                if animate:
+                    anim_points.append({'coordinates': [c[1],c[0]], 'time': times[coord_ind], 'color': current_point_color, 'radius':  point_radius, 'popup_str': common_processing.point_popup(trajectory[coord_ind], point_popup_properties)}) #swap lat/lon c[1],c[0]
+                else:
+                    render_point(trajectory[coord_ind],
+                                 point_popup_properties, c,
+                                 point_radius,
+                                 current_point_color, map_canvas)
         if show_dot:
             render_point(trajectory[-1],
                                 point_popup_properties,
@@ -267,7 +328,52 @@ def render_trajectories(trajectories,
         if show_distance_geometry:
             common_processing.render_distance_geometry('folium', distance_geometry_depth,
                                      trajectory, map_canvas)
+    if animate:
+        #linestrings/track
+        features = [{"type": "Feature",
+                     "geometry": {
+                         "type": "LineString",
+                         "coordinates": seg["coordinates"],
+                     },
+                     "properties": {
+                         "times": seg["times"],
+                         "style": {
+                             "color": seg["color"],
+                             "weight": seg["weight"]
+                         },
+                     },
+                 } for seg in segments ]
+        if show_points:
+            features+=[{"type": "Feature",
+                              "geometry": {
+                                  "type": "Point",
+                                  "coordinates": point["coordinates"],
+                              },
+                              "properties": {
+                                  "time": point["time"],
+                                  "popup": point["popup_str"],
+                                  "icon": 'circle',
+                                  "style": {
+                                      "color": point["color"],
+                                  },
+                                  'iconstyle': {
+                                      'fillOpacity': 1.0,
+                                      'radius': point['radius'],
+                                  },
+                              },
+            } for point in anim_points ]
+        
+        if anim_trail_duration != None:
+            anim_trail_duration = timedelta_to_iso8601_duration(anim_trail_duration)
+        anim_timestamp_update_step = timedelta_to_iso8601_duration(anim_timestamp_update_step)
 
+        plugins.TimestampedGeoJson({"type":"FeatureCollection",
+                                    "features": features}, add_last_point=False,
+                                   transition_time=anim_display_update_interval.microseconds // 1000, 
+                                   period=anim_timestamp_update_step,
+                                   duration=anim_trail_duration,
+                                   time_slider_drag_update=True,
+                                   loop_button=True).add_to(map_canvas)# need to set period automatically or allow users to set.
     if map_bbox:
         map_canvas.fit_bounds([(map_bbox[1], map_bbox[0]),
                       (map_bbox[3], map_bbox[2])])

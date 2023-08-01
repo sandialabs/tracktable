@@ -152,7 +152,11 @@ def render_trajectories(trajectories, backend='', simplify_traj=False, simplify_
         show_scale (bool): Boolean to draw the distance scale of the map, used for Folium rendering only. (Default: True)
         max_zoom (int): Maximum allowed zoom level for the tile layer that is created, used for Folium rendering only. (Default: 22)
         fast (bool): Bool for reduced/faster processing of the folium map, used for Folium rendering only. (Default: False)
-        use_markers (bool): Bool for using marker object instead of dots for airports and prots,
+        animate (bool): Animate the tracks. Used for Folium rendering only. (Default: False)
+        anim_display_update_interval (timedelta): time between map updates (smaller values yields faster animation rates) (currently maps to Folium's TimestampedGeoJson transition_time). (Default: timedelta(microseconds=200000)=200 milliseconds)
+        anim_timestamp_update_step (timedelta): time duration between updates (in the data time frame). The timestamp for the displayed data will increase by this amount every time the animation is updated.  (currently maps to Folium's TimestampedGeoJson period) (Default: timedelta(minutes=1))
+        anim_trail_duration (timedelta): how long (in the data time frame) a trail should persist behind the most recent point (duration for features to remain on the map after "their time" has passed). If set to None features will persist indefinitely. (currently maps to Folium's TimestampedGeoJson duration) Example:timedelta(hours=1) (Default: None)  
+        use_markers (bool): Bool for using marker object instead of dots for airports and ports,
             used for Folium rendering only. (Default: False)
         popup_width (int): Size of the popup window that displays airport/port information, used for Folium rendering only (Default: 250)
 
