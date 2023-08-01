@@ -355,6 +355,7 @@ def compare_html_docs(expected, actual, ignore_uuids=False):
                 expected_html_doc = re.sub('poly_line_................................', 'poly_line_', expected_html_doc)
                 expected_html_doc = re.sub('html_................................', 'html_', expected_html_doc)
                 expected_html_doc = re.sub('tile_layer_................................', 'tile_layer_', expected_html_doc)
+                expected_html_doc = re.sub('timestamped_geo_json_................................', 'timestamped_geo_json_', expected_html_doc)
 
                 actual_html_doc = re.sub('map_................................', 'map_', actual_html_doc)
                 actual_html_doc = re.sub('popup_................................', 'popup_', actual_html_doc)
@@ -362,6 +363,7 @@ def compare_html_docs(expected, actual, ignore_uuids=False):
                 actual_html_doc = re.sub('poly_line_................................', 'poly_line_', actual_html_doc)
                 actual_html_doc = re.sub('html_................................', 'html_', actual_html_doc)
                 actual_html_doc = re.sub('tile_layer_................................', 'tile_layer_', actual_html_doc)
+                actual_html_doc = re.sub('timestamped_geo_json_................................', 'timestamped_geo_json_', actual_html_doc)
             expected_html_lines = [line for line in expected_html_doc.split('\n')]
             actual_html_lines = [line for line in actual_html_doc.split('\n')]
             #differ = difflib.Differ()
