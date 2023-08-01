@@ -29,7 +29,7 @@
 
 import sys
 from datetime import datetime
-from tracktable.examples.data.generators import generate_trajectories
+from tracktable.data_generators import trajectory
 from tracktable.domain.terrestrial import Trajectory as TerrestrialTrajectory
 from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
 from tracktable.info import airports
@@ -45,7 +45,7 @@ def test_gen_single_airport_trajectory():
 
     ABQ_AIRPORT = airports.airport_information("ABQ")
     DEN_AIRPORT = airports.airport_information("DEN")
-    test_traj = generate_trajectories.generate_airport_trajectory(
+    test_traj = trajectory.generate_airport_trajectory(
                                                     start_airport=ABQ_AIRPORT,
                                                     end_airport=DEN_AIRPORT,
                                                     start_time=datetime.now(),
@@ -90,8 +90,8 @@ def test_gen_five_random_airport_trajectories():
 
     EXPECTED_LENGTH = 5
 
-    ten_largest_airports = generate_trajectories.n_largest_airports(10)
-    test_trajs = generate_trajectories.generate_random_airport_trajectories(
+    ten_largest_airports = trajectory.n_largest_airports(10)
+    test_trajs = trajectory.generate_random_airport_trajectories(
                                                   start_airport_list=ten_largest_airports[:5],
                                                   end_airport_list=ten_largest_airports[5:],
                                                   num_paths=EXPECTED_LENGTH,
@@ -128,7 +128,7 @@ def test_gen_totally_random_airport_trajectories():
 
     EXPECTED_LENGTH = 5
 
-    test_trajs = generate_trajectories.generate_random_airport_trajectories(
+    test_trajs = trajectory.generate_random_airport_trajectories(
                                                   start_airport_list=None,
                                                   end_airport_list=[],
                                                   num_paths=EXPECTED_LENGTH,
@@ -182,7 +182,7 @@ def test_gen_bbox_trajectories():
     MIN_EXPECTED_LENGTH = 300
     MAX_EXPECTED_LENGTH = 650
 
-    test_trajs = generate_trajectories.generate_bbox_trajectories(
+    test_trajs = trajectory.generate_bbox_trajectories(
                                                     starting_bbox,
                                                     ending_bbox,
                                                     EXPECTED_LIST_SIZE,

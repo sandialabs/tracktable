@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-"""tracktable.data_generators - Generate points within a specified bounding box or seed point
+"""tracktable.data_generators - Generate points and/or trajectories within a specified bounding box, seed point, airports or ports.
 """
 
 pass

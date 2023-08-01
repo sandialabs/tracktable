@@ -28,27 +28,23 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 """
-This file contains functions for generating trajectories.
+tracktable.data_generators.trajectory - Generating n trajectories between m airports.
 """
 
-from __future__ import division, absolute_import
-
+import datetime
+import logging
 import operator
 import random
-import datetime
 
 from tracktable.core import geomath
-from tracktable.domain.terrestrial import TrajectoryPoint as TerrestrialTrajectoryPoint
 from tracktable.domain.terrestrial import Trajectory as TerrestrialTrajectory
+from tracktable.domain.terrestrial import \
+    TrajectoryPoint as TerrestrialTrajectoryPoint
 from tracktable.info import airports
 
-import tracktable.core.log
+logger = logging.getLogger(__name__)
 
-import logging
-LOGGER = logging.getLogger(__name__)
-DOMAIN_MODULE = None
-
-def __time_between_positions(start, end, desired_speed=800):
+def _time_between_positions(start, end, desired_speed=800):
     """
     Given two points and a constant speed, calculate the amount of
     time (expressed in seconds as a timedelta) to travel from hither to
@@ -69,7 +65,7 @@ def __time_between_positions(start, end, desired_speed=800):
 
 # ----------------------------------------------------------------------
 
-def __num_points_between_positions(start, end, seconds_between_points=60,
+def _num_points_between_positions(start, end, seconds_between_points=60,
                                     desired_speed=800):
 
     """
@@ -89,12 +85,12 @@ def __num_points_between_positions(start, end, seconds_between_points=60,
 
     """
 
-    travel_time = __time_between_positions(start, end, desired_speed)
+    travel_time = _time_between_positions(start, end, desired_speed)
     return int(travel_time.total_seconds() / seconds_between_points)
 
 # ----------------------------------------------------------------------
 
-def __trajectory_point_generator(start, end, start_time, object_id,
+def _trajectory_point_generator(start, end, start_time, object_id,
                                     desired_speed=800,
                                     seconds_between_points=60,
                                     minimum_num_points=10):
@@ -115,10 +111,10 @@ def __trajectory_point_generator(start, end, start_time, object_id,
         Point Generator
     """
 
-    travel_time = __time_between_positions(start, end,
+    travel_time = _time_between_positions(start, end,
                                          desired_speed=desired_speed)
 
-    num_points = __num_points_between_positions(start, end,
+    num_points = _num_points_between_positions(start, end,
                               desired_speed=desired_speed,
                               seconds_between_points=seconds_between_points)
 
@@ -144,7 +140,7 @@ def __trajectory_point_generator(start, end, start_time, object_id,
 
 # ----------------------------------------------------------------------
 
-def __airport_random_path_point_generators(start_airport_list,
+def _airport_random_path_point_generators(start_airport_list,
                                          end_airport_list,
                                          num_paths,
                                          desired_speed=800,
@@ -189,13 +185,13 @@ def __airport_random_path_point_generators(start_airport_list,
         flight_counters[flight_id] = flight_number + 1
         full_flight_id = '{}{}'.format(flight_id, flight_number)
 
-        print("INFO: generating trajectory for {} - {}"\
+        logger.info("Generating trajectory for {} - {}"\
             .format(start_airport.name,end_airport.name))
 
         start_position = TerrestrialTrajectoryPoint(start_airport.position)
         end_position = TerrestrialTrajectoryPoint(end_airport.position)
 
-        generator = __trajectory_point_generator(start_position,
+        generator = _trajectory_point_generator(start_position,
                                end_position,
                                start_time=datetime.datetime.now(),
                                object_id=full_flight_id,
@@ -237,7 +233,7 @@ def generate_airport_trajectory(start_airport, end_airport, **kwargs):
     Args:
         start_airport (Airport): starting airport
         end_airport (Airport): ending airport
-        **kwargs: see __trajectory_point_generator for values
+        **kwargs: see _trajectory_point_generator for values
 
     Returns:
         TerrestrialTrajectory
@@ -246,10 +242,10 @@ def generate_airport_trajectory(start_airport, end_airport, **kwargs):
     start_position = TerrestrialTrajectoryPoint(start_airport.position)
     end_position = TerrestrialTrajectoryPoint(end_airport.position)
 
-    print("INFO: generating trajectory for {} - {}"\
+    logger.info("Generating trajectory for {} - {}"\
             .format(start_airport.name,end_airport.name))
 
-    point_list = __trajectory_point_generator(start=start_position,
+    point_list = _trajectory_point_generator(start=start_position,
                                             end=end_position,
                                             **kwargs)
     new_trajectory = TerrestrialTrajectory.from_position_list(point_list)
@@ -261,16 +257,16 @@ def generate_random_airport_trajectories(**kwargs):
     '''
     Create a list of trajectories from a list of iterables.
     This function is basically a trajectory wrapper for the
-    __airport_random_path_point_generators method.
+    _airport_random_path_point_generators method.
 
     Args:
-        **kwargs: see __airport_random_path_point_generators for values
+        **kwargs: see _airport_random_path_point_generators for values
 
     Returns:
         List of TerrestrialTrajectory Objects
     '''
     random_trajectories = []
-    iterable_list = __airport_random_path_point_generators(**kwargs)
+    iterable_list = _airport_random_path_point_generators(**kwargs)
     for point_list in iterable_list:
         random_trajectories.append(
                     TerrestrialTrajectory.from_position_list(point_list))
@@ -285,14 +281,14 @@ def generate_bbox_trajectories(start_bbox, end_bbox, num_paths,
     Generate terrestrial trajectories using randomly selected points
     from within two bounding boxes.
 
-    Uses parameters from __trajectory_point_generator.
+    Uses parameters from _trajectory_point_generator.
 
     Args:
         start_bbox (BoundingBox): starting airport
         end_bbox (BoundingBox): ending airport
         num_paths (int): number of trajectories to generate
         flight_prefix (string): prefix to use for trajectory ids
-        **kwargs: see __trajectory_point_generator for values
+        **kwargs: see _trajectory_point_generator for values
 
     Returns:
         List of TerrestrialTrajectory Objects
@@ -319,10 +315,10 @@ def generate_bbox_trajectories(start_bbox, end_bbox, num_paths,
 
         flight_id = flight_prefix + str(i)
 
-        print("INFO: generating trajectory for {} - {}"\
+        logger.info("Generating trajectory for {} - {}"\
             .format(start_position,end_position))
 
-        point_list = __trajectory_point_generator(start=start_position,
+        point_list = _trajectory_point_generator(start=start_position,
                                                 end=end_position,
                                                 object_id=flight_id,
                                                 **kwargs)
@@ -336,9 +332,9 @@ def generate_port_trajectory(start_port, end_port, **kwargs):
     port.
 
     Args:
-        start_port (Port): starting port
-        end_port (Port): ending port
-        **kwargs: see __trajectory_point_generator for values
+        start_port (Port): Starting port of trajectory
+        end_port (Port): Ending port of trajectory
+        **kwargs: see _trajectory_point_generator for values
 
     Returns:
         TerrestrialTrajectory
@@ -351,9 +347,9 @@ def generate_port_trajectory(start_port, end_port, **kwargs):
     start_position = TerrestrialTrajectoryPoint(start_port.position)
     end_position = TerrestrialTrajectoryPoint(end_port.position)
 
-    print("INFO: generating trajectory for {} - {}".format(start_port.name, end_port.name))
+    logger.info("Generating trajectory for {} - {}".format(start_port.name, end_port.name))
 
-    point_list = __trajectory_point_generator(start=start_position,
+    point_list = _trajectory_point_generator(start=start_position,
                                             end=end_position,
                                             **kwargs)
     new_trajectory = TerrestrialTrajectory.from_position_list(point_list)

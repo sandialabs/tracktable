@@ -32,11 +32,8 @@
 tracktable.data_generators.point - Ways to generate points around a seed point
 """
 
-from __future__ import division, print_function, absolute_import
-
 import math
 import random
-from six.moves import range
 
 
 def random_box_uniform(min_corner, max_corner, num_points=100):
