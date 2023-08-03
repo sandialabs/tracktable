@@ -1,5 +1,5 @@
-ARG CI_REGISTRY
-FROM ${CI_REGISTRY}/trajectory/tracktable/linux/boost_multipython_cmake:latest
+ARG SOURCE_IMAGE
+FROM ${SOURCE_IMAGE}
 
 ARG PYTHON_IMPLEMENTATION
 ARG CI_PROJECT_DIR
@@ -29,6 +29,8 @@ COPY configure_tracktable.sh .
 RUN ./configure_tracktable.sh ${PYTHON_IMPLEMENTATION} \
 # VERBOSE=1 causes the lines being fed to gmake to be printed in full.
 #&& VERBOSE=1 make -j \
-&& make -j 8
+&& make -j 4 \
+&& make install \
+&& make clean
 
-ENTRYPOINT ["/bin/bash"]
+ENTRYPOINT ["/bin/bash", "-c", "-l"]

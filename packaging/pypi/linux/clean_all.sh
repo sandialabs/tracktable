@@ -3,7 +3,7 @@
 # This script removes absolutely all the images created by
 # this project.  At present it hard-codes the Boost version.
 
-BOOST_VERSION=1.74.0
+BOOST_VERSION=1.82.0
 
 for py_version in cp35 cp36 cp37 cp38 cp39 cp310; do
     docker rmi tracktable:${py_version} \

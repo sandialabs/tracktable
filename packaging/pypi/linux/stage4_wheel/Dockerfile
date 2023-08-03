@@ -19,20 +19,17 @@ ENV CI_JOB_TOKEN=${CI_JOB_TOKEN}
 ENV CI_API_V4_URL=${CI_API_V4_URL}
 ENV CI_PROJECT_ID=${CI_PROJECT_ID}
 
-ARG HTTPS_PROXY
-ARG HTTP_PROXY
-ARG NO_PROXY
-ENV https_proxy=${HTTPS_PROXY}
-ENV http_proxy=${HTTP_PROXY}
-ENV no_proxy=${NO_PROXY}
-
 WORKDIR /opt/src/tracktable/build
-RUN /opt/python/${PYTHON_IMPLEMENTATION}-${PYTHON_IMPLEMENTATION}*/bin/pip install --trusted-host pypi.python.org --trusted-host pypi.org --trusted-host files.pythonhosted.org packaging \
-&& make install \
-&& make wheel
+RUN /opt/python/${PYTHON_IMPLEMENTATION}-${PYTHON_IMPLEMENTATION}*/bin/pip install \
+         --trusted-host pypi.python.org \
+         --trusted-host pypi.org \
+         --trusted-host files.pythonhosted.org \
+         packaging \
+    && make wheel \
+    && mkdir /finished_wheels \
+    && cp /opt/src/tracktable/build/wheel/wheelhouse/*.whl /finished_wheels
 
-ENTRYPOINT ["/bin/sh", "-c"]
-CMD [ "/bin/cp /opt/src/tracktable/build/wheel/wheelhouse/*.whl /finished_wheels" ]
+ENTRYPOINT ["/bin/bash", "-c", "-l"]
 
 
 

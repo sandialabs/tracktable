@@ -1,13 +1,23 @@
 # Manylinux2010-derived image that will include Boost and versions of
 # Boost.Python for all available Python versions.
+#
+# This is meant to be called from build_all.sh.
 
-FROM boost-1.76.0:cp37
+ARG BOOST_VERSION_DOTS
 
-COPY --from=boost-1.76.0:cp36 /usr/local/lib/libboost_python* /usr/local/lib/
-COPY --from=boost-1.76.0:cp37 /usr/local/lib/libboost_python* /usr/local/lib/
-COPY --from=boost-1.76.0:cp38 /usr/local/lib/libboost_python* /usr/local/lib/
-COPY --from=boost-1.76.0:cp39 /usr/local/lib/libboost_python* /usr/local/lib/
-COPY --from=boost-1.76.0:cp310 /usr/local/lib/libboost_python* /usr/local/lib/
+FROM boost-${BOOST_VERSION_DOTS}:cp36 as boost-cp36
+FROM boost-${BOOST_VERSION_DOTS}:cp37 as boost-cp37
+FROM boost-${BOOST_VERSION_DOTS}:cp38 as boost-cp38
+FROM boost-${BOOST_VERSION_DOTS}:cp39 as boost-cp39
+FROM boost-${BOOST_VERSION_DOTS}:cp310 as boost-cp310
 
-ENTRYPOINT [ "/bin/bash" ]
+FROM boost-${BOOST_VERSION_DOTS}:cp39
+
+COPY --from=boost-cp36 /usr/local/lib/libboost_python* /usr/local/lib
+COPY --from=boost-cp37 /usr/local/lib/libboost_python* /usr/local/lib
+COPY --from=boost-cp38 /usr/local/lib/libboost_python* /usr/local/lib
+COPY --from=boost-cp39 /usr/local/lib/libboost_python* /usr/local/lib
+COPY --from=boost-cp310 /usr/local/lib/libboost_python* /usr/local/lib
+
+ENTRYPOINT [ "/bin/bash", "-c", "-l" ]
 

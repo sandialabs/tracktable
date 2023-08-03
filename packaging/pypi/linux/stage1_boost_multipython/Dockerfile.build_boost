@@ -2,16 +2,25 @@
 # Boost.Python for all available Python versions.
 
 ARG PYTHON_IMPLEMENTATION=pydefault
-ARG BOOST_MINOR_VERSION=76
 
-# Download our boost base image
-FROM boost_downloaded:1.${BOOST_MINOR_VERSION}.0
+ARG BOOST_VERSION_DOTS
+ARG BOOST_VERSION_UNDERSCORES
+ARG BOOST_DOWNLOADED_CONTAINER
+
+# Download our boost base image.
+
+# Docker throws a syntax error if we try to say
+# FROM boost_downloaded:${BOOST_VERSION}
+# ...so we just pass in the whole image name instead.
+FROM ${BOOST_DOWNLOADED_CONTAINER}
 
 ARG PYTHON_IMPLEMENTATION
-ARG BOOST_MINOR_VERSION
+ARG BOOST_VERSION_DOTS
+ARG BOOST_VERSION_UNDERSCORES
 
-ENV boost_minor_version=${BOOST_MINOR_VERSION}
 ENV python_implementation=${PYTHON_IMPLEMENTATION}
+ENV BOOST_VERSION_DOTS=${BOOST_VERSION_DOTS}
+ENV BOOST_VERSION_UNDERSCORES=${BOOST_VERSION_UNDERSCORES}
 
 ### ----------------------------------------------------------------------
 ###
@@ -29,13 +38,12 @@ RUN /opt/src/make_python_include_symlink.sh ${PYTHON_IMPLEMENTATION}
 ###
 
 # Build and install Boost and clean up after ourselves
-ENV BOOST_VERSION=1_${BOOST_MINOR_VERSION}_0
-WORKDIR /opt/src/boost_${BOOST_VERSION}
-RUN echo " Building Boost for Python ${PYTHON_IMPLEMENTATION}" \
-&& ./bootstrap.sh --prefix=/usr/local --with-python=/opt/python/${PYTHON_IMPLEMENTATION}/bin/python \
-&& ./b2 -j 8 -d0 install
+WORKDIR /opt/src/boost_${BOOST_VERSION_UNDERSCORES}
+RUN \
+    ./bootstrap.sh --prefix=/usr/local --with-python=/opt/python/${PYTHON_IMPLEMENTATION}/bin/python \
+    && ./b2 -j 4 -d0 install
 WORKDIR /opt/src
-RUN rm -rf boost_1_${BOOST_MINOR_VERSION}_0
+RUN rm -rf boost_${BOOST_VERSION_UNDERSCORES}
 
-ENTRYPOINT [ "/bin/bash" ]
+ENTRYPOINT [ "/bin/bash", "-l", "-c" ]
 
