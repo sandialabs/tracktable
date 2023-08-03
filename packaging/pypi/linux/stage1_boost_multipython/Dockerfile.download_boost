@@ -4,17 +4,22 @@
 # Download base image
 FROM quay.io/pypa/manylinux2010_x86_64:latest
 
-# We need to configure the container to talk to the outside world
-ARG BOOST_MINOR_VERSION=76
-ARG BOOST_PATCH_VERSION=0
-ARG HTTPS_INTERCEPTION=0
+# Yum will need proxy information to talk to the outside world
 ARG SSL_CERT=0
 ARG HTTPS_PROXY
 ARG HTTP_PROXY
 ARG NO_PROXY
-ENV boost_minor_version=${BOOST_MINOR_VERSION}
-ENV boost_patch_version=${BOOST_PATCH_VERSION}
-ENV https_interception="${HTTPS_INTERCEPTION}"
+
+# Configure the Boost version once, externally, to cut down on typos here
+ARG BOOST_VERSION_DOTS
+ARG BOOST_VERSION_UNDERSCORES
+
+ENV boost_version_dots=${BOOST_VERSION_DOTS}
+ENV boost_version_underscores=${boost_version_underscores}
+
+# this is not used right now, I think
+# ENV https_interception="${HTTPS_INTERCEPTION}"
+
 ENV ssl_cert="${SSL_CERT}"
 ENV https_proxy=${HTTPS_PROXY}
 ENV http_proxy=${HTTP_PROXY}
@@ -29,7 +34,7 @@ RUN echo "${ssl_cert}" >> /etc/pki/ca-trust/source/anchors/ssl.cer
 ENV SSL_CERT_FILE=/etc/pki/ca-trust/source/anchors/ssl.cer
 RUN update-ca-trust enable \
 && update-ca-trust extract \
-&& yum -y install openssl-devel
+&& yum -y --disablerepo=epel install openssl-devel
 
 ### ----------------------------------------------------------------------
 ###
@@ -46,8 +51,8 @@ WORKDIR /opt/src
 #         -o boost_1_${boost_minor_version}_${boost_patch_version}.tar.gz \
 #         https://boostorg.jfrog.io/artifactory/main/release/1.${boost_minor_version}.${boost_patch_version}/source/boost_1_${boost_minor_version}_${boost_patch_version}.tar.gz
 
-COPY boost_1_${boost_minor_version}_0.tar.gz .
-RUN tar xzf boost_1_${BOOST_MINOR_VERSION}_0.tar.gz
+COPY boost_${BOOST_VERSION_UNDERSCORES}.tar.gz .
+RUN tar xzf boost_${BOOST_VERSION_UNDERSCORES}.tar.gz
 
 ENTRYPOINT [ "/bin/bash" ]
 

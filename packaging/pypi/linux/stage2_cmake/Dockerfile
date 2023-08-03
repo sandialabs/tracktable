@@ -2,10 +2,13 @@
 # for use on Linux.
 
 # Download base image
-ARG CI_REGISTRY
-FROM ${CI_REGISTRY}/trajectory/tracktable/linux/boost_multipython:latest
+ARG CMAKE_VERSION
+ARG SOURCE_IMAGE
 
-ENV CMAKE_VERSION 3.22.2
+FROM ${SOURCE_IMAGE}
+
+ARG CMAKE_VERSION
+ENV cmake_version=${CMAKE_VERSION}
 
 ### ----------------------------------------------------------------------
 ###
@@ -28,16 +31,20 @@ WORKDIR /opt/src
 #          -o cmake-${CMAKE_VERSION}.tar.gz \
 #          https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}.tar.gz
 
-COPY cmake-${CMAKE_VERSION}.tar.gz .
+COPY cmake-${cmake_version}.tar.gz .
 
 # Build and install CMake and clean up behind ourselves
-RUN tar xzf cmake-${CMAKE_VERSION}.tar.gz
-WORKDIR /opt/src/cmake-${CMAKE_VERSION}
+RUN tar xzf cmake-${cmake_version}.tar.gz
+WORKDIR /opt/src/cmake-${cmake_version}
 RUN ./bootstrap --prefix=/usr/local \
-&& make -j 8 \
-&& make -j 8 install
+&& make -j 4 \
+&& make install
 WORKDIR /opt/src
-RUN rm -rf cmake-${CMAKE_VERSION}
+RUN rm -rf cmake-${cmake_version}
 
-ENTRYPOINT [ "/bin/bash" ]
+# The "-c -l" is necessary to get an actual login shell. If you
+# skip it, you will often get an error from Docker like
+# "cannot execute binary file".
+
+ENTRYPOINT [ "/bin/bash", "-c", "-l" ]
 
