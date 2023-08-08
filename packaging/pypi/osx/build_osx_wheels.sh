@@ -2,7 +2,7 @@
 
 # This script will build OSX wheels for Tracktable from the currently
 # checked-out repository.  By default it will build for Python versions
-# 3.6, 3.7, 3.8, 3.9 and 3.10.
+# 3.8, 3.9, 3.10, and 3.11 on Intel platforms; 3.10-3.11 on Apple Silicon.  
 #
 # To request just one version, use the '--python-version 3.x' argument.
 # To set the output directory for wheels, use the '--output-directory /path' argument.
@@ -51,6 +51,14 @@ set -o errexit
 
 # Enable trace output
 #set -x
+
+ARCHITECTURE=$(uname -m)
+
+if [ "${ARCHITECTURE}" = "arm64" ]; then
+    export DEFAULT_PYTHON_VERSIONS=(3.10 3.11)
+else
+    export DEFAULT_PYTHON_VERSIONS=(3.8 3.9 3.10 3.11)
+fi
 
 # We need to run Conda functions with debugging off because there are some
 # bugs in their own scripts that we can't reach from here.
@@ -109,8 +117,8 @@ Required Arguments:
 Options:
     -p,--python-version X.Y: Build for Python version X.Y.  This can be
         specified multiple times to build for multiple versions.  By
-        default, wheels will be built for Python 3.6, 3.7, 3.8,
-        3.9 and 3.10.
+        default, wheels will be built for Python 3.8, 3.9, 3.10,
+        and 3.11.
 
     -b,--build-root <path>: Build trees will be created under the
         specified directory.  This defaults to the value of the
@@ -205,10 +213,10 @@ function check_for_build_prerequisites () {
 		__ok=1
 	fi
 
-	if ! check_for_program cmake; then
-		echo "Tracktable builds require CMake."
-		__ok=1
-	fi
+	# if ! check_for_program cmake; then
+	# 	echo "Tracktable builds require CMake."
+	# 	__ok=1
+	# fi
 
 	if ! check_for_program conda; then
 		echo "Tracktable builds require Anaconda to be installed and active."
@@ -253,6 +261,8 @@ function cmake_configure () {
 		-B ${__build_directory} \
 		-DBOOST_ROOT:PATH=${__conda_env_path} \
 		-DCMAKE_BUILD_TYPE:STRING=Release \
+		-DBUILD_TESTING:BOOL=False \
+                -DBUILD_EXAMPLES:BOOL=False \
 		-DCMAKE_INSTALL_PREFIX:PATH=${__build_directory}/install \
 		-DPython3_EXECUTABLE:FILEPATH=${__conda_env_path}/bin/python \
 		-DPython3_ROOT_DIR:PATH=${__conda_env_path} \
@@ -334,7 +344,7 @@ function cmake_run_install () {
 
 function conda_environment_name () {
 	local __py_version="$1"
-    conda_environment_name_OUTPUT="tracktable-build-python${__py_version}"
+    conda_environment_name_OUTPUT="tracktable-dev-python${__py_version}"
     return 0
 }
 
@@ -393,7 +403,7 @@ function copy_wheel_to_output () {
 # Create a Conda virtual environment for a given Python version.
 #
 # Arguments:
-#     Argument 1: Python version (for example, 3.6)
+#     Argument 1: Python version (for example, 3.9)
 #
 # Return Value:
 #     1 on success, 0 on failure
@@ -412,55 +422,15 @@ function copy_wheel_to_output () {
 
 function create_conda_environment () {
 	local __python_version=$1
+	local __source_directory=$2
 	local __envname
 
 	conda_environment_name ${__python_version}
 	__envname=${conda_environment_name_OUTPUT}
 
+	# XXX FIXME Change this to use .yml files in Tracktable tree
 	msg_info "Creating Conda build environment ${__envname}"
-	if [ ${__python_version} == "3.5" ]; then
-		conda create \
-			--name ${__envname} \
-			--yes \
-			--channel conda-forge \
-			python=${__python_version} \
-			"python_abi=*=*_cp*" \
-			"boost<=1.76" \
-			cartopy \
-			doxygen \
-			folium \
-			graphviz \
-			jupyter \
-			numpy \
-			pip \
-			pytz \
-			sphinx \
-			twine \
-			tracktable-data \
-			sphinx_rtd_theme
-	else
-		conda create \
-			--name ${__envname} \
-			--yes \
-			--channel conda-forge \
-			python=${__python_version} \
-			"python_abi=*=*_cp*" \
-			"boost<=1.76" \
-			cartopy \
-			doxygen \
-			folium \
-			graphviz \
-			jupyter \
-			numpy \
-			pip \
-			pytz \
-			sphinx \
-			sphinx_rtd_theme \
-			breathe \
-			twine \
-			tracktable-data \
-			"delocate=0.8.2"
-	fi
+	conda env create -f ${__source_directory}/conda_dev_environments/osx/tracktable_dev_python${__python_version}.yml
 
 	# Refresh the list of environments -- we just added one
 	list_conda_environments;
@@ -911,8 +881,8 @@ function main () {
 	# Set default value for Python versions
 	if [[ "${PYTHON_VERSIONS}" == "unset" ]]
 	then
-		msg_debug "No Python versions requested.  Defaulting to 3.6 - 3.10."
-		PYTHON_VERSIONS=(3.6 3.7 3.8 3.9 3.10)
+		msg_debug "No Python versions requested.  Defaulting to 3.8 - 3.11."
+		PYTHON_VERSIONS=(${DEFAULT_PYTHON_VERSIONS[@]})
 	fi
 
 	# Check the syntax of all the Python versions
@@ -975,12 +945,12 @@ function main () {
 
 		if ! conda_environment_exists ${py_version} list_conda_environments_OUTPUT
 		then
-			create_conda_environment ${py_version}
-			activate_conda_environment ${py_version}
+			create_conda_environment ${py_version} ${SOURCE_DIRECTORY}	
 		else
 			msg_debug "Conda environment already exists for this version"
 		fi
 
+		activate_conda_environment ${py_version}
 		make_build_directory ${py_version}
 
 		# Get the build directory for convenience

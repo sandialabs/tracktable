@@ -1,5 +1,5 @@
 # Fully Featured Tracktable Development Anaconda Environment
-name: tracktable-dev
+name: tracktable-dev-python3.11
 channels:
   - conda-forge
 dependencies:
@@ -7,7 +7,7 @@ dependencies:
   - git
 
   # Python Dependencies
-  - python>=3.6
+  - python==3.11
   - pip
   - numpy>=1.7
   - matplotlib>=3.0
@@ -45,3 +45,7 @@ dependencies:
   - doxygen>=1.8.17
   - graphviz>=2.42.2
   - breathe>=4.26.1, <=4.31.0
+
+# MacOS-specific utilities
+  - pip:
+    - delocate
