@@ -54,5 +54,5 @@ WORKDIR /opt/src
 COPY boost_${BOOST_VERSION_UNDERSCORES}.tar.gz .
 RUN tar xzf boost_${BOOST_VERSION_UNDERSCORES}.tar.gz
 
-ENTRYPOINT [ "/bin/bash" ]
+ENTRYPOINT [ "/bin/bash", "-l", "-c" ]
 
