@@ -43,7 +43,7 @@ from tracktable.core import test_utilities
 
 def test_florida_map(ground_truth_dir,
                      test_output_dir,
-                     image_filename='CustomBboxMap.png'):
+                     image_filename='CustomBboxObjectMap.png'):
 
     pyplot.figure(figsize=(8, 8))
     # This is approximately Florida

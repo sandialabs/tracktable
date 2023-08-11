@@ -32,8 +32,12 @@
 
 import logging
 
+from typing import List, Tuple
+
 import cartopy
 import cartopy.crs
+import cartopy.mpl.geoaxes
+
 import matplotlib
 import matplotlib.collections
 import matplotlib.colors
@@ -1175,8 +1179,8 @@ def draw_scale(mymap,
 
 # ----------------------------------------------------------------------
 
-def _find_map_scale_endpoints(mymap, scale_length_in_km):
-    min_lon, max_lon, min_lat, max_lat = mymap.get_extent()
+def _find_map_scale_endpoints(extent: Tuple[float, float, float, float], scale_length_in_km: float):
+    min_lon, max_lon, min_lat, max_lat = extent
 
     longitude_span = max_lon - min_lon
     latitude_span = max_lat - min_lat
@@ -1185,7 +1189,6 @@ def _find_map_scale_endpoints(mymap, scale_length_in_km):
     scale_latitude = min_lat + 0.05 * latitude_span
 
     scale_length_in_degrees = scale_length_in_km / longitude_degree_size(scale_latitude)
-
     if scale_length_in_degrees > 0.9 * longitude_span:
         raise RuntimeError("draw_scale: Requested map scale size ({} km) is too large to fit on map ({} km near bottom).".format(scale_length_in_km, longitude_span * longitude_degree_size(scale_latitude)))
 
@@ -1197,12 +1200,12 @@ def _find_map_scale_endpoints(mymap, scale_length_in_km):
 
 # ----------------------------------------------------------------------
 
-def _find_map_scale_tick_endpoints(mymap, scale_length_in_km):
-    min_lon, max_lon, min_lat, max_lat = mymap.get_extent()
+def _find_map_scale_tick_endpoints(extent: Tuple[float, float, float, float], scale_length_in_km: float):
+    min_lon, max_lon, min_lat, max_lat = extent
 
     latitude_span = max_lat - min_lat
 
-    scale_endpoints = _find_map_scale_endpoints(mymap, scale_length_in_km)
+    scale_endpoints = _find_map_scale_endpoints(extent, scale_length_in_km)
 
     tick_height = 0.025 * latitude_span
     tick1_endpoints = [ (scale_endpoints[0][0], scale_endpoints[0][1] - 0.5 * tick_height),
@@ -1224,8 +1227,11 @@ def _draw_map_scale_line(mymap,
     if axes is None:
         axes = pyplot.gca()
 
-    world_scale_endpoints = _find_map_scale_endpoints(mymap, scale_length_in_km)
-    world_tick_endpoints = _find_map_scale_tick_endpoints(mymap, scale_length_in_km)
+    geodetic_projection = cartopy.crs.PlateCarree()
+    geodetic_extent = mymap.get_extent(crs=geodetic_projection)
+
+    world_scale_endpoints = _find_map_scale_endpoints(geodetic_extent, scale_length_in_km)
+    world_tick_endpoints = _find_map_scale_tick_endpoints(geodetic_extent, scale_length_in_km)
 
     screen_scale_endpoints = [ world_scale_endpoints[0], world_scale_endpoints[1] ]
     screen_tick_endpoints = [ (world_tick_endpoints[0][0], world_tick_endpoints[0][1]),
@@ -1242,9 +1248,9 @@ def _draw_map_scale_line(mymap,
         segments,
         zorder=zorder,
         colors=colors,
-        linewidths=linewidths
-    )
-
+        linewidths=linewidths,
+        transform=geodetic_projection)
+    
     axes.add_artist(map_scale_segments)
     return [map_scale_segments]
 
@@ -1260,12 +1266,20 @@ def _draw_map_scale_label(mymap,
     if axes is None:
         axes = pyplot.gca()
 
-    min_lon, max_lon, min_lat, max_lat = mymap.get_extent()
+
+    original_projection = mymap.projection
+
+    # We use PlateCarree when we're getting the map extent because it uses
+    # geodetic coordinates.
+    geodetic_projection = cartopy.crs.PlateCarree()
+    geodetic_extent = mymap.get_extent(crs=geodetic_projection)
+
+    min_lon, max_lon, min_lat, max_lat = geodetic_extent
 
     longitude_span = max_lon - min_lon
     latitude_span = max_lat - min_lat
 
-    world_scale_endpoints = _find_map_scale_endpoints(mymap, scale_length_in_km)
+    world_scale_endpoints = _find_map_scale_endpoints(geodetic_extent, scale_length_in_km)
 
     longitude_center = 0.5 * (world_scale_endpoints[0][0] + world_scale_endpoints[1][0])
 
@@ -1278,7 +1292,8 @@ def _draw_map_scale_label(mymap,
         fontsize=fontsize,
         color=color,
         horizontalalignment='center',
-        verticalalignment='bottom'
+        verticalalignment='bottom',
+        transform=geodetic_projection
         )
 
     axes.add_artist(text_artist)
