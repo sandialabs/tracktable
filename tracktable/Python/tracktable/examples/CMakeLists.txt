@@ -54,6 +54,7 @@ if (PY_CARTOPY_MODULE)
     --latitude-column 3
     --object-id-column 0
     --timestamp-column 1
+    --scale-length-in-km 1000
     ${TEST_DATA}/Points/SampleHeatmapPoints.csv
     ${Tracktable_BINARY_DIR}/TestOutput/test_output_heatmap_terrestrial.png
   )
