@@ -47,6 +47,8 @@
 
 #include <string.h>
 #include <iostream>
+#include <sstream> // std::stringbuf
+#include <string>
 
 namespace tracktable {
 
@@ -59,32 +61,97 @@ public:
 
   explicit
   PythonReadSource(boost::python::object& object_source)
-    : object_(object_source)
+    : object_(object_source),
+      python_stream_closed_(false),
+      buffer_(0)
     {}
+
+  ~PythonReadSource()
+  {
+    if (this->buffer_)
+    {
+      delete this->buffer_;
+    }
+  }
+  //
+  // NOTE: PYTHON SUBTLETY BELOW
+  //
+  // The length argument to Python's read() method has different units 
+  // depending on whether we're reading from a stream opened in text
+  // or in binary mode.  In binary mode, the units are bytes.  In 
+  // text mode, the units are Unicode code points.  Depending on the 
+  // particular encoding, a single code point can take anywhere from
+  // 1 to 4 8-bit bytes.
+  // 
+  // The implication here is that we cannot trust that the string we 
+  // get back from read() is short enough to fit in the buffer.  Instead,
+  // we have to buffer the data internally and pull from our buffered
+  // source, which we know is in bytes.
 
   std::streamsize read(char_type* buffer, std::streamsize buffer_size)
     {
-      namespace python = boost::python;
-      // Read data through the Python object's API.  The following is
-      // is equivalent to:
-      //   data = object_.read(buffer_size)
-      boost::python::object py_data = object_.attr("read")(buffer_size);
-      std::string data = python::extract<std::string>(py_data);
+      if (!this->buffer_)
+      {
+        this->buffer_ = new std::stringbuf;
+      }
+
+      if (this->python_stream_closed_ && this->bytes_available() == 0)
+      {
+        // Indicate stream closed per Source concept
+        return -1;
+      }
+
+      if (this->bytes_available() < buffer_size && !this->python_stream_closed_)
+      {
+        this->fill_internal_buffer(buffer_size);
+      }
+
+    std::streamsize actual_read_size = this->buffer_->sgetn(buffer, buffer_size);
+    return actual_read_size;
+    }
+
+  // One would think this method could be const.  The standard library 
+  // definition for streambuf says that in_avail() can modify the 
+  // buffer object, so that won't fly.
+  std::streamsize bytes_available()
+  {
+    return this->buffer_->in_avail();
+  }
+
+  // Read from the Python stream to fill our internal buffer.  This
+  // function is also responsible for detecting when the Python 
+  // file-like object has no more bytes to offer.
+  //
+  // Arguments:
+  //     `buffer_size`: Minimum number of bytes needed in internal
+  //         buffer
+  
+  void fill_internal_buffer(std::streamsize desired_buffer_size)
+  {
+    while (this->bytes_available() < desired_buffer_size 
+           && !this->python_stream_closed_)
+    {
+      boost::python::object py_data = this->object_.attr("read")(desired_buffer_size);
+      std::string data = boost::python::extract<std::string>(py_data);
       // If the string is empty, then EOF has been reached.
       if (data.empty())
         {
-        return -1; // Indicate end-of-sequence, per Source concept.
+          this->python_stream_closed_ = true;
         }
-
-      // Otherwise, copy data into the buffer.
-      std::copy(data.begin(), data.end(), buffer);
-      return data.size();
+      else
+        {
+          this->buffer_->sputn(data.c_str(), data.size());
+        }
     }
+  }
 
   boost::python::object object() { return this->object_; }
 
 private:
   boost::python::object object_;
+  std::stringbuf *buffer_;
+  bool python_stream_closed_;
+
 };
 
 // ----------------------------------------------------------------------
