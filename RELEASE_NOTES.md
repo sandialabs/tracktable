@@ -1,5 +1,128 @@
 # Tracktable Release Notes
 
+## VERSION 1.7.0, 1 September 2023
+
+Welcome back!  We have a couple of new user-facing features, a lot of 
+improvements to infrastructure and documentation (including tutorials),
+and a generous handful of bugfixes.
+
+We extend a big thank-you and a fond farewell to Michael Fadem, the
+driving force behind most of the engineering improvements over the past
+couple years.  Michael has moved on from Sandia and we miss him very much.
+
+
+### New features in 1.7.0
+
+- Maps in Folium can now be created with the `attr` and `crs` 
+  parameters.  The `attr` argument is used to pass an attribution string
+  for custom tile sets.  The `crs` argument names a coordinate transform
+  to project geographical points into pixel coordinates and back.  The
+  functions `tracktable.render.render_trajectories.render_trajectories()` 
+  and `tracktable.render.render_heatmap.render_heatmap()` both support these
+  new arguments.
+
+- Trajectory maps in Folium can be animated.  See the arguments `animate`,
+  `anim_display_update_interval`, `anim_trail_duration`, and `use_markers`
+  in `tracktable.render.render_trajectories.render_trajectories()`.
+  
+- New function `tracktable.rw.load.load_trajectories()` that will load a
+  `.traj`, `.csv`, or `.tsv` file and assemble points into trajectories.
+  An optional flag will cause it to return points instead of trajectories.
+  Examples that load trajectories or points have been updated to use this
+  feature.
+
+- Sea ports and airports can be rendered into maps for both the Cartopy
+  and Folium back ends.
+
+- Docs and data have been separated out into their own repositories
+  implemented as submodules. Note that you will need to `git clone --recursive` 
+  when cloning the source code.
+
+
+### Bug fixes
+
+- We identified and fixed a problem with the I/O library that could cause 
+  a buffer overflow if the user opened a file containing UTF-8 data in 
+  Python in text mode and then passed it to one of Tracktable's loaders.  
+
+- Map scale bars were being rendered incorrectly in static images under
+  map projections that did not use geodetic coordinates (longitude/
+  latitude) as their native coordinate system.
+  
+- Tests for C++ point generators and great circle estimation were failing
+  because points did not initialize their coordinates by default.  Fixing
+  this results in a very minor slowdown.
+
+- Setting a point property's value to None no longer crashes the interpreter.
+
+- DeprecatedDeclaration.h was not being installed when the user called
+  `make install`.  
+
+
+### Known issues
+
+- The documentation for `tracktable.rw.load.load_trajectories()` implies 
+  that it takes a file-like object as its input.  It does not -- it takes
+  a string containing a filename.
+
+
+### Other changes
+
+- The data generators in `tracktable.examples.data_generators` have now moved
+  to `tracktable.data_generators`.   
+
+- Movies can be rendered directly from `tracktable.render.render_movie.render_trajectory_movie`
+  now.  This subsumes the code that used to be in the 
+  `movie_from_trajectories` example. 
+
+- Jupyter notebook tutorials are built locally and stored in a 
+  separate repository (tracktable-docs) so that we no longer run
+  into the CPU usage limits when uploading to ReadTheDocs.
+
+- The latest release branch in our repository is now called `main`,
+  not `master`.
+
+- Sample data has been moved into a separate repository (tracktable-data)
+  to help keep the Tracktable repository itself small(er).
+
+### Infrastructure and Support
+
+#### Python 3.6, 3.7 no longer supported
+
+We no longer officially support Python 3.6 or 3.7.  Python 3.6 stopped
+getting security updates in December 2021.  Python 3.7 stopped getting
+security updates in June 2023.  
+
+Having said that, we have not yet made any changes to the code that 
+actually require Python 3.8 or newer.  
+
+If you need to build and run Tracktable 1.7 in an environment where you
+absolutely cannot update to a more recent Python version, contact us.  
+We sympathize -- we have plenty of experience with such environments --
+and we'll work with you to get you up and running.
+
+#### Wheels available on PyPI, GitHub
+
+We are now building wheels for Python versions up through 3.11.  On Linux,
+we build and upload wheels to [PyPI](https://www.pypi.org) for Python 
+versions 3.6 through 3.11.  On Windows and MacOS (Intel), we build wheels
+for Python 3.8 through 3.11.  On MacOS (Apple Silicon/arm64), we build
+wheels for Python 3.10 and 3.11.  
+
+#### Internal changes to build infrastructure
+
+We've moved all of our Linux build infrastructure to Docker containers
+for easier management.  This also helps us build wheels with the `manylinux`
+standard that are usable on most common distributions.  Along the way,
+we've integrated test coverage and code linting into our CI pipeline.
+
+We're planning to do something similar for our Windows builds now that
+Docker on Windows hosts can run containers with the Windows kernel.
+
+MacOS build and test procedures are still run via shell scripts due to
+the lack of container support in the MacOS kernel.  
+
+
 ## VERSION 1.6.0, 16 September 2021
 
 NOTE:
