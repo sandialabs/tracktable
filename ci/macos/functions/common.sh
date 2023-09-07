@@ -74,6 +74,7 @@ function check_for_build_prerequisites () {
 function check_for_program () {
 	local __program_to_find=$1
 	msg_debug "Checking for program $1"
+	echo "type of conda: $(type -t conda)"
 	[[ -x "$(command -v ${__program_to_find})" ]]
 }
 
