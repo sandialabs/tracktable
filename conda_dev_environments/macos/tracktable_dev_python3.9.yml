@@ -22,12 +22,13 @@ dependencies:
 
   # C++ Dependencies
   - compilers
-  - boost>=1.74
+  - boost>=1.82
   - cmake>=3.19.5
   - ninja>=1.10.0
 
   # Jupyter Dependencies
   - ipykernel
+  - jupyter
 
   # Movie Dependencies
   - ffmpeg>=4.2.4
