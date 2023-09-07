@@ -54,6 +54,14 @@ function _load_helper_functions () {
     popd
 }
 
+function _set_tracktable_home () {
+    pushd .
+    # this will put us in tracktable/ci/macos
+    cd "${BASH_SOURCE%/*}" || exit 3
+    cd ../..
+    export TRACKTABLE_HOME="${PWD}"
+    popd
+}
 
 ### 
 ###
@@ -71,6 +79,8 @@ function main () {
         exit 5
     fi
 
+    _set_tracktable_home;
+    
     ### ---------------------------------------------------------------
     ### Step 1: Load in the helper functions we need
     ###
