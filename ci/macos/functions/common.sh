@@ -8,7 +8,7 @@
 # This is for use in all scripts -- unlike build_osx_wheels, we don't
 # create a different directory name for each Python version
 BUILD_DIRECTORY_NAME=build_macos
-DEFAULT_PYTHON_VERSION=3.8
+DEFAULT_PYTHON_VERSION=3.10
 
 __COMMON_DEBUG_ENABLED=1
 __COMMON_ERROR_ENABLED=1
