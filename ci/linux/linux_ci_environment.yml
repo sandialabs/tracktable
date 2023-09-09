@@ -7,7 +7,7 @@ dependencies:
   - git
 
   # Python Dependencies
-  - python=3.8
+  - python=3.10
   - pip
   - numpy>=1.7
   - matplotlib>=3.0
@@ -22,7 +22,7 @@ dependencies:
 
   # C++ Dependencies
   - compilers
-  - boost>=1.74, <=1.75
+  - boost>=1.82
   - cmake>=3.19.5
   - ninja>=1.10.0
 
