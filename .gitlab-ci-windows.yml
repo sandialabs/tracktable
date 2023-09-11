@@ -85,7 +85,7 @@ windows-test:
   script:
     - xcopy build_windows\lib\*.pyd tracktable\Python\tracktable\lib
     - cd build_windows
-    - ctest -j10 -C Release -T test --output-on-failure --exclude-regex "P_Render_Trajectories|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe"
+    - ctest -j4 -C Release -T test --output-on-failure --exclude-regex "P_Render_Trajectories|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe"
   artifacts:
     paths:
       - build_windows
@@ -123,7 +123,7 @@ windows-deploy-py36:
     - cd %BUILD_DIR%
     - call activate tracktable-windows-ci-py%PY_VERSION%
     - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
-    - cmake --build . --config Release --target INSTALL -j 10
+    - cmake --build . --config Release --target INSTALL -j 4
     - cd ..
     - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
     - dir %BUILD_DIR%\install\wheel
@@ -223,7 +223,33 @@ windows-deploy-py310:
     - cd %BUILD_DIR%
     - call activate tracktable-windows-ci-py%PY_VERSION%
     - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
-    - cmake --build . --config Release --target INSTALL -j 10
+    - cmake --build . --config Release --target INSTALL -j 4
+    - cd ..
+    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
+    - dir %BUILD_DIR%\install\wheel
+    - set HTTPS_PROXY=
+    - set https_proxy=
+    - python -m twine upload -u gitlab-ci-token -p %CI_JOB_TOKEN% --repository-url "%CI_API_V4_URL%/projects/%CI_PROJECT_ID%/packages/pypi" %BUILD_DIR%\install\wheel\*.whl
+
+
+windows-deploy-py311:
+  stage: deploy
+  tags:
+    - windows
+  timeout: 2 hours
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  before_script:
+    - *windows-wheel-script
+  needs: ["windows-deploy-py310"]
+  script:
+    - set PY_VERSION=311
+    - set BUILD_DIR=win_wheel_py%PY_VERSION%
+    - mkdir %BUILD_DIR%
+    - cd %BUILD_DIR%
+    - call activate tracktable-windows-ci-py%PY_VERSION%
+    - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
+    - cmake --build . --config Release --target INSTALL -j 4
     - cd ..
     - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
     - dir %BUILD_DIR%\install\wheel
