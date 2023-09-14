@@ -14,6 +14,7 @@ any given one.
 
 ### TRACKTABLE 1.7.0
 
+- 296: Conda YML per OS and Python version
 - 293: Add brand new CHANGELOG for 1.7.0 and future releases
 - 294: Update PyPI tags for Python 3.11
 - 295: Fix nbconvert validation error on documentation notebooks
