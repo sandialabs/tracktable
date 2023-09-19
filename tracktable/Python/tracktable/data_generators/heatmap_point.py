@@ -1,9 +1,4 @@
-#
-<<<<<<<< HEAD:tracktable/Python/tracktable/data_generators/generate_heatmap_points.py
-# Copyright (c) 2014-2021 National Technology and Engineering
-========
 # Copyright (c) 2014-2023 National Technology and Engineering
->>>>>>>> 527-release-tracktable-1-7-0:tracktable/Python/tracktable/data_generators/heatmap_point.py
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -33,28 +28,18 @@
 
 
 """
-<<<<<<<< HEAD:tracktable/Python/tracktable/data_generators/generate_heatmap_points.py
-This file contains functions for generating heatmap points.
-"""
-import csv
-import datetime
-========
 tracktable.data_generators.heatmap point - Generating heatmap points around n largest cities.
 """
 import csv
 import datetime
 import logging
->>>>>>>> 527-release-tracktable-1-7-0:tracktable/Python/tracktable/data_generators/heatmap_point.py
 
 from tracktable.data_generators import point
 from tracktable.domain import terrestrial
 from tracktable.feature import interleave_points
 from tracktable.info import cities
 
-<<<<<<<< HEAD:tracktable/Python/tracktable/data_generators/generate_heatmap_points.py
-========
 logger = logging.getLogger(__name__)
->>>>>>>> 527-release-tracktable-1-7-0:tracktable/Python/tracktable/data_generators/heatmap_point.py
 
 def n_largest_cities(howmany):
     """
@@ -106,11 +91,8 @@ def points_near_city(city, num_points):
 # ----------------------------------------------------------------------
 
 def generate_heatmap_points(**kwargs):
-<<<<<<<< HEAD:tracktable/Python/tracktable/data_generators/generate_heatmap_points.py
-    print("INFO: Generating {} points around each of the {} largest cities in the world.".format(kwargs['num_points_per_city'], kwargs['num_cities']))
-========
+
     logger.info("Generating {} points around each of the {} largest cities in the world.".format(kwargs['num_points_per_city'], kwargs['num_cities']))
->>>>>>>> 527-release-tracktable-1-7-0:tracktable/Python/tracktable/data_generators/heatmap_point.py
     heatmap_points = [ points_near_city(city, kwargs['num_points_per_city']) for city in n_largest_cities(kwargs['num_cities']) ]
     combined_point_source = interleave_points.interleave_points_by_timestamp(*heatmap_points)
     if kwargs['write_file']:
