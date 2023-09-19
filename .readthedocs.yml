@@ -30,7 +30,7 @@ build:
 
 # The Anaconda environment to build the docs
 conda:
-  environment: environment.yml
+  environment: documentation_build_environment.yml
 
 submodules:
   include:

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2022 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -643,7 +643,6 @@ def add_dependencies_to_wheel(dependency_results,
         original_file_path = os.path.dirname(original_file).lower()
         if original_file_path not in files_added_by_directory:
             files_added_by_directory[original_file_path] = set()
-
         if len(files_added_by_directory) > 0:
             logger.debug('Files already in directory: {}'.format(pprint.pformat(files_added_by_directory[original_file_path])))
 

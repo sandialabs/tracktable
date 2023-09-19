@@ -82,15 +82,6 @@ function main () {
     disable_debug_log
 
     ### ---------------------------------------------------------------
-    ### Step N: Make sure we have CMake.
-
-    if ! check_for_program cmake
-    then
-        msg_error "Tracktable builds require CMake."
-        exit 2
-    fi
-
-    ### ---------------------------------------------------------------
     ### Step 2: Activate Anaconda.  We already know it's available 
     ###         because we checked for it in the setup stage.
     ###
@@ -115,6 +106,16 @@ function main () {
     else 
         msg_error "Anaconda environment for Python ${__py_version} not found."
         exit 1
+    fi
+
+
+    ### ---------------------------------------------------------------
+    ### Step N: Make sure we have CMake.
+
+    if ! check_for_program cmake
+    then
+        msg_error "Tracktable builds require CMake."
+        exit 2
     fi
 
     ### ---------------------------------------------------------------

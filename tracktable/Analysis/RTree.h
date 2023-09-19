@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2022 National Technology and Engineering
+ * Copyright (c) 2014-2023 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -195,7 +195,6 @@ public:
     {
       this->_RTree.insert(range_begin, range_end);
     }
-
   /** Remove a single element from the RTree
    *
    * @param [in] value  Element to remove
