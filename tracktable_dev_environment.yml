@@ -3,8 +3,11 @@ name: tracktable-dev
 channels:
   - conda-forge
 dependencies:
+  # Dev Dependencies
+  - git
+
   # Python Dependencies
-  - python>=3.6, <=3.9
+  - python
   - pip
   - numpy>=1.7
   - matplotlib>=3.0
@@ -15,20 +18,24 @@ dependencies:
   - folium>=0.11.0
   - scipy>=1.5.2
   - tqdm>=4.51.0
-
-  # Jupyter Dependencies
-  - ipykernel
+  - tracktable-data>=1.7.0
 
   # C++ Dependencies
   - compilers
-  - boost>=1.74, <=1.75
+  - boost>=1.82
   - cmake>=3.19.5
+  - ninja>=1.10.0
+
+  # Jupyter Dependencies
+  - ipykernel
+  - jupyter
 
   # Movie Dependencies
   - ffmpeg>=4.2.4
 
   # Code Coverage Dependencies
   - lcov>=1.14
+  - coverage>=6.3.2
 
   # Documentation Dependencies
   - sphinx>=3.4.3
@@ -37,5 +44,6 @@ dependencies:
   - nbsphinx-link>=1.3.0
   - pandoc>=2.5
   - doxygen>=1.8.17
-  - graphviz >=2.42.2
-  - breathe>=4.26.1
+  - graphviz>=2.42.2
+  - breathe>=4.26.1, <=4.31.0
+

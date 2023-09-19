@@ -1,0 +1,6 @@
+[submodule "tracktable-data"]
+	path = tracktable-data
+	url = ../tracktable-data.git
+[submodule "tracktable-docs"]
+	path = tracktable-docs
+	url = ../tracktable-docs.git

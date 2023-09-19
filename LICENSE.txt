@@ -82,7 +82,7 @@ database under the following terms:
 
 Tracktable also includes a shapefile containing boundaries of time
 zones.  That data is in
-tracktable/Python/tracktable/info/data/tz_world.{dbf,png,prj,shp,shx}.  It
+tracktable-data/tracktable-data/tracktable_data/python_info_data/tz_world.shptz_world.{dbf,png,prj,shp,shx}.  It
 is distributed under the following license:
 
 # To the extent possible under law, Eric Muller has waived all
@@ -106,7 +106,7 @@ is distributed under the following license:
 ----------
 
 The list of airports in
-tracktable/Python/tracktable/info/data/airports.csv was obtained from
+tracktable-data/tracktable-data/tracktable_data/python_info_data/airports.csv was obtained from
 http://www.partow.net/miscellaneous/airportdatabase and is used in
 accordance with the OSI "Common Public License".  The most recent
 version of this license as of July 2014 is included below.
@@ -327,6 +327,41 @@ any resulting litigation.
 (end of section for Partow's airport database)
 
 
+
+
+
+
+---------
+--GSHHS--
+---------
+Tracktable also includes shapefiles containing boundaries lakes, rivers and coastlines
+from the Global Self-consistent Hierarchical High-resolution Geography database.
+This data is in tracktable-data/tracktable-data/tracktable_data/python_info_data/GSHHS_shp
+and tracktable-data/tracktable-data/tracktable_data/python_info_data/WDBII_shp. It
+is distributed under the following license:
+
+As of GSHHG 2.2.2, GSHHG is distributed under the GNU Lesser General Public
+License (LGPL) version 3 or later. Copies of the The GNU General Public
+License (GPL) and the GNU Lesser General Public License (LGPL) are
+distributed along with the sources. Refer to the files COPYINGv3 and
+COPYING.LESSERv3.
+
+Permission to use, copy, modify, and distribute (with no more than a
+reasonable redistribution fee) this data and its documentation for
+any purpose is hereby granted, provided that the above copyright notice
+appear in all copies, that both that copyright notice and this
+permission notice appear in supporting documentation, and that the name
+of GSHHG not be used in advertising or publicity pertaining to
+distribution of the software without specific, written prior permission.
+The GSHHG package may be included in a bundled distribution of software
+for which a fee may be charged. The University of Hawaii (UH) and the
+National Oceanic and Atmospheric Administration (NOAA) make no
+representations about the suitability of this software for any purpose.
+It is provided "as is" without expressed or implied warranty.  It is
+provided with no support and without obligation on the part of UH or
+NOAA, to assist in its use, correction, modification, or enhancement.
+
+(end of GSHHS license)
 
 
 

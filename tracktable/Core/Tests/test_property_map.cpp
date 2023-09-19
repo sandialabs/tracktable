@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 National Technology and Engineering
+ * Copyright (c) 2014-2023 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -41,12 +41,12 @@ test_property_map()
   double test_double_input = 3.14159;
   std::string test_string_input("Four score and seven years ago...");
   tracktable::Timestamp test_time_input(tracktable::time_from_string("1969-06-20 16:17:40"));
+  tracktable::NullValue test_null_input(tracktable::TYPE_NULL);
 
   tracktable::set_property(properties, "real_test", test_double_input);
-
   tracktable::set_property(properties, "string_test", test_string_input);
   tracktable::set_property(properties, "time_test", test_time_input);
-
+  tracktable::set_property(properties, "null_test", test_null_input);
 
   if (tracktable::has_property(properties, "real_test") == false)
     {
@@ -63,6 +63,11 @@ test_property_map()
     std::cerr << "ERROR: Property 'time_test' should be present\n";
     ++error_count;
     }
+  if (tracktable::has_property(properties, "null_test") == false)
+    {
+    std::cerr << "ERROR: Property 'null_test' should be present\n";
+    ++error_count;
+    }
   if (tracktable::has_property(properties, "no_such_property"))
     {
     std::cerr << "ERROR: Property 'no_such_property' should not be present\n";
@@ -72,6 +77,7 @@ test_property_map()
   double test_double;
   std::string test_string;
   tracktable::Timestamp test_time;
+  tracktable::NullValue test_null;
   bool ok;
 
   std::cout << "Retrieving properties with correct types\n";
@@ -120,7 +126,21 @@ test_property_map()
     ++error_count;
     }
 
-  std::cout << "Attempting to retrieve properties with incorrect types.  Expect the next three lines to be error messages.\n";
+  test_null = tracktable::nullvalue_property(properties, "null_test", &ok);
+  if (ok == false)
+    {
+    std::cerr << "ERROR: OK flag was set to false when retrieving null property\n";
+    ++error_count;
+    }
+  if (!is_property_null(test_null))
+    {
+    std::cerr << "ERROR: Test null property value was not null.  Value is "
+              << test_null << "\n";
+    ++error_count;
+    }
+
+  std::cout << "Attempting to retrieve properties with incorrect types.  Expect the next four lines to be error messages.\n";
+
   tracktable::real_property(properties, "time_test", &ok);
   if (ok)
     {
@@ -142,6 +162,12 @@ test_property_map()
     ++error_count;
     }
 
+  tracktable::timestamp_property(properties, "null_test", &ok);
+  if (ok)
+    {
+    std::cerr << "REAL ERROR: Property 'null_test' was successfully retrieved as a null according to the OK flag.\n";
+    ++error_count;
+    }
   return (error_count == 0);
 }
 

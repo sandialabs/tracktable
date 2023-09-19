@@ -2,7 +2,7 @@
 #
 # This is tracktable/Python/tracktable/CMakeLists.txt
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -38,13 +38,18 @@ if (BUILD_TESTING)
   add_subdirectory(algorithms/tests)
   add_subdirectory(applications/tests)
   add_subdirectory(core/tests)
+  add_subdirectory(data_generators/tests)
   add_subdirectory(domain/tests)
   add_subdirectory(examples)
-  add_subdirectory(examples/data/generators/tests)
   add_subdirectory(rw/tests)
   add_subdirectory(info/tests)
   add_subdirectory(render/tests)
  endif (BUILD_TESTING)
+
+if (COPY_NOTEBOOKS_TRACKTABLE_DATA)
+ message(STATUS "Copying notebooks from tracktable-docs. Don't modify these copies!")
+ execute_process(COMMAND ${Python3_EXECUTABLE} _copy_notebooks.py WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR})
+endif (COPY_NOTEBOOKS_TRACKTABLE_DATA)
 
 install(
   FILES __init__.py
@@ -94,6 +99,12 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/examples
 )
 
+file(GLOB response_files "examples/response_files/*.txt")
+install(
+  FILES ${response_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/response_files
+)
+
 file(GLOB example_python_scripts "examples/python_scripts/*.py")
 install(
   FILES ${example_python_scripts}
@@ -124,16 +135,10 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos/demo_images
 )
 
-file(GLOB example_data_files "examples/data/*.*")
+file(GLOB analytic_demo_helpers "examples/analytic_demos/*.py")
 install(
-  FILES ${example_data_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/data
-)
-
-file(GLOB example_data_generator_files "examples/data/generators/*.py")
-install(
-  FILES ${example_data_generator_files}
-  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/data/generators
+  FILES ${analytic_demo_helpers}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/examples/analytic_demos
 )
 
 file(GLOB feature_files "feature/*.py")

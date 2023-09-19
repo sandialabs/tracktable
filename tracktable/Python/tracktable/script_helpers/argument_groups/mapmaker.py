@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -274,9 +274,9 @@ def install_group():
                  default="PlateCarree",
                  help="Custom projection for map")
 
-    add_argument("mapmaker", [ "--map-scale-length" ],
+    add_argument("mapmaker", [ "--scale-length-in-km" ],
                  type=float,
-                 default=None,
+                 default=20,
                  help="Length of map scale indicator in km")
 
     add_argument("mapmaker", [ "--region-size" ],

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -613,23 +613,23 @@ def subset_during_interval(trajectory, start_time, end_time):
 # ----------------------------------------------------------------------
 
 def distance(hither, yon):
-    """Return the distance between two points
+    """Return the distance between two points or trajectories
 
-    This function will compute the distance between two points in
+    This function will compute the distance between two objects in
     domain-specific units.
 
-    The points being measured must be from the same domain.
+    The objects being measured must be from the same domain.
 
     Domain Information:
 
-      Terrestrial domain returns distance in km.
+      Terrestrial domain returns distance in kilometers.
 
       Cartesian domains return distance in native units.
 
-    Args:
-      hither (BasePoint): point 1
-      yon (BasePoint): point 2
-
+    Arguments:
+      hither (BasePoint, TrajectoryPoint, Trajectory, or LineString): start here
+      yon (BasePoint, TrajectoryPoint, Trajectory, or LineString): measure distance to here
+      
     Returns:
       Distance between hither and yon
 

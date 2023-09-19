@@ -1,18 +1,16 @@
-# MacOS continuous integration setup for Tracktable
-# This file gets included from .gitlab-ci.yml.
-#
-# Runner configuration:
-#
-# Gitlab Runner must run in an environment where the conda executable
-# is on the path.  We also need XCode and the command-line compiler
-# tools installed at the moment.  We will swap that out for the
-# Anaconda toolchain in due course.
+########################
+# MacOS CI/CD Pipeline #
+########################
 
-setup-macos:
+macos-setup:
   stage: setup
   tags:
     - macos
     - anaconda
+  # TODO: Figure out how to skip the pipeline, this rule doesn't work for some reason
+  # rules:
+  #   - if: $SKIP_NORMAL_PIPELINE && $SKIP_NORMAL_PIPELINE == "true"
+  #     when: never
   script:
     - ./ci/macos/configure_anaconda_environment.sh
     - mkdir build_macos
@@ -21,13 +19,16 @@ setup-macos:
       - build_macos
     expire_in: 1 day
 
-configure-macos:
+macos-configure:
   stage: configure
   tags:
     - macos
     - anaconda
   dependencies:
-    - setup-macos
+    - macos-setup
+  needs:
+    - job: macos-setup
+      artifacts: true
   script:
     - ./ci/macos/configure_cmake_build.sh
   artifacts:
@@ -35,13 +36,16 @@ configure-macos:
       - build_macos
     expire_in: 1 day
 
-build-macos:
+macos-build:
   stage: build
   tags:
     - macos
     - anaconda
   dependencies:
-    - configure-macos
+    - macos-configure
+  needs:
+    - job: macos-configure
+      artifacts: true
   script:
     - ./ci/macos/run_build.sh
   artifacts:
@@ -49,13 +53,16 @@ build-macos:
       - build_macos
     expire_in: 1 day
 
-test-macos:
+macos-test:
   stage: test
   tags:
     - macos
     - anaconda
   dependencies:
-    - build-macos
+    - macos-build
+  needs:
+    - job: macos-build
+      artifacts: true
   script:
     - cp ./build_macos/lib/*.so ./tracktable/Python/tracktable/lib
     - ./ci/macos/run_test.sh
@@ -64,4 +71,20 @@ test-macos:
       - build_macos
     expire_in: 1 day
 
-
+########################################
+# Build And Deploy MacOS PYPI Packages #
+########################################
+macos-deploy:
+  stage: deploy
+  tags:
+    - macos
+    - anaconda
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  timeout: 2 hours
+  needs: ["macos-test"]
+  script:
+    - cd packaging/pypi/osx
+    - mkdir wheel_build && cd wheel_build
+    - ../build_osx_wheels.sh -j 6 ../../../..
+    - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi *.whl

@@ -1,4 +1,4 @@
-# Copyright (c) 2017, National Technology & Engineering Solutions of
+# Copyright (c) 2014-2023, National Technology & Engineering Solutions of
 #   Sandia, LLC (NTESS).
 # All rights reserved.
 #
@@ -30,5 +30,9 @@ include(PythonTest)
 
 set(INFO "tracktable.info.tests")
 
+add_python_test(P_PortInfo ${INFO}.test_ports)
 add_python_test(P_CityInfo ${INFO}.test_cities)
+add_python_test(P_ShorelineInfo ${INFO}.test_shorelines)
+add_python_test(P_RiverInfo ${INFO}.test_rivers)
+add_python_test(P_BorderInfo ${INFO}.test_borders)
 

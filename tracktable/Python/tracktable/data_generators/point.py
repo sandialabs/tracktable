@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -32,11 +32,8 @@
 tracktable.data_generators.point - Ways to generate points around a seed point
 """
 
-from __future__ import division, print_function, absolute_import
-
 import math
 import random
-from six.moves import range
 
 
 def random_box_uniform(min_corner, max_corner, num_points=100):

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 National Technology and Engineering
+ * Copyright (c) 2014-2023 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -30,7 +30,7 @@
 
 
 /*
- * PropertyMap - map from string to string, double or timestamp
+ * PropertyMap - map from string to string, double, timestamp or null
  *
  * Rather than clutter the point classes' API with lots of properties
  * that we might or might not ever use we're going to explicitly
@@ -146,6 +146,24 @@ TRACKTABLE_CORE_EXPORT double real_property(PropertyMap const& properties, strin
 
 TRACKTABLE_CORE_EXPORT Timestamp timestamp_property(PropertyMap const& properties,  string_type const& name, bool* is_present=0);
 
+/*! @brief Retrieve a null-valued property from the map.
+ *
+ * This function will give you back the named property as a NullValue
+ * if it is present and that is its proper type. It will not attempt
+ * to cast other types to NullValue.
+ *
+ * @param [in] properties Property map
+ * @param [in] name Property to search for in the map
+ * @param [out] is_present Flag indicating if the property is present
+ *
+ * @return
+ *    On success, returns the requested property as a `NullValue` and sets
+ *    `*is_present` to `true`. On failure, returns an `uninitialized
+ *    NullValue` and sets `*is_present` to `false`.
+ */
+
+TRACKTABLE_CORE_EXPORT NullValue nullvalue_property(PropertyMap const& properties,  string_type const& name, bool* is_present=0);
+
 /*! @brief Add a value to the map.
  *
  * @fn tracktable::void set_property(PropertyMap& properties, string_type const& name, double value)
@@ -170,6 +188,11 @@ TRACKTABLE_CORE_EXPORT void set_property(PropertyMap& properties, string_type co
 TRACKTABLE_CORE_EXPORT void set_property(PropertyMap& properties, string_type const& name, Timestamp const& value);
 
 /**
+ * @overload tracktable::void set_property(PropertyMap& properties, string_type const& name, NullValue const& value)
+ */
+TRACKTABLE_CORE_EXPORT void set_property(PropertyMap& properties, string_type const& name, NullValue const& value);
+
+/**
  * @overload tracktable::void set_property(PropertyMap& properties, string_type const& name, int64_t value)
  */
 TRACKTABLE_CORE_EXPORT void set_property(PropertyMap& properties, string_type const& name, int64_t value);
@@ -185,6 +208,7 @@ TRACKTABLE_CORE_EXPORT PropertyValueT property_with_default(PropertyMap const& p
 TRACKTABLE_CORE_EXPORT double real_property_with_default(PropertyMap const& properties, string_type const& name, double default_value);
 TRACKTABLE_CORE_EXPORT string_type string_property_with_default(PropertyMap const& properties, string_type const& name, string_type const& default_value);
 TRACKTABLE_CORE_EXPORT Timestamp timestamp_property_with_default(PropertyMap const& properties, string_type const& name, Timestamp const& default_value);
+TRACKTABLE_CORE_EXPORT NullValue nullvalue_property_with_default(PropertyMap const& properties, string_type const& name, NullValue const& default_value);
 
 TRACKTABLE_CORE_EXPORT string_type property_map_to_string(PropertyMap const& properties);
 

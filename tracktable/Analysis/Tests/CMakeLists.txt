@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -231,6 +231,6 @@ add_test(
 
 add_test(
   NAME C_TrajectoryAssemblyDomain
-  COMMAND test_trajectory_assembly_with_domain ${Tracktable_SOURCE_DIR}/TestData/Points/SampleTrajectories.csv 91 109 86321
+  COMMAND test_trajectory_assembly_with_domain ${Tracktable_DATA_DIR}/internal_test_data/Points/SampleTrajectories.csv 91 109 86321
   )
 

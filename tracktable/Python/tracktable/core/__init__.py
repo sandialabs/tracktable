@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -42,10 +42,11 @@ from .core_types import BoostPythonArgumentError, set_default_timezone
 from .core_types import current_memory_use, peak_memory_use
 from .timestamp import Timestamp
 
-import os.path
 
 def data_directory():
     """Return path to Tracktable example data files
+
+    .. important:: This function as been superseded by the ``tracktable_data`` package's ``retrieve()`` function.
 
     We bundle a few example data files inside Tracktable.  This
     function will give you the path to those.  Use it as follows:
@@ -62,6 +63,27 @@ def data_directory():
         Path to Tracktable example data files.
     """
 
-    data_directory = os.path.join(os.path.dirname(__file__), '..', 'examples', 'data')
-    normalized_dir = os.path.normpath(data_directory)
-    return normalized_dir
+    # TODO (mjfadem): Remove this function in release 1.8
+
+    import warnings
+
+    # This just stops the source line from printing with the warning
+    def format_warning(message, category, filename, lineno, file=None, line=None):
+        return '%s:%s: %s:%s\n' % (filename, lineno, category.__name__, message)
+
+    warnings.formatwarning = format_warning
+
+    # Allow the DeprecationWarning through since it's disabled by default
+    warnings.simplefilter("always", category=DeprecationWarning)
+
+    # This will display a DeprecationWarning when the source modules are imported
+    warnings.warn(" `data_directory()` has been deprecated and removed and is superseded by the `tracktable_data` package's `retrieve()` function. Use `retrieve(filename=<filename>)` to get the desired file path.", category=DeprecationWarning)
+
+    import sys
+
+    if sys.version_info[1] < 7:
+        sys.tracebacklimit = None
+    else:
+        sys.tracebacklimit = 0
+
+    raise NotImplementedError

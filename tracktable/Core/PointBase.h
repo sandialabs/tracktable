@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 National Technology and Engineering
+ * Copyright (c) 2014-2023 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -89,7 +89,12 @@ public:
   typedef tracktable::settings::point_coordinate_type element_type;
 
   /// Initialize an empty point
-  PointBase() { }
+  PointBase() {
+        for(std::size_t i = 0; i < Dimension; ++i)
+    {
+        this->Coordinates[i] = 0;
+    }
+  }
 
   /** Copy contructor, create a PointBase with a copy of another
    *

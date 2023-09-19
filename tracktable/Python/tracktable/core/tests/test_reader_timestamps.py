@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017-2020 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -36,43 +36,43 @@ from tracktable.domain.terrestrial import TrajectoryPointReader
 
 def read_and_get_timestamp(file, format) :
     all_points = []
-    
+
     with open(file, 'rb') as infile:
         reader = TrajectoryPointReader()
         reader.input = infile
         reader.timestamp_format = format
         reader.timestamp_column = 1
         reader.field_delimiter = ","
-        
+
         for point in reader:
             all_points.append(point)
-            
-        return all_points[3].timestamp  
-        
+
+        return all_points[3].timestamp
+
 def test_reader_timestamps(file_location):
     print("Attempting to read timestamps from files in {}.".format(file_location))
     error_count = 0
 
     expected_timestamp = datetime.datetime(2004, 12, 7, 11, 43, 18, 0, datetime.timezone.utc)
-    
+
     actual_timestamp = read_and_get_timestamp(file_location + "PointsWithTimestamps1.csv", "%Y-%m-%d %H:%M:%S")
-    
+
     if (actual_timestamp != expected_timestamp) :
         print("Error, actual timestamp {} does not match expected timestamp {}".format(actual_timestamp, expected_timestamp))
         error_count += 1
-        
+
     actual_timestamp = read_and_get_timestamp(file_location + "PointsWithTimestamps2.csv", "%Y:%m:%d::%H:%M:%S")
-    
+
     if (actual_timestamp != expected_timestamp) :
         print("Error, actual timestamp {} does not match expected timestamp {}".format(actual_timestamp, expected_timestamp))
-        error_count += 1    
-        
+        error_count += 1
+
     actual_timestamp = read_and_get_timestamp(file_location + "PointsWithTimestamps3.csv", "%b %d %Y %H:%M:%S")
-    
+
     if (actual_timestamp != expected_timestamp) :
         print("Error, actual timestamp {} does not match expected timestamp {}".format(actual_timestamp, expected_timestamp))
-        error_count += 1    
-        
+        error_count += 1
+
     return error_count
 
 

@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -34,7 +34,8 @@ import logging
 import cartopy
 import cartopy.crs
 from matplotlib import pyplot
-from tracktable.render.map_decoration import geographic_decoration as decoration
+from tracktable.render.map_decoration import \
+    geographic_decoration as decoration
 from tracktable.render.map_processing import maps
 
 
@@ -105,6 +106,8 @@ def cartesian_map(map_bbox=None,
 # ----------------------------------------------------------------------
 
 from cartopy.io.img_tiles import GoogleWTS
+
+
 class Tiles(GoogleWTS):
     def __init__(self, url):
         """
@@ -129,6 +132,14 @@ def terrestrial_map(map_name,
                     draw_coastlines=True,
                     draw_countries=True,
                     draw_states=True,
+                    draw_airports = False,
+                    draw_ports = False,
+                    draw_shorelines=False,
+                    draw_rivers=False,
+                    draw_borders=False,
+                    draw_cities = False,
+                    draw_largest_cities=None,
+                    draw_cities_larger_than=None,
                     draw_lonlat=True,
                     draw_scale=True,
                     fill_land=True,
@@ -158,13 +169,49 @@ def terrestrial_map(map_name,
                     state_fill_color='none',
                     state_linewidth=0.3,
                     state_zorder=2,
-                    draw_largest_cities=None,
-                    draw_cities_larger_than=None,
                     city_label_size=12,
                     city_dot_size=2,
                     city_dot_color='white',
                     city_label_color='white',
                     city_zorder=6,
+                    airport_list=[],
+                    airport_label_size=12,
+                    airport_dot_size=2,
+                    airport_color='red',
+                    airport_label_color='white',
+                    airport_zorder=7,
+                    airport_bounding_box=None,
+                    port_list=[],
+                    port_label_size=12,
+                    port_dot_size=2,
+                    port_color='blue',
+                    port_label_color='white',
+                    port_zorder=8,
+                    port_country=None,
+                    port_water_body=None,
+                    port_wpi_region=None,
+                    port_bounding_box=None,
+                    port_and_country_seperate=False,
+                    shoreline_list=[],
+                    shoreline_color='red',
+                    shoreline_zorder=7,
+                    shoreline_bounding_box=None,
+                    shoreline_resolution='low',
+                    shoreline_level='L1',
+                    shoreline_fill_polygon=True,
+                    shoreline_fill_color='red',
+                    river_list=[],
+                    river_color='blue',
+                    river_zorder=6,
+                    river_bounding_box=None,
+                    river_resolution='low',
+                    river_level='L01',
+                    border_list=[],
+                    border_color='green',
+                    border_zorder=6,
+                    border_bounding_box=None,
+                    border_resolution='low',
+                    border_level='L1',
                     country_resolution='10m',
                     state_resolution='10m',
                     coastline_resolution='50m',
@@ -175,9 +222,18 @@ def terrestrial_map(map_name,
                     map_global=False,
                     map_projection=None,
                     region_size=None,
+                    country=None,
+                    location=None,
                     axes=None,
                     tiles=None,
                     tiles_zoom_level=8,
+                    draw_all_ports=False,
+                    draw_all_airports=False,
+                    draw_all_shorelines=False,
+                    draw_all_rivers=False,
+                    draw_all_borders=False,
+                    cities_to_draw=5,
+                    draw_arrows=True,
                     **kwargs):
     """Create and decorate a terrestrial map
 
@@ -185,15 +241,23 @@ def terrestrial_map(map_name,
     up to and including the entire world. The map will be decorated
     with some subset of coastlines, country borders, state/province
     borders and cities according to the keyword arguments you supply
-    to mapmaker() or terrestrial_map().
+    to render_map() or terrestrial_map().
 
     Args:
-      map_name:            Region name ('region:XXX' or 'airport:XXX' or 'city:XXX' or 'custom'). Available regions are in tracktable.render.maps.available_maps().
+      map_name:            Region name ('region:<region>' or 'airport:<airport>' or 'port:<port>' or 'city:<city>' or 'custom'). Available regions are in tracktable.render.map_processing.maps.available_maps().
 
     Keyword Args:
       draw_coastlines (bool):                       Whether or not to draw coastlines on the map (Default: True)
       draw_countries (bool):                        Whether or not to draw country borders on the map (Default: True)
       draw_states (bool):                           Whether or not to draw US/Canada state borders (Default: True)
+      draw_airports (bool):                         Whether or not to draw airports (Default: False)
+      draw_ports (bool):                            Whether or not to draw ports (Default: False)
+      draw_shorelines (bool):                       Whether or not to draw shorelines (Default: False)
+      draw_rivers (bool):                           Whether or not to draw rivers (Default: False)
+      draw_borders (bool):                          Whether or not to draw borders (Default: False)
+      draw_cities (bool):                           Whether or not to draw cities (Default: False)
+      draw_largest_cities (int):                    Draw the N largest cities on the map (Default: None)
+      draw_cities_larger_than (int):                Draw cities with populations greater than N (Default: None)
       draw_lonlat (bool):                           Whether or not to draw longitude/latitude lines (Default: True)
       draw_scale (bool):                            Whether or not to draw scale (Default: True)
       fill_land (bool):                             Whether or not to fill in the land areas (Default: True)
@@ -201,11 +265,11 @@ def terrestrial_map(map_name,
       land_fill_color (str):                        Color name or hex string for land area (Default: '#101010')
       water_fill_color (str):                       Color name or hex string for sea area (Default: '#000000')
       land_zorder (int):                            Image layer for land (Default: 4)
-      water_zorder (int):                           Image layer for sea (Default: 4)
+      water_zorder (int):                           Image layer for water (Default: 4)
       lonlat_spacing (int):                         Distance in degrees between lon/lat lines (Default: 10)
       lonlat_color (str):                           Color name or hex string for longitude/latitude lines (Default: '#A0A0A0')
       lonlat_linewidth (float):                     Width (in point) for lon/lat lines (Default: 0.2)
-      lonlat_zorder (int):                          Image layer for coastlines (Default: 6)
+      lonlat_zorder (int):                          Image layer for lonlat (Default: 6)
       scale_length_in_km (int)                      Scale's representative length (Default: 10)
       scale_label_color (str):                      Color (name or hex string) for scale (Default: '#C0C0C0')
       scale_label_size (int):                       Size of the scale label (Default: 10)
@@ -218,18 +282,57 @@ def terrestrial_map(map_name,
       country_color (str):                          Color name or hex string for coastlines (Default: '#606060')
       country_fill_color (str):                     Color name or hex string for coastlines (Default:'#303030' )
       country_linewidth (float):                    Width (in points) of coastlines (Default: 0.5)
-      country_zorder (int):                         Image layer for coastlines (Default: 3)
+      country_zorder (int):                         Image layer for countries (Default: 3)
       state_color (str):                            Color name or hex string for coastlines (Default: '#404040')
       state_fill_color (str):                       Color name or hex string for coastlines (Default: 'none')
       state_linewidth (float):                      Width (in points) of coastlines (Default: 0.3)
-      state_zorder (int):                           Image layer for coastlines (Default: 2)
-      draw_largest_cities (int):                    Draw the N largest cities on the map (Default: None)
-      draw_cities_larger_than (int):                Draw cities with populations greater than N (Default: None)
+      state_zorder (int):                           Image layer for states (Default: 2)
       city_label_size (int):                        Size (in points) for city name labels (Default: 12)
       city_dot_size (int):                          Size (in points) for city markers (Default: 2)
       city_dot_color (str):                         Color name or hex string for city markers (Default: 'white')
       city_label_color (str):                       Color name or hex string for city names (Default: 'white')
-      city_zorder (int):                            Color name or hex string for city names (Default: 6)
+      city_zorder (int):                            Image layer for cities (Default: 6)
+
+      airport_list (list(str)):                     IATA code of airports to render onto the map (Default: [])
+      airport_label_size (int):                     Size (in points) for airport name labels (Default: 12)
+      airport_dot_size (float):                     Radius of a airport dot (Default: 2)
+      airport_color (name of standard color as string, hex color string or matplotlib color object): Color of the airport dot (Default: 'red')
+      airport_label_color (str):                    Color name or hex string for airport names (Default: 'white')
+      airport_zorder (int):                         Image layer for airports (Default: 8)
+      airpor port_bounding_box (BoundingBox or tuple/list of points): Bounding box for rendering airports within. (Default: None)
+      port_list (list(str)):                        Name or WPI index number of ports to render onto the map (Default: [])
+      port_label_size (int):                        Size (in points) for port name labels (Default: 12)
+      port_dot_size (int):                          radius of a port dot (Default: 2)
+      port_color (name of standard color as string, hex color string or matplotlib color object): Color of the port dot (Default: 'blue')
+      port_label_color (str):                       Color name or hex string for port names (Default: 'white')
+      port_zorder (int):                            Image layer for ports (Default: 8)
+      port_country (str):                           Name of country to render ports in. (Default: None)
+      port_water_body (str):                        Name of body of water to render ports on. (Default: None)
+      port_wpi_region (str):                        Name of WPI region to render ports in. (Default: None)
+      port_bounding_box (BoundingBox or tuple/list of points): Bounding box for rendering ports within. (Default: None)
+      port_and_country_seperate (bool):             Bool for searching the ports database for a port and not considering it's
+                                                    country to see if it's rendered. i.e. You want to render a port in the U.K.
+                                                    while rendering all ports in Japan. (Default: False)
+      shoreline_list (list(int)):                   GSHHS index number of the shoreline polygons to render (Default: [])
+      shoreline_color (name of standard color as string, hex color string or matplotlib color object): Color of the shoreline (Default: 'red')
+      shoreline_zorder (int):                       Image layer for shorelines (Default: 7)
+      shoreline_resolution (string):                Resolution of the shapes to pull from the shapefile. (Default: "low")
+      shoreline_level (string):                     See the docstring for build_shoreline_dict() for more information about levels. (Default: "L1")
+      shoreline_bounding_box (BoundingBox):         Bounding box for rendering shorelines within. (Default: None)
+      shoreline_fill_polygon (bool):                Whether or not to fill in the inside of the shoreline polygon (Default: True)
+      shoreline_fill_color (name of standard color as string, hex color string or matplotlib color object): Fill color of the shoreline (Default: 'red')
+      river_list (list(int)):                       WDBII index number of the river polygons to render (Default: [])
+      river_zorder (int):                           Image layer for rivers (Default: 7)
+      river_color (name of standard color as string, hex color string or matplotlib color object): Color of the river (Default: 'blue')
+      river_bounding_box (BoundingBox):             Bounding box for rendering rivers within. (Default: None)
+      river_resolution (string):                    Resolution of the shapes to pull from the shapefile. (Default: "low")
+      river_level (string):                         See the docstring for build_river_dict() for more information about levels. (Default: "L01")
+      border_color (name of standard color as string, hex color string or matplotlib color object): Color of the border (Default: 'green')
+      border_zorder (int):                          Image layer for border (Default: 7)
+      border_list (list(int)):                      WDBII index number of the border polygons to render (Default: [])
+      border_bounding_box (BoundingBox):            Bounding box for rendering borders within. (Default: None)
+      border_resolution (string):                   Resolution of the shapes to pull from the shapefile. (Default: "low")
+      border_level (string):                        See the docstring for build_border_dict() for more information about levels. (Default: "L1")
       country_resolution (str):                     Detail of country borders (Default: '10m')
       state_resolution (str):                       Detail of state borders (Default: '10m')
       coastline_resolution (str):                   Detail of coastlines (Default: '500m')
@@ -241,7 +344,16 @@ def terrestrial_map(map_name,
       map_global (bool):                            If True overrides map_bbox and uses the limits of the projection
       map_scale_length (float):                     Length of map scale indicator (in km) (Default: None)
       region_size (float):                          Size of region depicted around an airport (km width x km height) (Default: None)
+      country (str):                                Two character country code for city maps, full country name for port maps. Required if a port or city name matches multiple items.  (Default: None).
+      location (tuple, TrajectoryPoint, BasePoint): Location to search near, exclusively used for city maps (Default: None).
       axes (GeoAxes):                               Matplotlib axes to render into (Default: None)
+      cities_to_draw (int):                         Number of cities to draw (Default: 5)
+      draw_all_airports (bool):                     Draw all of the airports in the bounding box (Default: False)
+      draw_all_ports (bool):                        Draw all of the ports in the bounding box (Default: False)
+      draw_all_shorelines (bool):                   Draw all of the shorelines in the bounding box (Default: False)
+      draw_all_rivers (bool):                       Draw all of the shorelines in the bounding box (Default: False)
+      draw_all_borders (bool):                      Draw all of the borders in the bounding box (Default: False)
+      draw_arrows (bool):                           Whether or not to draw arrows from airport/port labels to corresponding dots (Default: True)
       kwargs (dict):                                Any other arguments to customize the generated map (Default: dict)
 
     Raises:
@@ -266,6 +378,8 @@ def terrestrial_map(map_name,
     else:
         map_axes = maps.predefined_map(
             map_name,
+            country=country,
+            location=location,
             region_size=region_size,
             projection=map_projection
             )
@@ -336,11 +450,111 @@ def terrestrial_map(map_name,
         artists.extend(
             decoration.draw_lonlat(
                 map_axes,
+                spacing=lonlat_spacing,
                 color=lonlat_color,
                 draw_labels=lonlat_labels,
                 linewidth=lonlat_linewidth,
                 zorder=lonlat_zorder
                 ))
+
+    if draw_airports:
+        artists.extend(
+            decoration.draw_airports(
+                map_axes,
+                airport_list=airport_list,
+                label_size=airport_label_size,
+                dot_size=airport_dot_size,
+                label_color=airport_label_color,
+                dot_color=airport_color,
+                zorder=airport_zorder,
+                map_name=map_name,
+                map_bbox=map_bbox,
+                airport_bounding_box=airport_bounding_box,
+                draw_all_airports=draw_all_airports,
+                draw_arrows=draw_arrows
+            ))
+
+    if draw_ports:
+        artists.extend(
+            decoration.draw_ports(
+                map_axes,
+                port_list=port_list,
+                label_size=port_label_size,
+                dot_size=port_dot_size,
+                label_color=port_label_color,
+                dot_color=port_color,
+                zorder=port_zorder,
+                map_name=map_name,
+                map_bbox=map_bbox,
+                country=port_country,
+                port_country=port_country,
+                port_water_body=port_water_body,
+                port_wpi_region=port_wpi_region,
+                port_bounding_box=port_bounding_box,
+                port_and_country_seperate=port_and_country_seperate,
+                draw_all_ports=draw_all_ports,
+                draw_arrows=draw_arrows
+            ))
+
+    if draw_shorelines:
+        artists.extend(
+            decoration.draw_shorelines(
+                map_axes,
+                zorder=shoreline_zorder,
+                map_bbox=map_bbox,
+                shoreline_list=shoreline_list,
+                shoreline_color=shoreline_color,
+                shoreline_bounding_box=shoreline_bounding_box,
+                shoreline_resolution=shoreline_resolution,
+                shoreline_level=shoreline_level,
+                draw_all_shorelines=draw_all_shorelines,
+                shoreline_fill_polygon=shoreline_fill_polygon,
+                shoreline_fill_color=shoreline_fill_color,
+            ))
+
+    if draw_rivers:
+        artists.extend(
+            decoration.draw_rivers(
+                map_axes,
+                zorder=river_zorder,
+                map_bbox=map_bbox,
+                river_list=river_list,
+                river_color=river_color,
+                river_bounding_box=river_bounding_box,
+                river_resolution=river_resolution,
+                river_level=river_level,
+                draw_all_rivers=draw_all_rivers
+            ))
+
+    if draw_borders:
+        artists.extend(
+            decoration.draw_borders(
+                map_axes,
+                zorder=border_zorder,
+                map_bbox=map_bbox,
+                border_list=border_list,
+                border_color=border_color,
+                border_bounding_box=border_bounding_box,
+                border_resolution=border_resolution,
+                border_level=border_level,
+                draw_all_borders=draw_all_borders
+            ))
+
+    if draw_cities:
+        artists.extend(
+            decoration.draw_cities(
+                map_axes,
+                cities_to_draw,
+                label_size=city_label_size,
+                dot_size=city_dot_size,
+                label_color=city_label_color,
+                dot_color=city_dot_color,
+                zorder=city_zorder,
+                map_name=map_name,
+                map_bbox=map_bbox,
+                country=country,
+                location=location
+            ))
 
     if draw_largest_cities is not None:
         artists.extend(

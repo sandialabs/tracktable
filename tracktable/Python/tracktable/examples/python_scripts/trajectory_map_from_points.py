@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -98,19 +98,17 @@ trajectories as well.
 
 from __future__ import print_function
 
-import datetime
 import itertools
 import logging
 import sys
 
 import numpy
 
-import tracktable.domain
 from tracktable.core import geomath
 from tracktable.feature import annotations
 from tracktable.render.map_processing import paths
 from tracktable.render import render_map
-from tracktable.applications.assemble_trajectories import AssembleTrajectoryFromPoints
+from tracktable.rw.load import load_trajectories
 from tracktable.script_helpers import argument_groups, argparse, n_at_a_time
 
 import matplotlib
@@ -122,55 +120,6 @@ matplotlib.use('Agg')
 # we do anything with the toolkit.  The #noqa comment is to tell
 # flake8, the Python style checker, that we really did mean to do this.
 from matplotlib import pyplot # noqa
-
-# ----------------------------------------------------------------------
-
-
-def assemble_trajectories(point_source,
-                          separation_distance=1000,
-                          separation_time=datetime.timedelta(hours=24),
-                          minimum_length=2):
-    """Assemble a sequence of points into trajectories
-
-    This function will instantiate and configure a `tracktable.applications.
-    assemble_trajectories. AssembleTrajectoryFromPoints` to convert a sequence
-    of points into a sequence of trajectories.
-
-    You must specify an iterable of points.  You can also specify
-    parameters that determine when a series of points with the
-    same object ID will be cut into separate trajectories and the
-    minimum number of points a trajectory must have in order to
-    be worthy of consideration.
-
-    Note:
-        This function does not actually build the trajectories.  It
-        only sets up the pipeline to generate them.  Assembly does
-        not happen until you start to pull elements from the iterable
-        that gets returned.
-
-    Arguments:
-        point_source {iterable} -- Sequence of points to assemble
-
-    Keyword Arguments:
-        separation_distance {float} -- Points with the same object ID
-            that are at least this far apart will be used as the end
-            of one trajectory and the beginning of the next.  Defaults
-            to 1000 (km in terrestrial domain, units in cartesian2d).
-        separation_time {datetime.timedelta} -- Points with the same
-            object ID that have timestamps at least this far apart will
-            be used as the end of one trajectory and the beginning of
-            the next.  Defaults to 24 hours.
-        minimum_length {integer} -- Trajectories with fewer than this
-            many points will be discarded.  (default: 2)
-    """
-
-    assembler = AssembleTrajectoryFromPoints()
-    assembler.input = point_source
-    assembler.separation_distance = separation_distance
-    assembler.separation_time = separation_time
-    assembler.minimum_length = minimum_length
-
-    return assembler
 
 # ----------------------------------------------------------------------
 
@@ -462,181 +411,6 @@ def render_annotated_trajectories(trajectories,
 # --------------------------------------------------------------------
 
 
-def trajectories_from_point_file(infile,
-                                 object_id_column=0,
-                                 timestamp_column=1,
-                                 coordinate0_column=2,
-                                 coordinate1_column=3,
-                                 string_fields=None,
-                                 real_fields=None,
-                                 time_fields=None,
-                                 comment_character='#',
-                                 field_delimiter=',',
-                                 separation_distance=None,
-                                 separation_time=None,
-                                 minimum_length=2,
-                                 domain='terrestrial'):
-    """Load points from a file and assemble them into trajectories
-
-    This function encapsulates the pipeline that loads points from a
-    delimited text file, turns them into TrajectoryPoints, then
-    assembles trajectories from those points.
-
-    Note that timestamps must have the format "YYYY-mm-dd HH:MM:SS".
-    For example, December 10, 2001 at 12:34:56 PM would be
-    "2001-12-10 12:34:56".
-
-    Arguments:
-        infile {file-like object} -- Input source for points
-
-    Keyword Arguments:
-        object_id_column {integer} -- Column in file containing
-            object ID (default: 0)
-        timestamp_column {integer} -- Column in file containing
-            timestamp (default: 1)
-        coordinate0_column {integer} -- Column in file containing
-            longitude or X coordinate (default: 2)
-        coordinate1_column {integer} -- Column in file containing
-            latitude or Y coordinate (default: 3)
-        string_fields {dict} -- Mapping from field name to column
-            number for columns containing string metadata (default: None)
-        real_fields {dict} -- Mapping from field name to column
-            number for columns containing numeric metadata (default: None)
-        time_fields {dict} -- Mapping from field name to column number
-            for columns containing timestamp metadata (default: None)
-        comment_character {str} -- Lines in the input file that start
-            with this character will be ignored (default: '#')
-        field_delimiter {str} -- This character will be used as the
-            separator between fields in a file (default: ',')
-        domain {str} -- Point domain for data to be rendered.  Must be
-            either 'terrestrial' or 'cartesian2d'.  (default: 'terrestrial')
-
-    Returns:
-        Iterable of trajectories.
-
-    Raises:
-        ValueError: comment character string or field delimiter string are
-            not 1 character long, or domain is not 'terrestrial' or
-            'cartesian2d'
-    """
-
-    if len(comment_character) != 1:
-        raise ValueError(('trajectories_from_point_file: Comment character '
-                          'string must be 1 character long.  You supplied'
-                          '"{}".'.format(comment_character)))
-    if len(field_delimiter) != 1:
-        raise ValueError(('trajectories_from_point_file: Field delimiter '
-                          'string must be 1 character long.  You supplied '
-                          '"{}".').format(field_delimiter))
-    if domain not in ['terrestrial', 'cartesian2d']:
-        raise ValueError(('trajectories_from_point_file: Point domain must '
-                          'be either "terrestrial" or "cartesian2d".  You '
-                          'supplied "{}".').format(domain))
-
-    point_source = trajectory_points_from_file(
-                          infile,
-                          object_id_column,
-                          timestamp_column,
-                          coordinate0_column,
-                          coordinate1_column,
-                          string_fields=string_fields,
-                          real_fields=real_fields,
-                          time_fields=time_fields,
-                          comment_character=comment_character,
-                          field_delimiter=field_delimiter,
-                          domain=domain)
-
-    trajectory_source = assemble_trajectories(
-            point_source,
-            separation_distance=separation_distance,
-            separation_time=separation_time,
-            minimum_length=minimum_length)
-
-    return trajectory_source
-
-
-# ---------------------------------------------------------------------
-
-
-def trajectory_points_from_file(
-      infile,
-      object_id_column,
-      timestamp_column,
-      coordinate0_column,
-      coordinate1_column,
-      string_fields=None,
-      real_fields=None,
-      time_fields=None,
-      comment_character='#',
-      field_delimiter=',',
-      domain='terrestrial'
-      ):
-    """points_from_file: Load a list of points from a delimited text file
-
-    Use tracktable.domain.<domain>.BasePointReader to read points from a file.
-    Results are returned as an iterable.
-
-    Note:
-        You can only iterate over the resulting point sequence once.  If you
-        need to do more than that, save the points in a list:
-
-    >>> all_points = list(points_from_file(infile, 2, 3))
-
-    Note:
-        The function 'extract_field_assignments_from_arguments' will help
-        you pull out real_fields, string_fields, and time_fields from a
-        set of parsed arguments.
-
-    Arguments:
-        infile {file-like object}: Data source for points
-        object_id_column {int}: Column in file containing object ID
-        timestamp_column {int}: Column in file containing timestamps for points
-        coordinate0_column {int}: Column in file for x/longitude
-        coordinate1_column {int}: Column in file for y/latitude
-
-    Keyword Arguments:
-        string_fields {dict, string->int}: Columns in the input file that we
-            want to add to points as string properties.  The keys in this
-            dict should be the name of the field and the values should be the
-            integer column IDs (first column is 0).
-        real_fields {dict, string->int}: Columns in the input file that we
-            want to add to points as real-valued properties.  The keys in this
-            dict should be the name of the field and the values should be the
-            integer column IDs (first column is 0).
-        time_fields {dict, string->int}: Columns in the input file that we
-            want to add to points as timestamp-valued properties.  The keys in
-            this dict should be the name of the field and the values should be
-            the integer column IDs (first column is 0).
-        comment_character {single-character string}: Ignore lines in the input
-            that have this as the first non-whitespace character.  Defaults to
-            '#'.
-        field_delimiter {single-character string}: This character is the field
-            separator in the input and must be escaped inside strings.
-            Defaults to ','.
-        domain {(}string naming point domain}: Must be either 'terrestrial' or
-            'cartesian2d' depending on whether your points are
-            longitude/latitude or arbitrary Cartesian coordinates.  Defaults
-            to 'terrestrial'.
-
-    Returns:
-        Iterable of tracktable.domain.<domain>.TrajectoryPoints.
-    """
-    domain_module = tracktable.domain.domain_module_from_name(domain)
-    reader_type = getattr(domain_module, 'TrajectoryPointReader')
-    reader = reader_type()
-    reader.input = infile
-    reader.object_id_column = object_id_column
-    reader.timestamp_column = timestamp_column
-    reader.coordinates[0] = coordinate0_column
-    reader.coordinates[1] = coordinate1_column
-    reader.comment_character = comment_character
-    reader.field_delimiter = field_delimiter
-
-    return reader
-
-# ---------------------------------------------------------------------
-
-
 def _make_tapered_linewidth_generator(initial_linewidth,
                                       final_linewidth):
 
@@ -759,28 +533,27 @@ def main():
     point_filename = args.point_data_file[0]
     field_assignments = extract_field_assignments(vars(args))
 
-    with open(point_filename, 'r') as infile:
-        logger.info('Loading points and building trajectories.')
-        trajectories = list(
-            trajectories_from_point_file(
-                infile,
-                object_id_column=args.object_id_column,
-                timestamp_column=args.timestamp_column,
-                coordinate0_column=args.coordinate0,
-                coordinate1_column=args.coordinate1,
-                string_fields=field_assignments['string'],
-                real_fields=field_assignments['real'],
-                time_fields=field_assignments['time'],
-                comment_character=args.comment_character,
-                field_delimiter=args.delimiter,
-                separation_distance=args.separation_distance,
-                separation_time=datetime.timedelta(minutes=args.separation_time),
-                minimum_length=args.minimum_length,
-                domain=args.domain)
-            )
-        # Add the 'progress' annotation to all of our trajectories so
-        # we have some way to color them
-        trajectories = [annotations.progress(t) for t in trajectories]
+    logger.info('Loading points and building trajectories.')
+    trajectories = load_trajectories(point_filename,
+        comment_character=args.comment_character,
+        domain=args.domain,
+        field_delimiter=args.delimiter,
+        object_id_column=args.object_id_column,
+        timestamp_column=args.timestamp_column,
+        longitude_column=args.coordinate0,
+        latitude_column=args.coordinate1,
+        real_fields = field_assignments['real'],
+        string_fields = field_assignments['string'],
+        time_fields = field_assignments['time'],
+        separation_distance = args.separation_distance, # km
+        separation_time = args.separation_time, # minutes
+        minimum_length = args.minimum_length, # points
+        return_list=True
+        )
+
+    # Add the 'progress' annotation to all of our trajectories so
+    # we have some way to color them
+    trajectories = [annotations.progress(t) for t in trajectories]
 
     # We can compute the bounding box for Cartesian data automatically.
     # We don't need to do so for terrestrial data because the map will

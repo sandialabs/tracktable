@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -31,31 +31,37 @@
 tracktable.applications.tutorial_helpers - Helper functions to assist the jupyter notebook tutorials
 """
 
-import os.path
 from datetime import timedelta
 
+import folium as fol
 from numpy import zeros
 from tracktable.applications.assemble_trajectories import \
     AssembleTrajectoryFromPoints
 from tracktable.applications.trajectory_splitter import split_when_idle
-from tracktable.core import data_directory
 from tracktable.core.geomath import (convex_hull_area, end_to_end_distance,
                                      length, speed_between)
-from tracktable.domain.terrestrial import (TrajectoryPointReader,
-                                           TrajectoryReader)
+from tracktable.domain.terrestrial import TrajectoryPointReader
 from tracktable.render import render_map
 from tracktable.render.map_processing import maps
+from tracktable_data.data import retrieve
+from tracktable.rw.load import load_trajectories
 
 # TODO: Error handling throughout.
 
-SAMPLE_DATA_FILENAMES = {'tutorial-csv': os.path.join(data_directory(),'NYHarbor_2020_06_30_first_hour.csv'),
-                         'tutorial-traj': os.path.join(data_directory(),'NYHarbor_2020_06_30_first_hour.traj'),
-                         'tutorial-static-viz': os.path.join(data_directory(), 'SampleTrajectories.traj'),
-                         'rendezvous': os.path.join(data_directory(),'VirginiaBeach_2020_06_04_to_06_filtered.traj'),
-                         'boxiness': os.path.join(data_directory(),'VirginiaBeach_2020_06_04_to_06_filtered.traj'),
-                         'shape': os.path.join(data_directory(),'US_coastal_2020_06_30.traj'),
-                         'anomaly-historical': os.path.join(data_directory(),'NYHarbor_2020_12_first_week.traj'),
-                         'anomaly-test': os.path.join(data_directory(),'NYHarbor_2020_12_08.traj')
+SAMPLE_DATA_FILENAMES = {'tutorial-csv': retrieve('NYHarbor_2020_06_30_first_hour.csv'),
+                         'tutorial-traj': retrieve('NYHarbor_2020_06_30_first_hour.traj'),
+                         'tutorial-static-viz': retrieve( 'SampleTrajectories.traj'),
+                         'rendezvous': retrieve('VirginiaBeach_2020_06_04_to_06_filtered.traj'),
+                         'boxiness': retrieve('VirginiaBeach_2020_06_04_to_06_filtered.traj'),
+                         'shape': retrieve('US_coastal_2020_06_30.traj'),
+                         'anomaly-historical': retrieve('NYHarbor_2020_12_first_week.traj'),
+                         'anomaly-test': retrieve('NYHarbor_2020_12_08.traj'),
+                         'global-flights': retrieve('SampleTrajectories.csv'),
+                         'global-flights-traj': retrieve('SampleTrajectories.traj'),
+                         'one-flight': retrieve('SampleFlight.csv'),
+                         'two-flights': retrieve('TwoSampleFlights.csv'),
+                         'us-flights': retrieve('SampleFlightsUS.csv'),
+
                         }
 
 
@@ -72,24 +78,16 @@ def create_point_reader(filename=SAMPLE_DATA_FILENAMES['tutorial-csv'],
                         string_fields={'vessel-name': 7},
                         time_fields={'eta': 17}):
 
-    # set up the reader to match the file structure
-    reader = TrajectoryPointReader()
-    reader.input = open(filename, 'r')
-
-    # required columns
-    reader.object_id_column = object_id_column
-    reader.timestamp_column = timestamp_column
-    reader.coordinates[0] = longitude_column
-    reader.coordinates[1] = latitude_column
-
-    for name, column_num in real_fields.items():
-        reader.set_real_field_column(name, column_num)
-
-    for name, column_num in string_fields.items():
-        reader.set_string_field_column(name, column_num)
-
-    for name, column_num in time_fields.items():
-        reader.set_time_field_column(name, column_num)
+    reader = load_trajectories(filename,
+                      object_id_column=object_id_column,
+                      timestamp_column=timestamp_column,
+                      longitude_column=longitude_column,
+                      latitude_column=latitude_column,
+                      real_fields=real_fields,
+                      string_fields=string_fields,
+                      time_fields=time_fields,
+                      return_trajectory_points=True,
+                      return_list=False)
 
     return reader
 
@@ -103,42 +101,29 @@ def get_trajectory_list_from_csv(filename=SAMPLE_DATA_FILENAMES['tutorial-csv'],
                                  string_fields={'vessel-name': 7},
                                  time_fields={'eta': 17},
                                  separation_distance=10, # km
-                                 separation_time=timedelta(minutes=20),
+                                 separation_time=20,
                                  minimum_length=5 # points
                                 ):
 
-    # create the reader using Tracktable sample data
-    reader = create_point_reader(filename=filename,
-                                 object_id_column=object_id_column,
-                                 timestamp_column=timestamp_column,
-                                 longitude_column=longitude_column,
-                                 latitude_column=latitude_column,
-                                 real_fields=real_fields,
-                                 string_fields=string_fields,
-                                 time_fields=time_fields)
+    builder = load_trajectories(filename,
+                      object_id_column=object_id_column,
+                      timestamp_column=timestamp_column,
+                      longitude_column=longitude_column,
+                      latitude_column=latitude_column,
+                      real_fields=real_fields,
+                      string_fields=string_fields,
+                      time_fields=time_fields,
+                      separation_distance=separation_distance,
+                      separation_time=separation_time,
+                      minimum_length=minimum_length
+                    )
 
-    # create the builder object
-    builder = AssembleTrajectoryFromPoints()
-    builder.input = reader
-
-    # specify optional builder parameters
-    builder.separation_distance = separation_distance # km
-    builder.separation_time = separation_time
-    builder.minimum_length = minimum_length # points
-
-    # assemble trajectories
-    return list(builder)
+    return builder
 
 
 def get_trajectory_list(dataset='tutorial-traj'):
 
-    with open(SAMPLE_DATA_FILENAMES[dataset], 'r') as traj_file:
-        # create a Tracktable TrajectoryReader object
-        reader = TrajectoryReader()
-        # tell it where to find the traj file
-        reader.input = traj_file
-        # import the list of trajectories
-        return list(reader)
+    return load_trajectories(SAMPLE_DATA_FILENAMES[dataset])
 
 
 def count_points(trajectories):
@@ -274,3 +259,11 @@ def filter_trajectories(trajectories,
                 (min_average_speed <= speed_between(trajectory[0], trajectory[-1]) <= max_average_speed) and
                 (min_convex_hull_area <= convex_hull_area(trajectory) <= max_convex_hull_area) and
                 (min_straightness <= end_to_end_distance(trajectory) / length(trajectory) <= max_straightness))]
+
+def generate_blank_folium_map(bbox=None, **kwargs):
+    map = fol.Map(**kwargs)
+    if bbox:
+        map.fit_bounds(bbox)
+        return map
+    else:
+        return map

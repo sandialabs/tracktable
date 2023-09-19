@@ -1,27 +1,53 @@
+<!-- Tracktable Bug Report Template -->
+
+<!-- Please fill out the following sections to the best of your abilities -->
+
 <!-- 
-    Template for Tracktable bug report
+    If you have questions or concerns after you create this bug report add 
+    the `Waiting on Andy` or `Waiting on Michael` label to the report and 
+    we will drop in and see how we can help. The label dropdown can be found
+    below this text box or on the right side of the screen after this report has
+    be created.
 -->
 
-### What is the problem?
+### What issue/bug are you encountering?
 
 <!--
-    Example: Python interpreter crashes on startup.
+    Example: Tracktable fails to import.
 -->
 
-### How do you reproduce it?
+
+### How do you reproduce the issue/bug?
 
 <!-- 
-    If at all possible, include a code sample either inline or as an attachment to the issue.  Remember not to upload any OUO.
+    REMEMBER NOT TO UPLOAD ANY OUO!
 
-    For example:
-    ```
-    >>> import tracktable
+    If at all possible, please include a code sample either inline or as an attachment to the issue.  
+    If data files are involved, please attach a small (<1MB) file.
+
+    For inline code examples PLEASE use one of the following formats so your code
+    is rendered correctly with syntax highlighting.
+    
+    Example Python Code Snippet:
+    ----------------------------
+    ```python
+    print("Hello World!")
     ```
 
-    If data files are involved, please attach a small (<1MB) file
+    Example C++ Code Snippet:
+    ```cpp
+    cout >> "Hello World!"
+    ```
+
+    Example Console Code Snippet:
+    ```console
+    echo "Hello World!"
+    ```
+
 -->
 
-### Severity, from 1 (highest) to 5 (lowest)
+
+### What is the severity of the issue/bug on a scale of 1 (highest) to 5 (lowest)?
 
 <!--
     Meanings of each level:
@@ -31,18 +57,67 @@
     3. I cannot make progress on my project because of this bug
     4. I can work around this bug with difficulty
     5. I can work around this bug easily
+
+    Please place an `X` in one of the following boxes to indicate the severity level.
+    The box should look like `[X]` NOT `[X ]`,`[ X]` or `[ X ]`
 -->
 
-### What operating system and Python version are you using?
+- [ ] Urgent (**Only use this checkbox and the accompanying label if you need to attention of the *entire* engineering team immediately**)
+- [ ] Level 1 (Highest)  
+- [ ] Level 2   
+- [ ] Level 3 
+- [ ] Level 4  
+- [ ] Level 5 (Lowest)  
+
+### What operating system are you using?
 
 <!-- 
-    Example: Linux; Python 3.8 via Anaconda
+    Please place an `X` in one of the following boxes to indicate the severity level.
+    The box should look like `[X]` NOT `[X ]`,`[ X]` or `[ X ]`
 -->
 
-### What version of Tracktable are you using?
+- [ ] Linux
+- [ ] MacOS   
+- [ ] Windows 
 
-<!--
-    Examples:
-        Tracktable 1.3.0, installed via pip
-        Tracktable Develop, built from source on 2020/06/10
+### What Python version are you using?
+
+<!-- 
+    Please place an `X` in one of the following boxes to indicate the severity level.
+    The box should look like `[X]` NOT `[X ]`,`[ X]` or `[ X ]`
 -->
+
+- [ ] 3.5
+- [ ] 3.6   
+- [ ] 3.7 
+- [ ] 3.8 
+- [ ] 3.9 
+- [ ] 3.10 
+
+### What Tracktable version are you using?
+
+<!-- 
+    Please place an `X` in one of the following boxes to indicate the severity level.
+    The box should look like `[X]` NOT `[X ]`,`[ X]` or `[ X ]`
+-->
+
+- [ ] From Source (Please provide branch name, version number and date of build)
+- [ ] 1.2   
+- [ ] 1.3 
+- [ ] 1.4 
+- [ ] 1.5 
+- [ ] 1.6 
+- [ ] 1.7
+- [ ] Other 
+
+### Where did you install Tracktable from?
+
+<!-- 
+    Please place an `X` in one of the following boxes to indicate the severity level.
+    The box should look like `[X]` NOT `[X ]`,`[ X]` or `[ X ]`
+-->
+
+- [ ] Pypi
+- [ ] Conda-Forge  
+- [ ] Nightly (Please provide build date)
+- [ ] Internal Development (Please provide build date)

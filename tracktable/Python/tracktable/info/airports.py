@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -19,7 +19,7 @@
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
 # "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
 # LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# A PARTICULAR PURPOSE ARE DISCLA IMED. IN NO EVENT SHALL THE COPYRIGHT
 # HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
 # SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
 # LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
@@ -29,18 +29,16 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-from __future__ import print_function, absolute_import, division
+from __future__ import absolute_import, division, print_function
+
 import operator
 import os
 import os.path
-
 from csv import DictReader
+from tracktable_data.data import retrieve
 
-# if sys.version_info[0] > 2:
-#     pass # python 3
-# else:
-# #    from tracktable.core.compatibility import open_backport as open
-#     from tracktable.core.compatibility import UTF8Recoder, UnicodeReader
+from tracktable.core.geomath import intersects
+from tracktable.domain.terrestrial import TrajectoryPoint
 
 class Airport(object):
     """Information about a single airport
@@ -93,7 +91,6 @@ def build_airport_dict():
     else:
         AIRPORT_DICT = dict()
 
-        data_filename = '%s/data/airports.csv' % os.path.dirname(__file__)
         openflight_field_names = [ 'numeric_id',
                                    'name',
                                    'city',
@@ -106,7 +103,7 @@ def build_airport_dict():
                                    'utc_offset',
                                    'daylight_savings' ]
 
-        with open(data_filename, mode='r', encoding='utf-8') as infile:
+        with open(retrieve('airports.csv'), mode='r', encoding='utf-8') as infile:
 #        with open(data_filename, mode='r') as infile:
             csvreader = DictReader(
                 infile,
@@ -140,7 +137,7 @@ def build_airport_dict():
 
             # now we add traffic information - rank each airport by
             # the amount of traffic it sees in some arbitrary period
-            from tracktable.info.data.airport_traffic import AIRPORTS_BY_TRAFFIC
+            from tracktable_data.python_info_data.airport_traffic import AIRPORTS_BY_TRAFFIC
             airports_with_traffic = sorted(AIRPORTS_BY_TRAFFIC.items(),
                                            key=operator.itemgetter(1),
                                            reverse=True)
@@ -205,6 +202,30 @@ def all_airports():
         build_airport_dict()
 
     return list(set(AIRPORT_DICT.values()))
+
+# ----------------------------------------------------------------------
+
+def all_airports_within_bounding_box(bounding_box):
+  """Return all the airport records we have from a given bounding box.
+
+  Args:
+    bounding_box (str): Bounding box to return all airports from.
+
+  Returns:
+    Dictionary of airports from the given bounding box.
+  """
+
+  global AIRPORT_DICT
+
+  if len(AIRPORT_DICT) == 0:
+      build_airport_dict()
+
+  airports = {}
+  for airport_name, airport in AIRPORT_DICT.items():
+    if intersects(TrajectoryPoint(airport.position[0], airport.position[1]), bounding_box):
+      airports[airport_name] = airport
+
+  return airports
 
 # ----------------------------------------------------------------------
 

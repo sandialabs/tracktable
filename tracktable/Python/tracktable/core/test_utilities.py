@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -117,10 +117,10 @@ def image_shifter(imageA, imageB):
     """
     npImgA = np.array(imageA)
     npImgB = np.array(imageB)
-    
+
     num_rows, num_cols, num_chan = npImgA.shape
     r_mat = np.zeros((9, num_rows-2, num_cols-2, num_chan), dtype=float)
-    
+
     #affine translation matrices:
     xform = np.zeros((8, 2, 3), dtype=np.float32)
     xform[0] = np.array([ [1,0,0], [0,1,1] ])   # up
@@ -133,7 +133,7 @@ def image_shifter(imageA, imageB):
     xform[7] = np.array([ [1,0,1], [0,1,1] ])   # left up
 
     # Image translations
-    img_x = np.zeros((8, num_rows, num_cols, num_chan), dtype=np.uint8)  
+    img_x = np.zeros((8, num_rows, num_cols, num_chan), dtype=np.uint8)
     for i in range(8):
         tmpImg = imageB
         img_x[i] = np.array(tmpImg.transform((num_cols, num_rows),
@@ -147,7 +147,6 @@ def image_shifter(imageA, imageB):
         r_mat[i+1] = img_x[i, 1:num_rows-1, 1:num_cols-1]
 
     return r_mat
-        
 # ----------------------------------------------------------------------
 
 def image_pCorr(imageA, imageB):
@@ -355,6 +354,7 @@ def compare_html_docs(expected, actual, ignore_uuids=False):
                 expected_html_doc = re.sub('poly_line_................................', 'poly_line_', expected_html_doc)
                 expected_html_doc = re.sub('html_................................', 'html_', expected_html_doc)
                 expected_html_doc = re.sub('tile_layer_................................', 'tile_layer_', expected_html_doc)
+                expected_html_doc = re.sub('timestamped_geo_json_................................', 'timestamped_geo_json_', expected_html_doc)
 
                 actual_html_doc = re.sub('map_................................', 'map_', actual_html_doc)
                 actual_html_doc = re.sub('popup_................................', 'popup_', actual_html_doc)
@@ -362,6 +362,7 @@ def compare_html_docs(expected, actual, ignore_uuids=False):
                 actual_html_doc = re.sub('poly_line_................................', 'poly_line_', actual_html_doc)
                 actual_html_doc = re.sub('html_................................', 'html_', actual_html_doc)
                 actual_html_doc = re.sub('tile_layer_................................', 'tile_layer_', actual_html_doc)
+                actual_html_doc = re.sub('timestamped_geo_json_................................', 'timestamped_geo_json_', actual_html_doc)
             expected_html_lines = [line for line in expected_html_doc.split('\n')]
             actual_html_lines = [line for line in actual_html_doc.split('\n')]
             #differ = difflib.Differ()

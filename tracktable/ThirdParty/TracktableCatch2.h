@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 National Technology and Engineering
+ * Copyright (c) 2014-2023 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -397,12 +397,11 @@ namespace {
 
     char const * dashed_line =
     "--------------------------------------------------------------------------";
-    
     struct MyListener : Catch::TestEventListenerBase {
 
         using TestEventListenerBase::TestEventListenerBase; // inherit constructor
 
-        void testRunEnded(Catch::TestRunStats const& testRunStats) override {  
+        void testRunEnded(Catch::TestRunStats const& testRunStats) override {
             printTotalsDivider(testRunStats.totals);
             printTotals(testRunStats.totals);
         }
@@ -425,7 +424,6 @@ namespace {
                     std::cout << "with expansion:\n"
                         << "\t" << assertionStats.assertionResult.getExpandedExpression() << "\n";
                 std::cout << std::endl << dashed_line << std::endl;
-                
             }
             return true;
         }

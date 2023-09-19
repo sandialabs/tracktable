@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2014-2021 National Technology and Engineering
+* Copyright (c) 2014-2023 National Technology and Engineering
 * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 * with National Technology and Engineering Solutions of Sandia, LLC,
 * the U.S. Government retains certain rights in this software.
@@ -72,7 +72,6 @@ template< typename T >
 struct CityPointsAndTrajectories {
 
     CityPointsAndTrajectories() {
-        
         albuquerque = T(abq_coords);
         el_paso = T(ep_coords);
         houston = T(hou_coords);
@@ -99,12 +98,12 @@ struct CityPointsAndTrajectories {
 TEMPLATE_TEST_CASE_METHOD(CityPointsAndTrajectories, "Testing LatLon Based Point Distance", "[latlon point]", LonLatPoint, TrajectoryPointLonLat) {
 
     SECTION("albuquerque to el_paso ") {
-        CHECK(conversions::radians_to_km(distance(CityPointsAndTrajectories<TestType>::albuquerque, 
+        CHECK(conversions::radians_to_km(distance(CityPointsAndTrajectories<TestType>::albuquerque,
                                                     CityPointsAndTrajectories<TestType>::el_paso)) == Approx(369.764));
     }
 
     SECTION("albuquerque to houston ") {
-        CHECK(conversions::radians_to_km(distance(CityPointsAndTrajectories<TestType>::albuquerque, 
+        CHECK(conversions::radians_to_km(distance(CityPointsAndTrajectories<TestType>::albuquerque,
                                                     CityPointsAndTrajectories<TestType>::houston)) == Approx(3104.256));
     }
 }
@@ -121,7 +120,7 @@ TEMPLATE_TEST_CASE_METHOD(CityPointsAndTrajectories, "Testing Terrestrial Based 
 }
 
 TEMPLATE_TEST_CASE_METHOD(CityPointsAndTrajectories, "Testing LatLon Based Point to Trajectory Distance", "[latlon point trajectory]", LonLatPoint, TrajectoryPointLonLat) {
- 
+
     SECTION("point to trajectory ") {
         CHECK(conversions::radians_to_km(distance(CityPointsAndTrajectories<TestType>::albuquerque, CityPointsAndTrajectories<TestType>::sa_to_hou)) == Approx(975.674));
     }

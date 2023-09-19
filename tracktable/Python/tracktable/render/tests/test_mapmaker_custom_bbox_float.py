@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -43,7 +43,7 @@ matplotlib.use('Agg')
 
 def test_florida_map(ground_truth_dir,
                      test_output_dir,
-                     image_filename='CustomBboxMap.png'):
+                     image_filename='CustomBboxFloatMap.png'):
 
     pyplot.figure(figsize=(8, 8))
     # This is approximately Florida

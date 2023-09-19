@@ -7,6 +7,7 @@ Documentation/examples/tmp_my_tracks.html
 Documentation/examples/tmp_my_tracks.png
 Documentation/examples/trajs*
 Documentation/examples/myfig*.*
+Documentation/examples/demo_images/
 .ipnyb_checkpoints
 *-checkpoint.ipynb
 __pycache__
@@ -18,4 +19,11 @@ __pycache__
 /doxygen/
 /build_ubuntu2004/
 /build_macos/
+tracktable/Python/tracktable/examples/analytic_demos/demo_images
+tracktable/Python/tracktable/examples/analytic_demos/*.ipynb
+tracktable/Python/tracktable/examples/tutorials/*.ipynb
 Documentation/examples/demo_images/
+.mypy_cache
+sandbox.*
+scratchpad.*
+*.mp4

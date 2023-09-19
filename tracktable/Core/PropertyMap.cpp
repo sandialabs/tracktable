@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 National Technology and Engineering
+ * Copyright (c) 2014-2023 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -114,6 +114,17 @@ void set_property(PropertyMap& properties, string_type const& name, string_type 
  * @param[in] value       Timestamp value to store
  */
 void set_property(PropertyMap& properties, string_type const& name, Timestamp const& value)
+{
+  properties[name] = PropertyValueT(value);
+}
+
+/*! \brief Set a property in a collection
+ *
+ * @param[in] properties  Property map to alter
+ * @param[in] name        Name of property to change
+ * @param[in] value       NullValue value to store
+ */
+void set_property(PropertyMap& properties, string_type const& name, NullValue const& value)
 {
   properties[name] = PropertyValueT(value);
 }
@@ -414,6 +425,59 @@ Timestamp timestamp_property(PropertyMap const& properties, string_type const& n
 
 // ----------------------------------------------------------------------
 
+/*! \brief Retrieve a null property
+ *
+ * This accessor will let you retrieve the value of a null
+ * property. The catch is that we don't know whether or not the
+ * property is there to begin with.  If it isn't there then we can't
+ * return anything sensible.
+ *
+ * We deal with this by letting you pass in an optional pointer to a
+ * boolean.  We will set its value to true or false depending on
+ * whether or not we found the property you wanted.  If it is true,
+ * the return value is guaranteed to be whatever is in the map.  If it
+ * is false, the return value will be uninitialized.
+ *
+ * \note For the purposes of this function, a property that is present
+ *       but that has the wrong type is the same as a property that is
+ *       not present in the map.
+ *
+ * @param[in] properties   Property map to interrogate
+ * @param[in] name         Name of property to find
+ * @param     is_present   Pointer to boolean
+ * @return    Value of desired property (if present)
+ */
+
+NullValue nullvalue_property(PropertyMap const& properties, string_type const& name, bool* is_present)
+{
+  bool is_it_there;
+  PropertyValueT tuple_value = property(properties, name, &is_it_there);
+
+  if (is_it_there)
+    {
+    try
+      {
+      if (is_present) *is_present = true;
+      return boost::get<NullValue>(tuple_value);
+      }
+    catch (boost::bad_get e)
+      {
+      TRACKTABLE_LOG(log::warning)
+        << "PropertyMap: Property '"
+        << name << "' is present but is not a nullvalue";
+      if (is_present) *is_present = false;
+      return NullValue();
+      }
+    }
+  else
+    {
+    if (is_present) *is_present = false;
+    return NullValue();
+    }
+}
+
+// ----------------------------------------------------------------------
+
 /*! \brief Retrieve a property or some default value.
  *
  * This method of retrieving a named property will never fail or throw
@@ -540,6 +604,32 @@ Timestamp timestamp_property_with_default(
 )
 {
   return ::typed_property_with_default<Timestamp>(properties, name, default_value);
+}
+
+// ----------------------------------------------------------------------
+
+/*! \brief Retrieve a nullvalue property or some default value.
+ *
+ * This method of retrieving a named property will never fail or throw
+ * an exception.  You will either get back the value of the property
+ * you requested as your desired type or else you will get back your
+ * default value.
+ *
+ * @param[in] properties     Property map for lookup
+ * @param[in] name           Name of property to retrieve
+ * @param[in] default_value  Value to return if property is not present
+ *
+ * \note A property that is present but not numeric is treated as if
+ *       the property were not present at all.
+ */
+
+NullValue nullvalue_property_with_default(
+  PropertyMap const& properties,
+  string_type const& name,
+  NullValue const& default_value
+)
+{
+  return ::typed_property_with_default<NullValue>(properties, name, default_value);
 }
 
 // ----------------------------------------------------------------------

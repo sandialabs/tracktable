@@ -1,11 +1,258 @@
-compile-win:
+#############################
+# Windows 10 CI/CD Pipeline #
+#############################
+
+.windows-ci-before-script: &windows-ci-before-script
+  # - call activate tracktable-windows-ci-py36
+  # - call activate tracktable-windows-ci-py37
+  # - call activate tracktable-windows-ci-py38
+  - call activate tracktable-windows-ci-py39
+  # - call activate tracktable-windows-ci-py310
+
+windows-setup:
+  stage: setup
+  tags:
+    - windows
+  # TODO: Figure out how to skip the pipeline, this rule doesn't work for some reason
+  # rules:
+  #   - if: $SKIP_NORMAL_PIPELINE && $SKIP_NORMAL_PIPELINE == "true"
+  #     when: never
+  before_script:
+    - *windows-ci-before-script
+  script:
+    - echo $SKIP_NORMAL_PIPELINE
+    - mkdir build_windows
+  artifacts:
+    paths:
+      - build_windows
+    expire_in: 1 hour
+  retry: 1
+
+windows-configure:
+  stage: configure
+  tags:
+    - windows
+  dependencies:
+    - windows-setup
+  needs:
+    - job: windows-setup
+      artifacts: true
+  before_script:
+    - *windows-ci-before-script
+  script:
+    - set BOOST_ROOT=
+    - set BOOST_LIBRARYDIR=
+    - set BOOST_INCLUDEDIR=
+    - cd build_windows
+    - cmake -DBUILD_DOCUMENTATION=OFF ..
+  artifacts:
+    paths:
+      - build_windows
+    expire_in: 1 hour
+  retry: 1
+
+windows-build:
   stage: build
   tags:
     - windows
+  dependencies:
+    - windows-configure
+  needs:
+    - job: windows-configure
+      artifacts: true
+  before_script:
+    - *windows-ci-before-script
   script:
-    - xcopy * C:\Git\tracktable /E /H /Y
-    - cd C:\TrackTable
-    - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe" ALL_BUILD.vcxproj /t:Rebuild /p:Configuration=Release /m:8'
-    - '"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\ctest.exe" --force-new-ctest-process --output-on-failure -C Release'
+    - cd build_windows
+    - cmake --build . --config Release --target ALL_BUILD -j 10
+  artifacts:
+    paths:
+      - build_windows
+    expire_in: 1 hour
   retry: 1
 
+windows-test:
+  stage: test
+  tags:
+    - windows
+  dependencies:
+    - windows-build
+  needs:
+    - job: windows-build
+      artifacts: true
+  before_script:
+    - *windows-ci-before-script
+  script:
+    - xcopy build_windows\lib\*.pyd tracktable\Python\tracktable\lib
+    - cd build_windows
+    - ctest -j4 -C Release -T test --output-on-failure --exclude-regex "P_Render_Trajectories|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe"
+  artifacts:
+    paths:
+      - build_windows
+    expire_in: 1 hour
+  retry: 1
+
+##########################################
+# Build And Deploy Windows PYPI Packages #
+##########################################
+.windows-wheel-script: &windows-wheel-script
+  - set BOOST_ROOT=
+  - set BOOST_LIBRARYDIR=
+  - set BOOST_INCLUDEDIR=
+  - set https_proxy=%SNL_HTTPS_PROXY%
+  - set HTTPS_PROXY=%SNL_HTTPS_PROXY%
+  - set http_proxy=%SNL_HTTP_PROXY%
+  - set HTTP_PROXY=%SNL_HTTP_PROXY%
+  - set no_proxy=%SNL_NO_PROXY%
+  - set NO_PROXY=%SNL_NO_PROXY%
+
+windows-deploy-py36:
+  stage: deploy
+  tags:
+    - windows
+  timeout: 2 hours
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  before_script:
+    - *windows-wheel-script
+  needs: ["windows-test"]
+  script:
+    - set PY_VERSION=36
+    - set BUILD_DIR=win_wheel_py%PY_VERSION%
+    - mkdir %BUILD_DIR%
+    - cd %BUILD_DIR%
+    - call activate tracktable-windows-ci-py%PY_VERSION%
+    - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
+    - cmake --build . --config Release --target INSTALL -j 4
+    - cd ..
+    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
+    - dir %BUILD_DIR%\install\wheel
+    - set HTTPS_PROXY=
+    - set https_proxy=
+    - python -m twine upload -u gitlab-ci-token -p %CI_JOB_TOKEN% --repository-url "%CI_API_V4_URL%/projects/%CI_PROJECT_ID%/packages/pypi" %BUILD_DIR%\install\wheel\*.whl
+
+windows-deploy-py37:
+  stage: deploy
+  tags:
+    - windows
+  timeout: 2 hours
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  before_script:
+    - *windows-wheel-script
+  needs: ["windows-deploy-py36"]
+  script:
+    - set PY_VERSION=37
+    - set BUILD_DIR=win_wheel_py%PY_VERSION%
+    - mkdir %BUILD_DIR%
+    - cd %BUILD_DIR%
+    - call activate tracktable-windows-ci-py%PY_VERSION%
+    - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
+    - cmake --build . --config Release --target INSTALL -j 10
+    - cd ..
+    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
+    - dir %BUILD_DIR%\install\wheel
+    - set HTTPS_PROXY=
+    - set https_proxy=
+    - python -m twine upload -u gitlab-ci-token -p %CI_JOB_TOKEN% --repository-url "%CI_API_V4_URL%/projects/%CI_PROJECT_ID%/packages/pypi" %BUILD_DIR%\install\wheel\*.whl
+
+windows-deploy-py38:
+  stage: deploy
+  tags:
+    - windows
+  timeout: 2 hours
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  before_script:
+    - *windows-wheel-script
+  needs: ["windows-deploy-py37"]
+  script:
+    - set PY_VERSION=38
+    - set BUILD_DIR=win_wheel_py%PY_VERSION%
+    - mkdir %BUILD_DIR%
+    - cd %BUILD_DIR%
+    - call activate tracktable-windows-ci-py%PY_VERSION%
+    - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
+    - cmake --build . --config Release --target INSTALL -j 10
+    - cd ..
+    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
+    - dir %BUILD_DIR%\install\wheel
+    - set HTTPS_PROXY=
+    - set https_proxy=
+    - python -m twine upload -u gitlab-ci-token -p %CI_JOB_TOKEN% --repository-url "%CI_API_V4_URL%/projects/%CI_PROJECT_ID%/packages/pypi" %BUILD_DIR%\install\wheel\*.whl
+
+windows-deploy-py39:
+  stage: deploy
+  tags:
+    - windows
+  timeout: 2 hours
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  before_script:
+    - *windows-wheel-script
+  needs: ["windows-deploy-py38"]
+  script:
+    - set PY_VERSION=39
+    - set BUILD_DIR=win_wheel_py%PY_VERSION%
+    - mkdir %BUILD_DIR%
+    - cd %BUILD_DIR%
+    - call activate tracktable-windows-ci-py%PY_VERSION%
+    - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
+    - cmake --build . --config Release --target INSTALL -j 10
+    - cd ..
+    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
+    - dir %BUILD_DIR%\install\wheel
+    - set HTTPS_PROXY=
+    - set https_proxy=
+    - python -m twine upload -u gitlab-ci-token -p %CI_JOB_TOKEN% --repository-url "%CI_API_V4_URL%/projects/%CI_PROJECT_ID%/packages/pypi" %BUILD_DIR%\install\wheel\*.whl
+
+windows-deploy-py310:
+  stage: deploy
+  tags:
+    - windows
+  timeout: 2 hours
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  before_script:
+    - *windows-wheel-script
+  needs: ["windows-deploy-py39"]
+  script:
+    - set PY_VERSION=310
+    - set BUILD_DIR=win_wheel_py%PY_VERSION%
+    - mkdir %BUILD_DIR%
+    - cd %BUILD_DIR%
+    - call activate tracktable-windows-ci-py%PY_VERSION%
+    - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
+    - cmake --build . --config Release --target INSTALL -j 4
+    - cd ..
+    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
+    - dir %BUILD_DIR%\install\wheel
+    - set HTTPS_PROXY=
+    - set https_proxy=
+    - python -m twine upload -u gitlab-ci-token -p %CI_JOB_TOKEN% --repository-url "%CI_API_V4_URL%/projects/%CI_PROJECT_ID%/packages/pypi" %BUILD_DIR%\install\wheel\*.whl
+
+
+windows-deploy-py311:
+  stage: deploy
+  tags:
+    - windows
+  timeout: 2 hours
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+  before_script:
+    - *windows-wheel-script
+  needs: ["windows-deploy-py310"]
+  script:
+    - set PY_VERSION=311
+    - set BUILD_DIR=win_wheel_py%PY_VERSION%
+    - mkdir %BUILD_DIR%
+    - cd %BUILD_DIR%
+    - call activate tracktable-windows-ci-py%PY_VERSION%
+    - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
+    - cmake --build . --config Release --target INSTALL -j 4
+    - cd ..
+    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
+    - dir %BUILD_DIR%\install\wheel
+    - set HTTPS_PROXY=
+    - set https_proxy=
+    - python -m twine upload -u gitlab-ci-token -p %CI_JOB_TOKEN% --repository-url "%CI_API_V4_URL%/projects/%CI_PROJECT_ID%/packages/pypi" %BUILD_DIR%\install\wheel\*.whl

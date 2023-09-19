@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014-2021 National Technology and Engineering
+ * Copyright (c) 2014-2023 National Technology and Engineering
  * Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
  * with National Technology and Engineering Solutions of Sandia, LLC,
  * the U.S. Government retains certain rights in this software.
@@ -88,7 +88,7 @@ namespace
   // pointer assumes ownership of the object.  This convenience function
   // creates a borrowed reference that will not lead to the wrapped object's
   // destruction when the wrapper goes out of scope.
-  // 
+  //
   // @param[in] py_object (PyObject*) Object to wrap
   // @return New boost::python::object wrapping Python object
 
@@ -107,14 +107,14 @@ namespace
   //
   // @param[in] timestamp: (PyDateTime_DateTime*) Time stamp from Python
   // @returns New boost::python::object containing an aware datetime
-  //     object in our default time zone 
-  boost::python::object as_default_timezone(PyObject* timestamp) 
+  //     object in our default time zone
+  boost::python::object as_default_timezone(PyObject* timestamp)
   {
     using boost::python::object;
 
     object foreign_timestamp(borrowed_reference(timestamp));
     object fn_astimezone(foreign_timestamp.attr("astimezone"));
-    if (fn_astimezone.is_none()) 
+    if (fn_astimezone.is_none())
     {
       PyErr_SetString(PyExc_AttributeError,
         "Timestamp to convert has no astimezone attribute");
@@ -218,7 +218,7 @@ namespace
       {
         boost::python::object localized_pydate(as_default_timezone(obj_ptr));
 
-        PyDateTime_DateTime const* raw_localized_pydate = 
+        PyDateTime_DateTime const* raw_localized_pydate =
           reinterpret_cast<PyDateTime_DateTime const*>(
             localized_pydate.ptr());
 

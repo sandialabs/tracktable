@@ -1,0 +1,36 @@
+ARG SOURCE_IMAGE
+FROM ${SOURCE_IMAGE}
+
+ARG PYTHON_IMPLEMENTATION
+ARG CI_PROJECT_DIR
+ARG NIGHTLY
+ENV NIGHTLY=${NIGHTLY}
+ARG DEVELOPMENT
+ENV DEVELOPMENT=${DEVELOPMENT}
+ARG DEV_NUMBER
+ENV DEV_NUMBER=${DEV_NUMBER}
+ENV CI_PROJECT_DIR=${CI_PROJECT_DIR}
+ENV PYTHON_IMPLEMENTATION=${PYTHON_IMPLEMENTATION}
+ENV PYTHON_HOME=/opt/python/${PYTHON_IMPLEMENTATION}-${PYTHON_IMPLEMENTATION}m
+
+COPY create_dummy_libpython.sh .
+COPY install_numpy.sh .
+
+RUN ./create_dummy_libpython.sh ${PYTHON_IMPLEMENTATION} \
+&& ./install_numpy.sh ${PYTHON_IMPLEMENTATION}
+
+WORKDIR /opt/src
+RUN mkdir tracktable
+COPY tracktable tracktable/src
+RUN mkdir tracktable/build
+
+WORKDIR /opt/src/tracktable/build
+COPY configure_tracktable.sh .
+RUN ./configure_tracktable.sh ${PYTHON_IMPLEMENTATION} \
+# VERBOSE=1 causes the lines being fed to gmake to be printed in full.
+#&& VERBOSE=1 make -j \
+&& make -j 4 \
+&& make install \
+&& make clean
+
+ENTRYPOINT ["/bin/bash", "-c", "-l"]

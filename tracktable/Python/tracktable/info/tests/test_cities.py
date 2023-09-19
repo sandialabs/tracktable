@@ -1,4 +1,4 @@
-# Copyright (c) 2017-2020, National Technology & Engineering Solutions of
+# Copyright (c) 2014-2023, National Technology & Engineering Solutions of
 #   Sandia, LLC (NTESS).
 # All rights reserved.
 #
@@ -39,7 +39,7 @@ from tracktable.domain.terrestrial import TrajectoryPoint, BasePoint
 
 #Search for Paris in the US, using lat lon
 # There are multiple Paris's in the US.
-# Will use lat long of Paris France, should return 
+# Will use lat long of Paris France, should return
 # one in US though!
 def test_paris_us_lat_lon():
     city = cities.get_city("Paris", "US", (50, 2))
@@ -50,77 +50,77 @@ def test_paris_us_lat_lon():
         (city.location != BasePoint(44.2597222, -70.5011111)):
         print("Failed test_paris_us_lat_lon")
         return 1
-        
+
     return 0
 
 # Searching with lat lon close to Phillipines will return Albuquerque PH
 # Not using the US version since default is to return the largest town
 def test_abq_with_tuple():
     city = cities.get_city("Albuquerque", None, (10, 120))
-    
+
     if (city == None or city.name != "Albuquerque") or \
         (city.country_code != "ph") or \
         (city.population != 2730) or \
         (city.location != BasePoint(9.608056, 123.958056)):
         print("Failed test_abq_with_lat_lon")
         return 1
-        
+
     return 0
 
 # Searching with lat lon close to Phillipines will return Albuquerque PH
 # Not using the US version since default is to return the largest town
 def test_abq_with_basepoint():
     city = cities.get_city("Albuquerque", None, BasePoint(10, 120))
-    
+
     if (city == None or city.name != "Albuquerque") or \
         (city.country_code != "ph") or \
         (city.population != 2730) or \
         (city.location != BasePoint(9.608056, 123.958056)):
         print("Failed test_abq_with_lat_lon")
         return 1
-        
-    return 0    
+
+    return 0
 
 # Searching with lat lon close to Phillipines will return Albuquerque PH
 # Not using the US version since default is to return the largest town
 def test_abq_with_trajpoint():
     city = cities.get_city("Albuquerque", None, TrajectoryPoint(10, 120))
-    
+
     if (city == None or city.name != "Albuquerque") or \
         (city.country_code != "ph") or \
         (city.population != 2730) or \
         (city.location != BasePoint(9.608056, 123.958056)):
         print("Failed test_abq_with_lat_lon")
         return 1
-        
-    return 0    
-    
+
+    return 0
+
 # Searching by country in this example will return something smaller than Albuquerque US
 def test_abq_with_country():
     city = cities.get_city("Albuquerque", "PH")
-    
+
     if (city == None or city.name != "Albuquerque") or \
         (city.country_code != "ph") or \
         (city.population != 2730) or \
         (city.location != BasePoint(9.608056, 123.958056)):
         print("Failed test_abq_with_country")
         return 1
-        
+
     return 0
-    
+
 # If searching on only the name, the largest city (by population) is returned
 def test_abq_name_only():
     city = cities.get_city("Albuquerque")
-    
+
     if (city == None or city.name != "Albuquerque") or \
         (city.country_code != "us") or \
         (city.population != 487378) or \
         (city.location != BasePoint(35.0844444, -106.6505556)):
         print("Failed test_abq_name_only")
         return 1
-        
+
     return 0
-    
+
 def main():
     error_count = 0
     error_count += test_abq_name_only()

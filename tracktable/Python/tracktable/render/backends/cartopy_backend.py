@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2021 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -35,7 +35,6 @@ import itertools
 from datetime import datetime
 
 import cartopy
-
 import cartopy.crs
 import matplotlib
 import matplotlib.colors
@@ -59,6 +58,7 @@ def render_trajectories(trajectories,
                         map_canvas = None,
                         obj_ids = [],
                         map_bbox = [],
+                        region_size=(200,200),
                         show_lines = True,
                         gradient_hue = None,
                         color_map = '',
@@ -80,6 +80,11 @@ def render_trajectories(trajectories,
                         show_distance_geometry = False,
                         distance_geometry_depth = 4,
                         zoom_frac = [0,1], #undocumented feature, for now
+                        draw_airports=False,
+                        draw_ports=False,
+                        draw_shorelines=False,
+                        draw_rivers=False,
+                        draw_borders=False,
 
                         #cartopy specific arguments
                         draw_lonlat=True,
@@ -88,12 +93,13 @@ def render_trajectories(trajectories,
                         draw_coastlines=True,
                         draw_countries=True,
                         draw_states=True,
+                        draw_cities=False,
                         map_projection = None,
                         transform = cartopy.crs.PlateCarree(),
                         figsize=(4,2.25),
                         dpi=300,
                         bbox_buffer=(.3,.3),
-                        **kwargs): #kwargs are for mapmaker
+                        **kwargs): #kwargs are for render_map
     """Render a list of trajectories using the cartopy backend
 
         For documentation on the parameters, please see render_trajectories
@@ -159,16 +165,23 @@ def render_trajectories(trajectories,
                                             map_name='custom',
                                             map_bbox=map_bbox,
                                             map_projection = map_projection,
+                                            region_size=region_size,
                                             draw_lonlat=draw_lonlat,
                                             draw_coastlines=draw_coastlines,
                                             draw_countries=draw_countries,
                                             draw_states=draw_states,
+                                            draw_airports=draw_airports,
+                                            draw_ports=draw_ports,
+                                            draw_shorelines=draw_shorelines,
+                                            draw_rivers=draw_rivers,
+                                            draw_borders=draw_borders,
+                                            draw_cities=draw_cities,
                                             fill_land=fill_land,
                                             fill_water=fill_water,
                                             tiles=tiles,
                                             **kwargs)
 
-    # `dot_size*15` andl `inewidth*0.8` below accounts for differing units between folium and cartopy
+    # `dot_size*15` and `inewidth*0.8` below accounts for differing units between folium and cartopy
     paths.draw_traffic(traffic_map = map_canvas,
                        trajectory_iterable = trajectories,
                        color_map = color_maps,
@@ -202,6 +215,7 @@ def render_trajectories(trajectories,
 # ----------------------------------------------------------------------
 
 def render_heatmap(points,
+                   trajectories=None,
                    map_canvas = None,
                    map_bbox=[],
                    bin_size=1,
@@ -214,12 +228,20 @@ def render_heatmap(points,
                    draw_coastlines=True,
                    draw_countries=True,
                    draw_states=True,
+                   draw_airports=False,
+                   draw_ports=False,
+                   draw_shorelines=False,
+                   draw_rivers=False,
+                   draw_borders=False,
+                   draw_cities=False,
                    map_projection = None,
                    transform = cartopy.crs.PlateCarree(),
                    figsize=(4,2.25),
                    dpi=300,
                    bbox_buffer=(.3,.3),
                    tiles=None,
+                   save = False,
+                   filename = '',
                    **kwargs):
     """Render a histogram for the given map projection.
 
@@ -252,6 +274,12 @@ def render_heatmap(points,
                                             draw_coastlines=draw_coastlines,
                                             draw_countries=draw_countries,
                                             draw_states=draw_states,
+                                            draw_airports=draw_airports,
+                                            draw_ports=draw_ports,
+                                            draw_shorelines=draw_shorelines,
+                                            draw_rivers=draw_rivers,
+                                            draw_borders=draw_borders,
+                                            draw_cities=draw_cities,
                                             fill_land=fill_land,
                                             fill_water=fill_water,
                                             tiles=tiles,
@@ -298,12 +326,22 @@ def render_heatmap(points,
     masked_density = masked_array.masked_less_equal(density, 0)
 
     # And finally render it onto the map.
-    return common_processing.draw_density_array(masked_density,
+    density_array = common_processing.draw_density_array(masked_density,
                                                 map_canvas,
                                                 bounding_box,
                                                 colormap=colormap,
                                                 colorscale=colorscale,
                                                 zorder=zorder)
+
+    if not common_processing.in_notebook() or save:
+            if filename:
+                #plt.tight_layout()  #was giving warnings
+                plt.savefig(filename)
+            else:
+                datetime_str = datetime.now().strftime("%Y-%m-%dT%H%M%S-%f")
+                #plt.tight_layout()
+                plt.savefig("heatmap-"+datetime_str+".png")
+    return density_array
 
 # ----------------------------------------------------------------------
 
