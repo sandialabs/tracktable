@@ -1,5 +1,4 @@
-#
-# Copyright (c) 2014-2022 National Technology and Engineering
+# Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -92,6 +91,7 @@ def points_near_city(city, num_points):
 # ----------------------------------------------------------------------
 
 def generate_heatmap_points(**kwargs):
+
     logger.info("Generating {} points around each of the {} largest cities in the world.".format(kwargs['num_points_per_city'], kwargs['num_cities']))
     heatmap_points = [ points_near_city(city, kwargs['num_points_per_city']) for city in n_largest_cities(kwargs['num_cities']) ]
     combined_point_source = interleave_points.interleave_points_by_timestamp(*heatmap_points)

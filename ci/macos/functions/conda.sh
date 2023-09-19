@@ -6,6 +6,9 @@
 # enable_debug
 # disable_debug
 
+# We assume the following environment variables are already set:
+# TRACKTABLE_HOME
+
 ###
 ### INTERNAL-ONLY FUNCTIONS
 ###
@@ -63,7 +66,7 @@ function activate_conda_environment () {
 
 function conda_environment_name () {
 	local __py_version="$1"
-    conda_environment_name_OUTPUT="tracktable-ci-python${__py_version}"
+    conda_environment_name_OUTPUT="tracktable-dev-python${__py_version}"
     return 0
 }
 
@@ -83,7 +86,6 @@ function conda_environment_name () {
 
 function conda_environment_exists () {
 	local __python_version="$1"
-
 	msg_debug "Checking for Conda environment for Python ${__python_version}"
 
 	conda_environment_name ${__python_version}
@@ -122,7 +124,6 @@ function conda_environment_exists () {
 function create_conda_environment () {
 	local __python_version=$1
 	local __envname
-
 	conda_environment_name ${__python_version}
 	__envname=${conda_environment_name_OUTPUT}
 
@@ -130,29 +131,37 @@ function create_conda_environment () {
 
 	_disable_debug
 
-	conda create \
-		--name ${__envname} \
-		--yes \
-		--channel conda-forge \
-		python_abi=${__python_version}=*_cp* \
-		boost=1.75 \
-		cartopy \
-		cmake \
-		compilers \
-		doxygen \
-		folium \
-		graphviz \
-		jupyter \
-		nbsphinx \
-		nbsphinx-link \
-		numpy \
-		pandoc \
-		pip \
-		pytz \
-		sphinx \
-		sphinx_rtd_theme \
-		tracktable-data \
-		tqdm
+	if [ -z ${TRACKTABLE_HOME+x} ]; then
+	    echo "ERROR: create_conda_environment: TRACKTABLE_HOME must be set before this function is called."
+		exit 10
+	fi
+
+
+	conda env create \
+	    -f ${TRACKTABLE_HOME}/conda_dev_environments/macos/tracktable_dev_python${__python_version}.yml
+
+		# --name ${__envname} \
+		# --yes \
+		# --channel conda-forge \
+		# python_abi=${__python_version}=*_cp* \
+		# boost=1.75 \
+		# cartopy \
+		# cmake \
+		# compilers \
+		# doxygen \
+		# folium \
+		# graphviz \
+		# jupyter \
+		# nbsphinx \
+		# nbsphinx-link \
+		# numpy \
+		# pandoc \
+		# pip \
+		# pytz \
+		# sphinx \
+		# sphinx_rtd_theme \
+		# tracktable-data \
+		# tqdm
 
 	# Refresh the list of environments -- we just added one
 	list_conda_environments;

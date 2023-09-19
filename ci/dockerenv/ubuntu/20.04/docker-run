@@ -1,0 +1,2 @@
+#!/bin/sh
+docker run -it cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu:FocalFossa
