@@ -69,12 +69,9 @@ function enable_debug () {
 ### State variable initialization
 ###
 
-# Set these values to be 0 to inhibit categories of output
-DEBUG=1
-ERROR=1
-INFO=1
 
 # These will keep track of what we're building and where.
+TRACKTABLE_HOME=unset
 WORKDIR_LOCATION=unset
 PYTHON_VERSIONS=unset
 WHEEL_DIRECTORY=unset
@@ -109,8 +106,7 @@ Required Arguments:
 Options:
     -p,--python-version X.Y: Build for Python version X.Y.  This can be 
         specified multiple times to build for multiple versions.  By
-        default, wheels will be built for Python 3.5, 3.6, 3.7, 3.8,
-        and 3.9.
+        default, wheels will be built for Python 3.9 - 3.11.
 
     -b,--build-root <path>: Build trees will be created under the
         specified directory.  This defaults to the value of the
@@ -144,630 +140,31 @@ Notes:
 EOF
 }
 
-
-# Construct the directory name for a particular Python version.
-#
-# This function is here so that we can just call it to get the 
-# directory name instead of having to make sure we type the
-# same thing everywhere.
+# This will load our script libraries.  Since we have to call it before
+# we have those libraries, it has to be in this file by definition.
+# So it goes.
 #
 # Arguments:
-#    Argument 1: Python version (e.g. 3.5, 3.8)
-#
-# Variables Set:
-#    build_directory_name_OUTPUT: requested directory name
-
-function build_directory_name () {
-	local python_version="$1"
-	build_directory_name_OUTPUT="tt-python${python_version}"
-}
-
-
-# Activate a Conda virtual environment for a given Python version.
-#
-# This uses conda_environment_name to get the name of the environment
-# we want.
-#
-# Arguments:
-#     Argument 1: Python version (for example, 3.5)
+#    None.
 #
 # Returns:
-#     0 on success, 1 on error
-
-function activate_conda_environment () {
-	local __python_version="$1"
-	local __envname
-
-	conda_environment_name ${__python_version}
-	__envname=${conda_environment_name_OUTPUT}
-
-	msg_debug "Activating Conda environment ${__envname}"
-
-	disable_debug;
-	conda activate ${__envname}
-	enable_debug;
-}
-
-
-# Check for GNU Getopt, CMake, and Conda
-#
-# Arguments:
-#     None.
-#
-# Return Value:
-#     0 if all prerequisites found, 1 otherwise
-function check_for_build_prerequisites () {
-	local __ok=0
-
-	# We need GNU Getopt to parse long arguments
-	if ! check_for_program getopt; then
-		echo "This script requires GNU getopt.  Please install it and try again."
-		__ok=1
-	fi
-
-	if ! check_for_program cmake; then
-		echo "Tracktable builds require CMake."
-		__ok=1
-	fi
-
-	if ! check_for_program conda; then
-		echo "Tracktable builds require Anaconda to be installed and active."
-		__ok=1
-	fi
-
-	return ${__ok}
-}
-
-
-# Check to see if a specified command is on the user's PATH
-# and is executable.
-#
-# This takes one argument (the program to check for).
-#
-# Returns:
-#    0 if program found, 1 otherwise
-
-function check_for_program () {
-	local __program_to_find=$1
-	msg_debug "Checking for program $1"
-	[[ -x "$(command -v ${__program_to_find})" ]]
-}
-
-
-# Run CMake to configure the TT build for a specific Python version.
-#
-# Arguments:
-#    $1: Path to build directory
-#    $2: Path to source code
-#	 $3: Path to Conda environment for this build
-#
-# Returns:
-#    0 on success, 1 on failure
-
-function cmake_configure () {
-	local __build_directory="$1"
-	local __src_directory="$2"
-	local __conda_env_path="$3"
-
-	cmake \
-		-B ${__build_directory} \
-		-DBOOST_ROOT:PATH=${__conda_env_path} \
-		-DCMAKE_BUILD_TYPE:STRING=Release \
-		-DCMAKE_INSTALL_PREFIX:PATH=${__build_directory}/install \
-		-DPython3_EXECUTABLE:FILEPATH=${__conda_env_path}/bin/python \
-		-DPython3_ROOT_DIR:PATH=${__conda_env_path} \
-		${__src_directory}
-}
-
-
-# Have CMake invoke 'make wheel'.
-#
-# This calls CMake to invoke the build target since we might not always
-# be using GNU make.  
-#
-# Arguments:
-#     $1: Build directory
-#
-# Returns:
-#     0 on success, 1 on error
-
-function cmake_build_wheel () {
-	local __build_directory="$1"
-
-	cmake --build ${__build_directory} --target wheel
-}
-
-
-# Go forth and build!
-#
-# This calls CMake to invoke the build instead of running the build tool
-# directly since we might not always be using GNU make.
-#
-# Arguments:
-#     $1: Build directory
-#
-# Returns:
-#     0 on success, 1 on error
-#
-# Note:
-#     This function can be parameterized to include parallelization options
-#     for build tools that support it.  
-
-function cmake_run_build () {
-	local __build_directory="$1"
-
-	if [[ ${PARALLEL_JOBS} == "unset" ]]; then
-		cmake --build ${__build_directory}
-	else
-		cmake --build ${__build_directory} --parallel ${PARALLEL_JOBS}
-	fi
-}
-
-
-# Install after building.
-#
-# This calls CMake to invoke the install step instead of running the build tool
-# directly since we might not always be using GNU make.  According to CMake's
-# documentation, this might not even use the underlying build tool directly.
-#
-# Arguments:
-#     $1: Build directory
-#
-# Returns:
-#     0 on success, 1 on error
-
-function cmake_run_install () {
-	local __build_directory="$1"
-
-	cmake --install ${__build_directory}
-}
-
-# Make the Conda build environment name for a Python version.
-#
-# Like build_directory_name, this is here for consistency.
-#
-# Arguments:
-#     Argument 1: Python version (for example, 3.5)
-#
-# Output Variables:
-#     conda_environment_name_OUTPUT: String name of environment
-
-function conda_environment_name () {
-	local __py_version="$1"
-    conda_environment_name_OUTPUT="tracktable-build-python${__py_version}"
-    return 0
-}
-
-# Check to see if a Conda environment exists for a Python version.
-#
-# Arguments:
-#    Argument 1: Python version (for example, 3.5)
-#    Argument 2: Name of associative array of Conda environments (retrieve
-#        with list_conda_environments)
-#
-# Return Value:
-#    0 if environment exists, 1 otherwise
-#
-# NOTE:
-#    Bash can't pass associative arrays by value, only by reference.  This
-#    is why you must supply the NAME of the array.
-
-function conda_environment_exists () {
-	local __python_version="$1"
-	
-	msg_debug "Checking for Conda environment for Python ${__python_version}"
-
-	conda_environment_name ${__python_version}
-	local __envname="${conda_environment_name_OUTPUT}"
-
-	if map_has_key "${__envname}" "$2"; then
-		msg_debug "Environment found: ${__envname}"
-		return 0
-	else
-		msg_debug "Environment not found: ${__envname}"
-		return 1
-	fi
-}
-
-
-# Copy a finished wheel from a build directory to some output directory.
-#
-# This will actually grab all the wheels from that directory.  Because of
-# the way we've set up the rest of the build, there should only be one.
-#
-# Arguments:
-#     $1: build directory (wheel is in $1/wheel/*.whl)
-#     $2: destination directory
-#
-# Returns:
-#     0 on success, 1 on failure 
-
-function copy_wheel_to_output () {
-	local __build_directory="$1"
-	local __output_directory="$2"
-
-	cp ${__build_directory}/wheel/*.whl ${__output_directory}
-}
-
-
-# Create a Conda virtual environment for a given Python version.
-#
-# Arguments:
-#     Argument 1: Python version (for example, 3.5)
-#
-# Return Value:
-#     1 on success, 0 on failure
-#
-# NOTE: 
-#     This function could be enhanced to parameterize on Boost
-#     version as well. 
-#
-# NOTE:
-#     Channel names and package contents are hard-coded.  Further
-#     work will be needed to use different channels, contents, or
-#     Nexus proxies.
-#
-# NOTE:
-#     Package contents are currently specific to MacOS.
-
-function create_conda_environment () {
-	local __python_version=$1
-	local __envname
-	
-	conda_environment_name ${__python_version}
-	__envname=${conda_environment_name_OUTPUT}
-
-	msg_info "Creating Conda build environment ${__envname}"
-	conda create \
-		--name ${__envname} \
-		--yes \
-		--channel conda-forge \
-		python=${__python_version} \
-		boost \
-		cartopy \
-		doxygen \
-		folium \
-		graphviz \
-		jupyter \
-		numpy \
-		pip \
-		pytz \
-		sphinx \
-		sphinx_rtd_theme
-
-	# Refresh the list of environments -- we just added one
-	list_conda_environments;
-
-	if [[ "$?" != 0 ]]; then
-		msg_error "Failed to create Conda environment ${__envname} -- cannot continue."
-		exit 6
-	fi
-
-	if ! activate_conda_environment ${__python_version}; then
-		msg_error "Failed to activate Conda environment ${__envname} -- cannot continue."
-		exit 6
-	fi
-
-	# These utilities aren't in conda main or conda-forge
-	pip install \
-		delocate \
-		breathe
-}
-
-
-# Delete the Tracktable build tree for a particular Python version.
-#
-# This function checks to see that the Python version is kosher and
-# that the build directory actually exists.
-#
-# Arguments:
-#     Argument #1: Python version (for example, 3.5)
-#
-# Returns:
-#     0 on success, 1 on error
-
-function delete_build_directory () {
-	local __py_version="$1"
-	local __dirname
-
-	if ! parse_python_version ${__py_version}; then
-		msg_error "delete_build_tree: Declining to delete build tree for malformed Python version ${__py_version}"
-		return 1
-	fi
-
-	build_directory_name ${__py_version}
-	__dirname=${build_directory_name_OUTPUT}
-
-	local __full_build_path=${BUILD_ROOT}/${__dirname}
-
-	if [[ ! -d ${__full_build_path} ]]; then
-		msg_error "delete_build_directory: Directory ${__full_build_path} doesn't exist."
-		return 1
-	else
-		rm -r ${__full_build_path}
-	fi
-}
-
-# Delete the working directory where we keep our build trees.
-#
-# This function checks the global variable KEEP_BUILD_TREES to determine
-# whether or not the user wants to keep the trees around.  If not,
-# remove the work directory.
-#
-# Note: It is the responsibility of the build loop to clean up the tree
-# for each individual build!
-#
-# Arguments:
-#     None.
-#
-# Return value:
-#     0 if rmdir succeeds or KEEP_BUILD_TREES is set, 1 if rmdir fails
-
-function delete_workdir () {
-	if [[ ${KEEP_BUILD_TREES} == 1 ]]; then
-		exit 0
-	else
-		if [[ ! -z ${BUILD_ROOT+x} ]]; then
-			if [[ ${BUILD_ROOT} != "unset" ]]; then
-				msg_info "Removing work directory ${BUILD_ROOT}."
-				rmdir ${BUILD_ROOT}
-			fi
-		else
-			msg_error "Unexpected: BUILD_ROOT is not set in delete_workdir."
-			exit 1
-		fi
-	fi
-}
-
-
-# Check to see if an array contains a certain value
-#
-# Usage:
-#
-# if element_in "value_to_find" "${myArray[@]}"
-# then
-#     do something;
-# else
-#     do something else;
-# done
-#
-# Arguments:
-#    Argument 1: value_to_find (quote as string)
-#    Argument 2: array_to_search
-#        NOTE: this must be quoted as "${array_to_search[@]}"
-#
-# Returns:
-#    0 on success (element found), 1 otherwise
-
-function element_in () {
-	local element match="$1"
-    shift
-    for element
-    do
-    	[[ "$element" == "$match" ]] && return 0
-    done
-    return 1
-}
-
-
-# Enable Anaconda commands in the current shell
-#
-# Conda relies on a few shell variables and functions being set
-# in the shell.  This script, running in a non-interactive shell,
-# does not get those by default.  This function should fix that.
-#
-# Arguments:
-#     None.
-#
-# Return Value:
-#     0 on success, 1 on error.
-
-function enable_anaconda () {
-	msg_info "Enabling Anaconda commands."
-	export PS1=
-	disable_debug;
-	eval "$(command conda 'shell.bash' 'hook' 2>/dev/null)"
-	enable_debug;
-}
-
-
-
-### Clean up in case of ^C exit
-
-function exit_cleanup () {
-	msg_info "Cleaning up working files before exit."
-	if [[ ! -z ${BUILD_ROOT+x} ]]; then
-		delete_workdir
-	else
-		msg_info "Script had not yet created work directory - nothing to delete."
-	fi
-}
-
-
-# Retrieve the path containing the Conda environment for a given 
-# Python version
-#
-# Arguments:
-#     $1: Python version (for example, 3.5)
-#
-# Returns:
-#     0 if the environment exists, 1 otherwise
-#
-# Output Variables: 
-#     find_conda_environment_path_OUTPUT: Path to environment
-#
-# Global Variables:
-#     Uses list_conda_environments_OUTPUT.
-
-function find_conda_environment_path ()
-{
-	local __py_version="$1"
-	local __env_name
-
-	unset find_conda_environment_path_OUTPUT
-
-	conda_environment_name ${__py_version}
-	__env_name=${conda_environment_name_OUTPUT}
-
-	if ! map_has_key ${__env_name} list_conda_environments_OUTPUT; then
-		msg_error "find_conda_environment_path: Environment ${__env_name} not in map!"
-		return 1
-	else
-		find_conda_environment_path_OUTPUT="${list_conda_environments_OUTPUT[${__env_name}]}"
-		msg_debug "find_conda_environment_path: Environment ${__env_name} is at ${find_conda_environment_path_OUTPUT}"
-		return 0
-	fi
-}
-
-
-# Retrieve a list of the Anaconda environments visible to the user by
-# running the command 'conda env list'.
-#
-# Arguments:
-#     No arguments.
-#
-# Variables Set:
-#     list_conda_environments_OUTPUT: Associative array
-#         mapping environment names to paths on disk
-#
-# TODO: Possible bug: This function should clear the output array
-# every time it runs
-
-function list_conda_environments () {
-	msg_info "Retrieving list of Anaconda environments."
-    declare -gA list_conda_environments_OUTPUT
-	local __env_regex="^([a-zA-Z0-9._-]+)[ *]+(\/.+)\$"
-	while IFS= read -r __line; do
-		#msg_debug "Processing line ${__line}"
-		if [[ ${__line} =~ ${__env_regex} ]]
-			then
-				local __env_name="${BASH_REMATCH[1]}"
-				local __env_path="${BASH_REMATCH[2]}"
-				#msg_debug "Found Conda environment '${__env_name}' at '${__env_path}'"
-				#list_conda_environments_OUTPUT["${__env_name}"]="${__env_path}"
-				list_conda_environments_OUTPUT["${BASH_REMATCH[1]}"]+="${BASH_REMATCH[2]}"
-			else
-				msg_debug "Line didn't match"
-			fi
-		done < <( \
-		conda env list \
-		| grep -v \# \
-		)
-}
-
-   
-# Create the build directory for a specific Python version.
-#
-# Relies on BUILD_ROOT being set to provide the root path for all
-# of our build trees.
-#
-# Arguments:
-#    Argument 1: Python version for this build
-#
-# Returns:
-#    0 on success, 1 otherwise.
-
-function make_build_directory () {
-	local python_version="$1"
-
-	build_directory_name ${python_version}
-	local __build_dir="${build_directory_name_OUTPUT}"
-	mkdir ${BUILD_ROOT}/${__build_dir}
-}
-
-
-# Check to see if an associative array contains a certain key
-#
-# Usage:
-#
-# if map_has_key "value_to_find" name_of_map
-# then
-#     do something
-# else
-#     do something else
-#
-# Arguments:
-#     Argument 1: (quoted) key value to search for
-#     Argument 2: name of map to search
-#
-# Returns:
-#     0 on success, 1 on failure
-#
-# Note:
-#     Associative array to search is passed by name, NOT
-#     by value.  Bash cannot currently pass associative
-#     arrays by value.
-
-function map_has_key () {
-	local __value="$1"
-	local -n __map_to_check="$2"
-
-	[[ ${__map_to_check[${__value}]+abc} ]]
-}
-
-
-
-# Write an error message.  This will only produce output if the 
-# variable ERROR is set to 1.
-#
-# No return values.
-
-function msg_error() {
-	[[ "${ERROR}" == "1" ]] && echo -e "[ERROR]: $*" >&2 
-}
-
-# Write a debug message.  This will only produce output if the 
-# variable DEBUG is set to 1.
-#
-# No return values.
-
-function msg_debug() {
-	[[ "${DEBUG}" == "1" ]] && echo -e "[DEBUG]: $*" 
-}
-
-# Write an informational message.  This will only produce output
-# if the variable INFO is set to 1.
-#
-# No return values.
-
-function msg_info() {
-	[[ "${INFO}" == "1" ]] && echo -e "[INFO]: $*"
-}
-
-
-# Parse a version string to make sure it's of the format <major>.<minor>,
-# where <major> is a single digit and <minor> is an integer.  
-#
-# Arguments:
-#    Argument 1: String to be parsed
-#
-# Returns:
-#    1 on successful parse, 0 on error
-#
-# Output Variables:
-#
-# parse_python_version_OUTPUT_major_version: the part of the version string
-#     before the decimal
-# parse_python_version_OUTPUT_minor_version: the part of the version string
-#     after the decimal
-# Takes 1 argument (the string to be parsed and sets three variables:
-#
-
-function parse_python_version () {
-	__python_version_string="$1"
-	msg_debug "Trying to parse Python version ${__python_version_string}"
-	if [[ ${__python_version_string} =~ ^([[:digit:]])\.([[:digit:]]+)$ ]]
-	then
-		parse_python_version_OUTPUT_major_version=${BASH_REMATCH[1]}
-		parse_python_version_OUTPUT_minor_version=${BASH_REMATCH[2]}
-		msg_debug "Success: detected version ${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
-		return 0
-	else
-		msg_debug "Parse failed"
-		parse_python_version_OUTPUT_major_version=unset
-		parse_python_version_OUTPUT_minor_version=unset
-		return 1
-	fi
+#    No return value.  Exits if shell cannot cd to the directory 
+#    containing this script (which would be very weird).
+#
+# Output variables:
+#    Sets TRACKTABLE_HOME to the root of the directory tree containing
+#    this script.
+
+function _load_helper_functions () {
+    pushd .
+    cd "${BASH_SOURCE%/*}" || exit 3
+	# at this point we're in tracktable/packaging/osx
+	cd ../..
+	TRACKTABLE_HOME="$(pwd)"
+    source ./ci/macos/functions/common.sh
+    source ./ci/macos/functions/cmake.sh
+    source ./ci/macos/functions/conda.sh
+    popd
 }
 
 
@@ -790,11 +187,9 @@ function main () {
 		exit 5
 	fi
 
-	if ! check_for_build_prerequisites; then
-		msg_error "One or more build requirements not satisfied."
-		exit 1
-	fi
-
+	# Load our function libraries and set TRACKTABLE_HOME
+	_load_helper_functions
+	
 
 	### -------------------------------------------------------------------
 	### Parse command line options
@@ -845,6 +240,9 @@ function main () {
 		msg_info "Tracktable source code is in ${SOURCE_DIRECTORY}."
 	fi
 
+
+	# Find the root of our source tree
+
 	### -------------------------------------------------------------------
 	### Set default values for any parameters not specified
 	###
@@ -882,8 +280,16 @@ function main () {
 	# Set default value for Python versions
 	if [[ "${PYTHON_VERSIONS}" == "unset" ]]
 	then
-		msg_debug "No Python versions requested.  Defaulting to 3.5 - 3.9."
-		PYTHON_VERSIONS=(3.5 3.6 3.7 3.8 3.9)
+		msg_debug "No Python versions requested."
+		ARCH="$(uname -m)"
+		if [[ "${ARCH}" == "arm64" ]]
+		then
+			msg_debug "Defaulting to Python 3.9 - 3.11 on arm64."
+			PYTHON_VERSIONS=(3.9 3.10 3.11)
+		else
+			msg_debug "Defaulting to Python 3.8 - 3.11."
+			PYTHON_VERSIONS=(3.8 3.9 3.10 3.11)
+		fi
 	fi
 
 	# Check the syntax of all the Python versions
@@ -947,9 +353,18 @@ function main () {
 		if ! conda_environment_exists ${py_version} list_conda_environments_OUTPUT
 		then
 			create_conda_environment ${py_version}
-			activate_conda_environment ${py_version}
 		else
 			msg_debug "Conda environment already exists for this version"
+		fi
+
+		activate_conda_environment ${py_version}
+
+		# We check for build prerequisites after activating the Conda environment
+		# because some of them may be installed in the Conda environment
+		# instead of at system level.
+		if ! check_for_build_prerequisites; then
+			msg_error "One or more build requirements not satisfied."
+			exit 1
 		fi
 
 		make_build_directory ${py_version}
