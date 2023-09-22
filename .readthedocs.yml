@@ -24,10 +24,16 @@ sphinx:
 # Eventually we will also build docs as PDF and ePub.
 # formats: all
 
-# The Docker image for building the docs
+# This OS version 
 build:
-  image: latest
-
+  os: ubuntu-22.04
+  # This Conda environment (per the Read The Docs documentation, URL below)
+  # uses libmamba to handle conda install requests.  That should be much, 
+  # much faster than the old version.
+  tools: 
+    python: "mambaforge-22.9"
+      
+  
 # The Anaconda environment to build the docs
 conda:
   environment: documentation_build_environment.yml
