@@ -15,7 +15,8 @@ dependencies:
   - scipy>=1.5.2
   - tracktable
   - tracktable-data>=1.7.0
-
+  - pip
+  
   # Jupyter Dependencies
   - ipykernel
   - jupyter

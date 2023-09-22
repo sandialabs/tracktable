@@ -14,6 +14,7 @@ any given one.
 
 ### TRACKTABLE 1.7.0
 
+- 298: Update ReadTheDocs config to use libmamba
 - 296: Conda YML per OS and Python version
 - 293: Add brand new CHANGELOG for 1.7.0 and future releases
 - 294: Update PyPI tags for Python 3.11
