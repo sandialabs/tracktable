@@ -12,6 +12,10 @@ tracktable-questions at sandia dot gov if you have questions about
 any given one.
 
 
+### HOTFIXES TO TRACKTABLE 1.7.0
+
+- 302: Syntax error in dependencies in setup-generic.py
+
 ### TRACKTABLE 1.7.0
 
 - 298: Update ReadTheDocs config to use libmamba
