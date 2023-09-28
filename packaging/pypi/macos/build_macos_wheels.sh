@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# This script will build OSX wheels for Tracktable from the currently 
+# This script will build MacOS wheels for Tracktable from the currently 
 # checked-out repository.  By default it will build for Python versions 
-# 3.5, 3.6, 3.7, 3.8, and 3.9.  
+# 3.8 - 3.11 (3.9 - 3.11 on ARM64)
 #
 # To request just one version, use the '--python-version 3.x' argument.  
 # To set the output directory for wheels, use the '--output-directory /path' argument.
@@ -93,7 +93,7 @@ SOURCE_DIRECTORY=unset
 
 function usage() {
 	cat <<EOF
-usage: build_osx_wheels.sh [--python-version X.Y] [--build-root <dir>] [--wheel-directory <dir>] path_to_source
+usage: build_macos_wheels.sh [--python-version X.Y] [--build-root <dir>] [--wheel-directory <dir>] path_to_source
 
 Build Tracktable wheels for the specified Python versions.
 
@@ -106,7 +106,8 @@ Required Arguments:
 Options:
     -p,--python-version X.Y: Build for Python version X.Y.  This can be 
         specified multiple times to build for multiple versions.  By
-        default, wheels will be built for Python 3.9 - 3.11.
+        default, wheels will be built for Python 3.8 - 3.11 (3.9 - 3.11
+		on Apple Silicon).
 
     -b,--build-root <path>: Build trees will be created under the
         specified directory.  This defaults to the value of the
@@ -158,8 +159,8 @@ EOF
 function _load_helper_functions () {
     pushd .
     cd "${BASH_SOURCE%/*}" || exit 3
-	# at this point we're in tracktable/packaging/osx
-	cd ../..
+	# at this point we're in tracktable/packaging/pypi/macos
+	cd ../../..
 	TRACKTABLE_HOME="$(pwd)"
     source ./ci/macos/functions/common.sh
     source ./ci/macos/functions/cmake.sh
@@ -200,7 +201,7 @@ function main () {
 	### PYTHON_VERSIONS - Which versions of Python need Tracktable wheels?
 	### WHEEL_DIRECTORY - Where should the wheels go?
 
-	PARSED_ARGUMENTS=$(getopt -a -n build_osx_wheels \
+	PARSED_ARGUMENTS=$(getopt -a -n build_macos_wheels \
 		--options b:p:w:j:hk \
 		--longoptions build-root:,python-version:,wheel-directory:,parallel:,help,keep-build-trees \
 		-- "$@" )
