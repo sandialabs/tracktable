@@ -339,7 +339,7 @@ function main () {
 		msg_info "Destination directory ${WHEEL_DIRECTORY} already exists -- no need to create."
 	else
 		msg_info "Creating output directory ${WHEEL_DIRECTORY}."
-		mkdir ${_wheel_directory}
+		mkdir ${WHEEL_DIRECTORY}
 	fi
 
 	### --------------------------------------------------------------------
