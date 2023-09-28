@@ -228,7 +228,7 @@ def main():
         'pyshp',
         'pytz',
         'six',
-        'folium'
+        'folium',
         'tracktable-data'
     ]
 

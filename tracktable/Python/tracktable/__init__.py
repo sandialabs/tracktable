@@ -41,7 +41,7 @@ in kilometers.
 # \defgroup Tracktable_Python Python components of Tracktable
 import re
 import os
-__version__ = re.search(r"^TRACKTABLE VERSION ([0-9\.]*)", open(os.path.join(os.path.dirname(__file__), "..", "..", "..", "version.txt"), "rt").read(), re.M).group(1)
+__version__ = "1.7.0"
 __title__ = "Tracktable"
 __description__ = "Trajectory Analysis and Visualization"
 __url__ = "https://tracktable.sandia.gov"
