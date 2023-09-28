@@ -84,7 +84,7 @@ macos-deploy:
   timeout: 2 hours
   needs: ["macos-test"]
   script:
-    - cd packaging/pypi/osx
+    - cd packaging/pypi/macos
     - mkdir wheel_build && cd wheel_build
-    - ../build_osx_wheels.sh -j 6 ../../../..
+    - ../build_macos_wheels.sh -j 6 ../../../..
     - TWINE_PASSWORD=${CI_JOB_TOKEN} TWINE_USERNAME=gitlab-ci-token python -m twine upload --repository-url ${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/pypi *.whl
