@@ -213,7 +213,7 @@ function(build_wheel _build_directory _base_directory _output_directory _setup_p
     if (${_fixwheel} MATCHES ".*auditwheel.*")
       execute_process(
         COMMAND
-        ${_fixwheel} repair --plat manylinux2010_x86_64 ${_wheel_to_fix}
+        ${_fixwheel} repair --plat manylinux2014_x86_64 ${_wheel_to_fix}
         RESULT_VARIABLE _fixwheel_result
         WORKING_DIRECTORY ${_output_directory}
         OUTPUT_VARIABLE _fixwheel_output
