@@ -5,6 +5,7 @@ set -e
 
 PYTHON_IMPLEMENTATION=$1
 PYTHON_HOME=/opt/python/${PYTHON_IMPLEMENTATION}
+MANYLINUX_TAG=$2
 
 # This should exist: we put the symlink into place if needed back in 
 # Stage 1 when we built Boost.
@@ -34,4 +35,5 @@ cmake \
         -DPython3_INCLUDE_DIR=${PYTHON_INCLUDE_DIR} \
         -DBUILD_TESTING=OFF \
         -DBUILD_EXAMPLES=OFF \
+        -DMANYLINUX_WHEEL_TAG=${MANYLINUX_TAG}
         ../src
