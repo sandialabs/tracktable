@@ -81,6 +81,7 @@ for PYTHON_IMPLEMENTATION in ${AVAILABLE_PYTHON_IMPLEMENTATIONS}; do
          --build-arg NIGHTLY=${NIGHTLY} \
          --build-arg DEVELOPMENT=${DEVELOPMENT} \
          --build-arg DEV_NUMBER=${DEV_NUMBER} \
+         --build-arg MANYLINUX_TAG=${MANYLINUX_TAG} \
          --build-arg SOURCE_IMAGE=${BOOST_CMAKE_IMAGE} \
          .
 done

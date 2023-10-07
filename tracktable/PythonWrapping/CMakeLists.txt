@@ -407,6 +407,8 @@ message(STATUS "INFO: Wheel should go in ${CMAKE_BINARY_DIR}/wheel")
 # Windows doesn't have anything comparable. We have a utility called
 # 'winlocate' that tracks down the dependencies and adds them to the
 # list of files to be packaged in the wheel.
+
+
 if (UNIX)
   if (APPLE)
     find_program(
@@ -433,6 +435,18 @@ else (UNIX)
 endif (UNIX)
 
 
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  set(_default_wheel_tag "manylinux2014_x86_64")
+else ()
+  set(_default_wheel_tag "wheel-tag-only-used-on-linux")
+endif ()
+
+set(MANYLINUX_WHEEL_TAG ${_default_wheel_tag} CACHE STRING "Set the OS tag that will be requested by auditwheel.  Linux only.")
+mark_as_advanced(MANYLINUX_WHEEL_TAG)
+
+
+
 if (UNIX)
   add_custom_target( wheel
     COMMAND
@@ -443,6 +457,7 @@ if (UNIX)
     ${CMAKE_BINARY_DIR}/wheel
     ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
     ${FIX_WHEEL_EXECUTABLE}
+    ${MANYLINUX_WHEEL_TAG}
     NO_EXTRA_SEARCH_PATHS
     WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}
 #  DEPENDS install
@@ -458,6 +473,7 @@ else (UNIX)
     ${CMAKE_BINARY_DIR}/wheel
     ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
     ${FIX_WHEEL_EXECUTABLE}
+    ${MANYLINUX_WHEEL_TAG}
     # These will be picked up as extra search paths
     ${Boost_LIBRARY_DIRS}
     WORKING_DIRECTORY ${CMAKE_INSTALL_PREFIX}

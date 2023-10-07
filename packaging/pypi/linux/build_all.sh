@@ -12,6 +12,9 @@ export BOOST_PATCH_VERSION=0
 # Change this if you want to update the CMake version.
 export CMAKE_VERSION=3.22.2
 
+# Change this if you want to update the Manylinux version.
+export MANYLINUX_TAG=manylinux2014_x86_64
+
 pushd stage1_boost_multipython
 ./build_all.sh
 popd

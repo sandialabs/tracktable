@@ -3,6 +3,8 @@ FROM ${SOURCE_IMAGE}
 
 ARG PYTHON_IMPLEMENTATION
 ARG CI_PROJECT_DIR
+ARG MANYLINUX_TAG
+ENV MANYLINUX_TAG=${MANYLINUX_TAG}
 ARG NIGHTLY
 ENV NIGHTLY=${NIGHTLY}
 ARG DEVELOPMENT
@@ -26,7 +28,7 @@ RUN mkdir tracktable/build
 
 WORKDIR /opt/src/tracktable/build
 COPY configure_tracktable.sh .
-RUN ./configure_tracktable.sh ${PYTHON_IMPLEMENTATION}
+RUN ./configure_tracktable.sh ${PYTHON_IMPLEMENTATION} ${MANYLINUX_TAG}
 
 # This will run the build with standard CMake output.
 RUN make -j 4 install && make clean

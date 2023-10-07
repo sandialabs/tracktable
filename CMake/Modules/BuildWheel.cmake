@@ -148,7 +148,7 @@ endfunction(_get_python_abi_tag)
 
 # ----------------------------------------------------------------------
 
-function(build_wheel _build_directory _base_directory _output_directory _setup_py _python_interpreter _fixwheel _extra_search_paths)
+function(build_wheel _build_directory _base_directory _output_directory _setup_py _python_interpreter _fixwheel _desired_wheel_tag _extra_search_paths)
   set(_platform "PLATFORM_NOT_FOUND")
   set(_abi "ABI_NOT_FOUND")
   set(_implementation_version "IMPLEMENTATION_VERSION_TAG_NOT_FOUND")
@@ -207,13 +207,17 @@ function(build_wheel _build_directory _base_directory _output_directory _setup_p
   # We don't know what the exact filename is going to be.  It depends
   # on information scattered in several different locations.  Let's
   # just fix them all.
+      
 
   foreach(_wheel_to_fix ${_wheel_files})
     message(STATUS "Adding external libraries to ${_wheel_to_fix}.")
+    if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+      message(STATUS "    Requesting wheel tag ${_desired_wheel_tag}.")
+    endif ()
     if (${_fixwheel} MATCHES ".*auditwheel.*")
       execute_process(
         COMMAND
-        ${_fixwheel} repair --plat manylinux2014_x86_64 ${_wheel_to_fix}
+        ${_fixwheel} repair --plat ${_desired_wheel_tag} ${_wheel_to_fix}
         RESULT_VARIABLE _fixwheel_result
         WORKING_DIRECTORY ${_output_directory}
         OUTPUT_VARIABLE _fixwheel_output
@@ -277,6 +281,7 @@ set(INSTALL_TREE_ROOT ${CMAKE_ARGV5})
 set(OUTPUT_DIRECTORY ${CMAKE_ARGV6})
 set(SETUP_SCRIPT ${CMAKE_ARGV7})
 set(FIX_WHEEL_EXECUTABLE ${CMAKE_ARGV8})
+set(DESIRED_WHEEL_TAG ${CMAKE_ARGV9})
 
 message(STATUS "BuildWheel running.")
 message(STATUS "INFO: Python interpreter is ${PYTHON_INTERPRETER}")
@@ -285,20 +290,22 @@ message(STATUS "INFO: Install tree is at ${INSTALL_TREE_ROOT}")
 message(STATUS "INFO: Output directory is ${OUTPUT_DIRECTORY}")
 message(STATUS "INFO: Setup script is ${SETUP_SCRIPT}")
 message(STATUS "INFO: Wheel fixer is ${FIX_WHEEL_EXECUTABLE}")
-
-message(STATUS "DEBUG: CMake ARGC is ${CMAKE_ARGC} (we use up to ARGV8 by default; CMake itself gets an extra three directories)")
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(STATUS "INFO: Building on Linux; desired wheel tag is ${DESIRED_WHEEL_TAG}")
+endif()
+message(STATUS "DEBUG: CMake ARGC is ${CMAKE_ARGC} (we use up to ARGV9 by default; CMake itself gets an extra three directories)")
 
 # YOU ARE HERE
 #
 # Pass the Boost library directory as one of the arguments to BuildWheel.cmake in PythonWrapping/CMakeLists.txt.
 #
-# Grab any arguments after CMAKE_ARGV8 as extra search paths.  Pass those to the build_wheel function.
+# Grab any arguments after CMAKE_ARGV9 as extra search paths.  Pass those to the build_wheel function.
 
 set(EXTRA_SEARCH_PATHS "")
 
-if (${CMAKE_ARGC} GREATER 8)
+if (${CMAKE_ARGC} GREATER 9)
   math(EXPR _last_argument_index "${CMAKE_ARGC} - 1")
-  foreach (_i RANGE 9 ${_last_argument_index})
+  foreach (_i RANGE 10 ${_last_argument_index})
     message(STATUS "BuildWheel.cmake received extra search path: ${CMAKE_ARGV${_i}}")
     list(APPEND EXTRA_SEARCH_PATHS ${CMAKE_ARGV${_i}})
   endforeach()
@@ -311,6 +318,7 @@ build_wheel(
   ${SETUP_SCRIPT}
   ${PYTHON_INTERPRETER}
   ${FIX_WHEEL_EXECUTABLE}
+  ${DESIRED_WHEEL_TAG}
   ${EXTRA_SEARCH_PATHS}
   )
 
