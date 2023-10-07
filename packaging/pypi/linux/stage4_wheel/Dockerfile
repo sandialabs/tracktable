@@ -1,5 +1,8 @@
+ARG TRACKTABLE_BUILD_CONTAINER
 ARG PYTHON_IMPLEMENTATION
-FROM tracktable:${PYTHON_IMPLEMENTATION}
+
+FROM ${TRACKTABLE_BUILD_CONTAINER}
+
 
 ENV PYTHON_IMPLEMENTATION=${PYTHON_IMPLEMENTATION}
 
@@ -20,7 +23,7 @@ ENV CI_API_V4_URL=${CI_API_V4_URL}
 ENV CI_PROJECT_ID=${CI_PROJECT_ID}
 
 WORKDIR /opt/src/tracktable/build
-RUN /opt/python/${PYTHON_IMPLEMENTATION}-${PYTHON_IMPLEMENTATION}*/bin/pip install \
+RUN /opt/python/${PYTHON_IMPLEMENTATION}/bin/pip install \
          --trusted-host pypi.python.org \
          --trusted-host pypi.org \
          --trusted-host files.pythonhosted.org \

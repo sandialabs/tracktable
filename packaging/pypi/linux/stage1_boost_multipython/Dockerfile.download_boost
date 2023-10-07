@@ -2,7 +2,7 @@
 # Boost.Python for all available Python versions.
 
 # Download base image
-FROM quay.io/pypa/manylinux2010_x86_64:latest
+FROM quay.io/pypa/manylinux2014_x86_64:latest
 
 # Yum will need proxy information to talk to the outside world
 ARG SSL_CERT=0

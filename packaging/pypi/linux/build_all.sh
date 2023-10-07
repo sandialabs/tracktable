@@ -1,4 +1,7 @@
-#!/bin/sh
+#!/usr/bin/env bash
+
+# Exit immediately on error.
+set -e
 
 # Change these if you want to update the Boost version.  The default below
 # is Boost 1.82.0.  Remember to update clean_all.sh when you change this.
