@@ -11,16 +11,17 @@ FULL_IMPLEMENTATION=$1
 PYTHON_HOME=/opt/python/${FULL_IMPLEMENTATION}
 PYTHON=${PYTHON_HOME}/bin/python
 
-PYTHON_VERSION=`${PYTHON} -c 'from __future__ import print_function; import sys; print("{}.{}".format(sys.version_info.major, sys.version_info.minor))'`
+EXPECTED_INCLUDE_DIR_NAME=$(${PYTHON} -c 'from __future__ import print_function; import sys; print("python{}.{}".format(sys.version_info.major, sys.version_info.minor))')
 
-DIRECTORY_WITH_M=${PYTHON_HOME}/include/python${PYTHON_VERSION}m
-DIRECTORY_WITHOUT_M=${PYTHON_HOME}/include/python${PYTHON_VERSION}
+DIRECTORY_WITHOUT_M=${PYTHON_HOME}/include/${EXPECTED_INCLUDE_DIR_NAME}
+DIRECTORY_WITH_M=${DIRECTORY_WITHOUT_M}m
 
-if [ -d ${DIRECTORY_WITH_M} -a ! -d ${DIRECTORY_WITHOUT_M} ]; then
-    echo "Creating symlink: ${DIRECTORY_WITH_M} -> ${DIRECTORY_WITHOUT_M}"
+if [ -d ${DIRECTORY_WITHOUT_M} ]; then
+    echo "INFO: Python include directly already exists at expected path.  No repair necessary."
+elif [ -d ${DIRECTORY_WITH_M} ]; then
+    echo "INFO: Making Python include directory symlink from ${DIRECTORY_WITH_M} to ${DIRECTORY_WITHOUT_M} so Boost can find it."
     ln -s ${DIRECTORY_WITH_M} ${DIRECTORY_WITHOUT_M}
-elif [ -d ${DIRECTORY_WITHOUT_M} -a ! -d ${DIRECTORY_WITH_M} ]; then
-    echo "Creating symlink: ${DIRECTORY_WITHOUT_M} -> ${DIRECTORY_WITH_M}"
-    ln -s ${DIRECTORY_WITHOUT_M} ${DIRECTORY_WITH_M}
+else
+    echo "ERROR: Include directory for Python implementation ${FULL_IMPLEMENTATION} is not where we expect it (${DIRECTORY_WITH_M} or ${DIRECTORY_WITHOUT_M})."
+    exit 1
 fi
-

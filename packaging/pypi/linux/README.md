@@ -47,14 +47,15 @@ bring on your own and bundle if necessary.
 
 With that in mind, here's what we do:
 
-1.  Start with the latest ```manylinux2010``` image.
-2.  Download, build and install Boost for Python 3.7.
-3.  Build the Boost.Python library for Python versions 2.7, 3.4, 3.5,
-    and 3.6, and install them alongside the one we already built for
-    Python 3.7.
-4.  Download, build, and install the latest version of (CMake)[https://www.cmake.org].
-5.  Clone the latest Tracktable source code from Sandia's Gitlab instance.
-6.  Build and install Tracktable for all of the above versions of Python.
+1.  Start with the latest ```manylinux2014``` image.
+2.  Download, build and install Boost for all of the CPython versions 
+    in that image.  
+3.  Collect all of the binaries for the Boost.Python library.
+4.  Make an image that has Boost.Python binaries for all of those CPython
+    versions.  THIS ENDS STAGE 1.
+4.  Download, build, and install the latest version of 
+    (CMake)[https://www.cmake.org].  THIS IS STAGE 2.
+5.  Build and install Tracktable for all of the above versions of Python.
 7.  Use a custom CMake module (```BuildWheel.cmake```) to drive a
     standard Python setup script to create the wheel.
 8.  Use the ```auditwheel``` tool to find and bundle libraries that we link against.

@@ -1,11 +1,12 @@
 #!/bin/sh
 
-PYTHON_IMPLEMENTATION=$1
-PYTHON_BASE=/opt/python/${PYTHON_IMPLEMENTATION}-${PYTHON_IMPLEMENTATION}
-if [ -e ${PYTHON_BASE}m ]; then
-    PYTHON_HOME=${PYTHON_BASE}m
-else
-    PYTHON_HOME=${PYTHON_BASE}
+IMPLEMENTATION=$1
+PYTHON_HOME=/opt/python/${IMPLEMENTATION}
+
+if [ ! -f ${PYTHON_HOME}/bin/pip ]; then
+    echo "ERROR: install_numpy.sh: Pip not found at expected path ${PYTHON_HOME}/bin/pip"
+    exit 1
 fi
 
+echo "INFO: Installing NumPy for Python implementation ${IMPLEMENTATION}"
 ${PYTHON_HOME}/bin/pip install --trusted-host pypi.python.org --trusted-host pypi.org --trusted-host files.pythonhosted.org numpy
