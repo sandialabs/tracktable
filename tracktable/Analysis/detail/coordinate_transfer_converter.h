@@ -44,7 +44,7 @@ namespace tracktable { namespace detail {
  */
 
 template<class InputPointT, class OutputPointT>
-struct PointConverter : public std::unary_function<InputPointT, OutputPointT>
+struct PointConverter 
 {
   OutputPointT operator()(InputPointT const& input_point) const
     {
