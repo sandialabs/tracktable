@@ -165,6 +165,12 @@ install(
   DESTINATION ${PYTHON_INSTALL_PREFIX}/info/data
 )
 
+file(GLOB lib_files "lib/*.py")
+install(
+  FILES ${lib_files}
+  DESTINATION ${PYTHON_INSTALL_PREFIX}/lib
+)
+
 file(GLOB rw_files "rw/*.py")
 install(
   FILES ${rw_files}

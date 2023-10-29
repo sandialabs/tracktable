@@ -52,3 +52,5 @@ dependencies:
 # MacOS-specific utilities
   - pip:
     - delocate
+  - python-build
+  - twine
