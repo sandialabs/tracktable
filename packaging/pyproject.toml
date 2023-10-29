@@ -1,0 +1,110 @@
+# Copyright (c) 2014-2023 National Technology and Engineering
+# Solutions of Sandia, LLC . Under the terms of Contract DE-NA0003525
+# with National Technology and Engineering Solutions of Sandia, LLC,
+# the U.S. Government retains certain rights in this software.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+# notice, this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+###
+### PyPA-compliant project specification for Tracktable install
+###
+
+[project]
+
+name = "tracktable"
+version = "1.7.1"
+requires-python = ">= 3.8"
+license = {file = "Python/tracktable/LICENSE.txt"}
+readme = "Python/tracktable/README.md"
+
+dependencies = [
+    "cartopy",
+    "folium",
+    "matplotlib",
+    "numpy",
+    "pyshp",
+    "pytz",
+    "six",
+    "shapely",
+    "tqdm",
+    "tracktable-data"
+]
+
+authors = [
+    {name = "Andy Wilson"},
+    {name = "Danny Rintoul"},
+    {name = "Chris Valicka"},
+    {name = "Ben Newton"},
+    {name = "Paul Schrum"},
+    {name = "Phil Baxley"},
+    {name = "Kat Ward"},
+    {name = "Rick Vinyard"},
+    {name = "Michael Scoggin"},
+    {name = "Michael Fadem"},
+    {name = "Geoff Danielson"},
+    {name = "Erik Strobert"}
+]
+
+maintainers = [
+    {name = "Andy Wilson", email = "atwilso@sandia.gov"},
+    {name = "Phil Baxley", email = "pabaxle@sandia.gov"}
+]
+
+keywords = [
+    "trajectory", 
+    "analysis", 
+    "visualization"
+]
+
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Natural Language :: English",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: C++",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Topic :: Scientific/Engineering :: GIS"
+]
+
+[project.urls]
+homepage = "https://tracktable.sandia.gov"
+documentation = "https://tracktable.readthedocs.io"
+repository = "https://github.com/sandialabs/tracktable"
+changelog = "https://github.com/sandialabs/tracktable/blob/main/CHANGELOG.md"
+ 
+[build-system]
+requires = ["setuptools", "wheel"]
+

@@ -455,7 +455,6 @@ if (UNIX)
     ${CMAKE_BINARY_DIR}
     ${CMAKE_INSTALL_PREFIX}
     ${CMAKE_BINARY_DIR}/wheel
-    ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
     ${FIX_WHEEL_EXECUTABLE}
     ${MANYLINUX_WHEEL_TAG}
     NO_EXTRA_SEARCH_PATHS
@@ -471,7 +470,6 @@ else (UNIX)
     ${CMAKE_BINARY_DIR}
     ${CMAKE_INSTALL_PREFIX}
     ${CMAKE_BINARY_DIR}/wheel
-    ${Tracktable_SOURCE_DIR}/packaging/setup-generic.py
     ${FIX_WHEEL_EXECUTABLE}
     ${MANYLINUX_WHEEL_TAG}
     # These will be picked up as extra search paths

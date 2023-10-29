@@ -42,7 +42,7 @@ if [ -z "${TEMP_BUILD_CONTAINER}" ]; then
 fi
 
 echo "INFO: Retrieving list of CPython versions in build container."
-AVAILABLE_PYTHON_IMPLEMENTATIONS=$(docker run -ti --rm ${TEMP_BUILD_CONTAINER} '/bin/ls /opt/python | grep cp')
+AVAILABLE_PYTHON_IMPLEMENTATIONS=$(docker run -ti --rm ${TEMP_BUILD_CONTAINER} '/bin/ls /opt/python | grep cp | grep -v cp36')
 
 
 # # Trim leading and trailing whitespace.
@@ -132,7 +132,7 @@ for PYTHON_IMPLEMENTATION in ${AVAILABLE_PYTHON_IMPLEMENTATIONS}; do
 
         # Clean up after ourselves
         echo "INFO: Cleaning up build containers for CPython version ${PYTHON_IMPLEMENTATION}"
-        docker rmi ${WHEEL_BUILD_CONTAINER}
-        docker rmi ${TRACKTABLE_BUILD_CONTAINER}
+        #docker rmi ${WHEEL_BUILD_CONTAINER}
+        #docker rmi ${TRACKTABLE_BUILD_CONTAINER}
     fi
 done

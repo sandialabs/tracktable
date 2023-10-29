@@ -51,16 +51,28 @@ else
 fi
 
 
-# We're going to build Tracktable for all available CPython versions.
+# We're going to build Tracktable for all available CPython versions
+# newer than 3.6.
 # Get a list of those versions from the container.
 echo "INFO: Retrieving list of CPython versions in build container."
-AVAILABLE_PYTHON_IMPLEMENTATIONS=$(docker run -ti --rm ${BOOST_CMAKE_IMAGE} '/bin/ls /opt/python | grep cp')
+AVAILABLE_PYTHON_IMPLEMENTATIONS=$(docker run -ti --rm ${BOOST_CMAKE_IMAGE} '/bin/ls /opt/python | grep cp | grep -v cp36')
 
 
 ###
 ### Loop through all of the available CPython implementations in this container and
 ### build Boost for each one.
 ###
+
+# Uncomment this line if you want to build just one Python version for debugging.
+#AVAILABLE_PYTHON_IMPLEMENTATIONS=cp310-cp310
+
+# Default to manylinux2014_x86_64
+if [ -z "${MANYLINUX_TAG+x}" ]; then
+    echo "Using default manylinux tag: manylinux2014_x86_64"
+    MANYLINUX_TAG=manylinux2014_x86_64
+else
+    echo "Using user-supplied wheel tag: '${MANYLINUX_TAG}'"
+fi
 
 for PYTHON_IMPLEMENTATION in ${AVAILABLE_PYTHON_IMPLEMENTATIONS}; do
     trim ${PYTHON_IMPLEMENTATION}

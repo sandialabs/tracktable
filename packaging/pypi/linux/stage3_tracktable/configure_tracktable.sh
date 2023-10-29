@@ -27,6 +27,10 @@ ${PYTHON_HOME}/bin/pip install --trusted-host pypi.python.org --trusted-host pyp
 export PATH="${PYTHON_HOME}/bin:${PATH}"
 
 echo "INFO: Configuring Tracktable for CPython version ${PYTHON_IMPLEMENTATION}."
+echo "INFO: Current directory: ${PWD}"
+echo "INFO: Contents of ../src:"
+ls ../src
+
 cmake \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_INSTALL_PREFIX=/opt/src/tracktable/install \
@@ -35,5 +39,5 @@ cmake \
         -DPython3_INCLUDE_DIR=${PYTHON_INCLUDE_DIR} \
         -DBUILD_TESTING=OFF \
         -DBUILD_EXAMPLES=OFF \
-        -DMANYLINUX_WHEEL_TAG=${MANYLINUX_TAG}
+        -DMANYLINUX_WHEEL_TAG=${MANYLINUX_TAG} \
         ../src
