@@ -3,6 +3,8 @@ FROM ${SOURCE_IMAGE}
 
 ARG PYTHON_IMPLEMENTATION
 ARG CI_PROJECT_DIR
+ARG MANYLINUX_TAG
+ENV MANYLINUX_TAG=${MANYLINUX_TAG}
 ARG NIGHTLY
 ENV NIGHTLY=${NIGHTLY}
 ARG DEVELOPMENT
@@ -16,8 +18,8 @@ ENV PYTHON_HOME=/opt/python/${PYTHON_IMPLEMENTATION}-${PYTHON_IMPLEMENTATION}m
 COPY create_dummy_libpython.sh .
 COPY install_numpy.sh .
 
-RUN ./create_dummy_libpython.sh ${PYTHON_IMPLEMENTATION} \
-&& ./install_numpy.sh ${PYTHON_IMPLEMENTATION}
+RUN ./create_dummy_libpython.sh ${PYTHON_IMPLEMENTATION}
+RUN ./install_numpy.sh ${PYTHON_IMPLEMENTATION}
 
 WORKDIR /opt/src
 RUN mkdir tracktable
@@ -26,11 +28,13 @@ RUN mkdir tracktable/build
 
 WORKDIR /opt/src/tracktable/build
 COPY configure_tracktable.sh .
-RUN ./configure_tracktable.sh ${PYTHON_IMPLEMENTATION} \
-# VERBOSE=1 causes the lines being fed to gmake to be printed in full.
-#&& VERBOSE=1 make -j \
-&& make -j 4 \
-&& make install \
-&& make clean
+RUN ./configure_tracktable.sh ${PYTHON_IMPLEMENTATION} ${MANYLINUX_TAG}
+
+# This will run the build with standard CMake output.
+RUN make -j 4 install && make clean
+
+# Use this line instead if you want to see all the compiler calls in 
+# their messy glory.
+# RUN VERBOSE=1 make -j 4 install && make clean
 
 ENTRYPOINT ["/bin/bash", "-c", "-l"]

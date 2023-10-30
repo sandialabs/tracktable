@@ -148,7 +148,7 @@ endfunction(_get_python_abi_tag)
 
 # ----------------------------------------------------------------------
 
-function(build_wheel _build_directory _base_directory _output_directory _setup_py _python_interpreter _fixwheel _extra_search_paths)
+function(build_wheel _build_directory _base_directory _output_directory _python_interpreter _fixwheel _desired_wheel_tag _extra_search_paths)
   set(_platform "PLATFORM_NOT_FOUND")
   set(_abi "ABI_NOT_FOUND")
   set(_implementation_version "IMPLEMENTATION_VERSION_TAG_NOT_FOUND")
@@ -157,110 +157,158 @@ function(build_wheel _build_directory _base_directory _output_directory _setup_p
   _get_python_abi_tag(${_python_interpreter} _abi)
   _get_python_version_tag(${_python_interpreter} _implementation_version)
 
-  # Python 2.7 does not have defined ABI tags.
-  if (_implementation_version STREQUAL "cp27")
-    execute_process(
-      COMMAND
-      ${_python_interpreter}
-      ${_setup_py}
-      "bdist_wheel"
-      "--bdist-dir" ${_base_directory}/wheel_build_temp
-      "--plat-name" ${_platform}
-      "--dist-dir" ${_output_directory}
-      "--python-tag" ${_implementation_version}
-      RESULT_VARIABLE _wheel_build_result
-      WORKING_DIRECTORY ${_base_directory}
-      )
-  else()
-    execute_process(
-      COMMAND
-      ${_python_interpreter}
-      ${_setup_py}
-      "bdist_wheel"
-      "--bdist-dir" ${_base_directory}/wheel_build_temp
-      "--plat-name" ${_platform}
-      "--dist-dir" ${_output_directory}
-      "--python-tag" ${_implementation_version}
-      "--py-limited-api" ${_implementation_version}${_abi}
-      RESULT_VARIABLE _wheel_build_result
-      WORKING_DIRECTORY ${_base_directory}
-      )
-  endif()
+
+  execute_process(
+    COMMAND
+    ${_python_interpreter} -m build --outdir ${_output_directory} .
+    RESULT_VARIABLE _wheel_build_result
+    WORKING_DIRECTORY ${_base_directory}
+    )
 
   if (NOT ${_wheel_build_result} EQUAL 0)
-    message(ERROR "Error while building wheel: ${_wheel_build_result}")
+    message(FATAL_ERROR "Error while building wheel: ${_wheel_build_result}")
   elseif (NOT WIN32)
-    message(STATUS "Wheel build succeeded.  Next up: include binary dependencies.")
+    message(STATUS "Wheel build succeeded.  Next up: add external dependencies.")
   else ()
     message(STATUS "Wheel build succeeded.")
   endif ()
 
-  message(STATUS "Globbing pattern ${_output_directory}/tracktable-*-${_implementation_version}-none-${_platform}.whl")
   file(
     GLOB _wheel_files
-    ${_output_directory}/tracktable-*-${_implementation_version}-none-${_platform}.whl
+    ${_output_directory}/tracktable-*.whl
     LIST_DIRECTORIES false
     )
 
+  message(STATUS "Glob result: ${_wheel_files}")
+
+  # we should only have one wheel
+  list(LENGTH _wheel_files _wheel_count)
+  if (_wheel_count EQUAL 0)
+    message(FATAL_ERROR "No wheel files found in output directory.")
+  elseif (_wheel_count GREATER 1)
+    message(FATAL_ERROR "Too many wheel files (${_wheel_count}) found in output directory ${_output_directory}.")
+  endif ()
+
+  list(GET _wheel_files 0 _original_wheel_filename)
+  if ("${_original_wheel_file}" STREQUAL "NOTFOUND")
+    message(FATAL_ERROR "Couldn't find wheel file in output directory ${_output_directory}.  Glob result: ${_wheel_files}")
+  endif ()
+
+  # Add platform tag and interpreter tag.  This creates 
+  # tracktable-1.7.1-cp310-none-macos10_x86_64.whl from 
+  # tracktable-1.7.1-py3-none-any.whl.
+  
+  message(STATUS "Fixing wheel tags on ${_original_wheel_filename}.")
+  execute_process(
+    COMMAND
+    ${_python_interpreter} -m wheel tags --python-tag ${_implementation_version} --platform-tag ${_platform} 
+    ${_original_wheel_filename}
+    RESULT_VARIABLE _fix_tags_result
+    WORKING_DIRECTORY ${_output_directory}
+    OUTPUT_VARIABLE _fix_tags_output
+    ERROR_VARIABLE _fix_tags_error  
+  )
+  
+  if (NOT ${_fix_tags_result} EQUAL 0) 
+    message(FATAL_ERROR "Error fixing wheel tags: ${_fix_tags_error}")
+    return()
+  endif()
+
+  # Move the original wheel file to a subdirectory so that we can glob the
+  # filename and get just the one we care about.
+  if (NOT EXISTS ${_output_directory}/original_wheel)
+    file(
+      MAKE_DIRECTORY ${_output_directory}/original_wheel
+    )
+  endif()
+  cmake_path(GET _original_wheel_filename FILENAME _original_wheel_name_without_path)
+  
+  file(
+    RENAME ${_original_wheel_filename}
+    ${_output_directory}/original_wheel/${_original_wheel_name_without_path}
+  )
+
+  # Glob the wheel file so we can get the filename to pass to fixwheel.
+  file(
+    GLOB _wheel_files
+    ${_output_directory}/tracktable-*.whl
+    LIST_DIRECTORIES false
+    )
+
+  # we should only have one wheel
+  list(LENGTH _wheel_files _wheel_count)
+  if (_wheel_count EQUAL 0)
+    message(FATAL_ERROR "No wheel files found in output directory ${_output_directory} (second pass).")
+  elseif (_wheel_count GREATER 1)
+    message(FATAL_ERROR "Too many wheel files (${_wheel_count}) found in output directory ${_output_directory} (second pass).")
+  endif ()
+
+  list(GET _wheel_files 0 _tagged_wheel_filename)
 
 
-  # We don't know what the exact filename is going to be.  It depends
-  # on information scattered in several different locations.  Let's
-  # just fix them all.
+  # Now we can invoke auditwheel/delocate/winlocate to copy in the external
+  # library dependencies.
+  message(STATUS "Adding external libraries to ${_tagged_wheel_filename}.")
+  if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(STATUS "    Requesting wheel tag ${_desired_wheel_tag}.")
+  endif ()
 
-  foreach(_wheel_to_fix ${_wheel_files})
-    message(STATUS "Adding external libraries to ${_wheel_to_fix}.")
-    if (${_fixwheel} MATCHES ".*auditwheel.*")
-      execute_process(
-        COMMAND
-        ${_fixwheel} repair --plat manylinux2010_x86_64 ${_wheel_to_fix}
-        RESULT_VARIABLE _fixwheel_result
-        WORKING_DIRECTORY ${_output_directory}
-        OUTPUT_VARIABLE _fixwheel_output
-        ERROR_VARIABLE _fixwheel_error
-        )
-    elseif (${_fixwheel} MATCHES ".*delocate.*")
-      execute_process(
-        COMMAND
-        ${_fixwheel} -v ${_wheel_to_fix}
-        RESULT_VARIABLE _fixwheel_result
-        WORKING_DIRECTORY ${_output_directory}
-        OUTPUT_VARIABLE _fixwheel_output
-        ERROR_VARIABLE _fixwheel_error
+  # Linux uses auditwheel.
+  if (${_fixwheel} MATCHES ".*auditwheel.*")
+    execute_process(
+      COMMAND
+      ${_fixwheel} repair --plat ${_desired_wheel_tag} ${_tagged_wheel_filename}
+      RESULT_VARIABLE _fixwheel_result
+      WORKING_DIRECTORY ${_output_directory}
+      OUTPUT_VARIABLE _fixwheel_output
+      ERROR_VARIABLE _fixwheel_error
       )
-    elseif (${_fixwheel} MATCHES ".*winlocate.*")
-      # Since winlocate searches the user's PATH for dependencies, we need
-      # to add the binary and library directories from our build tree as
-      # well as any other paths (like the Boost search path) that the
-      # user supplied.
-      set(WINDOWS_PATH $ENV{PATH})
-      set(_bin_directory "${_build_directory}/bin")
-      set(_lib_directory "${_build_directory}/lib")
-      string(REPLACE "/" "\\" _bin_directory_backslash ${_bin_directory})
-      string(REPLACE "/" "\\" _lib_directory_backslash ${_lib_directory})
-      string(REPLACE "/" "\\" _extra_search_paths_backslashes ${_extra_search_paths})
-      set(WINDOWS_PATH "${WINDOWS_PATH};${_bin_directory_backslash};${_lib_directory_backslash};${_extra_search_paths_backslashes}")
-      set(ENV{PATH} "${WINDOWS_PATH}")
-
-      # And now, with the path set, we're ready to fix the wheel.
-      execute_process(
-        COMMAND
-          ${_python_interpreter} ${_fixwheel} -d ${_output_directory} ${_wheel_to_fix}
-        RESULT_VARIABLE _fixwheel_result
-        WORKING_DIRECTORY ${_output_directory}
-        OUTPUT_VARIABLE _fixwheel_output
-        ERROR_VARIABLE _fixwheel_error
-      )
-    else()
-      message(SEND_ERROR "ERROR: Unknown fixwheel executable '${_fixwheel}'.")
-    endif()
-
-    if (NOT ${_fixwheel_result} EQUAL 0)
-      message(SEND_ERROR "Error while adding external libraries to wheel: ${_fixwheel_error}")
-      return()
+  # MacOS uses delocate.
+  elseif (${_fixwheel} MATCHES ".*delocate.*")
+    execute_process(
+      COMMAND
+      ${_fixwheel} -v ${_tagged_wheel_filename}
+      RESULT_VARIABLE _fixwheel_result
+      WORKING_DIRECTORY ${_output_directory}
+      OUTPUT_VARIABLE _fixwheel_output
+      ERROR_VARIABLE _fixwheel_error
+    )
+  # Windows uses winlocate.
+  elseif (${_fixwheel} MATCHES ".*winlocate.*")
+    # Since winlocate searches the user's PATH for dependencies, we need
+    # to add the binary and library directories from our build tree as
+    # well as any other paths (like the Boost search path) that the
+    # user supplied.
+    set(WINDOWS_PATH $ENV{PATH})
+    set(_bin_directory "${_build_directory}/bin")
+    set(_lib_directory "${_build_directory}/lib")
+    string(REPLACE "/" "\\" _bin_directory_backslash ${_bin_directory})
+    string(REPLACE "/" "\\" _lib_directory_backslash ${_lib_directory})
+    set(WINDOWS_PATH "${WINDOWS_PATH};${_bin_directory_backslash};${_lib_directory_backslash}")
+    
+    if (NOT _extra_search_paths STREQUAL "NO_EXTRA_SEARCH_PATHS")
+      string(REPLACE "/" "\\" _extra_search_paths_backslashes ${_extra_search_paths}) 
+      set(WINDOWS_PATH "${WINDOWS_PATH};${_extra_search_paths_backslashes}")
     endif ()
-  endforeach ()
+    set(ENV{PATH} "${WINDOWS_PATH}")
 
+    # And now, with the path set, we're ready to fix the wheel.
+    execute_process(
+      COMMAND
+        ${_python_interpreter} ${_fixwheel} -d ${_output_directory} ${_tagged_wheel_filename}
+      RESULT_VARIABLE _fixwheel_result
+      WORKING_DIRECTORY ${_output_directory}
+      OUTPUT_VARIABLE _fixwheel_output
+      ERROR_VARIABLE _fixwheel_error
+    )
+  else()
+    message(SEND_ERROR "ERROR: Unknown fixwheel executable '${_fixwheel}'.")
+  endif()
+
+  if (NOT ${_fixwheel_result} EQUAL 0)
+    message(SEND_ERROR "Error while adding external libraries to wheel: ${_fixwheel_error}")
+    return()
+  endif ()
 
 endfunction(build_wheel)
 
@@ -275,42 +323,46 @@ set(PYTHON_INTERPRETER ${CMAKE_ARGV3})
 set(BUILD_TREE_ROOT ${CMAKE_ARGV4})
 set(INSTALL_TREE_ROOT ${CMAKE_ARGV5})
 set(OUTPUT_DIRECTORY ${CMAKE_ARGV6})
-set(SETUP_SCRIPT ${CMAKE_ARGV7})
-set(FIX_WHEEL_EXECUTABLE ${CMAKE_ARGV8})
+set(FIX_WHEEL_EXECUTABLE ${CMAKE_ARGV7})
+set(DESIRED_WHEEL_TAG ${CMAKE_ARGV8})
 
 message(STATUS "BuildWheel running.")
 message(STATUS "INFO: Python interpreter is ${PYTHON_INTERPRETER}")
 message(STATUS "INFO: Build tree is at ${BUILD_TREE_ROOT}.")
 message(STATUS "INFO: Install tree is at ${INSTALL_TREE_ROOT}")
 message(STATUS "INFO: Output directory is ${OUTPUT_DIRECTORY}")
-message(STATUS "INFO: Setup script is ${SETUP_SCRIPT}")
 message(STATUS "INFO: Wheel fixer is ${FIX_WHEEL_EXECUTABLE}")
-
-message(STATUS "DEBUG: CMake ARGC is ${CMAKE_ARGC} (we use up to ARGV8 by default; CMake itself gets an extra three directories)")
+message(STATUS "INFO: System name is ${CMAKE_SYSTEM_NAME}")
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(STATUS "INFO: Building on Linux; desired wheel tag is ${DESIRED_WHEEL_TAG}")
+endif()
 
 # YOU ARE HERE
 #
 # Pass the Boost library directory as one of the arguments to BuildWheel.cmake in PythonWrapping/CMakeLists.txt.
 #
-# Grab any arguments after CMAKE_ARGV8 as extra search paths.  Pass those to the build_wheel function.
+# Grab any arguments after CMAKE_ARGV9 as extra search paths.  Pass those to the build_wheel function.
 
 set(EXTRA_SEARCH_PATHS "")
 
-if (${CMAKE_ARGC} GREATER 8)
+if (${CMAKE_ARGC} GREATER 9)
   math(EXPR _last_argument_index "${CMAKE_ARGC} - 1")
-  foreach (_i RANGE 9 ${_last_argument_index})
+  foreach (_i RANGE 10 ${_last_argument_index})
     message(STATUS "BuildWheel.cmake received extra search path: ${CMAKE_ARGV${_i}}")
     list(APPEND EXTRA_SEARCH_PATHS ${CMAKE_ARGV${_i}})
   endforeach()
-endif()
+else ()
+  list(APPEND EXTRA_SEARCH_PATHS NO_EXTRA_SEARCH_PATHS)
+endif ()
+
 
 build_wheel(
   ${BUILD_TREE_ROOT}
   ${INSTALL_TREE_ROOT}
   ${OUTPUT_DIRECTORY}
-  ${SETUP_SCRIPT}
   ${PYTHON_INTERPRETER}
   ${FIX_WHEEL_EXECUTABLE}
+  ${DESIRED_WHEEL_TAG}
   ${EXTRA_SEARCH_PATHS}
   )
 
