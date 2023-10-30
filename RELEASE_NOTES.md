@@ -1,5 +1,64 @@
 # Tracktable Release Notes
 
+## VERSION 1.7.1, 29 October 2023
+
+Okay, let's try this again.
+
+Release 1.7.0 is still available as source code, but there were enough
+bugs in the binary packages that we decided to punt, go back, and fix
+those properly rather than accumulate layers upon layers of hotfixes.
+
+### New Features
+
+- Linux wheel-building scripts will now attempt to build Tracktable for
+  all versions of CPython newer than 3.6 that are available in the 
+  manylinux wheel.  This improves on previous work where we used a 
+  hardcoded and oft-duplicated list of versions to build.
+
+- The manylinux tag is now a CMake argument.  We will continue to default
+  to manylinux2014 for the moment but when it comes time to change that
+  we will only need to update it in one place.
+
+- We now control wheel building with `setup.cfg` and `pyproject.toml` 
+  instead of the outdated `python setup-generic.py`.  This puts our
+  build process on much sounder footing and will work better with 
+  the conda-forge build process.
+
+- The function libraries used by the MacOS CI scripts and wheel-building
+  scripts have been consolidated to remove duplication.
+
+- Large files in tracktable-docs and tracktable-data have been moved
+  into Git LFS.
+
+
+
+### Bug fixes
+
+- There is a compile error caused by a ternary expression inside a 
+  constexpr in tracktable/ThirdParty/catch2.hpp.  This is an error because
+  of some new rules in GCC.  The fix is to eliminate the ternary expression
+  and just set the stack size for Catch2 to 32K.
+
+- We now include `boost-cpp` in the Anaconda dependencies for our build
+  and runtime environments.  In some situations, compiled libraries in
+  Boost that we rely upon were only present in that package.
+
+- Fixed a typo in `setup-generic.py` that broke wheel building.
+
+- Switched to libmamba solver on ReadTheDocs.  Without it, our builds
+  time out while waiting for `conda install` to decide what packages
+  it wants.
+
+- Fixed an unbound variable error in `build_osx_wheels.sh` when a
+  wheel output directory was explicitly specified.
+
+- Fixed a problem that led to great-circle fitting returning numerically
+  incorrect answers.
+
+- Removed deprecated uses of `std::unary_function<>`.  This was deprecated
+  in C++11 and removed entirely in C++17.
+  
+
 ## VERSION 1.7.0, 1 September 2023
 
 Welcome back!  We have a couple of new user-facing features, a lot of 
