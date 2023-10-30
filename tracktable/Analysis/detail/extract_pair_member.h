@@ -7,10 +7,7 @@
 namespace tracktable {
 
 template<class pair_type>
-struct ExtractFirst : public std::unary_function<
-  pair_type,
-  typename pair_type::first_type
-  >
+struct ExtractFirst 
 {
   typename pair_type::first_type operator()(pair_type const& input) const
   {
@@ -19,10 +16,7 @@ struct ExtractFirst : public std::unary_function<
 };
 
 template<class pair_type>
-struct ExtractSecond : public std::unary_function<
-  pair_type,
-  typename pair_type::second_type
-  >
+struct ExtractSecond 
 {
   typename pair_type::second_type operator()(pair_type const& input) const
   {

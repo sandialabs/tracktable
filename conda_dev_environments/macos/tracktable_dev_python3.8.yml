@@ -23,6 +23,7 @@ dependencies:
   # C++ Dependencies
   - compilers
   - boost>=1.82
+  - boost-cpp
   - cmake>=3.19.5
   - ninja>=1.10.0
 
@@ -47,6 +48,8 @@ dependencies:
   - graphviz>=2.42.2
   - breathe>=4.26.1, <=4.31.0
 
-# MacOS-specific utilities
+# MacOS-specific utilities and Packagine
   - pip:
     - delocate
+  - python-build
+  - twine

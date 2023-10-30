@@ -23,6 +23,7 @@ dependencies:
   # C++ Dependencies
   - compilers
   - boost>=1.82
+  - boost-cpp
   - cmake>=3.19.5
   - ninja>=1.10.0
 

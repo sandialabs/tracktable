@@ -373,6 +373,10 @@ install(FILES README.md DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT
 if (TRACKTABLE_PYTHON)
   install(FILES LICENSE.txt DESTINATION ${PYTHON_INSTALL_PREFIX})
   install(FILES README.md DESTINATION ${PYTHON_INSTALL_PREFIX})
+  install(FILES README.md DESTINATION ${CMAKE_INSTALL_PREFIX})
+  install(FILES packaging/MANIFEST.in DESTINATION ${CMAKE_INSTALL_PREFIX})
+  install(FILES packaging/pyproject.toml DESTINATION ${CMAKE_INSTALL_PREFIX})
+  install(FILES packaging/setup.cfg DESTINATION ${CMAKE_INSTALL_PREFIX})
 endif ()
 # ----------------------------------------------------------------------
 
