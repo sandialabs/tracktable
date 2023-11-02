@@ -12,6 +12,23 @@ tracktable-questions at sandia dot gov if you have questions about
 any given one.
 
 
+### TRACKTABLE 1.7.1
+
+- 313: Resolve "Migrate wheel-building process away from invoking setup.py" 
+- 315: Resolve "Fix unary_function warnings"
+- 314: Resolve "Fix compile error in catch2.hpp"
+- 311: Resolve "Add Python 3.11 to Linux packaging"
+- 310: Make desired manylinux tag a parameter to BuildWheel
+- 312: Update manylinux tag to 2014
+- 309: Resolve "Great Fit Circle - wrong?"
+- 308: Resolve "Unbound variable error in build_osx_wheels"
+- 307: Change all OSX references to MacOS
+- 300: Hotfix: propagate CI changes to MacOS packaging script
+- 306: Add missing items to release checklist
+- 304: Fix wheel installation by fixing version number in __init__.py
+- 303: Resolve "Add boost-cpp to MacOS conda environment"
+- 302: Resolve 'Add missing comma in setup-generic'
+
 ### HOTFIXES TO TRACKTABLE 1.7.0
 
 - 302: Syntax error in dependencies in setup-generic.py
