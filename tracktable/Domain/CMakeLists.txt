@@ -93,6 +93,16 @@ install(
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
+
+if (TRACKTABLE_PYTHON)
+  install(
+    TARGETS TracktableDomain
+    RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/Python/tracktable/lib"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/Python/tracktable/lib"
+    RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/Python/tracktable/lib"
+    ARCHIVE
+  )
+endif ()
 install(
   FILES ${Domain_HEADERS}
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Domain

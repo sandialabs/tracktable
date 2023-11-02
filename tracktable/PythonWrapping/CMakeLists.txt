@@ -149,6 +149,15 @@ link_directories(
   ${Tracktable_BINARY_DIR}/lib
 )
 
+if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  message(STATUS "Setting RPATH for dynamic libraries to look in @loader_path/../lib.")
+  set(CMAKE_OSX_RPATH ON)
+  list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../lib")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  message(STATUS "Setting RPATH for dynamic libraries to look in \$ORIGIN/../lib.")
+  list(APPEND CMAKE_INSTALL_RPATH "\$ORIGIN/../lib")
+endif ()
+
 set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable)
 
 # We use Python-like naming for these files for two reasons. First,

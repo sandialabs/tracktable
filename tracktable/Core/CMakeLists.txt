@@ -264,3 +264,14 @@ install(
   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+
+if (TRACKTABLE_PYTHON)
+  message(STATUS "Installing C++ shared libraries alongside Python extensions.")
+  install(
+    TARGETS TracktableCore
+    RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/Python/tracktable/lib"
+    LIBRARY DESTINATION "${CMAKE_INSTALL_PREFIX}/Python/tracktable/lib"
+    RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/Python/tracktable/lib"
+    ARCHIVE
+  )
+endif ()
