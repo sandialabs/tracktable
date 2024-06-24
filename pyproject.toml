@@ -1,0 +1,144 @@
+[tool.coverage.report]
+    exclude_also = ["if TYPE_CHECKING:"]
+
+# Ruff Settings Documentation: https://docs.astral.sh/ruff/settings/
+################
+#
+# IMPORTANT!
+# These Ruff settings represent a sensible default baseline decided on
+# by the Platform Services team. If you wish to make adjustments to this config
+# for your specific repo you should only update the fields that follow the pattern
+# of `extend-<field>`. This ensures the baseline stays consistent across repos and
+# any repo specific changes are easily identifiable.
+#
+################
+[tool.ruff]
+    # The supported version of ruff
+    required-version = "0.4.10"
+
+    # The minimum Python version to target
+    target-version = "py312"
+
+    # Files that should be linted
+    include = ["**/pyproject.toml", "*.py", "*.pyi"]
+    # Include these patterns in addition to the ones already defined
+    extend-include = ["*.ipynb"]
+
+    # Ruff's default exclusion of commonly ignored directories. Explicitly added here for context.
+    exclude = [
+        ".bzr",
+        ".direnv",
+        ".eggs",
+        ".git",
+        ".git-rewrite",
+        ".hg",
+        ".mypy_cache",
+        ".nox",
+        ".pants.d",
+        ".pytype",
+        ".ruff_cache",
+        ".svn",
+        ".tox",
+        ".venv",
+        "__pypackages__",
+        "_build",
+        "buck-out",
+        "build",
+        "dist",
+        "node_modules",
+        "venv",
+    ]
+    # Exclude these patterns in addition to the ones already defined
+    # NOTE: Ignoring test folders prevents ruff from breaking existing tests while performing
+    # autofixes but it also means that IDE linting for these files will be impacted. If test
+    # files are brought up to compliance these exclusions should be removed.
+    extend-exclude = ["./**/_version_.py", "test", "tests"]
+
+    line-length = 120
+
+    # Output format
+    output-format = "pylint" # "text" | "grouped" | "json" | "junit" | "github" | "gitlab" | "pylint" | "azure"
+
+    [tool.ruff.format]
+        docstring-code-format      = true
+        docstring-code-line-length = 120
+
+    [tool.ruff.lint]
+
+        # Rules to enable. Documentation: https://beta.ruff.rs/docs/rules/
+        select = ["ALL"]
+
+        # Rules to ignore. Documentation: https://beta.ruff.rs/docs/rules/
+        ignore = [
+            "AIR",     # Airflow
+            "ANN003",  # flake8-annotations: missing-type-kwargs
+            "ANN101",  # flake8-annotations: missing-type-self
+            "ANN102",  # flake8-annotations: missing-type-cls
+            "ANN204",  # flake8-annotations: missing-return-type-special-method
+            "C90",     # mccabe
+            "COM812",  # missing-trailing-comma
+            "CPY",     # flake8-copyright
+            "D100",    # pydocstyle: undocumented-public-module
+            "D104",    # pydocstyle: undocumented-public-package
+            "D105",    # pydocstyle: undocumented-magic-method
+            "D107",    # pydocstyle: undocumented-public-init
+            "D401",    # pydocstyle: non-imperative-mood
+            "DJ",      # flake8-django
+            "EM",      # flake8-errmsg
+            "EXE",     # flake8-executable
+            "FA",      # flake8-future-annotations
+            "FBT",     # flake8-boolean-trap
+            "FIX",     # flake8-fixme
+            "FLY",     # flynt
+            "ICN",     # flake8-import-conventions
+            "INT",     # flake8-gettext
+            "ISC",     # flake8-implicit-str-concat 
+            "PD",      # pandas-vet
+            "PERF401", # Perflint: manual-list-comprehension
+            "PGH003",  # pygrep-hooks: blanket-type-ignore
+            "PGH004",  # pygrep-hooks: blanket-noqa
+            "PGH005",  # pygrep-hooks: invalid-mock-access
+            "PIE790",  # flake8-pie: unnecessary-pass
+            "PTH",     # flake8-use-pathlib
+            "PYI",     # flake8-pyi
+            "RET501",  # flake8-return:unnecessary-return-none | Turn off RET501 to force RET502 (implicit-return-value)
+            "RUF012",  # Ruff-specific rules: mutable-class-default
+            "T10",     # flake8-debugger
+            "T20",     # flake8-print
+            "TD002",   # flake8-todos: missing-todo-author
+            "TD003",   # flake8-todos: missing-todo-link
+            "TID251",  # flake8-tidy-imports: banned-api
+            "TRY003",  # raise-vanilla-args
+            "YTT",     # flake8-2020
+        ]
+
+        # Allow applying unsafe fixes from this list without the `--unsafe-fixes` flag
+        extend-safe-fixes = ["D"]
+
+        #Task tags to recognize
+        task-tags = ["FIXME", "TODO", "XXX"]
+
+        # Disable autofix for commented out code (`ERA001`).
+        unfixable = ["ERA001"]
+
+        [tool.ruff.lint.flake8-annotations]
+            allow-star-arg-any      = true
+            suppress-dummy-args     = true
+            suppress-none-returning = true # May conflict with RET501/RET502
+
+        [tool.ruff.lint.flake8-tidy-imports]
+            # Disallow all relative imports that extend only into parent module or beyond, use "all" to disallow all relative imports
+            ban-relative-imports = "all"
+
+        [tool.ruff.lint.flake8-unused-arguments]
+            # Allow unused variadic arguments, like *args and **kwargs
+            ignore-variadic-names = true
+
+        [tool.ruff.lint.pydocstyle]
+            convention = "pep257" # "google" | "numpy" | "pep257"
+
+        [tool.ruff.lint.extend-per-file-ignores]
+            "tests/**/*.py" = ["ANN", "D", "PLR0913"]
+
+        [tool.ruff.lint.isort]
+            required-imports = ["from __future__ import annotations"]
