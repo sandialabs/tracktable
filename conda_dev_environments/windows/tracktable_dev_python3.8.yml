@@ -18,7 +18,7 @@ dependencies:
   - folium>=0.11.0
   - scipy>=1.5.2
   - tqdm>=4.51.0
-  - tracktable-data>=1.7.0
+  - tracktable-data>=1.7.3
 
   # C++ Dependencies
   - boost>=1.82
@@ -46,7 +46,7 @@ dependencies:
   - doxygen>=1.8.17
   - graphviz>=2.42.2
   - breathe>=4.26.1, <=4.31.0
-  
+
   # Packaging Dependencies
   - python-build
   - twine

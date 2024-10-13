@@ -2,7 +2,7 @@
 #
 # When we upload documentation to readthedocs, it gets
 # built inside a Conda environment.  This file specifies
-# that environment's contents.  It is stripped down to 
+# that environment's contents.  It is stripped down to
 # what we believe is a minimal set of requirements.
 
 name: tracktable-readthedocs
@@ -14,9 +14,9 @@ dependencies:
   - matplotlib>=3.0
   - scipy>=1.5.2
   - tracktable
-  - tracktable-data>=1.7.0
+  - tracktable-data>=1.7.3
   - pip
-  
+
   # Jupyter Dependencies
   - ipykernel
   - jupyter
