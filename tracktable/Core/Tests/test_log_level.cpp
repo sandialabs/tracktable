@@ -112,6 +112,7 @@ int main(int /*argc*/, char** /*argv*/)
 	std::ostringstream outbuf;
  	ostringstream_ptr outbuf_ptr(&outbuf, boost::null_deleter());
 	sink->locked_backend()->add_stream(outbuf_ptr);
+	boost::log::core::get()->add_sink(sink);
 
 	int num_errors = 0;
 
