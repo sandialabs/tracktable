@@ -1,5 +1,5 @@
-## Tracktable Windows Python 3.10 CI/CD Anaconda Environment
-name: tracktable-windows-ci-py310
+# Fully Featured Tracktable Development Anaconda Environment
+name: tracktable-dev-python3.13
 channels:
   - conda-forge
 dependencies:
@@ -7,7 +7,7 @@ dependencies:
   - git
 
   # Python Dependencies
-  - python=3.10
+  - python==3.13
   - pip
   - numpy>=1.7
   - matplotlib>=3.0
@@ -21,13 +21,14 @@ dependencies:
   - tracktable-data>=1.7.3
 
   # C++ Dependencies
-  - compilers
   - boost>=1.82
+  - boost-cpp
   - cmake>=3.19.5
   - ninja>=1.10.0
 
   # Jupyter Dependencies
   - ipykernel
+  - jupyter
 
   # Movie Dependencies
   - ffmpeg>=4.2.4
@@ -47,4 +48,5 @@ dependencies:
   - breathe>=4.26.1, <=4.31.0
 
   # Packaging Dependencies
+  - python-build
   - twine

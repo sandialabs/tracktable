@@ -1,5 +1,5 @@
-## Tracktable Windows Python 3.10 CI/CD Anaconda Environment
-name: tracktable-windows-ci-py310
+# Tracktable MacOS Python 3.10 CI/CD Anaconda Environment
+name: tracktable-macos-ci-py310
 channels:
   - conda-forge
 dependencies:
@@ -8,6 +8,7 @@ dependencies:
 
   # Python Dependencies
   - python=3.10
+  - python_abi=*=*_cp*
   - pip
   - numpy>=1.7
   - matplotlib>=3.0
@@ -22,7 +23,7 @@ dependencies:
 
   # C++ Dependencies
   - compilers
-  - boost>=1.82
+  - boost>=1.74, <=1.75
   - cmake>=3.19.5
   - ninja>=1.10.0
 
@@ -47,4 +48,6 @@ dependencies:
   - breathe>=4.26.1, <=4.31.0
 
   # Packaging Dependencies
+  - delocate=0.8.2
+  - unzip
   - twine
