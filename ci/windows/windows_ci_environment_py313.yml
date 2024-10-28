@@ -1,5 +1,5 @@
-## Tracktable Windows Python 3.10 CI/CD Anaconda Environment
-name: tracktable-windows-ci-py310
+## Tracktable Windows Python 3.13 CI/CD Anaconda Environment
+name: tracktable-windows-ci-py313
 channels:
   - conda-forge
 dependencies:
@@ -7,7 +7,7 @@ dependencies:
   - git
 
   # Python Dependencies
-  - python=3.10
+  - python==3.13
   - pip
   - numpy>=1.7
   - matplotlib>=3.0

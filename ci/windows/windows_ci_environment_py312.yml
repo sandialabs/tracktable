@@ -1,5 +1,5 @@
-## Tracktable Windows Python 3.10 CI/CD Anaconda Environment
-name: tracktable-windows-ci-py310
+## Tracktable Windows Python 3.12 CI/CD Anaconda Environment
+name: tracktable-windows-ci-py312
 channels:
   - conda-forge
 dependencies:
