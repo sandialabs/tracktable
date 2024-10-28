@@ -34,7 +34,7 @@
 # This second check undoes the previous find and looks for all necessary components
 unset(Boost_FOUND)
 message(STATUS "Looking for Boost components needed for C++ examples")
-find_package(Boost
+find_package(Boost CONFIG
   ${BOOST_MINIMUM_VERSION_REQUIRED}
   REQUIRED
   COMPONENTS

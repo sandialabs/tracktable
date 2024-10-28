@@ -417,7 +417,7 @@ set(BOOST_TEST_COMPONENTS system timer chrono)
 
 # This first check gets the core component libraries needed for the pkgconfig file
 unset(Boost_FOUND)
-find_package(Boost
+find_package(Boost CONFIG
   ${BOOST_MINIMUM_VERSION_REQUIRED}
   REQUIRED
   COMPONENTS
