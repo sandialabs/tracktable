@@ -106,20 +106,22 @@ private:
    * Generates a iterator that can traverse the given parent
    * generic reader sequence
    */
-  class GenericInputIterator : public std::iterator<
-  std::input_iterator_tag,
-  sequence_object_type
-  >
-
+  class GenericInputIterator
   {
   public:
-    typedef std::ptrdiff_t          difference_type;
-    typedef sequence_object_type    value_type;
-    typedef value_type const&             reference;
-    typedef value_type const&       const_reference;
-    typedef value_type const*             pointer;
-    typedef value_type const*       const_pointer;
-    typedef std::input_iterator_tag iterator_category;
+    using iterator_category = std::input_iterator_tag;
+    using value_type        = sequence_object_type;
+    using difference_type   = std::ptrdiff_t;
+    // This looks wrong: we expect reference to be 'value_type &' without
+    // the const.  If we do that, though, we get a compilation error in
+    // Examples/FilterTime/filter_by_time.cpp where something deep in
+    // Boost tries to bind a const value to a non-const reference.
+    //
+    // That's an issue to investigate another time.
+    using reference         = value_type const &;
+    using const_reference   = value_type const &;
+    using pointer           = value_type *;
+    using const_pointer     = const value_type *;
 
     /// Instantiate an empty input iterator
     GenericInputIterator()

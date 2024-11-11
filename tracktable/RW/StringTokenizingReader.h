@@ -248,14 +248,17 @@ protected:
 
   /** Class for the tokenized string iterator
    */
-  class TokenizedStringIterator : public std::iterator<
-    std::input_iterator_tag,
-    token_iterator_pair,
-    std::ptrdiff_t,
-    const token_iterator_pair *,
-    token_iterator_pair  const&
-  >
+
+  class TokenizedStringIterator
   {
+  public:
+    using iterator_category = std::input_iterator_tag;
+    using value_type        = token_iterator_pair;
+    using difference_type   = std::ptrdiff_t;
+    using pointer           = token_iterator_pair *;
+    using reference         = token_iterator_pair&;
+    using iterator          = typename tokenizer_type::iterator;
+
   private:
     tokenizer_type* Tokenizer;
     token_iterator_pair TokenRangeCurrentString;
@@ -280,9 +283,6 @@ protected:
     }
 
   public:
-    typedef typename tokenizer_type::iterator iterator;
-    typedef token_iterator_pair value_type;
-
     /// Instantiate a default TokenizedStringIterator
     TokenizedStringIterator()
       : Tokenizer(0)
