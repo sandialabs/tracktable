@@ -68,7 +68,7 @@ int test_point_at_time_fraction()
   test_trajectory.push_back(points[2]);
 
   int error_count = 0;
-  Point2D halfway = tracktable::point_at_time_fraction(test_trajectory, 0.5);
+  TrajectoryPoint2D halfway = tracktable::point_at_time_fraction(test_trajectory, 0.5);
   if (halfway != points[1])
     {
     std::cout << "ERROR: Expected halfway point to return exactly the second point.\n";
