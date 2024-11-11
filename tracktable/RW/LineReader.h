@@ -153,16 +153,16 @@ protected:
    * Generates a iterator that can traverse the given parent
    * LineReader
    */
-  class LineReaderIterator : public std::iterator< std::input_iterator_tag,
-                                                   StringT,
-                                                   std::ptrdiff_t,
-                                                   const StringT*,
-                                                   StringT const&>
+  class LineReaderIterator
   {
   public:
-    typedef StringT                        value_type;
-    typedef typename StringT::value_type   char_type;
-    typedef typename StringT::traits_type  traits_type;
+    using iterator_category = std::input_iterator_tag;
+    using value_type        = StringT;
+    using difference_type   = std::ptrdiff_t;
+    using pointer           = StringT*;
+    using reference         = StringT&;
+    using char_type         = typename StringT::value_type;
+    using traits_type     = typename StringT::traits_type;
 
     /// Instantiate an empty reader iterator
     LineReaderIterator()
