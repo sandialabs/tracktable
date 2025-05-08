@@ -22,7 +22,10 @@ dependencies:
 
   # C++ Dependencies
   - compilers
-  - boost>=1.82
+  - libboost-devel>=1.86
+  - libboost-headers>=1.86
+  - libboost-python>=1.86
+  - libboost-python-devel>=1.86
   - cmake>=3.19.5
   - ninja>=1.10.0
 

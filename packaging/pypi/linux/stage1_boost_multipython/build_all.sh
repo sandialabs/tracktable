@@ -3,15 +3,15 @@
 # Exit on error.
 set -e
 
-### 
+###
 ### STARTUP
 ###
-### We get all of our arguments from environment variables rather than on 
+### We get all of our arguments from environment variables rather than on
 ### the command line.  Check to see what's there and what's not.
 ###
 ### Here's what we look for:
 ###
-### BOOST_MAJOR_VERSION, BOOST_MINOR_VERSION, BOOST_PATCH_VERSION: 
+### BOOST_MAJOR_VERSION, BOOST_MINOR_VERSION, BOOST_PATCH_VERSION:
 ###    What version of Boost should we build?  Defaults to 1.82.0.
 ###
 ### SNL_HTTP_PROXY, SNL_HTTPS_PROXY, SNL_NO_PROXY:
@@ -20,15 +20,15 @@ set -e
 ###    we will use the current shell's values for those variables.
 ###
 ### CUSTOM_SSL_CERT:
-###    This is a certificate to add to the OS list of authorities. 
-###    You will need this if you're building in an organization that 
+###    This is a certificate to add to the OS list of authorities.
+###    You will need this if you're building in an organization that
 ###    does HTTPS interception at the firewall.  You can either include
 ###    the certificate itself in this variable (as an ASCII string) or
 ###    provide a filename containing the cert.  No default.
 ###
 
 DEFAULT_BOOST_MAJOR_VERSION=1
-DEFAULT_BOOST_MINOR_VERSION=82
+DEFAULT_BOOST_MINOR_VERSION=86
 DEFAULT_BOOST_PATCH_VERSION=0
 
 # Change these lines whenever you want to build against a different version
@@ -121,7 +121,7 @@ fi
 
 find_script_directory() {
     local _source="${BASH_SOURCE[0]}"
-    while [ -L "${_source}" ]; do 
+    while [ -L "${_source}" ]; do
         # Resolve _source until the file is no longer a symlink.
         _dir=$( cd -P "$(dirname "${_source}" )" >/dev/null 2>&1 && pwd )
         _source=$(readlink "$_source")
@@ -135,7 +135,7 @@ source ${HERE}/../functions/parsing.sh
 
 echo "INFO: Building Boost.Python from Boost ${BOOST_VERSION_DOTS} for all supported Python versions."
 
-### 
+###
 ### Download Boost source if we don't have it already
 ###
 
@@ -145,7 +145,7 @@ if [ ! -f ${BOOST_FILENAME} ]; then
     curl \
        --location \
        -o ${BOOST_FILENAME} \
-       https://boostorg.jfrog.io/artifactory/main/release/${BOOST_VERSION_DOTS}/source/${BOOST_FILENAME}
+       https://archives.boost.io/release/1.86.0/source/boost_${BOOST_VERSION_UNDERSCORES}.tar.gz
 else
     echo "INFO: Boost source already downloaded."
 fi
@@ -196,11 +196,11 @@ mkdir libboost_python_tmp
 for PYTHON_IMPLEMENTATION in ${AVAILABLE_PYTHON_IMPLEMENTATIONS}; do
     trim "${PYTHON_IMPLEMENTATION}"
     PYTHON_IMPLEMENTATION="${_trimmed_string}"
-    
+
     parse_python_version "${PYTHON_IMPLEMENTATION}"
     PYTHON_VERSION=${_python_version}
     PYTHON_ABI=${_python_abi}
-    
+
     DESTINATION_IMAGE_NAME=boost-${BOOST_VERSION_DOTS}:${PYTHON_VERSION}
 
     if [ "${BASE_MULTIPYTHON_IMAGE}" = "not_yet_defined" ]; then
@@ -221,13 +221,13 @@ for PYTHON_IMPLEMENTATION in ${AVAILABLE_PYTHON_IMPLEMENTATIONS}; do
     CREATED_NAME=$(docker create ${DESTINATION_IMAGE_NAME})
     docker cp ${CREATED_NAME}:/boost_python/boost_python_libraries.tar ./libboost_python_tmp
     docker rm ${CREATED_NAME}
-    
+
     pushd libboost_python_tmp
     tar xf boost_python_libraries.tar && rm boost_python_libraries.tar
     popd
 done
 
-### 
+###
 ### Collect all of the compiled libboost_python libraries into a single image.
 ###
 
@@ -238,7 +238,7 @@ docker build \
     -f Dockerfile.collect_boost_python \
     .
 
-###    
+###
 ### Cleanup: we no longer need the individual builds or the Boost source code.
 ###
 for PYTHON_IMPLEMENTATION in ${AVAILABLE_PYTHON_IMPLEMENTATIONS}; do
