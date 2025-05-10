@@ -237,7 +237,7 @@ def matplotlib_cmap_to_dict(colormap_name,
     sample_points = np.linspace(0, 1, num_colors)
     output = dict()
     for sample_value in sample_points:
-        output[sample_value] = matplotlib.colors.to_hex(
+        output[str(float(sample_value))] = matplotlib.colors.to_hex(
             mpl_cmap(sample_value)
         )
     return output
