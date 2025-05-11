@@ -35,6 +35,7 @@ import hashlib
 import logging
 from math import ceil
 
+import cartopy.mpl.geoaxes
 import cartopy.crs
 import folium as fol
 import matplotlib
@@ -420,6 +421,8 @@ def load_density_array(infile):
 # ----------------------------------------------------------------------
 
 def draw_density_array(density,
+                       x_bin_boundaries: numpy.ndarray,
+                       y_bin_boundaries: numpy.ndarray,
                        map_projection,
                        bounding_box,
                        colormap=None,
@@ -430,6 +433,8 @@ def draw_density_array(density,
 
     Args:
        density (iterable): Density array that will be drawn onto the map
+       x_bin_boundaries (NumPy array, 1xN): Boundaries of bins in X/longitude
+       y_bin_boundaries (NumPy array, 1xM): Boundaries of bins in Y/latitude
        map_projection (Basemap): Map to render onto
        bounding_box (point2d): Bounding box of area to gdraw the
 
@@ -448,21 +453,28 @@ def draw_density_array(density,
     # density.shape[]. Recall that the X coordinate refers to
     # columns, typically dimension 1, while the Y coordinate refers to
     # rows, typically dimension 0.
-    x_bins = numpy.linspace(bounding_box.min_corner[0],
-                            bounding_box.max_corner[0],
-                            density.shape[1] + 1)
-
-    y_bins = numpy.linspace(bounding_box.min_corner[1],
-                            bounding_box.max_corner[1],
-                            density.shape[0] + 1)
-
-    x_bins_mesh, y_bins_mesh = numpy.meshgrid(x_bins, y_bins)
+    x_bins_mesh, y_bins_mesh = numpy.meshgrid(x_bin_boundaries, y_bin_boundaries)
 
     # And finally render it onto the map.
-    return [ matplotlib.pyplot.pcolormesh(x_bins_mesh,
-                                          y_bins_mesh,
-                                          density,
-                                          cmap=colormap,
-                                          norm=colorscale,
-                                          zorder=zorder,
-                                          axes=axes) ]
+    if axes is None:
+        axes = matplotlib.pyplot.gca()
+
+    # Are we in a GeoAxes instance?  If so, we need to tell pcolormesh
+    # how to transform the density map to whatever map projection
+    # we're using.
+    if isinstance(axes, cartopy.mpl.geoaxes.GeoAxes):
+        projection_kwargs = {"transform": cartopy.crs.PlateCarree()}
+    else:
+        projection_kwargs = {}
+
+    mesh = axes.pcolormesh(
+        x_bins_mesh,
+        y_bins_mesh,
+        density,
+        cmap=colormap,
+        norm=colorscale,
+        zorder=zorder,
+        **projection_kwargs
+    )
+
+    return [mesh]

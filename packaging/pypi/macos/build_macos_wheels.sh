@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-# This script will build MacOS wheels for Tracktable from the currently 
-# checked-out repository.  By default it will build for Python versions 
+# This script will build MacOS wheels for Tracktable from the currently
+# checked-out repository.  By default it will build for Python versions
 # 3.8 - 3.11 (3.9 - 3.11 on ARM64)
 #
-# To request just one version, use the '--python-version 3.x' argument.  
+# To request just one version, use the '--python-version 3.x' argument.
 # To set the output directory for wheels, use the '--output-directory /path' argument.
 # To set the parent directory for the build, use the '--build-root /path' argument.
 
@@ -21,7 +21,7 @@
 ### -------------------------------------------------------------------
 
 # TO DO:
-# 
+#
 # Check CMake version
 # Check Conda environment contents
 # Copy wheel to output directory
@@ -60,7 +60,7 @@ function disable_debug () {
 	set +o nounset
 }
 
-function enable_debug () { 
+function enable_debug () {
 	set -o pipefail
 	set -o nounset
 }
@@ -104,7 +104,7 @@ Required Arguments:
         CMakeLists.txt and RELEASE_NOTES.md.
 
 Options:
-    -p,--python-version X.Y: Build for Python version X.Y.  This can be 
+    -p,--python-version X.Y: Build for Python version X.Y.  This can be
         specified multiple times to build for multiple versions.  By
         default, wheels will be built for Python 3.8 - 3.11 (3.9 - 3.11
 		on Apple Silicon).
@@ -113,7 +113,7 @@ Options:
         specified directory.  This defaults to the value of the
         environment variable TMPDIR, which is often /tmp on Unix-like
         systems.  This directory needs to have about 1 gigabyte free
-        for each version of Python in the build list.  
+        for each version of Python in the build list.
 
         Note that the build trees will be collected in a temporary
         subdirectory of the build root named 'tracktable-build.XXXXXX'
@@ -127,12 +127,12 @@ Options:
 
     -j,--parallel <jobs>: Run <jobs> parallel build jobs.  The default
         is controlled by the native build tool.  For GNU Make, the default
-        is one.  
+        is one.
 
 Notes:
-    At present, this script does not allow the specification of patch 
-    levels for Python versions (e.g. 3.8.2), only major and minor versions.  
-    It also does not check whether requested Python versions actually exist 
+    At present, this script does not allow the specification of patch
+    levels for Python versions (e.g. 3.8.2), only major and minor versions.
+    It also does not check whether requested Python versions actually exist
     until build time.
 
     This script will be enhanced to allow specification of a post-build
@@ -149,7 +149,7 @@ EOF
 #    None.
 #
 # Returns:
-#    No return value.  Exits if shell cannot cd to the directory 
+#    No return value.  Exits if shell cannot cd to the directory
 #    containing this script (which would be very weird).
 #
 # Output variables:
@@ -190,11 +190,11 @@ function main () {
 
 	# Load our function libraries and set TRACKTABLE_HOME
 	_load_helper_functions
-	
+
 
 	### -------------------------------------------------------------------
 	### Parse command line options
-	### 
+	###
 	### This section sets the following variables:
 	###
 	### _tmpdir_root - Where to make our temporary directory
@@ -216,11 +216,11 @@ function main () {
 	while true; do
 		case "$1" in
 			-b | --build-root ) WORKDIR_LOCATION="$2"; shift 2 ;;
-			-p | --python-version ) if [ "${PYTHON_VERSIONS}" == "unset" ]; 
-									then PYTHON_VERSIONS=("$2"); 
+			-p | --python-version ) if [ "${PYTHON_VERSIONS}" == "unset" ];
+									then PYTHON_VERSIONS=("$2");
 									else PYTHON_VERSIONS+=("$2");
 									fi; shift 2 ;;
-			-w | --wheel-directory ) WHEEL_DIRECTORY="$2"; shift 2 ;; 
+			-w | --wheel-directory ) WHEEL_DIRECTORY="$2"; shift 2 ;;
 			-j | --parallel ) PARALLEL_JOBS="$2"; shift 2 ;;
 	        -k | --keep-build-trees ) KEEP_BUILD_TREES=1; shift ;;
 			-h | --help ) usage; exit 3 ;;
@@ -282,14 +282,17 @@ function main () {
 	if [[ "${PYTHON_VERSIONS}" == "unset" ]]
 	then
 		msg_debug "No Python versions requested."
+		# At present, arm64 (Apple Silicon) and Intel both support the
+		# same set of Python versions.  This if statement allows us to
+		# change that if necessary.
 		ARCH="$(uname -m)"
 		if [[ "${ARCH}" == "arm64" ]]
 		then
-			msg_debug "Defaulting to Python 3.9 - 3.11 on arm64."
-			PYTHON_VERSIONS=(3.9 3.10 3.11)
+			msg_debug "Defaulting to Python 3.9 - 3.13 on arm64."
+			PYTHON_VERSIONS=(3.9 3.10 3.11 3.12 3.13)
 		else
-			msg_debug "Defaulting to Python 3.8 - 3.11."
-			PYTHON_VERSIONS=(3.8 3.9 3.10 3.11)
+			msg_debug "Defaulting to Python 3.9 - 3.13."
+			PYTHON_VERSIONS=(3.9 3.10 3.11 3.12 3.13)
 		fi
 	fi
 
@@ -318,7 +321,7 @@ function main () {
 	### --------------------------------------------------------------------
 	### Grab Conda environments for future reference
 	### This will populate the variable list_conda_environments_OUTPUT
-	list_conda_environments 
+	list_conda_environments
 
 	### --------------------------------------------------------------------
 	### Make sure we have a place for our builds
@@ -389,7 +392,7 @@ function main () {
 		fi
 
 
-		if ! cmake_run_install ${__build_directory}; then 
+		if ! cmake_run_install ${__build_directory}; then
 			msg_error "CMake install stage failed.  Exiting."
 			return 30
 		fi

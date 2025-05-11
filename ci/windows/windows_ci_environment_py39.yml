@@ -22,8 +22,8 @@ dependencies:
 
   # C++ Dependencies
   - vs2022_win-64
-  - libboost-devel>=1.82
-  - libboost-python-devel>=1.82
+  - libboost-devel>=1.86
+  - libboost-python-devel>=1.86
   - cmake>=3.19.5
   - ninja>=1.10.0
 

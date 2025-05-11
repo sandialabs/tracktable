@@ -350,11 +350,14 @@ def render_heatmap(points,
 
     # And finally render it onto the map.
     density_array = common_processing.draw_density_array(masked_density,
+                                                x_bin_boundaries,
+                                                y_bin_boundaries,
                                                 map_canvas,
                                                 bounding_box,
                                                 colormap=colormap,
                                                 colorscale=colorscale,
-                                                zorder=zorder)
+                                                zorder=zorder,
+                                                axes=map_canvas)
 
     if not common_processing.in_notebook() or save:
             if filename:
