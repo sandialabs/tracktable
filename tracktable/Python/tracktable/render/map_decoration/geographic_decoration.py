@@ -216,7 +216,7 @@ def draw_cities(map_axes,
             longitude = city.longitude
             latitude = city.latitude
             text_artist = map_axes.annotate(
-                s=city.name,
+                text=city.name,
                 xy=(longitude, latitude),
                 xytext=(6, 0),
                 textcoords="offset points",
@@ -292,7 +292,7 @@ def draw_airports(map_axes,
 
         if draw_arrows:
             text_artist = map_axes.annotate(
-                s=airport_code,
+                text=airport_code,
                 xy=(longitude, latitude),
                 xytext=(-20, 20),
                 textcoords="offset points",
@@ -307,7 +307,7 @@ def draw_airports(map_axes,
             )
         else:
             text_artist = map_axes.annotate(
-                s=airport_code,
+                text=airport_code,
                 xy=(longitude, latitude),
                 xytext=(-10, 5),
                 textcoords="offset points",
@@ -369,7 +369,7 @@ def draw_airports(map_axes,
 
             if draw_arrows:
                 text_artist = map_axes.annotate(
-                    s=airport.name,
+                    text=airport.name,
                     xy=(longitude, latitude),
                     xytext=(-20, 20),
                     textcoords="offset points",
@@ -384,7 +384,7 @@ def draw_airports(map_axes,
                 )
             else:
                 text_artist = map_axes.annotate(
-                    s=airport.name,
+                    text=airport.name,
                     xy=(longitude, latitude),
                     xytext=(-10, 5),
                     textcoords="offset points",
@@ -470,7 +470,7 @@ def draw_ports(map_axes,
 
         if draw_arrows:
             text_artist = map_axes.annotate(
-                s=port_name,
+                text=port_name,
                 xy=(longitude, latitude),
                 xytext=(-20, 20),
                 textcoords="offset points",
@@ -485,7 +485,7 @@ def draw_ports(map_axes,
             )
         else:
             text_artist = map_axes.annotate(
-                s=port_name,
+                text=port_name,
                 xy=(longitude, latitude),
                 xytext=(-10, 5),
                 textcoords="offset points",
@@ -581,7 +581,7 @@ def draw_ports(map_axes,
 
             if draw_arrows:
                 text_artist = map_axes.annotate(
-                    s=port.name,
+                    text=port.name,
                     clip_on=True,
                     xy=(longitude, latitude),
                     xytext=(-20, 20),
@@ -597,7 +597,7 @@ def draw_ports(map_axes,
                 )
             else:
                 text_artist = map_axes.annotate(
-                    s=port.name,
+                    text=port.name,
                     clip_on=True,
                     xy=(longitude, latitude),
                     xytext=(-10, 5),
@@ -1250,7 +1250,7 @@ def _draw_map_scale_line(mymap,
         colors=colors,
         linewidths=linewidths,
         transform=geodetic_projection)
-    
+
     axes.add_artist(map_scale_segments)
     return [map_scale_segments]
 
