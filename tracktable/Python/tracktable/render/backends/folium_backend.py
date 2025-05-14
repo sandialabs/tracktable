@@ -35,14 +35,17 @@ import itertools
 import logging
 from datetime import datetime, timedelta
 
-import folium as fol
 import matplotlib
-from folium.plugins import HeatMap
 from matplotlib.colors import ListedColormap, hsv_to_rgb, rgb2hex
 from tracktable.core.geomath import compute_bounding_box
 from tracktable.info import airports, borders, ports, rivers, shorelines
 from tracktable.render.map_decoration import coloring
 from tracktable.render.map_processing import common_processing
+
+from tracktable.render.backends import folium_proxy
+
+fol = folium_proxy.import_folium()
+fol_heat_map = folium_proxy.import_folium("plugins.heat_map")
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +72,7 @@ def timedelta_to_iso8601_duration(td: timedelta) -> str:
     Returns:
         Duration represented as a string in ISO8601 format (without fractional seconds)
     """
-    #Adapted from isodate's _strfduration method.  
+    #Adapted from isodate's _strfduration method.
     ret = []
     usecs = abs(
         (td.days * 24 * 60 * 60 + td.seconds) * 1000000 + td.microseconds
@@ -362,14 +365,14 @@ def render_trajectories(trajectories,
                                   },
                               },
             } for point in anim_points ]
-        
+
         if anim_trail_duration != None:
             anim_trail_duration = timedelta_to_iso8601_duration(anim_trail_duration)
         anim_timestamp_update_step = timedelta_to_iso8601_duration(anim_timestamp_update_step)
 
         plugins.TimestampedGeoJson({"type":"FeatureCollection",
                                     "features": features}, add_last_point=False,
-                                   transition_time=anim_display_update_interval.microseconds // 1000, 
+                                   transition_time=anim_display_update_interval.microseconds // 1000,
                                    period=anim_timestamp_update_step,
                                    duration=anim_trail_duration,
                                    time_slider_drag_update=True,
@@ -516,7 +519,7 @@ def render_heatmap(points,
                                        line_color='grey', linewidth=0.5,
                                        tiles=tiles, attr=attr, crs=crs,
                                        prefer_canvas=prefer_canvas)
-    HeatMap(display_points, gradient=gradient).add_to(heat_map)
+    fol_heat_map.HeatMap(display_points, gradient=gradient).add_to(heat_map)
     if save:  # saves as .html document
         if not filename:
             datetime_str = datetime.now().strftime("%Y-%m-%dT%H%M%S-%f")
