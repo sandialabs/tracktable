@@ -154,47 +154,14 @@ def main():
     system = platform.system()
 
     if system == 'Linux':
-        extension_suffix = 'so'
-        shared_library_suffix = None
         os_classifier = 'Operating System :: POSIX :: Linux'
     elif system == 'Darwin':
-        extension_suffix = 'so'
-        shared_library_suffix = None
         os_classifier = 'Operating System :: MacOS :: MacOS X'
     elif system == 'Windows':
-        extension_suffix = 'pyd'
-        shared_library_suffix = 'dll'
         os_classifier = 'Operating System :: Microsoft :: Windows'
     else:
         raise RuntimeError('Unknown operating system: {}'.format(system))
 
-    binary_extensions = glob.glob(
-        os.path.join(here, 'Python', 'tracktable', '*',
-                     '*.{}'.format(extension_suffix))
-        )
-
-    support_libraries = []
-    if shared_library_suffix is not None:
-        support_libraries.extend(
-            glob.glob(
-                os.path.join(here, 'Python', 'tracktable', '*',
-                             '*.{}'.format(shared_library_suffix))
-                )
-        )
-
-    tutorial_notebook_directory = os.path.join(tracktable_home, 'examples', 'tutorials')
-    tutorial_notebook_files = files_from_components(tutorial_notebook_directory, '*.ipynb')
-
-    analytic_demo_notebook_directory = os.path.join(tracktable_home, 'examples', 'analytic_demos')
-    analytic_demo_notebook_files = files_from_components(analytic_demo_notebook_directory, '*.ipynb')
-
-    analytic_demo_images_directory = os.path.join(tracktable_home, 'examples', 'analytic_demos', 'demo_images')
-    analytic_demo_images_files = files_from_components(analytic_demo_images_directory, '*.png')
-
-    response_files_directory = os.path.join(tracktable_home, 'examples', 'response_files')
-    response_files_files = files_from_components(response_files_directory, '*.txt')
-
-    license_files = [os.path.join(tracktable_home, 'LICENSE.txt')]
 
     # --------------------
 
@@ -208,14 +175,14 @@ def main():
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Natural Language :: English",
-        "License :: OSI Approved :: BSD License",
         os_classifier,
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Programming Language :: C++",
         "Programming Language :: Python :: Implementation :: CPython",
         "Topic :: Scientific/Engineering :: Information Analysis",
@@ -233,7 +200,7 @@ def main():
     ]
 
     package_name = 'tracktable'
-    version_required = '>=3.8'
+    version_required = '>=3.9'
 
     # --------------------
 
@@ -252,16 +219,6 @@ def main():
         # Computed properties
         package_dir=package_directory,
         packages=tracktable_contents,
-        package_data={
-            'tracktable':
-                (binary_extensions +
-                 support_libraries +
-                 license_files +
-                 tutorial_notebook_files +
-                 analytic_demo_notebook_files +
-                 analytic_demo_images_files +
-                 response_files_files)
-                },
         # Assembly information and system parameters
         distclass=BinaryDistribution,
         zip_safe=False,

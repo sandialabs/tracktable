@@ -39,6 +39,12 @@ if (POLICY CMP0042)
   set(CMAKE_MACOSX_RPATH ${Tracktable_BINARY_DIR}/lib)
 endif ()
 
+# This policy says that Boost_ROOT will be ignored if set and
+# we'll take hints as to Boost's location from BOOST_ROOT.
+if (POLICY CMP0144)
+  cmake_policy(SET CMP0144 NEW)
+endif ()
+
 # This policy is supposed to set Python3_FIND_STRATEGY=LOCATION.
 # However, at least on CMake 3.16.5 on MacOS, setting it appears
 # to have no effect: we observe the same behavior we had previously
