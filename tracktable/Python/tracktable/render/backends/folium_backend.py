@@ -135,6 +135,7 @@ def render_trajectories(trajectories,
                         anim_display_update_interval=timedelta(microseconds=200000),
                         anim_timestamp_update_step=timedelta(minutes=1),
                         anim_trail_duration=None,
+                        anim_loop=True,
 
                         # Airport and poirt specific args
                         draw_airports=False,
@@ -373,7 +374,7 @@ def render_trajectories(trajectories,
                                    period=anim_timestamp_update_step,
                                    duration=anim_trail_duration,
                                    time_slider_drag_update=True,
-                                   loop_button=True).add_to(map_canvas)# need to set period automatically or allow users to set.
+                                   loop_button=True, loop=anim_loop).add_to(map_canvas)# need to set period automatically or allow users to set.
     if map_bbox:
         map_canvas.fit_bounds([(map_bbox[1], map_bbox[0]),
                       (map_bbox[3], map_bbox[2])])
