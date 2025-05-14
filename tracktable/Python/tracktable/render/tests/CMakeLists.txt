@@ -43,6 +43,12 @@ find_python_module(cartopy CARTOPY_MODULE_STATUS CARTOPY_MODULE_LOCATION)
 find_package_handle_standard_args(PY_cartopy_module DEFAULT_MSG PY_CARTOPY_MODULE)
 # message("PY_CARTOPY_MODULE ${PY_CARTOPY_MODULE}")
 
+add_python_test(P_Folium_Proxy_Import tracktable.render.tests.test_folium_proxy_import)
+add_python_test(P_Folium_Proxy_Disabled tracktable.render.tests.test_folium_proxy_disabled)
+add_python_test(P_Folium_Fallback_Import tracktable.render.tests.test_folium_proxy_import_fallback)
+add_python_test(P_Folium_Proxy_Import_Dotted_Package tracktable.render.tests.test_folium_proxy_import_dotted_package)
+
+
 if (PY_CARTOPY_MODULE)
   # TODO (mjfadem): Get these tests up and running once we chase the gremlins out of the existing mapmaker tests
 

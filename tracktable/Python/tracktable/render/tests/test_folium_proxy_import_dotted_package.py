@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2023 National Technology and Engineering
+# Copyright (c) 2014-2025 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -28,23 +28,53 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Tracktable Trajectory Library - Render module
+"""Test whether folium_proxy finds the module it's pointed to"""
 
-This module contains code to render points or trajectories either in
-regular Cartesian space or on a (world) map.  The 'maps' module
-provides a friendly way to get a map of various parts of the world.
-"""
+import sys
+import types
 
-from tracktable.render.backends.folium_proxy import (
-    folium_proxy_name,
-    folium_proxy_enabled,
-    set_folium_proxy_name,
-    set_folium_proxy_enabled
-)
+from tracktable.render.backends import folium_proxy
 
-__all__ = [
-    "folium_proxy_name",
-    "folium_proxy_enabled",
-    "set_folium_proxy_name",
-    "set_folium_proxy_enabled"
-]
+def _module_has_member(module: types.ModuleType, member: str) -> bool:
+    """Does a module contain some member?
+
+    Arguments:
+        module (imported module): Module to chechk
+        member (str): Name of member to look for
+
+    Returns:
+        True if member present, False if not
+    """
+
+    try:
+        _ = getattr(module, member)
+        print(f"Module {module.__name__} has member {member}")
+        return True
+    except AttributeError:
+        print(f"Module {module.__name__} does not have member {member}")
+        return False
+
+
+# ----------------------------------------------------------------------
+
+def test_folium_proxy_import_dotted_package() -> int:
+    """Try to import a package whose name contains a dot."""
+
+    folium_proxy.set_folium_proxy_name("logging.config")
+    my_logging_config = folium_proxy.import_folium()
+
+    if (_module_has_member(my_logging_config, "dictConfig")
+        and folium_proxy.ACTIVE_FOLIUM_NAME == "logging.config"):
+        return 0
+    return 1
+
+
+# ----------------------------------------------------------------------
+
+def main():
+    return test_folium_proxy_import_dotted_package()
+
+# ----------------------------------------------------------------------
+
+if __name__ == '__main__':
+    sys.exit(main())
