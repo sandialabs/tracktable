@@ -345,6 +345,17 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
           )
       endif (MINGW OR MSVC)
 
+      # Python documentation needs to build after these targets so that we
+      # can import Tracktable.  These targets are populated in
+      # PythonWrapping/CMakeLists.txt.
+      set(COMPILED_EXTENSION_TARGETS
+            _core_types _domain_algorithm_overloads _distance_geometry
+            _terrestrial _cartesian2d _cartesian3d _feature_vector_points
+            _dbscan_clustering _rtree)
+      # CMake documentation says that we add dependencies between targets
+      # this way rather than with the DEPENDS keyword to add_custom_target.
+      add_dependencies(doc_python ${COMPILED_EXTENSION_TARGETS})
+
       install(
         DIRECTORY ${DOC_BINARY_DIR}/html
         DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
@@ -355,7 +366,7 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
     if (BUILD_DOCUMENTATION_CXX_ONLY)
       set(DOC_DEPENDS doc_cxx)
     else (BUILD_DOCUMENTATION_CXX_ONLY)
-      set(DOC_DEPENDS doc_python)
+      set(DOC_DEPENDS doc_python doc_cxx)
     endif (BUILD_DOCUMENTATION_CXX_ONLY)
 
     add_custom_target( doc ALL
