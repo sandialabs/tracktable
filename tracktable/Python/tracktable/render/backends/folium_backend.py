@@ -270,27 +270,31 @@ def render_trajectories(trajectories,
             rgb = hsv_to_rgb([common_processing.hash_short_md5(trajectory[0].object_id), 1.0, 1.0])
             current_color_map = ListedColormap([rgb2hex(rgb)])
 
+        solid = (type(current_color_map) is ListedColormap \
+               and len(current_color_map.colors) == 1 \
+               and trajectory_linewidth_generator == None)
         if show_lines:
             popup_str = str(trajectory[0].object_id)+'<br>'+ \
                 trajectory[0].timestamp.strftime('%Y-%m-%d %H:%M:%S')+ \
                 '<br> to <br>'+ \
                 trajectory[-1].timestamp.strftime('%Y-%m-%d %H:%M:%S')
             tooltip_str = str(trajectory[0].object_id)
-            if fast or (type(current_color_map) is ListedColormap \
-               and len(current_color_map.colors) == 1 \
-               and trajectory_linewidth_generator == None): # Polyline ok
+            if fast or (solid and not animate): # Polyline ok
                 fol.PolyLine(coordinates,
                              color=current_color_map.colors[0],
                              weight=linewidth, opacity=1,
                              tooltip=tooltip_str,
                              popup=popup_str).add_to(map_canvas)
-            else: # mapped color (not solid)
+            else: # mapped color (not solid) or animate
                 last_pos = coordinates[0]
                 for i, pos in enumerate(coordinates[1:]):
                     weight = linewidth
                     if trajectory_linewidth_generator:
                         weight = widths[i]
-                    segment_color = rgb2hex(mapper.to_rgba(scalars[i]))
+                    if solid:
+                        segment_color = current_color_map.colors[0]
+                    else:
+                        segment_color = rgb2hex(mapper.to_rgba(scalars[i]))
                     if animate:
                         segments.append({'coordinates': [[last_pos[1], last_pos[0]], [pos[1], pos[0]]],
                                          'times': [times[i], times[i+1]], #i is off by one, so in first iter times[0] is the previous time
