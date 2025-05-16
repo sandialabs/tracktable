@@ -8,13 +8,33 @@ Each entry is formatted as follows:
 #<MERGE REQUEST NUMBER>: Short description of issue
 
 Entries are ordered newest-to-oldest based on merge date.  Contact
-tracktable-questions at sandia dot gov if you have questions about 
+tracktable-questions at sandia dot gov if you have questions about
 any given one.
 
+### TRACKTABLE 1.7.2
+
+- 339: Prefer offline Folium packages when available
+- 340: Python docs target must depende on extension libraries
+- 338: Fix miscellaneous build warnings
+- 332: solid colored trajectories weren't animating correctly.
+- 320: added anim_loop parameter and passed to timestampedgeojson
+- 334: Resolve "Magic call in Cartopy backend causes errors"
+- 333: Update build scripts for Python 3.12, 3.13
+- 335: Rename tutorial notebooks to match names in tracktable-docs
+- 331: Fix deprecated iterator usage
+- 330: Bump C++ version to 20
+- 329: Update CI environemnts for new Boost packages, VS 2022
+- 325: Add dev and CI YML files for new Python versions
+- 326: Clean C add_test macro
+- 324: Update tracktable-data version to 1.7.3
+- 317: Add shared libraries to Python install
+- 313: Migrate wheel-building process away from invoking setup.py
+- 315: Fix unary_function warnings
+- 312: Fix compile error in catch2.hpp
 
 ### TRACKTABLE 1.7.1
 
-- 313: Resolve "Migrate wheel-building process away from invoking setup.py" 
+- 313: Resolve "Migrate wheel-building process away from invoking setup.py"
 - 315: Resolve "Fix unary_function warnings"
 - 314: Resolve "Fix compile error in catch2.hpp"
 - 311: Resolve "Add Python 3.11 to Linux packaging"

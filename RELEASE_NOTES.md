@@ -1,5 +1,82 @@
 # Tracktable Release Notes
 
+## VERSION 1.7.2, 15 May 2025
+
+This is a patch release mainly intended to fix some regressions in the
+documentation with only a couple of minor new features.  We expect to
+release 1.8.0 later in summer 2025.
+
+### New Features
+
+- Folium proxy.  We use the [Folium package](https://FIXME.com) for rendering
+  interactive maps in Jupyter notebooks and Web applications.  Folium generates
+  HTML that requires Javascript resources out on the open Internet.  This is
+  awkward on air-gapped installations and other networks that can't access the
+  Internet.  There are alternatives such as `offlinefolium` (soon to be published)
+  that embed these Javascript resources locally.
+
+  By default, the Folium rendering back end will try to use `offlinefolium` first,
+  then fall back to `folium` if that's not available.  You can configure this
+  behavior (including changing the package name and enabling/disabling it) with
+  the functions in `tracktable.render.backends.folium_proxy`.
+
+- Looping animation: Passing `anim_loop=True` to `render_trajectories()` will
+  cause trajectory animations to loop indefinitely instead of play once and then
+  stop.
+
+### Bugs Fixed
+
+- Regression in Folium heat maps: Passing a color map to `render_heatmap()` when
+  rendering with Folium would lead to an error caused by trying to call `split()`
+  on values of type `np.float64`.  We've worked around this issue for now.  It
+  will be fixed properly in an upcoming release of Folium.
+
+- Points were not appearing on heat maps rendered with Cartopy.  The cause was
+  a missing coordinate transform.
+
+- A call to a deprecated IPython function (to force Matplotlib figures to render
+  inline) was causing an exception in notebooks that rendered static images.
+
+- Python documentation now builds after the extension modules have been
+  compiled.  Previously, trying to build documentation on a just-checked-out
+  source tree would often error out because these modules were not in place yet.
+
+### Other Changes
+
+- Cleanup: Several configure- and build-time warnings about CMake Boost macros
+  have been resolved.
+
+- Cleanup: We now declare C++ tests with a macro instead of multiple lines
+  of boilerplate.
+
+- Cleanup: Several warnings about deprecated C++ iterator usage squashed.
+
+- Cleanup: We have removed extra copies of the demo notebooks that had
+  uninformative names.
+
+- We now require a C++20 or newer compiler to build Tracktable.
+
+- We now use the `libboost-*` packages from conda-forge instead of `boost-*`.
+  The names changed after Boost 1.82 or so.
+
+- License specification for Python wheels has changed to use SPDF expressions.
+  We have changed our wheel-building configuration to use this.  Note:
+  Tracktable's license has not changed at all -- just the way we encode
+  that license in the metadata for the wheel file.
+
+### Coming Soon
+
+Here are some things we've got in the works.  We hope (but can't promise) to release at least some of these by the end of Summer 2025.
+
+- GeoJSON reader/writer for trajectories.
+
+- New data structure for trajectories that will use about 3x less memory.
+
+- New trajectory assembler that can operate in streaming mode and fix minor issues with out-of-order points.
+
+- Point reader adapter to read points from a Pandas DataFrame.
+
+
 ## VERSION 1.7.1, 29 October 2023
 
 Okay, let's try this again.
@@ -11,17 +88,17 @@ those properly rather than accumulate layers upon layers of hotfixes.
 ### New Features
 
 - Linux wheel-building scripts will now attempt to build Tracktable for
-  all versions of CPython newer than 3.6 that are available in the 
-  manylinux wheel.  This improves on previous work where we used a 
+  all versions of CPython newer than 3.6 that are available in the
+  manylinux wheel.  This improves on previous work where we used a
   hardcoded and oft-duplicated list of versions to build.
 
 - The manylinux tag is now a CMake argument.  We will continue to default
   to manylinux2014 for the moment but when it comes time to change that
   we will only need to update it in one place.
 
-- We now control wheel building with `setup.cfg` and `pyproject.toml` 
+- We now control wheel building with `setup.cfg` and `pyproject.toml`
   instead of the outdated `python setup-generic.py`.  This puts our
-  build process on much sounder footing and will work better with 
+  build process on much sounder footing and will work better with
   the conda-forge build process.
 
 - The function libraries used by the MacOS CI scripts and wheel-building
@@ -34,7 +111,7 @@ those properly rather than accumulate layers upon layers of hotfixes.
 
 ### Bug fixes
 
-- There is a compile error caused by a ternary expression inside a 
+- There is a compile error caused by a ternary expression inside a
   constexpr in tracktable/ThirdParty/catch2.hpp.  This is an error because
   of some new rules in GCC.  The fix is to eliminate the ternary expression
   and just set the stack size for Catch2 to 32K.
@@ -57,11 +134,11 @@ those properly rather than accumulate layers upon layers of hotfixes.
 
 - Removed deprecated uses of `std::unary_function<>`.  This was deprecated
   in C++11 and removed entirely in C++17.
-  
+
 
 ## VERSION 1.7.0, 1 September 2023
 
-Welcome back!  We have a couple of new user-facing features, a lot of 
+Welcome back!  We have a couple of new user-facing features, a lot of
 improvements to infrastructure and documentation (including tutorials),
 and a generous handful of bugfixes.
 
@@ -72,18 +149,18 @@ couple years.  Michael has moved on from Sandia and we miss him very much.
 
 ### New features in 1.7.0
 
-- Maps in Folium can now be created with the `attr` and `crs` 
+- Maps in Folium can now be created with the `attr` and `crs`
   parameters.  The `attr` argument is used to pass an attribution string
   for custom tile sets.  The `crs` argument names a coordinate transform
   to project geographical points into pixel coordinates and back.  The
-  functions `tracktable.render.render_trajectories.render_trajectories()` 
+  functions `tracktable.render.render_trajectories.render_trajectories()`
   and `tracktable.render.render_heatmap.render_heatmap()` both support these
   new arguments.
 
 - Trajectory maps in Folium can be animated.  See the arguments `animate`,
   `anim_display_update_interval`, `anim_trail_duration`, and `use_markers`
   in `tracktable.render.render_trajectories.render_trajectories()`.
-  
+
 - New function `tracktable.rw.load.load_trajectories()` that will load a
   `.traj`, `.csv`, or `.tsv` file and assemble points into trajectories.
   An optional flag will cause it to return points instead of trajectories.
@@ -94,20 +171,20 @@ couple years.  Michael has moved on from Sandia and we miss him very much.
   and Folium back ends.
 
 - Docs and data have been separated out into their own repositories
-  implemented as submodules. Note that you will need to `git clone --recursive` 
+  implemented as submodules. Note that you will need to `git clone --recursive`
   when cloning the source code.
 
 
 ### Bug fixes
 
-- We identified and fixed a problem with the I/O library that could cause 
-  a buffer overflow if the user opened a file containing UTF-8 data in 
-  Python in text mode and then passed it to one of Tracktable's loaders.  
+- We identified and fixed a problem with the I/O library that could cause
+  a buffer overflow if the user opened a file containing UTF-8 data in
+  Python in text mode and then passed it to one of Tracktable's loaders.
 
 - Map scale bars were being rendered incorrectly in static images under
   map projections that did not use geodetic coordinates (longitude/
   latitude) as their native coordinate system.
-  
+
 - Tests for C++ point generators and great circle estimation were failing
   because points did not initialize their coordinates by default.  Fixing
   this results in a very minor slowdown.
@@ -115,12 +192,12 @@ couple years.  Michael has moved on from Sandia and we miss him very much.
 - Setting a point property's value to None no longer crashes the interpreter.
 
 - DeprecatedDeclaration.h was not being installed when the user called
-  `make install`.  
+  `make install`.
 
 
 ### Known issues
 
-- The documentation for `tracktable.rw.load.load_trajectories()` implies 
+- The documentation for `tracktable.rw.load.load_trajectories()` implies
   that it takes a file-like object as its input.  It does not -- it takes
   a string containing a filename.
 
@@ -128,13 +205,13 @@ couple years.  Michael has moved on from Sandia and we miss him very much.
 ### Other changes
 
 - The data generators in `tracktable.examples.data_generators` have now moved
-  to `tracktable.data_generators`.   
+  to `tracktable.data_generators`.
 
 - Movies can be rendered directly from `tracktable.render.render_movie.render_trajectory_movie`
-  now.  This subsumes the code that used to be in the 
-  `movie_from_trajectories` example. 
+  now.  This subsumes the code that used to be in the
+  `movie_from_trajectories` example.
 
-- Jupyter notebook tutorials are built locally and stored in a 
+- Jupyter notebook tutorials are built locally and stored in a
   separate repository (tracktable-docs) so that we no longer run
   into the CPU usage limits when uploading to ReadTheDocs.
 
@@ -150,23 +227,23 @@ couple years.  Michael has moved on from Sandia and we miss him very much.
 
 We no longer officially support Python 3.6 or 3.7.  Python 3.6 stopped
 getting security updates in December 2021.  Python 3.7 stopped getting
-security updates in June 2023.  
+security updates in June 2023.
 
-Having said that, we have not yet made any changes to the code that 
-actually require Python 3.8 or newer.  
+Having said that, we have not yet made any changes to the code that
+actually require Python 3.8 or newer.
 
 If you need to build and run Tracktable 1.7 in an environment where you
-absolutely cannot update to a more recent Python version, contact us.  
+absolutely cannot update to a more recent Python version, contact us.
 We sympathize -- we have plenty of experience with such environments --
 and we'll work with you to get you up and running.
 
 #### Wheels available on PyPI, GitHub
 
 We are now building wheels for Python versions up through 3.11.  On Linux,
-we build and upload wheels to [PyPI](https://www.pypi.org) for Python 
+we build and upload wheels to [PyPI](https://www.pypi.org) for Python
 versions 3.6 through 3.11.  On Windows and MacOS (Intel), we build wheels
 for Python 3.8 through 3.11.  On MacOS (Apple Silicon/arm64), we build
-wheels for Python 3.10 and 3.11.  
+wheels for Python 3.10 and 3.11.
 
 #### Internal changes to build infrastructure
 
@@ -179,7 +256,7 @@ We're planning to do something similar for our Windows builds now that
 Docker on Windows hosts can run containers with the Windows kernel.
 
 MacOS build and test procedures are still run via shell scripts due to
-the lack of container support in the MacOS kernel.  
+the lack of container support in the MacOS kernel.
 
 
 ## VERSION 1.6.0, 16 September 2021
