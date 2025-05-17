@@ -39,9 +39,9 @@ in kilometers.
 """
 
 # \defgroup Tracktable_Python Python components of Tracktable
-import re
+
 import os
-__version__ = "1.7.0"
+__version__ = "1.7.2"
 __title__ = "Tracktable"
 __description__ = "Trajectory Analysis and Visualization"
 __url__ = "https://tracktable.sandia.gov"
