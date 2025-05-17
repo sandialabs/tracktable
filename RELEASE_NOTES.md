@@ -135,7 +135,6 @@ those properly rather than accumulate layers upon layers of hotfixes.
 - Removed deprecated uses of `std::unary_function<>`.  This was deprecated
   in C++11 and removed entirely in C++17.
 
-
 ## VERSION 1.7.0, 1 September 2023
 
 Welcome back!  We have a couple of new user-facing features, a lot of
