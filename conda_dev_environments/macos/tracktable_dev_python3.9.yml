@@ -1,7 +1,7 @@
 # Fully Featured Tracktable Development Anaconda Environment
 name: tracktable-dev-python3.9
 channels:
-  - conda-
+  - conda-forge
 
 dependencies:
   # Dev Dependencies
