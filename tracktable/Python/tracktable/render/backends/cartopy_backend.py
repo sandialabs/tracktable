@@ -33,6 +33,7 @@ tracktable.render.cartopy - render trajectories in using the cartopy backend
 
 import itertools
 from datetime import datetime
+import logging
 
 import cartopy
 import cartopy.crs
@@ -41,6 +42,7 @@ import matplotlib.colors
 import matplotlib.pyplot as plt
 import numpy
 from numpy import ma as masked_array
+
 from tracktable.core.geomath import compute_bounding_box
 from tracktable.domain.cartesian2d import BasePoint as Point2D
 from tracktable.domain.cartesian2d import BoundingBox as BoundingBox2D
@@ -49,7 +51,17 @@ from tracktable.render import render_map
 from tracktable.render.map_decoration import coloring
 from tracktable.render.map_processing import common_processing, paths
 
-# from IPython import get_ipython
+LOG = logging.getLogger(__name__)
+
+IPYTHON_AVAILABLE = False
+try:
+    from IPython import get_ipython
+    IPYTHON_AVAILABLE = True
+except ImportError:
+    # This is not necessarily a problem.  It just means that
+    # we won't be able to call '%matplotlib inline', which might
+    # affect how figures are rendered in notebooks.
+    pass
 
 
 def render_trajectories(trajectories,
@@ -124,8 +136,19 @@ def render_trajectories(trajectories,
     if common_processing.in_notebook():
         if show:
             # below effectively does %matplotlib inline (display inline)
-            get_ipython().magic("matplotlib inline")   # TODO may casue issues may want to remove
-            # TODO figure out how to get matplotlib not to show after executing code a second time.
+            pass
+            #get_ipython().magic("matplotlib inline")   # TODO may casue issues may want to remove
+
+            # TODO figure out how to get matplotlib not to show
+            # after executing code a second time.
+            #
+            # If you're talking about how to update a figure after
+            # it's been rendered, there are two ways.  The first
+            # is to use IPython.display.clear_output() as described
+            # on https://discourse.matplotlib.org/t/updating-a-figure/23572/3
+            # and the second is to install `ipympl` and use
+            # "%matplotlib widget".
+
     figure = plt.figure(dpi=dpi, figsize=figsize)
     if not map_bbox: #if it's empty
         if zoom_frac != [0,1]:
@@ -327,11 +350,14 @@ def render_heatmap(points,
 
     # And finally render it onto the map.
     density_array = common_processing.draw_density_array(masked_density,
+                                                x_bin_boundaries,
+                                                y_bin_boundaries,
                                                 map_canvas,
                                                 bounding_box,
                                                 colormap=colormap,
                                                 colorscale=colorscale,
-                                                zorder=zorder)
+                                                zorder=zorder,
+                                                axes=map_canvas)
 
     if not common_processing.in_notebook() or save:
             if filename:

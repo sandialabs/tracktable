@@ -429,7 +429,7 @@ def sample_trajectory(trajectory, samples):
 def process_historical_trajectories(data_file, raw_data=None, separation_time=20,
                                     separation_distance=100, minimum_length=20,
                                     minimum_total_distance=200,
-                                    only_commercial=True):
+                                    only_commercial=True, quiet=False):
     """Process historical trajectories from a file, filter them, and
     construct all of the data structures needed for prediction
 
@@ -450,6 +450,7 @@ def process_historical_trajectories(data_file, raw_data=None, separation_time=20
             this distance (km). (Default: 200)
         only_commercial (bool): True if you want to work with only
             commercial flights. (Default: True)
+        quiet (bool): produce no output, no tqdm output
 
     Returns:
         A dictionary of data structures which will be used in the prediction algorithm.
@@ -486,8 +487,9 @@ def process_historical_trajectories(data_file, raw_data=None, separation_time=20
                                                              separation_time)
                 builder.separation_distance = separation_distance
                 trajectories = []
-                logger.info('Begin reading in trajectories from file')
-                with tqdm(total=bytes_to_read) as pbar:
+                if not quiet:
+                    logger.info('Begin reading in trajectories from file')
+                with tqdm(total=bytes_to_read, disable=quiet) as pbar:
                     for trajectory in builder.trajectories():
                         pbar.update(wrapped_file.get_bytes_and_reset())
                         trajectories.append(trajectory)
@@ -516,19 +518,22 @@ def process_historical_trajectories(data_file, raw_data=None, separation_time=20
     # Set up RTree with all the points we are looking at and which trajectory
     # each point belongs to
     all_points = []
-    logger.info('Begin constructing feature vectors from all points')
-    for i in tqdm(range(0, len(trajectories))):
+    if not quiet:
+        logger.info('Begin constructing feature vectors from all points')
+    for i in tqdm(range(0, len(trajectories)), disable=quiet):
         for point in trajectories[i]:
             all_points.append(_create_feature_vector(point, i))
-    logger.info('Begin constructing RTree')
-    tree = RTree(points=tqdm(all_points))
+    if not quiet:
+        logger.info('Begin constructing RTree')
+    tree = RTree(points=tqdm(all_points, disable=quiet))
 
     prediction_dictionary['all_points'] = all_points
     prediction_dictionary['tree'] = tree
 
     segments = []
-    logger.info('Begin creating segment representation for all trajectories')
-    for trajectory in tqdm(trajectories):
+    if not quiet:
+        logger.info('Begin creating segment representation for all trajectories')
+    for trajectory in tqdm(trajectories, disable=quiet):
         segments.append(_represent_trajectory_with_segments(trajectory))
 
     prediction_dictionary['segments'] = segments
@@ -539,7 +544,8 @@ def process_historical_trajectories(data_file, raw_data=None, separation_time=20
 
     return prediction_dictionary
 
-def align(rtree, all_points, trajectories, observed_trajectory, neighbor_distance):
+def align(rtree, all_points, trajectories, observed_trajectory,
+          neighbor_distance, quiet=False):
     """Find historical trajectories that are close to at least one sample point
     of the observed trajectory
 
@@ -551,6 +557,7 @@ def align(rtree, all_points, trajectories, observed_trajectory, neighbor_distanc
         observed_trajectory (Tracktable trajectory): Trajectory
         neighbor_distance (int): points within this distance to the observed trajectory
             are considered close to it/nearby
+        quiet (bool): disable output, no tqdm output
 
     Returns:
         a dictionary of historical trajectories that align with the
@@ -560,7 +567,7 @@ def align(rtree, all_points, trajectories, observed_trajectory, neighbor_distanc
 
     results0 = []
     aligning_trajs = {}
-    for point in tqdm(observed_trajectory):
+    for point in tqdm(observed_trajectory, disable=quiet):
         point.set_property('altitude', 0)
         # convert to ECEF for more exact distance calculations
         converted_point = ECEF_from_feet(point, 'altitude')
@@ -599,7 +606,7 @@ def align(rtree, all_points, trajectories, observed_trajectory, neighbor_distanc
 
 
 def find_well_aligned_trajectories(observed_trajectory, prediction_dictionary,
-                                   neighbor_distance):
+                                   neighbor_distance, quiet=False):
     """Find the well-aligned trajectories for a given observed trajectory
     in historical data. A historical trajectory is well aligned to an observed
     trajectory if it is within neighbor_distance to each of the observed
@@ -611,6 +618,7 @@ def find_well_aligned_trajectories(observed_trajectory, prediction_dictionary,
             process_historical data
         neighbor_distance (int): points within this distance to the observed trajectory
             are considered close to it/nearby
+        quiet (bool): produce no output, no tqdm output
 
     Returns:
         a list of well-aligned trajectories' indices
@@ -622,7 +630,7 @@ def find_well_aligned_trajectories(observed_trajectory, prediction_dictionary,
 
     # find trajectories that are close to at least one sample point
     aligned_trajs = align(rtree, all_points, trajectories, observed_trajectory,
-                          neighbor_distance)
+                          neighbor_distance, quiet=quiet)
     # filter to find trajectories that are close to all sample points
     well_aligned_trajs = [trajectory for trajectory, close_sample_points in
                           aligned_trajs.items()
@@ -632,7 +640,7 @@ def find_well_aligned_trajectories(observed_trajectory, prediction_dictionary,
 
 
 def find_same_direction_trajectories(observed_trajectory, historical_trajectories,
-                                     prediction_dictionary):
+                                     prediction_dictionary, quiet=False):
     """Find the historical trajectories that go in the same direction as the
     observed trajectory
 
@@ -641,6 +649,7 @@ def find_same_direction_trajectories(observed_trajectory, historical_trajectorie
         historical_trajectories (list): list of historical trajectories
         prediction_dictionary (dict): prediction dictionary object returned from
             process_historical data
+        quiet (bool): produce no output, no tqdm output
 
     Returns:
         a list of trajectory indices of trajectories that go in the
@@ -649,7 +658,7 @@ def find_same_direction_trajectories(observed_trajectory, historical_trajectorie
 
     segments = prediction_dictionary['segments']
     correct_direction = []
-    for trajectory in tqdm(historical_trajectories):
+    for trajectory in tqdm(historical_trajectories, disable=quiet):
         # closest point to beginning of observed trajectory
         nearest_front = _nearest_trajectory_point(trajectory, observed_trajectory[0], segments)
         # closest point to end of observed trajectory

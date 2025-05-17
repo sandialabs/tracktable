@@ -34,9 +34,10 @@
 [project]
 
 name = "tracktable"
-version = "1.7.1"
-requires-python = ">= 3.8"
-license = {file = "Python/tracktable/LICENSE.txt"}
+version = "1.7.2"
+requires-python = ">= 3.9"
+license = "BSD-3-Clause"
+license-files = ["Python/tracktable/LICENSE.txt"]
 readme = "Python/tracktable/README.md"
 
 dependencies = [
@@ -73,8 +74,8 @@ maintainers = [
 ]
 
 keywords = [
-    "trajectory", 
-    "analysis", 
+    "trajectory",
+    "analysis",
     "visualization"
 ]
 
@@ -82,16 +83,15 @@ classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Natural Language :: English",
-    "License :: OSI Approved :: BSD License",
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS :: MacOS X",
     "Operating System :: Microsoft :: Windows",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Programming Language :: C++",
     "Programming Language :: Python :: Implementation :: CPython",
     "Topic :: Scientific/Engineering :: Information Analysis",
@@ -104,7 +104,16 @@ homepage = "https://tracktable.sandia.gov"
 documentation = "https://tracktable.readthedocs.io"
 repository = "https://github.com/sandialabs/tracktable"
 changelog = "https://github.com/sandialabs/tracktable/blob/main/CHANGELOG.md"
- 
+
 [build-system]
 requires = ["setuptools", "wheel"]
 
+[tool.setuptools.packages.find]
+namespaces = true
+where = [ "Python/" ]
+
+[tool.setuptools.package-data]
+"tracktable.lib" = ["*.so", "*.dylib", "*.dll", "*.pyd"]
+"tracktable.examples.tutorials" = ["*.ipynb"]
+"tracktable.examples.analytic_demos" = ["*.ipynb"]
+"tracktable.examples.analytic_demos.demo_images" = ["*.jpg", "*.png"]

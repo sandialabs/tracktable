@@ -235,15 +235,15 @@ protected:
    * @class SkipCommentsIterator
    * @brief This does the actual work of filtering lines.
    */
-  class SkipCommentsIterator : public std::iterator< std::input_iterator_tag,
-                                                     typename inner_iterator_type::value_type,
-                                                     std::ptrdiff_t,
-                                                     const typename inner_iterator_type::value_type*,
-                                                     typename inner_iterator_type::value_type const&>
+  class SkipCommentsIterator
   {
   public:
-    typedef typename inner_iterator_type::value_type             value_type;
-    typedef typename inner_iterator_type::value_type::value_type char_type;
+    using iterator_category = std::input_iterator_tag;
+    using value_type        = typename inner_iterator_type::value_type;
+    using difference_type   = std::ptrdiff_t;
+    using pointer           = const typename inner_iterator_type::value_type*;
+    using reference         = const typename inner_iterator_type::value_type&;
+    using char_type         = typename inner_iterator_type::value_type::value_type;
 
     /// Instantiate an default SkipCommentsIterator
     SkipCommentsIterator()

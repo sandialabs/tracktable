@@ -18,11 +18,14 @@ dependencies:
   - folium>=0.11.0
   - scipy>=1.5.2
   - tqdm>=4.51.0
-  - tracktable-data>=1.7.0
+  - tracktable-data>=1.7.3
 
   # C++ Dependencies
   - compilers
-  - boost>=1.82
+  - libboost-devel>=1.86
+  - libboost-headers>=1.86
+  - libboost-python>=1.86
+  - libboost-python-devel>=1.86
   - cmake>=3.19.5
   - ninja>=1.10.0
 

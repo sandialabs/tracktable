@@ -7,7 +7,7 @@ dependencies:
   - git
 
   # Python Dependencies
-  - python=3.10
+  - python==3.10
   - pip
   - numpy>=1.7
   - matplotlib>=3.0
@@ -18,13 +18,19 @@ dependencies:
   - folium>=0.11.0
   - scipy>=1.5.2
   - tqdm>=4.51.0
-  - tracktable-data>=1.7.0
+  - tracktable-data>=1.7.3
 
   # C++ Dependencies
-  - compilers
-  - boost>=1.74, <=1.75
+  - vs2022_win-64
+  - libboost-devel>=1.86
+  - libboost-python-devel>=1.86
+  - libboost-headers>=1.86
+  - libboost-python>=1.86
   - cmake>=3.19.5
   - ninja>=1.10.0
+
+  # Windows: find Visual Studio 2022 instead of 2019
+  - vs2022_win-64
 
   # Jupyter Dependencies
   - ipykernel
@@ -44,7 +50,7 @@ dependencies:
   - pandoc>=2.5
   - doxygen>=1.8.17
   - graphviz>=2.42.2
-  - breathe>=4.26.1, <=4.31.0
+  - breathe>4.31
 
   # Packaging Dependencies
   - twine

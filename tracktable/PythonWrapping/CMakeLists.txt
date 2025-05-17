@@ -109,9 +109,11 @@ endif (TRACKTABLE_PYTHON AND Boost_FOUND AND EXISTS ${Python3_EXECUTABLE})
 
 # This second check undoes the previous find and looks for all necessary components
 unset(Boost_FOUND)
+set(ALL_BOOST_COMPONENTS log serialization timer)
 set(ALL_BOOST_COMPONENTS ${ALL_BOOST_COMPONENTS} ${BOOST_PYTHON_COMPONENTS})
 message(STATUS "(PythonWrapping) Looking for Boost minimum version ${BOOST_MINIMUM_VERSION_REQUIRED} components ${ALL_BOOST_COMPONENTS}")
-find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED COMPONENTS ${ALL_BOOST_COMPONENTS} )
+find_package(Boost CONFIG ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED COMPONENTS ${ALL_BOOST_COMPONENTS} )
+
 
 if (NOT Boost_FOUND)
   message(WARNING "(PythonWrapping) DEBUG: Boost not found!")
@@ -123,6 +125,9 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 else ()
   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
 endif()
+
+
+message("DEBUG: Boost_LIBRARIES: ${Boost_LIBRARIES}")
 
 #message(STATUS "Boost_LIBRARIES ${Boost_LIBRARIES}")
 #message(STATUS "PYTHON_EXTENSION_LIBRARIES ${PYTHON_EXTENSION_LIBRARIES}")
@@ -148,6 +153,15 @@ link_directories(
   ${Boost_LIBRARY_DIRS}
   ${Tracktable_BINARY_DIR}/lib
 )
+
+if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+  message(STATUS "Setting RPATH for dynamic libraries to look in @loader_path/../lib.")
+  set(CMAKE_OSX_RPATH ON)
+  list(APPEND CMAKE_INSTALL_RPATH "@loader_path/../lib")
+elseif (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  message(STATUS "Setting RPATH for dynamic libraries to look in \$ORIGIN/../lib.")
+  list(APPEND CMAKE_INSTALL_RPATH "\$ORIGIN/../lib")
+endif ()
 
 set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/tracktable/Python/tracktable)
 

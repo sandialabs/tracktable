@@ -39,6 +39,12 @@ if (POLICY CMP0042)
   set(CMAKE_MACOSX_RPATH ${Tracktable_BINARY_DIR}/lib)
 endif ()
 
+# This policy says that Boost_ROOT will be ignored if set and
+# we'll take hints as to Boost's location from BOOST_ROOT.
+if (POLICY CMP0144)
+  cmake_policy(SET CMP0144 NEW)
+endif ()
+
 # This policy is supposed to set Python3_FIND_STRATEGY=LOCATION.
 # However, at least on CMake 3.16.5 on MacOS, setting it appears
 # to have no effect: we observe the same behavior we had previously
@@ -59,7 +65,7 @@ if (UNIX AND NOT APPLE)
 endif ()
 
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -339,6 +345,17 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
           )
       endif (MINGW OR MSVC)
 
+      # Python documentation needs to build after these targets so that we
+      # can import Tracktable.  These targets are populated in
+      # PythonWrapping/CMakeLists.txt.
+      set(COMPILED_EXTENSION_TARGETS
+            _core_types _domain_algorithm_overloads _distance_geometry
+            _terrestrial _cartesian2d _cartesian3d _feature_vector_points
+            _dbscan_clustering _rtree)
+      # CMake documentation says that we add dependencies between targets
+      # this way rather than with the DEPENDS keyword to add_custom_target.
+      add_dependencies(doc_python ${COMPILED_EXTENSION_TARGETS})
+
       install(
         DIRECTORY ${DOC_BINARY_DIR}/html
         DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
@@ -349,7 +366,7 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
     if (BUILD_DOCUMENTATION_CXX_ONLY)
       set(DOC_DEPENDS doc_cxx)
     else (BUILD_DOCUMENTATION_CXX_ONLY)
-      set(DOC_DEPENDS doc_python)
+      set(DOC_DEPENDS doc_python doc_cxx)
     endif (BUILD_DOCUMENTATION_CXX_ONLY)
 
     add_custom_target( doc ALL
@@ -417,7 +434,7 @@ set(BOOST_TEST_COMPONENTS system timer chrono)
 
 # This first check gets the core component libraries needed for the pkgconfig file
 unset(Boost_FOUND)
-find_package(Boost
+find_package(Boost CONFIG
   ${BOOST_MINIMUM_VERSION_REQUIRED}
   REQUIRED
   COMPONENTS

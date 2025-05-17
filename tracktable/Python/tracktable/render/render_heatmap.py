@@ -175,7 +175,7 @@ def render_heatmap(points, backend='', trajectories=None, **kwargs):
             if type(trajectories) is not list or len(trajectories) <= 10000:
                 render_function = folium_backend.render_heatmap
             else:
-                logger.warn("Too many trajectories to plot with folium. Reverting to non-interactive backend. Override with backend='folium'")
+                logger.warning("Too many trajectories to plot with folium. Reverting to non-interactive backend. Override with backend='folium'")
                 render_function = cartopy_backend.render_heatmap
         else:
             render_function = cartopy_backend.render_heatmap

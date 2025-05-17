@@ -24,10 +24,12 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+include(CplusplusTest)
+
 # CMAKE BUG: #231
 unset(Boost_FOUND)
 find_package(
-  Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
+  Boost CONFIG ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
   COMPONENTS ${BOOST_CORE_COMPONENTS_NEEDED} ${BOOST_EXAMPLE_COMPONENTS})
 
 include_directories(${Tracktable_SOURCE_DIR} ${Tracktable_BINARY_DIR} BEFORE)
@@ -36,13 +38,22 @@ include_directories(${Boost_INCLUDE_DIR} AFTER)
 
 link_directories(${Boost_LIBRARY_DIRS})
 
-# Factories
-add_executable(
-  FactoryTest FactoryTestMain.cpp AssemblerFromCommandLine_TEST.cpp CombinedCommandLine_TEST.cpp
-              PointReaderFromCommandLine_TEST.cpp)
-target_link_libraries(FactoryTest ${Boost_LIBRARIES} TracktableCore TracktableDomain)
-add_test(
+add_cpp_test(
   NAME C_FactoryTest
-  COMMAND FactoryTest
-  WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
+  TARGET factory_test
+  SOURCES FactoryTestMain.cpp AssemblerFromCommandLine_TEST.cpp CombinedCommandLine_TEST.cpp
+          PointReaderFromCommandLine_TEST.cpp
+  LIBRARIES TracktableDomain TracktableCore ${Boost_LIBRARIES}
+  WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
+)
+
+# # Factories
+# add_executable(
+#   FactoryTest FactoryTestMain.cpp AssemblerFromCommandLine_TEST.cpp CombinedCommandLine_TEST.cpp
+#               PointReaderFromCommandLine_TEST.cpp)
+# target_link_libraries(FactoryTest ${Boost_LIBRARIES} TracktableCore TracktableDomain)
+# add_test(
+#   NAME C_FactoryTest
+#   COMMAND FactoryTest
+#   WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 

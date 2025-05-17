@@ -27,12 +27,14 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+include(CplusplusTest)
+
 unset(Boost_FOUND)
 get_filename_component(_TEST_NAME_TMP ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 get_filename_component(_TEST_NAME_2 ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 get_filename_component(_TEST_NAME_1 ${_TEST_NAME_TMP} NAME)
 message(STATUS "Looking for Boost components needed for C++ tests in ${_TEST_NAME_1}/${_TEST_NAME_2}")
-find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
+find_package(Boost CONFIG ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
   COMPONENTS
     ${BOOST_CORE_COMPONENTS_NEEDED}
     ${BOOST_TEST_COMPONENTS}
@@ -43,100 +45,38 @@ include_directories(
   ${Boost_INCLUDE_DIR}
 )
 
-add_executable(test_domain_terrestrial
-  test_domain_terrestrial.cpp
-)
-# puts the target into a folder in Visual studio
-set_property(TARGET test_domain_terrestrial             PROPERTY FOLDER "Tests")
-
-add_executable(test_base_point_terrestrial
-  test_base_point_terrestrial.cpp
-)
-set_property(TARGET test_base_point_terrestrial         PROPERTY FOLDER "Tests")
-
-add_executable(test_feature_vector_to_string
-  test_feature_vector_to_string.cpp
-)
-set_property(TARGET test_feature_vector_to_string PROPERTY FOLDER "Tests")
-
-add_executable(test_trajectory_point_terrestrial
-  test_trajectory_point_terrestrial.cpp
-)
-set_property(TARGET test_trajectory_point_terrestrial   PROPERTY FOLDER "Tests")
-
-add_executable(test_trajectory_terrestrial
-  test_trajectory_terrestrial.cpp
-)
-set_property(TARGET test_trajectory_terrestrial         PROPERTY FOLDER "Tests")
-
-add_executable(test_trajectory_point_terrestrial_ECEF
-  test_trajectory_point_terrestrial_ECEF.cpp
-)
-set_property(TARGET test_trajectory_point_terrestrial_ECEF         PROPERTY FOLDER "Tests")
-
-
-target_link_libraries(test_domain_terrestrial
-  TracktableCore
-  TracktableDomain
-  ${Boost_LIBRARIES}
-  )
-
-target_link_libraries(test_base_point_terrestrial
-  TracktableCore
-  TracktableDomain
-  ${Boost_LIBRARIES}
+add_cpp_test(
+  NAME C_BasePoint_Terrestrial
+  SOURCE test_base_point_terrestrial.cpp
+  LIBRARIES TracktableDomain
 )
 
-target_link_libraries(test_feature_vector_to_string
-  TracktableCore
-  TracktableDomain
-  ${Boost_LIBRARIES}
-  )
-
-target_link_libraries(test_trajectory_point_terrestrial
-  TracktableCore
-  TracktableDomain
-  ${Boost_LIBRARIES}
+add_cpp_test(
+  NAME C_Domain_Terrestrial
+  SOURCE test_domain_terrestrial.cpp
+  LIBRARIES TracktableDomain
 )
 
-target_link_libraries(test_trajectory_terrestrial
-  TracktableCore
-  TracktableDomain
-  ${Boost_LIBRARIES}
-)
-
-target_link_libraries(test_trajectory_point_terrestrial_ECEF
-  TracktableCore
-  TracktableDomain
-  ${Boost_LIBRARIES}
-)
-
-add_test(
-  NAME C_TerrestrialDomain
-  COMMAND test_domain_terrestrial
-)
-
-add_test(
-  NAME C_BasePointTerrestrial
-  COMMAND test_base_point_terrestrial
-)
-
-add_test(
+add_cpp_test(
   NAME C_FeatureVectorToString
-  COMMAND test_feature_vector_to_string
+  SOURCE test_feature_vector_to_string.cpp
+  LIBRARIES TracktableDomain
 )
 
-add_test(
-  NAME C_TrajectoryPointTerrestrial
-  COMMAND test_trajectory_point_terrestrial
+add_cpp_test(
+  NAME C_Trajectory_Terrestrial
+  SOURCE test_trajectory_terrestrial.cpp
+  LIBRARIES TracktableDomain
 )
 
-add_test(
-  NAME C_TrajectoryTerrestrial
-  COMMAND test_trajectory_terrestrial
+add_cpp_test(
+  NAME C_TrajectoryPoint_Terrestrial
+  SOURCE test_trajectory_point_terrestrial.cpp
+  LIBRARIES TracktableDomain
 )
 
-add_test(
-  NAME C_TrajectoryPointTerrestrialECEF
-  COMMAND test_trajectory_point_terrestrial_ECEF
+add_cpp_test(
+  NAME C_TrajectoryPoint_Terrestrial_ECEF
+  SOURCE test_trajectory_point_terrestrial_ECEF.cpp
+  LIBRARIES TracktableDomain
 )

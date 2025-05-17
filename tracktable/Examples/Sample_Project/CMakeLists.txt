@@ -59,7 +59,7 @@ pkg_get_variable(CMAKE_CXX_STANDARD ${PKGCONFIG_TRACKTABLE} cxx_standard )
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(Boost REQUIRED COMPONENTS ${BOOST_COMPONENTS_NEEDED} )
+find_package(Boost CONFIG REQUIRED COMPONENTS ${BOOST_COMPONENTS_NEEDED} )
 
 # Declare the executable, its sources and compiling/linking flags
 # If you want more than one executable in the project you should be able to just copy/paste the

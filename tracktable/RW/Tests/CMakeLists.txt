@@ -29,12 +29,14 @@
 
 # This is tracktable/C++/RW/Tests/CMakeLists.txt
 
+include(CplusplusTest)
+
 unset(Boost_FOUND)
 get_filename_component(_TEST_NAME_TMP ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
 get_filename_component(_TEST_NAME_2 ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 get_filename_component(_TEST_NAME_1 ${_TEST_NAME_TMP} NAME)
 message(STATUS "Looking for Boost components needed for C++ tests in ${_TEST_NAME_1}/${_TEST_NAME_2}")
-find_package(Boost ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
+find_package(Boost CONFIG ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
   COMPONENTS
     ${BOOST_CORE_COMPONENTS_NEEDED}
     ${BOOST_TEST_COMPONENTS}
@@ -45,276 +47,124 @@ include_directories(
   ${Tracktable_BINARY_DIR}
   )
 
-add_executable(test_line_reader
-  test_line_reader.cpp
-)
-# puts the target into a folder in Visual studio
-set_property(TARGET test_line_reader                    PROPERTY FOLDER "Tests")
 
-add_executable(test_comment_reader
-  test_comment_reader.cpp
-)
-set_property(TARGET test_comment_reader                 PROPERTY FOLDER "Tests")
-
-add_executable(test_generic_reader
-  test_generic_reader.cpp
-)
-set_property(TARGET test_generic_reader                 PROPERTY FOLDER "Tests")
-
-add_executable(test_point_from_tokens_reader
-  test_point_from_tokens_reader.cpp
-)
-set_property(TARGET test_point_from_tokens_reader       PROPERTY FOLDER "Tests")
-
-add_executable(test_reader_skip_headers
-  test_reader_skip_headers.cpp
-)
-set_property(TARGET test_reader_skip_headers       PROPERTY FOLDER "Tests")
-
-add_executable(test_reader_timestamp_formats
-  test_reader_timestamp_formats.cpp
-)
-set_property(TARGET test_reader_timestamp_formats       PROPERTY FOLDER "Tests")
-
-add_executable(test_integrated_point_reader_traj_lonlat
-  test_integrated_point_reader_traj_lonlat.cpp
-)
-set_property(TARGET test_integrated_point_reader_traj_lonlat    PROPERTY FOLDER "Tests")
-
-add_executable(test_integrated_point_reader_cart5
-  test_integrated_point_reader_cart5.cpp
-)
-set_property(TARGET test_integrated_point_reader_cart5  PROPERTY FOLDER "Tests")
-
-add_executable(test_tokenizing_reader
-  test_tokenizing_reader.cpp
-)
-set_property(TARGET test_tokenizing_reader              PROPERTY FOLDER "Tests")
-
-add_executable(test_point_fields
-  test_point_fields.cpp
-)
-set_property(TARGET test_point_fields                   PROPERTY FOLDER "Tests")
-
-add_executable(test_point_writer_base_point
-  test_point_writer_base_point.cpp
-)
-set_property(TARGET test_point_writer_base_point        PROPERTY FOLDER "Tests")
-
-add_executable(test_point_writer_trajectory_point
-  test_point_writer_trajectory_point.cpp
-)
-set_property(TARGET test_point_writer_trajectory_point  PROPERTY FOLDER "Tests")
-
-add_executable(test_point_reader_autoconfig_base_point
-  test_point_reader_autoconfig_base_point.cpp
-)
-set_property(TARGET test_point_reader_autoconfig_base_point     PROPERTY FOLDER "Tests")
-
-add_executable(test_point_reader_autoconfig_trajectory_point
-  test_point_reader_autoconfig_trajectory_point.cpp
-)
-set_property(TARGET test_point_reader_autoconfig_trajectory_point       PROPERTY FOLDER "Tests")
-
-add_executable(test_trajectory_point_reader_default
-  test_trajectory_point_reader_default.cpp
-)
-set_property(TARGET test_trajectory_point_reader_default        PROPERTY FOLDER "Tests")
-
-add_executable(test_trajectory_writer
-  test_trajectory_writer.cpp
-)
-set_property(TARGET test_trajectory_writer              PROPERTY FOLDER "Tests")
-
-add_executable(test_trajectory_reader
-  test_trajectory_reader.cpp
-)
-set_property(TARGET test_trajectory_reader              PROPERTY FOLDER "Tests")
-
-add_executable(test_kml
-  test_kml.cpp
-)
-set_property(TARGET test_kml              PROPERTY FOLDER "Tests")
-# ----------------------------------------------------------------------
-
-target_link_libraries(test_comment_reader
-  TracktableCore
-  ${Boost_LIBRARIES}
-)
-
-target_link_libraries(test_generic_reader
-  TracktableCore
-  ${Boost_LIBRARIES}
-  )
-
-target_link_libraries(test_integrated_point_reader_traj_lonlat
-  TracktableCore
-  ${Boost_LIBRARIES}
-)
-
-target_link_libraries(test_integrated_point_reader_cart5
-  TracktableCore
-  ${Boost_LIBRARIES}
-)
-
-target_link_libraries(test_line_reader
-  TracktableCore
-  ${Boost_LIBRARIES}
-)
-
-target_link_libraries(test_point_fields
-  TracktableCore
-  ${Boost_LIBRARIES}
-  )
-
-target_link_libraries(test_point_from_tokens_reader
-  TracktableCore
-  ${Boost_LIBRARIES}
-)
-
-target_link_libraries(test_reader_skip_headers
-  TracktableCore
-  ${Boost_LIBRARIES}
-)
-
-target_link_libraries(test_reader_timestamp_formats
-  TracktableCore
-  ${Boost_LIBRARIES}
-)
-
-target_link_libraries(test_point_reader_autoconfig_base_point
-  TracktableCore
-  ${Boost_LIBRARIES}
-  )
-
-target_link_libraries(test_point_reader_autoconfig_trajectory_point
-  TracktableCore
-  ${Boost_LIBRARIES}
-  )
-
-target_link_libraries(test_point_writer_base_point
-  TracktableCore
-  ${Boost_LIBRARIES}
-  )
-
-target_link_libraries(test_point_writer_trajectory_point
-  TracktableCore
-  ${Boost_LIBRARIES}
-  )
-
-target_link_libraries(test_tokenizing_reader
-  TracktableCore
-  ${Boost_LIBRARIES}
-)
-
-target_link_libraries(test_trajectory_point_reader_default
-  TracktableCore
-  TracktableDomain
-  ${Boost_LIBRARIES}
-  )
-
-target_link_libraries(test_trajectory_writer
-  TracktableCore
-  ${Boost_LIBRARIES}
-  )
-
-target_link_libraries(test_trajectory_reader
-  TracktableCore
-  ${Boost_LIBRARIES}
-  )
-
-target_link_libraries(test_kml
-  TracktableRW
-  ${Boost_LIBRARIES}
-  )
-# ------------------------------
-
-add_test(
+add_cpp_test(
   NAME C_GenericReader
-  COMMAND test_generic_reader
-  )
-
-add_test(
-  NAME C_IntegratedPointReader_Cartesian5
-  COMMAND test_integrated_point_reader_cart5 14 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv
+  SOURCE test_generic_reader.cpp
+  LIBRARIES TracktableCore
 )
 
-add_test(
-  NAME C_IntegratedPointReader_PointFields
-  COMMAND test_point_fields 826 ${Tracktable_DATA_DIR}/internal_test_data/Points/SampleNFlights.csv
-)
-
-add_test(
+add_cpp_test(
   NAME C_IntegratedPointReader_TPLonLat
+  SOURCE test_integrated_point_reader_traj_lonlat.cpp
+  LIBRARIES TracktableCore
   COMMAND test_integrated_point_reader_traj_lonlat 14 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv
 )
 
-add_test(
+add_cpp_test(
+  NAME C_IntegratedPointReader_Cartesian5
+  SOURCE test_integrated_point_reader_cart5.cpp
+  LIBRARIES TracktableCore
+  COMMAND test_integrated_point_reader_cart5 14 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv
+)
+
+add_cpp_test(
   NAME C_LineReader
+  SOURCE test_line_reader.cpp
+  LIBRARIES TracktableCore
   COMMAND test_line_reader 1000 ${Tracktable_DATA_DIR}/internal_test_data/Points/Points1000.csv
 )
 
-add_test(
+add_cpp_test(
+  NAME C_IntegratedPointReader_PointFields
+  SOURCE test_point_fields.cpp
+  LIBRARIES TracktableCore
+  COMMAND test_point_fields 826 ${Tracktable_DATA_DIR}/internal_test_data/Points/SampleNFlights.csv
+)
+
+add_cpp_test(
   NAME C_PointFromTokensReader
+  SOURCE test_point_from_tokens_reader.cpp
+  LIBRARIES TracktableCore
   COMMAND test_point_from_tokens_reader 14 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv
 )
 
-add_test(
+add_cpp_test(
   NAME C_PointReader_Autoconfig_BasePoint
-  COMMAND test_point_reader_autoconfig_base_point
-  )
+  SOURCE test_point_reader_autoconfig_base_point.cpp
+  LIBRARIES TracktableCore
+)
 
-add_test(
+add_cpp_test(
   NAME C_PointReader_Autoconfig_TrajectoryPoint
-  COMMAND test_point_reader_autoconfig_trajectory_point
-  )
+  SOURCE test_point_reader_autoconfig_trajectory_point.cpp
+  LIBRARIES TracktableCore
+)
 
-add_test(
+add_cpp_test(
   NAME C_PointWriter_BasePoint
-  COMMAND test_point_writer_base_point
-  )
+  SOURCE test_point_writer_base_point.cpp
+  LIBRARIES TracktableCore
+)
 
-add_test(
+add_cpp_test(
   NAME C_PointWriter_TrajectoryPoint
-  COMMAND test_point_writer_trajectory_point
-  )
-
-add_test(
-  NAME C_SkipCommentsReader
-  COMMAND test_comment_reader 15 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv
+  SOURCE test_point_writer_trajectory_point.cpp
+  LIBRARIES TracktableCore
 )
 
-add_test(
-  NAME C_SkipHeadersReader
-  COMMAND test_reader_skip_headers 4 14 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithSkippableHeaders.csv
-)
-
-add_test(
-  NAME C_TimestampFormatsReader
+add_cpp_test(
+  NAME C_ReaderTimestampFormats
+  SOURCE test_reader_timestamp_formats.cpp
+  LIBRARIES TracktableCore
   COMMAND test_reader_timestamp_formats ${Tracktable_DATA_DIR}/internal_test_data/Timestamps/
 )
 
-add_test(
+add_cpp_test(
+  NAME C_SkipCommentsReader
+  SOURCE test_comment_reader.cpp
+  LIBRARIES TracktableCore
+  COMMAND test_comment_reader 15 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv
+)
+
+add_cpp_test(
+  NAME C_SkipHeadersReader
+  SOURCE test_reader_skip_headers.cpp
+  LIBRARIES TracktableCore
+  COMMAND test_reader_skip_headers 4 14 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithSkippableHeaders.csv
+)
+
+add_cpp_test(
   NAME C_StringTokenizingReader
+  SOURCE test_tokenizing_reader.cpp
+  LIBRARIES TracktableCore
   COMMAND test_tokenizing_reader ${Tracktable_DATA_DIR}/internal_test_data/Points/SampleASDI.csv
 )
 
-add_test(
+add_cpp_test(
   NAME C_TrajectoryPointReader_DefaultConfiguration
+  SOURCE test_trajectory_point_reader_default.cpp
+  TARGET test_trajectory_point_reader_default
+  LIBRARIES TracktableDomain TracktableCore
   COMMAND test_trajectory_point_reader_default 998 ${Tracktable_DATA_DIR}/internal_test_data/Points/Points1000.csv
 )
 
-add_test(
-  NAME C_TrajectoryWriter
-  COMMAND test_trajectory_writer
-  )
-
-add_test(
+add_cpp_test(
   NAME C_TrajectoryReader
-  COMMAND test_trajectory_reader
-  )
+  SOURCE test_trajectory_reader.cpp
+  LIBRARIES TracktableCore
+)
 
-  add_test(
-  NAME C_Kml
-  COMMAND test_kml
-  )
+add_cpp_test(
+  NAME C_TrajectoryWriter
+  SOURCE test_trajectory_writer.cpp
+  LIBRARIES TracktableCore
+)
+
+add_cpp_test(
+  NAME C_KML
+  SOURCE test_kml.cpp
+  LIBRARIES TracktableCore TracktableRW
+  CATCH2
+)
+

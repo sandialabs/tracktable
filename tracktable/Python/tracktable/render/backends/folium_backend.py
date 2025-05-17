@@ -35,14 +35,17 @@ import itertools
 import logging
 from datetime import datetime, timedelta
 
-import folium as fol
 import matplotlib
-from folium.plugins import HeatMap
 from matplotlib.colors import ListedColormap, hsv_to_rgb, rgb2hex
 from tracktable.core.geomath import compute_bounding_box
 from tracktable.info import airports, borders, ports, rivers, shorelines
 from tracktable.render.map_decoration import coloring
 from tracktable.render.map_processing import common_processing
+
+from tracktable.render.backends import folium_proxy
+
+fol = folium_proxy.import_folium()
+fol_heat_map = folium_proxy.import_folium("plugins.heat_map")
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +72,7 @@ def timedelta_to_iso8601_duration(td: timedelta) -> str:
     Returns:
         Duration represented as a string in ISO8601 format (without fractional seconds)
     """
-    #Adapted from isodate's _strfduration method.  
+    #Adapted from isodate's _strfduration method.
     ret = []
     usecs = abs(
         (td.days * 24 * 60 * 60 + td.seconds) * 1000000 + td.microseconds
@@ -135,6 +138,7 @@ def render_trajectories(trajectories,
                         anim_display_update_interval=timedelta(microseconds=200000),
                         anim_timestamp_update_step=timedelta(minutes=1),
                         anim_trail_duration=None,
+                        anim_loop=True,
 
                         # Airport and poirt specific args
                         draw_airports=False,
@@ -270,27 +274,31 @@ def render_trajectories(trajectories,
             rgb = hsv_to_rgb([common_processing.hash_short_md5(trajectory[0].object_id), 1.0, 1.0])
             current_color_map = ListedColormap([rgb2hex(rgb)])
 
+        solid = (type(current_color_map) is ListedColormap \
+               and len(current_color_map.colors) == 1 \
+               and trajectory_linewidth_generator == None)
         if show_lines:
             popup_str = str(trajectory[0].object_id)+'<br>'+ \
                 trajectory[0].timestamp.strftime('%Y-%m-%d %H:%M:%S')+ \
                 '<br> to <br>'+ \
                 trajectory[-1].timestamp.strftime('%Y-%m-%d %H:%M:%S')
             tooltip_str = str(trajectory[0].object_id)
-            if fast or (type(current_color_map) is ListedColormap \
-               and len(current_color_map.colors) == 1 \
-               and trajectory_linewidth_generator == None): # Polyline ok
+            if fast or (solid and not animate): # Polyline ok
                 fol.PolyLine(coordinates,
                              color=current_color_map.colors[0],
                              weight=linewidth, opacity=1,
                              tooltip=tooltip_str,
                              popup=popup_str).add_to(map_canvas)
-            else: # mapped color (not solid)
+            else: # mapped color (not solid) or animate
                 last_pos = coordinates[0]
                 for i, pos in enumerate(coordinates[1:]):
                     weight = linewidth
                     if trajectory_linewidth_generator:
                         weight = widths[i]
-                    segment_color = rgb2hex(mapper.to_rgba(scalars[i]))
+                    if solid:
+                        segment_color = current_color_map.colors[0]
+                    else:
+                        segment_color = rgb2hex(mapper.to_rgba(scalars[i]))
                     if animate:
                         segments.append({'coordinates': [[last_pos[1], last_pos[0]], [pos[1], pos[0]]],
                                          'times': [times[i], times[i+1]], #i is off by one, so in first iter times[0] is the previous time
@@ -362,18 +370,18 @@ def render_trajectories(trajectories,
                                   },
                               },
             } for point in anim_points ]
-        
+
         if anim_trail_duration != None:
             anim_trail_duration = timedelta_to_iso8601_duration(anim_trail_duration)
         anim_timestamp_update_step = timedelta_to_iso8601_duration(anim_timestamp_update_step)
 
         plugins.TimestampedGeoJson({"type":"FeatureCollection",
                                     "features": features}, add_last_point=False,
-                                   transition_time=anim_display_update_interval.microseconds // 1000, 
+                                   transition_time=anim_display_update_interval.microseconds // 1000,
                                    period=anim_timestamp_update_step,
                                    duration=anim_trail_duration,
                                    time_slider_drag_update=True,
-                                   loop_button=True).add_to(map_canvas)# need to set period automatically or allow users to set.
+                                   loop_button=True, loop=anim_loop).add_to(map_canvas)# need to set period automatically or allow users to set.
     if map_bbox:
         map_canvas.fit_bounds([(map_bbox[1], map_bbox[0]),
                       (map_bbox[3], map_bbox[2])])
@@ -516,7 +524,7 @@ def render_heatmap(points,
                                        line_color='grey', linewidth=0.5,
                                        tiles=tiles, attr=attr, crs=crs,
                                        prefer_canvas=prefer_canvas)
-    HeatMap(display_points, gradient=gradient).add_to(heat_map)
+    fol_heat_map.HeatMap(display_points, gradient=gradient).add_to(heat_map)
     if save:  # saves as .html document
         if not filename:
             datetime_str = datetime.now().strftime("%Y-%m-%dT%H%M%S-%f")
