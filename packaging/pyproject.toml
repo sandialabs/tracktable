@@ -34,7 +34,7 @@
 [project]
 
 name = "tracktable"
-version = "1.7.1"
+version = "1.7.2"
 requires-python = ">= 3.9"
 license = "BSD-3-Clause"
 license-files = ["Python/tracktable/LICENSE.txt"]
