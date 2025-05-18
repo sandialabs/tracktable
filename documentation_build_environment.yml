@@ -23,6 +23,7 @@ dependencies:
   - doxygen
   - breathe
   - sphinx_rtd_theme
+  - graphviz
 
   - pip:
     - nbsphinx-link
