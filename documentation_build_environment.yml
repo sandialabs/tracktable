@@ -29,7 +29,7 @@ dependencies:
   - pandoc>=2.5
   - doxygen>=1.8.17
   - graphviz>=2.42.2
-  - breathe>=4.26.1, <=4.31.0
+  - breathe>=4.26.1
 
   - pip:
     - nbsphinx-link
