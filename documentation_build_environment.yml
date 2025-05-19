@@ -9,6 +9,10 @@ name: tracktable-readthedocs
 channels:
   - conda-forge
 dependencies:
+  # Git Dependencies
+  - git
+  - git-lfs
+
   # Python Dependencies
   - python>=3.10
   - matplotlib>=3.0
