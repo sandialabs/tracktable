@@ -24,16 +24,23 @@ sphinx:
 # Eventually we will also build docs as PDF and ePub.
 # formats: all
 
-# This OS version 
+# This OS version
 build:
   os: ubuntu-22.04
   # This Conda environment (per the Read The Docs documentation, URL below)
-  # uses libmamba to handle conda install requests.  That should be much, 
+  # uses libmamba to handle conda install requests.  That should be much,
   # much faster than the old version.
-  tools: 
+  tools:
     python: "mambaforge-22.9"
-      
-  
+  jobs:
+    post_checkout:
+      # Notebooks are stored pre-rendered in Git LFS.  This isn't installed
+      # by default on RTD so we need to grab it.
+      - git lfs install
+      - git lfs fetch
+      - git lfs checkout
+
+
 # The Anaconda environment to build the docs
 conda:
   environment: documentation_build_environment.yml
