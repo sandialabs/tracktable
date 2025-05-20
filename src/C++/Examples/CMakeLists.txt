@@ -2,7 +2,6 @@
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
-
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -28,43 +27,28 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Function to set up and run a Python test using 'python -m foo'
 
-function(add_python_test test_name module_to_run)
+#
+# This is tracktable/Examples/CMakeLists.txt.
+#
+# This second check undoes the previous find and looks for all necessary components
+unset(Boost_FOUND)
+message(STATUS "Looking for Boost components needed for C++ examples")
+find_package(Boost CONFIG
+  ${BOOST_MINIMUM_VERSION_REQUIRED}
+  REQUIRED
+  COMPONENTS
+    ${BOOST_CORE_COMPONENTS_NEEDED} timer
+    ${BOOST_EXAMPLE_COMPONENTS}
+  )
 
-IF(CMAKE_BUILD_TYPE MATCHES Coverage)
-  add_test(
-    NAME ${test_name}
-    COMMAND coverage run -m ${module_to_run} ${ARGN}
-    )
-ELSE(CMAKE_BUILD_TYPE MATCHES Coverage)
-  add_test(
-    NAME ${test_name}
-    COMMAND ${Python3_EXECUTABLE} -m ${module_to_run} ${ARGN}
-    )
-ENDIF(CMAKE_BUILD_TYPE MATCHES Coverage)
 
-
-if (MINGW OR MSVC)
-  string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )
-  string( REPLACE ";" "\\;" ESCAPED_PYTHONPATH "$ENV{PYTHONPATH}" )
-
-  set_tests_properties(
-    ${test_name}
-    PROPERTIES
-    ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/src/Python/\\;${ESCAPED_PYTHONPATH};PATH=${Tracktable_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH}"
-	)
-else (MINGW OR MSVC)
-  # Trust the compiler to set RPATH so that the libraries in bin/ are
-  # accessible.
-  set_tests_properties(
-    ${test_name}
-    PROPERTIES
-    ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/src/Python:${Tracktable_BINARY_DIR}/lib:$ENV{PYTHONPATH}"
-	)
-endif (MINGW OR MSVC)
-
-endfunction(add_python_test)
-
+add_subdirectory(FindId)
+add_subdirectory(Assemble)
+add_subdirectory(Classify)
+add_subdirectory(Cluster)
+add_subdirectory(FilterTime)
+add_subdirectory(Portal)
+add_subdirectory(Predict)
+add_subdirectory(Reduce)
+add_subdirectory(Serialization)
