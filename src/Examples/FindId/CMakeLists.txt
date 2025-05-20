@@ -2,7 +2,6 @@
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
-
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -28,43 +27,35 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Function to set up and run a Python test using 'python -m foo'
+include_directories(
+  BEFORE
+  ${Tracktable_INCLUDE_DIRS}
+  ${Tracktable_BINARY_DIR}
+  )
 
-function(add_python_test test_name module_to_run)
+include_directories(
+  AFTER
+  ${Boost_INCLUDE_DIR}
+  )
 
-IF(CMAKE_BUILD_TYPE MATCHES Coverage)
-  add_test(
-    NAME ${test_name}
-    COMMAND coverage run -m ${module_to_run} ${ARGN}
-    )
-ELSE(CMAKE_BUILD_TYPE MATCHES Coverage)
-  add_test(
-    NAME ${test_name}
-    COMMAND ${Python3_EXECUTABLE} -m ${module_to_run} ${ARGN}
-    )
-ENDIF(CMAKE_BUILD_TYPE MATCHES Coverage)
+link_directories(
+  ${Boost_LIBRARY_DIRS}
+  )
 
+add_executable( findid
+  Main.cpp
+  )
 
-if (MINGW OR MSVC)
-  string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )
-  string( REPLACE ";" "\\;" ESCAPED_PYTHONPATH "$ENV{PYTHONPATH}" )
+target_link_libraries( findid
+  TracktableCore
+  TracktableDomain
+  ${Boost_LIBRARIES}
+  )
 
-  set_tests_properties(
-    ${test_name}
-    PROPERTIES
-    ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/src/Python/\\;${ESCAPED_PYTHONPATH};PATH=${Tracktable_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH}"
-	)
-else (MINGW OR MSVC)
-  # Trust the compiler to set RPATH so that the libraries in bin/ are
-  # accessible.
-  set_tests_properties(
-    ${test_name}
-    PROPERTIES
-    ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/src/Python:${Tracktable_BINARY_DIR}/lib:$ENV{PYTHONPATH}"
-	)
-endif (MINGW OR MSVC)
-
-endfunction(add_python_test)
+#TODO address example data files
+add_custom_command(
+  TARGET findid POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_CURRENT_SOURCE_DIR}/mapping_ids.txt
+    ${Tracktable_BINARY_DIR}/bin)
 

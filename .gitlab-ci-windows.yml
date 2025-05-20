@@ -83,7 +83,7 @@ windows-test:
   before_script:
     - *windows-ci-before-script
   script:
-    - xcopy build_windows\lib\*.pyd tracktable\Python\tracktable\lib
+    - xcopy build_windows\lib\*.pyd src\Python\tracktable\lib
     - cd build_windows
     - ctest -j4 -C Release -T test --output-on-failure --exclude-regex "P_Render_Trajectories|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe"
   artifacts:
