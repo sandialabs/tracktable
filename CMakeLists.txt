@@ -257,40 +257,60 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
   # Whichever is being build, we need Doxygen
   find_package(Doxygen REQUIRED)
 
-  set( DOC_SOURCE_DIR ${Tracktable_SOURCE_DIR}/tracktable-docs/Documentation )
-  set( DOC_BINARY_DIR ${Tracktable_BINARY_DIR}/Documentation )
-
   if(DOXYGEN_FOUND)
-
-    # Now, let's look for dot and see if it's installed
-    # We can still build the docs even if we don't find dot, but they won't be as nice
+    # We need dot (from Graphviz) in order to build documentation.
     find_program(DOT_FOUND dot)
-    if (DOT_FOUND)
-      set(HAVE_DOT YES)
-    else(DOT_FOUND)
-      set(HAVE_DOT NO)
-    endif(DOT_FOUND)
+    if (NOT DOT_FOUND)
+      message(ERROR "Please install GraphViz in the environment before building documentation.")
+    endif (NOT DOT_FOUND)
 
-    configure_file(
-      ${DOC_SOURCE_DIR}/Doxyfile.in
-      ${DOC_BINARY_DIR}/Doxyfile
-      @ONLY
-      )
+    # Provide environment variables to Doxygen and Sphinx
 
-    add_custom_target( doc_cxx ALL
-      ${DOXYGEN_EXECUTABLE} ${DOC_BINARY_DIR}/Doxyfile
-      WORKING_DIRECTORY ${DOC_BINARY_DIR}
-      COMMENT "Generating C++ Doxygen documentation" VERBATIM
-      )
+    set( DOC_SOURCE_DIR ${Tracktable_SOURCE_DIR}/tracktable-docs/Documentation )
+    set( DOC_OUTPUT_DIR ${Tracktable_BINARY_DIR}/Documentation )
+    set( DOXYGEN_XML_OUTPUT_PATH ${Tracktable_BINARY_DIR}/doxygen_xml )
+    set( DOXYGEN_HTML_OUTPUT_PATH ${DOC_OUTPUT_DIR}/html )
+    set( DOXYGEN_GENERATE_XML "YES" )
+
+    if (BUILD_DOCUMENTATION_CXX_ONLY)
+      set(DOXYGEN_GENERATE_HTML "YES")
+    else (DOCUMENTATION_BUILD_CXX_ONLY)
+      set(DOXYGEN_GENERATE_HTML "NO")
+    endif (BUILD_DOCUMENTATION_CXX_ONLY)
+
+    if (NOT EXISTS ${DOC_OUTPUT_DIR})
+      message(STATUS "Creating ${DOC_OUTPUT_DIR} for generated documentation.")
+      file(MAKE_DIRECTORY ${DOC_OUTPUT_DIR})
+    endif (NOT EXISTS ${DOC_OUTPUT_DIR})
+
+    add_custom_target(doc_cxx
+      ALL
+      BYPRODUCTS
+        ${DOC_OUTPUT_DIR}
+        ${Tracktable_BINARY_DIR}/doxygen_xml
+      WORKING_DIRECTORY
+        ${DOC_SOURCE_DIR}
+      COMMAND
+        ${CMAKE_COMMAND} -E env
+          TRACKTABLE_VERSION=${TRACKTABLE_VERSION}
+          DOXYGEN_GENERATE_XML=${DOXYGEN_GENERATE_XML}
+          DOXYGEN_XML_OUTPUT_PATH=${DOXYGEN_XML_OUTPUT_PATH}
+          DOXYGEN_GENERATE_HTML=${DOXYGEN_GENERATE_HTML}
+          DOXYGEN_HTML_OUTPUT_PATH=${DOXYGEN_HTML_OUTPUT_PATH}
+          --
+          ${DOXYGEN_EXECUTABLE} ${DOC_SOURCE_DIR}/Doxyfile
+    )
 
     install(
-      DIRECTORY ${DOC_BINARY_DIR}/doxygen/html/
+      DIRECTORY ${DOC_DOXYGEN_HTML_PATH}
       DESTINATION ${CMAKE_INSTALL_DOCDIR}/tracktable-${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}/cpp_reference
     )
 
     include(FindPythonModule)
 
-    # We have found Sphinx, but that isn't the end of it. We need to make sure the sphinx_rtd_theme is accessible
+
+    # We have found Sphinx, but that isn't the end of it. We need to make sure
+    # the sphinx_rtd_theme is accessible
     if(NOT BUILD_DOCUMENTATION_CXX_ONLY)
       unset(Sphinx_FOUND)
       find_package(Sphinx)
@@ -305,7 +325,9 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
       find_python_module(nbsphinx_link NBSPHINX_LINK_MODULE_STATUS NBSPHINX_LINK_MODULE_LOCATION)
       find_python_module(breathe BREATHE_MODULE_STATUS BREATHE_MODULE_LOCATION)
 
-      set(Sphinx_BUILD_DIR "${DOC_BINARY_DIR}/_build")
+      set(Sphinx_BUILD_DIR "${DOC_OUTPUT_DIR}/_build")
+
+      message(STATUS "Adding Sphinx documentation target.")
 
       if (MINGW OR MSVC)
         string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )
@@ -314,30 +336,43 @@ if (BUILD_DOCUMENTATION OR BUILD_DOCUMENTATION_CXX_ONLY)
         string( REPLACE "/" "\\;" ESCAPED_BINARY_DIR "${Tracktable_BINARY_DIR}" )
 
         add_custom_target( doc_python ALL
-            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${ESCAPED_SOURCE_DIR}\\tracktable\\Python\\;${ESCAPED_PYTHONPATH} PATH=${ESCAPED_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH}
-            SOURCE_DIR=${ESCAPED_SOURCE_DIR} BINARY_DIR=${ESCAPED_BINARY_DIR}
-            ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
-            -b html
-            -d "${Sphinx_BUILD_DIR}/doctrees"
-            -c "cmake_build"
-            ${DOC_SOURCE_DIR}
-            ${DOC_BINARY_DIR}/html
-          COMMENT "Generating Python documentation"
-          DEPENDS doc_cxx
-          WORKING_DIRECTORY ${DOC_SOURCE_DIR}
-          VERBATIM
+            BYPRODUCTS
+              ${DOC_OUTPUT_DIR}/html
+              ${Sphinx_BUILD_DIR}
+            COMMAND
+              ${CMAKE_COMMAND} -E env
+                TRACKTABLE_VERSION=${TRACKTABLE_VERSION}
+                # PYTHONPATH=${ESCAPED_SOURCE_DIR}\\tracktable\\Python\\;${ESCAPED_PYTHONPATH}
+                PATH=${ESCAPED_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH}
+                #SOURCE_DIR=${ESCAPED_SOURCE_DIR}
+                #BINARY_DIR=${ESCAPED_BINARY_DIR}
+                DOXYGEN_XML_OUTPUT_PATH=${DOXYGEN_XML_OUTPUT_PATH}
+                --
+                ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
+                  -b html
+                  -d "${Sphinx_BUILD_DIR}/doctrees"
+                  ${DOC_SOURCE_DIR}
+                  ${DOC_OUTPUT_DIR}
+            COMMENT "Generating Python documentation"
+            DEPENDS doc_cxx
+            WORKING_DIRECTORY ${DOC_SOURCE_DIR}
+            VERBATIM
           )
       else (MINGW OR MSVC)
         # Trust the compiler to set RPATH so that the libraries in bin/ are accessible
         add_custom_target( doc_python ALL
-            COMMAND ${CMAKE_COMMAND} -E env PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python:${Tracktable_BINARY_DIR}/lib:$ENV{PYTHONPATH}
-            SOURCE_DIR=${Tracktable_SOURCE_DIR} BINARY_DIR=${Tracktable_BINARY_DIR}
+          BYPRODUCTS
+            ${DOC_OUTPUT_DIR}/html
+            ${Sphinx_BUILD_DIR}/doctrees
+          COMMAND
+            ${CMAKE_COMMAND} -E env
+            DOXYGEN_XML_OUTPUT_PATH=${DOXYGEN_XML_OUTPUT_PATH}
+            --
             ${Python3_EXECUTABLE} ${Sphinx_BUILD_EXECUTABLE}
-            -b html
-            -d "${Sphinx_BUILD_DIR}/doctrees"
-            -c "cmake_build"
-            ${DOC_SOURCE_DIR}
-            ${DOC_BINARY_DIR}/html
+              -b html
+              -d "${Sphinx_BUILD_DIR}/doctrees"
+              ${DOC_SOURCE_DIR}
+              ${DOC_OUTPUT_DIR}
           COMMENT "Generating Python documentation"
           DEPENDS doc_cxx
           WORKING_DIRECTORY ${DOC_SOURCE_DIR}
