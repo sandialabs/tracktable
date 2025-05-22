@@ -138,7 +138,7 @@ set( FEATURE_VECTOR_MAX_DIMENSION 30 CACHE STRING "Maximum dimension of feature 
 
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/PythonWrappingParameters.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/PythonWrappingParameters.h
+  ${PROJECT_BINARY_DIR}/tracktable/PythonWrapping/PythonWrappingParameters.h
   )
 
 include_directories(

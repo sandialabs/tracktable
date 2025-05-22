@@ -97,6 +97,7 @@ generate_export_header( TracktableAnalysis
    EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/tracktable/Analysis/TracktableAnalysisWindowsHeader.h
    )
 
+
 if (APPLE)
     set(CMAKE_INSTALL_BINDIR bin)
     set(CMAKE_INSTALL_LIBDIR lib)
@@ -114,7 +115,9 @@ install(
 )
 
 install(
-  FILES ${Analysis_HEADERS}
+  FILES
+    ${Analysis_HEADERS}
+    ${PROJECT_BINARY_DIR}/tracktable/Analysis/TracktableAnalysisWindowsHeader.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Analysis
 )
 

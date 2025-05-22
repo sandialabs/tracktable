@@ -26,6 +26,7 @@
 
 include_directories(
   ${Tracktable_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 add_library(TracktableFactory INTERFACE)
