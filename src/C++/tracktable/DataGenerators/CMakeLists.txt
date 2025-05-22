@@ -31,6 +31,8 @@
 include_directories(
   ${Tracktable_SOURCE_DIR}
   ${Tracktable_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}
+  ${PROJECT_BINARY_DIR}
   ${Boost_INCLUDE_DIR}
 )
 

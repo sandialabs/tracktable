@@ -33,13 +33,12 @@
 
 include(GenerateExportHeader)
 
-message(STATUS "--- Tracktable include dir: ${Tracktable_INCLUDE_DIRS}")
-
 include_directories(
   ${PROJECT_SOURCE_DIR}
   ${PROJECT_BINARY_DIR}
   ${Boost_INCLUDE_DIR}
   ${Tracktable_INCLUDE_DIRS}
+  ${CMAKE_CURRENT_BINARY_DIR}
   )
 
 # Most of the files in Core are header-only implementations and don't
@@ -212,7 +211,7 @@ generate_export_header( TracktableCore
    BASE_NAME TRACKTABLE_CORE
    EXPORT_MACRO_NAME TRACKTABLE_CORE_EXPORT
    STATIC_DEFINE TRACKTABLE_CORE_STATIC_LIBRARY
-   EXPORT_FILE_NAME TracktableCoreWindowsHeader.h
+   EXPORT_FILE_NAME ${PROJECT_BINARY_DIR}/tracktable/Core/TracktableCoreWindowsHeader.h
    )
 
 target_link_libraries(TracktableCore ${Boost_LIBRARIES} Threads::Threads)
@@ -227,7 +226,7 @@ install(
 )
 
 install(
-  FILES ${CMAKE_BINARY_DIR}/tracktable/Core/TracktableCoreWindowsHeader.h
+  FILES ${PROJECT_BINARY_DIR}/tracktable/Core/TracktableCoreWindowsHeader.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/Core
   )
 

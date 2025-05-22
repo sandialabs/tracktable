@@ -35,8 +35,7 @@
 
 # TODO: This declaration will need to move when we move Examples/
 # back to top level.
-set(Tracktable_INCLUDE_DIRS ${Tracktable_SOURCE_DIR}/src/C++ ${Tracktable_BINARY_DIR}/src/C++)
-
+set(Tracktable_INCLUDE_DIRS ${Tracktable_SOURCE_DIR}/src/C++)
 add_subdirectory(C++)
 if (TRACKTABLE_PYTHON)
   add_subdirectory(Python)
