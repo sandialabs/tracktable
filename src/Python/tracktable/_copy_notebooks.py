@@ -33,69 +33,107 @@
 import os
 import shutil
 import subprocess
-import filecmp
-import hashlib
+import sys
 
-def copy_notebooks(source, dest):
+# We need different notebook-cleaning commands depending on the nbconvert version
+NBCONVERT_VERSION: int = -1
+
+def copy_and_clean_notebook(notebook_filename: str,
+                            dest_path: str,
+                            check_timestamp: bool=True):
+    """Copy and clean a single notebook.
+
+    This function will run a notebook through `nbconvert` to remove its output
+    cells, then copy it into the destination directory.
+
+    Arguments:
+        notebook_filename (str): Filename (with full path) to notebook to clean
+        dest_path (str): Where to put the cleaned notebook
+
+    Keyword Arguments:
+        check_timestamp (bool): If True, the timestamp on `destpath/notebook_filename`
+            will be compared to the timestamp on the input notebook.  If the cleaned
+            notebook is newer than the input, nothing will be done.
+
+    Returns:
+        None
+    """
+
+    (_, notebook_only) = os.path.split(notebook_filename)
+    dest_filename = os.path.join(dest_path, notebook_only)
+
+    if check_timestamp:
+        if os.path.exists(dest_filename):
+            if os.path.getmtime(dest_filename) > os.path.getmtime(notebook_filename):
+                print(f"-- INFO: Output notebook {notebook_only} is newer than input.  Cleaning not needed.")
+                return
+
+    shutil.copyfile(notebook_filename, dest_path)
+
+    if NBCONVERT_VERSION > 6:
+        # Running this through the shell is much more concise than doing the
+        # conversion programmatically.
+        subprocess.check_output(['jupyter', 'nbconvert',
+                                 '--clear-output', '--inplace',
+                                 '--log-level', 'WARN',
+                                 dest_filename])
+    else:
+        subprocess.check_output(['jupyter', 'nbconvert',
+                                 '--ClearOutputPreprocessor.enabled=True', '--inplace',
+                                 '--log-level', 'WARN',
+                                 dest_filename])
+
+
+def copy_notebook_directory(source: str, dest: str):
+    """Copy a directory of demo notebooks and clean their contents.
+
+    Also copies any auxiliary files or directories we find along the way.
+
+    Arguments:
+        source (str): Source path containing notebooks to copy
+        dest (str): Destination path for cleaned notebooks
+
+    Returns:
+        None
+    """
     for thing in os.scandir(source):
-        if thing.is_dir(): # This is specifically for the `demo_images` folder since we don't keep an empty folder for it in tracktable
-            if not os.path.exists(os.path.join(dest, thing.name)): # If the destination sub-folder doesn't exist then create it
-                os.mkdir(os.path.join(dest, thing.name))
-            copy_notebooks(os.path.join(source, thing.name), os.path.join(dest, thing.name))
+        if thing.is_dir():
+            # This is specifically for the `demo_images` folder since
+            # we don't keep an empty folder for it in tracktable
+            shutil.copytree(os.path.join(source, thing.name),
+                            os.path.join(dest, thing.name),
+                            dirs_exist_ok=True)
+        elif thing.name.endswith('.ipynb'):
+            copy_and_clean_notebook(os.path.join(source, thing.name), dest)
         else:
-            if os.path.exists(os.path.join(dest, thing.name)): # If the files are already copied check if we even need to copy them
-                if not filecmp.cmp(os.path.join(source, thing.name), os.path.join(dest, thing.name)):
-                    shutil.copy(os.path.join(source, thing.name), dest)
-            else:
-                shutil.copy(os.path.join(source, thing.name), dest)
-
-# --------------------------------------------------------------------
-
-def clear_notebook_output(notebook_directory, nbconvert_version):
-    for file in os.listdir(notebook_directory):
-        if file.endswith(".ipynb"):
-            # As far as I can tell just running the CLI command is way easier for doing the conversions comapred to the API
-            if nbconvert_version >= 6:
-                subprocess.check_output(['jupyter', 'nbconvert', '--clear-output', '--inplace', '--log-level', 'WARN', os.path.join(notebook_directory, file)])
-            else:
-                subprocess.check_output(['jupyter', 'nbconvert', '--ClearOutputPreprocessor.enabled=True', '--inplace', '--log-level', 'WARN', os.path.join(notebook_directory, file)])
+            shutil.copy(os.path.join(source, thing.name), dest)
 
 # --------------------------------------------------------------------
 
 def main():
+    global NBCONVERT_VERSION
+
     here = os.path.dirname(__file__)
-    tracktable_home = os.path.join(here)
     # We expect to be in $repository/src/Python/tracktable
-    tracktable_docs = os.path.join(here, '..', '..', '..', 'tracktable-docs')
+    tracktable_docs = os.path.normpath(
+        os.path.join(here, '..', '..', '..', 'tracktable-docs')
+    )
 
     # Commands differ based on the version of nbconvert installed
-    nbconvert_version = subprocess.check_output(['jupyter', 'nbconvert', '--version'])
-    nbconvert_version = int(nbconvert_version.decode().strip()[0])
+    nbconvert_version_full = subprocess.check_output(['jupyter', 'nbconvert', '--version'])
+    NBCONVERT_VERSION = int(nbconvert_version_full.decode().strip()[0])
 
-    # Copy tutorial notebooks to tracktable and clear output
-    tracktable_docs_tutorial_notebook_directory = os.path.join(tracktable_docs, 'tutorial_notebooks')
-    tracktable_docs_cleaned_tutorial_notebook_directory = os.path.join(tracktable_docs, "cleaned_tutorial_notebooks")
-    tutorial_notebook_directory = os.path.join(tracktable_home, 'examples', 'tutorials')
+    tutorial_src_path = os.path.join(tracktable_docs, 'tutorial_notebooks')
+    tutorial_dest_path = os.path.join(here, 'examples', 'tutorials')
 
-    if not os.path.isdir(tracktable_docs_cleaned_tutorial_notebook_directory):
-        os.mkdir(tracktable_docs_cleaned_tutorial_notebook_directory)
-    copy_notebooks(tracktable_docs_tutorial_notebook_directory, tracktable_docs_cleaned_tutorial_notebook_directory)
-    clear_notebook_output(tracktable_docs_cleaned_tutorial_notebook_directory, nbconvert_version)
-    copy_notebooks(tracktable_docs_cleaned_tutorial_notebook_directory, tutorial_notebook_directory)
-    shutil.rmtree(tracktable_docs_cleaned_tutorial_notebook_directory)
+    analysis_demo_src_path = os.path.join(tracktable_docs, 'analytic_demo_notebooks')
+    analysis_demo_dest_path = os.path.join(here, 'examples', 'analytic_demos')
 
-    # Copy analytic demo notebooks and images to tracktable and clear output
-    tracktable_docs_analytic_demo_notebook_directory = os.path.join(tracktable_docs, 'analytic_demo_notebooks')
-    tracktable_docs_cleaned_analytic_demo_notebook_directory = os.path.join(tracktable_docs, "cleaned_analytic_demo_notebooks")
-    analytic_demo_notebook_directory = os.path.join(tracktable_home, 'examples', 'analytic_demos')
+    copy_notebook_directory(tutorial_src_path, tutorial_dest_path)
+    copy_notebook_directory(analysis_demo_src_path, analysis_demo_dest_path)
 
-    if not os.path.isdir(tracktable_docs_cleaned_analytic_demo_notebook_directory):
-        os.mkdir(tracktable_docs_cleaned_analytic_demo_notebook_directory)
-    copy_notebooks(tracktable_docs_analytic_demo_notebook_directory, tracktable_docs_cleaned_analytic_demo_notebook_directory)
-    clear_notebook_output(tracktable_docs_cleaned_analytic_demo_notebook_directory, nbconvert_version)
-    copy_notebooks(tracktable_docs_cleaned_analytic_demo_notebook_directory, analytic_demo_notebook_directory)
-    shutil.rmtree(tracktable_docs_cleaned_analytic_demo_notebook_directory)
+    return 0
 
 
 if __name__=='__main__':
-  main()
+  sys.exit(main())
