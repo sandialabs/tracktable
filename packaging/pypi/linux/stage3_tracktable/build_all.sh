@@ -12,7 +12,7 @@ set -e
 
 find_script_directory() {
     local _source="${BASH_SOURCE[0]}"
-    while [ -L "${_source}" ]; do 
+    while [ -L "${_source}" ]; do
         # Resolve _source until the file is no longer a symlink.
         _dir=$( cd -P "$(dirname "${_source}" )" >/dev/null 2>&1 && pwd )
         _source=$(readlink "$_source")
@@ -23,14 +23,25 @@ find_script_directory() {
 # Load parsing functions from external library
 find_script_directory
 source ${HERE}/../functions/parsing.sh
+source ${HERE}/../functions/find_interpreters.sh
+source ${HERE}/../defaults.sh
 
+if [ -z ${PYTHON_VERSIONS+x} ]; then
+    echo "WARNING: PYTHON_VERSIONS is not set.  We will default to building "
+    echo "         for these versions: ${DEFAULT_PYTHON_VERSIONS}"
+    export PYTHON_VERSIONS=${DEFAULT_PYTHON_VERSIONS}
+fi
+
+
+if [ -z "${MANYLINUX_TAG+x}" ]; then
+    echo "Using default manylinux tag ${DEFAULT_MANYLINUX_TAG}"
+    MANYLINUX_TAG=${DEFAULT_MANYLINUX_TAG}
+else
+    echo "Using user-supplied manylinux image name: ${MANYLINUX_TAG}"
+fi
 
 
 echo "Building Tracktable for all supported Python versions."
-if [ -d tracktable-copy ]; then
-    echo "INFO: Cleaning up after previous run of script."
-    rm -rf tracktable-copy
-fi
 
 if [ -d tracktable ]; then
     echo "INFO: Removing old copy of Tracktable source."
@@ -39,9 +50,12 @@ fi
 
 
 echo "INFO: Copying Tracktable source from current tree."
-cp -r ../../../../../tracktable ../../../../../tracktable-copy
-mv ../../../../../tracktable-copy ./tracktable
-
+# Get the name of the root directory of the source tree
+pushd ../../../../
+TRACKTABLE_ROOT=`pwd`
+popd
+# Put it here so it'll be copied into the Docker containers
+cp -r $TRACKTABLE_ROOT ./tracktable
 
 
 if [ -z "${CI_REGISTRY+x}" ]; then
@@ -52,10 +66,10 @@ fi
 
 
 # We're going to build Tracktable for all available CPython versions
-# newer than 3.6.
-# Get a list of those versions from the container.
-echo "INFO: Retrieving list of CPython versions in build container."
-AVAILABLE_PYTHON_IMPLEMENTATIONS=$(docker run -ti --rm ${BOOST_CMAKE_IMAGE} '/bin/ls /opt/python | grep cp | grep -v cp36')
+# in PYTHON_VERSIONS.
+
+# This sets INTERPRETER_DIRECTORIES
+find_interpreters "${PYTHON_VERSIONS}" ${BOOST_CMAKE_IMAGE}
 
 
 ###
@@ -63,27 +77,17 @@ AVAILABLE_PYTHON_IMPLEMENTATIONS=$(docker run -ti --rm ${BOOST_CMAKE_IMAGE} '/bi
 ### build Boost for each one.
 ###
 
-# Uncomment this line if you want to build just one Python version for debugging.
-#AVAILABLE_PYTHON_IMPLEMENTATIONS=cp310-cp310
 
-# Default to manylinux2014_x86_64
-if [ -z "${MANYLINUX_TAG+x}" ]; then
-    echo "Using default manylinux tag: manylinux2014_x86_64"
-    MANYLINUX_TAG=manylinux2014_x86_64
-else
-    echo "Using user-supplied wheel tag: '${MANYLINUX_TAG}'"
-fi
-
-for PYTHON_IMPLEMENTATION in ${AVAILABLE_PYTHON_IMPLEMENTATIONS}; do
+for PYTHON_IMPLEMENTATION in ${INTERPRETER_DIRECTORIES}; do
     trim ${PYTHON_IMPLEMENTATION}
     PYTHON_IMPLEMENTATION=${_trimmed_string}
-    
+
     parse_python_version ${PYTHON_IMPLEMENTATION}
-    PYTHON_VERSION=${_python_version}
+    PYTHON_VERSION=${_python_platform}${_python_version}${_python_abi}
     PYTHON_ABI=${_python_abi}
-    
+
     DESTINATION_IMAGE=tracktable:${PYTHON_VERSION}
-    
+
    echo "INFO: Building Tracktable for Python version ${PYTHON_IMPLEMENTATION}."
    echo "DEBUG: destination image is ${DESTINATION_IMAGE}"
 

@@ -27,27 +27,57 @@ set -e
 ###    provide a filename containing the cert.  No default.
 ###
 
-DEFAULT_BOOST_MAJOR_VERSION=1
-DEFAULT_BOOST_MINOR_VERSION=86
-DEFAULT_BOOST_PATCH_VERSION=0
 
-# Change these lines whenever you want to build against a different version
-# of Boost
-if [ -z ${BOOST_MAJOR_VERSION+x} ]; then
-    echo "WARNING: BOOST_MAJOR_VERSION is not set in the environment.  This "
-    echo "         usually happens when you're running a build stage in isolation"
-    echo "         (for testing or debugging) instead of from the top-level"
-    echo "         build_all.sh script.  Defaulting to Boost ${DEFAULT_BOOST_MAJOR_VERSION}.${DEFAULT_BOOST_MINOR_VERSION}.${DEFAULT_BOOST_PATCH_VERSION}."
 
-    BOOST_MAJOR_VERSION=${DEFAULT_BOOST_MAJOR_VERSION}
-    BOOST_MINOR_VERSION=${DEFAULT_BOOST_MINOR_VERSION}
-    BOOST_PATCH_VERSION=${DEFAULT_BOOST_PATCH_VERSION}
-else
-    echo "INFO: Boost version present in environment variables."
+###
+### Housekeeping: load parsing functions
+###
+
+# Utility function: where is this script?  We need this to get to our
+# function library.
+#
+# Sets the variable HERE.
+#
+# From https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script
+
+find_script_directory() {
+    local _source="${BASH_SOURCE[0]}"
+    while [ -L "${_source}" ]; do
+        # Resolve _source until the file is no longer a symlink.
+        _dir=$( cd -P "$(dirname "${_source}" )" >/dev/null 2>&1 && pwd )
+        _source=$(readlink "$_source")
+    done
+    export HERE=$( cd -P "$(dirname "${_source}")" >/dev/null 2>&1 && pwd )
+}
+
+###
+### Get the Boost and Python versions from user-specified environment
+### variables if possible or built-in defaults if not
+###
+
+find_script_directory
+source ${HERE}/../functions/parsing.sh
+source ${HERE}/../functions/find_interpreters.sh
+source ${HERE}/../defaults.sh
+
+if [ -z ${PYTHON_VERSIONS+x} ]; then
+    echo "WARNING: PYTHON_VERSIONS is not set.  Defaulting to versions: "
+    echo "         ${DEFAULT_PYTHON_VERSIONS}"
+    PYTHON_VERSIONS=${DEFAULT_PYTHON_VERSIONS}
 fi
 
-BOOST_VERSION_DOTS=${BOOST_MAJOR_VERSION}.${BOOST_MINOR_VERSION}.${BOOST_PATCH_VERSION}
-BOOST_VERSION_UNDERSCORES=${BOOST_MAJOR_VERSION}_${BOOST_MINOR_VERSION}_${BOOST_PATCH_VERSION}
+if [ -z ${BOOST_VERSION+x} ]; then
+    echo "WARNING: BOOST_VERSION is not set.  Defaulting to version ${DEFAULT_BOOST_VERSION}."
+    BOOST_VERSION=${DEFAULT_BOOST_VERSION}
+fi
+
+# This sets BOOST_VERSION_DOTS and BOOST_VERSION_UNDERSCORES
+parse_boost_version ${BOOST_VERSION}
+
+###
+### Get SSL and proxy parameters from more environment variables.  These
+### do not have default values.
+###
 
 # The variables SNL_*_PROXY and CUSTOM_SSL_CERT should be set by the CI
 # runner configuration.  If they're missing, try to pull them
@@ -108,30 +138,6 @@ else
     echo "INFO: Proxy exceptions provided by build host."
 fi
 
-###
-### Housekeeping: load parsing functions
-###
-
-# Utility function: where is this script?  We need this to get to our
-# function library.
-#
-# Sets the variable HERE.
-#
-# From https://stackoverflow.com/questions/59895/how-do-i-get-the-directory-where-a-bash-script-is-located-from-within-the-script
-
-find_script_directory() {
-    local _source="${BASH_SOURCE[0]}"
-    while [ -L "${_source}" ]; do
-        # Resolve _source until the file is no longer a symlink.
-        _dir=$( cd -P "$(dirname "${_source}" )" >/dev/null 2>&1 && pwd )
-        _source=$(readlink "$_source")
-    done
-    export HERE=$( cd -P "$(dirname "${_source}")" >/dev/null 2>&1 && pwd )
-}
-
-# Load parsing functions from external library
-find_script_directory
-source ${HERE}/../functions/parsing.sh
 
 echo "INFO: Building Boost.Python from Boost ${BOOST_VERSION_DOTS} for all supported Python versions."
 
@@ -145,7 +151,7 @@ if [ ! -f ${BOOST_FILENAME} ]; then
     curl \
        --location \
        -o ${BOOST_FILENAME} \
-       https://archives.boost.io/release/1.86.0/source/boost_${BOOST_VERSION_UNDERSCORES}.tar.gz
+       https://archives.boost.io/release/${BOOST_VERSION_DOTS}/source/boost_${BOOST_VERSION_UNDERSCORES}.tar.gz
 else
     echo "INFO: Boost source already downloaded."
 fi
@@ -154,6 +160,7 @@ fi
 ### Save source code in a container along with the SSL/proxy environment.
 ### We'll clean up this image when we're done.
 ###
+
 BOOST_DOWNLOADED_CONTAINER=boost_downloaded:${BOOST_VERSION_DOTS}
 
 docker build \
@@ -167,12 +174,13 @@ docker build \
        --build-arg NO_PROXY=${SNL_NO_PROXY} \
        .
 
-
 ###
-### Find all of the CPython implementations in our container.
+### Find all of the CPython implementations in our container that
+### match the versions in PYTHON_VERSIONS.
 ###
 
-AVAILABLE_PYTHON_IMPLEMENTATIONS=$(docker run -ti --rm ${BOOST_DOWNLOADED_CONTAINER} '/bin/ls /opt/python | grep cp')
+# This sets INTERPRETER_DIRECTORIES
+find_interpreters "${PYTHON_VERSIONS}" ${BOOST_DOWNLOADED_CONTAINER}
 
 # This image will be used as the basis for the final output of this stage.
 # They're all the same except for the selected Python interpreter
@@ -193,13 +201,12 @@ mkdir libboost_python_tmp
 ### build Boost for each one.
 ###
 
-for PYTHON_IMPLEMENTATION in ${AVAILABLE_PYTHON_IMPLEMENTATIONS}; do
+for PYTHON_IMPLEMENTATION in ${INTERPRETER_DIRECTORIES}; do
     trim "${PYTHON_IMPLEMENTATION}"
     PYTHON_IMPLEMENTATION="${_trimmed_string}"
 
     parse_python_version "${PYTHON_IMPLEMENTATION}"
-    PYTHON_VERSION=${_python_version}
-    PYTHON_ABI=${_python_abi}
+    PYTHON_VERSION=${_python_platform}${_python_version}${_python_abi}
 
     DESTINATION_IMAGE_NAME=boost-${BOOST_VERSION_DOTS}:${PYTHON_VERSION}
 
@@ -218,8 +225,10 @@ for PYTHON_IMPLEMENTATION in ${AVAILABLE_PYTHON_IMPLEMENTATIONS}; do
            .
 
     echo "INFO: Copying Boost.Python libraries for ${PYTHON_VERSION} to temporary directory."
+    # Start an instance of the container so we can extract things from its filesystem
     CREATED_NAME=$(docker create ${DESTINATION_IMAGE_NAME})
     docker cp ${CREATED_NAME}:/boost_python/boost_python_libraries.tar ./libboost_python_tmp
+    # OK, done, delete the container
     docker rm ${CREATED_NAME}
 
     pushd libboost_python_tmp
@@ -227,32 +236,41 @@ for PYTHON_IMPLEMENTATION in ${AVAILABLE_PYTHON_IMPLEMENTATIONS}; do
     popd
 done
 
+
 ###
 ### Collect all of the compiled libboost_python libraries into a single image.
 ###
 
 echo "INFO: Collecting all Boost Python compiled libraries for final image."
+pushd libboost_python_tmp
+tar cf ../collected_boost_python.tar .
+popd
+
 docker build \
-    -t boost_multipython:latest \
+    -t boost_multipython:${BOOST_VERSION_DOTS} \
     --build-arg BASE_MULTIPYTHON_IMAGE=${BASE_MULTIPYTHON_IMAGE} \
     -f Dockerfile.collect_boost_python \
     .
+docker tag boost_multipython:${BOOST_VERSION_DOTS} boost_multipython:latest
+
 
 ###
 ### Cleanup: we no longer need the individual builds or the Boost source code.
 ###
-for PYTHON_IMPLEMENTATION in ${AVAILABLE_PYTHON_IMPLEMENTATIONS}; do
+rm collected_boost_python.tar
+rm -rf libboost_python_tmp
+
+for PYTHON_IMPLEMENTATION in ${INTERPRETER_DIRECTORIES}; do
     parse_python_version "${PYTHON_IMPLEMENTATION}"
-    PYTHON_VERSION=${_python_version}
+    PYTHON_VERSION=${_python_platform}${_python_version}${_python_abi}
 
     DESTINATION_IMAGE_NAME=boost-${BOOST_VERSION_DOTS}:${PYTHON_VERSION}
+    echo "CLEANUP: Removing Docker image ${DESTINATION_IMAGE_NAME} after build"
     docker rmi ${DESTINATION_IMAGE_NAME}
 done
 
 docker rmi boost_downloaded:${BOOST_VERSION_DOTS}
 rm ${BOOST_FILENAME}
-rm -rf libboost_python_tmp
-
 
 ###
 ### Finally, if we're being called from a CI job, we may have a registry URL
