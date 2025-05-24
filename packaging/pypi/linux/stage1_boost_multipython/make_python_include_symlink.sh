@@ -1,9 +1,9 @@
 #!/bin/sh
 
-# The Python include directory is often called 'python3.7m'.  The
-# Boost build process expects to see just 'python3.7'.  Make a symlink
-# if needed.  In fact, just make symlinks to ensure that both
-# directories exist.
+# The Python include directory is usually named 'python{major}.{minor}{abi_flag}'.
+# Boost expects it to be named 'python{major}.{minor}'.  This script
+# checks for that and makes a symlink if necessary.
+
 
 
 FULL_IMPLEMENTATION=$1
@@ -11,17 +11,18 @@ FULL_IMPLEMENTATION=$1
 PYTHON_HOME=/opt/python/${FULL_IMPLEMENTATION}
 PYTHON=${PYTHON_HOME}/bin/python
 
-EXPECTED_INCLUDE_DIR_NAME=$(${PYTHON} -c 'from __future__ import print_function; import sys; print("python{}.{}".format(sys.version_info.major, sys.version_info.minor))')
+MAJOR_DOT_MINOR=$(${PYTHON} -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor})')
+MAJOR_DOT_MINOR_ABI=$(${PYTHON} -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}{sys.abiflags}")')
 
-DIRECTORY_WITHOUT_M=${PYTHON_HOME}/include/${EXPECTED_INCLUDE_DIR_NAME}
-DIRECTORY_WITH_M=${DIRECTORY_WITHOUT_M}m
+DESIRED_INCLUDE_DIR="${PYTHON_HOME}/include/python${MAJOR_DOT_MINOR}"
+EXPECTED_INCLUDE_DIR="${PYTHON_HOME}/include/python${MAJOR_DOT_MINOR_ABI}"
 
-if [ -d ${DIRECTORY_WITHOUT_M} ]; then
+if [ -d ${DESIRED_INCLUDE_DIR} ]; then
     echo "INFO: Python include directly already exists at expected path.  No repair necessary."
-elif [ -d ${DIRECTORY_WITH_M} ]; then
-    echo "INFO: Making Python include directory symlink from ${DIRECTORY_WITH_M} to ${DIRECTORY_WITHOUT_M} so Boost can find it."
-    ln -s ${DIRECTORY_WITH_M} ${DIRECTORY_WITHOUT_M}
+elif [ -d ${EXPECTED_INCLUDE_DIR} ]; then
+    echo "INFO: Making Python include directory symlink from ${EXPECTED_INCLUDE_DIR} to ${DESIRED_INCLUDE_DIR} so Boost can find it."
+    ln -s ${EXPECTED_INCLUDE_DIR} ${DESIRED_INCLUDE_DIR}
 else
-    echo "ERROR: Include directory for Python implementation ${FULL_IMPLEMENTATION} is not where we expect it (${DIRECTORY_WITH_M} or ${DIRECTORY_WITHOUT_M})."
+    echo "ERROR: Include directory for Python implementation ${FULL_IMPLEMENTATION} is not where we expect it (${EXPECTED_INCLUDE_DIR} or ${DESIRED_INCLUDE_DIR})."
     exit 1
 fi
