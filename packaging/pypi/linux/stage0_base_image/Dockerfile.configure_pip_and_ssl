@@ -1,0 +1,79 @@
+### Dockerfile.configure_pip_and_ssl
+###
+### Configure PyPI mirror, proxy settings, and SSL certificate(s)
+### to make a base image we can use in all subsequent stages.
+###
+### Required environment variables:
+### - BASE_IMAGE: Docker image to use as base
+###
+### Optional environment variables:
+### - PIP_INDEX: If set, this will be used as the index parameter in
+###       pip.conf.  Also requires PIP_INDEX_URL.
+### - PIP_INDEX_URL: If set, this will be used as the index parameter
+###       in pip.conf.  Also requires PIP_INDEX.
+### - PYTHON_INTERPRETER: If set, this interpreter will be used
+###       to execute pip.  Required if your base image is Manylinux
+###       because the Python interpreter in /usr/bin doesn't have
+###       Pip installed.
+### - HTTP_PROXY, HTTPS_PROXY, NO_PROXY: If set, the value of these
+###       will be used to set the HTTP_PROXY, HTTPS_PROXY, and
+###       NO_PROXY environment variables in /etc/bashrc.
+### - SSL_CERT: If set, this should contain a certificate that will
+###       be added to the system trust bundle.
+###
+### See https://pip.pypa.io/en/stable/cli/pip_config/ for more
+### information on what PIP_INDEX and PIP_URL mean.
+
+ARG BASE_IMAGE
+FROM ${BASE_IMAGE}
+
+ARG PIP_INDEX
+ARG PIP_INDEX_URL
+ARG PYTHON_INTERPRETER
+ARG SSL_CERT=0
+ARG HTTPS_PROXY
+ARG HTTP_PROXY
+ARG NO_PROXY
+
+WORKDIR /opt/src/scripts
+
+###
+### Set up the PyPI mirror we'll use.  This is a no-op if
+### the user did not specify PIP_INDEX and PIP_INDEX_URL.
+###
+
+ENV PIP_INDEX=${PIP_INDEX}
+ENV PIP_INDEX_URL=${PIP_INDEX_URL}
+ENV PYTHON_INTERPRETER=${PIP_PYTHON_INTERPRETER}
+
+COPY configure_pip_index.sh /opt/src/scripts
+RUN ./configure_pip_index.sh ${PYTHON_INTERPRETER} ${PIP_INDEX} ${PIP_INDEX_URL}
+
+###
+### Install the SSL certificate(s) in the system store.  Install OpenSSL
+### -- we'll need it for CMake.
+###
+
+ENV ssl_cert="${SSL_CERT}"
+RUN echo "${ssl_cert}" >> /etc/pki/ca-trust/source/anchors/ssl.cer
+ENV SSL_CERT_FILE=/etc/pki/ca-trust/source/anchors/ssl.cer
+RUN update-ca-trust enable \
+    && update-ca-trust extract \
+    && yum -y --disablerepo=epel install openssl-devel
+
+###
+### Add the proxies to /etc/bashrc.  This script will only add them
+### if they are non-empty.
+###
+
+
+ENV HTTPS_PROXY=${HTTPS_PROXY}
+ENV HTTP_PROXY=${HTTP_PROXY}
+ENV NO_PROXY=${NO_PROXY}
+
+COPY add_proxies_to_bashrc.sh /opt/src/scripts
+RUN /opt/src/scripts/add_proxies_to_bashrc.sh
+
+
+ENTRYPOINT [ "/bin/bash", "-l", "-c" ]
+
