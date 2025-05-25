@@ -3,12 +3,19 @@
 # Exit immediately on error.
 set -e
 
-# These will override the defaults in defaults.sh.
-export BOOST_VERSION=1.82.0
-export CMAKE_VERSION=4.02
-export PYTHON_VERSIONS="3.9 3.10 3.11 3.12 3.13"
-export MANYLINUX_TAG=manylinux2014_x86_64
-export KEEP_CONTAINERS_AFTER_BUILD=0
+# Set the following environment variables in order
+# to specify exactly what you want to build.  These
+# override the defaults in defaults.sh.
+#
+#export BOOST_VERSION=1.82.0
+#export CMAKE_VERSION=4.02
+#export PYTHON_VERSIONS="3.9 3.10 3.11 3.12 3.13"
+#export MANYLINUX_TAG=manylinux2014_x86_64
+#export KEEP_CONTAINERS_AFTER_BUILD=0
+
+pushd stage0_base_image
+./build_all.sh
+popd
 
 pushd stage1_boost_multipython
 ./build_all.sh

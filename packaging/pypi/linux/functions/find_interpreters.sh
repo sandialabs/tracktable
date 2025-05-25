@@ -65,7 +65,7 @@ function find_interpreters {
         ${_image_name} \
         "cd /opt/python && ls -1 -d cp*"
     )
-    echo "DEBUG: Interpreters in image: ${_interpreter_dirs_in_image}"
+    #echo "DEBUG: Interpreters in image: ${_interpreter_dirs_in_image}"
 
     _interpreter_dirnames=$(\
         python ${HERE}/../functions/match_versions_to_tags.py \
@@ -73,7 +73,7 @@ function find_interpreters {
                                    "${_desired_versions}" \
     )
 
-    echo "DEBUG: Found interpreters: ${_interpreter_dirnames}"
+    #echo "DEBUG: Found interpreters: ${_interpreter_dirnames}"
     export INTERPRETER_DIRECTORIES=${_interpreter_dirnames}
 }
 

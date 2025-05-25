@@ -46,10 +46,11 @@ def main():
         abiflags = re_match.group(7)
         detected_version = (platform, major, minor, abiflags)
         if detected_version in desired_versions:
-            print(f"Found interpreter for {detected_version} in directory {dirname}", file=sys.stderr)
+            readable_version = "".join(detected_version)
+            print(f"Found interpreter for {readable_version} in directory {dirname}", file=sys.stderr)
             found_versions.append(dirname)
-        else:
-            print(f"Version {detected_version} not on desired list", file=sys.stderr)
+        # else:
+            # print(f"Version {detected_version} not on desired list", file=sys.stderr)
 
     print("\n".join(found_versions))
     return 0

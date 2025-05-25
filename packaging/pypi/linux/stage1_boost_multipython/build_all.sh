@@ -9,29 +9,17 @@ set -e
 ### We get all of our arguments from environment variables rather than on
 ### the command line.  Check to see what's there and what's not.
 ###
-### Here's what we look for:
+### Parameters are supplied with environment variables.  Here are
+### the ones we look for:
 ###
-### BOOST_MAJOR_VERSION, BOOST_MINOR_VERSION, BOOST_PATCH_VERSION:
-###    What version of Boost should we build?  Defaults to 1.82.0.
-###
-### SNL_HTTP_PROXY, SNL_HTTPS_PROXY, SNL_NO_PROXY:
-###    If set, these variables will provide the values for http_proxy,
-###    https_proxy, and no_proxy inside the Docker build.  If not set,
-###    we will use the current shell's values for those variables.
-###
-### CUSTOM_SSL_CERT:
-###    This is a certificate to add to the OS list of authorities.
-###    You will need this if you're building in an organization that
-###    does HTTPS interception at the firewall.  You can either include
-###    the certificate itself in this variable (as an ASCII string) or
-###    provide a filename containing the cert.  No default.
+### BOOST_VERSION: Defaults to 1.82.0.
 ###
 
-
-
+### ---------------------------------------------------------------------
 ###
 ### Housekeeping: load parsing functions
 ###
+### ---------------------------------------------------------------------
 
 # Utility function: where is this script?  We need this to get to our
 # function library.
@@ -50,19 +38,28 @@ find_script_directory() {
     export HERE=$( cd -P "$(dirname "${_source}")" >/dev/null 2>&1 && pwd )
 }
 
-###
-### Get the Boost and Python versions from user-specified environment
-### variables if possible or built-in defaults if not
-###
 
 find_script_directory
 source ${HERE}/../functions/parsing.sh
 source ${HERE}/../functions/find_interpreters.sh
 source ${HERE}/../defaults.sh
 
+
+### ---------------------------------------------------------------------
+###
+### Argument Parsing
+###
+### Get all of our settings from user-provided environment variables if
+### available or built-ind efaults (from defaults.sh) if not.
+###
+### Note to future visitors: You are welcome to refactor all of this to
+### use command line arguments and getopt if you'd like.
+###
+### ---------------------------------------------------------------------
+
 if [ -z ${PYTHON_VERSIONS+x} ]; then
-    echo "WARNING: PYTHON_VERSIONS is not set.  Defaulting to versions: "
-    echo "         ${DEFAULT_PYTHON_VERSIONS}"
+    echo "INFO: PYTHON_VERSIONS is not set.  Defaulting to versions: "
+    echo "      ${DEFAULT_PYTHON_VERSIONS}"
     PYTHON_VERSIONS=${DEFAULT_PYTHON_VERSIONS}
 fi
 
@@ -74,69 +71,12 @@ fi
 # This sets BOOST_VERSION_DOTS and BOOST_VERSION_UNDERSCORES
 parse_boost_version ${BOOST_VERSION}
 
+
+### ---------------------------------------------------------------------
 ###
-### Get SSL and proxy parameters from more environment variables.  These
-### do not have default values.
+### Download Boost and unpack in /opt/src
 ###
-
-# The variables SNL_*_PROXY and CUSTOM_SSL_CERT should be set by the CI
-# runner configuration.  If they're missing, try to pull them
-# from the local environemnt as a reasonable backup.
-#
-# The idiom "-z ${VARNAME:x}" is Bash for "if this variable is not set
-# at all".
-
-if [ -z "${CUSTOM_SSL_CERT:x}" ]; then
-    echo "INFO: No custom SSL certificate found. Using OS default."
-else
-    echo "INFO: Custom SSL certificate provided by build host."
-    if [ "${#CUSTOM_SSL_CERT}" -le 500 ]; then
-        echo "INFO: Custom SSL certificate is very short.  Interpreting as filename."
-        export CUSTOM_SSL_CERT=$(cat ${CUSTOM_SSL_CERT})
-    else
-        echo "INFO: Custom SSL certificate in environment variable may be the text of the certificate itself."
-    fi
-fi
-
-# The proxy variables should be all lower case.  We'll check those first.
-# It's still common to have upper-case versions, though, so we'll just
-# deal with it if they're all we have.
-
-if [ -z ${SNL_HTTP_PROXY:x} ]; then
-    if [ ! -z ${http_proxy:x} ]; then
-       export SNL_HTTP_PROXY=${http_proxy}
-    elif [ ! -z ${HTTP_PROXY:x} ]; then
-       export SNL_HTTP_PROXY=${HTTP_PROXY}
-    else
-       echo "INFO: No HTTP proxy environment variable set.  Using OS default."
-    fi
-else
-    echo "INFO: HTTP proxy provided by build host."
-fi
-
-if [ -z ${SNL_HTTPS_PROXY:x} ]; then
-    if [ ! -z ${https_proxy:x} ]; then
-       export SNL_HTTPS_PROXY=${https_proxy}
-    elif [ ! -z ${HTTPS_PROXY:x} ]; then
-       export SNL_HTTPS_PROXY=${HTTPS_PROXY}
-    else
-       echo "INFO: No HTTPS proxy environment variable set.  Using OS default."
-    fi
-else
-    echo "INFO: HTTPS proxy provided by build host."
-fi
-
-if [ -z ${SNL_NO_PROXY:x} ]; then
-    if [ ! -z ${no_proxy:x} ]; then
-       export SNL_NO_PROXY=${no_proxy}
-    elif [ ! -z ${NO_PROXY:x} ]; then
-       export SNL_NO_PROXY=${NO_PROXY}
-    else
-       echo "INFO: Proxy exception environment variable is not set.  Using OS default."
-    fi
-else
-    echo "INFO: Proxy exceptions provided by build host."
-fi
+### ---------------------------------------------------------------------
 
 
 echo "INFO: Building Boost.Python from Boost ${BOOST_VERSION_DOTS} for all supported Python versions."
@@ -168,11 +108,15 @@ docker build \
        -f Dockerfile.download_boost \
        --build-arg BOOST_VERSION_DOTS=${BOOST_VERSION_DOTS} \
        --build-arg BOOST_VERSION_UNDERSCORES=${BOOST_VERSION_UNDERSCORES} \
-       --build-arg SSL_CERT="${CUSTOM_SSL_CERT}" \
-       --build-arg HTTPS_PROXY=${SNL_HTTPS_PROXY} \
-       --build-arg HTTP_PROXY=${SNL_HTTP_PROXY} \
-       --build-arg NO_PROXY=${SNL_NO_PROXY} \
        .
+
+
+
+### ---------------------------------------------------------------------
+###
+### Build Boost for all of our Python versions
+###
+### ---------------------------------------------------------------------
 
 ###
 ### Find all of the CPython implementations in our container that
@@ -200,7 +144,9 @@ mkdir libboost_python_tmp
 ### Loop through all of the available CPython implementations in this container and
 ### build Boost for each one.
 ###
-
+### We could also push this into a shell script inside the container and
+### run all the builds in a single container.
+###
 for PYTHON_IMPLEMENTATION in ${INTERPRETER_DIRECTORIES}; do
     trim "${PYTHON_IMPLEMENTATION}"
     PYTHON_IMPLEMENTATION="${_trimmed_string}"
@@ -254,9 +200,14 @@ docker build \
 docker tag boost_multipython:${BOOST_VERSION_DOTS} boost_multipython:latest
 
 
+
+### ---------------------------------------------------------------------
 ###
-### Cleanup: we no longer need the individual builds or the Boost source code.
+### Cleanup: we no longer need the individual builds or the Boost source
+### code.
 ###
+### ---------------------------------------------------------------------
+
 rm collected_boost_python.tar
 rm -rf libboost_python_tmp
 
