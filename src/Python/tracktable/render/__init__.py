@@ -42,6 +42,10 @@ from tracktable.render.backends.folium_proxy import (
     set_folium_proxy_enabled
 )
 
+# This will cause all of our named colormaps to be registered
+# with Matplotlib
+from tracktable.render.map_decoration import colormaps
+
 __all__ = [
     "folium_proxy_name",
     "folium_proxy_enabled",
