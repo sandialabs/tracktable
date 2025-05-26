@@ -69,13 +69,35 @@ try:
     if platform.system() == "Darwin" or platform.system() == "Linux":
         subprocess.check_output(['which', 'ffmpeg'])
 except Exception as e:
-    raise ImportError("ffmpeg isn't installed on this system, unable to generate a Tracktable movie. Please install ffmpeg.")
+    logger.warning(("ffmpeg is not installed on this system or not "
+                    "accessible on the path.  Attempts to render a "
+                    "movie will fail."))
+
 
 try:
     from tqdm import tqdm
     tqdm_installed = True
 except ImportError:
     tqdm_installed = False
+
+
+def _ffmpeg_available() -> bool:
+    """Check whether ffmpeg is available on the path
+
+    No arguments.
+
+    Returns:
+        bool: True if ffmpeg is on the path, False otherwise
+    """
+
+    try:
+        if platform.system() == "Windows":
+            subprocess.check_output(['where', 'ffmpeg'])
+        if platform.system() == "Darwin" or platform.system() == "Linux":
+            subprocess.check_output(['which', 'ffmpeg'])
+        return True
+    except subprocess.CalledProcessError:
+        return False
 
 # ---------------------------------------------------------------------
 
@@ -140,6 +162,9 @@ def render_trajectory_movie(trajectories,
 
         For documentation on the parameters, please see render_movie
     """
+
+    if not _ffmpeg_available():
+        raise RuntimeError("FFMPEG is not available on the path.  Cannot render movie.")
 
     # Steps:
     # 1.  Cull trajectories that are entirely outside the map
@@ -394,6 +419,9 @@ def render_trajectory_movie_parallel(trajectories,
 
         For documentation on the parameters, please see render_movie
     """
+
+    if not _ffmpeg_available():
+        raise RuntimeError("FFMPEG is not available on the path.  Cannot render movie.")
 
     # Steps:
     # 1.  Cull trajectories that are entirely outside the map
