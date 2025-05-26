@@ -1,6 +1,6 @@
 # -*- Mode: cmake; -*-
 #
-# This is tracktable/Python/tracktable/CMakeLists.txt
+# This is src/Python/tracktable/CMakeLists.txt
 #
 # Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525

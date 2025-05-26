@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# This is tracktable/Python/CMakeLists.txt
+# This is src/Python/CMakeLists.txt
 #
 # This file has the sole purpose of forwarding CMake to Python/tracktable.
 

@@ -738,7 +738,7 @@ def render_airports_and_ports(map_canvas,
             # TODO (mjfadem): It appears that the WPI.shp file is made up of coordinates and not polygon lists so
             # it's no different then the CSV data we use as a baseline. This needs a bit more investigation.
             # if use_shapefile:
-                # sf = shapefile.Reader("tracktable/Python/tracktable/info/data/WPI.shp")
+                # sf = shapefile.Reader("src/Python/tracktable/info/data/WPI.shp")
                 # for record in sf.shapeRecords():
                 #     fol.GeoJson(shape(record.shape.__geo_interface__)).add_to(map_canvas)
 

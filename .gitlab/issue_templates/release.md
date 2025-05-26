@@ -1,7 +1,7 @@
 
 <!--
 
-This template is for creating a Tracktable release that will go out to the world.  
+This template is for creating a Tracktable release that will go out to the world.
 
 -->
 
@@ -11,7 +11,7 @@ Documentation on this process is available on the wiki for the Tracktable GitLab
 
 ### Version Number
 
-<!-- 
+<!--
     Example: 1.3.1
 -->
 
@@ -29,7 +29,7 @@ Documentation on this process is available on the wiki for the Tracktable GitLab
 
 ### Major bug fixes in this release
 
-<!-- 
+<!--
     Example: Python interpreter crashes on import
 -->
 
@@ -42,7 +42,7 @@ Documentation on this process is available on the wiki for the Tracktable GitLab
     * [ ] Documentation/conf.py
     * [ ] Documentation/conf.py.in
     * [ ] Documentation/readthedocs/Doxyfile-readthedocs
-    * [ ] tracktable/Python/tracktable/__init__.py
+    * [ ] src/Python/tracktable/__init__.py
 - [ ] Wheels
     * [ ] Build Tracktable Data Wheel
     * [ ] Build Tracktable Wheels
@@ -94,7 +94,7 @@ Documentation on this process is available on the wiki for the Tracktable GitLab
          * [ ] Approve pull request
        - [ ] Create GitHub release - see wiki for instructions
          * [ ] Add auxiliary files
-           - [ ] Documentation 
+           - [ ] Documentation
            - [ ] Source code (`tracktable` only)
            - [ ] Source code (everything included)
            - [ ] Wheels
@@ -115,7 +115,7 @@ Documentation on this process is available on the wiki for the Tracktable GitLab
     - This list will be updated when we learn what happens after that
 - [ ] Web Site
     * [ ] Announcement on front page
-    * [ ] Release Notes 
+    * [ ] Release Notes
     * [ ] Links to new documentation
     * [ ] Links to new example notebooks
     * [ ] Links to wheels
