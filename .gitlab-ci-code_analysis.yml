@@ -33,7 +33,7 @@ mypy:
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
   script:
-    - mypy --pretty --config-file mypy.ini --junit-xml mypy_output.xml tracktable/Python/tracktable/
+    - mypy --pretty --config-file mypy.ini --junit-xml mypy_output.xml src/Python/tracktable/
   artifacts:
     reports:
       junit: mypy_output.xml
@@ -56,7 +56,7 @@ mypy:
 #   rules:
 #    - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
 #   script:
-#     - flake8 --max-complexity 10 --benchmark --output-file=flake8_output.txt tracktable/Python/tracktable/
+#     - flake8 --max-complexity 10 --benchmark --output-file=flake8_output.txt src/Python/tracktable/
 #   artifacts:
 #     paths:
 #       - flake8_output.txt
@@ -74,7 +74,7 @@ pylint:
     - if: $CI_COMMIT_BRANCH == "develop" || $CODE_ANALYSIS == "true"
   script:
     - mkdir ./pylint
-    - pylint --output-format=text:pylint_output.txt,colorized tracktable/Python/tracktable/ | tee ./pylint/pylint.log || pylint-exit $?
+    - pylint --output-format=text:pylint_output.txt,colorized src/Python/tracktable/ | tee ./pylint/pylint.log || pylint-exit $?
     - PYLINT_SCORE=$(sed -n 's/^Your code has been rated at \([-0-9.]*\)\/.*/\1/p' ./pylint/pylint.log)
     - anybadge --label=Pylint --file=pylint/pylint.svg --value=$PYLINT_SCORE 2=red 4=orange 8=yellow 10=green
     - echo "Pylint score is $PYLINT_SCORE"
@@ -212,7 +212,7 @@ coverage-build-python:
       artifacts: true
   script:
     - cd build_coverage
-    - coverage combine tracktable/Python/tracktable/*/*/.coverage
+    - coverage combine src/Python/tracktable/*/*/.coverage
     - coverage report -m
     - coverage html
   coverage: '/^TOTAL.+?(\d+\%)$/'

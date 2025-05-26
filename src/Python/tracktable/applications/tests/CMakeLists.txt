@@ -26,7 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# This is tracktable/Python/tracktable/sources/tests/CMakeLists.txt
+# This is src/Python/tracktable/applications/tests/CMakeLists.txt
 #
 # Here we list the Python tests that we need to run to make sure that
 # our Python point sources are working.

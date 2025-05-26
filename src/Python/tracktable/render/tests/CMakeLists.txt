@@ -29,11 +29,12 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 
-# This is tracktable/Python/tracktable/render/tests/CMakeLists.txt
+# This is src/tracktable/render/tests/CMakeLists.txt
 #
 # Here we list the Python tests that we need to run to make sure that
-# our rendering code is working.  These are basically "smoke tests" --
-# we don't yet have the ability to verify the content of an image.
+# our rendering code is working.  We test the output of static images
+# to make sure they match ground truth.  For HTML-based tests with Folium
+# we compare the generated HTML+JavaScript against saved ground truth.
 
 include(PythonTest)
 include(FindPythonModule)
