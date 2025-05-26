@@ -68,7 +68,7 @@ def copy_and_clean_notebook(notebook_filename: str,
                 print(f"-- INFO: Output notebook {notebook_only} is newer than input.  Cleaning not needed.")
                 return
 
-    shutil.copyfile(notebook_filename, dest_path)
+    shutil.copyfile(notebook_filename, dest_filename)
 
     if NBCONVERT_VERSION > 6:
         # Running this through the shell is much more concise than doing the
