@@ -24,6 +24,9 @@ release 1.8.0 later in summer 2025.
   cause trajectory animations to loop indefinitely instead of play once and then
   stop.
 
+- Linux wheel-building scripts can now take parameters for a local PyPI mirror
+  instead of always using pypi.org.
+
 ### Bugs Fixed
 
 - Regression in Folium heat maps: Passing a color map to `render_heatmap()` when
@@ -40,6 +43,22 @@ release 1.8.0 later in summer 2025.
 - Python documentation now builds after the extension modules have been
   compiled.  Previously, trying to build documentation on a just-checked-out
   source tree would often error out because these modules were not in place yet.
+
+- Color maps (in `tracktable.render.map_decoration.colormaps`) are now registered
+  with `matplotlib.colormaps` instead of the deprecated `matplotlib.cm.register_cmap`.
+
+- You can now import `tracktable.render.render_movie` whether or not you have
+  FFMPEG installed.  You'll get a warning, but it won't actually generate an
+  exception until you try to render a movie.
+
+- src/C++/CommandLineFactories only builds its test cases if `BUILD_TESTING`
+  is on in CMake.
+
+- CI scripts for Windows now refer correctly to `winlocate.py` for fixing
+  libraries within wheels.
+
+- Our Read the Docs config now installs `git-lfs` so we can download the
+  pre-rendered notebooks.
 
 ### Other Changes
 
@@ -63,6 +82,13 @@ release 1.8.0 later in summer 2025.
   We have changed our wheel-building configuration to use this.  Note:
   Tracktable's license has not changed at all -- just the way we encode
   that license in the metadata for the wheel file.
+
+- Cleanup: We now use a single configuration for building documentation
+  instead of having separate ones for Read the Docs and local builds.
+
+- Cleanup: Source directory has been reorganized.  Instead of
+  `$root/tracktable/{library}` and `$root/tracktable/Python/{library}`
+  we now have `$root/src/{C++,Python}/tracktable/{library}`.
 
 ### Coming Soon
 
