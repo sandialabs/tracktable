@@ -5,7 +5,13 @@
 ARG BASE_MULTIPYTHON_IMAGE
 FROM ${BASE_MULTIPYTHON_IMAGE}
 
-COPY ./libboost_python_tmp/* /usr/local/lib
+# Get the libraries and CMake config from the build context
+COPY collected_boost_python.tar /opt/src
+
+# Unpack them into the existing Boost installation and clean up
+WORKDIR /usr/local/lib
+RUN tar xf /opt/src/collected_boost_python.tar && rm /opt/src/collected_boost_python.tar
+
 
 ENTRYPOINT [ "/bin/bash", "-c", "-l" ]
 

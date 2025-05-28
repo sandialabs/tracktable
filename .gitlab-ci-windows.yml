@@ -83,7 +83,7 @@ windows-test:
   before_script:
     - *windows-ci-before-script
   script:
-    - xcopy build_windows\lib\*.pyd tracktable\Python\tracktable\lib
+    - xcopy build_windows\lib\*.pyd src\Python\tracktable\lib
     - cd build_windows
     - ctest -j4 -C Release -T test --output-on-failure --exclude-regex "P_Render_Trajectories|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe"
   artifacts:
@@ -124,7 +124,7 @@ windows-deploy-py39:
     - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
     - cmake --build . --config Release --target INSTALL -j 10
     - cd ..
-    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
+    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\winlocate.py none
     - dir %BUILD_DIR%\install\wheel
     - set HTTPS_PROXY=
     - set https_proxy=
@@ -149,7 +149,7 @@ windows-deploy-py310:
     - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
     - cmake --build . --config Release --target INSTALL -j 4
     - cd ..
-    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
+    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\winlocate.py none
     - dir %BUILD_DIR%\install\wheel
     - set HTTPS_PROXY=
     - set https_proxy=
@@ -175,7 +175,7 @@ windows-deploy-py311:
     - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
     - cmake --build . --config Release --target INSTALL -j 4
     - cd ..
-    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
+    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\winlocate.py none
     - dir %BUILD_DIR%\install\wheel
     - set HTTPS_PROXY=
     - set https_proxy=
@@ -201,7 +201,7 @@ windows-deploy-py312:
     - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
     - cmake --build . --config Release --target INSTALL -j 4
     - cd ..
-    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
+    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\winlocate.py none
     - dir %BUILD_DIR%\install\wheel
     - set HTTPS_PROXY=
     - set https_proxy=
@@ -228,7 +228,7 @@ windows-deploy-py313:
     - cmake -DBUILD_DOCUMENTATION=OFF -DCMAKE_INSTALL_PREFIX:PATH=%cd%\install ..
     - cmake --build . --config Release --target INSTALL -j 4
     - cd ..
-    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\setup-generic.py none
+    - cmake -P CMake\Modules\BuildWheel.cmake python . %BUILD_DIR%\install wheel %cd%\packaging\winlocate.py none
     - dir %BUILD_DIR%\install\wheel
     - set HTTPS_PROXY=
     - set https_proxy=

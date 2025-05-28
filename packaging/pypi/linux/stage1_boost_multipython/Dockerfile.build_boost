@@ -44,7 +44,7 @@ RUN rm -rf boost_${BOOST_VERSION_UNDERSCORES}
 # we care about in a directory we can pull wholesale
 RUN mkdir /boost_python
 WORKDIR /usr/local/lib
-RUN tar cf /boost_python/boost_python_libraries.tar libboost_python*
+RUN tar cf /boost_python/boost_python_libraries.tar libboost_python* cmake/boost_python*
 
 ENTRYPOINT [ "/bin/bash", "-l", "-c" ]
 

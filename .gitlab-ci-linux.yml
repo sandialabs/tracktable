@@ -87,7 +87,7 @@ linux-test:
   before_script:
     - *linux-before
   script:
-    - cp build_linux/lib/_*.so tracktable/Python/tracktable/lib/
+    - cp build_linux/lib/_*.so src/Python/tracktable/lib/
     - cd build_linux
     - ctest --output-on-failure --exclude-regex 'C_GREAT_CIRCLE_FIT|C_MemoryUse|C_PointGenerator|P_TerrestrialHeatmapExample|P_TerrestrialTrajectoryMapExample|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe|P_Render_Trajectories'
   artifacts:

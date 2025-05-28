@@ -13,6 +13,19 @@ any given one.
 
 ### TRACKTABLE 1.7.2
 
+- 355: BUG: render_movie should not raise exception if ffmpeg not installed
+- 353: BUG: Windows CI wheel-building must refer to winlocate
+- 354: BUG: Command line tests are building with BUILD_TESTIING off
+- 352: BUG: _copy_notebooks.py needs full path for destination
+- 351: Fix more dangling paths
+- 349: BUG: Linux packaging needs to use local Pip mirror
+- 350: BUG: matplotlib.cm.register_cmap is deprecated
+- 348: FEATURE: Improve Python version-detecting logic in wheel build scripts
+- 347: CLEANUP: _copy_notebooks should use Python temporary directory
+- 346: BUG: Fix paths for wheel building
+- 345: Use single Doxygen configuration in docs
+- 344: Reorganize source directory
+- 342: Install Git LFS on Read the Docs build
 - 339: Prefer offline Folium packages when available
 - 340: Python docs target must depende on extension libraries
 - 338: Fix miscellaneous build warnings
@@ -51,7 +64,7 @@ any given one.
 
 ### TRACKTABLE 1.7.1
 
-- 313: Resolve "Migrate wheel-building process away from invoking setup.py" 
+- 313: Resolve "Migrate wheel-building process away from invoking setup.py"
 - 315: Resolve "Fix unary_function warnings"
 - 314: Resolve "Fix compile error in catch2.hpp"
 - 311: Resolve "Add Python 3.11 to Linux packaging"

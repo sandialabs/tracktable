@@ -53,7 +53,7 @@ if (MINGW OR MSVC)
     ${test_name}
     PROPERTIES
     ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python\\;${ESCAPED_PYTHONPATH};PATH=${Tracktable_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH}"
+	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/src/Python/\\;${ESCAPED_PYTHONPATH};PATH=${Tracktable_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH}"
 	)
 else (MINGW OR MSVC)
   # Trust the compiler to set RPATH so that the libraries in bin/ are
@@ -62,7 +62,7 @@ else (MINGW OR MSVC)
     ${test_name}
     PROPERTIES
     ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/tracktable/Python:${Tracktable_BINARY_DIR}/lib:$ENV{PYTHONPATH}"
+	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/src/Python:${Tracktable_BINARY_DIR}/lib:$ENV{PYTHONPATH}"
 	)
 endif (MINGW OR MSVC)
 

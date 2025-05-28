@@ -19,9 +19,9 @@ __pycache__
 /doxygen/
 /build_ubuntu2004/
 /build_macos/
-tracktable/Python/tracktable/examples/analytic_demos/demo_images
-tracktable/Python/tracktable/examples/analytic_demos/*.ipynb
-tracktable/Python/tracktable/examples/tutorials/*.ipynb
+src/Python/tracktable/examples/analytic_demos/demo_images
+src/Python/tracktable/examples/analytic_demos/*.ipynb
+src/Python/tracktable/examples/tutorials/*.ipynb
 Documentation/examples/demo_images/
 .mypy_cache
 sandbox.*

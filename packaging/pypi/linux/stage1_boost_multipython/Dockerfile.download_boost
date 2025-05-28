@@ -1,40 +1,10 @@
 # Manylinux2010-derived image that will include Boost and versions of
 # Boost.Python for all available Python versions.
 
-# Download base image
-FROM quay.io/pypa/manylinux2014_x86_64:latest
+FROM tracktable_build_base:latest
 
-# Yum will need proxy information to talk to the outside world
-ARG SSL_CERT=0
-ARG HTTPS_PROXY
-ARG HTTP_PROXY
-ARG NO_PROXY
-
-# Configure the Boost version once, externally, to cut down on typos here
-ARG BOOST_VERSION_DOTS
 ARG BOOST_VERSION_UNDERSCORES
-
-ENV boost_version_dots=${BOOST_VERSION_DOTS}
-ENV boost_version_underscores=${boost_version_underscores}
-
-# this is not used right now, I think
-# ENV https_interception="${HTTPS_INTERCEPTION}"
-
-ENV ssl_cert="${SSL_CERT}"
-ENV https_proxy=${HTTPS_PROXY}
-ENV http_proxy=${HTTP_PROXY}
-ENV no_proxy=${NO_PROXY}
-
-### ----------------------------------------------------------------------
-###
-### Step 1: Add SSL certificate and install OpenSSL for CMake later
-###
-
-RUN echo "${ssl_cert}" >> /etc/pki/ca-trust/source/anchors/ssl.cer
-ENV SSL_CERT_FILE=/etc/pki/ca-trust/source/anchors/ssl.cer
-RUN update-ca-trust enable \
-&& update-ca-trust extract \
-&& yum -y --disablerepo=epel install openssl-devel
+ENV BOOST_VERSION_UNDERSCORES=${BOOST_VERSION_UNDERSCORES}
 
 ### ----------------------------------------------------------------------
 ###
@@ -43,13 +13,15 @@ RUN update-ca-trust enable \
 
 WORKDIR /opt/src
 
-# This curl command works but due to some proxy issues we're downloading
-# boost outside of the container for now and just copying it in
-# RUN curl \
-#         --location \
-#         -v \
-#         -o boost_1_${boost_minor_version}_${boost_patch_version}.tar.gz \
-#         https://boostorg.jfrog.io/artifactory/main/release/1.${boost_minor_version}.${boost_patch_version}/source/boost_1_${boost_minor_version}_${boost_patch_version}.tar.gz
+# Because proxy issues inside Docker containers are a pain, we're
+# downloading the source in build_all.sh and just copying it in
+# here.  If we were to download it inside the image
+# we would do this:
+#
+# curl \
+#   --location \
+#   -o ${BOOST_FILENAME} \
+# https://archives.boost.io/release/${BOOST_VERSION_DOTS}/source/boost_${BOOST_VERSION_UNDERSCORES}.tar.gz
 
 COPY boost_${BOOST_VERSION_UNDERSCORES}.tar.gz .
 RUN tar xzf boost_${BOOST_VERSION_UNDERSCORES}.tar.gz

@@ -64,7 +64,7 @@ macos-test:
     - job: macos-build
       artifacts: true
   script:
-    - cp ./build_macos/lib/*.so ./tracktable/Python/tracktable/lib
+    - cp ./build_macos/lib/*.so ./src/Python/tracktable/lib
     - ./ci/macos/run_test.sh
   artifacts:
     paths:
