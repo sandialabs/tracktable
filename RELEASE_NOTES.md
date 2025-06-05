@@ -289,7 +289,7 @@ tests to find out exactly where in the import chain things are going wrong.
 
 
 This release also includes revamped Python tutorials and demos which should be easier to follow
-and try out for yourself! Find them in the code at `...tracktable/Python/tracktable/examples`
+and try out for yourself! Find them in the code at `...src/Python/tracktable/examples`
 and on ReadTheDocs at https://tracktable.readthedocs.io/en/latest/examples/examples.html.
 
 ### GENERAL UPDATES SINCE 1.5.0
@@ -706,7 +706,7 @@ This is a bug-fix/documentation release.
 ### DOCUMENTATION UPDATES
 
 * The Installation page in the documentation has had its list of dependencies brought up to date.  It also now contains a recommendation that you install from binary packages on Pip wherever possible.
-* There are now Jupyter notebooks in `tracktable/Python/tracktable/examples/notebook_examples`.  We are working through the Python examples one at a time to bring them up to date and provide Jupyter versions.
+* There are now Jupyter notebooks in `src/Python/tracktable/examples/notebook_examples`.  We are working through the Python examples one at a time to bring them up to date and provide Jupyter versions.
 
 ### NOTABLE FIXES
 
@@ -886,7 +886,7 @@ past and present, for their many years of service.
   code base.
 
 * There are several useful scripts in
-  ``tracktable/Python/tracktable/examples/work_in_progress`` that need
+  ``src/Python/tracktable/examples/work_in_progress`` that need
   minor fixes to run with the latest API.
 
 

@@ -3,17 +3,19 @@
 # Exit immediately on error.
 set -e
 
-# Change these if you want to update the Boost version.  The default below
-# is Boost 1.82.0.  Remember to update clean_all.sh when you change this.
-export BOOST_MAJOR_VERSION=1
-export BOOST_MINOR_VERSION=82
-export BOOST_PATCH_VERSION=0
+# Set the following environment variables in order
+# to specify exactly what you want to build.  These
+# override the defaults in defaults.sh.
+#
+#export BOOST_VERSION=1.82.0
+#export CMAKE_VERSION=4.02
+#export PYTHON_VERSIONS="3.9 3.10 3.11 3.12 3.13"
+#export MANYLINUX_TAG=manylinux2014_x86_64
+#export KEEP_CONTAINERS_AFTER_BUILD=0
 
-# Change this if you want to update the CMake version.
-export CMAKE_VERSION=3.22.2
-
-# Change this if you want to update the Manylinux version.
-export MANYLINUX_TAG=manylinux2014_x86_64
+pushd stage0_base_image
+./build_all.sh
+popd
 
 pushd stage1_boost_multipython
 ./build_all.sh
