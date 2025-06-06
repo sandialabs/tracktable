@@ -69,16 +69,19 @@ from typing import Literal, Sequence, Tuple
 
 COLORMAPS_REGISTERED: bool = False
 
-MatplotlibColor: typing.TypeAlias = (
-    str  # HTML colorspec or color name or float as string or
+# We don't get TypeAlias until Python 3.10.
+#MatplotlibColor: typing.TypeAlias = typing.Union[
+MatplotlibColor = typing.Union[
+    str,  # HTML colorspec or color name or float as string or
     # single-character shorthand or XKCD color survey or
     # Tableau color
-    | tuple[float, float, float]  # RGB
-    | tuple[float, float, float, float]  # RGBA
-    | tuple[str, float]  # str + alpha
-)
+    tuple[float, float, float],  # RGB
+    tuple[float, float, float, float],  # RGBA
+    tuple[str, float]  # str + alpha
+]
 
-SegmentedColormap: typing.TypeAlias = dict[
+# SegmentedColormap: typing.TypeAlias = dict[
+SegmentedColormap = dict[
     Literal["red", "green", "blue", "alpha"],
     Sequence[Tuple[float, ...]]
 ]
