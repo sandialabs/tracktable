@@ -33,7 +33,7 @@ build:
   tools:
     python: "mambaforge-latest"
   jobs:
-    post_checkout:
+    #post_checkout:
       ###
       ### Notebooks are stored pre-rendered in Git LFS.  This isn't installed
       ### by default on RTD so we need to grab it.
