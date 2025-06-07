@@ -32,7 +32,7 @@ build:
   # much faster than the old version.
   tools:
     python: "mambaforge-latest"
-  jobs:
+  #jobs:
     #post_checkout:
       ###
       ### Notebooks are stored pre-rendered in Git LFS.  This isn't installed
