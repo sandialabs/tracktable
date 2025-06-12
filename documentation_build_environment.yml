@@ -26,7 +26,7 @@ dependencies:
   - jupyter
 
   # Documentation Dependencies
-  - sphinx
+  - sphinx>=8.0
   - sphinx_rtd_theme
   - nbsphinx>=0.7.1
   - pandoc>=2.5
