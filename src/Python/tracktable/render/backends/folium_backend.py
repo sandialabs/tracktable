@@ -206,7 +206,7 @@ def render_trajectories(trajectories,
                             prefer_canvas=prefer_canvas)
 
     if animate:
-        from folium import plugins # to not require it always. Reconsider moving to top?
+        fol_tsgj = folium_proxy.import_folium("plugins.timestamped_geo_json") # to not require it always. Reconsider moving to top?
         segments = []
         anim_points = []
 
@@ -375,7 +375,7 @@ def render_trajectories(trajectories,
             anim_trail_duration = timedelta_to_iso8601_duration(anim_trail_duration)
         anim_timestamp_update_step = timedelta_to_iso8601_duration(anim_timestamp_update_step)
 
-        plugins.TimestampedGeoJson({"type":"FeatureCollection",
+        fol_tsgj.TimestampedGeoJson({"type":"FeatureCollection",
                                     "features": features}, add_last_point=False,
                                    transition_time=anim_display_update_interval.microseconds // 1000,
                                    period=anim_timestamp_update_step,
