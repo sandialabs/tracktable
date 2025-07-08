@@ -37,7 +37,7 @@ from math import ceil
 
 import cartopy.mpl.geoaxes
 import cartopy.crs
-import folium as fol
+#import folium as fol
 import matplotlib
 import matplotlib.colors
 import matplotlib.pyplot
