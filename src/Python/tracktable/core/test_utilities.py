@@ -60,6 +60,7 @@ except ImportError:
 
 import datetime
 import io
+import matplotlib.pyplot as plt
 import os.path
 import pickle
 import random
@@ -174,7 +175,8 @@ def image_pCorr(imageA, imageB):
 
 # ----------------------------------------------------------------------
 
-def compare_images(expected, actual, tolerance=1):
+def compare_images(expected, actual, tolerance=1,
+                   absolute_diff_filename=None, signed_diff_filename=None):
     """Compare two images pixel-by-pixel.
 
     Args:
@@ -198,8 +200,11 @@ def compare_images(expected, actual, tolerance=1):
     if not PIL_AVAILABLE:
         return False
     else:
-        expected_image = Image.open(expected)
-        actual_image = Image.open(actual)
+        expected_image = Image.open(expected).convert('RGB')
+        actual_image = Image.open(actual).convert('RGB')
+
+        expected_np = np.array(expected_image).astype(float)
+        actual_np = np.array(actual_image).astype(float)
 
         computed_correlation = image_pCorr(expected_image, actual_image)
 
@@ -212,6 +217,31 @@ def compare_images(expected, actual, tolerance=1):
             print(("Image comparison failed: tolerance = {}, "
                   "computed mean squared error = {}").format(tolerance,
                                                              computed_mse))
+
+            # Save absolute (unsigned) and signed difference images
+            absolute_diff = np.abs(expected_np - actual_np)
+            absolute_diff_greyscale = np.mean(absolute_diff, axis=2) / 255.0
+
+            if absolute_diff_filename is None:
+                absolute_diff_path = actual.replace(".png", "-absolute_diff.png")
+                plt.imsave(absolute_diff_path, absolute_diff_greyscale, cmap='hot')
+                print(f"Saved difference image to: {absolute_diff_path}")
+            else:
+                plt.imsave(absolute_diff_filename, absolute_diff_greyscale, cmap='hot')
+                print(f"Saved absolute diff image to: {absolute_diff_filename}")
+
+            signed_diff = np.mean(expected_np - actual_np, axis=2)
+
+            if signed_diff_filename is None:
+                signed_diff_path = actual.replace(".png", "-signed_diff.png")
+                plt.imsave(signed_diff_path, signed_diff, cmap='bwr',
+                           vmin=-255, vmax=255)
+                print(f"Saved signed diff image to: {signed_diff_path}")
+            else:
+                plt.imsave(signed_diff_filename, signed_diff, cmap='bwr',
+                           vmin=-255, vmax=255)
+                print(f"Saved signed diff image to: {signed_diff_filename}")
+
         return computed_mse < tolerance
 
 # ----------------------------------------------------------------------
