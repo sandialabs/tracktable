@@ -38,11 +38,6 @@ include_directories(
   ${Boost_INCLUDE_DIR}
 )
 
-if (BUILD_TESTING)
-   add_subdirectory(Tests)
-endif (BUILD_TESTING)
-
-
 set( Domain_SRCS
   PrintFunctions.cpp
 )

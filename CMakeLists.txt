@@ -442,6 +442,7 @@ if (BUILD_TESTING)
      file(MAKE_DIRECTORY "${Tracktable_BINARY_DIR}/TestOutput")
   endif()
   option(TEST_MOVIES "Include tests of movie-making.  These take a few minutes each." OFF)
+  add_subdirectory(tests)
 endif (BUILD_TESTING)
 
 message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")

@@ -34,7 +34,3 @@ target_link_libraries(
   TracktableFactory INTERFACE TracktableCore TracktableDomain
                               ${Boost_LIBRARIES})
 
-
-if (BUILD_TESTING)
-  add_subdirectory(Tests)
-endif (BUILD_TESTING)

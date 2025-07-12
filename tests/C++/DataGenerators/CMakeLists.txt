@@ -24,37 +24,46 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+include(CplusplusTest)
 
-# So far this is a header-only library.  The lack of any library files being
-# built is not an error.
+# We search for Boost anew in test directories because the test cases may
+# need Boost components that the library code does not.
+unset(Boost_FOUND)
+get_filename_component(_TEST_NAME_TMP ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+get_filename_component(_TEST_NAME_2 ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+get_filename_component(_TEST_NAME_1 ${_TEST_NAME_TMP} NAME)
+message(STATUS "Looking for Boost components needed for C++ tests in ${_TEST_NAME_1}/${_TEST_NAME_2}")
+find_package(Boost CONFIG ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
+  COMPONENTS
+    ${BOOST_CORE_COMPONENTS_NEEDED}
+    ${BOOST_TEST_COMPONENTS}
+  )
 
 include_directories(
-  ${Tracktable_SOURCE_DIR}
   ${Tracktable_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${PROJECT_BINARY_DIR}
+  ${Tracktable_BINARY_DIR}
   ${Boost_INCLUDE_DIR}
 )
 
-set( DataGenerators_HEADERS
-  PointGenerator.h
-)
-
-# This adds this folder to Visual Studio on Windows so that files
-# are visible without creating a build command.
-add_custom_target( TracktableDataGenerators
-    SOURCES
-    ${DataGenerators_HEADERS}
+add_executable( PointGenerator_TEST
+    PointGenerator_TEST.cpp
     )
 
-# And this puts those files in their own folder in Visual Studio.
-source_group( "Header Files"
-    ${DataGenerators_HEADERS}
+target_link_libraries( PointGenerator_TEST
+    TracktableCore
+    TracktableDomain
+    TracktableTestSupport
+    ${Boost_LIBRARIES}
     )
 
-# This adds the files in DataGenerators_HEADERS to the list of files
-# that will be copied during 'make install'.
-install(
-  FILES ${DataGenerators_HEADERS}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/DataGenerators
-)
+add_catch2_test(
+    C_PointGenerator
+    PointGenerator_TEST
+    ${Tracktable_BINARY_DIR}
+    )
+
+# Keep the test cases in a separate folder in Visual Studio
+set_property(
+    TARGET PointGenerator_TEST
+    PROPERTY FOLDER "Tests"
+    )

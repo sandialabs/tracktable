@@ -39,10 +39,6 @@ include_directories(
   ${Tracktable_INCLUDE_DIRS}
 )
 
-if (BUILD_TESTING)
-  add_subdirectory(Tests)
-endif (BUILD_TESTING)
-
 set( RW_SOURCES
   KmlOut.cpp
 )
