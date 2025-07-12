@@ -1,8 +1,8 @@
+#
 # Copyright (c) 2014-2023 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
-
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -28,43 +28,40 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Function to set up and run a Python test using 'python -m foo'
+from __future__ import print_function, division, absolute_import
 
-function(add_python_test test_name module_to_run)
+import sys
 
-IF(CMAKE_BUILD_TYPE MATCHES Coverage)
-  add_test(
-    NAME ${test_name}
-    COMMAND coverage run ${CMAKE_CURRENT_LIST_DIR}/${module_to_run} ${ARGN}
-    )
-ELSE(CMAKE_BUILD_TYPE MATCHES Coverage)
-  add_test(
-    NAME ${test_name}
-    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/${module_to_run} ${ARGN}
-    )
-ENDIF(CMAKE_BUILD_TYPE MATCHES Coverage)
+import create_points_and_trajectories as tt_generators
 
+from tracktable.domain.cartesian3d import TrajectoryPoint, TrajectoryPointWriter
+from tracktable.core import Timestamp
+from tracktable.core.test_utilities import version_appropriate_string_buffer
 
-if (MINGW OR MSVC)
-  string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )
-  string( REPLACE ";" "\\;" ESCAPED_PYTHONPATH "$ENV{PYTHONPATH}" )
+import datetime
 
-  set_tests_properties(
-    ${test_name}
-    PROPERTIES
-    ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/src/Python/\\;${ESCAPED_PYTHONPATH};PATH=${Tracktable_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH}"
-	)
-else (MINGW OR MSVC)
-  # Trust the compiler to set RPATH so that the libraries in bin/ are
-  # accessible.
-  set_tests_properties(
-    ${test_name}
-    PROPERTIES
-    ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/src/Python:${Tracktable_BINARY_DIR}/lib:$ENV{PYTHONPATH}"
-	)
-endif (MINGW OR MSVC)
+# ----------------------------------------------------------------------
 
-endfunction(add_python_test)
+def write_points_to_string(points):
+    output = version_appropriate_string_buffer()
+    writer = TrajectoryPointWriter(output)
+    writer.write(points)
 
+    return output.getvalue()
+
+# ----------------------------------------------------------------------
+
+def main():
+    points_as_string = write_points_to_string(tt_generators.generate_random_points(
+        TrajectoryPoint,
+        num_points=10,
+        num_point_properties=5))
+
+    print("Trajectory points as string:\n{}(end)".format(points_as_string))
+
+    return 0
+
+# ----------------------------------------------------------------------
+
+if __name__ == '__main__':
+    sys.exit(main())

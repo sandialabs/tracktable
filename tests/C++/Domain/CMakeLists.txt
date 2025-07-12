@@ -2,7 +2,6 @@
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
-
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -28,43 +27,57 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-# Function to set up and run a Python test using 'python -m foo'
+include(CplusplusTest)
 
-function(add_python_test test_name module_to_run)
+unset(Boost_FOUND)
+get_filename_component(_TEST_NAME_TMP ${CMAKE_CURRENT_SOURCE_DIR} DIRECTORY)
+get_filename_component(_TEST_NAME_2 ${CMAKE_CURRENT_SOURCE_DIR} NAME)
+get_filename_component(_TEST_NAME_1 ${_TEST_NAME_TMP} NAME)
+message(STATUS "Looking for Boost components needed for C++ tests in ${_TEST_NAME_1}/${_TEST_NAME_2}")
+find_package(Boost CONFIG ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
+  COMPONENTS
+    ${BOOST_CORE_COMPONENTS_NEEDED}
+    ${BOOST_TEST_COMPONENTS}
+  )
 
-IF(CMAKE_BUILD_TYPE MATCHES Coverage)
-  add_test(
-    NAME ${test_name}
-    COMMAND coverage run ${CMAKE_CURRENT_LIST_DIR}/${module_to_run} ${ARGN}
-    )
-ELSE(CMAKE_BUILD_TYPE MATCHES Coverage)
-  add_test(
-    NAME ${test_name}
-    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/${module_to_run} ${ARGN}
-    )
-ENDIF(CMAKE_BUILD_TYPE MATCHES Coverage)
+include_directories(
+  ${Tracktable_INCLUDE_DIRS}
+#  ${Tracktable_BINARY_DIR}
+  ${Boost_INCLUDE_DIR}
+)
 
+add_cpp_test(
+  NAME C_BasePoint_Terrestrial
+  SOURCE test_base_point_terrestrial.cpp
+  LIBRARIES TracktableDomain
+)
 
-if (MINGW OR MSVC)
-  string( REPLACE ";" "\\;" ESCAPED_SYSTEM_PATH "$ENV{PATH}" )
-  string( REPLACE ";" "\\;" ESCAPED_PYTHONPATH "$ENV{PYTHONPATH}" )
+add_cpp_test(
+  NAME C_Domain_Terrestrial
+  SOURCE test_domain_terrestrial.cpp
+  LIBRARIES TracktableDomain
+)
 
-  set_tests_properties(
-    ${test_name}
-    PROPERTIES
-    ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/src/Python/\\;${ESCAPED_PYTHONPATH};PATH=${Tracktable_BINARY_DIR}\\bin\\;${ESCAPED_SYSTEM_PATH}"
-	)
-else (MINGW OR MSVC)
-  # Trust the compiler to set RPATH so that the libraries in bin/ are
-  # accessible.
-  set_tests_properties(
-    ${test_name}
-    PROPERTIES
-    ENVIRONMENT
-	  "PYTHONPATH=${Tracktable_SOURCE_DIR}/src/Python:${Tracktable_BINARY_DIR}/lib:$ENV{PYTHONPATH}"
-	)
-endif (MINGW OR MSVC)
+add_cpp_test(
+  NAME C_FeatureVectorToString
+  SOURCE test_feature_vector_to_string.cpp
+  LIBRARIES TracktableDomain
+)
 
-endfunction(add_python_test)
+add_cpp_test(
+  NAME C_Trajectory_Terrestrial
+  SOURCE test_trajectory_terrestrial.cpp
+  LIBRARIES TracktableDomain
+)
 
+add_cpp_test(
+  NAME C_TrajectoryPoint_Terrestrial
+  SOURCE test_trajectory_point_terrestrial.cpp
+  LIBRARIES TracktableDomain
+)
+
+add_cpp_test(
+  NAME C_TrajectoryPoint_Terrestrial_ECEF
+  SOURCE test_trajectory_point_terrestrial_ECEF.cpp
+  LIBRARIES TracktableDomain
+)

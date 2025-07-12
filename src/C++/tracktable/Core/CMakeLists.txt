@@ -216,9 +216,9 @@ generate_export_header( TracktableCore
 
 target_link_libraries(TracktableCore ${Boost_LIBRARIES} Threads::Threads)
 
-if (BUILD_TESTING)
-  add_subdirectory(Tests)
-endif (BUILD_TESTING)
+#if (BUILD_TESTING)
+#  add_subdirectory(Tests)
+#endif (BUILD_TESTING)
 
 install(
   FILES ${Core_HEADERS}
