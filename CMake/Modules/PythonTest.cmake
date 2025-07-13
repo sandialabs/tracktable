@@ -32,15 +32,26 @@
 
 function(add_python_test test_name module_to_run)
 
+# If the user didn't pass in an absolute pathname for the module
+# to run, add the current directory onto the front.
+
+cmake_path(IS_ABSOLUTE module_to_run _module_filename_is_absolute)
+
+if (${_module_filename_is_absolute})
+  set(_qualified_module_name ${module_to_run})
+else ()
+  set(_qualified_module_name ${CMAKE_CURRENT_LIST_DIR}/${module_to_run})
+endif ()
+
 IF(CMAKE_BUILD_TYPE MATCHES Coverage)
   add_test(
     NAME ${test_name}
-    COMMAND coverage run ${CMAKE_CURRENT_LIST_DIR}/${module_to_run} ${ARGN}
+    COMMAND coverage run ${_qualified_module_name} ${ARGN}
     )
 ELSE(CMAKE_BUILD_TYPE MATCHES Coverage)
   add_test(
     NAME ${test_name}
-    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/${module_to_run} ${ARGN}
+    COMMAND ${Python3_EXECUTABLE} ${_qualified_module_name} ${ARGN}
     )
 ENDIF(CMAKE_BUILD_TYPE MATCHES Coverage)
 
