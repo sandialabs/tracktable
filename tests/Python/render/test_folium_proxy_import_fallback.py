@@ -32,7 +32,7 @@
 
 import sys
 
-from tracktable.render.backends import folium_proxy
+from tracktable.render import folium_proxy
 
 
 # ----------------------------------------------------------------------

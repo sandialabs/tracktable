@@ -47,7 +47,7 @@ import numpy
 import tracktable.domain.terrestrial as domain
 from tracktable.core.geomath import distance, length, point_at_length_fraction
 from tracktable.render.map_decoration import coloring
-from tracktable.render.backends import folium_proxy
+from tracktable.render import folium_proxy
 
 fol = folium_proxy.import_folium()
 

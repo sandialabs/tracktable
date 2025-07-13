@@ -33,7 +33,7 @@ when the proxy is disabled"""
 
 import sys
 
-from tracktable.render.backends import folium_proxy
+from tracktable.render import folium_proxy
 
 def test_folium_proxy_import_disabled() -> int:
     """Try to use sys as offlinefolium.  Yes, this is absurd."""

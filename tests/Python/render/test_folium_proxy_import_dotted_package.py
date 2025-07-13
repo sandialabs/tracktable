@@ -33,7 +33,7 @@
 import sys
 import types
 
-from tracktable.render.backends import folium_proxy
+from tracktable.render import folium_proxy
 
 def _module_has_member(module: types.ModuleType, member: str) -> bool:
     """Does a module contain some member?
