@@ -35,7 +35,7 @@ regular Cartesian space or on a (world) map.  The 'maps' module
 provides a friendly way to get a map of various parts of the world.
 """
 
-from tracktable.render.backends.folium_proxy import (
+from tracktable.render.folium_proxy import (
     folium_proxy_name,
     folium_proxy_enabled,
     set_folium_proxy_name,
