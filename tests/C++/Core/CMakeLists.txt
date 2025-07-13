@@ -40,9 +40,6 @@ find_package(Boost CONFIG ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
     ${BOOST_TEST_COMPONENTS}
   )
 
-message("DEBUG: Tracktable_BINARY_DIR: ${Tracktable_BINARY_DIR}")
-message("DEBUG: CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
-
 include_directories(
   ${Tracktable_INCLUDE_DIRS}
   ${Tracktable_BINARY_DIR}
