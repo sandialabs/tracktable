@@ -1,2 +1,0 @@
-#!/bin/sh
-docker run -it -v "`pwd`/../../../..":/root/tracktable cee-gitlab.sandia.gov:4567/trajectory/tracktable/ubuntu:FocalFossa

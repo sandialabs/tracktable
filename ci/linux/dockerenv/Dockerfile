@@ -1,3 +1,9 @@
+#
+# Dockerfile for Linux CI image
+#
+# See tracktable/ci/linux/README.md for details.
+#
+
 # We'll start from a preconfigured debian based miniconda image.
 ARG CI_REGISTRY
 FROM ${CI_REGISTRY}/innersource/docker/miniconda:debian
@@ -18,7 +24,6 @@ RUN echo "conda activate tracktable-linux-ci" >> /root/.bashrc
 # intermediate work that doesn't need to hang around. This will make our
 # gitlab-ci docker image a bit smaller.
 
-ADD build-tracktable-ubuntu2004.sh /root/bin/build-tracktable-ubuntu2004.sh
 RUN echo "PATH=\"/root/bin:\${PATH}\"" >> /root/.bashrc
 RUN rm -rf /tmp/* /var/tmp/*
 
