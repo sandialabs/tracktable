@@ -313,7 +313,7 @@ protected:
      */
     value_type const* operator->() const
       {
-        return this->InnerBegin.operator->();
+        return this->InnerIterator.operator->();
       }
 
     /** Advance the iterator to the next position in the sequence.

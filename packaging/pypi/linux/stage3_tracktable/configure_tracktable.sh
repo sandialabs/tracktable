@@ -7,7 +7,7 @@ PYTHON_IMPLEMENTATION=$1
 PYTHON_HOME=/opt/python/${PYTHON_IMPLEMENTATION}
 MANYLINUX_TAG=$2
 
-# This should exist: we put the symlink into place if needed back in 
+# This should exist: we put the symlink into place if needed back in
 # Stage 1 when we built Boost.
 PYTHON_INCLUDE_DIR_NAME=$(${PYTHON_HOME}/bin/python -c 'from __future__ import print_function; import sys; print("python{}.{}".format(sys.version_info.major, sys.version_info.minor))')
 PYTHON_INCLUDE_DIR=${PYTHON_HOME}/include/${PYTHON_INCLUDE_DIR_NAME}
@@ -23,7 +23,13 @@ if [ ! -d ${PYTHON_INCLUDE_DIR} ]; then
 fi
 
 # We need Jupyter as part of the build
-${PYTHON_HOME}/bin/pip install --trusted-host pypi.python.org --trusted-host pypi.org --trusted-host files.pythonhosted.org jupyter
+${PYTHON_HOME}/bin/pip install \
+    --trusted-host pypi.python.org \
+    --trusted-host pypi.org \
+    --trusted-host files.pythonhosted.org \
+    --prefer-binary \
+    jupyter
+
 export PATH="${PYTHON_HOME}/bin:${PATH}"
 
 echo "INFO: Configuring Tracktable for CPython version ${PYTHON_IMPLEMENTATION}."
