@@ -11,6 +11,28 @@ Entries are ordered newest-to-oldest based on merge date.  Contact
 tracktable-questions at sandia dot gov if you have questions about
 any given one.
 
+### TRACKTABLE 1.7.3
+
+- 363: Update render_trajectories test ground truth
+- 362: Fix timestamped GeoJSON plugin and remove other Folium import
+- 360: Update template for release checklist
+- 358: BUG: Include visuals for tutorial notebooks in RTD documentation
+- 357: BUG: Fix type error with Matplotlib colors
+- 356: Merge copy_notebooks build fix, ffmpeg fix back into main
+- 355: BUG: render_movie should not raise exception if ffmpeg not installed
+- 354: BUG: Command line tests are building with BUILD_TESTING off
+- 353: BUG: Windows CI wheel-building must refer to winlocate
+- 352: BUG: copy_notebooks.py needs full path for destination
+- 351: Fix more dangling paths
+- 350: BUG: matplotlib.cmap.register_cmap is deprecated
+- 349: BUG: Linux packaging needs to use local Pip mirror
+- 348: FEATURE: Improve Python version detection when building wheels
+- 347: CLEANUP: _copy_notebooks uses Python tempdir
+- 346: BUG: Fix paths for wheel building
+- 345: Use single Doxygen config file in docs build
+- 344: Reorganize source code into src/
+- 342: Install Git LFS during Read the Docs build
+
 ### TRACKTABLE 1.7.2
 
 - 339: Prefer offline Folium packages when available
@@ -51,7 +73,7 @@ any given one.
 
 ### TRACKTABLE 1.7.1
 
-- 313: Resolve "Migrate wheel-building process away from invoking setup.py" 
+- 313: Resolve "Migrate wheel-building process away from invoking setup.py"
 - 315: Resolve "Fix unary_function warnings"
 - 314: Resolve "Fix compile error in catch2.hpp"
 - 311: Resolve "Add Python 3.11 to Linux packaging"
