@@ -1,8 +1,6 @@
-#
-# Copyright (c) 2014-2023 National Technology and Engineering
-# Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
-# with National Technology and Engineering Solutions of Sandia, LLC,
-# the U.S. Government retains certain rights in this software.
+# Copyright (c) 2014-2025, National Technology & Engineering Solutions of
+#   Sandia, LLC (NTESS).
+# All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -28,27 +26,11 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Tracktable Trajectory Library - Render module
+# This is tracktable/tests/Python/rw/CMakeLists.txt
 
-This module contains code to render points or trajectories either in
-regular Cartesian space or on a (world) map.  The 'maps' module
-provides a friendly way to get a map of various parts of the world.
-"""
+include(PythonTest)
 
-from tracktable.render.folium_proxy import (
-    folium_proxy_name,
-    folium_proxy_enabled,
-    set_folium_proxy_name,
-    set_folium_proxy_enabled
-)
-
-# This will cause all of our named colormaps to be registered
-# with Matplotlib
-from tracktable.render.map_decoration import colormaps
-
-__all__ = [
-    "folium_proxy_name",
-    "folium_proxy_enabled",
-    "set_folium_proxy_name",
-    "set_folium_proxy_enabled"
-]
+add_python_test(P_TrajLoad test_load.py ${Tracktable_DATA_DIR}/internal_test_data/Points/SampleFlightsUS.csv ${Tracktable_DATA_DIR}/internal_test_data/Points/tab_separated/SampleFlightsUS.tsv ${Tracktable_DATA_DIR}/internal_test_data/Trajectories/NYHarbor_2020_06_30_first_hour.traj)
+add_python_test(P_TrajToFromDictionary test_read_write_dictionary.py)
+add_python_test(P_TrajToFromJson test_read_write_json.py)
+add_python_test(P_ReadUTF8 test_utf8_load.py ${Tracktable_DATA_DIR}/internal_test_data/Points/ads_with_utf8.csv)

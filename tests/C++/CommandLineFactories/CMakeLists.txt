@@ -24,37 +24,36 @@
 # OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+include(CplusplusTest)
 
-# So far this is a header-only library.  The lack of any library files being
-# built is not an error.
+# CMAKE BUG: #231
+unset(Boost_FOUND)
+find_package(
+  Boost CONFIG ${BOOST_MINIMUM_VERSION_REQUIRED} REQUIRED
+  COMPONENTS ${BOOST_CORE_COMPONENTS_NEEDED} ${BOOST_EXAMPLE_COMPONENTS} program_options)
 
-include_directories(
-  ${Tracktable_SOURCE_DIR}
-  ${Tracktable_INCLUDE_DIRS}
-  ${CMAKE_CURRENT_BINARY_DIR}
-  ${PROJECT_BINARY_DIR}
-  ${Boost_INCLUDE_DIR}
+include_directories(${Tracktable_INCLUDE_DIRS} ${Tracktable_BINARY_DIR} BEFORE)
+
+include_directories(${Boost_INCLUDE_DIR} AFTER)
+
+link_directories(${Boost_LIBRARY_DIRS})
+
+add_cpp_test(
+  NAME C_FactoryTest
+  TARGET factory_test
+  SOURCES FactoryTestMain.cpp AssemblerFromCommandLine_TEST.cpp CombinedCommandLine_TEST.cpp
+          PointReaderFromCommandLine_TEST.cpp
+  LIBRARIES TracktableDomain TracktableCore ${Boost_LIBRARIES}
+  WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
 )
 
-set( DataGenerators_HEADERS
-  PointGenerator.h
-)
+# # Factories
+# add_executable(
+#   FactoryTest FactoryTestMain.cpp AssemblerFromCommandLine_TEST.cpp CombinedCommandLine_TEST.cpp
+#               PointReaderFromCommandLine_TEST.cpp)
+# target_link_libraries(FactoryTest ${Boost_LIBRARIES} TracktableCore TracktableDomain)
+# add_test(
+#   NAME C_FactoryTest
+#   COMMAND FactoryTest
+#   WORKING_DIRECTORY ${PROJECT_BINARY_DIR})
 
-# This adds this folder to Visual Studio on Windows so that files
-# are visible without creating a build command.
-add_custom_target( TracktableDataGenerators
-    SOURCES
-    ${DataGenerators_HEADERS}
-    )
-
-# And this puts those files in their own folder in Visual Studio.
-source_group( "Header Files"
-    ${DataGenerators_HEADERS}
-    )
-
-# This adds the files in DataGenerators_HEADERS to the list of files
-# that will be copied during 'make install'.
-install(
-  FILES ${DataGenerators_HEADERS}
-  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${TRACKTABLE_INCLUDEDIR}/DataGenerators
-)

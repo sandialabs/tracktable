@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2023 National Technology and Engineering
+# Copyright (c) 2014-2025 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -125,9 +125,6 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 else ()
   set(PYTHON_EXTENSION_LIBRARIES ${Boost_LIBRARIES})
 endif()
-
-
-message("DEBUG: Boost_LIBRARIES: ${Boost_LIBRARIES}")
 
 #message(STATUS "Boost_LIBRARIES ${Boost_LIBRARIES}")
 #message(STATUS "PYTHON_EXTENSION_LIBRARIES ${PYTHON_EXTENSION_LIBRARIES}")
@@ -476,7 +473,6 @@ if (UNIX)
 #  DEPENDS install
     )
 else (UNIX)
-  message(STATUS "DEBUG: Boost_LIBRARY_DIRS is ${Boost_LIBRARY_DIRS}")
   add_custom_target( wheel
     COMMAND
     ${CMAKE_COMMAND} -P ${Tracktable_SOURCE_DIR}/CMake/Modules/BuildWheel.cmake

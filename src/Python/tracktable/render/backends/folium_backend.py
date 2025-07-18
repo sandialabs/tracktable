@@ -42,7 +42,7 @@ from tracktable.info import airports, borders, ports, rivers, shorelines
 from tracktable.render.map_decoration import coloring
 from tracktable.render.map_processing import common_processing
 
-from tracktable.render.backends import folium_proxy
+from tracktable.render import folium_proxy
 
 fol = folium_proxy.import_folium()
 fol_heat_map = folium_proxy.import_folium("plugins.heat_map")

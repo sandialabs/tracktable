@@ -103,10 +103,6 @@ if (APPLE)
     set(CMAKE_INSTALL_LIBDIR lib)
 endif ()
 
-if (BUILD_TESTING)
-  add_subdirectory(Tests)
-endif (BUILD_TESTING)
-
 install(
   TARGETS TracktableAnalysis
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

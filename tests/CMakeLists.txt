@@ -1,8 +1,8 @@
-#
-# Copyright (c) 2014-2023 National Technology and Engineering
+# Copyright (c) 2014-2025 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
+
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -28,27 +28,9 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""Tracktable Trajectory Library - Render module
+# This is tracktable/tests/CMakeLists.txt.
 
-This module contains code to render points or trajectories either in
-regular Cartesian space or on a (world) map.  The 'maps' module
-provides a friendly way to get a map of various parts of the world.
-"""
+add_subdirectory(C++)
+add_subdirectory(Python)
 
-from tracktable.render.folium_proxy import (
-    folium_proxy_name,
-    folium_proxy_enabled,
-    set_folium_proxy_name,
-    set_folium_proxy_enabled
-)
 
-# This will cause all of our named colormaps to be registered
-# with Matplotlib
-from tracktable.render.map_decoration import colormaps
-
-__all__ = [
-    "folium_proxy_name",
-    "folium_proxy_enabled",
-    "set_folium_proxy_name",
-    "set_folium_proxy_enabled"
-]

@@ -42,9 +42,14 @@ import matplotlib
 import matplotlib.colors
 import matplotlib.pyplot
 import numpy
+
+
 import tracktable.domain.terrestrial as domain
 from tracktable.core.geomath import distance, length, point_at_length_fraction
 from tracktable.render.map_decoration import coloring
+from tracktable.render import folium_proxy
+
+fol = folium_proxy.import_folium()
 
 logger = logging.getLogger(__name__)
 
@@ -97,11 +102,11 @@ def common_processing(trajectories, obj_ids, line_color, color_map, gradient_hue
 
     # translate strings into colormaps
     if type(color_map) is str and color_map != '':
-        color_map = matplotlib.cm.get_cmap(color_map)
+        color_map = matplotlib.colormaps.get_cmap(color_map)
     elif type(color_map) is list:
         for i, cm in enumerate(color_map):
             if type(cm) is str:
-                color_map[i] = matplotlib.cm.get_cmap(cm)
+                color_map[i] = matplotlib.colormaps.get_cmap(cm)
 
     # TODO make this into a function called 3 times
     # Handle too few colors
@@ -238,9 +243,9 @@ def in_notebook():
     """Returns True if run within a Jupyter notebook, and false otherwise
     """
     try:
-        from IPython import get_ipython
+        from IPython.core.getipython import get_ipython
         ip = get_ipython()
-        if ip == None:
+        if ip is None:
             return False
         if 'IPKernelApp' not in ip.config:
             return False
