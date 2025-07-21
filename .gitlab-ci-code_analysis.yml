@@ -5,7 +5,7 @@
 # Note: We use a Ubuntu docker container to run our code analysis stages
 
 variables:
-  UBUNTU_2004_DOCKER_IMAGE: $CI_REGISTRY/trajectory/tracktable/ubuntu/20.04:latest
+  DOCKER_IMAGE: $LINUX_CI_DOCKER_IMAGE
 
 .linux-before: &linux-before
   - . /opt/conda/etc/profile.d/conda.sh
@@ -23,10 +23,10 @@ variables:
 
 # Type Checkers
 mypy:
-  image: $UBUNTU_2004_DOCKER_IMAGE
+  image: $DOCKER_IMAGE
   stage: code analysis
   tags:
-    - linux
+    - do.medium
   before_script:
     - *linux-before
   allow_failure: true
@@ -63,10 +63,10 @@ mypy:
 
 # Python Static Code Analysis
 pylint:
-  image: $UBUNTU_2004_DOCKER_IMAGE
+  image: $DOCKER_IMAGE
   stage: code analysis
   tags:
-    - linux
+    - do.medium
   before_script:
     - *linux-before
   allow_failure: true
@@ -105,7 +105,7 @@ snl-analysis-tool:
       - tracktable/snl_analysis
 
 cppcheck:
-  image: $UBUNTU_2004_DOCKER_IMAGE
+  image: $DOCKER_IMAGE
   stage: code analysis
   tags:
     - linux
@@ -132,12 +132,12 @@ cppcheck:
 # Code Coverage #
 #################
 coverage-setup:
-  image: $UBUNTU_2004_DOCKER_IMAGE
+  image: $DOCKER_IMAGE
   stage: code analysis
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
   tags:
-    - linux
+    - do.medium
   before_script:
     - *linux-before
   script:
@@ -148,12 +148,12 @@ coverage-setup:
     expire_in: 2 hours
 
 coverage-configure:
-  image: $UBUNTU_2004_DOCKER_IMAGE
+  image: $DOCKER_IMAGE
   stage: code analysis
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
   tags:
-    - linux
+    - do.medium
   before_script:
     - *linux-before
   dependencies:
@@ -170,12 +170,12 @@ coverage-configure:
     expire_in: 1 hours
 
 coverage-build-cpp:
-  image: $UBUNTU_2004_DOCKER_IMAGE
+  image: $DOCKER_IMAGE
   stage: code analysis
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
   tags:
-    - linux
+    - do.medium
   before_script:
     - *linux-before
   dependencies:
@@ -197,12 +197,12 @@ coverage-build-cpp:
     expire_in: 1 week
 
 coverage-build-python:
-  image: $UBUNTU_2004_DOCKER_IMAGE
+  image: $DOCKER_IMAGE
   stage: code analysis
   rules:
     - if: $CI_COMMIT_BRANCH == "develop" || $DO_COVERAGE == "true"
   tags:
-    - linux
+    - do.medium
   before_script:
     - *linux-before
   dependencies:

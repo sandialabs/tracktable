@@ -8,8 +8,7 @@ coverage-setup:
     variables:
       - $DO_COVERAGE == "true"
   tags:
-    - ubuntu
-    - docker
+    - do.medium
   script:
     - mkdir build_coverage
   artifacts:
@@ -24,8 +23,7 @@ coverage-configure:
     variables:
       - $DO_COVERAGE == "true"
   tags:
-    - ubuntu
-    - docker
+    - do.medium
   dependencies:
     - coverage-setup
   script:
@@ -45,8 +43,7 @@ coverage-build:
     variables:
       - $DO_COVERAGE == "true"
   tags:
-    - ubuntu
-    - docker
+    - do.medium
   dependencies:
     - coverage-configure
   script:
