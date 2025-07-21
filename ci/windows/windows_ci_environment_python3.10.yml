@@ -1,5 +1,5 @@
-## Tracktable Windows Python 3.12 CI/CD Anaconda Environment
-name: tracktable-windows-ci-py312
+## Tracktable Windows Python 3.10 CI/CD Anaconda Environment
+name: tracktable-ci-python3.10
 channels:
   - conda-forge
 dependencies:
@@ -7,7 +7,7 @@ dependencies:
   - git
 
   # Python Dependencies
-  - python=3.12
+  - python==3.10
   - pip
   - numpy>=1.7
   - matplotlib>=3.0
@@ -28,6 +28,9 @@ dependencies:
   - libboost-python>=1.86
   - cmake>=3.19.5
   - ninja>=1.10.0
+
+  # Windows: find Visual Studio 2022 instead of 2019
+  - vs2022_win-64
 
   # Jupyter Dependencies
   - ipykernel

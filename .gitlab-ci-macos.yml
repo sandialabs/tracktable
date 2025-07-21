@@ -13,6 +13,7 @@ macos-setup:
   #     when: never
   script:
     - ./ci/macos/configure_anaconda_environment.sh
+    - ./ci/macos/check_conda_environment.sh
     - mkdir build_macos
   artifacts:
     paths:
