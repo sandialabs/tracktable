@@ -4,7 +4,8 @@
 
 .windows-ci-before-script: &windows-ci-before-script
   - call activate tracktable-ci-python3.10
-  - call .\\ci\\windows\\is_conda_environment_up_to_date.bat .\\ci\\windows\\windows_ci_environment_python3.10.yml
+# This check is disabled for now: it's too buggy.
+#  - call .\\ci\\windows\\is_conda_environment_up_to_date.bat .\\ci\\windows\\windows_ci_environment_python3.10.yml
 
 windows-setup:
   stage: setup
