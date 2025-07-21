@@ -7,7 +7,7 @@
 
 .linux-before: &linux-before
   - source /opt/conda/etc/profile.d/conda.sh
-  - echo "Before conda activate"
+  - ./ci/common/is_conda_environment_up_to_date.sh ./ci/linux/linux_ci_environment.yml
   - conda activate tracktable-linux-ci
 
 linux-setup:

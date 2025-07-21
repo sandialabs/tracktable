@@ -66,7 +66,7 @@ function activate_conda_environment () {
 
 function conda_environment_name () {
 	local __py_version="$1"
-    conda_environment_name_OUTPUT="tracktable-dev-python${__py_version}"
+    conda_environment_name_OUTPUT="tracktable-ci-python${__py_version}"
     return 0
 }
 
@@ -138,7 +138,7 @@ function create_conda_environment () {
 
 
 	conda env create \
-	    -f ${TRACKTABLE_HOME}/conda_dev_environments/macos/tracktable_dev_python${__python_version}.yml
+	    -f ${TRACKTABLE_HOME}/ci/macos/macos_ci_environment_python${__python_version}.yml
 
 		# --name ${__envname} \
 		# --yes \

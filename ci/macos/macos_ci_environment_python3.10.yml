@@ -1,5 +1,5 @@
 # Tracktable MacOS Python 3.10 CI/CD Anaconda Environment
-name: tracktable-macos-ci-py310
+name: tracktable-ci-python3.10
 channels:
   - conda-forge
 dependencies:

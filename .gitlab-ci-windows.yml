@@ -3,11 +3,8 @@
 #############################
 
 .windows-ci-before-script: &windows-ci-before-script
-  # - call activate tracktable-windows-ci-py36
-  # - call activate tracktable-windows-ci-py37
-  # - call activate tracktable-windows-ci-py38
-  # - call activate tracktable-windows-ci-py39
-  - call activate tracktable-windows-ci-py310
+  - call activate tracktable-ci-python3.10
+  - call .\\ci\\windows\\is_conda_environment_up_to_date.bat .\\ci\\windows\\windows_ci_environment_python3.10.yml
 
 windows-setup:
   stage: setup
