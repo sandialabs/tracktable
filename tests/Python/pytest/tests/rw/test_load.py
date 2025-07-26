@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2023 National Technology and Engineering
+# Copyright (c) 2014-2025 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -29,36 +29,53 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import logging
+import os.path
 import sys
+
+import pytest
+
 from tracktable.rw.load import load_trajectories
 
 logger = logging.getLogger(__name__)
 
-def test_loader_csv(file):
-    logger.info("Testing CSV Loader")
-    trajectory_points = load_trajectories(file, return_trajectory_points=True)
+def test_load_trajectory_points_csv(ground_truth_path: str):
+    filename = os.path.join(ground_truth_path, "Points", "SampleFlightsUS.csv")
+    trajectory_points = load_trajectories(filename, return_trajectory_points=True)
     assert len(trajectory_points) > 0
-    trajectories = load_trajectories(file)
+
+def test_load_trajectories_points_csv(ground_truth_path: str):
+    filename = os.path.join(ground_truth_path, "Points", "SampleFlightsUS.csv")
+    trajectories = load_trajectories(filename)
     assert len(trajectories) > 0
 
-def test_loader_tsv(file):
-    logger.info("Testing TSV Loader")
-    trajectory_points = load_trajectories(file, return_trajectory_points=True)
+def test_load_trajectory_points_tsv(ground_truth_path: str):
+    filename = os.path.join(
+        ground_truth_path,
+        "Points", "tab_separated", "SampleFlightsUS.tsv"
+        )
+    trajectory_points = load_trajectories(filename, return_trajectory_points=True)
     assert len(trajectory_points) > 0
-    trajectories = load_trajectories(file)
+
+def test_load_trajectories_tsv(ground_truth_path: str):
+    filename = os.path.join(
+        ground_truth_path,
+        "Points", "tab_separated", "SampleFlightsUS.tsv"
+        )
+    trajectories = load_trajectories(filename)
     assert len(trajectories) > 0
 
-def test_loader_traj(file):
-    logger.info("Testing Traj Loader")
-    trajectory_points = load_trajectories(file, return_trajectory_points=True)
+def test_load_trajectory_points_traj(ground_truth_path: str):
+    filename = os.path.join(
+        ground_truth_path,
+        "Trajectories", "NYHarbor_2020_06_30_first_hour.traj"
+        )
+    trajectory_points = load_trajectories(filename, return_trajectory_points=True)
     assert len(trajectory_points) > 0
-    trajectories = load_trajectories(file)
+
+def test_load_trajectories_traj(ground_truth_path: str):
+    filename = os.path.join(
+        ground_truth_path,
+        "Trajectories", "NYHarbor_2020_06_30_first_hour.traj"
+        )
+    trajectories = load_trajectories(filename)
     assert len(trajectories) > 0
-
-def main():
-    test_loader_csv(sys.argv[1])
-    test_loader_tsv(sys.argv[2])
-    test_loader_traj(sys.argv[3])
-
-if __name__ == '__main__':
-    sys.exit(main())

@@ -171,6 +171,7 @@ set(Tracktable_PYTHON_DIR ${Tracktable_SOURCE_DIR}/src/Python/tracktable)
 # This is a trivial module whose purpose is to make sure we can
 # build barebones C modules for Python. It contains a single function
 # called hello_world() that returns 'Hello World!'.
+
 add_library(_c_python MODULE
   CPythonModule.c
 )
@@ -275,6 +276,7 @@ target_link_libraries(_terrestrial PUBLIC
 install_python_extension(_terrestrial lib ${Tracktable_PYTHON_DIR})
 
 
+
 add_library(_logging MODULE
   LoggingModule.cpp
   )
@@ -286,7 +288,7 @@ target_link_libraries(_logging PUBLIC
   )
 
 install_python_extension(_logging lib ${Tracktable_PYTHON_DIR})
-install_python_extension(_terrestrial lib ${Tracktable_PYTHON_DIR})
+
 
 add_library(_cartesian2d MODULE
   Cartesian2DDomainModule.cpp
@@ -395,6 +397,80 @@ target_link_libraries(_rtree PUBLIC
   )
 
 install_python_extension(_rtree lib ${Tracktable_PYTHON_DIR})
+
+###
+###
+### PyTest test case configuration
+###
+### This has to happen after we have defined the targets for the
+### compiled libraries because we don't want to even run test
+### discovery until the targets have been built and copied into
+### the source tree.  PyTest imports test cases as part of test
+### discovery and that will fail if the extensions aren't there.
+###
+
+# We need the DLLs in src/Python/tracktable/lib on Windows
+if (MSVC)
+  # Wildcards aren't supported in 'cmake -E copy' so we have to
+  # get the filenames ourselves
+  add_custom_target(
+    _dlls_in_python_source
+    COMMAND
+      cmake -E copy $<TARGET_FILE:TracktableCore> $<TARGET_FILE:TracktableAnalysis> $<TARGET_FILE:TracktableDomain> $<TARGET_FILE:TracktableRW> ${Tracktable_SOURCE_DIR}/src/Python/tracktable/lib
+    COMMENT
+      "Copying C++ DLLs to tracktable/lib"
+    )
+  set(_extra_targets _dlls_in_python_source)
+else (MSVC)
+  set(_extra_targets)
+endif (MSVC)
+
+# These targets get defined in install_python_extension()
+set(COMPILED_EXTENSION_TARGETS_IN_SOURCE_TREE
+    _boost_libs_in_source_tree
+    _c_python_in_source_tree
+    _tracktable_hello_in_source_tree
+    _core_types_in_source_tree
+    _domain_algorithm_overloads_in_source_tree
+    _distance_geometry_in_source_tree
+    _terrestrial_in_source_tree
+    _cartesian2d_in_source_tree
+    _cartesian3d_in_source_tree
+    _logging_in_source_tree
+    _feature_vector_points_in_source_tree
+    _rtree_in_source_tree
+    _dbscan_clustering_in_source_tree
+    ${_extra_targets}
+)
+
+
+if (BUILD_TESTING)
+  find_package (Pytest REQUIRED)
+
+  # This target will always be out of date, thus forcing a
+  # rerun of pytest_discover_tests to pick up whatever test
+  # cases we may have added since the last build.
+  add_custom_target(always_rebuild_tests
+    COMMENT
+      "Forcing PyTest discovery to run anew"
+    )
+
+  pytest_discover_tests(
+    PythonTest
+    LIBRARY_PATH_PREPEND
+      ${CMAKE_BINARY_DIR}/bin
+    PYTHON_PATH_PREPEND
+      ${Tracktable_SOURCE_DIR}/src/Python
+
+    DEPENDS
+      ${COMPILED_EXTENSION_TARGETS_IN_SOURCE_TREE}
+      always_rebuild_tests
+    WORKING_DIRECTORY
+      # Run from the root directory so we can get the configuration
+      # options in pytest.ini and see the source code
+      ${Tracktable_SOURCE_DIR}
+  )
+endif (BUILD_TESTING)
 
 get_filename_component(
   Python3_EXECUTABLE_DIRECTORY
