@@ -436,13 +436,23 @@ if (TRACKTABLE_PYTHON AND NOT BUILD_SHARED_LIBS)
   message("Python wrapping requires shared libraries.  Please turn on BUILD_SHARED_LIBS.")
 endif ()
 
+# -----------------------------------------------------------------------
+#
+# Test configuration
+#
+# -----------------------------------------------------------------------
 
 if (BUILD_TESTING)
   if (NOT EXISTS "${Tracktable_BINARY_DIR}/TestOutput")
      file(MAKE_DIRECTORY "${Tracktable_BINARY_DIR}/TestOutput")
   endif()
   option(TEST_MOVIES "Include tests of movie-making.  These take a few minutes each." OFF)
+
+  # Pick up the C++ and legacy Python tests
   add_subdirectory(tests)
+
+  # PyTest tests will be configured in src/C++/PythonWrapping/CMakeLists.txt
+  # because they need to depend on the compiled targets defined there.
 endif (BUILD_TESTING)
 
 message(STATUS "Project source directory: ${PROJECT_SOURCE_DIR}")

@@ -41,20 +41,43 @@ function(install_python_extension targetname dirname basedirname)
 
    set_target_properties( ${targetname}
      PROPERTIES
-	 OUTPUT_NAME "${targetname}"
-	 PREFIX ""
-	 SUFFIX "${PYTHON_EXTENSION_SUFFIX}"
+	     OUTPUT_NAME "${targetname}"
+	     PREFIX ""
+	     SUFFIX "${PYTHON_EXTENSION_SUFFIX}"
    )
 
    install(
      TARGETS ${targetname}
-	 DESTINATION ${CMAKE_INSTALL_PREFIX}/Python/tracktable/${dirname}
-	 RENAME "${targetname}.${PYTHON_EXTENSION_SUFFIX}"
+	   DESTINATION ${CMAKE_INSTALL_PREFIX}/Python/tracktable/${dirname}
+	   RENAME "${targetname}.${PYTHON_EXTENSION_SUFFIX}"
 	)
 
-   add_custom_command( TARGET ${targetname}
-     POST_BUILD
-     COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${targetname}> ${basedirname}/${dirname}/$<TARGET_FILE_NAME:${targetname}>
-     )
+  # Copy the built library into the source tree so that we can pick it
+  # up with Python's import statement.  Doing this with add_custom_target
+  # allows us to make other targets run after this step.
+
+  # We use get_target_property() here because generator expressions are
+  # apparently not available in the BYPRODUCTS clause of add_custom_target().
+  # This has to do with when in the whole generation process each bit gets
+  # evaluated.
+  get_target_property(_target_basename ${targetname} OUTPUT_NAME)
+  set(_in_source_destination ${basedirname}/${dirname}/${_target_basename}${PYTHON_EXTENSION_SUFFIX})
+
+  add_custom_target(
+    ${targetname}_in_source_tree
+    DEPENDS
+      ${targetname}
+    COMMAND
+      ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${targetname}> ${_in_source_destination}
+    BYPRODUCTS
+      ${_in_source_destination}
+    COMMENT
+      "Copying ${targetname} into Python source tree"
+  )
+
+  #  add_custom_command( TARGET ${targetname}
+  #    POST_BUILD
+  #    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${targetname}> ${basedirname}/${dirname}/$<TARGET_FILE_NAME:${targetname}>
+  #    )
 
 endfunction(install_python_extension)

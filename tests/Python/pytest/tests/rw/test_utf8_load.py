@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2014-2023 National Technology and Engineering
+# Copyright (c) 2014-2025 National Technology and Engineering
 # Solutions of Sandia, LLC. Under the terms of Contract DE-NA0003525
 # with National Technology and Engineering Solutions of Sandia, LLC,
 # the U.S. Government retains certain rights in this software.
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 #
-# This test case exercises the trajectory point loader on data 
+# This test case exercises the trajectory point loader on data
 # containing non-ASCII characters.  Depending on how a file is
 # opened in Python ("r" for text or "rb" for binary), read() will
 # return either `str` or `bytes` objects.  The len() method on `bytes`
@@ -40,53 +40,62 @@
 #
 # This is problematic when we come to the point of reading data
 # into a buffer in C++ because we need to know exactly how many bytes
-# we're getting.  Our solution is in 
-# tracktable/PythonWrapping/PythonFileLikeObjectStreams.h.  
+# we're getting.  Our solution is in
+# tracktable/PythonWrapping/PythonFileLikeObjectStreams.h.
 #
 
 
 
 import logging
+import os.path
 import sys
+
+import pytest
 
 from tracktable.domain import terrestrial
 
-logger = logging.getLogger(__name__)
+#from tracktable_fixtures import ground_truth_path
 
-def points_from_file(infile):
-    reader = terrestrial.TrajectoryPointReader(infile)
-    reader.comment_character = '#'  
-    reader.field_delimiter = ','    
+from typing import List
+
+@pytest.fixture
+def utf8_point_filename(ground_truth_path) -> str:
+    return os.path.join(
+        ground_truth_path,
+        "Points",
+        "ads_with_utf8.csv"
+    )
+
+def points_from_file(instream) -> List[terrestrial.TrajectoryPoint]:
+
+    reader = terrestrial.TrajectoryPointReader(instream)
+    reader.comment_character = '#'
+    reader.field_delimiter = ','
     reader.quote_character = '"'
 
-    reader.object_id_column = 0         
-    reader.coordinates[0] = 2           # longitude 
+    reader.object_id_column = 0
+    reader.coordinates[0] = 2           # longitude
     reader.coordinates[1] = 3           # latitude
-    reader.timestamp_column = 1        
-    reader.set_real_field_column('altitude', 6) 
-    reader.set_real_field_column('heading', 5) 
+    reader.timestamp_column = 1
+    reader.set_real_field_column('altitude', 6)
+    reader.set_real_field_column('heading', 5)
     reader.set_real_field_column('utf8_text', 18)
 
     return list(reader)
-    
-    
-    
-def test_loader_csv_bytes(filename):
-    logger.info("Testing CSV loader with bytes object")
-    with open(filename, "rb") as infile:
+
+
+def test_loader_csv_bytes(utf8_point_filename: str):
+    with open(utf8_point_filename, "rb") as infile:
         points = points_from_file(infile)
-        
+        assert len(points) > 0
 
-def test_loader_csv_string(filename):
-    logger.info("Testing CSV loader with str to force len() mismatch")
-    with open(filename, "r", encoding="utf8") as infile:
+
+def test_loader_csv_string(utf8_point_filename: str):
+    with open(utf8_point_filename, "r", encoding="utf8") as infile:
         points = points_from_file(infile)
+        assert len(points) > 0
 
 
-def main():
-    test_loader_csv_bytes(sys.argv[1])
-    test_loader_csv_string(sys.argv[1])
-    
 
 if __name__ == '__main__':
     sys.exit(main())

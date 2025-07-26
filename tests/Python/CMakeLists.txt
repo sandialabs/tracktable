@@ -33,10 +33,8 @@
 add_subdirectory(algorithms)
 add_subdirectory(applications)
 add_subdirectory(core)
-add_subdirectory(data_generators)
 add_subdirectory(domain)
 add_subdirectory(examples)
 add_subdirectory(info)
 add_subdirectory(render)
-add_subdirectory(rw)
 
