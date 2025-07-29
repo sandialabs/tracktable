@@ -104,8 +104,10 @@ def copy_notebook_directory(source: str, dest: str):
                             os.path.join(dest, thing.name),
                             dirs_exist_ok=True)
         elif thing.name.endswith('.ipynb'):
+            print(f"DEBUG: Processing notebook {thing.name}")
             copy_and_clean_notebook(os.path.join(source, thing.name), dest)
         else:
+            print(f"DEBUG: Copying notebook {thing.name} as-is")
             shutil.copy(os.path.join(source, thing.name), dest)
 
 # --------------------------------------------------------------------
@@ -120,7 +122,9 @@ def main():
     )
 
     # Commands differ based on the version of nbconvert installed
+    print("DEBUG: Checking nbconvert version.")
     nbconvert_version_full = subprocess.check_output(['jupyter', 'nbconvert', '--version'])
+    print(f"Full version string: {nbconvert_version_full}")
     NBCONVERT_VERSION = int(nbconvert_version_full.decode().strip()[0])
 
     tutorial_src_path = os.path.join(tracktable_docs, 'tutorial_notebooks')

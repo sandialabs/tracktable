@@ -1,0 +1,13 @@
+
+# Linux-specific components for Conda environments
+
+channels:
+  - conda-forge
+
+dependencies:
+  - compilers
+
+  # Wheel building - this packages our external libraries
+  - auditwheel
+
+

@@ -1,0 +1,70 @@
+# Platform- and Python-version-independent components of
+# Conda development/CI environments for Tracktable
+#
+# Note: By 'platform-independent' we mean 'we use this package
+# in our builds for all platforms' rather than 'this package
+# has no platform-dependent components'.
+
+channels:
+  - conda-forge
+
+dependencies:
+  # Python components available through conda-forge
+  - cartopy
+  - conda-merge
+  - folium
+  - lazy_import
+  - matplotlib
+  - numpy
+  - pandas
+  - pip
+  - pytest
+  - pytz
+  - scipy
+  - shapely
+  - tqdm
+
+  # C++ dependencies
+  # Compilers will be added in platform-dependent YML files
+  - cmake
+  - libboost-devel>=1.86
+  - libboost-headers>=1.86
+  - libboost-python>=1.86
+  - libboost-python-devel>=1.86
+  - ninja
+
+  # Jupyter
+  - ipykernel
+  - jupyter
+  - nbconvert
+
+  # Movie rendering
+  - ffmpeg
+
+  # Code coverage
+  - coverage
+  - lcov
+
+  # Documentation
+  - breathe
+  - doxygen
+  - graphviz
+  - nbsphinx
+  - pandoc
+  - sphinx
+  - sphinx_rtd_theme
+
+  # Packaging
+  - python-build
+  - twine
+  - wheel
+  - unzip
+
+  # Stuff we have to install via pip
+  - pip:
+    - nbsphinx-link>=1.3.1
+    - pytest-cmake
+
+
+
+

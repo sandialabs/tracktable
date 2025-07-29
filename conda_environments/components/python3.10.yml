@@ -1,0 +1,4 @@
+name: tracktable-dev-python3.10
+
+dependencies:
+  - python=3.10
