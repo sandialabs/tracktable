@@ -1,0 +1,9 @@
+
+# Windows-specific components for Conda environments
+
+channels:
+  - conda-forge
+
+dependencies:
+  - vs2022_win-64
+

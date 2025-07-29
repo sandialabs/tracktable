@@ -1,0 +1,4 @@
+name: tracktable-dev-python3.9
+
+dependencies:
+  - python=3.9
