@@ -29,9 +29,9 @@ linux-setup:
       - build_linux
     expire_in: 1 hour
 
-linux-configure:
+linux-build-and-test:
   image: $LINUX_CI_DOCKER_IMAGE
-  stage: configure
+  stage: build-and-test
   tags:
     - do.medium
   dependencies:
@@ -44,26 +44,8 @@ linux-configure:
   script:
     - cd build_linux
     - cmake -GNinja -DBUILD_DOCUMENTATION=OFF ..
-  artifacts:
-    paths:
-      - build_linux
-    expire_in: 1 hour
-
-linux-build:
-  image: $LINUX_CI_DOCKER_IMAGE
-  stage: build
-  tags:
-    - do.medium
-  dependencies:
-    - linux-configure
-  needs:
-    - job: linux-configure
-      artifacts: true
-  before_script:
-    - *linux-before
-  script:
-    - cd build_linux
     - ninja
+    - ctest --output-on-failure --exclude-regex 'C_GREAT_CIRCLE_FIT|C_MemoryUse|C_PointGenerator|P_TerrestrialHeatmapExample|P_TerrestrialTrajectoryMapExample|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe|P_Render_Trajectories'
     - |-
       if [[ $CI_PIPELINE_SOURCE == "schedule" && $NIGHTLY == "true" ]]; then
         cmake -GNinja -DBUILD_DOCUMENTATION=ON .. && ninja doc
@@ -73,23 +55,6 @@ linux-build:
       - build_linux
     expire_in: 1 week
 
-linux-test:
-  image: $LINUX_CI_DOCKER_IMAGE
-  stage: test
-  tags:
-    - do.medium
-  dependencies:
-    - linux-build
-  needs:
-    - job: linux-build
-      artifacts: true
-  before_script:
-    - *linux-before
-  script:
-    # Do we actually need this copy statement?
-    - cp build_linux/lib/_*.so src/Python/tracktable/lib/
-    - cd build_linux
-    - ctest --output-on-failure --exclude-regex 'C_GREAT_CIRCLE_FIT|C_MemoryUse|C_PointGenerator|P_TerrestrialHeatmapExample|P_TerrestrialTrajectoryMapExample|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe|P_Render_Trajectories'
   artifacts:
     paths:
       - build_linux

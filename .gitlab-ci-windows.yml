@@ -26,8 +26,8 @@ windows-setup:
     expire_in: 1 hour
   retry: 1
 
-windows-configure:
-  stage: configure
+windows-build-and-test:
+  stage: build-and-test
   tags:
     - windows
   dependencies:
@@ -43,51 +43,12 @@ windows-configure:
     - set BOOST_INCLUDEDIR=
     - cd build_windows
     - cmake -DBUILD_DOCUMENTATION=OFF ..
-  artifacts:
-    paths:
-      - build_windows
-    expire_in: 1 hour
-  retry: 1
-
-windows-build:
-  stage: build
-  tags:
-    - windows
-  dependencies:
-    - windows-configure
-  needs:
-    - job: windows-configure
-      artifacts: true
-  before_script:
-    - *windows-ci-before-script
-  script:
-    - cd build_windows
     - cmake --build . --config Release --target ALL_BUILD -j 10
-  artifacts:
-    paths:
-      - build_windows
-    expire_in: 1 hour
-  retry: 1
-
-windows-test:
-  stage: test
-  tags:
-    - windows
-  dependencies:
-    - windows-build
-  needs:
-    - job: windows-build
-      artifacts: true
-  before_script:
-    - *windows-ci-before-script
-  script:
-    - xcopy build_windows\lib\*.pyd src\Python\tracktable\lib
-    - cd build_windows
     - ctest -j4 -C Release -T test --output-on-failure --exclude-regex "P_Render_Trajectories|P_Mapmaker_CONUS|P_Mapmaker_Custom_Bounding_Box_Object|P_Mapmaker_Custom_Bounding_Box_Floats|P_Mapmaker_Europe"
   artifacts:
     paths:
       - build_windows
-    expire_in: 1 hour
+    expire_in: 1 week
   retry: 1
 
 ##########################################

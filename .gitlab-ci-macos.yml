@@ -21,8 +21,8 @@ macos-setup:
       - build_macos
     expire_in: 1 day
 
-macos-configure:
-  stage: configure
+macos-build-and-test:
+  stage: build-and-test
   tags:
     - macos
     - anaconda
@@ -33,45 +33,13 @@ macos-configure:
       artifacts: true
   script:
     - ./ci/macos/configure_cmake_build.sh
-  artifacts:
-    paths:
-      - build_macos
-    expire_in: 1 day
-
-macos-build:
-  stage: build
-  tags:
-    - macos
-    - anaconda
-  dependencies:
-    - macos-configure
-  needs:
-    - job: macos-configure
-      artifacts: true
-  script:
     - ./ci/macos/run_build.sh
-  artifacts:
-    paths:
-      - build_macos
-    expire_in: 1 day
-
-macos-test:
-  stage: test
-  tags:
-    - macos
-    - anaconda
-  dependencies:
-    - macos-build
-  needs:
-    - job: macos-build
-      artifacts: true
-  script:
-    - cp ./build_macos/lib/*.so ./src/Python/tracktable/lib
     - ./ci/macos/run_test.sh
   artifacts:
     paths:
       - build_macos
-    expire_in: 1 day
+    expire_in: 1 week
+
 
 ########################################
 # Build And Deploy MacOS PYPI Packages #
@@ -84,7 +52,7 @@ macos-deploy:
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
   timeout: 2 hours
-  needs: ["macos-test"]
+  needs: ["macos-build-and-test"]
   script:
     - cd packaging/pypi/macos
     - mkdir wheel_build && cd wheel_build
