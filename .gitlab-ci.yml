@@ -1,9 +1,7 @@
 stages:
   - code analysis
   - setup
-  - configure
-  - build
-  - test
+  - build-and-test
   - deploy
 
 variables:
