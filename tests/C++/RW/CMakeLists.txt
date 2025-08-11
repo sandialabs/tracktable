@@ -124,7 +124,7 @@ add_cpp_test(
   NAME C_SkipCommentsReader
   SOURCE test_comment_reader.cpp
   LIBRARIES TracktableCore
-  COMMAND test_comment_reader 15 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv
+  COMMAND test_comment_reader 16 ${Tracktable_DATA_DIR}/internal_test_data/Points/PointsWithComments.csv
 )
 
 add_cpp_test(

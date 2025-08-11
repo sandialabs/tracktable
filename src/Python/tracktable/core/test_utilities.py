@@ -40,6 +40,8 @@ import logging
 import numpy as np
 import re
 
+from typing import Any
+
 try:
     import PIL
     from PIL import Image
@@ -427,3 +429,115 @@ def compare_html_to_ground_truth(filename,
     else:
         return NO_ERROR
 
+def properties_equal(thing1, thing2) -> bool:
+    """Check to make sure the properties on two objects are equivalent
+
+    Compare the property maps in two objects to ensure that they have
+    the same keys and the same values.
+
+    Arguments:
+        thing1: Trajectory or TrajectoryPoint
+        thing2: Trajectory or TrajectoryPoint
+
+    Returns:
+        True or false (equal or not)
+    """
+
+    keys1 = set(thing1.properties.keys())
+    keys2 = set(thing2.properties.keys())
+
+    if keys1 != keys2:
+        return False
+
+    for (name, value1) in thing1.properties.items():
+        value2 = thing2.properties[name]
+        if value1 != value2:
+            return False
+
+    return True
+
+
+def coordinates_equal(point1, point2) -> bool:
+    """Check whether two points have the same coordinates
+
+    Checks number and values of coordinates.
+
+    Arguments:
+        point1 (BasePoint or TrajectoryPoint): First point to check
+        point2 (BasePoint or TrajectoryPoint): Second point to check
+
+    Returns:
+        True if coordinates are equal, False otherwise
+    """
+
+    if len(point1) != len(point2):
+        return False
+
+    for i in range(len(point1)):
+        if point1[i] != point2[i]:
+            return False
+
+    return True
+
+
+
+
+def points_equal(point1, point2) -> bool:
+    """Compare two points for equality
+
+    For BasePoint, just check coordinates.
+
+    For TrajectoryPoint, check type, coordinates, object ID,
+    timestamp, and properties.
+
+    Arguments:
+        point1 (BasePoint or TrajectoryPoint): First point to check
+        point2 (BasePoint or TrajectoryPoint): Second point to check
+
+    Returns:
+        True if points are equal, False otherwise
+    """
+
+    if not coordinates_equal(point1, point2):
+        return False
+
+    if hasattr(point1, "object_id"):
+        if type(point1) is not type(point2):
+            return False
+        if point1.object_id != point2.object_id:
+            return False
+        if point1.timestamp != point2.timestamp:
+            return False
+        if not properties_equal(point1, point2):
+            return False
+
+    return True
+
+def trajectories_equal(trajectory1, trajectory2) -> bool:
+    """Compare two trajectories for equality
+
+    Checks type, properties, and points.
+
+    Arguments:
+        trajectory1 (Tracktable trajectory): First trajectory to compare
+        trajectory2 (Tracktable trajectory): Second trajectory to compare
+
+    Returns:
+        True if equivalent, False otherwise
+    """
+
+    if type(trajectory1) is not type(trajectory2):
+        return False
+
+    if len(trajectory1) != len(trajectory2):
+        return False
+
+    if not properties_equal(trajectory1, trajectory2):
+        return False
+
+    for (i, points) in enumerate(zip(trajectory1, trajectory2)):
+        (point1, point2) = points
+        if not points_equal(point1, point2):
+            return False
+
+    return True
